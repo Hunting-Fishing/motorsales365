@@ -234,6 +234,11 @@ function QrAnalyticsPage() {
                       <td className="px-4 py-2 text-right">{r.leads}</td>
                       <td className="px-4 py-2 text-right">
                         <Button asChild variant="ghost" size="sm">
+                          <Link to="/admin/advertisements/analytics/$code" params={{ code: r.code }}>
+                            Drilldown
+                          </Link>
+                        </Button>
+                        <Button asChild variant="ghost" size="sm">
                           <Link to="/r/$code" params={{ code: r.code }} target="_blank">
                             <ExternalLink className="h-3 w-3" />
                           </Link>

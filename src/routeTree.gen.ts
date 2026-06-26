@@ -233,6 +233,7 @@ import { Route as ApiPublicHooksDiscoverSyncRouteImport } from './routes/api/pub
 import { Route as ApiPublicHooksAnnualBonusesRouteImport } from './routes/api/public/hooks/annual-bonuses'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 import { Route as ApiPublicFlashcardsContentRouteImport } from './routes/api/public/flashcards.content'
+import { Route as AdminAdvertisementsAnalyticsCodeRouteImport } from './routes/admin.advertisements.analytics.$code'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
@@ -1403,6 +1404,12 @@ const ApiPublicFlashcardsContentRoute =
     path: '/api/public/flashcards/content',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminAdvertisementsAnalyticsCodeRoute =
+  AdminAdvertisementsAnalyticsCodeRouteImport.update({
+    id: '/$code',
+    path: '/$code',
+    getParentRoute: () => AdminAdvertisementsAnalyticsRoute,
+  } as any)
 const ApiPublicTrainingPartnersIdClickRoute =
   ApiPublicTrainingPartnersIdClickRouteImport.update({
     id: '/api/public/training-partners/$id/click',
@@ -1570,7 +1577,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
-  '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRoute
+  '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
@@ -1602,6 +1609,7 @@ export interface FileRoutesByFullPath {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
+  '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
@@ -1791,7 +1799,7 @@ export interface FileRoutesByTo {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
-  '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRoute
+  '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
@@ -1822,6 +1830,7 @@ export interface FileRoutesByTo {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
+  '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
@@ -2018,7 +2027,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/_authenticated/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/_authenticated/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
-  '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRoute
+  '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
@@ -2050,6 +2059,7 @@ export interface FileRoutesById {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
+  '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
@@ -2278,6 +2288,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/dashboard/team/'
+    | '/admin/advertisements/analytics/$code'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/annual-bonuses'
@@ -2498,6 +2509,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements'
     | '/dashboard/team'
+    | '/admin/advertisements/analytics/$code'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/annual-bonuses'
@@ -2725,6 +2737,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/dashboard/team/'
+    | '/admin/advertisements/analytics/$code'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/annual-bonuses'
@@ -4449,6 +4462,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFlashcardsContentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/advertisements/analytics/$code': {
+      id: '/admin/advertisements/analytics/$code'
+      path: '/$code'
+      fullPath: '/admin/advertisements/analytics/$code'
+      preLoaderRoute: typeof AdminAdvertisementsAnalyticsCodeRouteImport
+      parentRoute: typeof AdminAdvertisementsAnalyticsRoute
+    }
     '/api/public/training-partners/$id/click': {
       id: '/api/public/training-partners/$id/click'
       path: '/api/public/training-partners/$id/click'
@@ -4485,8 +4505,23 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AdminAdvertisementsAnalyticsRouteChildren {
+  AdminAdvertisementsAnalyticsCodeRoute: typeof AdminAdvertisementsAnalyticsCodeRoute
+}
+
+const AdminAdvertisementsAnalyticsRouteChildren: AdminAdvertisementsAnalyticsRouteChildren =
+  {
+    AdminAdvertisementsAnalyticsCodeRoute:
+      AdminAdvertisementsAnalyticsCodeRoute,
+  }
+
+const AdminAdvertisementsAnalyticsRouteWithChildren =
+  AdminAdvertisementsAnalyticsRoute._addFileChildren(
+    AdminAdvertisementsAnalyticsRouteChildren,
+  )
+
 interface AdminAdvertisementsRouteChildren {
-  AdminAdvertisementsAnalyticsRoute: typeof AdminAdvertisementsAnalyticsRoute
+  AdminAdvertisementsAnalyticsRoute: typeof AdminAdvertisementsAnalyticsRouteWithChildren
   AdminAdvertisementsApprovalsRoute: typeof AdminAdvertisementsApprovalsRoute
   AdminAdvertisementsCampaignsRoute: typeof AdminAdvertisementsCampaignsRoute
   AdminAdvertisementsHistoryRoute: typeof AdminAdvertisementsHistoryRoute
@@ -4500,7 +4535,8 @@ interface AdminAdvertisementsRouteChildren {
 }
 
 const AdminAdvertisementsRouteChildren: AdminAdvertisementsRouteChildren = {
-  AdminAdvertisementsAnalyticsRoute: AdminAdvertisementsAnalyticsRoute,
+  AdminAdvertisementsAnalyticsRoute:
+    AdminAdvertisementsAnalyticsRouteWithChildren,
   AdminAdvertisementsApprovalsRoute: AdminAdvertisementsApprovalsRoute,
   AdminAdvertisementsCampaignsRoute: AdminAdvertisementsCampaignsRoute,
   AdminAdvertisementsHistoryRoute: AdminAdvertisementsHistoryRoute,
