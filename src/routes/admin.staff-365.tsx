@@ -21,6 +21,7 @@ import { listStaff365, setStaff365Disabled } from "@/lib/admin-staff-list.functi
 import { generateStaffMagicLink } from "@/lib/admin-magic-link.functions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmailRoutingPanel } from "@/components/admin/email-routing-panel";
+import { StaffQrDialog } from "@/components/admin/staff-qr-dialog";
 
 const SUPER_ADMIN_EMAIL = "jordilwbailey@gmail.com";
 const STAFF_DOMAIN = "@365motorsales.com";
