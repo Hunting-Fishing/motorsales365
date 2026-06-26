@@ -140,7 +140,7 @@ export function SiteHeader() {
             </span>
           )}
 
-          <nav className="hidden items-center gap-0.5 2xl:flex">
+          <nav className="hidden items-center gap-0.5 min-[1700px]:flex">
             {NAV.map((n) => (
               <Link
                 key={n.category}
@@ -225,7 +225,7 @@ export function SiteHeader() {
             </Link>
             <Link
               to="/export"
-              className="hidden rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground 2xl:inline-flex"
+              className="hidden rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1700px]:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Export
@@ -233,7 +233,7 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           {/* Help icon — desktop */}
           <Button
             asChild
