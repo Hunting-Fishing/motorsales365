@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Inbox, Megaphone, Ticket, QrCode, History, Settings2, ImageIcon, Eye, ShieldCheck } from "lucide-react";
+import { Inbox, Megaphone, Ticket, QrCode, History, Settings2, ImageIcon, Eye, ShieldCheck, BarChart3 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,7 @@ type Tab = {
     | "/admin/advertisements/campaigns"
     | "/admin/advertisements/promotions"
     | "/admin/advertisements/qr-ads"
+    | "/admin/advertisements/analytics"
     | "/admin/advertisements/history"
     | "/admin/advertisements/slots"
     | "/admin/advertisements/placeholders"
@@ -57,6 +58,13 @@ const TABS: Tab[] = [
     label: "QR Advertisements",
     desc: "Your personal QR on printable templates.",
     Icon: QrCode,
+    roles: ["admin", "advertising", "sales"],
+  },
+  {
+    to: "/admin/advertisements/analytics",
+    label: "QR Analytics",
+    desc: "Scans, signups and redemptions from your QR codes.",
+    Icon: BarChart3,
     roles: ["admin", "advertising", "sales"],
   },
   {
