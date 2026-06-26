@@ -7,6 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+
+type DrillStage = "scans" | "signups" | "listings";
+type DrillTarget = { day: string; stage: DrillStage } | null;
 
 export const Route = createFileRoute("/admin/advertisements/analytics/$code")({
   component: QrCodeDrilldownPage,
@@ -40,6 +44,7 @@ function dayKey(iso: string): string {
 function QrCodeDrilldownPage() {
   const { code } = Route.useParams();
   const [range, setRange] = useState<RangeId>("30");
+  const [drill, setDrill] = useState<DrillTarget>(null);
   const since = useMemo(() => rangeSince(range), [range]);
 
   const ownerQ = useQuery({
@@ -255,12 +260,19 @@ function QrCodeDrilldownPage() {
                   {byDay.map((d) => {
                     const su = d.scans > 0 ? (d.signups / d.scans) * 100 : 0;
                     const ul = d.signups > 0 ? (d.listings / d.signups) * 100 : 0;
+                    const cellBtn = "rounded px-1.5 py-0.5 tabular-nums hover:bg-muted disabled:cursor-default disabled:hover:bg-transparent disabled:text-muted-foreground";
                     return (
                       <tr key={d.day} className="border-t">
                         <td className="px-4 py-2 font-mono text-xs">{d.day}</td>
-                        <td className="px-4 py-2 text-right tabular-nums">{d.scans}</td>
-                        <td className="px-4 py-2 text-right tabular-nums">{d.signups}</td>
-                        <td className="px-4 py-2 text-right tabular-nums">{d.listings}</td>
+                        <td className="px-4 py-2 text-right">
+                          <button type="button" className={cellBtn} disabled={d.scans === 0} onClick={() => setDrill({ day: d.day, stage: "scans" })}>{d.scans}</button>
+                        </td>
+                        <td className="px-4 py-2 text-right">
+                          <button type="button" className={cellBtn} disabled={d.signups === 0} onClick={() => setDrill({ day: d.day, stage: "signups" })}>{d.signups}</button>
+                        </td>
+                        <td className="px-4 py-2 text-right">
+                          <button type="button" className={cellBtn} disabled={d.listings === 0} onClick={() => setDrill({ day: d.day, stage: "listings" })}>{d.listings}</button>
+                        </td>
                         <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">
                           {d.scans > 0 ? `${su.toFixed(0)}%` : "—"}
                         </td>
@@ -269,20 +281,32 @@ function QrCodeDrilldownPage() {
                         </td>
                         <td className="px-4 py-2">
                           <div className="flex h-3 items-center gap-px overflow-hidden rounded bg-muted">
-                            <div
-                              className="h-full bg-primary/70"
+                            <button
+                              type="button"
+                              className="h-full bg-primary/70 hover:bg-primary disabled:cursor-default disabled:hover:bg-primary/70"
                               style={{ width: `${(d.scans / maxBar) * 100}%` }}
-                              aria-label={`${d.scans} scans`}
+                              aria-label={`${d.scans} scans on ${d.day}`}
+                              title={`${d.scans} scans`}
+                              disabled={d.scans === 0}
+                              onClick={() => setDrill({ day: d.day, stage: "scans" })}
                             />
-                            <div
-                              className="h-full bg-emerald-500/80"
+                            <button
+                              type="button"
+                              className="h-full bg-emerald-500/80 hover:bg-emerald-500 disabled:cursor-default disabled:hover:bg-emerald-500/80"
                               style={{ width: `${(d.signups / maxBar) * 100}%` }}
-                              aria-label={`${d.signups} signups`}
+                              aria-label={`${d.signups} signups on ${d.day}`}
+                              title={`${d.signups} signups`}
+                              disabled={d.signups === 0}
+                              onClick={() => setDrill({ day: d.day, stage: "signups" })}
                             />
-                            <div
-                              className="h-full bg-amber-500/80"
+                            <button
+                              type="button"
+                              className="h-full bg-amber-500/80 hover:bg-amber-500 disabled:cursor-default disabled:hover:bg-amber-500/80"
                               style={{ width: `${(d.listings / maxBar) * 100}%` }}
-                              aria-label={`${d.listings} activated listings`}
+                              aria-label={`${d.listings} activated listings on ${d.day}`}
+                              title={`${d.listings} listings`}
+                              disabled={d.listings === 0}
+                              onClick={() => setDrill({ day: d.day, stage: "listings" })}
                             />
                           </div>
                         </td>
@@ -382,7 +406,142 @@ function QrCodeDrilldownPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={!!drill} onOpenChange={(o) => !o && setDrill(null)}>
+        <DialogContent className="max-w-3xl">
+          {drill && (
+            <DrillDialogBody
+              drill={drill}
+              scans={scansQ.data ?? []}
+              signups={signupsQ.data ?? []}
+              listings={listingsQ.data ?? []}
+              profiles={profilesQ.data}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+function DrillDialogBody({
+  drill,
+  scans,
+  signups,
+  listings,
+  profiles,
+}: {
+  drill: { day: string; stage: DrillStage };
+  scans: Array<{ id: string; scanned_at: string; device_type: string | null; browser: string | null; country: string | null; visitor_id: string | null }>;
+  signups: Array<{ id: string; user_id: string; signup_date: string; first_referral_code: string | null; last_referral_code: string | null }>;
+  listings: Array<{ id: string; user_id: string; published_at: string | null; status: string | null }>;
+  profiles: Map<string, { full_name: string | null; phone: string | null }> | undefined;
+}) {
+  const stageLabel: Record<DrillStage, string> = {
+    scans: "Scans",
+    signups: "Credited signups",
+    listings: "Activated listings",
+  };
+  const rowsScans = drill.stage === "scans" ? scans.filter((s) => dayKey(s.scanned_at) === drill.day) : [];
+  const rowsSignups = drill.stage === "signups" ? signups.filter((s) => dayKey(s.signup_date) === drill.day) : [];
+  const rowsListings = drill.stage === "listings"
+    ? listings.filter((l) => l.published_at && dayKey(l.published_at) === drill.day)
+    : [];
+  const count = drill.stage === "scans" ? rowsScans.length : drill.stage === "signups" ? rowsSignups.length : rowsListings.length;
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle>{stageLabel[drill.stage]} — {drill.day}</DialogTitle>
+        <DialogDescription>{count} record{count === 1 ? "" : "s"} on this day.</DialogDescription>
+      </DialogHeader>
+      <div className="max-h-[60vh] overflow-auto">
+        {drill.stage === "scans" && (
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-muted/50 text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">When</th>
+                <th className="px-3 py-2 text-left">Device</th>
+                <th className="px-3 py-2 text-left">Browser</th>
+                <th className="px-3 py-2 text-left">Country</th>
+                <th className="px-3 py-2 text-left">Visitor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rowsScans.map((s) => (
+                <tr key={s.id} className="border-t">
+                  <td className="px-3 py-2 whitespace-nowrap">{new Date(s.scanned_at).toLocaleTimeString()}</td>
+                  <td className="px-3 py-2">{s.device_type ?? "—"}</td>
+                  <td className="px-3 py-2">{s.browser ?? "—"}</td>
+                  <td className="px-3 py-2">{s.country ?? "—"}</td>
+                  <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">{s.visitor_id?.slice(0, 8) ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {drill.stage === "signups" && (
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-muted/50 text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">When</th>
+                <th className="px-3 py-2 text-left">Name</th>
+                <th className="px-3 py-2 text-left">Phone</th>
+                <th className="px-3 py-2 text-left">User ID</th>
+                <th className="px-3 py-2 text-left">First touch</th>
+                <th className="px-3 py-2 text-left">Last touch</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rowsSignups.map((r) => {
+                const p = profiles?.get(r.user_id);
+                return (
+                  <tr key={r.id} className="border-t">
+                    <td className="px-3 py-2 whitespace-nowrap">{new Date(r.signup_date).toLocaleTimeString()}</td>
+                    <td className="px-3 py-2">{p?.full_name ?? "—"}</td>
+                    <td className="px-3 py-2">{p?.phone ?? "—"}</td>
+                    <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">{r.user_id?.slice(0, 8) ?? "—"}</td>
+                    <td className="px-3 py-2 font-mono text-xs">{r.first_referral_code ?? "—"}</td>
+                    <td className="px-3 py-2 font-mono text-xs">{r.last_referral_code ?? "—"}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+        {drill.stage === "listings" && (
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-muted/50 text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">Published</th>
+                <th className="px-3 py-2 text-left">Listing ID</th>
+                <th className="px-3 py-2 text-left">Seller</th>
+                <th className="px-3 py-2 text-left">Status</th>
+                <th className="px-3 py-2 text-left">Open</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rowsListings.map((l) => {
+                const p = profiles?.get(l.user_id);
+                return (
+                  <tr key={l.id} className="border-t">
+                    <td className="px-3 py-2 whitespace-nowrap">{l.published_at ? new Date(l.published_at).toLocaleTimeString() : "—"}</td>
+                    <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">{l.id.slice(0, 8)}</td>
+                    <td className="px-3 py-2">{p?.full_name ?? l.user_id.slice(0, 8)}</td>
+                    <td className="px-3 py-2">{l.status ?? "—"}</td>
+                    <td className="px-3 py-2">
+                      <Link to="/listing/$id" params={{ id: l.id }} className="text-primary underline-offset-2 hover:underline">View</Link>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+        {count === 0 && (
+          <p className="px-3 py-6 text-sm text-muted-foreground">No records.</p>
+        )}
+      </div>
+    </>
   );
 }
 
