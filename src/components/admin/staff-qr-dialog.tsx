@@ -148,12 +148,37 @@ export function StaffQrDialog({ code, name, email, active }: Props) {
                 <Copy className="mr-1 h-4 w-4" /> Copy link
               </Button>
             )}
-            {status === "authorized" && dataUrl && (
-              <a href={dataUrl} download={`${code}-qr.png`}>
-                <Button variant="outline" size="sm">
-                  <Download className="mr-1 h-4 w-4" /> Download PNG
-                </Button>
-              </a>
+            {status === "authorized" && (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={downloading}
+                onClick={async () => {
+                  setDownloading(true);
+                  try {
+                    const res = await (downloadPng as any)({ data: { code } });
+                    // Trigger download from the server-issued PNG only after
+                    // the server re-confirms permission on this request.
+                    const a = document.createElement("a");
+                    a.href = res.dataUrl;
+                    a.download = res.filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                  } catch (e: any) {
+                    toast.error(e?.message ?? "Download not permitted");
+                  } finally {
+                    setDownloading(false);
+                  }
+                }}
+              >
+                {downloading ? (
+                  <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="mr-1 h-4 w-4" />
+                )}
+                Download PNG
+              </Button>
             )}
             {status === "authorized" && (
               <Link to="/r/$code/poster" params={{ code }} target="_blank">
