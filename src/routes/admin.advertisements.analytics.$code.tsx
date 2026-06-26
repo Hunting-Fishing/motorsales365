@@ -229,8 +229,10 @@ function QrCodeDrilldownPage() {
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Daily activity</CardTitle>
-          <CardDescription>Scans and credited signups per day in the selected range.</CardDescription>
+          <CardTitle className="text-base">Funnel timeline</CardTitle>
+          <CardDescription>
+            Scans → credited signups → activated listings per day, with stage-by-stage conversion.
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {byDay.length === 0 ? (
@@ -243,31 +245,50 @@ function QrCodeDrilldownPage() {
                     <th className="px-4 py-2 text-left">Date</th>
                     <th className="px-4 py-2 text-right">Scans</th>
                     <th className="px-4 py-2 text-right">Signups</th>
-                    <th className="px-4 py-2 text-left w-1/2">Volume</th>
+                    <th className="px-4 py-2 text-right">Listings</th>
+                    <th className="px-4 py-2 text-right" title="Signups ÷ Scans">S→U</th>
+                    <th className="px-4 py-2 text-right" title="Listings ÷ Signups">U→L</th>
+                    <th className="px-4 py-2 text-left w-2/5">Funnel</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {byDay.map((d) => (
-                    <tr key={d.day} className="border-t">
-                      <td className="px-4 py-2 font-mono text-xs">{d.day}</td>
-                      <td className="px-4 py-2 text-right tabular-nums">{d.scans}</td>
-                      <td className="px-4 py-2 text-right tabular-nums">{d.signups}</td>
-                      <td className="px-4 py-2">
-                        <div className="flex h-3 items-center gap-px overflow-hidden rounded bg-muted">
-                          <div
-                            className="h-full bg-primary/70"
-                            style={{ width: `${(d.scans / maxBar) * 100}%` }}
-                            aria-label={`${d.scans} scans`}
-                          />
-                          <div
-                            className="h-full bg-emerald-500/80"
-                            style={{ width: `${(d.signups / maxBar) * 100}%` }}
-                            aria-label={`${d.signups} signups`}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {byDay.map((d) => {
+                    const su = d.scans > 0 ? (d.signups / d.scans) * 100 : 0;
+                    const ul = d.signups > 0 ? (d.listings / d.signups) * 100 : 0;
+                    return (
+                      <tr key={d.day} className="border-t">
+                        <td className="px-4 py-2 font-mono text-xs">{d.day}</td>
+                        <td className="px-4 py-2 text-right tabular-nums">{d.scans}</td>
+                        <td className="px-4 py-2 text-right tabular-nums">{d.signups}</td>
+                        <td className="px-4 py-2 text-right tabular-nums">{d.listings}</td>
+                        <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">
+                          {d.scans > 0 ? `${su.toFixed(0)}%` : "—"}
+                        </td>
+                        <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">
+                          {d.signups > 0 ? `${ul.toFixed(0)}%` : "—"}
+                        </td>
+                        <td className="px-4 py-2">
+                          <div className="flex h-3 items-center gap-px overflow-hidden rounded bg-muted">
+                            <div
+                              className="h-full bg-primary/70"
+                              style={{ width: `${(d.scans / maxBar) * 100}%` }}
+                              aria-label={`${d.scans} scans`}
+                            />
+                            <div
+                              className="h-full bg-emerald-500/80"
+                              style={{ width: `${(d.signups / maxBar) * 100}%` }}
+                              aria-label={`${d.signups} signups`}
+                            />
+                            <div
+                              className="h-full bg-amber-500/80"
+                              style={{ width: `${(d.listings / maxBar) * 100}%` }}
+                              aria-label={`${d.listings} activated listings`}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
