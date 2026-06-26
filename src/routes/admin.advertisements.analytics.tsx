@@ -172,7 +172,7 @@ function QrAnalyticsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="__all">All QR codes</SelectItem>
-              {(myCodesQ.data ?? []).map((c) => (
+              {(myCodesQ.data ?? []).map((c: any) => (
                 <SelectItem key={c.referral_code} value={c.referral_code}>
                   {c.referral_code} — {c.full_name}
                 </SelectItem>
