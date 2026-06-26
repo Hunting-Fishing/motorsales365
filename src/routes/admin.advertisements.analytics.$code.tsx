@@ -44,6 +44,7 @@ function dayKey(iso: string): string {
 function QrCodeDrilldownPage() {
   const { code } = Route.useParams();
   const [range, setRange] = useState<RangeId>("30");
+  const [drill, setDrill] = useState<DrillTarget>(null);
   const since = useMemo(() => rangeSince(range), [range]);
 
   const ownerQ = useQuery({
