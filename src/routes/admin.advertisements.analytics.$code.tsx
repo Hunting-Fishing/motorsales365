@@ -354,7 +354,7 @@ function Stat({
 }: {
   icon: typeof QrCode;
   label: string;
-  value: number;
+  value: number | string;
   loading: boolean;
 }) {
   return (
@@ -366,9 +366,70 @@ function Stat({
         <div>
           <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
           <div className="text-2xl font-semibold tabular-nums">
-            {loading ? "—" : value.toLocaleString()}
+            {loading ? "—" : typeof value === "number" ? value.toLocaleString() : value}
           </div>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function BreakdownCard({
+  title,
+  rows,
+  loading,
+  emptyLabel,
+}: {
+  title: string;
+  rows: { key: string; scans: number; visitors: number; share: number }[];
+  loading: boolean;
+  emptyLabel: string;
+}) {
+  const top = rows.slice(0, 8);
+  const maxScans = Math.max(1, ...top.map((r) => r.scans));
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">{title}</CardTitle>
+        <CardDescription>Scans and unique visitors by segment.</CardDescription>
+      </CardHeader>
+      <CardContent className="p-0">
+        {loading ? (
+          <p className="px-6 py-8 text-sm text-muted-foreground">Loading…</p>
+        ) : top.length === 0 ? (
+          <p className="px-6 py-8 text-sm text-muted-foreground">{emptyLabel}</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="px-4 py-2 text-left">Segment</th>
+                <th className="px-4 py-2 text-right">Scans</th>
+                <th className="px-4 py-2 text-right">Visitors</th>
+                <th className="px-4 py-2 text-right">Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              {top.map((r) => (
+                <tr key={r.key} className="border-t">
+                  <td className="px-4 py-2">
+                    <div className="truncate">{r.key}</div>
+                    <div className="mt-1 h-1.5 w-full overflow-hidden rounded bg-muted">
+                      <div
+                        className="h-full bg-primary/70"
+                        style={{ width: `${(r.scans / maxScans) * 100}%` }}
+                      />
+                    </div>
+                  </td>
+                  <td className="px-4 py-2 text-right tabular-nums">{r.scans}</td>
+                  <td className="px-4 py-2 text-right tabular-nums">{r.visitors}</td>
+                  <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">
+                    {r.share.toFixed(0)}%
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </CardContent>
     </Card>
   );
