@@ -370,3 +370,98 @@ function Kpi({ icon, label, value }: { icon: React.ReactNode; label: string; val
     </div>
   );
 }
+
+function ReferralQrCard({
+  link,
+  fullName,
+  referralCode,
+  storedQrUrl,
+  posterUrl,
+}: {
+  link: string;
+  fullName: string;
+  referralCode: string;
+  storedQrUrl: string | null;
+  posterUrl: string;
+}) {
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = () => {
+    const canvas = canvasRef.current?.querySelector("canvas");
+    if (!canvas) return;
+    const url = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${referralCode}-qr.png`;
+    a.click();
+  };
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-4">
+      <Dialog>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="group relative block aspect-square w-full overflow-hidden rounded-md bg-white p-3 ring-1 ring-border transition hover:ring-primary"
+            aria-label="View QR full screen"
+          >
+            <div ref={canvasRef} className="flex h-full w-full items-center justify-center">
+              {link ? (
+                <QRCodeCanvas
+                  value={link}
+                  size={512}
+                  level="H"
+                  includeMargin={false}
+                  className="h-full w-full"
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : null}
+            </div>
+            <span className="pointer-events-none absolute right-2 top-2 rounded-md bg-black/60 p-1 text-white opacity-0 transition group-hover:opacity-100">
+              <Maximize2 className="h-3.5 w-3.5" />
+            </span>
+          </button>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl">
+          <div className="flex flex-col items-center gap-4 p-4">
+            <div className="rounded-lg bg-white p-6">
+              <QRCodeCanvas value={link} size={480} level="H" includeMargin />
+            </div>
+            <div className="text-center">
+              <div className="font-display text-xl font-bold">{fullName}</div>
+              <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
+              <div className="mt-1 break-all text-xs text-muted-foreground">{link}</div>
+            </div>
+            <Button onClick={handleDownload}>
+              <Download className="mr-2 h-4 w-4" /> Download PNG
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="mt-3 text-center">
+        <div className="font-display text-lg font-bold">{fullName}</div>
+        <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <Button variant="outline" size="sm" className="w-full" onClick={handleDownload}>
+          <Download className="mr-1 h-4 w-4" /> PNG
+        </Button>
+        <a href={posterUrl} target="_blank" rel="noreferrer">
+          <Button variant="outline" size="sm" className="w-full">
+            <Printer className="mr-1 h-4 w-4" /> Poster
+          </Button>
+        </a>
+      </div>
+      {storedQrUrl ? (
+        <a
+          href={storedQrUrl}
+          download={`${referralCode}-original.png`}
+          className="mt-2 block text-center text-xs text-muted-foreground underline-offset-2 hover:underline"
+        >
+          Download original (admin)
+        </a>
+      ) : null}
+    </div>
+  );
+}
