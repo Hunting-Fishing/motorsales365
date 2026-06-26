@@ -29,6 +29,8 @@ export function StaffQrDialog({ code, name, email, active }: Props) {
   const [status, setStatus] = useState<"idle" | "checking" | "authorized" | "denied">("idle");
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const authorize = useServerFn(authorizeStaffQrAccess);
+  const downloadPng = useServerFn(downloadStaffQrPng);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (!open) return;
