@@ -218,6 +218,14 @@ function Staff365Page() {
                 <Eye className="mr-1 h-4 w-4" />
                 Sign-in link
               </Button>
+              {u.referral_code && (
+                <StaffQrDialog
+                  code={u.referral_code}
+                  name={u.full_name}
+                  email={u.email}
+                  active={Boolean(u.referral_active)}
+                />
+              )}
               <EditProfileDialog user={u} onSaved={load} />
               <ResetPasswordDialog user={u} />
               <Button
