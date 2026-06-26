@@ -534,7 +534,7 @@ export function SiteHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="2xl:hidden h-9 w-9"
+                className="min-[1700px]:hidden h-9 w-9"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
