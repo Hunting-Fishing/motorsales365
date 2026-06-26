@@ -128,6 +128,31 @@ function QrCodeDrilldownPage() {
     uniqueVisitors: new Set((scansQ.data ?? []).map((s) => s.visitor_id).filter(Boolean)).size,
   };
 
+  const convRate = totals.uniqueVisitors > 0 ? (totals.signups / totals.uniqueVisitors) * 100 : 0;
+
+  type BreakdownRow = { key: string; scans: number; visitors: number; share: number };
+  const breakdowns = useMemo(() => {
+    function build(field: "device_type" | "browser" | "country"): BreakdownRow[] {
+      const m = new Map<string, { scans: number; visitors: Set<string> }>();
+      for (const s of scansQ.data ?? []) {
+        const key = ((s as never)[field] as string | null) || "Unknown";
+        const v = m.get(key) ?? { scans: 0, visitors: new Set<string>() };
+        v.scans += 1;
+        if (s.visitor_id) v.visitors.add(s.visitor_id);
+        m.set(key, v);
+      }
+      const total = totals.scans || 1;
+      return Array.from(m.entries())
+        .map(([key, v]) => ({ key, scans: v.scans, visitors: v.visitors.size, share: (v.scans / total) * 100 }))
+        .sort((a, b) => b.scans - a.scans);
+    }
+    return {
+      device: build("device_type"),
+      browser: build("browser"),
+      country: build("country"),
+    };
+  }, [scansQ.data, totals.scans]);
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
