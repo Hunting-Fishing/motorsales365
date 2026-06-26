@@ -1,14 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
 
-
+import { QRCodeCanvas } from "qrcode.react";
 import { Button } from "@/components/ui/button";
-import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
 
@@ -232,35 +233,13 @@ function StaffReferral() {
 
 
       <section className="grid gap-6 md:grid-cols-[260px_1fr]">
-        <div className="rounded-xl border border-border bg-card p-4">
-          {qrUrl ? (
-            <img
-              src={qrUrl}
-              alt={`QR for ${staff.full_name}`}
-              className="aspect-square w-full rounded-md bg-white object-contain p-2"
-            />
-          ) : (
-            <div className="aspect-square w-full rounded-md bg-muted" />
-          )}
-          <div className="mt-3 text-center">
-            <div className="font-display text-lg font-bold">{staff.full_name}</div>
-            <div className="font-mono text-xs text-muted-foreground">{staff.referral_code}</div>
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            {qrUrl && (
-              <a href={qrUrl} download={`${staff.referral_code}.png`}>
-                <Button variant="outline" size="sm" className="w-full">
-                  <Download className="mr-1 h-4 w-4" /> PNG
-                </Button>
-              </a>
-            )}
-            <a href={posterUrl} target="_blank" rel="noreferrer">
-              <Button variant="outline" size="sm" className="w-full">
-                <Printer className="mr-1 h-4 w-4" /> Poster
-              </Button>
-            </a>
-          </div>
-        </div>
+        <ReferralQrCard
+          link={link}
+          fullName={staff.full_name}
+          referralCode={staff.referral_code}
+          storedQrUrl={qrUrl}
+          posterUrl={posterUrl}
+        />
 
         <div className="space-y-4">
           <div className="rounded-xl border border-border bg-card p-4">
@@ -388,6 +367,101 @@ function Kpi({ icon, label, value }: { icon: React.ReactNode; label: string; val
         <span className="uppercase tracking-wider">{label}</span>
       </div>
       <div className="font-display mt-1 text-xl font-bold">{value}</div>
+    </div>
+  );
+}
+
+function ReferralQrCard({
+  link,
+  fullName,
+  referralCode,
+  storedQrUrl,
+  posterUrl,
+}: {
+  link: string;
+  fullName: string;
+  referralCode: string;
+  storedQrUrl: string | null;
+  posterUrl: string;
+}) {
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = () => {
+    const canvas = canvasRef.current?.querySelector("canvas");
+    if (!canvas) return;
+    const url = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${referralCode}-qr.png`;
+    a.click();
+  };
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-4">
+      <Dialog>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="group relative block aspect-square w-full overflow-hidden rounded-md bg-white p-3 ring-1 ring-border transition hover:ring-primary"
+            aria-label="View QR full screen"
+          >
+            <div ref={canvasRef} className="flex h-full w-full items-center justify-center">
+              {link ? (
+                <QRCodeCanvas
+                  value={link}
+                  size={512}
+                  level="H"
+                  includeMargin={false}
+                  className="h-full w-full"
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : null}
+            </div>
+            <span className="pointer-events-none absolute right-2 top-2 rounded-md bg-black/60 p-1 text-white opacity-0 transition group-hover:opacity-100">
+              <Maximize2 className="h-3.5 w-3.5" />
+            </span>
+          </button>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl">
+          <div className="flex flex-col items-center gap-4 p-4">
+            <div className="rounded-lg bg-white p-6">
+              <QRCodeCanvas value={link} size={480} level="H" includeMargin />
+            </div>
+            <div className="text-center">
+              <div className="font-display text-xl font-bold">{fullName}</div>
+              <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
+              <div className="mt-1 break-all text-xs text-muted-foreground">{link}</div>
+            </div>
+            <Button onClick={handleDownload}>
+              <Download className="mr-2 h-4 w-4" /> Download PNG
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="mt-3 text-center">
+        <div className="font-display text-lg font-bold">{fullName}</div>
+        <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <Button variant="outline" size="sm" className="w-full" onClick={handleDownload}>
+          <Download className="mr-1 h-4 w-4" /> PNG
+        </Button>
+        <a href={posterUrl} target="_blank" rel="noreferrer">
+          <Button variant="outline" size="sm" className="w-full">
+            <Printer className="mr-1 h-4 w-4" /> Poster
+          </Button>
+        </a>
+      </div>
+      {storedQrUrl ? (
+        <a
+          href={storedQrUrl}
+          download={`${referralCode}-original.png`}
+          className="mt-2 block text-center text-xs text-muted-foreground underline-offset-2 hover:underline"
+        >
+          Download original (admin)
+        </a>
+      ) : null}
     </div>
   );
 }
