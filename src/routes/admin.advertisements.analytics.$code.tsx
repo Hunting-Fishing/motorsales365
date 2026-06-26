@@ -220,6 +220,8 @@ function QrCodeDrilldownPage() {
           loading={scansQ.isLoading || signupsQ.isLoading || listingsQ.isLoading}
         />
       </div>
+
+      <div className="grid gap-3 lg:grid-cols-3">
         <BreakdownCard title="By device" rows={breakdowns.device} loading={scansQ.isLoading} emptyLabel="No device data." />
         <BreakdownCard title="By browser" rows={breakdowns.browser} loading={scansQ.isLoading} emptyLabel="No browser data." />
         <BreakdownCard title="By country" rows={breakdowns.country} loading={scansQ.isLoading} emptyLabel="No location data." />
