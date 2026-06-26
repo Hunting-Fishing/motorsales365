@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { authorizeStaffQrAccess } from "@/lib/staff-qr-auth.functions";
+import { authorizeStaffQrAccess, downloadStaffQrPng } from "@/lib/staff-qr-auth.functions";
 
 type Props = {
   code: string;
