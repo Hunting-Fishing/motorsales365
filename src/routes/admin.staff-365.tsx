@@ -21,6 +21,7 @@ import { listStaff365, setStaff365Disabled } from "@/lib/admin-staff-list.functi
 import { generateStaffMagicLink } from "@/lib/admin-magic-link.functions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmailRoutingPanel } from "@/components/admin/email-routing-panel";
+import { StaffQrDialog } from "@/components/admin/staff-qr-dialog";
 
 const SUPER_ADMIN_EMAIL = "jordilwbailey@gmail.com";
 const STAFF_DOMAIN = "@365motorsales.com";
@@ -217,6 +218,14 @@ function Staff365Page() {
                 <Eye className="mr-1 h-4 w-4" />
                 Sign-in link
               </Button>
+              {u.referral_code && (
+                <StaffQrDialog
+                  code={u.referral_code}
+                  name={u.full_name}
+                  email={u.email}
+                  active={Boolean(u.referral_active)}
+                />
+              )}
               <EditProfileDialog user={u} onSaved={load} />
               <ResetPasswordDialog user={u} />
               <Button

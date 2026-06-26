@@ -16,6 +16,8 @@ export type Staff365Row = {
   disabled: boolean;
   has_route: boolean;
   route_destination: string | null;
+  referral_code: string | null;
+  referral_active: boolean;
 };
 
 async function assertSuperAdmin(callerEmail: string | undefined) {
@@ -78,9 +80,28 @@ export const listStaff365 = createServerFn({ method: "POST" })
       });
     }
 
+    // Pull each staff member's personal referral code so admins can download
+    // the matching QR from the staff list directly.
+    const referralMap = new Map<string, { code: string; active: boolean }>();
+    if (ids.length > 0) {
+      const { data: refs } = await supabaseAdmin
+        .from("staff_referrals")
+        .select("staff_user_id,referral_code,active")
+        .in("staff_user_id", ids);
+      (refs ?? []).forEach((r: any) => {
+        if (!r.staff_user_id || !r.referral_code) return;
+        const existing = referralMap.get(r.staff_user_id);
+        // Prefer an active code if a staff member somehow has multiple rows.
+        if (!existing || (r.active && !existing.active)) {
+          referralMap.set(r.staff_user_id, { code: r.referral_code, active: !!r.active });
+        }
+      });
+    }
+
     const rows: Staff365Row[] = allUsers.map((u) => {
       const emailLc = (u.email ?? "").toLowerCase();
       const dest = routeMap.get(emailLc) ?? null;
+      const ref = referralMap.get(u.id) ?? null;
       return {
         id: u.id,
         email: u.email ?? "",
@@ -92,6 +113,8 @@ export const listStaff365 = createServerFn({ method: "POST" })
         disabled: !!(u.banned_until && new Date(u.banned_until).getTime() > Date.now()),
         has_route: routeMap.has(emailLc),
         route_destination: dest,
+        referral_code: ref?.code ?? null,
+        referral_active: ref?.active ?? false,
       };
     });
 
