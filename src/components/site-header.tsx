@@ -140,7 +140,7 @@ export function SiteHeader() {
             </span>
           )}
 
-          <nav className="hidden items-center gap-0.5 xl:flex">
+          <nav className="hidden items-center gap-0.5 2xl:flex">
             {NAV.map((n) => (
               <Link
                 key={n.category}
