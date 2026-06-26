@@ -61,6 +61,13 @@ const TABS: Tab[] = [
     roles: ["admin", "advertising", "sales"],
   },
   {
+    to: "/admin/advertisements/analytics",
+    label: "QR Analytics",
+    desc: "Scans, signups and redemptions from your QR codes.",
+    Icon: BarChart3,
+    roles: ["admin", "advertising", "sales"],
+  },
+  {
     to: "/admin/advertisements/slots",
     label: "Slots",
     desc: "Define ad positions, dimensions and ordering.",
