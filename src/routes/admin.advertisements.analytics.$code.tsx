@@ -100,27 +100,43 @@ function QrCodeDrilldownPage() {
     },
   });
 
-  // Daily rollup combining scans + signups
+  // Activated listings = listings published by users credited to this code
+  const listingsQ = useQuery({
+    queryKey: ["qr-drill", "listings", userIds, since],
+    enabled: userIds.length > 0,
+    queryFn: async () => {
+      let q = supabase
+        .from("listings")
+        .select("id, user_id, published_at, status, created_at")
+        .in("user_id", userIds)
+        .not("published_at", "is", null);
+      if (since) q = q.gte("published_at", since);
+      const { data, error } = await q.order("published_at", { ascending: false }).limit(2000);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  // Daily funnel: scans -> signups -> activated listings
   const byDay = useMemo(() => {
-    const m = new Map<string, { scans: number; signups: number }>();
-    for (const s of scansQ.data ?? []) {
-      const k = dayKey(s.scanned_at);
-      const v = m.get(k) ?? { scans: 0, signups: 0 };
-      v.scans += 1;
+    const m = new Map<string, { scans: number; signups: number; listings: number }>();
+    const ensure = (k: string) => {
+      const v = m.get(k) ?? { scans: 0, signups: 0, listings: 0 };
       m.set(k, v);
-    }
-    for (const s of signupsQ.data ?? []) {
-      const k = dayKey(s.signup_date);
-      const v = m.get(k) ?? { scans: 0, signups: 0 };
-      v.signups += 1;
-      m.set(k, v);
+      return v;
+    };
+    for (const s of scansQ.data ?? []) ensure(dayKey(s.scanned_at)).scans += 1;
+    for (const s of signupsQ.data ?? []) ensure(dayKey(s.signup_date)).signups += 1;
+    for (const l of listingsQ.data ?? []) {
+      if (!l.published_at) continue;
+      ensure(dayKey(l.published_at)).listings += 1;
     }
     return Array.from(m.entries())
       .map(([day, v]) => ({ day, ...v }))
       .sort((a, b) => (a.day < b.day ? 1 : -1));
-  }, [scansQ.data, signupsQ.data]);
+  }, [scansQ.data, signupsQ.data, listingsQ.data]);
 
-  const maxBar = Math.max(1, ...byDay.map((d) => d.scans + d.signups));
+  const maxBar = Math.max(1, ...byDay.map((d) => d.scans + d.signups + d.listings));
 
   const totals = {
     scans: scansQ.data?.length ?? 0,
