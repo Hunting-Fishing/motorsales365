@@ -260,12 +260,19 @@ function QrCodeDrilldownPage() {
                   {byDay.map((d) => {
                     const su = d.scans > 0 ? (d.signups / d.scans) * 100 : 0;
                     const ul = d.signups > 0 ? (d.listings / d.signups) * 100 : 0;
+                    const cellBtn = "rounded px-1.5 py-0.5 tabular-nums hover:bg-muted disabled:cursor-default disabled:hover:bg-transparent disabled:text-muted-foreground";
                     return (
                       <tr key={d.day} className="border-t">
                         <td className="px-4 py-2 font-mono text-xs">{d.day}</td>
-                        <td className="px-4 py-2 text-right tabular-nums">{d.scans}</td>
-                        <td className="px-4 py-2 text-right tabular-nums">{d.signups}</td>
-                        <td className="px-4 py-2 text-right tabular-nums">{d.listings}</td>
+                        <td className="px-4 py-2 text-right">
+                          <button type="button" className={cellBtn} disabled={d.scans === 0} onClick={() => setDrill({ day: d.day, stage: "scans" })}>{d.scans}</button>
+                        </td>
+                        <td className="px-4 py-2 text-right">
+                          <button type="button" className={cellBtn} disabled={d.signups === 0} onClick={() => setDrill({ day: d.day, stage: "signups" })}>{d.signups}</button>
+                        </td>
+                        <td className="px-4 py-2 text-right">
+                          <button type="button" className={cellBtn} disabled={d.listings === 0} onClick={() => setDrill({ day: d.day, stage: "listings" })}>{d.listings}</button>
+                        </td>
                         <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">
                           {d.scans > 0 ? `${su.toFixed(0)}%` : "—"}
                         </td>
@@ -274,20 +281,32 @@ function QrCodeDrilldownPage() {
                         </td>
                         <td className="px-4 py-2">
                           <div className="flex h-3 items-center gap-px overflow-hidden rounded bg-muted">
-                            <div
-                              className="h-full bg-primary/70"
+                            <button
+                              type="button"
+                              className="h-full bg-primary/70 hover:bg-primary disabled:cursor-default disabled:hover:bg-primary/70"
                               style={{ width: `${(d.scans / maxBar) * 100}%` }}
-                              aria-label={`${d.scans} scans`}
+                              aria-label={`${d.scans} scans on ${d.day}`}
+                              title={`${d.scans} scans`}
+                              disabled={d.scans === 0}
+                              onClick={() => setDrill({ day: d.day, stage: "scans" })}
                             />
-                            <div
-                              className="h-full bg-emerald-500/80"
+                            <button
+                              type="button"
+                              className="h-full bg-emerald-500/80 hover:bg-emerald-500 disabled:cursor-default disabled:hover:bg-emerald-500/80"
                               style={{ width: `${(d.signups / maxBar) * 100}%` }}
-                              aria-label={`${d.signups} signups`}
+                              aria-label={`${d.signups} signups on ${d.day}`}
+                              title={`${d.signups} signups`}
+                              disabled={d.signups === 0}
+                              onClick={() => setDrill({ day: d.day, stage: "signups" })}
                             />
-                            <div
-                              className="h-full bg-amber-500/80"
+                            <button
+                              type="button"
+                              className="h-full bg-amber-500/80 hover:bg-amber-500 disabled:cursor-default disabled:hover:bg-amber-500/80"
                               style={{ width: `${(d.listings / maxBar) * 100}%` }}
-                              aria-label={`${d.listings} activated listings`}
+                              aria-label={`${d.listings} activated listings on ${d.day}`}
+                              title={`${d.listings} listings`}
+                              disabled={d.listings === 0}
+                              onClick={() => setDrill({ day: d.day, stage: "listings" })}
                             />
                           </div>
                         </td>
