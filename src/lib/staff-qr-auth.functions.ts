@@ -50,8 +50,8 @@ export const authorizeStaffQrAccess = createServerFn({ method: "POST" })
     // Verify the code actually belongs to a staff referral.
     const { data: row, error: refErr } = await supabaseAdmin
       .from("staff_referrals")
-      .select("code,staff_user_id,active")
-      .eq("code", data.code)
+      .select("referral_code,staff_user_id,active")
+      .eq("referral_code", data.code)
       .maybeSingle();
     if (refErr) throw new Error(refErr.message);
     if (!row) throw new Error("Unknown staff referral code");
@@ -75,5 +75,5 @@ export const authorizeStaffQrAccess = createServerFn({ method: "POST" })
       process.env.PUBLIC_SITE_ORIGIN ??
       process.env.VITE_PUBLIC_SITE_ORIGIN ??
       "https://365motorsales.com";
-    return { ok: true, link: `${origin.replace(/\/$/, "")}/r/${row.code}` };
+    return { ok: true, link: `${origin.replace(/\/$/, "")}/r/${row.referral_code}` };
   });
