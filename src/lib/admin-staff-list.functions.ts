@@ -16,6 +16,8 @@ export type Staff365Row = {
   disabled: boolean;
   has_route: boolean;
   route_destination: string | null;
+  referral_code: string | null;
+  referral_active: boolean;
 };
 
 async function assertSuperAdmin(callerEmail: string | undefined) {
