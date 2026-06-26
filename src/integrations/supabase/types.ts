@@ -4211,6 +4211,42 @@ export type Database = {
         }
         Relationships: []
       }
+      jdm_chassis_codes: {
+        Row: {
+          code: string
+          created_at: string
+          engine: string | null
+          make: string
+          model: string
+          notes: string | null
+          updated_at: string
+          year_max: number | null
+          year_min: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          engine?: string | null
+          make: string
+          model: string
+          notes?: string | null
+          updated_at?: string
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          engine?: string | null
+          make?: string
+          model?: string
+          notes?: string | null
+          updated_at?: string
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Relationships: []
+      }
       lead_activities: {
         Row: {
           actor_id: string | null
