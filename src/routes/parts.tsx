@@ -150,7 +150,7 @@ function PartsHub() {
         </div>
 
         {tab === "find" && <PartsWizard />}
-        {tab === "order" && <OemOrderForm />}
+        {tab === "order" && <OemSearch />}
 
         {tab === "browse" && (
           <div className="space-y-2">
