@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { authorizeStaffQrAccess } from "@/lib/staff-qr-auth.functions";
+import { authorizeStaffQrAccess, downloadStaffQrPng } from "@/lib/staff-qr-auth.functions";
 
 type Props = {
   code: string;
@@ -29,6 +29,8 @@ export function StaffQrDialog({ code, name, email, active }: Props) {
   const [status, setStatus] = useState<"idle" | "checking" | "authorized" | "denied">("idle");
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const authorize = useServerFn(authorizeStaffQrAccess);
+  const downloadPng = useServerFn(downloadStaffQrPng);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -146,12 +148,37 @@ export function StaffQrDialog({ code, name, email, active }: Props) {
                 <Copy className="mr-1 h-4 w-4" /> Copy link
               </Button>
             )}
-            {status === "authorized" && dataUrl && (
-              <a href={dataUrl} download={`${code}-qr.png`}>
-                <Button variant="outline" size="sm">
-                  <Download className="mr-1 h-4 w-4" /> Download PNG
-                </Button>
-              </a>
+            {status === "authorized" && (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={downloading}
+                onClick={async () => {
+                  setDownloading(true);
+                  try {
+                    const res = await (downloadPng as any)({ data: { code } });
+                    // Trigger download from the server-issued PNG only after
+                    // the server re-confirms permission on this request.
+                    const a = document.createElement("a");
+                    a.href = res.dataUrl;
+                    a.download = res.filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                  } catch (e: any) {
+                    toast.error(e?.message ?? "Download not permitted");
+                  } finally {
+                    setDownloading(false);
+                  }
+                }}
+              >
+                {downloading ? (
+                  <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="mr-1 h-4 w-4" />
+                )}
+                Download PNG
+              </Button>
             )}
             {status === "authorized" && (
               <Link to="/r/$code/poster" params={{ code }} target="_blank">
