@@ -58,7 +58,7 @@ export function StaffQrDialog({ code, name, email, active }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [open, code, authorize]);
+  }, [open, code]);
 
   const reset = () => {
     setOpen(false);
