@@ -128,6 +128,31 @@ function QrCodeDrilldownPage() {
     uniqueVisitors: new Set((scansQ.data ?? []).map((s) => s.visitor_id).filter(Boolean)).size,
   };
 
+  const convRate = totals.uniqueVisitors > 0 ? (totals.signups / totals.uniqueVisitors) * 100 : 0;
+
+  type BreakdownRow = { key: string; scans: number; visitors: number; share: number };
+  const breakdowns = useMemo(() => {
+    function build(field: "device_type" | "browser" | "country"): BreakdownRow[] {
+      const m = new Map<string, { scans: number; visitors: Set<string> }>();
+      for (const s of scansQ.data ?? []) {
+        const key = ((s as never)[field] as string | null) || "Unknown";
+        const v = m.get(key) ?? { scans: 0, visitors: new Set<string>() };
+        v.scans += 1;
+        if (s.visitor_id) v.visitors.add(s.visitor_id);
+        m.set(key, v);
+      }
+      const total = totals.scans || 1;
+      return Array.from(m.entries())
+        .map(([key, v]) => ({ key, scans: v.scans, visitors: v.visitors.size, share: (v.scans / total) * 100 }))
+        .sort((a, b) => b.scans - a.scans);
+    }
+    return {
+      device: build("device_type"),
+      browser: build("browser"),
+      country: build("country"),
+    };
+  }, [scansQ.data, totals.scans]);
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -165,10 +190,22 @@ function QrCodeDrilldownPage() {
         </Select>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat icon={ScanLine} label="Scans" value={totals.scans} loading={scansQ.isLoading} />
-        <Stat icon={UserPlus} label="Credited signups" value={totals.signups} loading={signupsQ.isLoading} />
         <Stat icon={Inbox} label="Unique visitors" value={totals.uniqueVisitors} loading={scansQ.isLoading} />
+        <Stat icon={UserPlus} label="Credited signups" value={totals.signups} loading={signupsQ.isLoading} />
+        <Stat
+          icon={Ticket}
+          label="Conversion (visitor → signup)"
+          value={`${convRate.toFixed(1)}%`}
+          loading={scansQ.isLoading || signupsQ.isLoading}
+        />
+      </div>
+
+      <div className="grid gap-3 lg:grid-cols-3">
+        <BreakdownCard title="By device" rows={breakdowns.device} loading={scansQ.isLoading} emptyLabel="No device data." />
+        <BreakdownCard title="By browser" rows={breakdowns.browser} loading={scansQ.isLoading} emptyLabel="No browser data." />
+        <BreakdownCard title="By country" rows={breakdowns.country} loading={scansQ.isLoading} emptyLabel="No location data." />
       </div>
 
       <Card>
@@ -317,7 +354,7 @@ function Stat({
 }: {
   icon: typeof QrCode;
   label: string;
-  value: number;
+  value: number | string;
   loading: boolean;
 }) {
   return (
@@ -329,9 +366,70 @@ function Stat({
         <div>
           <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
           <div className="text-2xl font-semibold tabular-nums">
-            {loading ? "—" : value.toLocaleString()}
+            {loading ? "—" : typeof value === "number" ? value.toLocaleString() : value}
           </div>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function BreakdownCard({
+  title,
+  rows,
+  loading,
+  emptyLabel,
+}: {
+  title: string;
+  rows: { key: string; scans: number; visitors: number; share: number }[];
+  loading: boolean;
+  emptyLabel: string;
+}) {
+  const top = rows.slice(0, 8);
+  const maxScans = Math.max(1, ...top.map((r) => r.scans));
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">{title}</CardTitle>
+        <CardDescription>Scans and unique visitors by segment.</CardDescription>
+      </CardHeader>
+      <CardContent className="p-0">
+        {loading ? (
+          <p className="px-6 py-8 text-sm text-muted-foreground">Loading…</p>
+        ) : top.length === 0 ? (
+          <p className="px-6 py-8 text-sm text-muted-foreground">{emptyLabel}</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="px-4 py-2 text-left">Segment</th>
+                <th className="px-4 py-2 text-right">Scans</th>
+                <th className="px-4 py-2 text-right">Visitors</th>
+                <th className="px-4 py-2 text-right">Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              {top.map((r) => (
+                <tr key={r.key} className="border-t">
+                  <td className="px-4 py-2">
+                    <div className="truncate">{r.key}</div>
+                    <div className="mt-1 h-1.5 w-full overflow-hidden rounded bg-muted">
+                      <div
+                        className="h-full bg-primary/70"
+                        style={{ width: `${(r.scans / maxScans) * 100}%` }}
+                      />
+                    </div>
+                  </td>
+                  <td className="px-4 py-2 text-right tabular-nums">{r.scans}</td>
+                  <td className="px-4 py-2 text-right tabular-nums">{r.visitors}</td>
+                  <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">
+                    {r.share.toFixed(0)}%
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </CardContent>
     </Card>
   );
