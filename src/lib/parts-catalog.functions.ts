@@ -45,6 +45,46 @@ export const listPartsOutlets = createServerFn({ method: "POST" })
     return rows ?? [];
   });
 
+/** Search outlets that carry a given brand in a country (for OEM search results). */
+export const searchOemOutlets = createServerFn({ method: "POST" })
+  .inputValidator((d: { country: string; make: string; model?: string; year?: number } | undefined) =>
+    z
+      .object({
+        country: z.string().trim().length(2),
+        make: z.string().trim().min(1).max(60),
+        model: z.string().trim().max(80).optional(),
+        year: z.number().int().min(1900).max(2100).optional(),
+      })
+      .parse(d ?? ({} as any)),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const make = data.make.trim();
+    // Match brand case-insensitively by checking both raw and title-cased variants.
+    const variants = Array.from(
+      new Set([
+        make,
+        make.toLowerCase(),
+        make.toUpperCase(),
+        make[0].toUpperCase() + make.slice(1).toLowerCase(),
+      ]),
+    );
+    const { data: rows, error } = await supabaseAdmin
+      .from("parts_outlets")
+      .select(
+        "id,country_code,name,slug,outlet_type,brands,region,city,phone,website,is_verified,is_d2c_enabled",
+      )
+      .eq("is_active", true)
+      .eq("country_code", data.country.toUpperCase())
+      .overlaps("brands", variants)
+      .order("is_verified", { ascending: false })
+      .order("is_d2c_enabled", { ascending: false })
+      .order("name", { ascending: true })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
 // ---------- Admin ----------
 
 async function requireStaff(context: any) {
