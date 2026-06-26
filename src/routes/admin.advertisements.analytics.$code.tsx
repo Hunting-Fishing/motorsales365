@@ -238,9 +238,8 @@ function QrCodeDrilldownPage() {
                   <tr>
                     <th className="px-4 py-2 text-left">Signed up</th>
                     <th className="px-4 py-2 text-left">Name</th>
-                    <th className="px-4 py-2 text-left">Email</th>
                     <th className="px-4 py-2 text-left">Phone</th>
-                    <th className="px-4 py-2 text-left">City</th>
+                    <th className="px-4 py-2 text-left">User ID</th>
                     <th className="px-4 py-2 text-left">First touch</th>
                     <th className="px-4 py-2 text-left">Last touch</th>
                   </tr>
@@ -252,9 +251,8 @@ function QrCodeDrilldownPage() {
                       <tr key={r.id} className="border-t align-top">
                         <td className="px-4 py-2 whitespace-nowrap">{new Date(r.signup_date).toLocaleString()}</td>
                         <td className="px-4 py-2">{p?.full_name ?? "—"}</td>
-                        <td className="px-4 py-2">{p?.email ?? "—"}</td>
                         <td className="px-4 py-2">{p?.phone ?? "—"}</td>
-                        <td className="px-4 py-2">{p?.city ?? "—"}</td>
+                        <td className="px-4 py-2 font-mono text-[10px] text-muted-foreground">{r.user_id?.slice(0, 8) ?? "—"}</td>
                         <td className="px-4 py-2 font-mono text-xs">{r.first_referral_code ?? "—"}</td>
                         <td className="px-4 py-2 font-mono text-xs">{r.last_referral_code ?? "—"}</td>
                       </tr>
