@@ -24,7 +24,7 @@ export const Route = createFileRoute("/admin/parts")({
   head: () => ({ meta: [{ title: "Parts Fulfillment — Admin" }] }),
 });
 
-type Tab = "catalog" | "quotes" | "tires" | "setup" | "interest" | "outlets";
+type Tab = "catalog" | "quotes" | "tires" | "setup" | "interest" | "outlets" | "suppliers";
 
 function AdminPartsPage() {
   const [tab, setTab] = useState<Tab>("quotes");
