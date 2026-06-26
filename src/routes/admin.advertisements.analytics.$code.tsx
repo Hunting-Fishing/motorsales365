@@ -406,7 +406,142 @@ function QrCodeDrilldownPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={!!drill} onOpenChange={(o) => !o && setDrill(null)}>
+        <DialogContent className="max-w-3xl">
+          {drill && (
+            <DrillDialogBody
+              drill={drill}
+              scans={scansQ.data ?? []}
+              signups={signupsQ.data ?? []}
+              listings={listingsQ.data ?? []}
+              profiles={profilesQ.data}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+function DrillDialogBody({
+  drill,
+  scans,
+  signups,
+  listings,
+  profiles,
+}: {
+  drill: { day: string; stage: DrillStage };
+  scans: Array<{ id: string; scanned_at: string; device_type: string | null; browser: string | null; country: string | null; visitor_id: string | null }>;
+  signups: Array<{ id: string; user_id: string; signup_date: string; first_referral_code: string | null; last_referral_code: string | null }>;
+  listings: Array<{ id: string; user_id: string; published_at: string | null; status: string | null }>;
+  profiles: Map<string, { full_name: string | null; phone: string | null }> | undefined;
+}) {
+  const stageLabel: Record<DrillStage, string> = {
+    scans: "Scans",
+    signups: "Credited signups",
+    listings: "Activated listings",
+  };
+  const rowsScans = drill.stage === "scans" ? scans.filter((s) => dayKey(s.scanned_at) === drill.day) : [];
+  const rowsSignups = drill.stage === "signups" ? signups.filter((s) => dayKey(s.signup_date) === drill.day) : [];
+  const rowsListings = drill.stage === "listings"
+    ? listings.filter((l) => l.published_at && dayKey(l.published_at) === drill.day)
+    : [];
+  const count = drill.stage === "scans" ? rowsScans.length : drill.stage === "signups" ? rowsSignups.length : rowsListings.length;
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle>{stageLabel[drill.stage]} — {drill.day}</DialogTitle>
+        <DialogDescription>{count} record{count === 1 ? "" : "s"} on this day.</DialogDescription>
+      </DialogHeader>
+      <div className="max-h-[60vh] overflow-auto">
+        {drill.stage === "scans" && (
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-muted/50 text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">When</th>
+                <th className="px-3 py-2 text-left">Device</th>
+                <th className="px-3 py-2 text-left">Browser</th>
+                <th className="px-3 py-2 text-left">Country</th>
+                <th className="px-3 py-2 text-left">Visitor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rowsScans.map((s) => (
+                <tr key={s.id} className="border-t">
+                  <td className="px-3 py-2 whitespace-nowrap">{new Date(s.scanned_at).toLocaleTimeString()}</td>
+                  <td className="px-3 py-2">{s.device_type ?? "—"}</td>
+                  <td className="px-3 py-2">{s.browser ?? "—"}</td>
+                  <td className="px-3 py-2">{s.country ?? "—"}</td>
+                  <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">{s.visitor_id?.slice(0, 8) ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {drill.stage === "signups" && (
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-muted/50 text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">When</th>
+                <th className="px-3 py-2 text-left">Name</th>
+                <th className="px-3 py-2 text-left">Phone</th>
+                <th className="px-3 py-2 text-left">User ID</th>
+                <th className="px-3 py-2 text-left">First touch</th>
+                <th className="px-3 py-2 text-left">Last touch</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rowsSignups.map((r) => {
+                const p = profiles?.get(r.user_id);
+                return (
+                  <tr key={r.id} className="border-t">
+                    <td className="px-3 py-2 whitespace-nowrap">{new Date(r.signup_date).toLocaleTimeString()}</td>
+                    <td className="px-3 py-2">{p?.full_name ?? "—"}</td>
+                    <td className="px-3 py-2">{p?.phone ?? "—"}</td>
+                    <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">{r.user_id?.slice(0, 8) ?? "—"}</td>
+                    <td className="px-3 py-2 font-mono text-xs">{r.first_referral_code ?? "—"}</td>
+                    <td className="px-3 py-2 font-mono text-xs">{r.last_referral_code ?? "—"}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+        {drill.stage === "listings" && (
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-muted/50 text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">Published</th>
+                <th className="px-3 py-2 text-left">Listing ID</th>
+                <th className="px-3 py-2 text-left">Seller</th>
+                <th className="px-3 py-2 text-left">Status</th>
+                <th className="px-3 py-2 text-left">Open</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rowsListings.map((l) => {
+                const p = profiles?.get(l.user_id);
+                return (
+                  <tr key={l.id} className="border-t">
+                    <td className="px-3 py-2 whitespace-nowrap">{l.published_at ? new Date(l.published_at).toLocaleTimeString() : "—"}</td>
+                    <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">{l.id.slice(0, 8)}</td>
+                    <td className="px-3 py-2">{p?.full_name ?? l.user_id.slice(0, 8)}</td>
+                    <td className="px-3 py-2">{l.status ?? "—"}</td>
+                    <td className="px-3 py-2">
+                      <Link to="/listing/$id" params={{ id: l.id }} className="text-primary underline-offset-2 hover:underline">View</Link>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+        {count === 0 && (
+          <p className="px-3 py-6 text-sm text-muted-foreground">No records.</p>
+        )}
+      </div>
+    </>
   );
 }
 
