@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Inbox, Megaphone, Ticket, QrCode, History, Settings2, ImageIcon, Eye, ShieldCheck } from "lucide-react";
+import { Inbox, Megaphone, Ticket, QrCode, History, Settings2, ImageIcon, Eye, ShieldCheck, BarChart3 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
