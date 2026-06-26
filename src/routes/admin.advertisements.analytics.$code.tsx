@@ -1,0 +1,340 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, ScanLine, UserPlus, Ticket, Inbox, QrCode } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+export const Route = createFileRoute("/admin/advertisements/analytics/$code")({
+  component: QrCodeDrilldownPage,
+  head: ({ params }) => ({
+    meta: [
+      { title: `QR ${params.code} — Drilldown` },
+      { name: "robots", content: "noindex,nofollow" },
+    ],
+  }),
+});
+
+const RANGES = [
+  { id: "7", label: "Last 7 days" },
+  { id: "30", label: "Last 30 days" },
+  { id: "90", label: "Last 90 days" },
+  { id: "365", label: "Last 12 months" },
+  { id: "all", label: "All time" },
+] as const;
+type RangeId = (typeof RANGES)[number]["id"];
+
+function rangeSince(id: RangeId): string | null {
+  if (id === "all") return null;
+  return new Date(Date.now() - Number(id) * 86400000).toISOString();
+}
+
+function dayKey(iso: string): string {
+  const d = new Date(iso);
+  return d.toISOString().slice(0, 10);
+}
+
+function QrCodeDrilldownPage() {
+  const { code } = Route.useParams();
+  const [range, setRange] = useState<RangeId>("30");
+  const since = useMemo(() => rangeSince(range), [range]);
+
+  const ownerQ = useQuery({
+    queryKey: ["qr-drill", "owner", code],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("staff_referrals")
+        .select("full_name, email, phone, active, created_at")
+        .eq("referral_code", code)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const scansQ = useQuery({
+    queryKey: ["qr-drill", "scans", code, since],
+    queryFn: async () => {
+      let q = supabase
+        .from("qr_scans")
+        .select("id, scanned_at, device_type, browser, country, visitor_id")
+        .eq("referral_code", code);
+      if (since) q = q.gte("scanned_at", since);
+      const { data, error } = await q.order("scanned_at", { ascending: false }).limit(2000);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const signupsQ = useQuery({
+    queryKey: ["qr-drill", "signups", code, since],
+    queryFn: async () => {
+      let q = supabase
+        .from("user_referrals")
+        .select("id, user_id, signup_date, first_referral_code, last_referral_code, credited_referral_code, referred_by_staff_id")
+        .eq("credited_referral_code", code);
+      if (since) q = q.gte("signup_date", since);
+      const { data, error } = await q.order("signup_date", { ascending: false }).limit(2000);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  // Best-effort profile attribution lookup for the credited signups
+  const userIds = useMemo(() => (signupsQ.data ?? []).map((r) => r.user_id).filter(Boolean), [signupsQ.data]);
+  const profilesQ = useQuery({
+    queryKey: ["qr-drill", "profiles", userIds],
+    enabled: userIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, phone, city")
+        .in("id", userIds);
+      if (error) throw error;
+      const m = new Map<string, { full_name: string | null; email: string | null; phone: string | null; city: string | null }>();
+      for (const p of data ?? []) m.set(p.id, p as never);
+      return m;
+    },
+  });
+
+  // Daily rollup combining scans + signups
+  const byDay = useMemo(() => {
+    const m = new Map<string, { scans: number; signups: number }>();
+    for (const s of scansQ.data ?? []) {
+      const k = dayKey(s.scanned_at);
+      const v = m.get(k) ?? { scans: 0, signups: 0 };
+      v.scans += 1;
+      m.set(k, v);
+    }
+    for (const s of signupsQ.data ?? []) {
+      const k = dayKey(s.signup_date);
+      const v = m.get(k) ?? { scans: 0, signups: 0 };
+      v.signups += 1;
+      m.set(k, v);
+    }
+    return Array.from(m.entries())
+      .map(([day, v]) => ({ day, ...v }))
+      .sort((a, b) => (a.day < b.day ? 1 : -1));
+  }, [scansQ.data, signupsQ.data]);
+
+  const maxBar = Math.max(1, ...byDay.map((d) => d.scans + d.signups));
+
+  const totals = {
+    scans: scansQ.data?.length ?? 0,
+    signups: signupsQ.data?.length ?? 0,
+    uniqueVisitors: new Set((scansQ.data ?? []).map((s) => s.visitor_id).filter(Boolean)).size,
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="space-y-1">
+          <Button asChild variant="ghost" size="sm" className="-ml-2">
+            <Link to="/admin/advertisements/analytics">
+              <ArrowLeft className="h-4 w-4" /> Back to analytics
+            </Link>
+          </Button>
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <QrCode className="h-5 w-5" />
+            <span className="font-mono">{code}</span>
+            {ownerQ.data?.full_name && (
+              <span className="text-muted-foreground">— {ownerQ.data.full_name}</span>
+            )}
+            {ownerQ.data && (
+              <Badge variant={ownerQ.data.active ? "default" : "secondary"}>
+                {ownerQ.data.active ? "Active" : "Inactive"}
+              </Badge>
+            )}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Day-by-day scans and credited signups with full attribution details.
+          </p>
+        </div>
+        <Select value={range} onValueChange={(v) => setRange(v as RangeId)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {RANGES.map((r) => (
+              <SelectItem key={r.id} value={r.id}>{r.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Stat icon={ScanLine} label="Scans" value={totals.scans} loading={scansQ.isLoading} />
+        <Stat icon={UserPlus} label="Credited signups" value={totals.signups} loading={signupsQ.isLoading} />
+        <Stat icon={Inbox} label="Unique visitors" value={totals.uniqueVisitors} loading={scansQ.isLoading} />
+      </div>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Daily activity</CardTitle>
+          <CardDescription>Scans and credited signups per day in the selected range.</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {byDay.length === 0 ? (
+            <p className="px-6 py-8 text-sm text-muted-foreground">No activity yet for this range.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Date</th>
+                    <th className="px-4 py-2 text-right">Scans</th>
+                    <th className="px-4 py-2 text-right">Signups</th>
+                    <th className="px-4 py-2 text-left w-1/2">Volume</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {byDay.map((d) => (
+                    <tr key={d.day} className="border-t">
+                      <td className="px-4 py-2 font-mono text-xs">{d.day}</td>
+                      <td className="px-4 py-2 text-right tabular-nums">{d.scans}</td>
+                      <td className="px-4 py-2 text-right tabular-nums">{d.signups}</td>
+                      <td className="px-4 py-2">
+                        <div className="flex h-3 items-center gap-px overflow-hidden rounded bg-muted">
+                          <div
+                            className="h-full bg-primary/70"
+                            style={{ width: `${(d.scans / maxBar) * 100}%` }}
+                            aria-label={`${d.scans} scans`}
+                          />
+                          <div
+                            className="h-full bg-emerald-500/80"
+                            style={{ width: `${(d.signups / maxBar) * 100}%` }}
+                            aria-label={`${d.signups} signups`}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Credited signups — attribution</CardTitle>
+          <CardDescription>
+            Each signup credited to this QR code with first/last touch and basic profile data.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {signupsQ.isLoading ? (
+            <p className="px-6 py-8 text-sm text-muted-foreground">Loading…</p>
+          ) : (signupsQ.data?.length ?? 0) === 0 ? (
+            <p className="px-6 py-8 text-sm text-muted-foreground">No credited signups in this range.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Signed up</th>
+                    <th className="px-4 py-2 text-left">Name</th>
+                    <th className="px-4 py-2 text-left">Email</th>
+                    <th className="px-4 py-2 text-left">Phone</th>
+                    <th className="px-4 py-2 text-left">City</th>
+                    <th className="px-4 py-2 text-left">First touch</th>
+                    <th className="px-4 py-2 text-left">Last touch</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(signupsQ.data ?? []).map((r) => {
+                    const p = profilesQ.data?.get(r.user_id);
+                    return (
+                      <tr key={r.id} className="border-t align-top">
+                        <td className="px-4 py-2 whitespace-nowrap">{new Date(r.signup_date).toLocaleString()}</td>
+                        <td className="px-4 py-2">{p?.full_name ?? "—"}</td>
+                        <td className="px-4 py-2">{p?.email ?? "—"}</td>
+                        <td className="px-4 py-2">{p?.phone ?? "—"}</td>
+                        <td className="px-4 py-2">{p?.city ?? "—"}</td>
+                        <td className="px-4 py-2 font-mono text-xs">{r.first_referral_code ?? "—"}</td>
+                        <td className="px-4 py-2 font-mono text-xs">{r.last_referral_code ?? "—"}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Recent scans</CardTitle>
+          <CardDescription>Most recent 2,000 scans of this QR code in the selected range.</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {scansQ.isLoading ? (
+            <p className="px-6 py-8 text-sm text-muted-foreground">Loading…</p>
+          ) : (scansQ.data?.length ?? 0) === 0 ? (
+            <p className="px-6 py-8 text-sm text-muted-foreground">No scans in this range.</p>
+          ) : (
+            <div className="max-h-[480px] overflow-auto">
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-muted/50 text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-2 text-left">When</th>
+                    <th className="px-4 py-2 text-left">Device</th>
+                    <th className="px-4 py-2 text-left">Browser</th>
+                    <th className="px-4 py-2 text-left">Country</th>
+                    <th className="px-4 py-2 text-left">Visitor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(scansQ.data ?? []).map((s) => (
+                    <tr key={s.id} className="border-t">
+                      <td className="px-4 py-2 whitespace-nowrap">{new Date(s.scanned_at).toLocaleString()}</td>
+                      <td className="px-4 py-2">{s.device_type ?? "—"}</td>
+                      <td className="px-4 py-2">{s.browser ?? "—"}</td>
+                      <td className="px-4 py-2">{s.country ?? "—"}</td>
+                      <td className="px-4 py-2 font-mono text-[10px] text-muted-foreground">
+                        {s.visitor_id ? s.visitor_id.slice(0, 8) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function Stat({
+  icon: Icon,
+  label,
+  value,
+  loading,
+}: {
+  icon: typeof QrCode;
+  label: string;
+  value: number;
+  loading: boolean;
+}) {
+  return (
+    <Card>
+      <CardContent className="flex items-center gap-3 p-4">
+        <div className="rounded-md bg-primary/10 p-2 text-primary">
+          <Icon className="h-5 w-5" />
+        </div>
+        <div>
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+          <div className="text-2xl font-semibold tabular-nums">
+            {loading ? "—" : value.toLocaleString()}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
