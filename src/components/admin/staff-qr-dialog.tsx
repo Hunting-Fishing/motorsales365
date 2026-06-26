@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { toast } from "sonner";
-import { Copy, Download, Printer, QrCode } from "lucide-react";
+import { Copy, Download, Loader2, Lock, Printer, QrCode } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { siteOrigin } from "@/lib/site-config";
+import { authorizeStaffQrAccess } from "@/lib/staff-qr-auth.functions";
 
 type Props = {
   code: string;
@@ -24,22 +25,47 @@ type Props = {
 export function StaffQrDialog({ code, name, email, active }: Props) {
   const [open, setOpen] = useState(false);
   const [dataUrl, setDataUrl] = useState<string | null>(null);
-  const link = `${siteOrigin()}/r/${code}`;
+  const [link, setLink] = useState<string | null>(null);
+  const [status, setStatus] = useState<"idle" | "checking" | "authorized" | "denied">("idle");
+  const [errMsg, setErrMsg] = useState<string | null>(null);
+  const authorize = useServerFn(authorizeStaffQrAccess);
 
   useEffect(() => {
-    if (!open || dataUrl) return;
+    if (!open) return;
+    if (status !== "idle") return;
     let cancelled = false;
-    QRCode.toDataURL(link, { width: 900, margin: 2, errorCorrectionLevel: "H" })
-      .then((png) => {
+    setStatus("checking");
+    setErrMsg(null);
+    (async () => {
+      try {
+        const res = await (authorize as any)({ data: { code } });
+        if (cancelled) return;
+        setLink(res.link);
+        setStatus("authorized");
+        const png = await QRCode.toDataURL(res.link, {
+          width: 900,
+          margin: 2,
+          errorCorrectionLevel: "H",
+        });
         if (!cancelled) setDataUrl(png);
-      })
-      .catch(() => {
-        if (!cancelled) toast.error("Failed to generate QR");
-      });
+      } catch (e: any) {
+        if (cancelled) return;
+        setStatus("denied");
+        setErrMsg(e?.message ?? "Not permitted");
+      }
+    })();
     return () => {
       cancelled = true;
     };
-  }, [open, dataUrl, link]);
+  }, [open, status, code, authorize]);
+
+  const reset = () => {
+    setOpen(false);
+    setDataUrl(null);
+    setLink(null);
+    setStatus("idle");
+    setErrMsg(null);
+  };
 
   return (
     <>
@@ -52,7 +78,7 @@ export function StaffQrDialog({ code, name, email, active }: Props) {
         <QrCode className="mr-1 h-4 w-4" />
         QR
       </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : reset())}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>QR code — {name ?? email}</DialogTitle>
@@ -65,48 +91,75 @@ export function StaffQrDialog({ code, name, email, active }: Props) {
               )}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col items-center gap-3">
-            {dataUrl ? (
-              <img
-                src={dataUrl}
-                alt={`QR for ${code}`}
-                className="h-72 w-72 rounded-md border border-border bg-white p-3"
-              />
-            ) : (
-              <div className="h-72 w-72 animate-pulse rounded-md bg-muted" />
-            )}
-            <a
-              href={link}
-              target="_blank"
-              rel="noreferrer"
-              className="break-all text-xs text-primary hover:underline"
-            >
-              {link}
-            </a>
-          </div>
+
+          {status === "checking" && (
+            <div className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Verifying permission…
+            </div>
+          )}
+
+          {status === "denied" && (
+            <div className="flex flex-col items-center gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-6 text-center">
+              <Lock className="h-6 w-6 text-destructive" />
+              <div className="text-sm font-medium text-destructive">Access denied</div>
+              <div className="text-xs text-muted-foreground">
+                {errMsg ?? "You don't have permission to view this QR code."}
+              </div>
+            </div>
+          )}
+
+          {status === "authorized" && (
+            <div className="flex flex-col items-center gap-3">
+              {dataUrl ? (
+                <img
+                  src={dataUrl}
+                  alt={`QR for ${code}`}
+                  className="h-72 w-72 rounded-md border border-border bg-white p-3"
+                />
+              ) : (
+                <div className="h-72 w-72 animate-pulse rounded-md bg-muted" />
+              )}
+              {link && (
+                <a
+                  href={link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="break-all text-xs text-primary hover:underline"
+                >
+                  {link}
+                </a>
+              )}
+            </div>
+          )}
+
           <DialogFooter className="flex-wrap gap-2 sm:gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                await navigator.clipboard.writeText(link);
-                toast.success("Link copied");
-              }}
-            >
-              <Copy className="mr-1 h-4 w-4" /> Copy link
-            </Button>
-            {dataUrl && (
+            {status === "authorized" && link && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(link);
+                  toast.success("Link copied");
+                }}
+              >
+                <Copy className="mr-1 h-4 w-4" /> Copy link
+              </Button>
+            )}
+            {status === "authorized" && dataUrl && (
               <a href={dataUrl} download={`${code}-qr.png`}>
                 <Button variant="outline" size="sm">
                   <Download className="mr-1 h-4 w-4" /> Download PNG
                 </Button>
               </a>
             )}
-            <Link to="/r/$code/poster" params={{ code }} target="_blank">
-              <Button variant="outline" size="sm">
-                <Printer className="mr-1 h-4 w-4" /> Print poster
-              </Button>
-            </Link>
+            {status === "authorized" && (
+              <Link to="/r/$code/poster" params={{ code }} target="_blank">
+                <Button variant="outline" size="sm">
+                  <Printer className="mr-1 h-4 w-4" /> Print poster
+                </Button>
+              </Link>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
