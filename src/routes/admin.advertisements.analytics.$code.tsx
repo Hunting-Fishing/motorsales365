@@ -7,6 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+
+type DrillStage = "scans" | "signups" | "listings";
+type DrillTarget = { day: string; stage: DrillStage } | null;
 
 export const Route = createFileRoute("/admin/advertisements/analytics/$code")({
   component: QrCodeDrilldownPage,
