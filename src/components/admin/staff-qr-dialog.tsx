@@ -34,7 +34,6 @@ export function StaffQrDialog({ code, name, email, active }: Props) {
 
   useEffect(() => {
     if (!open) return;
-    if (status !== "idle") return;
     let cancelled = false;
     setStatus("checking");
     setErrMsg(null);
@@ -59,7 +58,7 @@ export function StaffQrDialog({ code, name, email, active }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [open, status, code, authorize]);
+  }, [open, code, authorize]);
 
   const reset = () => {
     setOpen(false);
