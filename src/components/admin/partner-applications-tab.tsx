@@ -8,6 +8,8 @@ import {
   adminGetSupplierDocUrl,
 } from "@/lib/partner-applications.functions";
 
+type DocRow = { name: string; path: string; size?: number; type?: string; kind?: string };
+
 type Row = {
   id: string;
   company_name: string;
@@ -29,6 +31,21 @@ type Row = {
   storefront_blurb: string | null;
   storefront_logo_url: string | null;
   storefront_categories: string[] | null;
+  // onboarding
+  legal_business_name: string | null;
+  tax_id: string | null;
+  business_address: string | null;
+  city: string | null;
+  province_state: string | null;
+  postal_code: string | null;
+  years_in_business: number | null;
+  warehouse_locations: string | null;
+  ships_nationwide: boolean | null;
+  payment_terms: string | null;
+  catalog_feed_url: string | null;
+  catalog_feed_format: string | null;
+  documents: DocRow[] | null;
+  agreed_terms: boolean | null;
 };
 
 
