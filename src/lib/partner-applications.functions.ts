@@ -204,3 +204,17 @@ export const adminUpdatePartnerApplication = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+
+/** Admin: produce a signed URL to view an uploaded supplier document. */
+export const adminGetSupplierDocUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { path: string; expiresIn?: number }) => d)
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signed, error } = await supabaseAdmin.storage
+      .from("supplier-docs")
+      .createSignedUrl(data.path, data.expiresIn ?? 60 * 10);
+    if (error) throw new Error(error.message);
+    return { url: signed.signedUrl };
+  });
