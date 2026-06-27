@@ -67,7 +67,7 @@ export const listStaff365 = createServerFn({ method: "POST" })
 
     const ids = allUsers.map((u) => u.id);
     const roleMap = new Map<string, string[]>();
-    const nameMap = new Map<string, string | null>();
+    const profileMap = new Map<string, any>();
     if (ids.length > 0) {
       const { data: rs } = await supabaseAdmin
         .from("user_roles")
@@ -80,9 +80,11 @@ export const listStaff365 = createServerFn({ method: "POST" })
       });
       const { data: ps } = await supabaseAdmin
         .from("profiles")
-        .select("id,full_name")
+        .select(
+          "id,full_name,first_name,last_name,phone,personal_email,avatar_url,street_address,postal_code,signup_city,signup_region,signup_province,business_name,business_kind,business_address,business_region,business_province,business_city,business_postal_code,seller_type,verification_status",
+        )
         .in("id", ids);
-      (ps ?? []).forEach((p: any) => nameMap.set(p.id, p.full_name ?? null));
+      (ps ?? []).forEach((p: any) => profileMap.set(p.id, p));
     }
 
     // Cross-reference with Cloudflare Email Routing entries so we can flag
