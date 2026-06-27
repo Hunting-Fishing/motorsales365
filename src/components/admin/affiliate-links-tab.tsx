@@ -48,6 +48,11 @@ export function AffiliateLinksTab() {
   const [clicks, setClicks] = useState<Record<string, number>>({});
   const [editing, setEditing] = useState<Row | null>(null);
   const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [envFilter, setEnvFilter] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
 
   async function refresh() {
     setLoading(true);
@@ -145,6 +150,62 @@ export function AffiliateLinksTab() {
       {loading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : (
+        <>
+        {(() => {
+          const envOptions = Array.from(
+            new Set(rows.map((r) => r.affiliate_id_env).filter(Boolean) as string[])
+          ).sort();
+          const needle = q.trim().toLowerCase();
+          const filtered = rows.filter((r) => {
+            if (statusFilter === "active" && !r.is_active) return false;
+            if (statusFilter === "inactive" && r.is_active) return false;
+            if (envFilter !== "all" && (r.affiliate_id_env ?? "") !== envFilter) return false;
+            if (!needle) return true;
+            return (
+              r.label.toLowerCase().includes(needle) ||
+              r.supplier_slug.toLowerCase().includes(needle) ||
+              (r.url_template ?? "").toLowerCase().includes(needle) ||
+              (r.network ?? "").toLowerCase().includes(needle) ||
+              (r.affiliate_id_env ?? "").toLowerCase().includes(needle)
+            );
+          });
+          const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+          const safePage = Math.min(page, totalPages);
+          const start = (safePage - 1) * pageSize;
+          const pageRows = filtered.slice(start, start + pageSize);
+          return (
+        <>
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card/40 p-2">
+          <input
+            className="input flex-1 min-w-[180px]"
+            placeholder="Search label, slug, template, network…"
+            value={q}
+            onChange={(e) => { setQ(e.target.value); setPage(1); }}
+          />
+          <select
+            className="input w-auto"
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value as any); setPage(1); }}
+          >
+            <option value="all">All status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <select
+            className="input w-auto"
+            value={envFilter}
+            onChange={(e) => { setEnvFilter(e.target.value); setPage(1); }}
+          >
+            <option value="all">All env vars</option>
+            {envOptions.map((e) => (
+              <option key={e} value={e}>{e}</option>
+            ))}
+          </select>
+          <span className="text-xs text-muted-foreground">
+            {filtered.length} of {rows.length}
+          </span>
+        </div>
+
         <div className="overflow-x-auto rounded-lg border border-border">
           <table className="w-full min-w-[800px] text-sm">
             <thead className="bg-muted/50 text-left text-xs uppercase tracking-wider text-muted-foreground">
@@ -158,7 +219,7 @@ export function AffiliateLinksTab() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => {
+              {pageRows.map((r) => {
                 const idSet = r.affiliate_id_env
                   ? "configured by name"
                   : "—";
@@ -213,6 +274,33 @@ export function AffiliateLinksTab() {
             </tbody>
           </table>
         </div>
+        {totalPages > 1 && (
+          <div className="flex items-center justify-end gap-2 text-sm">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={safePage <= 1}
+              onClick={() => setPage(safePage - 1)}
+            >
+              Prev
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Page {safePage} / {totalPages}
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={safePage >= totalPages}
+              onClick={() => setPage(safePage + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        )}
+        </>
+          );
+        })()}
+        </>
       )}
 
       {editing && (
