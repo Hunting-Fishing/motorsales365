@@ -219,7 +219,7 @@ export function AffiliateLinksTab() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => {
+              {pageRows.map((r) => {
                 const idSet = r.affiliate_id_env
                   ? "configured by name"
                   : "—";
