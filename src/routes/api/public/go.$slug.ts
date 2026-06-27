@@ -32,6 +32,38 @@ export const Route = createFileRoute("/api/public/go/$slug")({
         const year = yearRaw ? Number(yearRaw) : null;
 
         const sb = publicClient();
+
+        // Partner storefronts: slug = "partner-<storefront_slug>"
+        if (slug.startsWith("partner-")) {
+          const storefrontSlug = slug.slice("partner-".length);
+          const { data: app } = await sb
+            .from("parts_supplier_applications" as any)
+            .select("website,storefront_slug,storefront_published")
+            .eq("storefront_slug", storefrontSlug)
+            .eq("storefront_published", true)
+            .maybeSingle();
+          const partnerTarget = (app as any)?.website;
+          if (!partnerTarget) {
+            return new Response("Partner storefront not found", { status: 404 });
+          }
+          try {
+            await sb.from("affiliate_clicks" as any).insert({
+              supplier_slug: slug,
+              query: query || null,
+              listing_id: listingId,
+              vehicle_make: make,
+              vehicle_model: model,
+              vehicle_year: Number.isFinite(year as number) ? year : null,
+              referrer: request.headers.get("referer"),
+              user_agent: request.headers.get("user-agent"),
+            });
+          } catch { /* ignore */ }
+          return new Response(null, {
+            status: 302,
+            headers: { Location: partnerTarget, "Cache-Control": "no-store" },
+          });
+        }
+
         const { data: link } = await sb
           .from("affiliate_links" as any)
           .select("supplier_slug,url_template,affiliate_id_env,is_active")
@@ -42,6 +74,7 @@ export const Route = createFileRoute("/api/public/go/$slug")({
         if (!link) {
           return new Response("Supplier not found", { status: 404 });
         }
+
 
         const l = link as any;
         const useInvolveAsia = l.affiliate_id_env === "INVOLVE_ASIA";
