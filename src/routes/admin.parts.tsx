@@ -41,12 +41,20 @@ function AdminPartsPage() {
             checklist for the accounts/integrations we need.
           </p>
         </div>
-        <a
-          href="/admin/parts/analytics"
-          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium hover:border-primary hover:text-primary"
-        >
-          📊 Click analytics
-        </a>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href="/admin/parts/analytics"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium hover:border-primary hover:text-primary"
+          >
+            📊 Click analytics
+          </a>
+          <a
+            href="/admin/parts/commissions"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium hover:border-primary hover:text-primary"
+          >
+            💰 Commissions
+          </a>
+        </div>
       </div>
 
 
