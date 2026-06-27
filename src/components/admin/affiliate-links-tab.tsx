@@ -75,6 +75,17 @@ export function AffiliateLinksTab() {
 
   async function save() {
     if (!editing) return;
+    const tpl = editing.url_template ?? "";
+    if (!tpl.trim() || !tpl.includes("{QUERY}")) {
+      toast.error("URL template must include {QUERY}");
+      return;
+    }
+    try {
+      new URL(tpl.replace(/\{QUERY\}/g, "test"));
+    } catch {
+      toast.error("URL template is not a valid absolute URL");
+      return;
+    }
     try {
       await upsert({
         data: {
