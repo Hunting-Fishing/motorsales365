@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Handshake, CheckCircle2, Globe2, Boxes, Zap, ShieldCheck } from "lucide-react";
+import { Handshake, CheckCircle2, Globe2, Boxes, Zap, ShieldCheck, FileText } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { submitPartnerApplication } from "@/lib/partner-applications.functions";
@@ -112,6 +112,26 @@ function PartnersPartsPage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Onboarding CTA */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
+          <div className="flex items-start gap-2">
+            <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+            <div>
+              <p className="text-sm font-semibold">Ready to be a verified supplier?</p>
+              <p className="text-xs text-muted-foreground">
+                Skip the short form — go straight to full onboarding with document upload (Mayor's
+                permit, BIR 2303, DTI/SEC, ID).
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/partners/parts/onboarding"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            Start onboarding →
+          </Link>
         </div>
 
         {/* Partnership types */}

@@ -21,6 +21,14 @@ const PartnershipType = z.enum([
   "other",
 ]);
 
+const DocItem = z.object({
+  name: z.string().max(200),
+  path: z.string().max(400),
+  size: z.number().int().nonnegative().optional(),
+  type: z.string().max(120).optional(),
+  kind: z.string().max(60).optional(), // e.g. "business_permit", "tax_cert", "id"
+});
+
 const SubmitInput = z.object({
   company_name: z.string().trim().min(2).max(120),
   contact_name: z.string().trim().min(2).max(120),
@@ -33,6 +41,21 @@ const SubmitInput = z.object({
   monthly_volume: z.string().trim().max(60).optional().nullable(),
   brands_carried: z.string().trim().max(500).optional().nullable(),
   notes: z.string().trim().max(2000).optional().nullable(),
+  // Onboarding (optional so the short /partners/parts form still works)
+  legal_business_name: z.string().trim().max(160).optional().nullable(),
+  tax_id: z.string().trim().max(60).optional().nullable(),
+  business_address: z.string().trim().max(240).optional().nullable(),
+  city: z.string().trim().max(80).optional().nullable(),
+  province_state: z.string().trim().max(80).optional().nullable(),
+  postal_code: z.string().trim().max(20).optional().nullable(),
+  years_in_business: z.number().int().min(0).max(200).optional().nullable(),
+  warehouse_locations: z.string().trim().max(500).optional().nullable(),
+  ships_nationwide: z.boolean().optional(),
+  payment_terms: z.string().trim().max(120).optional().nullable(),
+  catalog_feed_url: z.string().trim().max(300).optional().nullable(),
+  catalog_feed_format: z.string().trim().max(40).optional().nullable(),
+  documents: z.array(DocItem).max(20).optional(),
+  agreed_terms: z.boolean().optional(),
 });
 
 /** Public: submit a B2B parts-supplier / affiliate partnership application. */
@@ -54,6 +77,21 @@ export const submitPartnerApplication = createServerFn({ method: "POST" })
         monthly_volume: data.monthly_volume || null,
         brands_carried: data.brands_carried || null,
         notes: data.notes || null,
+        legal_business_name: data.legal_business_name || null,
+        tax_id: data.tax_id || null,
+        business_address: data.business_address || null,
+        city: data.city || null,
+        province_state: data.province_state || null,
+        postal_code: data.postal_code || null,
+        years_in_business: data.years_in_business ?? null,
+        warehouse_locations: data.warehouse_locations || null,
+        ships_nationwide: data.ships_nationwide ?? false,
+        payment_terms: data.payment_terms || null,
+        catalog_feed_url: data.catalog_feed_url || null,
+        catalog_feed_format: data.catalog_feed_format || null,
+        documents: data.documents ?? [],
+        agreed_terms: data.agreed_terms ?? false,
+        agreed_terms_at: data.agreed_terms ? new Date().toISOString() : null,
       });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -166,3 +204,17 @@ export const adminUpdatePartnerApplication = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+
+/** Admin: produce a signed URL to view an uploaded supplier document. */
+export const adminGetSupplierDocUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { path: string; expiresIn?: number }) => d)
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signed, error } = await supabaseAdmin.storage
+      .from("supplier-docs")
+      .createSignedUrl(data.path, data.expiresIn ?? 60 * 10);
+    if (error) throw new Error(error.message);
+    return { url: signed.signedUrl };
+  });
