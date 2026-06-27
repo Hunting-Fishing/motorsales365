@@ -70,6 +70,7 @@ function AdminPartsPage() {
       {tab === "quotes" && <QuotesTab />}
       {tab === "interest" && <InterestTab />}
       {tab === "suppliers" && <SuppliersTab />}
+      {tab === "affiliates" && <AffiliateLinksTab />}
       {tab === "outlets" && <OutletsTab />}
       {tab === "catalog" && <CatalogTab />}
       {tab === "tires" && <TireSpecsTab />}
