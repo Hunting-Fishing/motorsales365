@@ -222,6 +222,7 @@ export function EditProfileDialog({
         await updateProfile({ data: payload });
       }
 
+      if (canEditRoles) {
       const current = new Set<StaffRole>(
         ((user.roles ?? []) as string[]).filter((r): r is StaffRole =>
           (STAFF_ROLES as string[]).includes(r),
