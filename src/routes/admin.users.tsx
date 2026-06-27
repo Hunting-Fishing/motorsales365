@@ -44,8 +44,9 @@ type StaffRole = (typeof STAFF_ROLES)[number];
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
 
 function AdminUsers() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const isSuperAdmin = (user?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
+  const canEditRoles = isAdmin || isSuperAdmin;
   const genMagicLink = useServerFn(generateStaffMagicLink);
   const fetchStaffIds = useServerFn(listStaffUserIds);
   const [staffIds, setStaffIds] = useState<Set<string>>(new Set());
