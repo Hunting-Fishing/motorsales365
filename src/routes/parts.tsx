@@ -150,8 +150,19 @@ function PartsHub() {
           </button>
         </div>
 
+
+        {/* Affiliate shop row — hidden until at least one supplier is active in admin */}
+        <div className="mb-4">
+          <AffiliateShopRow
+            query="auto parts philippines"
+            title="Shop parts from our partners"
+          />
+        </div>
+
         {tab === "find" && <PartsWizard />}
         {tab === "order" && <OemSearch />}
+
+
 
         {tab === "browse" && (
           <div className="space-y-2">
