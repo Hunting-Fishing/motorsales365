@@ -47,6 +47,8 @@ function PartsHub() {
   const [density, setDensity] = useGridDensity(3);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [countries, setCountries] = useState<Array<{ code: string; name: string; is_active: boolean }>>([]);
+  const [vehicleCtx, setVehicleCtx] = useState<{ make: string; model: string; year: string }>({ make: "", model: "", year: "" });
+  const partnerQuery = [vehicleCtx.make, vehicleCtx.model, "parts"].filter(Boolean).join(" ").trim() || "auto parts";
 
   useEffect(() => {
     fetchCountries().then(setCountries as any).catch(() => {});
