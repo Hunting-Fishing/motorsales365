@@ -50,6 +50,9 @@ function AdminPartsPage() {
         <TabButton active={tab === "suppliers"} onClick={() => setTab("suppliers")}>
           <Network className="h-4 w-4" /> Suppliers & APIs
         </TabButton>
+        <TabButton active={tab === "affiliates"} onClick={() => setTab("affiliates")}>
+          <Link2 className="h-4 w-4" /> Affiliate links
+        </TabButton>
         <TabButton active={tab === "outlets"} onClick={() => setTab("outlets")}>
           <Building2 className="h-4 w-4" /> Markets & outlets
         </TabButton>
