@@ -225,6 +225,7 @@ import { Route as DashboardBusinessBusinessIdBillingRouteImport } from './routes
 import { Route as ApiSellerStaffResetPasswordRouteImport } from './routes/api/seller/staff/reset-password'
 import { Route as ApiSellerStaffDeactivateRouteImport } from './routes/api/seller/staff/deactivate'
 import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/staff/create'
+import { Route as ApiPublicPostbackNetworkRouteImport } from './routes/api/public/postback.$network'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicHooksRecomputeTiersRouteImport } from './routes/api/public/hooks/recompute-tiers'
@@ -1358,6 +1359,12 @@ const ApiSellerStaffCreateRoute = ApiSellerStaffCreateRouteImport.update({
   path: '/api/seller/staff/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPostbackNetworkRoute =
+  ApiPublicPostbackNetworkRouteImport.update({
+    id: '/api/public/postback/$network',
+    path: '/api/public/postback/$network',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -1657,6 +1664,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
@@ -1883,6 +1891,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
@@ -2117,6 +2126,7 @@ export interface FileRoutesById {
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
@@ -2351,6 +2361,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/api/public/postback/$network'
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
@@ -2577,6 +2588,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/api/public/postback/$network'
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
@@ -2810,6 +2822,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/api/public/postback/$network'
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
@@ -2943,6 +2956,7 @@ export interface RootRouteChildren {
   ApiPublicHooksRecomputeTiersRoute: typeof ApiPublicHooksRecomputeTiersRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicPostbackNetworkRoute: typeof ApiPublicPostbackNetworkRoute
   ApiSellerStaffCreateRoute: typeof ApiSellerStaffCreateRoute
   ApiSellerStaffDeactivateRoute: typeof ApiSellerStaffDeactivateRoute
   ApiSellerStaffResetPasswordRoute: typeof ApiSellerStaffResetPasswordRoute
@@ -4469,6 +4483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSellerStaffCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/postback/$network': {
+      id: '/api/public/postback/$network'
+      path: '/api/public/postback/$network'
+      fullPath: '/api/public/postback/$network'
+      preLoaderRoute: typeof ApiPublicPostbackNetworkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -5078,6 +5099,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksRecomputeTiersRoute: ApiPublicHooksRecomputeTiersRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicPostbackNetworkRoute: ApiPublicPostbackNetworkRoute,
   ApiSellerStaffCreateRoute: ApiSellerStaffCreateRoute,
   ApiSellerStaffDeactivateRoute: ApiSellerStaffDeactivateRoute,
   ApiSellerStaffResetPasswordRoute: ApiSellerStaffResetPasswordRoute,
