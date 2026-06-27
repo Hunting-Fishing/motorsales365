@@ -226,7 +226,7 @@ function Staff365Page() {
                   active={Boolean(u.referral_active)}
                 />
               )}
-              <EditProfileDialog user={u} onSaved={load} />
+              <EditProfileDialog user={u} onSaved={load} canEditRoles={isSuperAdmin} />
               <ResetPasswordDialog user={u} />
               <Button
                 size="sm"

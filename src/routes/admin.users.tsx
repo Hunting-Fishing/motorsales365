@@ -44,8 +44,9 @@ type StaffRole = (typeof STAFF_ROLES)[number];
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
 
 function AdminUsers() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const isSuperAdmin = (user?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
+  const canEditRoles = isAdmin || isSuperAdmin;
   const genMagicLink = useServerFn(generateStaffMagicLink);
   const fetchStaffIds = useServerFn(listStaffUserIds);
   const [staffIds, setStaffIds] = useState<Set<string>>(new Set());
@@ -440,7 +441,7 @@ function AdminUsers() {
                     {magicLoadingId === u.id ? "…" : "Sign-in link"}
                   </Button>
                 )}
-                <EditProfileDialog user={u} onSaved={load} is365Staff={staffIds.has(u.id)} />
+                <EditProfileDialog user={u} onSaved={load} is365Staff={staffIds.has(u.id)} canEditRoles={canEditRoles} />
                 {isSuperAdmin && <ResetPasswordDialog user={u} />}
                 {isVerified ? (
                   <Button

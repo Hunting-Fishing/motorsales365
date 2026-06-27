@@ -85,6 +85,46 @@ export const adminUpdateUserProfile = createServerFn({ method: "POST" })
       if (pErr) throw new Error(pErr.message);
     }
 
+    // Mirror business fields onto the user's single owned business row, when
+    // exactly one exists. Multi-owner / no-owner cases are left alone so the
+    // admin can edit each business directly from its own page.
+    const businessTouched =
+      "business_name" in profilePatch ||
+      "business_address" in profilePatch ||
+      "business_city" in profilePatch ||
+      "business_province" in profilePatch ||
+      "business_region" in profilePatch ||
+      "business_postal_code" in profilePatch ||
+      "business_kind" in profilePatch;
+    let mirroredBusinessId: string | null = null;
+    if (businessTouched) {
+      const { data: owned } = await supabaseAdmin
+        .from("businesses")
+        .select("id")
+        .eq("owner_id", targetUserId);
+      if (owned && owned.length === 1) {
+        const bizPatch: Record<string, any> = {};
+        if ("business_name" in profilePatch) bizPatch.name = profilePatch.business_name;
+        if ("business_address" in profilePatch)
+          bizPatch.street_address = profilePatch.business_address;
+        if ("business_city" in profilePatch) bizPatch.city = profilePatch.business_city;
+        if ("business_province" in profilePatch)
+          bizPatch.province = profilePatch.business_province;
+        if ("business_region" in profilePatch) bizPatch.region = profilePatch.business_region;
+        if ("business_postal_code" in profilePatch)
+          bizPatch.postal_code = profilePatch.business_postal_code;
+        if ("business_kind" in profilePatch) bizPatch.type_slug = profilePatch.business_kind;
+        if (Object.keys(bizPatch).length > 0) {
+          const { error: bErr } = await supabaseAdmin
+            .from("businesses")
+            .update(bizPatch as any)
+            .eq("id", owned[0].id);
+          if (bErr) throw new Error(`Business mirror failed: ${bErr.message}`);
+          mirroredBusinessId = owned[0].id;
+        }
+      }
+    }
+
     // Audit (best effort)
     try {
       await supabaseAdmin.from("admin_audit_log").insert({
@@ -100,5 +140,31 @@ export const adminUpdateUserProfile = createServerFn({ method: "POST" })
       // ignore
     }
 
-    return { ok: true };
+    return { ok: true, mirroredBusinessId };
+  });
+
+/**
+ * Returns a lightweight summary of businesses owned by the target user so
+ * the admin "Edit user profile" dialog can show whether business-tab edits
+ * will mirror to a `businesses` row.
+ */
+export const adminGetOwnedBusinesses = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ targetUserId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const callerEmail = (context.claims?.email as string | undefined)?.toLowerCase();
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin && callerEmail !== ALLOWED_ADMIN_EMAIL) {
+      throw new Error("Not permitted");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("businesses")
+      .select("id,name,slug")
+      .eq("owner_id", data.targetUserId);
+    if (error) throw new Error(error.message);
+    return { businesses: rows ?? [] };
   });
