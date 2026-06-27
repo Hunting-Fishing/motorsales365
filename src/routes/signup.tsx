@@ -25,6 +25,8 @@ import { LocationPicker, type LocationValue } from "@/components/location-picker
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
 import { siteOrigin } from "@/lib/site-config";
+import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
+
 
 type SignupSearch = { type?: SignupIntent; redirect?: string };
 
