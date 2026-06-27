@@ -6422,6 +6422,7 @@ export type Database = {
           login_username: string | null
           member_number: number | null
           parent_org_id: string | null
+          personal_email: string | null
           phone: string | null
           phone_e164: string | null
           phone_verified_at: string | null
@@ -6475,6 +6476,7 @@ export type Database = {
           login_username?: string | null
           member_number?: number | null
           parent_org_id?: string | null
+          personal_email?: string | null
           phone?: string | null
           phone_e164?: string | null
           phone_verified_at?: string | null
@@ -6528,6 +6530,7 @@ export type Database = {
           login_username?: string | null
           member_number?: number | null
           parent_org_id?: string | null
+          personal_email?: string | null
           phone?: string | null
           phone_e164?: string | null
           phone_verified_at?: string | null

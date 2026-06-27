@@ -1,64 +1,39 @@
-## Goal
-Turn `/parts` and listing detail pages from "Coming Soon" placeholders into a real, monetized parts surface — across all 4 channels you picked. Since you don't have any approvals yet, I'll build the infrastructure first so revenue starts flowing the moment each account gets approved (just paste the ID/key into a secret).
+## Goals
+1. Fix Edit user profile dialog showing blank fields after creating a 365 staff user.
+2. Add a Personal email field (separate from the staff @365motorsales.com login email) on both Create and Edit.
+3. Make the Create form's Email field a username box with a fixed `@365motorsales.com` suffix so admins type only the local part.
 
-## Phase 1 — Foundation (works with zero approvals)
+## Root cause (#1)
+`admin.staff-365.tsx` passes `Staff365Row` to `EditProfileDialog`. That row only contains `id, email, full_name, roles, …` — no first/last name, phone, address, or business fields. The dialog's `useEffect` seeds the form from those missing properties, so every tab beyond "Identity → Full name" appears empty even when Create saved the data correctly.
 
-**Database**
-- New `affiliate_links` table: `id, supplier_slug, label, url_template, tracking_param, is_active, priority`. Lets admins manage outbound deep-link templates per supplier (e.g. `https://shopee.ph/search?keyword={QUERY}&af_id={SHOPEE_AFFILIATE_ID}`).
-- New `affiliate_clicks` table: logs every outbound click (`supplier_slug, query, listing_id, vehicle_id, user_id, visitor_id, referrer, ua, created_at`) — gives us our own analytics independent of supplier dashboards.
-- New `ad_placements_parts` table (lightweight): in-house sponsored slots specifically for `/parts` so we can sell placements to PH shops while affiliate approvals are pending.
+## Changes
 
-**Server**
-- `src/lib/affiliate.functions.ts` — `getAffiliateLinks(query, vehicle)` builds tagged URLs from active templates, `recordAffiliateClick(...)` logs the click, then 302-redirects.
-- `src/routes/api/public/go.$slug.ts` server route — every outbound link goes through `/api/public/go/<supplier>?q=...&listing_id=...`, which logs and redirects. This is what makes the whole funnel measurable + lets us swap suppliers without touching UI.
+### A. Database
+- New migration: add `profiles.personal_email text` (nullable, lower-case index). No grant changes needed (column inherits table grants).
 
-**UI**
-- Replace the "Coming Soon" body of `affiliate-parts-section.tsx` with a real "Shop these parts" row that renders cards for each active supplier (Lazada, Shopee, Amazon, eBay, RockAuto, Amayama, etc.) using the make/model/year on the listing. Each card → `/api/public/go/...`.
-- Add the same component to `/parts` keyed off the VIN/chassis search query.
-- Keep the amber Coming Soon strip for whichever suppliers are still inactive — auto-hides as soon as their secret is added.
+### B. Create-user API (`src/routes/api/admin/create-user.tsx`)
+- Add `personal_email` to the Zod body schema and copy it into the profile patch.
 
-**Admin**
-- New "Affiliate links" tab in `/admin/parts` to CRUD `affiliate_links` rows + see click counts.
-- New "Sponsored slots" tab to manage in-house sponsored placements (PH shops) — pay-per-week or pay-per-click.
+### C. Profile update server fn (`src/lib/admin-profile.functions.ts`)
+- Add `personal_email` to `ProfilePatch` schema so the Edit dialog can save it.
 
-## Phase 2 — Approvals & wiring (one supplier at a time)
+### D. Staff list (`src/lib/admin-staff-list.functions.ts`)
+- Extend the `profiles` select to include `first_name, last_name, phone, personal_email, street_address, postal_code, signup_city, signup_region, signup_province, business_name, business_kind, business_address, business_region, business_province, business_city, business_postal_code, seller_type, verification_status, avatar_url`, and expose them on `Staff365Row`.
+- This is the simplest fix and ensures the Edit dialog hydrates from the same row already rendered in the list.
 
-For each supplier you sign up with, the only work is:
-1. I prep the signup checklist + give you the callback URL / site URL they'll ask for.
-2. You apply at the affiliate portal.
-3. Once approved, you paste the affiliate ID/API key — I store it via `add_secret`.
-4. I flip the template's `is_active` to true and links go live.
+### E. AddUserDialog (`src/components/admin/add-user-dialog.tsx`)
+- Replace the `Email *` Input with a split control when `enforceDomain` is set:
+  - Left: `username` text input (lowercased, strips non `[a-z0-9._-]`)
+  - Right: muted suffix chip `@365motorsales.com`
+  - On submit, compose `email = `${username}${enforceDomain}``.
+  - When `enforceDomain` is not set, keep current full-email Input.
+- Add a new "Personal email" field on the Identity tab (optional, validated as email if filled), included in the POST body.
 
-**Suggested order** (fastest approval → slowest):
-- **Shopee Affiliate PH** (Involve Asia) — usually 1–3 days
-- **Lazada Affiliate PH** (Involve Asia or direct) — 1–7 days
-- **eBay Partner Network** (Motors vertical) — 1–3 days, very generous for car parts
-- **Amazon PA-API** — needs 3 qualifying sales in first 180 days, but apply now
-- **Amayama / Megazip / PartSouq** — direct email partnerships; I'll draft outreach copy
+### F. EditProfileDialog (`src/components/admin/edit-profile-dialog.tsx`)
+- Extend `EditableUser` type and the `form` state with `personal_email`.
+- Add a "Personal email" input next to the existing "Email (change auth email)" field.
+- Include `personal_email` in the diff-and-save payload.
 
-## Phase 3 — Sponsored placements (revenue while we wait)
-
-- "Featured shop" cards on `/parts` (Banawe row, Autohub, etc.) sold by your sales reps using the existing ad pipeline.
-- Uses the same click-logging route, so shops get a real dashboard of clicks.
-- This is the only channel where revenue is 100% in your control — no third-party approval needed.
-
-## Phase 4 — OEM lead-gen layer
-
-- Wire the existing `oem_parts_interest` form so when a VIN/chassis lookup returns matches from Amayama/PartSouq, we show "Get OEM quote" with an affiliate-tagged outbound link AND capture the lead in our DB.
-- Dual revenue: their commission + we keep the lead for our own future D2C catalog (parts vision memory).
-
-## Technical Notes
-
-- `/api/public/go/...` is a TanStack server route under `/api/public/` so it bypasses the auth wall and is cheap to call.
-- Click logging uses a publishable-key client + narrow `TO anon` INSERT policy; no service-role on a public endpoint.
-- Affiliate IDs are non-secret per-supplier but I'll still store them as secrets so they don't end up in git.
-- Honors the Parts vision memory (PH→SEA→global, country-scoped catalog, wash-sale + ad monetization) and the Terms sync rule (I'll add the affiliate disclosure update to `/terms` and `/affiliate-disclosure` in the same turn).
-
-## What I'll need from you after the plan is approved
-
-Nothing immediately — Phase 1 builds the whole infrastructure with no secrets needed. After it ships I'll hand you a checklist with apply-links for Shopee/Lazada/eBay/Amazon so you can start the approvals in parallel.
-
-## Out of scope (for now)
-- Building our own OEM catalog DB (separate, larger effort tracked in the Parts vision memory).
-- Lazada scraper hardening — keep as-is until we have the real affiliate API.
-- Stripe/payout work — pure affiliate, no money moves through us yet.
+## Out of scope
+- Cloudflare Email Routing automation (still a manual step, message kept).
+- No changes to RLS, role policies, or non-staff create flows.
