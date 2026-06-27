@@ -289,3 +289,84 @@ function StorefrontEditor({ row, onSaved }: { row: Row; onSaved: () => void }) {
   );
 }
 
+function OnboardingPanel({ row }: { row: Row }) {
+  const getUrl = useServerFn(adminGetSupplierDocUrl);
+  const hasOnboarding =
+    row.legal_business_name ||
+    row.tax_id ||
+    row.business_address ||
+    (row.documents && row.documents.length > 0);
+  if (!hasOnboarding) return null;
+
+  async function openDoc(path: string) {
+    try {
+      const { url } = await getUrl({ data: { path } });
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not open document");
+    }
+  }
+
+  const detailRows: [string, string | null | undefined][] = [
+    ["Legal name", row.legal_business_name],
+    ["Tax ID / TIN", row.tax_id],
+    ["Years", row.years_in_business?.toString() ?? null],
+    [
+      "Address",
+      [row.business_address, row.city, row.province_state, row.postal_code]
+        .filter(Boolean)
+        .join(", ") || null,
+    ],
+    ["Warehouses", row.warehouse_locations],
+    ["Ships nationwide", row.ships_nationwide ? "Yes" : null],
+    ["Payment terms", row.payment_terms],
+    ["Catalog feed", row.catalog_feed_url],
+    ["Catalog format", row.catalog_feed_format],
+    ["Agreed to terms", row.agreed_terms ? "Yes" : null],
+  ].filter(([, v]) => !!v) as [string, string][];
+
+  return (
+    <div className="mt-3 rounded-lg border border-border bg-background/50 p-3">
+      <p className="mb-2 flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <FileText className="h-3 w-3" /> Onboarding details
+      </p>
+      {detailRows.length > 0 && (
+        <dl className="grid gap-x-3 gap-y-1 text-xs sm:grid-cols-2">
+          {detailRows.map(([k, v]) => (
+            <div key={k} className="flex gap-1">
+              <dt className="text-muted-foreground">{k}:</dt>
+              <dd className="font-medium">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {row.documents && row.documents.length > 0 && (
+        <div className="mt-2">
+          <p className="mb-1 text-xs font-medium">Documents</p>
+          <ul className="space-y-1">
+            {row.documents.map((d) => (
+              <li key={d.path} className="flex items-center gap-2 text-xs">
+                <FileText className="h-3 w-3 text-primary" />
+                <span className="truncate">{d.name}</span>
+                {d.kind && (
+                  <span className="rounded bg-muted px-1 text-[10px] text-muted-foreground">
+                    {d.kind}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => openDoc(d.path)}
+                  className="ml-auto inline-flex items-center gap-1 text-primary hover:underline"
+                >
+                  <Download className="h-3 w-3" /> View
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
