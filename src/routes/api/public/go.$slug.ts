@@ -68,13 +68,29 @@ export const Route = createFileRoute("/api/public/go/$slug")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: link } = await supabaseAdmin
           .from("affiliate_links" as any)
-          .select("supplier_slug,url_template,affiliate_id_env,is_active")
+          .select("supplier_slug,url_template,affiliate_id_env,is_active,allowed_countries")
           .eq("supplier_slug", slug)
           .eq("is_active", true)
           .maybeSingle();
 
         if (!link) {
           return new Response("Supplier not found", { status: 404 });
+        }
+
+        // Region gate: only redirect when visitor's country is allowed for this partner.
+        // Visitor country comes from Cloudflare's CF-IPCountry header; falls back to PH
+        // (our default active market). Empty/null allowed_countries = available everywhere.
+        const visitorCountry = (
+          request.headers.get("cf-ipcountry") ||
+          request.headers.get("x-vercel-ip-country") ||
+          "PH"
+        ).toUpperCase();
+        const allowed = (link as any).allowed_countries as string[] | null;
+        if (allowed && allowed.length > 0 && !allowed.includes(visitorCountry)) {
+          return new Response(
+            `This partner is not available in ${visitorCountry}. Try a regional partner instead.`,
+            { status: 451, headers: { "Cache-Control": "no-store" } },
+          );
         }
 
 
