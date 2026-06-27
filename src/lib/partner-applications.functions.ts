@@ -59,6 +59,51 @@ export const submitPartnerApplication = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ---- Public storefront ----
+
+export type PartnerStorefront = {
+  storefront_slug: string;
+  company_name: string;
+  country: string;
+  business_kind: string;
+  website: string | null;
+  storefront_blurb: string | null;
+  storefront_logo_url: string | null;
+  storefront_categories: string[] | null;
+};
+
+/** Public: fetch a published partner storefront by slug. */
+export const getPartnerStorefront = createServerFn({ method: "GET" })
+  .inputValidator((d: { slug: string }) => d)
+  .handler(async ({ data }): Promise<PartnerStorefront | null> => {
+    const sb = publicClient();
+    const { data: row } = await sb
+      .from("parts_supplier_applications" as any)
+      .select(
+        "storefront_slug,company_name,country,business_kind,website,storefront_blurb,storefront_logo_url,storefront_categories",
+      )
+      .eq("storefront_slug", data.slug)
+      .eq("storefront_published", true)
+      .maybeSingle();
+    return (row as any) ?? null;
+  });
+
+/** Public: list all published partner storefronts (for /shop index). */
+export const listPartnerStorefronts = createServerFn({ method: "GET" }).handler(
+  async (): Promise<PartnerStorefront[]> => {
+    const sb = publicClient();
+    const { data } = await sb
+      .from("parts_supplier_applications" as any)
+      .select(
+        "storefront_slug,company_name,country,business_kind,website,storefront_blurb,storefront_logo_url,storefront_categories",
+      )
+      .eq("storefront_published", true)
+      .order("company_name", { ascending: true });
+    return ((data as any) ?? []) as PartnerStorefront[];
+  },
+);
+
+
 // ---- Admin ----
 
 async function ensureAdmin(ctx: { supabase: any; userId: string }) {
