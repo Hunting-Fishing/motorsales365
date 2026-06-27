@@ -169,6 +169,7 @@ export function PartnerApplicationsTab() {
                   <span className="font-medium">Notes:</span> {r.notes}
                 </p>
               )}
+              <OnboardingPanel row={r} />
               {r.status === "approved" && (
                 <StorefrontEditor row={r} onSaved={refresh} />
               )}
