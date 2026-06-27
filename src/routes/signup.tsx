@@ -530,6 +530,12 @@ function SignupPage() {
               {errorFor("email") && (
                 <p className="mt-1 text-xs text-destructive">{errorFor("email")}</p>
               )}
+              {isStaffEmail(email) && (
+                <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
+                  {STAFF_EMAIL_DOMAIN} is reserved for 365 employees. Ask a 365 admin to create your account.
+                </p>
+              )}
+
             </div>
           </div>
 
