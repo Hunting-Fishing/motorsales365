@@ -8,6 +8,7 @@ import {
   adminUpsertAffiliateLink,
   adminDeleteAffiliateLink,
   adminAffiliateClickStats,
+  adminPingInvolveAsia,
 } from "@/lib/affiliate.functions";
 
 type Row = {
@@ -42,6 +43,7 @@ export function AffiliateLinksTab() {
   const upsert = useServerFn(adminUpsertAffiliateLink);
   const remove = useServerFn(adminDeleteAffiliateLink);
   const stats = useServerFn(adminAffiliateClickStats);
+  const pingIA = useServerFn(adminPingInvolveAsia);
   const [rows, setRows] = useState<Row[]>([]);
   const [clicks, setClicks] = useState<Record<string, number>>({});
   const [editing, setEditing] = useState<Row | null>(null);
@@ -94,16 +96,32 @@ export function AffiliateLinksTab() {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">
           Templates for tagged outbound deep-links. Use{" "}
           <code className="rounded bg-muted px-1">{`{QUERY}`}</code> for the search
-          term and store affiliate IDs as project secrets (referenced by name in{" "}
-          <em>Affiliate ID env</em>).
+          term. Set <em>Affiliate ID env</em> to <code className="rounded bg-muted px-1">INVOLVE_ASIA</code>{" "}
+          to mint tracked links via the Involve Asia deeplink API.
         </p>
-        <Button size="sm" onClick={() => setEditing({ ...BLANK })}>
-          <Plus className="mr-1 h-4 w-4" /> Add supplier
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={async () => {
+              try {
+                const r = await pingIA();
+                r.ok ? toast.success(r.message) : toast.error(r.message);
+              } catch (e: any) {
+                toast.error(e?.message ?? "Ping failed");
+              }
+            }}
+          >
+            Test Involve Asia
+          </Button>
+          <Button size="sm" onClick={() => setEditing({ ...BLANK })}>
+            <Plus className="mr-1 h-4 w-4" /> Add supplier
+          </Button>
+        </div>
       </div>
 
       {loading ? (
