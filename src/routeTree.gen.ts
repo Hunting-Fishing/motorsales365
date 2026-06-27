@@ -188,6 +188,7 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
+import { Route as AdminPartsOutreachRouteImport } from './routes/admin.parts.outreach'
 import { Route as AdminPartsCommissionsRouteImport } from './routes/admin.parts.commissions'
 import { Route as AdminPartsAnalyticsRouteImport } from './routes/admin.parts.analytics'
 import { Route as AdminAdvertisementsSlotsRouteImport } from './routes/admin.advertisements.slots'
@@ -1145,6 +1146,11 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   path: '/redemptions/$staffId',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPartsOutreachRoute = AdminPartsOutreachRouteImport.update({
+  id: '/outreach',
+  path: '/outreach',
+  getParentRoute: () => AdminPartsRoute,
+} as any)
 const AdminPartsCommissionsRoute = AdminPartsCommissionsRouteImport.update({
   id: '/commissions',
   path: '/commissions',
@@ -1641,6 +1647,7 @@ export interface FileRoutesByFullPath {
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
+  '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1871,6 +1878,7 @@ export interface FileRoutesByTo {
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
+  '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2107,6 +2115,7 @@ export interface FileRoutesById {
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
+  '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2344,6 +2353,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/slots'
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
+    | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2574,6 +2584,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/slots'
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
+    | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2809,6 +2820,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/slots'
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
+    | '/admin/parts/outreach'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -4248,6 +4260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRedemptionsStaffIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/parts/outreach': {
+      id: '/admin/parts/outreach'
+      path: '/outreach'
+      fullPath: '/admin/parts/outreach'
+      preLoaderRoute: typeof AdminPartsOutreachRouteImport
+      parentRoute: typeof AdminPartsRoute
+    }
     '/admin/parts/commissions': {
       id: '/admin/parts/commissions'
       path: '/commissions'
@@ -4712,11 +4731,13 @@ const AdminAdvertisementsRouteWithChildren =
 interface AdminPartsRouteChildren {
   AdminPartsAnalyticsRoute: typeof AdminPartsAnalyticsRoute
   AdminPartsCommissionsRoute: typeof AdminPartsCommissionsRoute
+  AdminPartsOutreachRoute: typeof AdminPartsOutreachRoute
 }
 
 const AdminPartsRouteChildren: AdminPartsRouteChildren = {
   AdminPartsAnalyticsRoute: AdminPartsAnalyticsRoute,
   AdminPartsCommissionsRoute: AdminPartsCommissionsRoute,
+  AdminPartsOutreachRoute: AdminPartsOutreachRoute,
 }
 
 const AdminPartsRouteWithChildren = AdminPartsRoute._addFileChildren(
