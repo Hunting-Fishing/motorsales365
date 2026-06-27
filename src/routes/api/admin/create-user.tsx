@@ -140,6 +140,25 @@ export const Route = createFileRoute("/api/admin/create-user")({
             );
           }
 
+          // Hard rule: any @365motorsales.com address is always a 365 staff
+          // account. Silently coerce so admins can't accidentally provision a
+          // staff inbox as a private/business seller. We zero out any business
+          // fields the client may have sent.
+          const staffDomain = isStaffEmail(input.email);
+          if (staffDomain && input.account_type !== "staff") {
+            input.account_type = "staff";
+            input.seller_type = undefined;
+            input.business_name = undefined;
+            input.business_kind = undefined;
+            input.business_address = undefined;
+            input.business_city = undefined;
+            input.business_province = undefined;
+            input.business_region = undefined;
+            input.business_postal_code = undefined;
+            input.mark_verified = undefined;
+          }
+
+
           const { data: created, error: createErr } = await sb.auth.admin.createUser({
             email: input.email,
             password: input.password,
