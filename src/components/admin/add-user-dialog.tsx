@@ -82,6 +82,8 @@ export function AddUserDialog({
   const [tab, setTab] = useState<TabKey>("identity");
   const [submitting, setSubmitting] = useState(false);
   const [email, setEmail] = useState("");
+  const [emailUser, setEmailUser] = useState("");
+  const [personalEmail, setPersonalEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [fullName, setFullName] = useState("");
@@ -115,6 +117,8 @@ export function AddUserDialog({
   const reset = () => {
     setTab("identity");
     setEmail("");
+    setEmailUser("");
+    setPersonalEmail("");
     setFirstName("");
     setLastName("");
     setFullName("");
@@ -156,13 +160,25 @@ export function AddUserDialog({
   };
 
   const submit = async () => {
-    if (!email || !firstName.trim() || !lastName.trim() || !password) {
+    // Compose the auth email. When a domain is enforced, the admin only types
+    // the local part (the part before "@"); we append the suffix here.
+    const composedEmail = enforceDomain
+      ? `${emailUser.trim().toLowerCase()}${enforceDomain.toLowerCase()}`
+      : email.trim().toLowerCase();
+    const localOk = enforceDomain ? /^[a-z0-9][a-z0-9._-]*$/.test(emailUser.trim().toLowerCase()) : true;
+
+    if (!composedEmail || !firstName.trim() || !lastName.trim() || !password) {
       toast.error("Fill email, first/last name and password");
       setTab("identity");
       return;
     }
-    if (enforceDomain && !email.trim().toLowerCase().endsWith(enforceDomain.toLowerCase())) {
-      toast.error(`Email must end with ${enforceDomain}`);
+    if (enforceDomain && !localOk) {
+      toast.error("Username can only contain letters, numbers, dot, underscore, hyphen");
+      setTab("identity");
+      return;
+    }
+    if (personalEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(personalEmail.trim())) {
+      toast.error("Personal email looks invalid");
       setTab("identity");
       return;
     }
@@ -176,11 +192,12 @@ export function AddUserDialog({
       }
 
       const body: any = {
-        email: email.trim().toLowerCase(),
+        email: composedEmail,
         full_name: effectiveFullName || `${firstName.trim()} ${lastName.trim()}`.trim(),
         first_name: firstName.trim() || undefined,
         last_name: lastName.trim() || undefined,
         phone: phone.trim() || undefined,
+        personal_email: personalEmail.trim().toLowerCase() || undefined,
         password,
         account_type: accountType,
         roles: accountType === "staff" ? roles : [],
@@ -274,13 +291,43 @@ export function AddUserDialog({
             </TabsList>
 
             <TabsContent value="identity" className="mt-3 space-y-3">
-              <Field label="Email *">
+              {enforceDomain ? (
+                <Field label={`Work email * ${enforceDomain}`}>
+                  <div className="flex items-stretch overflow-hidden rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-ring">
+                    <Input
+                      className="h-9 flex-1 rounded-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                      value={emailUser}
+                      onChange={(e) =>
+                        setEmailUser(
+                          e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""),
+                        )
+                      }
+                      placeholder="firstname.lastname"
+                      autoComplete="off"
+                    />
+                    <span className="flex select-none items-center bg-muted px-3 text-sm text-muted-foreground">
+                      {enforceDomain}
+                    </span>
+                  </div>
+                </Field>
+              ) : (
+                <Field label="Email *">
+                  <Input
+                    className={compactInput()}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="user@example.com"
+                  />
+                </Field>
+              )}
+              <Field label="Personal email">
                 <Input
                   className={compactInput()}
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="user@example.com"
+                  value={personalEmail}
+                  onChange={(e) => setPersonalEmail(e.target.value)}
+                  placeholder="optional — personal contact email"
                 />
               </Field>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -320,6 +367,7 @@ export function AddUserDialog({
                   />
                 </Field>
               </div>
+
 
               <Field label="Temporary password *">
                 <div className="flex gap-2">

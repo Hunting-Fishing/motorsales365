@@ -9,6 +9,25 @@ export type Staff365Row = {
   id: string;
   email: string;
   full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  phone: string | null;
+  personal_email: string | null;
+  avatar_url: string | null;
+  street_address: string | null;
+  postal_code: string | null;
+  signup_city: string | null;
+  signup_region: string | null;
+  signup_province: string | null;
+  business_name: string | null;
+  business_kind: string | null;
+  business_address: string | null;
+  business_region: string | null;
+  business_province: string | null;
+  business_city: string | null;
+  business_postal_code: string | null;
+  seller_type: string | null;
+  verification_status: string | null;
   roles: string[];
   created_at: string | null;
   last_sign_in_at: string | null;
@@ -48,7 +67,7 @@ export const listStaff365 = createServerFn({ method: "POST" })
 
     const ids = allUsers.map((u) => u.id);
     const roleMap = new Map<string, string[]>();
-    const nameMap = new Map<string, string | null>();
+    const profileMap = new Map<string, any>();
     if (ids.length > 0) {
       const { data: rs } = await supabaseAdmin
         .from("user_roles")
@@ -61,9 +80,11 @@ export const listStaff365 = createServerFn({ method: "POST" })
       });
       const { data: ps } = await supabaseAdmin
         .from("profiles")
-        .select("id,full_name")
+        .select(
+          "id,full_name,first_name,last_name,phone,personal_email,avatar_url,street_address,postal_code,signup_city,signup_region,signup_province,business_name,business_kind,business_address,business_region,business_province,business_city,business_postal_code,seller_type,verification_status",
+        )
         .in("id", ids);
-      (ps ?? []).forEach((p: any) => nameMap.set(p.id, p.full_name ?? null));
+      (ps ?? []).forEach((p: any) => profileMap.set(p.id, p));
     }
 
     // Cross-reference with Cloudflare Email Routing entries so we can flag
@@ -102,10 +123,30 @@ export const listStaff365 = createServerFn({ method: "POST" })
       const emailLc = (u.email ?? "").toLowerCase();
       const dest = routeMap.get(emailLc) ?? null;
       const ref = referralMap.get(u.id) ?? null;
+      const p = profileMap.get(u.id) ?? {};
       return {
         id: u.id,
         email: u.email ?? "",
-        full_name: nameMap.get(u.id) ?? null,
+        full_name: p.full_name ?? null,
+        first_name: p.first_name ?? null,
+        last_name: p.last_name ?? null,
+        phone: p.phone ?? null,
+        personal_email: p.personal_email ?? null,
+        avatar_url: p.avatar_url ?? null,
+        street_address: p.street_address ?? null,
+        postal_code: p.postal_code ?? null,
+        signup_city: p.signup_city ?? null,
+        signup_region: p.signup_region ?? null,
+        signup_province: p.signup_province ?? null,
+        business_name: p.business_name ?? null,
+        business_kind: p.business_kind ?? null,
+        business_address: p.business_address ?? null,
+        business_region: p.business_region ?? null,
+        business_province: p.business_province ?? null,
+        business_city: p.business_city ?? null,
+        business_postal_code: p.business_postal_code ?? null,
+        seller_type: p.seller_type ?? null,
+        verification_status: p.verification_status ?? null,
         roles: roleMap.get(u.id) ?? [],
         created_at: u.created_at ?? null,
         last_sign_in_at: u.last_sign_in_at ?? null,

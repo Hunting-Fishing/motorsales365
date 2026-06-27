@@ -43,6 +43,7 @@ type EditableUser = {
   first_name?: string | null;
   last_name?: string | null;
   phone?: string | null;
+  personal_email?: string | null;
   avatar_url?: string | null;
   street_address?: string | null;
   postal_code?: string | null;
@@ -82,6 +83,7 @@ export function EditProfileDialog({
     last_name: "",
     phone: "",
     email: "",
+    personal_email: "",
     avatar_url: "",
     street_address: "",
     postal_code: "",
@@ -109,6 +111,7 @@ export function EditProfileDialog({
       last_name: user.last_name ?? "",
       phone: user.phone ?? "",
       email: "",
+      personal_email: user.personal_email ?? "",
       avatar_url: user.avatar_url ?? "",
       street_address: user.street_address ?? "",
       postal_code: user.postal_code ?? "",
@@ -188,6 +191,12 @@ export function EditProfileDialog({
       if (form.verification_status !== (user.verification_status ?? "unverified"))
         payload.verification_status = form.verification_status;
       if (form.email.trim()) payload.email = form.email.trim();
+      setIfDiff(
+        "personal_email",
+        form.personal_email.trim().toLowerCase() || null,
+        (user.personal_email ?? "").toLowerCase() || null,
+      );
+
 
       if (Object.keys(payload).length > 1) {
         await updateProfile({ data: payload });
@@ -306,17 +315,24 @@ export function EditProfileDialog({
                   onChange={(e) => set("last_name", e.target.value)}
                 />
               </Field>
-              <div className="sm:col-span-2">
-                <Field label="Email (change auth email)">
-                  <Input
-                    className={compactInput()}
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => set("email", e.target.value)}
-                    placeholder="leave blank to keep current"
-                  />
-                </Field>
-              </div>
+              <Field label="Work email (auth login)">
+                <Input
+                  className={compactInput()}
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => set("email", e.target.value)}
+                  placeholder={user.email ?? "leave blank to keep current"}
+                />
+              </Field>
+              <Field label="Personal email">
+                <Input
+                  className={compactInput()}
+                  type="email"
+                  value={form.personal_email}
+                  onChange={(e) => set("personal_email", e.target.value)}
+                  placeholder="optional — personal contact"
+                />
+              </Field>
             </div>
 
             <Field label="Avatar">

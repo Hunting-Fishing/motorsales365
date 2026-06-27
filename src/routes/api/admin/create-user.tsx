@@ -15,6 +15,7 @@ const Body = z.object({
   first_name: z.string().trim().max(80).optional(),
   last_name: z.string().trim().max(80).optional(),
   phone: z.string().trim().max(40).optional(),
+  personal_email: z.string().trim().email().max(255).optional().or(z.literal("")),
   password: z.string().min(8).max(72),
   account_type: z.enum(["staff", "business"]),
   roles: z.array(RoleEnum).default([]),
@@ -199,6 +200,9 @@ export const Route = createFileRoute("/api/admin/create-user")({
           };
           copyIf("first_name");
           copyIf("last_name");
+          if (input.personal_email && input.personal_email.trim() !== "") {
+            profilePatch.personal_email = input.personal_email.trim().toLowerCase();
+          }
           if (input.phone) {
             profilePatch.phone = input.phone;
             profilePatch.phone_e164 = normalizeE164(input.phone);
