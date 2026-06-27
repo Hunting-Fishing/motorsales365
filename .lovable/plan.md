@@ -1,53 +1,56 @@
-## Goal
 
-Two changes to the admin "Edit user profile" experience used on `/admin/staff-365` and `/admin/users`:
+## Phase A — Region-correct partner display
 
-1. **Only `admin`-role accounts may change roles.** All other staff (sales, support, advertising, moderator, etc.) see the Roles tab as read-only.
-2. **Make every tab in Edit User Profile actually round-trip to the correct table** — Identity/Address → `profiles`, Business → `profiles` *and* the user's `businesses` row when they own one, Ads → `advertisements` (already wired via `UserAdvertisementsTab`, will verify).
+Audit of current `affiliate_links`:
 
-## Scope
+| Partner | Reality | Action |
+|---|---|---|
+| Shopee PH | PH only | keep, allowed = PH |
+| Lazada PH | PH only | keep, allowed = PH |
+| AliExpress | Ships PH (global) | keep, allowed = PH, SEA |
+| **eBay Motors** | US‑centric, no PH shipping on most listings | **hide for PH**, allowed = US, CA, AU, GB |
+| Amazon | Patchy PH delivery for parts | allowed = US, CA, GB (not PH) |
+| RockAuto | US, CA only | allowed = US, CA (already inactive) |
+| Amayama | Global incl PH | allowed = all |
+| PartSouq | Global incl PH | allowed = all |
+| Megazip | Global incl PH | allowed = all |
 
-- `/admin/staff-365` (super-admin only) — Roles tab stays editable for the super-admin.
-- `/admin/users` — Roles tab becomes read-only unless the caller has `admin` role.
-- Edit User Profile dialog — fields persist to the right tables on save.
+`parts_suppliers` already has `region`; the B2B outreach list is correctly PH-only. No data change needed there — only display filtering by active country.
 
-## Changes
+Changes:
+1. Migration: add `allowed_countries text[]` (NULL = all) to `affiliate_links`, backfill per table above.
+2. `listAffiliateSuppliers` accepts `country` (default `PH`, taken from `parts_countries.is_active`) and filters `allowed_countries IS NULL OR country = ANY(allowed_countries)`.
+3. `AffiliateShopRow` + `/parts` + listing detail pass current PH country; only PH-eligible partners render. eBay/Amazon disappear for PH visitors.
+4. Admin `/admin/parts` affiliate editor gains a multi-country chip picker for `allowed_countries`.
 
-### 1. Gate the Roles tab by caller role
+## Phase B — Autopull product feeds (Lazada + Shopee + AliExpress via Involve Asia)
 
-- `src/components/admin/edit-profile-dialog.tsx`
-  - Accept a new prop `canEditRoles?: boolean` (default `false`).
-  - When `false`: render `RoleChips` disabled, hide the save-side role diff logic, and show a small "Only Admin accounts can change roles" hint.
-  - Keep the tab visible (so non-admins can still see what roles a user has).
-- `src/routes/admin.users.tsx` and `src/routes/admin.staff-365.tsx`
-  - Compute `canEditRoles` from the current viewer: `useStaffScope().scope.isAdmin` (super-admin always true on staff-365).
-  - Pass `canEditRoles` into `<EditProfileDialog />`.
-- `src/lib/admin-profile.functions.ts` — no change needed; roles are not edited here.
-- Defense in depth: tighten the existing `user_roles` RLS so only `has_role(auth.uid(),'admin')` can INSERT/DELETE rows. Today the client writes directly via `supabase.from("user_roles")`; if the policy isn't already admin-only, add a migration to make it so. (Will verify policies first; only add migration if needed.)
+Goal: ingest real SKUs (title, price, image, deeplink) instead of only sending users to search pages, so the parts page shows actual shoppable items matched to a vehicle.
 
-### 2. Edit User Profile → correct tables
+Approach: use the **Involve Asia Datafeed API** (key already saved). It exposes per-merchant product feeds for Lazada PH, Shopee PH, AliExpress, with daily refresh. No separate Lazada Open Platform app needed.
 
-Current state confirmed by reading the code:
+1. Migration — two new tables:
+   - `partner_product_feeds(network, merchant_slug, last_synced_at, last_status, item_count, ...)`
+   - `partner_products(network, sku, title, price, currency, image_url, deeplink, brand, category_path, country, raw jsonb, ...)` with unique `(network, sku)` and trigram index on `title`.
+2. Server module `src/lib/partner-feed.server.ts`:
+   - `fetchInvolveAsiaFeed(merchant, page)` paginated pull
+   - `upsertPartnerProducts(rows)` chunked upsert
+   - Logs per-feed result to `partner_product_feeds`
+3. Public cron route `/api/public/hooks/sync-parts-feeds` (apikey-guarded) — runs all enabled feeds for active countries; scheduled via `pg_cron` daily 02:00 PH.
+4. Admin page `/admin/parts/feeds`:
+   - List feeds with last sync, item count, status
+   - "Sync now" button per feed
+   - Enable/disable per merchant
+5. Universal Shop widget: if `partner_products` has matches for the query (filtered by vehicle make/model and active country), show real product cards (image + price + Shop button → tracked /go redirect). Falls back to today's deep-link cards when no matches yet.
 
-- **Identity / Address / Seller type / Verification / Personal email** → `profiles` via `adminUpdateUserProfile` server fn. ✅ Already correct.
-- **Work email** → `auth.users` via `supabaseAdmin.auth.admin.updateUserById`. ✅ Already correct.
-- **Business fields** (`business_name`, `business_kind`, `business_address`, `business_city`, `business_province`, `business_region`, `business_postal_code`) → currently only written to `profiles`. The user-facing business page lives in the `businesses` table, so edits here never reach the public business listing.
-  - Update `adminUpdateUserProfile` to: write to `profiles` (as today) **and** if the target user owns exactly one row in `businesses` (`owner_id = targetUserId`), mirror the same fields to that row (`name`, `kind`, `address`, `city`, `province`, `region`, `postal_code`). If they own zero or multiple businesses, only `profiles` is touched and the dialog shows a small note ("User owns N businesses — edit each on its Business page").
-  - Surface the owned-business count in `listStaff365` / admin user loader so the dialog can render the note.
-- **Roles** → `user_roles` directly. ✅ Already correct (gated per #1).
-- **Ads tab** → `UserAdvertisementsTab` already reads/writes `advertisements`. Will spot-check that create/edit calls use the user's `owner_id`, fix if missing.
+### Technical notes
 
-### 3. Small polish
+- All product clicks continue to flow through the existing `/api/public/go/:slug` so commission attribution stays intact.
+- `partner_products` is RLS public-read (anon SELECT) since it's a public catalog; writes restricted to service role / cron route.
+- Country filter chains through: `parts_countries.is_active` → `affiliate_links.allowed_countries` → `partner_products.country`. PH is the only active country today, so non-PH partners and non-PH SKUs stay hidden until those countries flip active.
+- Out of scope this round: Shopee Open Platform direct API, Lazada seller-app onboarding (both require partner approval); we use the affiliate datafeed path instead.
 
-- In the Business tab, add a read-only "Linked business" badge that links to `/admin/businesses/<id>` when one is found, so admins know edits will sync.
-
-## Out of scope
-
-- No changes to `/admin/staff-365` access control itself — still super-admin only.
-- No schema changes beyond the optional `user_roles` policy tightening.
-- No redesign of the dialog layout.
-
-## Verification
-
-- Typecheck.
-- Manual: as super-admin, edit a staff member's business address → confirm both `profiles` row and their `businesses` row update; as a non-admin staff viewer, confirm Roles tab is disabled with the explanatory note.
+## Deliverables
+- 1 migration (schema + backfill)
+- ~4 new files (feed server module, cron route, admin feeds page, country-aware affiliate filter)
+- Updates to 3 existing files (`affiliate.functions.ts`, `AffiliateShopRow`, admin affiliate editor)
