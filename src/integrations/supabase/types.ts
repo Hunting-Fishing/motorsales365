@@ -5894,20 +5894,32 @@ export type Database = {
       parts_supplier_applications: {
         Row: {
           admin_notes: string | null
+          agreed_terms: boolean
+          agreed_terms_at: string | null
           brands_carried: string | null
+          business_address: string | null
           business_kind: string
+          catalog_feed_format: string | null
+          catalog_feed_url: string | null
+          city: string | null
           company_name: string
           contact_name: string
           country: string
           created_at: string
+          documents: Json
           email: string
           id: string
+          legal_business_name: string | null
           monthly_volume: string | null
           notes: string | null
           partnership_type: string
+          payment_terms: string | null
           phone: string | null
+          postal_code: string | null
+          province_state: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          ships_nationwide: boolean | null
           source_ip: string | null
           status: string
           storefront_blurb: string | null
@@ -5915,26 +5927,41 @@ export type Database = {
           storefront_logo_url: string | null
           storefront_published: boolean
           storefront_slug: string | null
+          tax_id: string | null
           updated_at: string
           user_agent: string | null
+          warehouse_locations: string | null
           website: string | null
+          years_in_business: number | null
         }
         Insert: {
           admin_notes?: string | null
+          agreed_terms?: boolean
+          agreed_terms_at?: string | null
           brands_carried?: string | null
+          business_address?: string | null
           business_kind: string
+          catalog_feed_format?: string | null
+          catalog_feed_url?: string | null
+          city?: string | null
           company_name: string
           contact_name: string
           country?: string
           created_at?: string
+          documents?: Json
           email: string
           id?: string
+          legal_business_name?: string | null
           monthly_volume?: string | null
           notes?: string | null
           partnership_type: string
+          payment_terms?: string | null
           phone?: string | null
+          postal_code?: string | null
+          province_state?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          ships_nationwide?: boolean | null
           source_ip?: string | null
           status?: string
           storefront_blurb?: string | null
@@ -5942,26 +5969,41 @@ export type Database = {
           storefront_logo_url?: string | null
           storefront_published?: boolean
           storefront_slug?: string | null
+          tax_id?: string | null
           updated_at?: string
           user_agent?: string | null
+          warehouse_locations?: string | null
           website?: string | null
+          years_in_business?: number | null
         }
         Update: {
           admin_notes?: string | null
+          agreed_terms?: boolean
+          agreed_terms_at?: string | null
           brands_carried?: string | null
+          business_address?: string | null
           business_kind?: string
+          catalog_feed_format?: string | null
+          catalog_feed_url?: string | null
+          city?: string | null
           company_name?: string
           contact_name?: string
           country?: string
           created_at?: string
+          documents?: Json
           email?: string
           id?: string
+          legal_business_name?: string | null
           monthly_volume?: string | null
           notes?: string | null
           partnership_type?: string
+          payment_terms?: string | null
           phone?: string | null
+          postal_code?: string | null
+          province_state?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          ships_nationwide?: boolean | null
           source_ip?: string | null
           status?: string
           storefront_blurb?: string | null
@@ -5969,9 +6011,12 @@ export type Database = {
           storefront_logo_url?: string | null
           storefront_published?: boolean
           storefront_slug?: string | null
+          tax_id?: string | null
           updated_at?: string
           user_agent?: string | null
+          warehouse_locations?: string | null
           website?: string | null
+          years_in_business?: number | null
         }
         Relationships: []
       }
