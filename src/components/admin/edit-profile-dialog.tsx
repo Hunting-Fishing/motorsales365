@@ -43,6 +43,7 @@ type EditableUser = {
   first_name?: string | null;
   last_name?: string | null;
   phone?: string | null;
+  personal_email?: string | null;
   avatar_url?: string | null;
   street_address?: string | null;
   postal_code?: string | null;
