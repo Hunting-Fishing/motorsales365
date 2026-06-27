@@ -118,6 +118,24 @@ export function AffiliateLinksTab() {
           >
             Test Involve Asia
           </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() =>
+              setEditing({
+                ...BLANK,
+                region: "PH",
+                network: "Involve Asia",
+                affiliate_id_env: "INVOLVE_ASIA",
+                url_template: "https://shopee.ph/search?keyword={QUERY}",
+                commission_note: "Tracked via Involve Asia deeplink API",
+                is_active: true,
+                priority: 10,
+              })
+            }
+          >
+            <Plus className="mr-1 h-4 w-4" /> Add Involve Asia merchant
+          </Button>
           <Button size="sm" onClick={() => setEditing({ ...BLANK })}>
             <Plus className="mr-1 h-4 w-4" /> Add supplier
           </Button>
