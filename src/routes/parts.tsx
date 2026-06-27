@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { PartsWizard } from "@/components/parts/parts-wizard";
 import { OemOrderForm } from "@/components/parts/oem-order-form";
 import { OemSearch } from "@/components/parts/oem-search";
+import { AffiliateShopRow } from "@/components/parts/affiliate-shop-row";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { Button } from "@/components/ui/button";
 import { browseUsedParts } from "@/lib/parts-search.functions";
@@ -149,8 +150,19 @@ function PartsHub() {
           </button>
         </div>
 
+
+        {/* Affiliate shop row — hidden until at least one supplier is active in admin */}
+        <div className="mb-4">
+          <AffiliateShopRow
+            query="auto parts philippines"
+            title="Shop parts from our partners"
+          />
+        </div>
+
         {tab === "find" && <PartsWizard />}
         {tab === "order" && <OemSearch />}
+
+
 
         {tab === "browse" && (
           <div className="space-y-2">

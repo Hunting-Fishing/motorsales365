@@ -848,6 +848,102 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_clicks: {
+        Row: {
+          created_at: string
+          id: string
+          ip_hash: string | null
+          listing_id: string | null
+          query: string | null
+          referrer: string | null
+          supplier_slug: string
+          user_agent: string | null
+          user_id: string | null
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_year: number | null
+          visitor_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          listing_id?: string | null
+          query?: string | null
+          referrer?: string | null
+          supplier_slug: string
+          user_agent?: string | null
+          user_id?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: number | null
+          visitor_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          listing_id?: string | null
+          query?: string | null
+          referrer?: string | null
+          supplier_slug?: string
+          user_agent?: string | null
+          user_id?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: number | null
+          visitor_id?: string | null
+        }
+        Relationships: []
+      }
+      affiliate_links: {
+        Row: {
+          affiliate_id_env: string | null
+          commission_note: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string
+          logo_url: string | null
+          network: string | null
+          priority: number
+          region: string
+          supplier_slug: string
+          updated_at: string
+          url_template: string
+        }
+        Insert: {
+          affiliate_id_env?: string | null
+          commission_note?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          logo_url?: string | null
+          network?: string | null
+          priority?: number
+          region?: string
+          supplier_slug: string
+          updated_at?: string
+          url_template: string
+        }
+        Update: {
+          affiliate_id_env?: string | null
+          commission_note?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          logo_url?: string | null
+          network?: string | null
+          priority?: number
+          region?: string
+          supplier_slug?: string
+          updated_at?: string
+          url_template?: string
+        }
+        Relationships: []
+      }
       affiliate_networks: {
         Row: {
           active: boolean
