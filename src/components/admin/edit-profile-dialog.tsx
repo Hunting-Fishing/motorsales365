@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Pencil } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { adminUpdateUserProfile } from "@/lib/admin-profile.functions";
+import { adminUpdateUserProfile, adminGetOwnedBusinesses } from "@/lib/admin-profile.functions";
 import { logAdminAudit, type AdminAuditEntry } from "@/lib/admin-audit";
 import { Staff365Badge } from "@/components/admin/staff-365-badge";
 import { Button } from "@/components/ui/button";
