@@ -140,5 +140,31 @@ export const adminUpdateUserProfile = createServerFn({ method: "POST" })
       // ignore
     }
 
-    return { ok: true };
+    return { ok: true, mirroredBusinessId };
+  });
+
+/**
+ * Returns a lightweight summary of businesses owned by the target user so
+ * the admin "Edit user profile" dialog can show whether business-tab edits
+ * will mirror to a `businesses` row.
+ */
+export const adminGetOwnedBusinesses = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ targetUserId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const callerEmail = (context.claims?.email as string | undefined)?.toLowerCase();
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin && callerEmail !== ALLOWED_ADMIN_EMAIL) {
+      throw new Error("Not permitted");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("businesses")
+      .select("id,name,slug")
+      .eq("owner_id", data.targetUserId);
+    if (error) throw new Error(error.message);
+    return { businesses: rows ?? [] };
   });
