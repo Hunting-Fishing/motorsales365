@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Search, Grid3x3, Wrench, Recycle, Car, Tag, ShoppingCart, Globe2 } from "lucide-react";
+import { Search, Grid3x3, Wrench, Recycle, Car, Tag, ShoppingCart, Globe2, Handshake } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { PartsWizard } from "@/components/parts/parts-wizard";
 import { OemOrderForm } from "@/components/parts/oem-order-form";
@@ -91,6 +91,11 @@ function PartsHub() {
             <Button asChild variant="outline" size="sm">
               <Link to="/wanted">
                 <Car className="mr-1 h-4 w-4" /> Post a wanted ad
+              </Link>
+            </Button>
+            <Button asChild variant="default" size="sm">
+              <Link to="/partners/parts">
+                <Handshake className="mr-1 h-4 w-4" /> Sell on 365 (partners)
               </Link>
             </Button>
           </div>

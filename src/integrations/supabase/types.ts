@@ -5754,6 +5754,75 @@ export type Database = {
           },
         ]
       }
+      parts_supplier_applications: {
+        Row: {
+          admin_notes: string | null
+          brands_carried: string | null
+          business_kind: string
+          company_name: string
+          contact_name: string
+          country: string
+          created_at: string
+          email: string
+          id: string
+          monthly_volume: string | null
+          notes: string | null
+          partnership_type: string
+          phone: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source_ip: string | null
+          status: string
+          updated_at: string
+          user_agent: string | null
+          website: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          brands_carried?: string | null
+          business_kind: string
+          company_name: string
+          contact_name: string
+          country?: string
+          created_at?: string
+          email: string
+          id?: string
+          monthly_volume?: string | null
+          notes?: string | null
+          partnership_type: string
+          phone?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_ip?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          website?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          brands_carried?: string | null
+          business_kind?: string
+          company_name?: string
+          contact_name?: string
+          country?: string
+          created_at?: string
+          email?: string
+          id?: string
+          monthly_volume?: string | null
+          notes?: string | null
+          partnership_type?: string
+          phone?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_ip?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       parts_suppliers: {
         Row: {
           account_email: string | null
