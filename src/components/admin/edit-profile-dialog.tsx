@@ -406,6 +406,23 @@ export function EditProfileDialog({
           </TabsContent>
 
           <TabsContent value="business" className="mt-3 space-y-3">
+            {ownedBiz.length === 1 ? (
+              <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-400">
+                Linked business: <strong>{ownedBiz[0].name ?? "(unnamed)"}</strong> — name,
+                address, city, province, region, postal code and kind are mirrored to the
+                business page on save.{" "}
+                {ownedBiz[0].slug && (
+                  <a className="underline" href={`/s/${ownedBiz[0].slug}`} target="_blank" rel="noreferrer">
+                    View page
+                  </a>
+                )}
+              </div>
+            ) : ownedBiz.length > 1 ? (
+              <div className="rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+                This user owns {ownedBiz.length} businesses — edits here only update the
+                profile. Edit each business from its own Business page.
+              </div>
+            ) : null}
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Business name">
                 <Input
