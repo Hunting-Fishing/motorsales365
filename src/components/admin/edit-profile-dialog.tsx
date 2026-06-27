@@ -140,6 +140,21 @@ export function EditProfileDialog({
     );
   }, [open, user]);
 
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    getOwnedBusinesses({ data: { targetUserId: user.id } })
+      .then((res) => {
+        if (!cancelled) setOwnedBiz(res.businesses ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setOwnedBiz([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, user.id, getOwnedBusinesses]);
+
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((s) => ({ ...s, [k]: v }));
 
