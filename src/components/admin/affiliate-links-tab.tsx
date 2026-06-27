@@ -361,15 +361,77 @@ export function AffiliateLinksTab() {
                 />
               </Field>
             </div>
-            <Field label="URL template (use {QUERY} placeholder)">
-              <input
-                className="input font-mono text-xs"
-                value={editing.url_template}
-                onChange={(e) =>
-                  setEditing({ ...editing, url_template: e.target.value })
+            {(() => {
+              const tpl = editing.url_template ?? "";
+              const hasQuery = tpl.includes("{QUERY}");
+              const sample = sampleQuery.trim() || "brake pads";
+              let resolved = "";
+              let parseError: string | null = null;
+              let urlValid = false;
+              try {
+                resolved = tpl.replace(/\{QUERY\}/g, encodeURIComponent(sample));
+                const u = new URL(resolved);
+                if (u.protocol !== "https:" && u.protocol !== "http:") {
+                  parseError = "URL must use http:// or https://";
+                } else {
+                  urlValid = true;
                 }
-              />
-            </Field>
+              } catch {
+                parseError = "Not a valid absolute URL";
+              }
+              const errors: string[] = [];
+              if (!tpl.trim()) errors.push("Template is required");
+              if (tpl && !hasQuery) errors.push("Must contain {QUERY} placeholder");
+              if (tpl && parseError) errors.push(parseError);
+              return (
+                <>
+                  <Field label="URL template (use {QUERY} placeholder)">
+                    <input
+                      className={`input font-mono text-xs ${errors.length ? "border-red-500" : ""}`}
+                      value={tpl}
+                      onChange={(e) =>
+                        setEditing({ ...editing, url_template: e.target.value })
+                      }
+                    />
+                  </Field>
+                  <div className="rounded-md border border-border bg-muted/30 p-2 space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-medium text-muted-foreground shrink-0">
+                        Sample {`{QUERY}`}:
+                      </span>
+                      <input
+                        className="input h-7 py-0 text-xs"
+                        value={sampleQuery}
+                        placeholder="brake pads"
+                        onChange={(e) => setSampleQuery(e.target.value)}
+                      />
+                    </div>
+                    {errors.length > 0 ? (
+                      <ul className="text-xs text-red-600 dark:text-red-400 list-disc pl-5">
+                        {errors.map((er) => <li key={er}>{er}</li>)}
+                      </ul>
+                    ) : (
+                      <div className="space-y-1">
+                        <div className="text-[11px] text-muted-foreground">Resolved URL preview:</div>
+                        <a
+                          href={resolved}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block break-all font-mono text-xs text-emerald-700 hover:underline dark:text-emerald-300"
+                        >
+                          {resolved}
+                        </a>
+                      </div>
+                    )}
+                    {editing.affiliate_id_env === "INVOLVE_ASIA" && urlValid && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Note: at click time this URL is wrapped by the Involve Asia deeplink API.
+                      </p>
+                    )}
+                  </div>
+                </>
+              );
+            })()}
             <Field label="Logo URL (optional)">
               <input
                 className="input"
