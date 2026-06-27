@@ -307,8 +307,18 @@ function SignupPage() {
     }
     if (!intent) return;
 
+    // The 365 staff domain is reserved — only admins can mint these accounts
+    // via the internal Create User flow, so self-signup is blocked here.
+    if (isStaffEmail(email)) {
+      toast.error(
+        `${STAFF_EMAIL_DOMAIN} is reserved for 365 employees. Ask a 365 admin to create your account.`,
+      );
+      return;
+    }
+
     setSubmitting(true);
     stashPendingProfile();
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
