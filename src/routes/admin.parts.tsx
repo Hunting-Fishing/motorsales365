@@ -75,6 +75,7 @@ function AdminPartsPage() {
       {tab === "interest" && <InterestTab />}
       {tab === "suppliers" && <SuppliersTab />}
       {tab === "affiliates" && <AffiliateLinksTab />}
+      {tab === "partners" && <PartnerApplicationsTab />}
       {tab === "outlets" && <OutletsTab />}
       {tab === "catalog" && <CatalogTab />}
       {tab === "tires" && <TireSpecsTab />}
