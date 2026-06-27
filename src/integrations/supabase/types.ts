@@ -6020,23 +6020,232 @@ export type Database = {
         }
         Relationships: []
       }
+      parts_supplier_contacts: {
+        Row: {
+          created_at: string
+          do_not_contact: boolean
+          email: string | null
+          id: string
+          is_primary: boolean
+          language: string | null
+          messenger: string | null
+          mobile: string | null
+          name: string
+          notes: string | null
+          phone: string | null
+          preferred_channel: string | null
+          preferred_time: string | null
+          role: string
+          supplier_id: string
+          title: string | null
+          updated_at: string
+          viber: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string
+          do_not_contact?: boolean
+          email?: string | null
+          id?: string
+          is_primary?: boolean
+          language?: string | null
+          messenger?: string | null
+          mobile?: string | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          preferred_channel?: string | null
+          preferred_time?: string | null
+          role?: string
+          supplier_id: string
+          title?: string | null
+          updated_at?: string
+          viber?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string
+          do_not_contact?: boolean
+          email?: string | null
+          id?: string
+          is_primary?: boolean
+          language?: string | null
+          messenger?: string | null
+          mobile?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          preferred_channel?: string | null
+          preferred_time?: string | null
+          role?: string
+          supplier_id?: string
+          title?: string | null
+          updated_at?: string
+          viber?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parts_supplier_contacts_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "parts_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parts_supplier_outreach: {
+        Row: {
+          application_id: string | null
+          channel: string
+          contact_id: string | null
+          created_at: string
+          direction: string
+          duration_sec: number | null
+          id: string
+          next_action: string | null
+          next_action_at: string | null
+          occurred_at: string
+          outcome: string
+          owner_user_id: string | null
+          summary: string | null
+          supplier_id: string
+          updated_at: string
+        }
+        Insert: {
+          application_id?: string | null
+          channel?: string
+          contact_id?: string | null
+          created_at?: string
+          direction?: string
+          duration_sec?: number | null
+          id?: string
+          next_action?: string | null
+          next_action_at?: string | null
+          occurred_at?: string
+          outcome?: string
+          owner_user_id?: string | null
+          summary?: string | null
+          supplier_id: string
+          updated_at?: string
+        }
+        Update: {
+          application_id?: string | null
+          channel?: string
+          contact_id?: string | null
+          created_at?: string
+          direction?: string
+          duration_sec?: number | null
+          id?: string
+          next_action?: string | null
+          next_action_at?: string | null
+          occurred_at?: string
+          outcome?: string
+          owner_user_id?: string | null
+          summary?: string | null
+          supplier_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parts_supplier_outreach_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "parts_supplier_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parts_supplier_outreach_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "parts_supplier_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parts_supplier_outreach_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "parts_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parts_supplier_tasks: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          due_at: string | null
+          id: string
+          notes: string | null
+          owner_user_id: string | null
+          status: string
+          supplier_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          notes?: string | null
+          owner_user_id?: string | null
+          status?: string
+          supplier_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          notes?: string | null
+          owner_user_id?: string | null
+          status?: string
+          supplier_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parts_supplier_tasks_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "parts_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parts_suppliers: {
         Row: {
           account_email: string | null
           account_ref: string | null
+          address: string | null
           api_docs_url: string | null
           api_status: string
           brands: string[]
+          business_hours: string | null
           category: string
+          city: string | null
           commission_notes: string | null
           contact_name: string | null
           contact_phone: string | null
           created_at: string
+          do_not_contact: boolean
+          google_maps_url: string | null
           id: string
           is_recommended: boolean
+          last_contacted_at: string | null
+          lead_score: number
+          lost_reason: string | null
           name: string
+          next_action_at: string | null
           notes: string | null
+          owner_user_id: string | null
+          pipeline_stage: string
           priority: number
+          province: string | null
           region: string
           signup_status: string
           signup_url: string | null
@@ -6051,19 +6260,31 @@ export type Database = {
         Insert: {
           account_email?: string | null
           account_ref?: string | null
+          address?: string | null
           api_docs_url?: string | null
           api_status?: string
           brands?: string[]
+          business_hours?: string | null
           category?: string
+          city?: string | null
           commission_notes?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          do_not_contact?: boolean
+          google_maps_url?: string | null
           id?: string
           is_recommended?: boolean
+          last_contacted_at?: string | null
+          lead_score?: number
+          lost_reason?: string | null
           name: string
+          next_action_at?: string | null
           notes?: string | null
+          owner_user_id?: string | null
+          pipeline_stage?: string
           priority?: number
+          province?: string | null
           region?: string
           signup_status?: string
           signup_url?: string | null
@@ -6078,19 +6299,31 @@ export type Database = {
         Update: {
           account_email?: string | null
           account_ref?: string | null
+          address?: string | null
           api_docs_url?: string | null
           api_status?: string
           brands?: string[]
+          business_hours?: string | null
           category?: string
+          city?: string | null
           commission_notes?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          do_not_contact?: boolean
+          google_maps_url?: string | null
           id?: string
           is_recommended?: boolean
+          last_contacted_at?: string | null
+          lead_score?: number
+          lost_reason?: string | null
           name?: string
+          next_action_at?: string | null
           notes?: string | null
+          owner_user_id?: string | null
+          pipeline_stage?: string
           priority?: number
+          province?: string | null
           region?: string
           signup_status?: string
           signup_url?: string | null
