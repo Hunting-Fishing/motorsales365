@@ -7,6 +7,7 @@ import { PartsWizard } from "@/components/parts/parts-wizard";
 import { OemOrderForm } from "@/components/parts/oem-order-form";
 import { OemSearch } from "@/components/parts/oem-search";
 import { AffiliateShopRow } from "@/components/parts/affiliate-shop-row";
+import { PartnerProductsGrid } from "@/components/parts/partner-products-grid";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { Button } from "@/components/ui/button";
 import { browseUsedParts } from "@/lib/parts-search.functions";
@@ -46,6 +47,8 @@ function PartsHub() {
   const [density, setDensity] = useGridDensity(3);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [countries, setCountries] = useState<Array<{ code: string; name: string; is_active: boolean }>>([]);
+  const [vehicleCtx, setVehicleCtx] = useState<{ make: string; model: string; year: string }>({ make: "", model: "", year: "" });
+  const partnerQuery = [vehicleCtx.make, vehicleCtx.model, "parts"].filter(Boolean).join(" ").trim() || "auto parts";
 
   useEffect(() => {
     fetchCountries().then(setCountries as any).catch(() => {});
@@ -165,13 +168,25 @@ function PartsHub() {
         {/* Affiliate shop row — hidden until at least one supplier is active in admin */}
         <div className="mb-4">
           <AffiliateShopRow
-            query="auto parts philippines"
-            title="Shop parts from our partners"
+            query={partnerQuery}
+            make={vehicleCtx.make || null}
+            model={vehicleCtx.model || null}
+            year={vehicleCtx.year ? Number(vehicleCtx.year) : null}
+            title="Search these partners"
           />
         </div>
 
-        {tab === "find" && <PartsWizard />}
+        {/* Real product tiles from ingested partner feeds (Shopee/Lazada/AliExpress PH) */}
+        <div className="mb-4">
+          <PartnerProductsGrid
+            query={partnerQuery}
+            title={vehicleCtx.make ? `Parts for ${[vehicleCtx.year, vehicleCtx.make, vehicleCtx.model].filter(Boolean).join(" ")}` : "Trending parts from our partners"}
+          />
+        </div>
+
+        {tab === "find" && <PartsWizard onContextChange={setVehicleCtx} />}
         {tab === "order" && <OemSearch />}
+
 
 
 

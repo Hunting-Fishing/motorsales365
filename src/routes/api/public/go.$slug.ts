@@ -100,25 +100,38 @@ export const Route = createFileRoute("/api/public/go/$slug")({
           ? (process.env[l.affiliate_id_env as string] ?? "")
           : "";
 
-        let target = String(l.url_template)
-          .replaceAll("{QUERY}", encodeURIComponent(query))
-          .replaceAll("{AFFILIATE_ID}", encodeURIComponent(affiliateId));
+        // Pre-built deeplink (from ingested partner_products tiles): take it as-is.
+        // Country gate above still applies; Involve Asia deeplinks are already tracked.
+        const prebuiltDeeplink = url.searchParams.get("dl");
+        let target: string;
+        if (prebuiltDeeplink) {
+          try {
+            target = decodeURIComponent(prebuiltDeeplink);
+          } catch {
+            target = prebuiltDeeplink;
+          }
+        } else {
+          target = String(l.url_template)
+            .replaceAll("{QUERY}", encodeURIComponent(query))
+            .replaceAll("{AFFILIATE_ID}", encodeURIComponent(affiliateId));
 
-        if (useInvolveAsia) {
-          // Mint a tracked deeplink via Involve Asia (Shopee/Lazada/etc.)
-          const { generateInvolveAsiaDeeplink } = await import("@/lib/involve-asia.server");
-          target = await generateInvolveAsiaDeeplink(target);
-        } else if (affiliateId && !target.includes(affiliateId)) {
-          // Append affiliate id as a tracking param if the template doesn't bake it in.
-          const sep = target.includes("?") ? "&" : "?";
-          const param =
-            slug.startsWith("amazon")
-              ? "tag"
-              : slug.startsWith("ebay")
-                ? "campid"
-                : "aff_id";
-          target += `${sep}${param}=${encodeURIComponent(affiliateId)}`;
+          if (useInvolveAsia) {
+            // Mint a tracked deeplink via Involve Asia (Shopee/Lazada/etc.)
+            const { generateInvolveAsiaDeeplink } = await import("@/lib/involve-asia.server");
+            target = await generateInvolveAsiaDeeplink(target);
+          } else if (affiliateId && !target.includes(affiliateId)) {
+            // Append affiliate id as a tracking param if the template doesn't bake it in.
+            const sep = target.includes("?") ? "&" : "?";
+            const param =
+              slug.startsWith("amazon")
+                ? "tag"
+                : slug.startsWith("ebay")
+                  ? "campid"
+                  : "aff_id";
+            target += `${sep}${param}=${encodeURIComponent(affiliateId)}`;
+          }
         }
+
 
         // Fire-and-forget click log (don't block redirect on failure).
         try {
