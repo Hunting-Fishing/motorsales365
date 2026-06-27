@@ -123,10 +123,30 @@ export const listStaff365 = createServerFn({ method: "POST" })
       const emailLc = (u.email ?? "").toLowerCase();
       const dest = routeMap.get(emailLc) ?? null;
       const ref = referralMap.get(u.id) ?? null;
+      const p = profileMap.get(u.id) ?? {};
       return {
         id: u.id,
         email: u.email ?? "",
-        full_name: nameMap.get(u.id) ?? null,
+        full_name: p.full_name ?? null,
+        first_name: p.first_name ?? null,
+        last_name: p.last_name ?? null,
+        phone: p.phone ?? null,
+        personal_email: p.personal_email ?? null,
+        avatar_url: p.avatar_url ?? null,
+        street_address: p.street_address ?? null,
+        postal_code: p.postal_code ?? null,
+        signup_city: p.signup_city ?? null,
+        signup_region: p.signup_region ?? null,
+        signup_province: p.signup_province ?? null,
+        business_name: p.business_name ?? null,
+        business_kind: p.business_kind ?? null,
+        business_address: p.business_address ?? null,
+        business_region: p.business_region ?? null,
+        business_province: p.business_province ?? null,
+        business_city: p.business_city ?? null,
+        business_postal_code: p.business_postal_code ?? null,
+        seller_type: p.seller_type ?? null,
+        verification_status: p.verification_status ?? null,
         roles: roleMap.get(u.id) ?? [],
         created_at: u.created_at ?? null,
         last_sign_in_at: u.last_sign_in_at ?? null,
