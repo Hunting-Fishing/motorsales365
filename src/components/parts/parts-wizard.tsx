@@ -25,15 +25,21 @@ type Suggestion = {
   photo_url: string | null;
 };
 
-export function PartsWizard() {
+export function PartsWizard({
+  onContextChange,
+}: { onContextChange?: (ctx: { make: string; model: string; year: string }) => void } = {}) {
   const navigate = useNavigate();
   const runSearch = useServerFn(searchUsedParts);
   const runSuggest = useServerFn(suggestCatalogParts);
 
   const [step, setStep] = useState<Step>(1);
-  const [year, setYear] = useState<string>("");
-  const [make, setMake] = useState<string>("");
-  const [model, setModel] = useState<string>("");
+  const [year, setYearRaw] = useState<string>("");
+  const [make, setMakeRaw] = useState<string>("");
+  const [model, setModelRaw] = useState<string>("");
+  const setYear = (v: string) => { setYearRaw(v); onContextChange?.({ make, model, year: v }); };
+  const setMake = (v: string) => { setMakeRaw(v); setModelRaw(""); onContextChange?.({ make: v, model: "", year }); };
+  const setModel = (v: string) => { setModelRaw(v); onContextChange?.({ make, model: v, year }); };
+
   const [systems, setSystems] = useState<string[]>([]);
   const [partKeys, setPartKeys] = useState<string[]>([]);
   const [oemPref, setOemPref] = useState<OemPref>("any");
