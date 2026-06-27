@@ -44,7 +44,8 @@ export const Route = createFileRoute("/api/public/go/$slug")({
         }
 
         const l = link as any;
-        const affiliateId = l.affiliate_id_env
+        const useInvolveAsia = l.affiliate_id_env === "INVOLVE_ASIA";
+        const affiliateId = !useInvolveAsia && l.affiliate_id_env
           ? (process.env[l.affiliate_id_env as string] ?? "")
           : "";
 
@@ -52,10 +53,13 @@ export const Route = createFileRoute("/api/public/go/$slug")({
           .replaceAll("{QUERY}", encodeURIComponent(query))
           .replaceAll("{AFFILIATE_ID}", encodeURIComponent(affiliateId));
 
-        // Append affiliate id as a tracking param if the template doesn't bake it in.
-        if (affiliateId && !target.includes(affiliateId)) {
+        if (useInvolveAsia) {
+          // Mint a tracked deeplink via Involve Asia (Shopee/Lazada/etc.)
+          const { generateInvolveAsiaDeeplink } = await import("@/lib/involve-asia.server");
+          target = await generateInvolveAsiaDeeplink(target);
+        } else if (affiliateId && !target.includes(affiliateId)) {
+          // Append affiliate id as a tracking param if the template doesn't bake it in.
           const sep = target.includes("?") ? "&" : "?";
-          // Common tracking param names by network
           const param =
             slug.startsWith("amazon")
               ? "tag"
