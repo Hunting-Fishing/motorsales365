@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Search, Grid3x3, Wrench, Recycle, Car, Tag, ShoppingCart, Globe2 } from "lucide-react";
+import { Search, Grid3x3, Wrench, Recycle, Car, Tag, ShoppingCart, Globe2, Handshake } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { PartsWizard } from "@/components/parts/parts-wizard";
 import { OemOrderForm } from "@/components/parts/oem-order-form";
