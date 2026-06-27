@@ -15,6 +15,7 @@ const ProfilePatch = z.object({
   avatar_url: z.string().url().max(2048).nullable().optional(),
   // email (auth.users)
   email: z.string().email().max(255).optional(),
+  personal_email: z.string().trim().email().max(255).nullable().optional().or(z.literal("")),
   // address
   street_address: z.string().trim().max(200).nullable().optional(),
   postal_code: z.string().trim().max(20).nullable().optional(),
