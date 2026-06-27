@@ -66,16 +66,21 @@ export function EditProfileDialog({
   user,
   onSaved,
   is365Staff = false,
+  canEditRoles = false,
 }: {
   user: EditableUser;
   onSaved?: () => void;
   is365Staff?: boolean;
+  /** When false, the Roles tab is read-only. Only admin-role viewers can change roles. */
+  canEditRoles?: boolean;
 }) {
   const updateProfile = useServerFn(adminUpdateUserProfile);
+  const getOwnedBusinesses = useServerFn(adminGetOwnedBusinesses);
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("identity");
   const [saving, setSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [ownedBiz, setOwnedBiz] = useState<{ id: string; name: string | null; slug: string | null }[]>([]);
 
   const [form, setForm] = useState({
     full_name: "",
