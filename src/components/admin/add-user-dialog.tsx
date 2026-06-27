@@ -1,10 +1,12 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
-import { Copy, Info, RefreshCw, UserPlus } from "lucide-react";
+import { Copy, Info, RefreshCw, ShieldCheck, UserPlus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
+
 
 import {
   Dialog,
