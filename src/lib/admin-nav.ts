@@ -75,6 +75,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
 
   // OPERATIONS
   { to: "/admin/parts", label: "Parts Fulfillment", Icon: Store, roles: ["admin"], info: "In-house parts: catalog, tire specs, buyer quotes, setup checklist.", section: "Operations" },
+  { to: "/admin/parts/outreach", label: "Parts Outreach", Icon: Store, roles: ["admin", "sales"], info: "CRM-style call queue for onboarding parts suppliers.", section: "Operations" },
   { to: "/admin/dispatch", label: "365 Dispatch", Icon: Truck, roles: ["admin", "support"], info: "Dispatch subscriptions, live tow-job queue, provider performance.", section: "Operations" },
   { to: "/admin/education", label: "Education", Icon: GraduationCap, roles: ["admin", "moderator"], info: "Courses, modules, lessons, quizzes and Partner Training schools.", section: "Operations" },
   { to: "/admin/flashcards", label: "Flashcards content", Icon: Sparkles, roles: ["admin", "moderator"], info: "Pull the latest 365 Flashcards decks from the upstream GitHub repo.", section: "Operations" },
