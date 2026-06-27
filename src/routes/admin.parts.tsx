@@ -33,13 +33,22 @@ function AdminPartsPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="font-display text-2xl font-bold">Parts Fulfillment</h1>
-        <p className="text-sm text-muted-foreground">
-          In-house parts sales: catalog, vehicle tire data, buyer quote requests, and setup
-          checklist for the accounts/integrations we need.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl font-bold">Parts Fulfillment</h1>
+          <p className="text-sm text-muted-foreground">
+            In-house parts sales: catalog, vehicle tire data, buyer quote requests, and setup
+            checklist for the accounts/integrations we need.
+          </p>
+        </div>
+        <a
+          href="/admin/parts/analytics"
+          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium hover:border-primary hover:text-primary"
+        >
+          📊 Click analytics
+        </a>
       </div>
+
 
       <div className="flex flex-wrap gap-1 rounded-md border border-border bg-card p-1">
         <TabButton active={tab === "quotes"} onClick={() => setTab("quotes")}>
