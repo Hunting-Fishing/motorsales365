@@ -111,6 +111,7 @@ export function EditProfileDialog({
       last_name: user.last_name ?? "",
       phone: user.phone ?? "",
       email: "",
+      personal_email: user.personal_email ?? "",
       avatar_url: user.avatar_url ?? "",
       street_address: user.street_address ?? "",
       postal_code: user.postal_code ?? "",
