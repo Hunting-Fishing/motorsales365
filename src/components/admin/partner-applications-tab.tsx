@@ -23,7 +23,13 @@ type Row = {
   status: "pending" | "reviewing" | "approved" | "rejected";
   admin_notes: string | null;
   created_at: string;
+  storefront_slug: string | null;
+  storefront_published: boolean;
+  storefront_blurb: string | null;
+  storefront_logo_url: string | null;
+  storefront_categories: string[] | null;
 };
+
 
 const STATUSES: Row["status"][] = ["pending", "reviewing", "approved", "rejected"];
 
