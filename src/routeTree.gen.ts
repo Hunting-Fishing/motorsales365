@@ -67,6 +67,7 @@ import { Route as SupportBuyingRouteImport } from './routes/support_.buying'
 import { Route as SupportBusinessRouteImport } from './routes/support_.business'
 import { Route as SupportAccountRouteImport } from './routes/support_.account'
 import { Route as ShopCategoriesRouteImport } from './routes/shop.categories'
+import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
 import { Route as ServicesInspectionRouteImport } from './routes/services.inspection'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
@@ -77,6 +78,7 @@ import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as PayManualRouteImport } from './routes/pay.manual'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
 import { Route as PassportPremiumCheckoutRouteImport } from './routes/passport-premium.checkout'
+import { Route as PartsSearchRouteImport } from './routes/parts.search'
 import { Route as PartnersPartsRouteImport } from './routes/partners.parts'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
@@ -185,6 +187,7 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
+import { Route as AdminPartsAnalyticsRouteImport } from './routes/admin.parts.analytics'
 import { Route as AdminAdvertisementsSlotsRouteImport } from './routes/admin.advertisements.slots'
 import { Route as AdminAdvertisementsQrAdsRouteImport } from './routes/admin.advertisements.qr-ads'
 import { Route as AdminAdvertisementsPromotionsRouteImport } from './routes/admin.advertisements.promotions'
@@ -527,6 +530,11 @@ const ShopCategoriesRoute = ShopCategoriesRouteImport.update({
   path: '/shop/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopSlugRoute = ShopSlugRouteImport.update({
+  id: '/shop/$slug',
+  path: '/shop/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopCategoryRoute = ShopCategoryRouteImport.update({
   id: '/shop/$category',
   path: '/shop/$category',
@@ -576,6 +584,11 @@ const PassportPremiumCheckoutRoute = PassportPremiumCheckoutRouteImport.update({
   id: '/passport-premium/checkout',
   path: '/passport-premium/checkout',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PartsSearchRoute = PartsSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => PartsRoute,
 } as any)
 const PartnersPartsRoute = PartnersPartsRouteImport.update({
   id: '/partners/parts',
@@ -1124,6 +1137,11 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   path: '/redemptions/$staffId',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPartsAnalyticsRoute = AdminPartsAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminPartsRoute,
+} as any)
 const AdminAdvertisementsSlotsRoute =
   AdminAdvertisementsSlotsRouteImport.update({
     id: '/slots',
@@ -1450,7 +1468,7 @@ export interface FileRoutesByFullPath {
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
   '/partner-training': typeof PartnerTrainingRoute
-  '/parts': typeof PartsRoute
+  '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -1487,7 +1505,7 @@ export interface FileRoutesByFullPath {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
-  '/admin/parts': typeof AdminPartsRoute
+  '/admin/parts': typeof AdminPartsRouteWithChildren
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/permissions': typeof AdminPermissionsRoute
@@ -1555,6 +1573,7 @@ export interface FileRoutesByFullPath {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partners/parts': typeof PartnersPartsRoute
+  '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/pay/manual': typeof PayManualRoute
@@ -1565,6 +1584,7 @@ export interface FileRoutesByFullPath {
   '/seller/$id': typeof SellerIdRoute
   '/services/inspection': typeof ServicesInspectionRoute
   '/shop/$category': typeof ShopCategoryRoute
+  '/shop/$slug': typeof ShopSlugRoute
   '/shop/categories': typeof ShopCategoriesRoute
   '/support/account': typeof SupportAccountRoute
   '/support/business': typeof SupportBusinessRoute
@@ -1600,6 +1620,7 @@ export interface FileRoutesByFullPath {
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
+  '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1676,7 +1697,7 @@ export interface FileRoutesByTo {
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
   '/partner-training': typeof PartnerTrainingRoute
-  '/parts': typeof PartsRoute
+  '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -1712,7 +1733,7 @@ export interface FileRoutesByTo {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
-  '/admin/parts': typeof AdminPartsRoute
+  '/admin/parts': typeof AdminPartsRouteWithChildren
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/permissions': typeof AdminPermissionsRoute
@@ -1779,6 +1800,7 @@ export interface FileRoutesByTo {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partners/parts': typeof PartnersPartsRoute
+  '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/pay/manual': typeof PayManualRoute
@@ -1789,6 +1811,7 @@ export interface FileRoutesByTo {
   '/seller/$id': typeof SellerIdRoute
   '/services/inspection': typeof ServicesInspectionRoute
   '/shop/$category': typeof ShopCategoryRoute
+  '/shop/$slug': typeof ShopSlugRoute
   '/shop/categories': typeof ShopCategoriesRoute
   '/support/account': typeof SupportAccountRoute
   '/support/business': typeof SupportBusinessRoute
@@ -1824,6 +1847,7 @@ export interface FileRoutesByTo {
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
+  '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1904,7 +1928,7 @@ export interface FileRoutesById {
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
   '/partner-training': typeof PartnerTrainingRoute
-  '/parts': typeof PartsRoute
+  '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -1941,7 +1965,7 @@ export interface FileRoutesById {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
-  '/admin/parts': typeof AdminPartsRoute
+  '/admin/parts': typeof AdminPartsRouteWithChildren
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/permissions': typeof AdminPermissionsRoute
@@ -2009,6 +2033,7 @@ export interface FileRoutesById {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partners/parts': typeof PartnersPartsRoute
+  '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/pay/manual': typeof PayManualRoute
@@ -2019,6 +2044,7 @@ export interface FileRoutesById {
   '/seller/$id': typeof SellerIdRoute
   '/services/inspection': typeof ServicesInspectionRoute
   '/shop/$category': typeof ShopCategoryRoute
+  '/shop/$slug': typeof ShopSlugRoute
   '/shop/categories': typeof ShopCategoriesRoute
   '/support_/account': typeof SupportAccountRoute
   '/support_/business': typeof SupportBusinessRoute
@@ -2054,6 +2080,7 @@ export interface FileRoutesById {
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
+  '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2240,6 +2267,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/listing/checkout'
     | '/partners/parts'
+    | '/parts/search'
     | '/passport-premium/checkout'
     | '/passport/$slug'
     | '/pay/manual'
@@ -2250,6 +2278,7 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/services/inspection'
     | '/shop/$category'
+    | '/shop/$slug'
     | '/shop/categories'
     | '/support/account'
     | '/support/business'
@@ -2285,6 +2314,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/promotions'
     | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/slots'
+    | '/admin/parts/analytics'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2464,6 +2494,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/listing/checkout'
     | '/partners/parts'
+    | '/parts/search'
     | '/passport-premium/checkout'
     | '/passport/$slug'
     | '/pay/manual'
@@ -2474,6 +2505,7 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/services/inspection'
     | '/shop/$category'
+    | '/shop/$slug'
     | '/shop/categories'
     | '/support/account'
     | '/support/business'
@@ -2509,6 +2541,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/promotions'
     | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/slots'
+    | '/admin/parts/analytics'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2693,6 +2726,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/listing/checkout'
     | '/partners/parts'
+    | '/parts/search'
     | '/passport-premium/checkout'
     | '/passport/$slug'
     | '/pay/manual'
@@ -2703,6 +2737,7 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/services/inspection'
     | '/shop/$category'
+    | '/shop/$slug'
     | '/shop/categories'
     | '/support_/account'
     | '/support_/business'
@@ -2738,6 +2773,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/promotions'
     | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/slots'
+    | '/admin/parts/analytics'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2819,7 +2855,7 @@ export interface RootRouteChildren {
   MapRoute: typeof MapRoute
   MyQrRoute: typeof MyQrRoute
   PartnerTrainingRoute: typeof PartnerTrainingRoute
-  PartsRoute: typeof PartsRoute
+  PartsRoute: typeof PartsRouteWithChildren
   PaymentsRoute: typeof PaymentsRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -2869,6 +2905,7 @@ export interface RootRouteChildren {
   SellerIdRoute: typeof SellerIdRoute
   ServicesInspectionRoute: typeof ServicesInspectionRoute
   ShopCategoryRoute: typeof ShopCategoryRoute
+  ShopSlugRoute: typeof ShopSlugRoute
   ShopCategoriesRoute: typeof ShopCategoriesRoute
   SupportAccountRoute: typeof SupportAccountRoute
   SupportBusinessRoute: typeof SupportBusinessRoute
@@ -3326,6 +3363,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopCategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop/$slug': {
+      id: '/shop/$slug'
+      path: '/shop/$slug'
+      fullPath: '/shop/$slug'
+      preLoaderRoute: typeof ShopSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/$category': {
       id: '/shop/$category'
       path: '/shop/$category'
@@ -3395,6 +3439,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/passport-premium/checkout'
       preLoaderRoute: typeof PassportPremiumCheckoutRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/parts/search': {
+      id: '/parts/search'
+      path: '/search'
+      fullPath: '/parts/search'
+      preLoaderRoute: typeof PartsSearchRouteImport
+      parentRoute: typeof PartsRoute
     }
     '/partners/parts': {
       id: '/partners/parts'
@@ -4152,6 +4203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRedemptionsStaffIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/parts/analytics': {
+      id: '/admin/parts/analytics'
+      path: '/analytics'
+      fullPath: '/admin/parts/analytics'
+      preLoaderRoute: typeof AdminPartsAnalyticsRouteImport
+      parentRoute: typeof AdminPartsRoute
+    }
     '/admin/advertisements/slots': {
       id: '/admin/advertisements/slots'
       path: '/slots'
@@ -4592,6 +4650,18 @@ const AdminAdvertisementsRouteChildren: AdminAdvertisementsRouteChildren = {
 const AdminAdvertisementsRouteWithChildren =
   AdminAdvertisementsRoute._addFileChildren(AdminAdvertisementsRouteChildren)
 
+interface AdminPartsRouteChildren {
+  AdminPartsAnalyticsRoute: typeof AdminPartsAnalyticsRoute
+}
+
+const AdminPartsRouteChildren: AdminPartsRouteChildren = {
+  AdminPartsAnalyticsRoute: AdminPartsAnalyticsRoute,
+}
+
+const AdminPartsRouteWithChildren = AdminPartsRoute._addFileChildren(
+  AdminPartsRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminAccountsRoute: typeof AdminAccountsRoute
   AdminAdvertisementsRoute: typeof AdminAdvertisementsRouteWithChildren
@@ -4611,7 +4681,7 @@ interface AdminRouteChildren {
   AdminLeadOffersRoute: typeof AdminLeadOffersRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminLocationCorrectionsRoute: typeof AdminLocationCorrectionsRoute
-  AdminPartsRoute: typeof AdminPartsRoute
+  AdminPartsRoute: typeof AdminPartsRouteWithChildren
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPermissionsRoute: typeof AdminPermissionsRoute
@@ -4654,7 +4724,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLeadOffersRoute: AdminLeadOffersRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminLocationCorrectionsRoute: AdminLocationCorrectionsRoute,
-  AdminPartsRoute: AdminPartsRoute,
+  AdminPartsRoute: AdminPartsRouteWithChildren,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPermissionsRoute: AdminPermissionsRoute,
@@ -4842,6 +4912,16 @@ const ExportRouteChildren: ExportRouteChildren = {
 const ExportRouteWithChildren =
   ExportRoute._addFileChildren(ExportRouteChildren)
 
+interface PartsRouteChildren {
+  PartsSearchRoute: typeof PartsSearchRoute
+}
+
+const PartsRouteChildren: PartsRouteChildren = {
+  PartsSearchRoute: PartsSearchRoute,
+}
+
+const PartsRouteWithChildren = PartsRoute._addFileChildren(PartsRouteChildren)
+
 interface PaymentsRouteChildren {
   PaymentsIdReceiptRoute: typeof PaymentsIdReceiptRoute
 }
@@ -4910,7 +4990,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapRoute: MapRoute,
   MyQrRoute: MyQrRoute,
   PartnerTrainingRoute: PartnerTrainingRoute,
-  PartsRoute: PartsRoute,
+  PartsRoute: PartsRouteWithChildren,
   PaymentsRoute: PaymentsRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
@@ -4960,6 +5040,7 @@ const rootRouteChildren: RootRouteChildren = {
   SellerIdRoute: SellerIdRoute,
   ServicesInspectionRoute: ServicesInspectionRoute,
   ShopCategoryRoute: ShopCategoryRoute,
+  ShopSlugRoute: ShopSlugRoute,
   ShopCategoriesRoute: ShopCategoriesRoute,
   SupportAccountRoute: SupportAccountRoute,
   SupportBusinessRoute: SupportBusinessRoute,
@@ -5011,13 +5092,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

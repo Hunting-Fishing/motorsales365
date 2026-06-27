@@ -23,7 +23,13 @@ type Row = {
   status: "pending" | "reviewing" | "approved" | "rejected";
   admin_notes: string | null;
   created_at: string;
+  storefront_slug: string | null;
+  storefront_published: boolean;
+  storefront_blurb: string | null;
+  storefront_logo_url: string | null;
+  storefront_categories: string[] | null;
 };
+
 
 const STATUSES: Row["status"][] = ["pending", "reviewing", "approved", "rejected"];
 
@@ -145,10 +151,122 @@ export function PartnerApplicationsTab() {
                   <span className="font-medium">Notes:</span> {r.notes}
                 </p>
               )}
+              {r.status === "approved" && (
+                <StorefrontEditor row={r} onSaved={refresh} />
+              )}
             </div>
           ))}
+
         </div>
       )}
     </div>
   );
 }
+
+function StorefrontEditor({ row, onSaved }: { row: Row; onSaved: () => void }) {
+  const update = useServerFn(adminUpdatePartnerApplication);
+  const [slug, setSlug] = useState(row.storefront_slug ?? "");
+  const [blurb, setBlurb] = useState(row.storefront_blurb ?? "");
+  const [logo, setLogo] = useState(row.storefront_logo_url ?? "");
+  const [cats, setCats] = useState((row.storefront_categories ?? []).join(", "));
+  const [published, setPublished] = useState(row.storefront_published);
+  const [saving, setSaving] = useState(false);
+
+  async function save(nextPublished?: boolean) {
+    setSaving(true);
+    try {
+      await update({
+        data: {
+          id: row.id,
+          storefront_slug: slug || null,
+          storefront_blurb: blurb || null,
+          storefront_logo_url: logo || null,
+          storefront_categories: cats
+            ? cats.split(",").map((s) => s.trim()).filter(Boolean)
+            : null,
+          storefront_published: nextPublished ?? published,
+        },
+      });
+      if (nextPublished !== undefined) setPublished(nextPublished);
+      toast.success("Storefront saved");
+      onSaved();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="mt-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs">
+      <p className="mb-2 flex items-center gap-1 font-semibold text-primary">
+        <Handshake className="h-3 w-3" /> Public storefront
+      </p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <label className="flex flex-col gap-1">
+          <span className="font-medium">URL slug (/shop/…)</span>
+          <input
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            placeholder="banawe-toyota-parts"
+            className="rounded border border-border bg-background px-2 py-1"
+          />
+        </label>
+        <label className="flex flex-col gap-1">
+          <span className="font-medium">Logo URL</span>
+          <input
+            value={logo}
+            onChange={(e) => setLogo(e.target.value)}
+            placeholder="https://…"
+            className="rounded border border-border bg-background px-2 py-1"
+          />
+        </label>
+        <label className="flex flex-col gap-1 sm:col-span-2">
+          <span className="font-medium">Blurb (shown on storefront)</span>
+          <textarea
+            value={blurb}
+            onChange={(e) => setBlurb(e.target.value)}
+            rows={2}
+            className="rounded border border-border bg-background px-2 py-1"
+          />
+        </label>
+        <label className="flex flex-col gap-1 sm:col-span-2">
+          <span className="font-medium">Categories (comma separated)</span>
+          <input
+            value={cats}
+            onChange={(e) => setCats(e.target.value)}
+            placeholder="Engines, Transmissions, Suspension"
+            className="rounded border border-border bg-background px-2 py-1"
+          />
+        </label>
+      </div>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => save()}
+          disabled={saving || !slug}
+          className="rounded bg-primary px-3 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50"
+        >
+          Save draft
+        </button>
+        <button
+          onClick={() => save(!published)}
+          disabled={saving || !slug}
+          className={`rounded px-3 py-1 text-xs font-medium ${published ? "bg-amber-600 text-white" : "bg-emerald-600 text-white"} disabled:opacity-50`}
+        >
+          {published ? "Unpublish" : "Publish to /shop/" + (slug || "…")}
+        </button>
+        {published && slug && (
+          <a
+            href={`/shop/${slug}`}
+            target="_blank"
+            rel="noopener"
+            className="text-primary hover:underline"
+          >
+            View live →
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+

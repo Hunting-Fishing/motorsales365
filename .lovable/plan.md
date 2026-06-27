@@ -1,52 +1,59 @@
-
 ## Goal
 
-Anyone whose email ends in `@365motorsales.com` must be created as a **365 Staff** account. Private seller, business, and any future account types are disabled (greyed out) in the UI and rejected on the server.
+Deepen parts monetization across four tracks. Phase the work so each piece ships independently.
 
-## Scope of changes
+## 1. Universal "Shop parts" widget on every vehicle page
 
-### 1. `src/components/admin/add-user-dialog.tsx` (UI lock-in)
-- Derive `isStaffDomain` from the composed email (`enforceDomain === "@365motorsales.com"` OR the typed email ends with that domain).
-- When `isStaffDomain` is true:
-  - Force `accountType` state to `"staff"` via an effect.
-  - In the Account Type selector, render `private` and `business` (and any future options) as disabled with a tooltip/help text: "Locked — @365motorsales.com emails are always 365 Staff accounts."
-  - Hide/disable the Business tab content so business-only fields can't be filled.
-  - Show a small amber notice at the top of the Identity tab: "This email domain is reserved for 365 Staff. Account type is locked to Staff."
-- Keep existing `enforceDomain` username + suffix UI unchanged.
+- `AffiliatePartsSection` already renders on `listing.$id` for all categories except towing/services.
+- Add it to `rides.$slug.tsx` (community ride pages — same `make/model/year` context).
+- Add a compact variant to listing cards' detail modal where applicable.
+- No schema changes.
 
-### 2. `src/routes/api/admin/create-user.tsx` (server enforcement — authoritative)
-- After composing the final email, compute `isStaffDomain = email.toLowerCase().endsWith("@365motorsales.com")`.
-- If `isStaffDomain`:
-  - Override `account_type` to `"staff"` regardless of what the client sent.
-  - Ignore `seller_type`, `business_name`, `business_kind`, `mark_verified`, and business address fields.
-  - Ensure at least a default staff role is assigned if `roles` is empty (e.g. keep current behavior, no auto-elevation to admin).
-- If a non-staff `account_type` is explicitly sent with a `@365motorsales.com` email, return a 400 with a clear message rather than silently coercing — pick one behavior; recommend **silent coerce + log** to avoid breaking the admin form, and surface a toast hint client-side.
+## 2. `/parts/search` — VIN / Year-Make-Model multi-merchant fan-out
 
-### 3. Self-signup path (public auth)
-- Check `src/routes/auth.*` / signup handler. If users can self-register, add the same domain guard server-side so a stranger can't claim a `@365motorsales.com` address and become staff. Two options:
-  - **Block self-signup** for `@365motorsales.com` (recommended) — only the admin Create-User flow can mint these accounts. Show "This domain is reserved. Ask a 365 admin to create your account."
-  - OR allow signup but force `account_type=staff` with **zero roles** until an admin grants them. No automatic role grants from email domain (per security guidance — email must be verified, and role grants still require admin action).
+New public route `src/routes/parts.search.tsx`:
 
-I'll recommend **block self-signup** for simplicity and safety.
+- Top form: VIN input (calls existing `decodeVin`), OR Year/Make/Model dropdowns, OR free-text part query.
+- Optional JDM chassis code lookup (uses existing `jdm_chassis_codes`).
+- Result section reuses `AffiliateShopRow` with the resolved query, plus a grid of merchant cards (Amazon, eBay, AliExpress PH, Shopee PH, Lazada PH) each opened via `/api/public/go/<slug>` so clicks are tracked.
+- SEO: head() with VIN/MMY in title for shareable URLs (`?vin=…` or `?mk=…&md=…&yr=…`).
 
-### 4. Edit flow (`src/components/admin/edit-profile-dialog.tsx`)
-- If the profile's email ends in `@365motorsales.com`, lock the `account_type` field to Staff (disabled select) with the same helper note. Prevents an admin from later flipping a staff account to "business".
+## 3. Approved-partner storefronts (B2B retail)
 
-### 5. Existing data sweep (one-off)
-- Run a migration/data update: any existing `profiles` row whose auth email ends in `@365motorsales.com` and whose `account_type` is not `staff` → set to `staff`, clear `seller_type`/business fields. Report count to the user before applying.
+Schema additions:
 
-## Out of scope
-- No changes to role assignment logic (admin/moderator/support/advertising stay manually granted).
-- No changes to the `@365motorsales.com` suffix UI built last turn.
-- No new tables.
+```text
+parts_supplier_applications
+  + storefront_slug TEXT UNIQUE (nullable)
+  + storefront_published BOOLEAN DEFAULT false
+  + storefront_blurb TEXT
+  + storefront_logo_url TEXT
+  + storefront_categories TEXT[]
+```
 
-## Technical notes
-- Domain check is a single helper: `const STAFF_DOMAIN = "@365motorsales.com"; const isStaffEmail = (e: string) => e.trim().toLowerCase().endsWith(STAFF_DOMAIN);` — colocate in `src/lib/staff-domain.ts` so client + server import the same constant.
-- Server is the source of truth; UI lock is UX only.
-- Coercion on the server should be logged to `admin_audit_log` when client submitted a different `account_type`.
+- Admin "Partner applications" tab: when status set to `approved`, prompt for a slug + publish toggle.
+- New public route `src/routes/shop.$slug.tsx`: hero with logo/blurb, categories chips, a primary "Visit shop" CTA routed through `/api/public/go/partner-<slug>` (creates a per-partner tracked outbound), plus contact form that pipes into existing `part_quote_requests`.
+- New `affiliate_links` row pattern `partner-<slug>` so click logging reuses the existing pipeline.
 
-## Open questions (please confirm before I build)
+## 4. Click + conversion analytics dashboard
 
-1. **Self-signup**: block `@365motorsales.com` entirely on the public signup page, or allow with `account_type=staff` and no roles until granted?
-2. **Existing rows**: do you want me to scan and auto-convert any existing non-staff `@365motorsales.com` accounts as part of this change?
-3. **Edit dialog**: lock the account-type selector for staff-domain emails (recommended), or leave it editable for admins?
+New admin route `src/routes/admin.parts.analytics.tsx`:
+
+- Reads `affiliate_clicks` aggregates: by merchant, by day (7/30d), by listing, by make/model.
+- Top earners table + CSV export.
+- Empty "Conversions" panel with a stub showing where postback data will appear once webhooks are wired (deferred per your answer).
+
+Server fn `getAffiliateAnalytics` in `src/lib/affiliate-analytics.functions.ts`, admin-gated via `requireSupabaseAuth` + `has_role('admin')`.
+
+## Order of execution
+
+1. Migration (storefront columns on `parts_supplier_applications`, `partner-*` row pattern docs).
+2. `/parts/search` route + add widget to `rides.$slug`.
+3. Storefront publish flow in admin + public `/shop/:slug`.
+4. Analytics dashboard + CSV export.
+
+## Notes
+
+- No new secrets. Postback wiring deferred until you enable a network console.
+- Everything reuses existing `affiliate_links` + `affiliate_clicks` tables and the `/api/public/go/$slug` redirect.
+- All public routes get loader-fed `head()` tags for OG share.

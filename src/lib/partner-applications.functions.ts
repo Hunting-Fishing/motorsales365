@@ -59,6 +59,51 @@ export const submitPartnerApplication = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ---- Public storefront ----
+
+export type PartnerStorefront = {
+  storefront_slug: string;
+  company_name: string;
+  country: string;
+  business_kind: string;
+  website: string | null;
+  storefront_blurb: string | null;
+  storefront_logo_url: string | null;
+  storefront_categories: string[] | null;
+};
+
+/** Public: fetch a published partner storefront by slug. */
+export const getPartnerStorefront = createServerFn({ method: "GET" })
+  .inputValidator((d: { slug: string }) => d)
+  .handler(async ({ data }): Promise<PartnerStorefront | null> => {
+    const sb = publicClient();
+    const { data: row } = await sb
+      .from("parts_supplier_applications" as any)
+      .select(
+        "storefront_slug,company_name,country,business_kind,website,storefront_blurb,storefront_logo_url,storefront_categories",
+      )
+      .eq("storefront_slug", data.slug)
+      .eq("storefront_published", true)
+      .maybeSingle();
+    return (row as any) ?? null;
+  });
+
+/** Public: list all published partner storefronts (for /shop index). */
+export const listPartnerStorefronts = createServerFn({ method: "GET" }).handler(
+  async (): Promise<PartnerStorefront[]> => {
+    const sb = publicClient();
+    const { data } = await sb
+      .from("parts_supplier_applications" as any)
+      .select(
+        "storefront_slug,company_name,country,business_kind,website,storefront_blurb,storefront_logo_url,storefront_categories",
+      )
+      .eq("storefront_published", true)
+      .order("company_name", { ascending: true });
+    return ((data as any) ?? []) as PartnerStorefront[];
+  },
+);
+
+
 // ---- Admin ----
 
 async function ensureAdmin(ctx: { supabase: any; userId: string }) {
@@ -85,16 +130,34 @@ export const adminListPartnerApplications = createServerFn({ method: "GET" })
 export const adminUpdatePartnerApplication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (d: { id: string; status: "pending" | "reviewing" | "approved" | "rejected"; admin_notes?: string | null }) => d,
+    (d: {
+      id: string;
+      status?: "pending" | "reviewing" | "approved" | "rejected";
+      admin_notes?: string | null;
+      storefront_slug?: string | null;
+      storefront_published?: boolean;
+      storefront_blurb?: string | null;
+      storefront_logo_url?: string | null;
+      storefront_categories?: string[] | null;
+    }) => d,
   )
   .handler(async ({ data, context }) => {
     await ensureAdmin(context);
-    const patch: any = {
-      status: data.status,
-      reviewed_by: context.userId,
-      reviewed_at: new Date().toISOString(),
-    };
+    const patch: any = {};
+    if (data.status) {
+      patch.status = data.status;
+      patch.reviewed_by = context.userId;
+      patch.reviewed_at = new Date().toISOString();
+    }
     if (typeof data.admin_notes === "string") patch.admin_notes = data.admin_notes;
+    if (data.storefront_slug !== undefined) {
+      const s = (data.storefront_slug ?? "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
+      patch.storefront_slug = s || null;
+    }
+    if (data.storefront_published !== undefined) patch.storefront_published = data.storefront_published;
+    if (data.storefront_blurb !== undefined) patch.storefront_blurb = data.storefront_blurb;
+    if (data.storefront_logo_url !== undefined) patch.storefront_logo_url = data.storefront_logo_url;
+    if (data.storefront_categories !== undefined) patch.storefront_categories = data.storefront_categories;
     const { error } = await context.supabase
       .from("parts_supplier_applications" as any)
       .update(patch)
@@ -102,3 +165,4 @@ export const adminUpdatePartnerApplication = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+

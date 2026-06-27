@@ -1,0 +1,191 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { BarChart3, Download, TrendingUp, ShoppingCart, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  getAffiliateAnalytics,
+  type AffiliateAnalytics,
+} from "@/lib/affiliate-analytics.functions";
+
+export const Route = createFileRoute("/admin/parts/analytics")({
+  head: () => ({ meta: [{ title: "Parts click analytics — Admin" }] }),
+  component: PartsAnalyticsPage,
+});
+
+function PartsAnalyticsPage() {
+  const fetchStats = useServerFn(getAffiliateAnalytics);
+  const [days, setDays] = useState(30);
+  const [stats, setStats] = useState<AffiliateAnalytics | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    setStats(null);
+    setErr(null);
+    fetchStats({ data: { rangeDays: days } })
+      .then(setStats)
+      .catch((e) => setErr(e?.message ?? "Failed"));
+  }, [days, fetchStats]);
+
+  function exportCsv() {
+    if (!stats) return;
+    const rows = [
+      ["created_at", "supplier_slug", "query", "listing_id", "make", "model", "year"],
+      ...stats.recent.map((r) => [
+        r.created_at,
+        r.supplier_slug,
+        r.query ?? "",
+        r.listing_id ?? "",
+        r.vehicle_make ?? "",
+        r.vehicle_model ?? "",
+        r.vehicle_year ?? "",
+      ]),
+    ];
+    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `affiliate-clicks-${days}d.csv`;
+    a.click();
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl font-bold">Parts click analytics</h1>
+          <p className="text-sm text-muted-foreground">
+            Outbound affiliate clicks across all merchants & partner storefronts.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            value={days}
+            onChange={(e) => setDays(Number(e.target.value))}
+            className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+          >
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+          </select>
+          <Button variant="outline" onClick={exportCsv} disabled={!stats}>
+            <Download className="mr-2 h-4 w-4" /> Export CSV
+          </Button>
+        </div>
+      </div>
+
+      {err && <p className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">{err}</p>}
+      {!stats ? (
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      ) : (
+        <>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Stat label="Total clicks" value={stats.total_clicks.toLocaleString()} icon={<TrendingUp className="h-4 w-4" />} />
+            <Stat
+              label="Top merchant"
+              value={stats.by_supplier[0]?.supplier_slug ?? "—"}
+              sub={stats.by_supplier[0] ? `${stats.by_supplier[0].clicks} clicks` : undefined}
+              icon={<ShoppingCart className="h-4 w-4" />}
+            />
+            <Stat
+              label="Active merchants"
+              value={String(stats.by_supplier.length)}
+              icon={<BarChart3 className="h-4 w-4" />}
+            />
+          </div>
+
+          <Card title="Clicks by merchant">
+            {stats.by_supplier.length === 0 ? (
+              <Empty>No clicks yet.</Empty>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs uppercase text-muted-foreground">
+                  <tr><th className="py-1">Merchant</th><th className="py-1 text-right">Clicks</th><th className="py-1 text-right">Share</th></tr>
+                </thead>
+                <tbody>
+                  {stats.by_supplier.map((r) => (
+                    <tr key={r.supplier_slug} className="border-t border-border">
+                      <td className="py-1.5 font-mono text-xs">{r.supplier_slug}</td>
+                      <td className="py-1.5 text-right">{r.clicks}</td>
+                      <td className="py-1.5 text-right text-muted-foreground">
+                        {((r.clicks / stats.total_clicks) * 100).toFixed(1)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </Card>
+
+          <div className="grid gap-3 lg:grid-cols-2">
+            <Card title="Top listings">
+              {stats.top_listings.length === 0 ? (
+                <Empty>No listing-attributed clicks.</Empty>
+              ) : (
+                <ul className="space-y-1 text-sm">
+                  {stats.top_listings.map((r) => (
+                    <li key={r.listing_id} className="flex items-center justify-between gap-2 border-b border-border py-1 last:border-0">
+                      <a href={`/listing/${r.listing_id}`} className="truncate font-mono text-xs text-primary hover:underline">
+                        {r.listing_id}
+                      </a>
+                      <span>{r.clicks}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+            <Card title="Top make / model">
+              {stats.top_make_model.length === 0 ? (
+                <Empty>No vehicle data captured.</Empty>
+              ) : (
+                <ul className="space-y-1 text-sm">
+                  {stats.top_make_model.map((r) => (
+                    <li key={r.key} className="flex items-center justify-between gap-2 border-b border-border py-1 last:border-0">
+                      <span className="truncate">{r.key}</span>
+                      <span>{r.clicks}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+          </div>
+
+          <Card title="Conversions (postback)">
+            <div className="flex items-start gap-3 rounded-md border border-amber-200/40 bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
+              <AlertCircle className="h-5 w-5 shrink-0" />
+              <div>
+                <p className="font-medium">Postbacks not yet wired.</p>
+                <p className="mt-1">
+                  Once you enable conversion postbacks in each network's console (Involve Asia, Amazon
+                  Associates, eBay Partner Network), confirmed orders & commissions will appear here
+                  alongside clicks. Endpoint stub: <code>/api/public/postback/:network</code>.
+                </p>
+              </div>
+            </div>
+          </Card>
+        </>
+      )}
+    </div>
+  );
+}
+
+function Stat({ label, value, sub, icon }: { label: string; value: string; sub?: string; icon?: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">{icon}{label}</div>
+      <div className="mt-1 font-display text-2xl font-bold">{value}</div>
+      {sub && <div className="text-xs text-muted-foreground">{sub}</div>}
+    </div>
+  );
+}
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-xl border border-border bg-card p-4">
+      <h2 className="mb-2 text-sm font-semibold">{title}</h2>
+      {children}
+    </section>
+  );
+}
+function Empty({ children }: { children: React.ReactNode }) {
+  return <p className="rounded border border-dashed border-border p-4 text-center text-xs text-muted-foreground">{children}</p>;
+}
