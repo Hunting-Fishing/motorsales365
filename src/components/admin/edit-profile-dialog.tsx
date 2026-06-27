@@ -509,9 +509,15 @@ export function EditProfileDialog({
 
           <TabsContent value="roles" className="mt-3 space-y-2">
             <Field label="Staff roles">
-              <RoleChips roles={roles} onToggle={toggleRole} />
+              <RoleChips roles={roles} onToggle={toggleRole} disabled={!canEditRoles} />
             </Field>
-            <p className="text-xs text-muted-foreground">Base &quot;user&quot; role is always kept.</p>
+            {canEditRoles ? (
+              <p className="text-xs text-muted-foreground">Base &quot;user&quot; role is always kept.</p>
+            ) : (
+              <p className="text-xs text-amber-700 dark:text-amber-400">
+                Only accounts with the <strong>Admin</strong> role can change staff roles.
+              </p>
+            )}
           </TabsContent>
 
           <TabsContent value="ads" className="mt-3">
