@@ -93,6 +93,11 @@ function PartsHub() {
                 <Car className="mr-1 h-4 w-4" /> Post a wanted ad
               </Link>
             </Button>
+            <Button asChild variant="default" size="sm">
+              <Link to="/partners/parts">
+                <Handshake className="mr-1 h-4 w-4" /> Sell on 365 (partners)
+              </Link>
+            </Button>
           </div>
         </div>
 
