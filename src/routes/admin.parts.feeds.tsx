@@ -50,6 +50,11 @@ function FeedsPage() {
             Auto-pull product catalogs from Lazada, Shopee, AliExpress (via Involve Asia)
             into the universal Shop widget. Daily cron + manual sync.
           </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            🌏 Cron only syncs feeds whose country is marked active in <code>parts_countries</code>.
+            Outbound clicks are also gated by visitor country vs each partner's allowed_countries.
+          </p>
+
         </div>
         <Button size="sm" variant="outline" onClick={refresh}>
           <RefreshCw className="mr-1 h-3.5 w-3.5" /> Refresh
