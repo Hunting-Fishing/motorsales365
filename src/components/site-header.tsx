@@ -106,10 +106,10 @@ export function SiteHeader() {
   return (
     <header className="w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container mx-auto flex h-14 items-center justify-between gap-2 px-3 sm:h-16 sm:gap-4 sm:px-4">
-        <div className="relative z-0 flex min-w-0 flex-1 items-center gap-4 overflow-hidden lg:gap-6">
+        <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-5">
           <Link
             to="/"
-            className="flex items-center gap-2"
+            className="flex shrink-0 items-center gap-2"
             aria-label="365 MotorSales Philippines home"
           >
             <BrandLogo size={36} className="shrink-0 sm:[&]:!h-11 sm:[&]:!w-11" />
@@ -147,13 +147,13 @@ export function SiteHeader() {
             </span>
           )}
 
-          <nav className="hidden items-center gap-0.5 min-[1700px]:flex">
+          <nav className="hidden min-w-0 flex-1 items-center gap-0.5 overflow-hidden xl:flex">
             {NAV.map((n) => (
               <Link
                 key={n.category}
                 to="/browse/$category"
                 params={{ category: n.category }}
-                className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                className="shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                 activeProps={{ className: "bg-secondary text-foreground" }}
               >
                 {n.label}
@@ -161,63 +161,63 @@ export function SiteHeader() {
             ))}
             <Link
               to={WANTED_LINK.to}
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               {WANTED_LINK.label}
             </Link>
             <Link
               to={PARTS_WANTED_LINK.to}
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="hidden shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1500px]:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               {PARTS_WANTED_LINK.label}
             </Link>
             <Link
               to={BUSINESSES_LINK.to}
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               {BUSINESSES_LINK.label}
             </Link>
             <Link
               to={RIDES_LINK.to}
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               {RIDES_LINK.label}
             </Link>
             <Link
               to="/map"
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Map
             </Link>
             <Link
               to="/parts"
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Parts
             </Link>
             <Link
               to="/shop"
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="hidden shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1900px]:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Shop
             </Link>
             <Link
               to="/learn"
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="hidden shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1900px]:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Learn
             </Link>
             <Link
               to="/games"
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="hidden shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1900px]:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Games
@@ -225,14 +225,14 @@ export function SiteHeader() {
 
             <Link
               to="/shop-manager"
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="hidden shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1900px]:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Shop Manager
             </Link>
             <Link
               to="/export"
-              className="hidden rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1700px]:inline-flex"
+              className="hidden shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1900px]:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Export
@@ -240,7 +240,7 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <div className="relative z-10 flex shrink-0 items-center gap-1.5 bg-background/95 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 bg-background/95 sm:gap-2">
           {/* Help icon — desktop */}
           <Button
             asChild
@@ -595,7 +595,7 @@ export function SiteHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="min-[1700px]:hidden h-9 w-9"
+                className="h-9 w-9 min-[1900px]:hidden"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
