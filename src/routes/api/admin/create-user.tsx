@@ -234,7 +234,11 @@ export const Route = createFileRoute("/api/admin/create-user")({
           copyIf("signup_region");
           copyIf("postal_code");
 
-          if (input.account_type === "business") {
+          if (input.account_type === "staff") {
+            profilePatch.is_staff_account = true;
+            profilePatch.seller_type = null;
+          } else if (input.account_type === "business") {
+            profilePatch.is_staff_account = false;
             profilePatch.seller_type = input.seller_type ?? "private";
             copyIf("business_name");
             copyIf("business_kind");
@@ -248,6 +252,7 @@ export const Route = createFileRoute("/api/admin/create-user")({
               profilePatch.verified_at = new Date().toISOString();
             }
           }
+
 
           await sb.from("profiles").update(profilePatch as any).eq("id", newUserId);
 
