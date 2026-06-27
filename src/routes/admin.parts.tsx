@@ -43,6 +43,12 @@ function AdminPartsPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           <a
+            href="/admin/parts/outreach"
+            className="inline-flex items-center gap-1.5 rounded-md border border-primary bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
+          >
+            📞 Outreach workspace
+          </a>
+          <a
             href="/admin/parts/analytics"
             className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium hover:border-primary hover:text-primary"
           >
