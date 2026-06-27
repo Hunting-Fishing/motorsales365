@@ -1,56 +1,59 @@
+## Goal
 
-## Phase A — Region-correct partner display
+Turn `/parts` into a shoppable hub by pulling real product tiles from our affiliate partners (Shopee PH, Lazada PH, AliExpress PH via Involve Asia) on top of the existing "search at partner" buttons.
 
-Audit of current `affiliate_links`:
+## What you'll see on /parts
 
-| Partner | Reality | Action |
-|---|---|---|
-| Shopee PH | PH only | keep, allowed = PH |
-| Lazada PH | PH only | keep, allowed = PH |
-| AliExpress | Ships PH (global) | keep, allowed = PH, SEA |
-| **eBay Motors** | US‑centric, no PH shipping on most listings | **hide for PH**, allowed = US, CA, AU, GB |
-| Amazon | Patchy PH delivery for parts | allowed = US, CA, GB (not PH) |
-| RockAuto | US, CA only | allowed = US, CA (already inactive) |
-| Amayama | Global incl PH | allowed = all |
-| PartSouq | Global incl PH | allowed = all |
-| Megazip | Global incl PH | allowed = all |
+1. **Existing supplier row** (logos that link out with your search) — kept as-is.
+2. **New "Trending parts from our partners" grid** — 12 real product tiles with image, title, price, merchant badge, and a Shop button that opens the partner's product page using your affiliate deeplink.
+3. **Vehicle-aware mode**: once a shopper picks a make/model in the Find-a-part wizard, the same grid re-queries with that vehicle context so tiles match.
+4. **Smart empty state**: if no products have been synced yet, the grid is hidden (no empty boxes); the supplier row alone shows.
 
-`parts_suppliers` already has `region`; the B2B outreach list is correctly PH-only. No data change needed there — only display filtering by active country.
+The grid is country-gated — visitors in PH see PH merchants, others only see partners allowed in their region (already enforced by the country rules we added).
 
-Changes:
-1. Migration: add `allowed_countries text[]` (NULL = all) to `affiliate_links`, backfill per table above.
-2. `listAffiliateSuppliers` accepts `country` (default `PH`, taken from `parts_countries.is_active`) and filters `allowed_countries IS NULL OR country = ANY(allowed_countries)`.
-3. `AffiliateShopRow` + `/parts` + listing detail pass current PH country; only PH-eligible partners render. eBay/Amazon disappear for PH visitors.
-4. Admin `/admin/parts` affiliate editor gains a multi-country chip picker for `allowed_countries`.
+## Backend status
 
-## Phase B — Autopull product feeds (Lazada + Shopee + AliExpress via Involve Asia)
+- `partner_products` table and `searchPartnerProducts` server function already exist and already filter by country.
+- 3 PH feeds are enabled but **0 products have been synced yet**, so the grid will be empty on first load.
+- First-time fill: run a manual sync from `/admin/parts/feeds` (Sync now button) for each PH merchant. After that the daily cron keeps it fresh.
 
-Goal: ingest real SKUs (title, price, image, deeplink) instead of only sending users to search pages, so the parts page shows actual shoppable items matched to a vehicle.
+No new tables, no new secrets.
 
-Approach: use the **Involve Asia Datafeed API** (key already saved). It exposes per-merchant product feeds for Lazada PH, Shopee PH, AliExpress, with daily refresh. No separate Lazada Open Platform app needed.
+---
 
-1. Migration — two new tables:
-   - `partner_product_feeds(network, merchant_slug, last_synced_at, last_status, item_count, ...)`
-   - `partner_products(network, sku, title, price, currency, image_url, deeplink, brand, category_path, country, raw jsonb, ...)` with unique `(network, sku)` and trigram index on `title`.
-2. Server module `src/lib/partner-feed.server.ts`:
-   - `fetchInvolveAsiaFeed(merchant, page)` paginated pull
-   - `upsertPartnerProducts(rows)` chunked upsert
-   - Logs per-feed result to `partner_product_feeds`
-3. Public cron route `/api/public/hooks/sync-parts-feeds` (apikey-guarded) — runs all enabled feeds for active countries; scheduled via `pg_cron` daily 02:00 PH.
-4. Admin page `/admin/parts/feeds`:
-   - List feeds with last sync, item count, status
-   - "Sync now" button per feed
-   - Enable/disable per merchant
-5. Universal Shop widget: if `partner_products` has matches for the query (filtered by vehicle make/model and active country), show real product cards (image + price + Shop button → tracked /go redirect). Falls back to today's deep-link cards when no matches yet.
+## Technical section
 
-### Technical notes
+### 1. New component: `src/components/parts/partner-products-grid.tsx`
+- Props: `query: string`, `country?: string`, `limit?: number`, `title?: string`.
+- Calls `searchPartnerProducts` via `useServerFn`. Returns `null` when result is empty (clean fallback).
+- Renders a responsive grid (`grid-cols-2 sm:grid-cols-3 lg:grid-cols-4`) of tiles:
+  - 1:1 image (lazy-loaded), 2-line clamped title, price + currency, merchant badge (Shopee / Lazada / AliExpress).
+  - Outbound `<a>` to the product's `deeplink` with `target="_blank" rel="nofollow sponsored noopener"`.
+  - Fire-and-forget click log via a new tiny logger so we get per-product analytics in `affiliate_clicks` (reuse existing table — add `partner_sku` column-less write under the existing `supplier_slug`, with `query` carrying the product title).
 
-- All product clicks continue to flow through the existing `/api/public/go/:slug` so commission attribution stays intact.
-- `partner_products` is RLS public-read (anon SELECT) since it's a public catalog; writes restricted to service role / cron route.
-- Country filter chains through: `parts_countries.is_active` → `affiliate_links.allowed_countries` → `partner_products.country`. PH is the only active country today, so non-PH partners and non-PH SKUs stay hidden until those countries flip active.
-- Out of scope this round: Shopee Open Platform direct API, Lazada seller-app onboarding (both require partner approval); we use the affiliate datafeed path instead.
+### 2. Click logging endpoint
+Extend the existing `/api/public/go/$slug` to accept an optional `?dl=<base64-encoded deeplink>` so the redirect is consistent with the supplier-row clicks (one analytics path, same country gate, same Involve Asia logging). Tile click → `/api/public/go/shopee-ph?dl=...&q=<title>&sku=<sku>`. Falls back to the templated URL if `dl` missing.
 
-## Deliverables
-- 1 migration (schema + backfill)
-- ~4 new files (feed server module, cron route, admin feeds page, country-aware affiliate filter)
-- Updates to 3 existing files (`affiliate.functions.ts`, `AffiliateShopRow`, admin affiliate editor)
+### 3. Wire into `src/routes/parts.tsx`
+- Add `<PartnerProductsGrid query={...} title="Trending parts from our partners" />` directly under the existing `<AffiliateShopRow>` block (line ~171).
+- Default query: `"auto parts"`. When the Find-a-part wizard has picked a make/model, lift that state up and pass `query` as `"{make} {model} parts"`.
+- Keep the existing Browse / Find / Order tabs untouched.
+
+### 4. No DB migration required
+All tables, RLS, grants, and country filters are in place from previous turns.
+
+### 5. After ship — one-time seeding
+Open `/admin/parts/feeds` and click "Sync now" on each enabled PH feed. The grid populates immediately. After that, the daily cron at `/api/public/hooks/sync-parts-feeds` keeps it fresh.
+
+### Files touched
+
+- **new** `src/components/parts/partner-products-grid.tsx`
+- **edit** `src/routes/parts.tsx` (mount the grid, lift wizard make/model)
+- **edit** `src/routes/api/public/go.$slug.ts` (accept optional `?dl=` passthrough)
+- **edit** `src/components/parts/parts-wizard.tsx` (expose an `onContextChange?(make, model)` callback so the grid can react)
+
+### Out of scope (call out as next steps if you want them)
+
+- Per-tile "Add to wanted ad" shortcut.
+- Pulling tiles into individual listing detail pages (already have the supplier row there — could be a follow-up).
+- Fitment-matched filtering (we'd need OEM/category tags on partner products — only `category_path` is currently ingested).
