@@ -78,11 +78,17 @@ function PartsHub() {
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
+            <Button asChild variant="default" size="sm">
+              <Link to="/parts/search">
+                <Search className="mr-1 h-4 w-4" /> Search parts by VIN
+              </Link>
+            </Button>
             <Button asChild variant="outline" size="sm">
               <Link to="/sell" search={{ category: "parts" } as any}>
                 <Tag className="mr-1 h-4 w-4" /> Sell a part
               </Link>
             </Button>
+
             <Button asChild variant="outline" size="sm">
               <Link to="/businesses">
                 <Recycle className="mr-1 h-4 w-4" /> Salvage yards directory
