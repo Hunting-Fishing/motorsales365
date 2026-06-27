@@ -200,6 +200,9 @@ export const Route = createFileRoute("/api/admin/create-user")({
           };
           copyIf("first_name");
           copyIf("last_name");
+          if (input.personal_email && input.personal_email.trim() !== "") {
+            profilePatch.personal_email = input.personal_email.trim().toLowerCase();
+          }
           if (input.phone) {
             profilePatch.phone = input.phone;
             profilePatch.phone_e164 = normalizeE164(input.phone);
