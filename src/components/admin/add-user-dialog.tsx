@@ -291,13 +291,43 @@ export function AddUserDialog({
             </TabsList>
 
             <TabsContent value="identity" className="mt-3 space-y-3">
-              <Field label="Email *">
+              {enforceDomain ? (
+                <Field label={`Work email * ${enforceDomain}`}>
+                  <div className="flex items-stretch overflow-hidden rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-ring">
+                    <Input
+                      className="h-9 flex-1 rounded-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                      value={emailUser}
+                      onChange={(e) =>
+                        setEmailUser(
+                          e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""),
+                        )
+                      }
+                      placeholder="firstname.lastname"
+                      autoComplete="off"
+                    />
+                    <span className="flex select-none items-center bg-muted px-3 text-sm text-muted-foreground">
+                      {enforceDomain}
+                    </span>
+                  </div>
+                </Field>
+              ) : (
+                <Field label="Email *">
+                  <Input
+                    className={compactInput()}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="user@example.com"
+                  />
+                </Field>
+              )}
+              <Field label="Personal email">
                 <Input
                   className={compactInput()}
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="user@example.com"
+                  value={personalEmail}
+                  onChange={(e) => setPersonalEmail(e.target.value)}
+                  placeholder="optional — personal contact email"
                 />
               </Field>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -337,6 +367,7 @@ export function AddUserDialog({
                   />
                 </Field>
               </div>
+
 
               <Field label="Temporary password *">
                 <div className="flex gap-2">
