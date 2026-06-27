@@ -315,17 +315,24 @@ export function EditProfileDialog({
                   onChange={(e) => set("last_name", e.target.value)}
                 />
               </Field>
-              <div className="sm:col-span-2">
-                <Field label="Email (change auth email)">
-                  <Input
-                    className={compactInput()}
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => set("email", e.target.value)}
-                    placeholder="leave blank to keep current"
-                  />
-                </Field>
-              </div>
+              <Field label="Work email (auth login)">
+                <Input
+                  className={compactInput()}
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => set("email", e.target.value)}
+                  placeholder={user.email ?? "leave blank to keep current"}
+                />
+              </Field>
+              <Field label="Personal email">
+                <Input
+                  className={compactInput()}
+                  type="email"
+                  value={form.personal_email}
+                  onChange={(e) => set("personal_email", e.target.value)}
+                  placeholder="optional — personal contact"
+                />
+              </Field>
             </div>
 
             <Field label="Avatar">
