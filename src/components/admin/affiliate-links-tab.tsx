@@ -43,6 +43,7 @@ export function AffiliateLinksTab() {
   const upsert = useServerFn(adminUpsertAffiliateLink);
   const remove = useServerFn(adminDeleteAffiliateLink);
   const stats = useServerFn(adminAffiliateClickStats);
+  const pingIA = useServerFn(adminPingInvolveAsia);
   const [rows, setRows] = useState<Row[]>([]);
   const [clicks, setClicks] = useState<Record<string, number>>({});
   const [editing, setEditing] = useState<Row | null>(null);
@@ -107,9 +108,8 @@ export function AffiliateLinksTab() {
             size="sm"
             variant="outline"
             onClick={async () => {
-              const ping = useServerFn(adminPingInvolveAsia);
               try {
-                const r = await ping();
+                const r = await pingIA();
                 r.ok ? toast.success(r.message) : toast.error(r.message);
               } catch (e: any) {
                 toast.error(e?.message ?? "Ping failed");
