@@ -187,6 +187,7 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
+import { Route as AdminPartsCommissionsRouteImport } from './routes/admin.parts.commissions'
 import { Route as AdminPartsAnalyticsRouteImport } from './routes/admin.parts.analytics'
 import { Route as AdminAdvertisementsSlotsRouteImport } from './routes/admin.advertisements.slots'
 import { Route as AdminAdvertisementsQrAdsRouteImport } from './routes/admin.advertisements.qr-ads'
@@ -225,6 +226,7 @@ import { Route as DashboardBusinessBusinessIdBillingRouteImport } from './routes
 import { Route as ApiSellerStaffResetPasswordRouteImport } from './routes/api/seller/staff/reset-password'
 import { Route as ApiSellerStaffDeactivateRouteImport } from './routes/api/seller/staff/deactivate'
 import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/staff/create'
+import { Route as ApiPublicPostbackNetworkRouteImport } from './routes/api/public/postback.$network'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicHooksRecomputeTiersRouteImport } from './routes/api/public/hooks/recompute-tiers'
@@ -1137,6 +1139,11 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   path: '/redemptions/$staffId',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPartsCommissionsRoute = AdminPartsCommissionsRouteImport.update({
+  id: '/commissions',
+  path: '/commissions',
+  getParentRoute: () => AdminPartsRoute,
+} as any)
 const AdminPartsAnalyticsRoute = AdminPartsAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -1358,6 +1365,12 @@ const ApiSellerStaffCreateRoute = ApiSellerStaffCreateRouteImport.update({
   path: '/api/seller/staff/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPostbackNetworkRoute =
+  ApiPublicPostbackNetworkRouteImport.update({
+    id: '/api/public/postback/$network',
+    path: '/api/public/postback/$network',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -1621,6 +1634,7 @@ export interface FileRoutesByFullPath {
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
+  '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1657,6 +1671,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
@@ -1848,6 +1863,7 @@ export interface FileRoutesByTo {
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
+  '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1883,6 +1899,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
@@ -2081,6 +2098,7 @@ export interface FileRoutesById {
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
+  '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2117,6 +2135,7 @@ export interface FileRoutesById {
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
@@ -2315,6 +2334,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/slots'
     | '/admin/parts/analytics'
+    | '/admin/parts/commissions'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2351,6 +2371,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/api/public/postback/$network'
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
@@ -2542,6 +2563,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/slots'
     | '/admin/parts/analytics'
+    | '/admin/parts/commissions'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2577,6 +2599,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/api/public/postback/$network'
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
@@ -2774,6 +2797,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/slots'
     | '/admin/parts/analytics'
+    | '/admin/parts/commissions'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2810,6 +2834,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/api/public/postback/$network'
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
@@ -2943,6 +2968,7 @@ export interface RootRouteChildren {
   ApiPublicHooksRecomputeTiersRoute: typeof ApiPublicHooksRecomputeTiersRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicPostbackNetworkRoute: typeof ApiPublicPostbackNetworkRoute
   ApiSellerStaffCreateRoute: typeof ApiSellerStaffCreateRoute
   ApiSellerStaffDeactivateRoute: typeof ApiSellerStaffDeactivateRoute
   ApiSellerStaffResetPasswordRoute: typeof ApiSellerStaffResetPasswordRoute
@@ -4203,6 +4229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRedemptionsStaffIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/parts/commissions': {
+      id: '/admin/parts/commissions'
+      path: '/commissions'
+      fullPath: '/admin/parts/commissions'
+      preLoaderRoute: typeof AdminPartsCommissionsRouteImport
+      parentRoute: typeof AdminPartsRoute
+    }
     '/admin/parts/analytics': {
       id: '/admin/parts/analytics'
       path: '/analytics'
@@ -4469,6 +4502,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSellerStaffCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/postback/$network': {
+      id: '/api/public/postback/$network'
+      path: '/api/public/postback/$network'
+      fullPath: '/api/public/postback/$network'
+      preLoaderRoute: typeof ApiPublicPostbackNetworkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -4652,10 +4692,12 @@ const AdminAdvertisementsRouteWithChildren =
 
 interface AdminPartsRouteChildren {
   AdminPartsAnalyticsRoute: typeof AdminPartsAnalyticsRoute
+  AdminPartsCommissionsRoute: typeof AdminPartsCommissionsRoute
 }
 
 const AdminPartsRouteChildren: AdminPartsRouteChildren = {
   AdminPartsAnalyticsRoute: AdminPartsAnalyticsRoute,
+  AdminPartsCommissionsRoute: AdminPartsCommissionsRoute,
 }
 
 const AdminPartsRouteWithChildren = AdminPartsRoute._addFileChildren(
@@ -5078,6 +5120,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksRecomputeTiersRoute: ApiPublicHooksRecomputeTiersRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicPostbackNetworkRoute: ApiPublicPostbackNetworkRoute,
   ApiSellerStaffCreateRoute: ApiSellerStaffCreateRoute,
   ApiSellerStaffDeactivateRoute: ApiSellerStaffDeactivateRoute,
   ApiSellerStaffResetPasswordRoute: ApiSellerStaffResetPasswordRoute,
