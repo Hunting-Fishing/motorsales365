@@ -21,6 +21,14 @@ const PartnershipType = z.enum([
   "other",
 ]);
 
+const DocItem = z.object({
+  name: z.string().max(200),
+  path: z.string().max(400),
+  size: z.number().int().nonnegative().optional(),
+  type: z.string().max(120).optional(),
+  kind: z.string().max(60).optional(), // e.g. "business_permit", "tax_cert", "id"
+});
+
 const SubmitInput = z.object({
   company_name: z.string().trim().min(2).max(120),
   contact_name: z.string().trim().min(2).max(120),
@@ -33,6 +41,21 @@ const SubmitInput = z.object({
   monthly_volume: z.string().trim().max(60).optional().nullable(),
   brands_carried: z.string().trim().max(500).optional().nullable(),
   notes: z.string().trim().max(2000).optional().nullable(),
+  // Onboarding (optional so the short /partners/parts form still works)
+  legal_business_name: z.string().trim().max(160).optional().nullable(),
+  tax_id: z.string().trim().max(60).optional().nullable(),
+  business_address: z.string().trim().max(240).optional().nullable(),
+  city: z.string().trim().max(80).optional().nullable(),
+  province_state: z.string().trim().max(80).optional().nullable(),
+  postal_code: z.string().trim().max(20).optional().nullable(),
+  years_in_business: z.number().int().min(0).max(200).optional().nullable(),
+  warehouse_locations: z.string().trim().max(500).optional().nullable(),
+  ships_nationwide: z.boolean().optional(),
+  payment_terms: z.string().trim().max(120).optional().nullable(),
+  catalog_feed_url: z.string().trim().max(300).optional().nullable(),
+  catalog_feed_format: z.string().trim().max(40).optional().nullable(),
+  documents: z.array(DocItem).max(20).optional(),
+  agreed_terms: z.boolean().optional(),
 });
 
 /** Public: submit a B2B parts-supplier / affiliate partnership application. */
