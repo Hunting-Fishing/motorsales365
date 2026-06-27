@@ -266,6 +266,7 @@ export function EditProfileDialog({
         }),
       );
       if (auditRows.length) await logAdminAudit(auditRows);
+      }
 
       toast.success("Profile updated");
       onSaved?.();
