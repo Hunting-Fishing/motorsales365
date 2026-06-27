@@ -25,8 +25,9 @@ export const Route = createFileRoute("/parts/search")({
   loaderDeps: ({ search }) => search,
   loader: ({ deps }) => deps,
   head: ({ loaderData }) => {
-    const s = loaderData ?? {};
+    const s: any = loaderData ?? {};
     const v = [s.yr, s.mk, s.md].filter(Boolean).join(" ").trim();
+
     const title = v ? `Parts for ${v} — 365 MotorSales` : TITLE;
     return {
       meta: [
