@@ -64,7 +64,9 @@ export const Route = createFileRoute("/api/public/go/$slug")({
           });
         }
 
-        const { data: link } = await sb
+        // affiliate_id_env is restricted from anon/authenticated reads — use admin client.
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: link } = await supabaseAdmin
           .from("affiliate_links" as any)
           .select("supplier_slug,url_template,affiliate_id_env,is_active")
           .eq("supplier_slug", slug)
