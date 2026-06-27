@@ -77,6 +77,7 @@ import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as PayManualRouteImport } from './routes/pay.manual'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
 import { Route as PassportPremiumCheckoutRouteImport } from './routes/passport-premium.checkout'
+import { Route as PartnersPartsRouteImport } from './routes/partners.parts'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnMechanicsRouteImport } from './routes/learn.mechanics'
@@ -574,6 +575,11 @@ const PassportSlugRoute = PassportSlugRouteImport.update({
 const PassportPremiumCheckoutRoute = PassportPremiumCheckoutRouteImport.update({
   id: '/passport-premium/checkout',
   path: '/passport-premium/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnersPartsRoute = PartnersPartsRouteImport.update({
+  id: '/partners/parts',
+  path: '/partners/parts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingCheckoutRoute = ListingCheckoutRouteImport.update({
@@ -1548,6 +1554,7 @@ export interface FileRoutesByFullPath {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/partners/parts': typeof PartnersPartsRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/pay/manual': typeof PayManualRoute
@@ -1771,6 +1778,7 @@ export interface FileRoutesByTo {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/partners/parts': typeof PartnersPartsRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/pay/manual': typeof PayManualRoute
@@ -2000,6 +2008,7 @@ export interface FileRoutesById {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/partners/parts': typeof PartnersPartsRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/pay/manual': typeof PayManualRoute
@@ -2230,6 +2239,7 @@ export interface FileRouteTypes {
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
+    | '/partners/parts'
     | '/passport-premium/checkout'
     | '/passport/$slug'
     | '/pay/manual'
@@ -2453,6 +2463,7 @@ export interface FileRouteTypes {
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
+    | '/partners/parts'
     | '/passport-premium/checkout'
     | '/passport/$slug'
     | '/pay/manual'
@@ -2681,6 +2692,7 @@ export interface FileRouteTypes {
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
+    | '/partners/parts'
     | '/passport-premium/checkout'
     | '/passport/$slug'
     | '/pay/manual'
@@ -2846,6 +2858,7 @@ export interface RootRouteChildren {
   LearnMechanicsRoute: typeof LearnMechanicsRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   ListingCheckoutRoute: typeof ListingCheckoutRoute
+  PartnersPartsRoute: typeof PartnersPartsRoute
   PassportPremiumCheckoutRoute: typeof PassportPremiumCheckoutRoute
   PassportSlugRoute: typeof PassportSlugRoute
   PayManualRoute: typeof PayManualRoute
@@ -3381,6 +3394,13 @@ declare module '@tanstack/react-router' {
       path: '/passport-premium/checkout'
       fullPath: '/passport-premium/checkout'
       preLoaderRoute: typeof PassportPremiumCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partners/parts': {
+      id: '/partners/parts'
+      path: '/partners/parts'
+      fullPath: '/partners/parts'
+      preLoaderRoute: typeof PartnersPartsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/listing/checkout': {
@@ -4929,6 +4949,7 @@ const rootRouteChildren: RootRouteChildren = {
   LearnMechanicsRoute: LearnMechanicsRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   ListingCheckoutRoute: ListingCheckoutRoute,
+  PartnersPartsRoute: PartnersPartsRoute,
   PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
   PassportSlugRoute: PassportSlugRoute,
   PayManualRoute: PayManualRoute,
