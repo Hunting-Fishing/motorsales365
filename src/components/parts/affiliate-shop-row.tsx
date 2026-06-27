@@ -33,7 +33,7 @@ export function AffiliateShopRow({
   const [suppliers, setSuppliers] = useState<AffiliateLinkPublic[] | null>(null);
 
   useEffect(() => {
-    fetchSuppliers()
+    fetchSuppliers({ data: undefined as any })
       .then((rows) => setSuppliers(rows))
       .catch(() => setSuppliers([]));
   }, [fetchSuppliers]);
