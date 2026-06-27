@@ -191,6 +191,12 @@ export function EditProfileDialog({
       if (form.verification_status !== (user.verification_status ?? "unverified"))
         payload.verification_status = form.verification_status;
       if (form.email.trim()) payload.email = form.email.trim();
+      setIfDiff(
+        "personal_email",
+        form.personal_email.trim().toLowerCase() || null,
+        (user.personal_email ?? "").toLowerCase() || null,
+      );
+
 
       if (Object.keys(payload).length > 1) {
         await updateProfile({ data: payload });
