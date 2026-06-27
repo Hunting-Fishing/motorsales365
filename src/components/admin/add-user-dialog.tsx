@@ -117,6 +117,8 @@ export function AddUserDialog({
   const reset = () => {
     setTab("identity");
     setEmail("");
+    setEmailUser("");
+    setPersonalEmail("");
     setFirstName("");
     setLastName("");
     setFullName("");
