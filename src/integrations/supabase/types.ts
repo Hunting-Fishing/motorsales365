@@ -1015,6 +1015,7 @@ export type Database = {
       affiliate_links: {
         Row: {
           affiliate_id_env: string | null
+          allowed_countries: string[] | null
           commission_note: string | null
           created_at: string
           id: string
@@ -1030,6 +1031,7 @@ export type Database = {
         }
         Insert: {
           affiliate_id_env?: string | null
+          allowed_countries?: string[] | null
           commission_note?: string | null
           created_at?: string
           id?: string
@@ -1045,6 +1047,7 @@ export type Database = {
         }
         Update: {
           affiliate_id_env?: string | null
+          allowed_countries?: string[] | null
           commission_note?: string | null
           created_at?: string
           id?: string
@@ -5704,6 +5707,105 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      partner_product_feeds: {
+        Row: {
+          country: string
+          created_at: string
+          id: string
+          is_enabled: boolean
+          item_count: number
+          last_error: string | null
+          last_status: string | null
+          last_synced_at: string | null
+          merchant_label: string
+          merchant_slug: string
+          network: string
+          updated_at: string
+        }
+        Insert: {
+          country?: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          item_count?: number
+          last_error?: string | null
+          last_status?: string | null
+          last_synced_at?: string | null
+          merchant_label: string
+          merchant_slug: string
+          network: string
+          updated_at?: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          item_count?: number
+          last_error?: string | null
+          last_status?: string | null
+          last_synced_at?: string | null
+          merchant_label?: string
+          merchant_slug?: string
+          network?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      partner_products: {
+        Row: {
+          brand: string | null
+          category_path: string | null
+          country: string
+          created_at: string
+          currency: string | null
+          deeplink: string
+          id: string
+          image_url: string | null
+          merchant_slug: string
+          network: string
+          price: number | null
+          raw: Json | null
+          sku: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          brand?: string | null
+          category_path?: string | null
+          country?: string
+          created_at?: string
+          currency?: string | null
+          deeplink: string
+          id?: string
+          image_url?: string | null
+          merchant_slug: string
+          network: string
+          price?: number | null
+          raw?: Json | null
+          sku: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          brand?: string | null
+          category_path?: string | null
+          country?: string
+          created_at?: string
+          currency?: string | null
+          deeplink?: string
+          id?: string
+          image_url?: string | null
+          merchant_slug?: string
+          network?: string
+          price?: number | null
+          raw?: Json | null
+          sku?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       parts_catalog: {
         Row: {
@@ -11119,6 +11221,8 @@ export type Database = {
       rotate_internal_webhook_key: { Args: { _name: string }; Returns: boolean }
       self_serve_change_plan: { Args: { _plan_id: string }; Returns: Json }
       seller_account_active: { Args: { _user_id: string }; Returns: boolean }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       suggest_business_tag: {
         Args: { _category: string; _label: string; _type_slug: string }
         Returns: string

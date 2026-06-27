@@ -189,6 +189,7 @@ import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
 import { Route as AdminPartsOutreachRouteImport } from './routes/admin.parts.outreach'
+import { Route as AdminPartsFeedsRouteImport } from './routes/admin.parts.feeds'
 import { Route as AdminPartsCommissionsRouteImport } from './routes/admin.parts.commissions'
 import { Route as AdminPartsAnalyticsRouteImport } from './routes/admin.parts.analytics'
 import { Route as AdminAdvertisementsSlotsRouteImport } from './routes/admin.advertisements.slots'
@@ -230,6 +231,7 @@ import { Route as ApiSellerStaffDeactivateRouteImport } from './routes/api/selle
 import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/staff/create'
 import { Route as ApiPublicPostbackNetworkRouteImport } from './routes/api/public/postback.$network'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicHooksSyncPartsFeedsRouteImport } from './routes/api/public/hooks/sync-parts-feeds'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicHooksRecomputeTiersRouteImport } from './routes/api/public/hooks/recompute-tiers'
 import { Route as ApiPublicHooksQuarterlyBonusesRouteImport } from './routes/api/public/hooks/quarterly-bonuses'
@@ -1151,6 +1153,11 @@ const AdminPartsOutreachRoute = AdminPartsOutreachRouteImport.update({
   path: '/outreach',
   getParentRoute: () => AdminPartsRoute,
 } as any)
+const AdminPartsFeedsRoute = AdminPartsFeedsRouteImport.update({
+  id: '/feeds',
+  path: '/feeds',
+  getParentRoute: () => AdminPartsRoute,
+} as any)
 const AdminPartsCommissionsRoute = AdminPartsCommissionsRouteImport.update({
   id: '/commissions',
   path: '/commissions',
@@ -1387,6 +1394,12 @@ const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
     path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksSyncPartsFeedsRoute =
+  ApiPublicHooksSyncPartsFeedsRouteImport.update({
+    id: '/api/public/hooks/sync-parts-feeds',
+    path: '/api/public/hooks/sync-parts-feeds',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksRefreshLazadaRoute =
@@ -1647,6 +1660,7 @@ export interface FileRoutesByFullPath {
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
+  '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
@@ -1684,6 +1698,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
+  '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
@@ -1878,6 +1893,7 @@ export interface FileRoutesByTo {
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
+  '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
@@ -1914,6 +1930,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
+  '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
@@ -2115,6 +2132,7 @@ export interface FileRoutesById {
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
+  '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
@@ -2152,6 +2170,7 @@ export interface FileRoutesById {
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
+  '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
@@ -2353,6 +2372,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/slots'
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
+    | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
@@ -2390,6 +2410,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/quarterly-bonuses'
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
+    | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
     | '/api/public/postback/$network'
     | '/api/seller/staff/create'
@@ -2584,6 +2605,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/slots'
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
+    | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
@@ -2620,6 +2642,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/quarterly-bonuses'
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
+    | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
     | '/api/public/postback/$network'
     | '/api/seller/staff/create'
@@ -2820,6 +2843,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/slots'
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
+    | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
@@ -2857,6 +2881,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/quarterly-bonuses'
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
+    | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
     | '/api/public/postback/$network'
     | '/api/seller/staff/create'
@@ -2991,6 +3016,7 @@ export interface RootRouteChildren {
   ApiPublicHooksQuarterlyBonusesRoute: typeof ApiPublicHooksQuarterlyBonusesRoute
   ApiPublicHooksRecomputeTiersRoute: typeof ApiPublicHooksRecomputeTiersRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
+  ApiPublicHooksSyncPartsFeedsRoute: typeof ApiPublicHooksSyncPartsFeedsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicPostbackNetworkRoute: typeof ApiPublicPostbackNetworkRoute
   ApiSellerStaffCreateRoute: typeof ApiSellerStaffCreateRoute
@@ -4267,6 +4293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPartsOutreachRouteImport
       parentRoute: typeof AdminPartsRoute
     }
+    '/admin/parts/feeds': {
+      id: '/admin/parts/feeds'
+      path: '/feeds'
+      fullPath: '/admin/parts/feeds'
+      preLoaderRoute: typeof AdminPartsFeedsRouteImport
+      parentRoute: typeof AdminPartsRoute
+    }
     '/admin/parts/commissions': {
       id: '/admin/parts/commissions'
       path: '/commissions'
@@ -4554,6 +4587,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/sync-parts-feeds': {
+      id: '/api/public/hooks/sync-parts-feeds'
+      path: '/api/public/hooks/sync-parts-feeds'
+      fullPath: '/api/public/hooks/sync-parts-feeds'
+      preLoaderRoute: typeof ApiPublicHooksSyncPartsFeedsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/refresh-lazada': {
       id: '/api/public/hooks/refresh-lazada'
       path: '/api/public/hooks/refresh-lazada'
@@ -4731,12 +4771,14 @@ const AdminAdvertisementsRouteWithChildren =
 interface AdminPartsRouteChildren {
   AdminPartsAnalyticsRoute: typeof AdminPartsAnalyticsRoute
   AdminPartsCommissionsRoute: typeof AdminPartsCommissionsRoute
+  AdminPartsFeedsRoute: typeof AdminPartsFeedsRoute
   AdminPartsOutreachRoute: typeof AdminPartsOutreachRoute
 }
 
 const AdminPartsRouteChildren: AdminPartsRouteChildren = {
   AdminPartsAnalyticsRoute: AdminPartsAnalyticsRoute,
   AdminPartsCommissionsRoute: AdminPartsCommissionsRoute,
+  AdminPartsFeedsRoute: AdminPartsFeedsRoute,
   AdminPartsOutreachRoute: AdminPartsOutreachRoute,
 }
 
@@ -5171,6 +5213,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksQuarterlyBonusesRoute: ApiPublicHooksQuarterlyBonusesRoute,
   ApiPublicHooksRecomputeTiersRoute: ApiPublicHooksRecomputeTiersRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
+  ApiPublicHooksSyncPartsFeedsRoute: ApiPublicHooksSyncPartsFeedsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicPostbackNetworkRoute: ApiPublicPostbackNetworkRoute,
   ApiSellerStaffCreateRoute: ApiSellerStaffCreateRoute,

@@ -17,21 +17,45 @@ export type AffiliateLinkPublic = {
   region: string;
   logo_url: string | null;
   priority: number;
+  allowed_countries: string[] | null;
 };
 
-/** Public: list active affiliate suppliers (no secret/template fields). */
-export const listAffiliateSuppliers = createServerFn({ method: "GET" }).handler(
-  async (): Promise<AffiliateLinkPublic[]> => {
+/** Default country = PH (the only currently active market). */
+async function activeDefaultCountry(): Promise<string> {
+  try {
     const sb = publicClient();
-    const { data, error } = await sb
+    const { data } = await sb
+      .from("parts_countries" as any)
+      .select("code")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    return ((data as any)?.code as string) ?? "PH";
+  } catch {
+    return "PH";
+  }
+}
+
+/** Public: list active affiliate suppliers, filtered by country availability. */
+export const listAffiliateSuppliers = createServerFn({ method: "GET" })
+  .inputValidator((d: { country?: string } | undefined) => ({
+    country: (d?.country ?? "").toString().toUpperCase().slice(0, 2) || null,
+  }))
+  .handler(async ({ data }): Promise<AffiliateLinkPublic[]> => {
+    const sb = publicClient();
+    const country = data.country ?? (await activeDefaultCountry());
+    const { data: rows, error } = await sb
       .from("affiliate_links" as any)
-      .select("supplier_slug,label,region,logo_url,priority")
+      .select("supplier_slug,label,region,logo_url,priority,allowed_countries")
       .eq("is_active", true)
       .order("priority", { ascending: true });
     if (error) return [];
-    return (data as any) ?? [];
-  },
-);
+    return ((rows as any[]) ?? []).filter(
+      (r) => !r.allowed_countries || r.allowed_countries.length === 0 || r.allowed_countries.includes(country),
+    ) as AffiliateLinkPublic[];
+  });
+
 
 /** Build the outbound /api/public/go URL for a supplier + query/context. */
 export function buildGoUrl(params: {
