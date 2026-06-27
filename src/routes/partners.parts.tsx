@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Handshake, CheckCircle2, Globe2, Boxes, Zap, ShieldCheck } from "lucide-react";
+import { Handshake, CheckCircle2, Globe2, Boxes, Zap, ShieldCheck, FileText } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { submitPartnerApplication } from "@/lib/partner-applications.functions";

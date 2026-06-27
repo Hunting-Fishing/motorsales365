@@ -172,6 +172,7 @@ import { Route as ShopDepartmentSlugRouteImport } from './routes/shop.department
 import { Route as ShopBrandSlugRouteImport } from './routes/shop.brand.$slug'
 import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
+import { Route as PartnersPartsOnboardingRouteImport } from './routes/partners.parts.onboarding'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 import { Route as DashboardTeamPerformanceRouteImport } from './routes/dashboard.team.performance'
@@ -1061,6 +1062,11 @@ const PaymentsIdReceiptRoute = PaymentsIdReceiptRouteImport.update({
   path: '/$id/receipt',
   getParentRoute: () => PaymentsRoute,
 } as any)
+const PartnersPartsOnboardingRoute = PartnersPartsOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => PartnersPartsRoute,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -1585,7 +1591,7 @@ export interface FileRoutesByFullPath {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
-  '/partners/parts': typeof PartnersPartsRoute
+  '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
@@ -1650,6 +1656,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
@@ -1814,7 +1821,7 @@ export interface FileRoutesByTo {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
-  '/partners/parts': typeof PartnersPartsRoute
+  '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
@@ -1878,6 +1885,7 @@ export interface FileRoutesByTo {
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
@@ -2049,7 +2057,7 @@ export interface FileRoutesById {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
-  '/partners/parts': typeof PartnersPartsRoute
+  '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
@@ -2114,6 +2122,7 @@ export interface FileRoutesById {
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
@@ -2350,6 +2359,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/performance'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/partners/parts/onboarding'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/brand/$slug'
@@ -2578,6 +2588,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/performance'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/partners/parts/onboarding'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/brand/$slug'
@@ -2813,6 +2824,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/performance'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/partners/parts/onboarding'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/brand/$slug'
@@ -2919,7 +2931,7 @@ export interface RootRouteChildren {
   LearnMechanicsRoute: typeof LearnMechanicsRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   ListingCheckoutRoute: typeof ListingCheckoutRoute
-  PartnersPartsRoute: typeof PartnersPartsRoute
+  PartnersPartsRoute: typeof PartnersPartsRouteWithChildren
   PassportPremiumCheckoutRoute: typeof PassportPremiumCheckoutRoute
   PassportSlugRoute: typeof PassportSlugRoute
   PayManualRoute: typeof PayManualRoute
@@ -4124,6 +4136,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentsIdReceiptRouteImport
       parentRoute: typeof PaymentsRoute
     }
+    '/partners/parts/onboarding': {
+      id: '/partners/parts/onboarding'
+      path: '/onboarding'
+      fullPath: '/partners/parts/onboarding'
+      preLoaderRoute: typeof PartnersPartsOnboardingRouteImport
+      parentRoute: typeof PartnersPartsRoute
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -5000,6 +5019,18 @@ const ListingIdRouteWithChildren = ListingIdRoute._addFileChildren(
   ListingIdRouteChildren,
 )
 
+interface PartnersPartsRouteChildren {
+  PartnersPartsOnboardingRoute: typeof PartnersPartsOnboardingRoute
+}
+
+const PartnersPartsRouteChildren: PartnersPartsRouteChildren = {
+  PartnersPartsOnboardingRoute: PartnersPartsOnboardingRoute,
+}
+
+const PartnersPartsRouteWithChildren = PartnersPartsRoute._addFileChildren(
+  PartnersPartsRouteChildren,
+)
+
 interface RCodeRouteChildren {
   RCodePosterRoute: typeof RCodePosterRoute
 }
@@ -5071,7 +5102,7 @@ const rootRouteChildren: RootRouteChildren = {
   LearnMechanicsRoute: LearnMechanicsRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   ListingCheckoutRoute: ListingCheckoutRoute,
-  PartnersPartsRoute: PartnersPartsRoute,
+  PartnersPartsRoute: PartnersPartsRouteWithChildren,
   PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
   PassportSlugRoute: PassportSlugRoute,
   PayManualRoute: PayManualRoute,
