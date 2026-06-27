@@ -53,6 +53,7 @@ export function AffiliateLinksTab() {
   const [envFilter, setEnvFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
   const pageSize = 20;
+  const [sampleQuery, setSampleQuery] = useState("brake pads");
 
   async function refresh() {
     setLoading(true);
