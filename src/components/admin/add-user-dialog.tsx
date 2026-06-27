@@ -82,6 +82,8 @@ export function AddUserDialog({
   const [tab, setTab] = useState<TabKey>("identity");
   const [submitting, setSubmitting] = useState(false);
   const [email, setEmail] = useState("");
+  const [emailUser, setEmailUser] = useState("");
+  const [personalEmail, setPersonalEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [fullName, setFullName] = useState("");
