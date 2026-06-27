@@ -149,18 +149,38 @@ export async function syncFeed(feedId: string): Promise<{ ok: boolean; count: nu
   }
 }
 
-/** Run all enabled feeds (used by cron). */
+/** Run all enabled feeds whose country is in the active markets (used by cron). */
 export async function syncAllEnabledFeeds() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  // Active markets: only sync feeds for countries we actively serve.
+  // Defaults to ['PH'] when the parts_countries table is empty/unavailable.
+  let activeCountries: string[] = ["PH"];
+  try {
+    const { data: countries } = await supabaseAdmin
+      .from("parts_countries" as any)
+      .select("code")
+      .eq("is_active", true);
+    const codes = ((countries as any[]) ?? [])
+      .map((c) => String(c.code).toUpperCase())
+      .filter(Boolean);
+    if (codes.length > 0) activeCountries = codes;
+  } catch {
+    /* fall back to PH */
+  }
+
   const { data, error } = await supabaseAdmin
     .from("partner_product_feeds" as any)
-    .select("id")
-    .eq("is_enabled", true);
+    .select("id,country,merchant_slug")
+    .eq("is_enabled", true)
+    .in("country", activeCountries);
   if (error) throw error;
-  const results: Array<{ id: string } & Awaited<ReturnType<typeof syncFeed>>> = [];
+
+  const results: Array<{ id: string; merchant_slug: string; country: string } & Awaited<ReturnType<typeof syncFeed>>> = [];
   for (const row of (data as any[]) ?? []) {
     const r = await syncFeed(row.id);
-    results.push({ id: row.id, ...r });
+    results.push({ id: row.id, merchant_slug: row.merchant_slug, country: row.country, ...r });
   }
-  return results;
+  return { activeCountries, results };
 }
+
