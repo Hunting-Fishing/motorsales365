@@ -151,8 +151,12 @@ export function PartnerApplicationsTab() {
                   <span className="font-medium">Notes:</span> {r.notes}
                 </p>
               )}
+              {r.status === "approved" && (
+                <StorefrontEditor row={r} onSaved={refresh} />
+              )}
             </div>
           ))}
+
         </div>
       )}
     </div>
