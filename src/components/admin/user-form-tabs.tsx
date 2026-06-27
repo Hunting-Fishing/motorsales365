@@ -19,9 +19,11 @@ export function Field({ label, children }: { label: string; children: ReactNode 
 export function RoleChips({
   roles,
   onToggle,
+  disabled = false,
 }: {
   roles: StaffRole[];
   onToggle: (r: StaffRole) => void;
+  disabled?: boolean;
 }) {
   return (
     <div className="flex flex-wrap gap-1.5">
@@ -31,12 +33,13 @@ export function RoleChips({
           <button
             key={r}
             type="button"
-            onClick={() => onToggle(r)}
+            disabled={disabled}
+            onClick={() => !disabled && onToggle(r)}
             className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
               on
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-border bg-background text-muted-foreground hover:border-primary/50"
-            }`}
+            } ${disabled ? "cursor-not-allowed opacity-60 hover:border-border" : ""}`}
           >
             {on ? "✓ " : "+ "}
             {r}
