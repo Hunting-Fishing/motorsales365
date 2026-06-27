@@ -117,7 +117,7 @@ export const adminUpdateUserProfile = createServerFn({ method: "POST" })
         if (Object.keys(bizPatch).length > 0) {
           const { error: bErr } = await supabaseAdmin
             .from("businesses")
-            .update(bizPatch)
+            .update(bizPatch as any)
             .eq("id", owned[0].id);
           if (bErr) throw new Error(`Business mirror failed: ${bErr.message}`);
           mirroredBusinessId = owned[0].id;
