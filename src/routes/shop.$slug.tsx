@@ -102,7 +102,7 @@ function ShopPage() {
 
           {sf.storefront_categories && sf.storefront_categories.length > 0 && (
             <div className="mt-5 flex flex-wrap gap-2">
-              {sf.storefront_categories.map((c) => (
+              {sf.storefront_categories.map((c: string) => (
                 <span
                   key={c}
                   className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium"

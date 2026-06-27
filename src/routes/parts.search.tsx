@@ -22,8 +22,11 @@ export const Route = createFileRoute("/parts/search")({
     yr: s.yr ? Number(s.yr) : undefined,
     q: (s.q as string) || undefined,
   }),
-  head: ({ search }) => {
-    const v = [search.yr, search.mk, search.md].filter(Boolean).join(" ").trim();
+  loaderDeps: ({ search }) => search,
+  loader: ({ deps }) => deps,
+  head: ({ loaderData }) => {
+    const s = loaderData ?? {};
+    const v = [s.yr, s.mk, s.md].filter(Boolean).join(" ").trim();
     const title = v ? `Parts for ${v} — 365 MotorSales` : TITLE;
     return {
       meta: [
@@ -38,6 +41,7 @@ export const Route = createFileRoute("/parts/search")({
   },
   component: PartsSearchPage,
 });
+
 
 function PartsSearchPage() {
   const sp = Route.useSearch();
