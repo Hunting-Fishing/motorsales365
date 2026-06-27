@@ -442,19 +442,39 @@ export function AddUserDialog({
             </TabsContent>
 
             <TabsContent value="business" className="mt-3 space-y-3">
+              {isStaffDomain && (
+                <div className="flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-2.5 text-xs text-amber-900 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-200">
+                  <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                  <div>
+                    <strong>{STAFF_EMAIL_DOMAIN}</strong> is reserved for 365 employees.
+                    Account type is locked to <strong>Staff / Employee</strong> — Private seller
+                    and Business are disabled for this email.
+                  </div>
+                </div>
+              )}
               {!lockStaff && (
                 <Field label="Account type">
-                  <Select value={accountType} onValueChange={(v: any) => setAccountType(v)}>
+                  <Select
+                    value={accountType}
+                    onValueChange={(v: any) => {
+                      if (isStaffDomain) return; // enforced by domain
+                      setAccountType(v);
+                    }}
+                    disabled={isStaffDomain}
+                  >
                     <SelectTrigger className={compactInput()}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="staff">Staff / Employee</SelectItem>
-                      <SelectItem value="business">Business / Customer</SelectItem>
+                      <SelectItem value="business" disabled={isStaffDomain}>
+                        Business / Customer{isStaffDomain ? " — locked for @365" : ""}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </Field>
               )}
+
               {accountType === "business" ? (
                 <>
                   <div className="grid gap-3 sm:grid-cols-2">
