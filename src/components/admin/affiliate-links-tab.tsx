@@ -48,6 +48,11 @@ export function AffiliateLinksTab() {
   const [clicks, setClicks] = useState<Record<string, number>>({});
   const [editing, setEditing] = useState<Row | null>(null);
   const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [envFilter, setEnvFilter] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
 
   async function refresh() {
     setLoading(true);
