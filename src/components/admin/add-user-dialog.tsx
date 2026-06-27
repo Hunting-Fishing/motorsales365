@@ -160,13 +160,25 @@ export function AddUserDialog({
   };
 
   const submit = async () => {
-    if (!email || !firstName.trim() || !lastName.trim() || !password) {
+    // Compose the auth email. When a domain is enforced, the admin only types
+    // the local part (the part before "@"); we append the suffix here.
+    const composedEmail = enforceDomain
+      ? `${emailUser.trim().toLowerCase()}${enforceDomain.toLowerCase()}`
+      : email.trim().toLowerCase();
+    const localOk = enforceDomain ? /^[a-z0-9][a-z0-9._-]*$/.test(emailUser.trim().toLowerCase()) : true;
+
+    if (!composedEmail || !firstName.trim() || !lastName.trim() || !password) {
       toast.error("Fill email, first/last name and password");
       setTab("identity");
       return;
     }
-    if (enforceDomain && !email.trim().toLowerCase().endsWith(enforceDomain.toLowerCase())) {
-      toast.error(`Email must end with ${enforceDomain}`);
+    if (enforceDomain && !localOk) {
+      toast.error("Username can only contain letters, numbers, dot, underscore, hyphen");
+      setTab("identity");
+      return;
+    }
+    if (personalEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(personalEmail.trim())) {
+      toast.error("Personal email looks invalid");
       setTab("identity");
       return;
     }
@@ -180,11 +192,12 @@ export function AddUserDialog({
       }
 
       const body: any = {
-        email: email.trim().toLowerCase(),
+        email: composedEmail,
         full_name: effectiveFullName || `${firstName.trim()} ${lastName.trim()}`.trim(),
         first_name: firstName.trim() || undefined,
         last_name: lastName.trim() || undefined,
         phone: phone.trim() || undefined,
+        personal_email: personalEmail.trim().toLowerCase() || undefined,
         password,
         account_type: accountType,
         roles: accountType === "staff" ? roles : [],
