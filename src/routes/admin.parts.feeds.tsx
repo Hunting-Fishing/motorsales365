@@ -35,7 +35,7 @@ function FeedsPage() {
   const [rows, setRows] = useState<Feed[] | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const refresh = () => list().then((r) => setRows(r as Feed[])).catch(() => setRows([]));
+  const refresh = () => list().then((r) => setRows(r as unknown as Feed[])).catch(() => setRows([]));
   useEffect(() => { refresh(); /* eslint-disable-next-line */ }, []);
 
   return (
