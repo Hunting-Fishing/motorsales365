@@ -83,6 +83,7 @@ export function EditProfileDialog({
     last_name: "",
     phone: "",
     email: "",
+    personal_email: "",
     avatar_url: "",
     street_address: "",
     postal_code: "",
