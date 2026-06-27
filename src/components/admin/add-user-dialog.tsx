@@ -116,6 +116,24 @@ export function AddUserDialog({
   const computedFullName = `${firstName.trim()} ${lastName.trim()}`.trim();
   const effectiveFullName = fullNameTouched && fullName.trim() ? fullName.trim() : computedFullName;
 
+  // Resolve the effective email so we can detect the reserved 365 staff domain
+  // in real time (covers both the suffix-locked form and a free-text email).
+  const previewEmail = enforceDomain
+    ? `${emailUser.trim().toLowerCase()}${enforceDomain.toLowerCase()}`
+    : email.trim().toLowerCase();
+  const isStaffDomain =
+    (!!enforceDomain && enforceDomain.toLowerCase() === STAFF_EMAIL_DOMAIN) ||
+    isStaffEmail(previewEmail);
+
+  // Whenever the email resolves to the 365 staff domain, force the account
+  // type to "staff" — private/business is never a valid choice for @365.
+  useEffect(() => {
+    if (isStaffDomain && accountType !== "staff") {
+      setAccountType("staff");
+    }
+  }, [isStaffDomain, accountType]);
+
+
   const reset = () => {
     setTab("identity");
     setEmail("");
