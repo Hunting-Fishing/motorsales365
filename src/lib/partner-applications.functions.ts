@@ -77,6 +77,21 @@ export const submitPartnerApplication = createServerFn({ method: "POST" })
         monthly_volume: data.monthly_volume || null,
         brands_carried: data.brands_carried || null,
         notes: data.notes || null,
+        legal_business_name: data.legal_business_name || null,
+        tax_id: data.tax_id || null,
+        business_address: data.business_address || null,
+        city: data.city || null,
+        province_state: data.province_state || null,
+        postal_code: data.postal_code || null,
+        years_in_business: data.years_in_business ?? null,
+        warehouse_locations: data.warehouse_locations || null,
+        ships_nationwide: data.ships_nationwide ?? false,
+        payment_terms: data.payment_terms || null,
+        catalog_feed_url: data.catalog_feed_url || null,
+        catalog_feed_format: data.catalog_feed_format || null,
+        documents: data.documents ?? [],
+        agreed_terms: data.agreed_terms ?? false,
+        agreed_terms_at: data.agreed_terms ? new Date().toISOString() : null,
       });
     if (error) throw new Error(error.message);
     return { ok: true };
