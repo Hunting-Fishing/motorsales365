@@ -5773,6 +5773,11 @@ export type Database = {
           reviewed_by: string | null
           source_ip: string | null
           status: string
+          storefront_blurb: string | null
+          storefront_categories: string[] | null
+          storefront_logo_url: string | null
+          storefront_published: boolean
+          storefront_slug: string | null
           updated_at: string
           user_agent: string | null
           website: string | null
@@ -5795,6 +5800,11 @@ export type Database = {
           reviewed_by?: string | null
           source_ip?: string | null
           status?: string
+          storefront_blurb?: string | null
+          storefront_categories?: string[] | null
+          storefront_logo_url?: string | null
+          storefront_published?: boolean
+          storefront_slug?: string | null
           updated_at?: string
           user_agent?: string | null
           website?: string | null
@@ -5817,6 +5827,11 @@ export type Database = {
           reviewed_by?: string | null
           source_ip?: string | null
           status?: string
+          storefront_blurb?: string | null
+          storefront_categories?: string[] | null
+          storefront_logo_url?: string | null
+          storefront_published?: boolean
+          storefront_slug?: string | null
           updated_at?: string
           user_agent?: string | null
           website?: string | null
