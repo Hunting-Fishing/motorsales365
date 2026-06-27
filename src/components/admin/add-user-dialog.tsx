@@ -1,10 +1,12 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
-import { Copy, Info, RefreshCw, UserPlus } from "lucide-react";
+import { Copy, Info, RefreshCw, ShieldCheck, UserPlus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
+
 
 import {
   Dialog,
@@ -113,6 +115,24 @@ export function AddUserDialog({
 
   const computedFullName = `${firstName.trim()} ${lastName.trim()}`.trim();
   const effectiveFullName = fullNameTouched && fullName.trim() ? fullName.trim() : computedFullName;
+
+  // Resolve the effective email so we can detect the reserved 365 staff domain
+  // in real time (covers both the suffix-locked form and a free-text email).
+  const previewEmail = enforceDomain
+    ? `${emailUser.trim().toLowerCase()}${enforceDomain.toLowerCase()}`
+    : email.trim().toLowerCase();
+  const isStaffDomain =
+    (!!enforceDomain && enforceDomain.toLowerCase() === STAFF_EMAIL_DOMAIN) ||
+    isStaffEmail(previewEmail);
+
+  // Whenever the email resolves to the 365 staff domain, force the account
+  // type to "staff" — private/business is never a valid choice for @365.
+  useEffect(() => {
+    if (isStaffDomain && accountType !== "staff") {
+      setAccountType("staff");
+    }
+  }, [isStaffDomain, accountType]);
+
 
   const reset = () => {
     setTab("identity");
@@ -422,19 +442,39 @@ export function AddUserDialog({
             </TabsContent>
 
             <TabsContent value="business" className="mt-3 space-y-3">
+              {isStaffDomain && (
+                <div className="flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-2.5 text-xs text-amber-900 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-200">
+                  <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                  <div>
+                    <strong>{STAFF_EMAIL_DOMAIN}</strong> is reserved for 365 employees.
+                    Account type is locked to <strong>Staff / Employee</strong> — Private seller
+                    and Business are disabled for this email.
+                  </div>
+                </div>
+              )}
               {!lockStaff && (
                 <Field label="Account type">
-                  <Select value={accountType} onValueChange={(v: any) => setAccountType(v)}>
+                  <Select
+                    value={accountType}
+                    onValueChange={(v: any) => {
+                      if (isStaffDomain) return; // enforced by domain
+                      setAccountType(v);
+                    }}
+                    disabled={isStaffDomain}
+                  >
                     <SelectTrigger className={compactInput()}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="staff">Staff / Employee</SelectItem>
-                      <SelectItem value="business">Business / Customer</SelectItem>
+                      <SelectItem value="business" disabled={isStaffDomain}>
+                        Business / Customer{isStaffDomain ? " — locked for @365" : ""}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </Field>
               )}
+
               {accountType === "business" ? (
                 <>
                   <div className="grid gap-3 sm:grid-cols-2">

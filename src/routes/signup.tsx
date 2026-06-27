@@ -25,6 +25,8 @@ import { LocationPicker, type LocationValue } from "@/components/location-picker
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
 import { siteOrigin } from "@/lib/site-config";
+import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
+
 
 type SignupSearch = { type?: SignupIntent; redirect?: string };
 
@@ -305,8 +307,18 @@ function SignupPage() {
     }
     if (!intent) return;
 
+    // The 365 staff domain is reserved — only admins can mint these accounts
+    // via the internal Create User flow, so self-signup is blocked here.
+    if (isStaffEmail(email)) {
+      toast.error(
+        `${STAFF_EMAIL_DOMAIN} is reserved for 365 employees. Ask a 365 admin to create your account.`,
+      );
+      return;
+    }
+
     setSubmitting(true);
     stashPendingProfile();
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -518,6 +530,12 @@ function SignupPage() {
               {errorFor("email") && (
                 <p className="mt-1 text-xs text-destructive">{errorFor("email")}</p>
               )}
+              {isStaffEmail(email) && (
+                <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
+                  {STAFF_EMAIL_DOMAIN} is reserved for 365 employees. Ask a 365 admin to create your account.
+                </p>
+              )}
+
             </div>
           </div>
 

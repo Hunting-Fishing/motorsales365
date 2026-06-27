@@ -4,6 +4,8 @@ import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
 import { logRouteAccess } from "@/integrations/supabase/route-audit.server";
 import { BUSINESS_KIND_VALUES } from "@/data/business-kinds";
+import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
+
 
 
 const RoleEnum = z.enum(["admin", "moderator", "support", "sales", "advertising"]);
@@ -138,6 +140,25 @@ export const Route = createFileRoute("/api/admin/create-user")({
             );
           }
 
+          // Hard rule: any @365motorsales.com address is always a 365 staff
+          // account. Silently coerce so admins can't accidentally provision a
+          // staff inbox as a private/business seller. We zero out any business
+          // fields the client may have sent.
+          const staffDomain = isStaffEmail(input.email);
+          if (staffDomain && input.account_type !== "staff") {
+            input.account_type = "staff";
+            input.seller_type = undefined;
+            input.business_name = undefined;
+            input.business_kind = undefined;
+            input.business_address = undefined;
+            input.business_city = undefined;
+            input.business_province = undefined;
+            input.business_region = undefined;
+            input.business_postal_code = undefined;
+            input.mark_verified = undefined;
+          }
+
+
           const { data: created, error: createErr } = await sb.auth.admin.createUser({
             email: input.email,
             password: input.password,
@@ -213,7 +234,11 @@ export const Route = createFileRoute("/api/admin/create-user")({
           copyIf("signup_region");
           copyIf("postal_code");
 
-          if (input.account_type === "business") {
+          if (input.account_type === "staff") {
+            profilePatch.is_staff_account = true;
+            profilePatch.seller_type = null;
+          } else if (input.account_type === "business") {
+            profilePatch.is_staff_account = false;
             profilePatch.seller_type = input.seller_type ?? "private";
             copyIf("business_name");
             copyIf("business_kind");
@@ -227,6 +252,7 @@ export const Route = createFileRoute("/api/admin/create-user")({
               profilePatch.verified_at = new Date().toISOString();
             }
           }
+
 
           await sb.from("profiles").update(profilePatch as any).eq("id", newUserId);
 

@@ -1,39 +1,52 @@
-## Goals
-1. Fix Edit user profile dialog showing blank fields after creating a 365 staff user.
-2. Add a Personal email field (separate from the staff @365motorsales.com login email) on both Create and Edit.
-3. Make the Create form's Email field a username box with a fixed `@365motorsales.com` suffix so admins type only the local part.
 
-## Root cause (#1)
-`admin.staff-365.tsx` passes `Staff365Row` to `EditProfileDialog`. That row only contains `id, email, full_name, roles, …` — no first/last name, phone, address, or business fields. The dialog's `useEffect` seeds the form from those missing properties, so every tab beyond "Identity → Full name" appears empty even when Create saved the data correctly.
+## Goal
 
-## Changes
+Anyone whose email ends in `@365motorsales.com` must be created as a **365 Staff** account. Private seller, business, and any future account types are disabled (greyed out) in the UI and rejected on the server.
 
-### A. Database
-- New migration: add `profiles.personal_email text` (nullable, lower-case index). No grant changes needed (column inherits table grants).
+## Scope of changes
 
-### B. Create-user API (`src/routes/api/admin/create-user.tsx`)
-- Add `personal_email` to the Zod body schema and copy it into the profile patch.
+### 1. `src/components/admin/add-user-dialog.tsx` (UI lock-in)
+- Derive `isStaffDomain` from the composed email (`enforceDomain === "@365motorsales.com"` OR the typed email ends with that domain).
+- When `isStaffDomain` is true:
+  - Force `accountType` state to `"staff"` via an effect.
+  - In the Account Type selector, render `private` and `business` (and any future options) as disabled with a tooltip/help text: "Locked — @365motorsales.com emails are always 365 Staff accounts."
+  - Hide/disable the Business tab content so business-only fields can't be filled.
+  - Show a small amber notice at the top of the Identity tab: "This email domain is reserved for 365 Staff. Account type is locked to Staff."
+- Keep existing `enforceDomain` username + suffix UI unchanged.
 
-### C. Profile update server fn (`src/lib/admin-profile.functions.ts`)
-- Add `personal_email` to `ProfilePatch` schema so the Edit dialog can save it.
+### 2. `src/routes/api/admin/create-user.tsx` (server enforcement — authoritative)
+- After composing the final email, compute `isStaffDomain = email.toLowerCase().endsWith("@365motorsales.com")`.
+- If `isStaffDomain`:
+  - Override `account_type` to `"staff"` regardless of what the client sent.
+  - Ignore `seller_type`, `business_name`, `business_kind`, `mark_verified`, and business address fields.
+  - Ensure at least a default staff role is assigned if `roles` is empty (e.g. keep current behavior, no auto-elevation to admin).
+- If a non-staff `account_type` is explicitly sent with a `@365motorsales.com` email, return a 400 with a clear message rather than silently coercing — pick one behavior; recommend **silent coerce + log** to avoid breaking the admin form, and surface a toast hint client-side.
 
-### D. Staff list (`src/lib/admin-staff-list.functions.ts`)
-- Extend the `profiles` select to include `first_name, last_name, phone, personal_email, street_address, postal_code, signup_city, signup_region, signup_province, business_name, business_kind, business_address, business_region, business_province, business_city, business_postal_code, seller_type, verification_status, avatar_url`, and expose them on `Staff365Row`.
-- This is the simplest fix and ensures the Edit dialog hydrates from the same row already rendered in the list.
+### 3. Self-signup path (public auth)
+- Check `src/routes/auth.*` / signup handler. If users can self-register, add the same domain guard server-side so a stranger can't claim a `@365motorsales.com` address and become staff. Two options:
+  - **Block self-signup** for `@365motorsales.com` (recommended) — only the admin Create-User flow can mint these accounts. Show "This domain is reserved. Ask a 365 admin to create your account."
+  - OR allow signup but force `account_type=staff` with **zero roles** until an admin grants them. No automatic role grants from email domain (per security guidance — email must be verified, and role grants still require admin action).
 
-### E. AddUserDialog (`src/components/admin/add-user-dialog.tsx`)
-- Replace the `Email *` Input with a split control when `enforceDomain` is set:
-  - Left: `username` text input (lowercased, strips non `[a-z0-9._-]`)
-  - Right: muted suffix chip `@365motorsales.com`
-  - On submit, compose `email = `${username}${enforceDomain}``.
-  - When `enforceDomain` is not set, keep current full-email Input.
-- Add a new "Personal email" field on the Identity tab (optional, validated as email if filled), included in the POST body.
+I'll recommend **block self-signup** for simplicity and safety.
 
-### F. EditProfileDialog (`src/components/admin/edit-profile-dialog.tsx`)
-- Extend `EditableUser` type and the `form` state with `personal_email`.
-- Add a "Personal email" input next to the existing "Email (change auth email)" field.
-- Include `personal_email` in the diff-and-save payload.
+### 4. Edit flow (`src/components/admin/edit-profile-dialog.tsx`)
+- If the profile's email ends in `@365motorsales.com`, lock the `account_type` field to Staff (disabled select) with the same helper note. Prevents an admin from later flipping a staff account to "business".
+
+### 5. Existing data sweep (one-off)
+- Run a migration/data update: any existing `profiles` row whose auth email ends in `@365motorsales.com` and whose `account_type` is not `staff` → set to `staff`, clear `seller_type`/business fields. Report count to the user before applying.
 
 ## Out of scope
-- Cloudflare Email Routing automation (still a manual step, message kept).
-- No changes to RLS, role policies, or non-staff create flows.
+- No changes to role assignment logic (admin/moderator/support/advertising stay manually granted).
+- No changes to the `@365motorsales.com` suffix UI built last turn.
+- No new tables.
+
+## Technical notes
+- Domain check is a single helper: `const STAFF_DOMAIN = "@365motorsales.com"; const isStaffEmail = (e: string) => e.trim().toLowerCase().endsWith(STAFF_DOMAIN);` — colocate in `src/lib/staff-domain.ts` so client + server import the same constant.
+- Server is the source of truth; UI lock is UX only.
+- Coercion on the server should be logged to `admin_audit_log` when client submitted a different `account_type`.
+
+## Open questions (please confirm before I build)
+
+1. **Self-signup**: block `@365motorsales.com` entirely on the public signup page, or allow with `account_type=staff` and no roles until granted?
+2. **Existing rows**: do you want me to scan and auto-convert any existing non-staff `@365motorsales.com` accounts as part of this change?
+3. **Edit dialog**: lock the account-type selector for staff-domain emails (recommended), or leave it editable for admins?
