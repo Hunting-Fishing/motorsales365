@@ -168,13 +168,25 @@ function PartsHub() {
         {/* Affiliate shop row — hidden until at least one supplier is active in admin */}
         <div className="mb-4">
           <AffiliateShopRow
-            query="auto parts philippines"
-            title="Shop parts from our partners"
+            query={partnerQuery}
+            make={vehicleCtx.make || null}
+            model={vehicleCtx.model || null}
+            year={vehicleCtx.year ? Number(vehicleCtx.year) : null}
+            title="Search these partners"
           />
         </div>
 
-        {tab === "find" && <PartsWizard />}
+        {/* Real product tiles from ingested partner feeds (Shopee/Lazada/AliExpress PH) */}
+        <div className="mb-4">
+          <PartnerProductsGrid
+            query={partnerQuery}
+            title={vehicleCtx.make ? `Parts for ${[vehicleCtx.year, vehicleCtx.make, vehicleCtx.model].filter(Boolean).join(" ")}` : "Trending parts from our partners"}
+          />
+        </div>
+
+        {tab === "find" && <PartsWizard onContextChange={setVehicleCtx} />}
         {tab === "order" && <OemSearch />}
+
 
 
 
