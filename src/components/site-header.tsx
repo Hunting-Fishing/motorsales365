@@ -466,7 +466,7 @@ export function SiteHeader() {
                   <>
                     <DropdownMenuSeparator />
                     <div className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      {isAdmin ? "365 Staff" : "Sales Rep"}
+                      365 Staff · Quick routing
                     </div>
                     {isSales && (
                       <>
@@ -485,7 +485,61 @@ export function SiteHeader() {
                         <DropdownMenuItem asChild>
                           <Link to="/dashboard/team/performance">
                             <BarChart3 className="mr-2 h-4 w-4" />
-                            Performance
+                            Sales performance
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    {(isAdvertising || isAdmin) && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/advertisements">
+                            <Megaphone className="mr-2 h-4 w-4" />
+                            Advertisements
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/advertisements/analytics">
+                            <QrCode className="mr-2 h-4 w-4" />
+                            QR analytics
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    {(isModerator || isAdmin) && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/listings">
+                            <ListChecks className="mr-2 h-4 w-4" />
+                            Moderate listings
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/businesses">
+                            <Building2 className="mr-2 h-4 w-4" />
+                            Business directory
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/verifications">
+                            <ShieldCheck className="mr-2 h-4 w-4" />
+                            Verifications
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    {(isSupport || isAdmin) && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/reports">
+                            <LifeBuoy className="mr-2 h-4 w-4" />
+                            Activity &amp; reports
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/qr-leads">
+                            <Inbox className="mr-2 h-4 w-4" />
+                            QR leads
                           </Link>
                         </DropdownMenuItem>
                       </>
