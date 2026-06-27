@@ -274,6 +274,33 @@ export function AffiliateLinksTab() {
             </tbody>
           </table>
         </div>
+        {totalPages > 1 && (
+          <div className="flex items-center justify-end gap-2 text-sm">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={safePage <= 1}
+              onClick={() => setPage(safePage - 1)}
+            >
+              Prev
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Page {safePage} / {totalPages}
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={safePage >= totalPages}
+              onClick={() => setPage(safePage + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        )}
+        </>
+          );
+        })()}
+        </>
       )}
 
       {editing && (
