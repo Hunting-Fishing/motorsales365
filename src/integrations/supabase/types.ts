@@ -896,6 +896,122 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_commission_rules: {
+        Row: {
+          boost_multiplier_bps: number
+          created_at: string
+          currency: string
+          flat_fee_cents: number
+          id: string
+          is_active: boolean
+          notes: string | null
+          per_listing_fee_cents: number
+          rate_bps: number
+          supplier_slug: string
+          updated_at: string
+        }
+        Insert: {
+          boost_multiplier_bps?: number
+          created_at?: string
+          currency?: string
+          flat_fee_cents?: number
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          per_listing_fee_cents?: number
+          rate_bps?: number
+          supplier_slug: string
+          updated_at?: string
+        }
+        Update: {
+          boost_multiplier_bps?: number
+          created_at?: string
+          currency?: string
+          flat_fee_cents?: number
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          per_listing_fee_cents?: number
+          rate_bps?: number
+          supplier_slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      affiliate_conversions: {
+        Row: {
+          click_id: string | null
+          computed_commission_cents: number
+          created_at: string
+          currency: string
+          external_id: string | null
+          id: string
+          listing_id: string | null
+          network: string | null
+          occurred_at: string
+          order_amount_cents: number
+          raw: Json | null
+          reported_commission_cents: number | null
+          status: string
+          supplier_slug: string
+          updated_at: string
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_year: number | null
+          was_boosted: boolean
+        }
+        Insert: {
+          click_id?: string | null
+          computed_commission_cents?: number
+          created_at?: string
+          currency?: string
+          external_id?: string | null
+          id?: string
+          listing_id?: string | null
+          network?: string | null
+          occurred_at?: string
+          order_amount_cents?: number
+          raw?: Json | null
+          reported_commission_cents?: number | null
+          status?: string
+          supplier_slug: string
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: number | null
+          was_boosted?: boolean
+        }
+        Update: {
+          click_id?: string | null
+          computed_commission_cents?: number
+          created_at?: string
+          currency?: string
+          external_id?: string | null
+          id?: string
+          listing_id?: string | null
+          network?: string | null
+          occurred_at?: string
+          order_amount_cents?: number
+          raw?: Json | null
+          reported_commission_cents?: number | null
+          status?: string
+          supplier_slug?: string
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: number | null
+          was_boosted?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_conversions_click_id_fkey"
+            columns: ["click_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_clicks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       affiliate_links: {
         Row: {
           affiliate_id_env: string | null
@@ -1050,6 +1166,27 @@ export type Database = {
             referencedColumns: ["slug"]
           },
         ]
+      }
+      affiliate_postback_secrets: {
+        Row: {
+          created_at: string
+          network: string
+          secret: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          network: string
+          secret: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          network?: string
+          secret?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       boost_credits: {
         Row: {
