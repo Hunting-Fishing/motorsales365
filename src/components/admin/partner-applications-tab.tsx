@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Handshake, ExternalLink } from "lucide-react";
+import { Handshake, ExternalLink, FileText, Download } from "lucide-react";
 import {
   adminListPartnerApplications,
   adminUpdatePartnerApplication,
+  adminGetSupplierDocUrl,
 } from "@/lib/partner-applications.functions";
 
 type Row = {
