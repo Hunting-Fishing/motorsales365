@@ -10,6 +10,8 @@ import {
 import {
   getPartsFilterAnalytics,
   type PartsFilterAnalytics,
+  type PartsFilterAnalytics,
+  type FilterCtrRow,
 } from "@/lib/parts-analytics.functions";
 
 export const Route = createFileRoute("/admin/parts/analytics")({
