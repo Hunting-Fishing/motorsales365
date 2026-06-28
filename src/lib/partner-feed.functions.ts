@@ -49,30 +49,50 @@ export const adminSyncFeed = createServerFn({ method: "POST" })
     return syncFeed(data.id);
   });
 
-/** Public: search ingested partner products by free text + country. */
+/** Public: search ingested partner products by free text + vehicle filters + country. */
 export const searchPartnerProducts = createServerFn({ method: "POST" })
-  .inputValidator((d: { q?: string; country?: string; limit?: number } | undefined) =>
-    z
-      .object({
-        q: z.string().trim().max(200).optional(),
-        country: z.string().trim().length(2).optional(),
-        limit: z.number().int().min(1).max(48).default(12),
-      })
-      .parse(d ?? {}),
+  .inputValidator(
+    (d: { q?: string; country?: string; limit?: number; make?: string; model?: string; year?: string | number } | undefined) =>
+      z
+        .object({
+          q: z.string().trim().max(200).optional(),
+          country: z.string().trim().length(2).optional(),
+          limit: z.number().int().min(1).max(48).default(12),
+          make: z.string().trim().max(40).optional(),
+          model: z.string().trim().max(40).optional(),
+          year: z.union([z.string(), z.number()]).optional(),
+        })
+        .parse(d ?? {}),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const country = (data.country ?? "PH").toUpperCase();
+
+    // Build AND-ed token list: structured vehicle filters first, then free-text fallback.
+    const tokens: string[] = [];
+    if (data.make) tokens.push(data.make.trim());
+    if (data.model) tokens.push(data.model.trim());
+    if (data.year != null) {
+      const y = String(data.year).trim();
+      if (/^\d{4}$/.test(y)) tokens.push(y);
+    }
+    // Only use free-text q if no structured filters — avoids double-matching the same words.
+    if (tokens.length === 0 && data.q && data.q.trim()) tokens.push(data.q.trim());
+
     let q = supabaseAdmin
       .from("partner_products" as any)
       .select("network,merchant_slug,sku,title,brand,price,currency,image_url,deeplink,country")
       .eq("country", country)
       .limit(data.limit);
-    if (data.q && data.q.trim()) {
-      // simple ILIKE; trigram index speeds it up
-      q = q.ilike("title", `%${data.q.trim()}%`);
+
+    for (const t of tokens) {
+      // Escape PostgREST ILIKE wildcards in user input.
+      const safe = t.replace(/[%_]/g, (m) => `\\${m}`);
+      q = q.ilike("title", `%${safe}%`);
     }
+
     const { data: rows, error } = await q;
     if (error) return [];
     return (rows as any[]) ?? [];
   });
+

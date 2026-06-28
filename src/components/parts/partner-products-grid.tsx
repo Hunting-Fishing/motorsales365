@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ShoppingBag, ExternalLink } from "lucide-react";
+import { ShoppingBag, ExternalLink, X } from "lucide-react";
 import { searchPartnerProducts } from "@/lib/partner-feed.functions";
 
 type Product = {
@@ -21,6 +21,10 @@ interface Props {
   country?: string;
   limit?: number;
   title?: string;
+  make?: string | null;
+  model?: string | null;
+  year?: string | number | null;
+  onClearFilters?: () => void;
 }
 
 const MERCHANT_LABEL: Record<string, string> = {
@@ -43,28 +47,48 @@ function fmtPrice(p: number | null, c: string | null) {
  * Renders a responsive grid of real partner products (ingested via Involve Asia
  * datafeed). Clicks route through `/api/public/go/{merchant_slug}?dl=<deeplink>`
  * so all outbound traffic is logged + country-gated + Involve-Asia-tracked.
- *
- * Returns null when no products match (clean fallback — supplier search row
- * still appears above).
  */
 export function PartnerProductsGrid({
   query,
   country,
   limit = 12,
   title = "Trending parts from our partners",
+  make,
+  model,
+  year,
+  onClearFilters,
 }: Props) {
   const run = useServerFn(searchPartnerProducts);
   const [items, setItems] = useState<Product[] | null>(null);
 
+  const activeFilters: { label: string; value: string }[] = [];
+  if (make) activeFilters.push({ label: "Make", value: String(make) });
+  if (model) activeFilters.push({ label: "Model", value: String(model) });
+  if (year) activeFilters.push({ label: "Year", value: String(year) });
+  const hasFilters = activeFilters.length > 0;
+
   useEffect(() => {
     let active = true;
-    run({ data: { q: query, country, limit } as any })
+    run({
+      data: {
+        q: query,
+        country,
+        limit,
+        make: make || undefined,
+        model: model || undefined,
+        year: year || undefined,
+      } as any,
+    })
       .then((rows) => { if (active) setItems(rows as unknown as Product[]); })
       .catch(() => { if (active) setItems([]); });
     return () => { active = false; };
-  }, [run, query, country, limit]);
+  }, [run, query, country, limit, make, model, year]);
 
-  if (!items || items.length === 0) return null;
+  // Hide entirely when no items AND no active filters (keeps page clean pre-sync).
+  if (!items) return null;
+  if (items.length === 0 && !hasFilters) return null;
+
+
 
   return (
     <section className="rounded-xl border border-border bg-card p-4">
@@ -78,7 +102,36 @@ export function PartnerProductsGrid({
         </span>
       </div>
 
+      {hasFilters && (
+        <div className="mb-3 flex flex-wrap items-center gap-1.5 text-xs">
+          <span className="text-muted-foreground">Filtered by:</span>
+          {activeFilters.map((f) => (
+            <span
+              key={f.label}
+              className="rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary"
+            >
+              {f.value}
+            </span>
+          ))}
+          {onClearFilters && (
+            <button
+              type="button"
+              onClick={onClearFilters}
+              className="ml-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              <X className="h-3 w-3" /> Clear
+            </button>
+          )}
+        </div>
+      )}
+
+      {items.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border bg-background/60 p-6 text-center text-xs text-muted-foreground">
+          No partner matches for these filters yet — try removing one.
+        </div>
+      ) : (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+
         {items.map((p) => {
           const merchantLabel = MERCHANT_LABEL[p.merchant_slug] ?? p.merchant_slug;
           const dl = encodeURIComponent(p.deeplink);
@@ -124,6 +177,8 @@ export function PartnerProductsGrid({
           );
         })}
       </div>
+      )}
     </section>
   );
 }
+

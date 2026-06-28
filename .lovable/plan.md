@@ -1,59 +1,44 @@
 ## Goal
 
-Turn `/parts` into a shoppable hub by pulling real product tiles from our affiliate partners (Shopee PH, Lazada PH, AliExpress PH via Involve Asia) on top of the existing "search at partner" buttons.
+Make the `/parts` product grid actually filter by the wizard's make / model / year selection — not just concatenate them into a free-text query — and show the user which filters are active.
 
-## What you'll see on /parts
+## Changes
 
-1. **Existing supplier row** (logos that link out with your search) — kept as-is.
-2. **New "Trending parts from our partners" grid** — 12 real product tiles with image, title, price, merchant badge, and a Shop button that opens the partner's product page using your affiliate deeplink.
-3. **Vehicle-aware mode**: once a shopper picks a make/model in the Find-a-part wizard, the same grid re-queries with that vehicle context so tiles match.
-4. **Smart empty state**: if no products have been synced yet, the grid is hidden (no empty boxes); the supplier row alone shows.
+### 1. `src/lib/partner-feed.functions.ts` — `searchPartnerProducts`
 
-The grid is country-gated — visitors in PH see PH merchants, others only see partners allowed in their region (already enforced by the country rules we added).
+Extend the input validator and query:
 
-## Backend status
+- New optional fields: `make`, `model`, `year` (string, trimmed, max 40 / year 4 chars).
+- Build a token list from `[make, model, year]` plus the free-text `q`. Each non-empty token becomes its own `ilike("title", "%token%")` so all of them must match (AND-ed by PostgREST when chained). Year is only added when it looks like a 4-digit number.
+- Keep the existing `country` gate and `limit`.
+- If no tokens at all, fall back to current behavior (latest products in country).
 
-- `partner_products` table and `searchPartnerProducts` server function already exist and already filter by country.
-- 3 PH feeds are enabled but **0 products have been synced yet**, so the grid will be empty on first load.
-- First-time fill: run a manual sync from `/admin/parts/feeds` (Sync now button) for each PH merchant. After that the daily cron keeps it fresh.
+This avoids false positives like a `"Toyota Vios parts"` blob matching a Honda listing whose title happens to contain "parts".
 
-No new tables, no new secrets.
+### 2. `src/components/parts/partner-products-grid.tsx`
 
----
+- Add props: `make?: string | null`, `model?: string | null`, `year?: string | number | null`.
+- Pass them into the `searchPartnerProducts` call and include them in the `useEffect` deps.
+- Above the grid, render a small filter-chip row when any of make/model/year is set: `Toyota` · `Vios` · `2018` with an "Clear" link that calls an optional `onClearFilters` prop (only rendered when provided).
+- Empty-state tweak: if filters are active and `items.length === 0`, render a compact "No partner matches for these filters yet — try removing one." card instead of returning `null`, so the user understands why the grid disappeared. With no filters and no items, keep returning `null` (today's behavior).
 
-## Technical section
+### 3. `src/routes/parts.tsx`
 
-### 1. New component: `src/components/parts/partner-products-grid.tsx`
-- Props: `query: string`, `country?: string`, `limit?: number`, `title?: string`.
-- Calls `searchPartnerProducts` via `useServerFn`. Returns `null` when result is empty (clean fallback).
-- Renders a responsive grid (`grid-cols-2 sm:grid-cols-3 lg:grid-cols-4`) of tiles:
-  - 1:1 image (lazy-loaded), 2-line clamped title, price + currency, merchant badge (Shopee / Lazada / AliExpress).
-  - Outbound `<a>` to the product's `deeplink` with `target="_blank" rel="nofollow sponsored noopener"`.
-  - Fire-and-forget click log via a new tiny logger so we get per-product analytics in `affiliate_clicks` (reuse existing table — add `partner_sku` column-less write under the existing `supplier_slug`, with `query` carrying the product title).
+- Pass `make`, `model`, `year` from `vehicleCtx` into `<PartnerProductsGrid />` alongside the existing `query` (query becomes the broad fallback string; the structured fields drive the actual filter).
+- Add `onClearFilters={() => setVehicleCtx({ make: "", model: "", year: "" })}` so users can reset from the grid header. (The wizard keeps its own internal state; clearing here just clears the grid filter — acceptable trade-off, noted below.)
 
-### 2. Click logging endpoint
-Extend the existing `/api/public/go/$slug` to accept an optional `?dl=<base64-encoded deeplink>` so the redirect is consistent with the supplier-row clicks (one analytics path, same country gate, same Involve Asia logging). Tile click → `/api/public/go/shopee-ph?dl=...&q=<title>&sku=<sku>`. Falls back to the templated URL if `dl` missing.
+### 4. No schema changes
 
-### 3. Wire into `src/routes/parts.tsx`
-- Add `<PartnerProductsGrid query={...} title="Trending parts from our partners" />` directly under the existing `<AffiliateShopRow>` block (line ~171).
-- Default query: `"auto parts"`. When the Find-a-part wizard has picked a make/model, lift that state up and pass `query` as `"{make} {model} parts"`.
-- Keep the existing Browse / Find / Order tabs untouched.
+`partner_products` already has `title`, `brand`, `country`. Token ILIKE on `title` is sufficient for current ingested feeds (Shopee/Lazada/AliExpress PH). Future improvement (not in scope): structured `vehicle_make` / `vehicle_model` columns populated by the ingest job.
 
-### 4. No DB migration required
-All tables, RLS, grants, and country filters are in place from previous turns.
+## Technical notes
 
-### 5. After ship — one-time seeding
-Open `/admin/parts/feeds` and click "Sync now" on each enabled PH feed. The grid populates immediately. After that, the daily cron at `/api/public/hooks/sync-parts-feeds` keeps it fresh.
+- `PartsWizard`'s existing `onContextChange` callback already fires on every year/make/model change, so no wizard changes are needed.
+- AffiliateShopRow already receives make/model/year — unchanged.
+- Reset caveat: clicking "Clear" in the grid header clears `vehicleCtx` but does not reset the dropdowns inside `PartsWizard` (which holds its own state). Acceptable for v1; a follow-up could lift wizard state up.
 
-### Files touched
+## Files touched
 
-- **new** `src/components/parts/partner-products-grid.tsx`
-- **edit** `src/routes/parts.tsx` (mount the grid, lift wizard make/model)
-- **edit** `src/routes/api/public/go.$slug.ts` (accept optional `?dl=` passthrough)
-- **edit** `src/components/parts/parts-wizard.tsx` (expose an `onContextChange?(make, model)` callback so the grid can react)
-
-### Out of scope (call out as next steps if you want them)
-
-- Per-tile "Add to wanted ad" shortcut.
-- Pulling tiles into individual listing detail pages (already have the supplier row there — could be a follow-up).
-- Fitment-matched filtering (we'd need OEM/category tags on partner products — only `category_path` is currently ingested).
+- `src/lib/partner-feed.functions.ts` (validator + query)
+- `src/components/parts/partner-products-grid.tsx` (props + chips + empty state)
+- `src/routes/parts.tsx` (pass props, wire clear handler)
