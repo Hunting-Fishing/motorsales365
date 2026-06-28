@@ -30,6 +30,9 @@ export const Route = createFileRoute("/api/public/go/$slug")({
         const model = url.searchParams.get("md");
         const yearRaw = url.searchParams.get("yr");
         const year = yearRaw ? Number(yearRaw) : null;
+        const partnerSku = url.searchParams.get("sku");
+        const productTitle = url.searchParams.get("t");
+
 
         const sb = publicClient();
 
@@ -54,10 +57,13 @@ export const Route = createFileRoute("/api/public/go/$slug")({
               vehicle_make: make,
               vehicle_model: model,
               vehicle_year: Number.isFinite(year as number) ? year : null,
+              partner_sku: partnerSku,
+              product_title: productTitle,
               referrer: request.headers.get("referer"),
               user_agent: request.headers.get("user-agent"),
             });
           } catch { /* ignore */ }
+
           return new Response(null, {
             status: 302,
             headers: { Location: partnerTarget, "Cache-Control": "no-store" },
@@ -142,12 +148,15 @@ export const Route = createFileRoute("/api/public/go/$slug")({
             vehicle_make: make,
             vehicle_model: model,
             vehicle_year: Number.isFinite(year as number) ? year : null,
+            partner_sku: partnerSku,
+            product_title: productTitle,
             referrer: request.headers.get("referer"),
             user_agent: request.headers.get("user-agent"),
           });
         } catch {
           /* ignore */
         }
+
 
         return new Response(null, {
           status: 302,
