@@ -207,6 +207,40 @@ function PartsAnalyticsPage() {
             <CtrCard title="Top years" rows={filters?.top_years} />
           </div>
 
+          <Card title="Merchant / feed conversion">
+            {!filters || filters.top_merchants.length === 0 ? (
+              <Empty>No merchant clicks yet.</Empty>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="py-1">Merchant</th>
+                    <th className="py-1 text-right">Clicks</th>
+                    <th className="py-1 text-right">Filtered</th>
+                    <th className="py-1 text-right">Unfiltered</th>
+                    <th className="py-1 text-right">Share</th>
+                    <th className="py-1 text-right">CTR*</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filters.top_merchants.map((r) => (
+                    <tr key={r.supplier_slug} className="border-t border-border">
+                      <td className="py-1.5 font-mono text-xs">{r.supplier_slug}</td>
+                      <td className="py-1.5 text-right">{r.clicks}</td>
+                      <td className="py-1.5 text-right">{r.filtered_clicks}</td>
+                      <td className="py-1.5 text-right text-muted-foreground">{r.unfiltered_clicks}</td>
+                      <td className="py-1.5 text-right text-muted-foreground">{(r.share * 100).toFixed(1)}%</td>
+                      <td className="py-1.5 text-right">{(r.ctr * 100).toFixed(1)}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              *CTR = filtered clicks for this merchant ÷ total wizard filter events in range.
+            </p>
+          </Card>
+
           <Card title="Top clicked products">
             {!filters || filters.top_products.length === 0 ? (
               <Empty>No product-attributed clicks yet. Clicks from /parts tiles now log SKU + title.</Empty>
