@@ -180,9 +180,14 @@ function PartsHub() {
         <div className="mb-4">
           <PartnerProductsGrid
             query={partnerQuery}
+            make={vehicleCtx.make || null}
+            model={vehicleCtx.model || null}
+            year={vehicleCtx.year || null}
+            onClearFilters={() => setVehicleCtx({ make: "", model: "", year: "" })}
             title={vehicleCtx.make ? `Parts for ${[vehicleCtx.year, vehicleCtx.make, vehicleCtx.model].filter(Boolean).join(" ")}` : "Trending parts from our partners"}
           />
         </div>
+
 
         {tab === "find" && <PartsWizard onContextChange={setVehicleCtx} />}
         {tab === "order" && <OemSearch />}

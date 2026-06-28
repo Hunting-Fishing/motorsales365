@@ -102,7 +102,36 @@ export function PartnerProductsGrid({
         </span>
       </div>
 
+      {hasFilters && (
+        <div className="mb-3 flex flex-wrap items-center gap-1.5 text-xs">
+          <span className="text-muted-foreground">Filtered by:</span>
+          {activeFilters.map((f) => (
+            <span
+              key={f.label}
+              className="rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary"
+            >
+              {f.value}
+            </span>
+          ))}
+          {onClearFilters && (
+            <button
+              type="button"
+              onClick={onClearFilters}
+              className="ml-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              <X className="h-3 w-3" /> Clear
+            </button>
+          )}
+        </div>
+      )}
+
+      {items.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border bg-background/60 p-6 text-center text-xs text-muted-foreground">
+          No partner matches for these filters yet — try removing one.
+        </div>
+      ) : (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+
         {items.map((p) => {
           const merchantLabel = MERCHANT_LABEL[p.merchant_slug] ?? p.merchant_slug;
           const dl = encodeURIComponent(p.deeplink);
@@ -148,6 +177,8 @@ export function PartnerProductsGrid({
           );
         })}
       </div>
+      )}
     </section>
   );
 }
+
