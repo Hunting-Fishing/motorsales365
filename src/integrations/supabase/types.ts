@@ -854,6 +854,8 @@ export type Database = {
           id: string
           ip_hash: string | null
           listing_id: string | null
+          partner_sku: string | null
+          product_title: string | null
           query: string | null
           referrer: string | null
           supplier_slug: string
@@ -869,6 +871,8 @@ export type Database = {
           id?: string
           ip_hash?: string | null
           listing_id?: string | null
+          partner_sku?: string | null
+          product_title?: string | null
           query?: string | null
           referrer?: string | null
           supplier_slug: string
@@ -884,6 +888,8 @@ export type Database = {
           id?: string
           ip_hash?: string | null
           listing_id?: string | null
+          partner_sku?: string | null
+          product_title?: string | null
           query?: string | null
           referrer?: string | null
           supplier_slug?: string
@@ -5891,6 +5897,45 @@ export type Database = {
           name?: string
           sort_order?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      parts_filter_events: {
+        Row: {
+          country: string | null
+          created_at: string
+          id: string
+          make: string | null
+          model: string | null
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string | null
+          year: number | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          id?: string
+          make?: string | null
+          model?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          year?: number | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          id?: string
+          make?: string | null
+          model?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          year?: number | null
         }
         Relationships: []
       }

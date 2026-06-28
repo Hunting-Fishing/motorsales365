@@ -12,6 +12,8 @@ import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { Button } from "@/components/ui/button";
 import { browseUsedParts } from "@/lib/parts-search.functions";
 import { listPartsCountries } from "@/lib/parts-catalog.functions";
+import { logPartsFilterEvent } from "@/lib/parts-analytics.functions";
+
 import { MarketplaceToolbar, type ViewMode } from "@/components/marketplace/marketplace-toolbar";
 import { ListingCardSkeletonGrid } from "@/components/marketplace/listing-card-skeleton";
 import { ListingsMapView } from "@/components/marketplace/listings-map-view";
@@ -53,6 +55,26 @@ function PartsHub() {
   useEffect(() => {
     fetchCountries().then(setCountries as any).catch(() => {});
   }, [fetchCountries]);
+
+  // Debounced filter-event logging so we capture intent without spamming on every keystroke.
+  const logFilter = useServerFn(logPartsFilterEvent);
+  useEffect(() => {
+    if (!vehicleCtx.make && !vehicleCtx.model && !vehicleCtx.year) return;
+    const t = setTimeout(() => {
+      let sid: string | undefined;
+      try {
+        sid = sessionStorage.getItem("365_sid") ?? undefined;
+        if (!sid) {
+          sid = (crypto.randomUUID?.() ?? String(Date.now())).slice(0, 32);
+          sessionStorage.setItem("365_sid", sid);
+        }
+      } catch { /* ignore */ }
+      logFilter({ data: { make: vehicleCtx.make || undefined, model: vehicleCtx.model || undefined, year: vehicleCtx.year || undefined, session_id: sid } as any })
+        .catch(() => {});
+    }, 800);
+    return () => clearTimeout(t);
+  }, [vehicleCtx.make, vehicleCtx.model, vehicleCtx.year, logFilter]);
+
 
   useEffect(() => {
     if (tab !== "browse" || browseRows !== null) return;

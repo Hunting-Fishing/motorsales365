@@ -137,8 +137,15 @@ export function PartnerProductsGrid({
           const dl = encodeURIComponent(p.deeplink);
           const q = encodeURIComponent(p.title.slice(0, 120));
           const sku = encodeURIComponent(p.sku);
-          const href = `/api/public/go/${encodeURIComponent(p.merchant_slug)}?dl=${dl}&q=${q}&sku=${sku}`;
+          const titleParam = encodeURIComponent(p.title.slice(0, 200));
+          const ctx = [
+            make ? `mk=${encodeURIComponent(String(make))}` : "",
+            model ? `md=${encodeURIComponent(String(model))}` : "",
+            year ? `yr=${encodeURIComponent(String(year))}` : "",
+          ].filter(Boolean).join("&");
+          const href = `/api/public/go/${encodeURIComponent(p.merchant_slug)}?dl=${dl}&q=${q}&sku=${sku}&t=${titleParam}${ctx ? `&${ctx}` : ""}`;
           const price = fmtPrice(p.price, p.currency);
+
           return (
             <a
               key={`${p.merchant_slug}:${p.sku}`}
