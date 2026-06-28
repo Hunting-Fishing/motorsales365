@@ -177,55 +177,33 @@ function PartsAnalyticsPage() {
 
           <div className="mt-2 flex items-center gap-2">
             <Filter className="h-4 w-4 text-primary" />
-            <h2 className="font-display text-lg font-bold">Wizard filter usage</h2>
+            <h2 className="font-display text-lg font-bold">Wizard filter usage & CTR</h2>
             <span className="text-xs text-muted-foreground">
               {filters ? `${filters.total_events.toLocaleString()} filter events` : "loading…"}
             </span>
           </div>
 
+          {filters && (
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Stat label="Filter events" value={filters.total_events.toLocaleString()} icon={<Filter className="h-4 w-4" />} />
+              <Stat
+                label="Clicks w/ filters"
+                value={filters.total_clicks_with_filters.toLocaleString()}
+                icon={<TrendingUp className="h-4 w-4" />}
+              />
+              <Stat
+                label="Overall CTR"
+                value={`${(filters.overall_ctr * 100).toFixed(1)}%`}
+                sub="clicks ÷ filter events"
+                icon={<BarChart3 className="h-4 w-4" />}
+              />
+            </div>
+          )}
+
           <div className="grid gap-3 lg:grid-cols-3">
-            <Card title="Top makes">
-              {!filters || filters.top_makes.length === 0 ? (
-                <Empty>No filter data yet.</Empty>
-              ) : (
-                <ul className="space-y-1 text-sm">
-                  {filters.top_makes.map((r) => (
-                    <li key={r.key} className="flex items-center justify-between gap-2 border-b border-border py-1 last:border-0">
-                      <span className="truncate">{r.key}</span>
-                      <span>{r.events}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-            <Card title="Top make / model">
-              {!filters || filters.top_make_models.length === 0 ? (
-                <Empty>No filter data yet.</Empty>
-              ) : (
-                <ul className="space-y-1 text-sm">
-                  {filters.top_make_models.map((r) => (
-                    <li key={r.key} className="flex items-center justify-between gap-2 border-b border-border py-1 last:border-0">
-                      <span className="truncate">{r.key}</span>
-                      <span>{r.events}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-            <Card title="Top years">
-              {!filters || filters.top_years.length === 0 ? (
-                <Empty>No filter data yet.</Empty>
-              ) : (
-                <ul className="space-y-1 text-sm">
-                  {filters.top_years.map((r) => (
-                    <li key={r.key} className="flex items-center justify-between gap-2 border-b border-border py-1 last:border-0">
-                      <span className="truncate">{r.key}</span>
-                      <span>{r.events}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
+            <CtrCard title="Top makes" rows={filters?.top_makes} />
+            <CtrCard title="Top make / model" rows={filters?.top_make_models} />
+            <CtrCard title="Top years" rows={filters?.top_years} />
           </div>
 
           <Card title="Top clicked products">
