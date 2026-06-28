@@ -173,6 +173,7 @@ export const getPartsFilterAnalytics = createServerFn({ method: "GET" })
       top_makes: mergeCtr(byMake, clkByMake).slice(0, 20),
       top_make_models: mergeCtr(byMm, clkByMm).slice(0, 25),
       top_years: mergeCtr(byYr, clkByYr).slice(0, 20),
+      top_merchants: topMerchants,
       top_products: [...byProd.values()].sort((a, b) => b.clicks - a.clicks).slice(0, 25),
     };
   });
