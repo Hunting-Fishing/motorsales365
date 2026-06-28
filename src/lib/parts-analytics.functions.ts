@@ -45,6 +45,14 @@ export const logPartsFilterEvent = createServerFn({ method: "POST" })
   });
 
 export type FilterCtrRow = { key: string; events: number; clicks: number; ctr: number };
+export type MerchantCtrRow = {
+  supplier_slug: string;
+  clicks: number;
+  filtered_clicks: number;
+  unfiltered_clicks: number;
+  ctr: number;
+  share: number;
+};
 export type PartsFilterAnalytics = {
   range_days: number;
   total_events: number;
@@ -53,6 +61,7 @@ export type PartsFilterAnalytics = {
   top_makes: FilterCtrRow[];
   top_make_models: FilterCtrRow[];
   top_years: FilterCtrRow[];
+  top_merchants: MerchantCtrRow[];
   top_products: Array<{ supplier_slug: string; sku: string; title: string | null; clicks: number }>;
 };
 
@@ -104,15 +113,37 @@ export const getPartsFilterAnalytics = createServerFn({ method: "GET" })
     const clkByMake = new Map<string, number>();
     const clkByMm = new Map<string, number>();
     const clkByYr = new Map<string, number>();
+    const clkBySupplier = new Map<string, number>();
+    const filteredClkBySupplier = new Map<string, number>();
     let totalFilteredClicks = 0;
     for (const c of clickRows) {
       const hasFilter = !!(c.vehicle_make || c.vehicle_model || c.vehicle_year);
       if (hasFilter) totalFilteredClicks += 1;
+      if (c.supplier_slug) {
+        clkBySupplier.set(c.supplier_slug, (clkBySupplier.get(c.supplier_slug) ?? 0) + 1);
+        if (hasFilter) filteredClkBySupplier.set(c.supplier_slug, (filteredClkBySupplier.get(c.supplier_slug) ?? 0) + 1);
+      }
       if (c.vehicle_make) clkByMake.set(c.vehicle_make, (clkByMake.get(c.vehicle_make) ?? 0) + 1);
       const mm = [c.vehicle_make, c.vehicle_model].filter(Boolean).join(" ").trim();
       if (mm) clkByMm.set(mm, (clkByMm.get(mm) ?? 0) + 1);
       if (c.vehicle_year) clkByYr.set(String(c.vehicle_year), (clkByYr.get(String(c.vehicle_year)) ?? 0) + 1);
     }
+
+    const totalClicks = clickRows.length;
+    const topMerchants: MerchantCtrRow[] = [...clkBySupplier.entries()]
+      .map(([supplier_slug, clicks]) => {
+        const filtered = filteredClkBySupplier.get(supplier_slug) ?? 0;
+        return {
+          supplier_slug,
+          clicks,
+          filtered_clicks: filtered,
+          unfiltered_clicks: clicks - filtered,
+          ctr: fRows.length > 0 ? filtered / fRows.length : 0,
+          share: totalClicks > 0 ? clicks / totalClicks : 0,
+        };
+      })
+      .sort((a, b) => b.clicks - a.clicks)
+      .slice(0, 25);
 
     const mergeCtr = (events: Map<string, number>, clicks: Map<string, number>): FilterCtrRow[] => {
       const keys = new Set<string>([...events.keys(), ...clicks.keys()]);
@@ -142,6 +173,7 @@ export const getPartsFilterAnalytics = createServerFn({ method: "GET" })
       top_makes: mergeCtr(byMake, clkByMake).slice(0, 20),
       top_make_models: mergeCtr(byMm, clkByMm).slice(0, 25),
       top_years: mergeCtr(byYr, clkByYr).slice(0, 20),
+      top_merchants: topMerchants,
       top_products: [...byProd.values()].sort((a, b) => b.clicks - a.clicks).slice(0, 25),
     };
   });
