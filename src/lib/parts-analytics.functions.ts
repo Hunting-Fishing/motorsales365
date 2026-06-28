@@ -45,6 +45,14 @@ export const logPartsFilterEvent = createServerFn({ method: "POST" })
   });
 
 export type FilterCtrRow = { key: string; events: number; clicks: number; ctr: number };
+export type MerchantCtrRow = {
+  supplier_slug: string;
+  clicks: number;
+  filtered_clicks: number;
+  unfiltered_clicks: number;
+  ctr: number;
+  share: number;
+};
 export type PartsFilterAnalytics = {
   range_days: number;
   total_events: number;
@@ -53,6 +61,7 @@ export type PartsFilterAnalytics = {
   top_makes: FilterCtrRow[];
   top_make_models: FilterCtrRow[];
   top_years: FilterCtrRow[];
+  top_merchants: MerchantCtrRow[];
   top_products: Array<{ supplier_slug: string; sku: string; title: string | null; clicks: number }>;
 };
 
