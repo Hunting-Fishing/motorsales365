@@ -257,6 +257,38 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
     </section>
   );
 }
+function CtrCard({ title, rows }: { title: string; rows: FilterCtrRow[] | undefined }) {
+  return (
+    <Card title={title}>
+      {!rows || rows.length === 0 ? (
+        <Empty>No filter data yet.</Empty>
+      ) : (
+        <table className="w-full text-sm">
+          <thead className="text-left text-xs uppercase text-muted-foreground">
+            <tr>
+              <th className="py-1">Key</th>
+              <th className="py-1 text-right">Events</th>
+              <th className="py-1 text-right">Clicks</th>
+              <th className="py-1 text-right">CTR</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.key} className="border-t border-border">
+                <td className="py-1.5 truncate max-w-[160px]">{r.key}</td>
+                <td className="py-1.5 text-right">{r.events}</td>
+                <td className="py-1.5 text-right">{r.clicks}</td>
+                <td className="py-1.5 text-right text-muted-foreground">
+                  {r.events > 0 ? `${(r.ctr * 100).toFixed(1)}%` : "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </Card>
+  );
+}
 function Empty({ children }: { children: React.ReactNode }) {
   return <p className="rounded border border-dashed border-border p-4 text-center text-xs text-muted-foreground">{children}</p>;
 }
