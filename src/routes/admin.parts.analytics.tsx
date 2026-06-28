@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { BarChart3, Download, TrendingUp, ShoppingCart, AlertCircle } from "lucide-react";
+import { BarChart3, Download, TrendingUp, ShoppingCart, AlertCircle, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   getAffiliateAnalytics,
   type AffiliateAnalytics,
 } from "@/lib/affiliate-analytics.functions";
+import {
+  getPartsFilterAnalytics,
+  type PartsFilterAnalytics,
+} from "@/lib/parts-analytics.functions";
 
 export const Route = createFileRoute("/admin/parts/analytics")({
   head: () => ({ meta: [{ title: "Parts click analytics — Admin" }] }),
@@ -15,17 +19,24 @@ export const Route = createFileRoute("/admin/parts/analytics")({
 
 function PartsAnalyticsPage() {
   const fetchStats = useServerFn(getAffiliateAnalytics);
+  const fetchFilters = useServerFn(getPartsFilterAnalytics);
   const [days, setDays] = useState(30);
   const [stats, setStats] = useState<AffiliateAnalytics | null>(null);
+  const [filters, setFilters] = useState<PartsFilterAnalytics | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
     setStats(null);
+    setFilters(null);
     setErr(null);
     fetchStats({ data: { rangeDays: days } })
       .then(setStats)
       .catch((e) => setErr(e?.message ?? "Failed"));
-  }, [days, fetchStats]);
+    fetchFilters({ data: { rangeDays: days } })
+      .then(setFilters)
+      .catch(() => {});
+  }, [days, fetchStats, fetchFilters]);
+
 
   function exportCsv() {
     if (!stats) return;
@@ -163,11 +174,92 @@ function PartsAnalyticsPage() {
               </div>
             </div>
           </Card>
+
+          <div className="mt-2 flex items-center gap-2">
+            <Filter className="h-4 w-4 text-primary" />
+            <h2 className="font-display text-lg font-bold">Wizard filter usage</h2>
+            <span className="text-xs text-muted-foreground">
+              {filters ? `${filters.total_events.toLocaleString()} filter events` : "loading…"}
+            </span>
+          </div>
+
+          <div className="grid gap-3 lg:grid-cols-3">
+            <Card title="Top makes">
+              {!filters || filters.top_makes.length === 0 ? (
+                <Empty>No filter data yet.</Empty>
+              ) : (
+                <ul className="space-y-1 text-sm">
+                  {filters.top_makes.map((r) => (
+                    <li key={r.key} className="flex items-center justify-between gap-2 border-b border-border py-1 last:border-0">
+                      <span className="truncate">{r.key}</span>
+                      <span>{r.events}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+            <Card title="Top make / model">
+              {!filters || filters.top_make_models.length === 0 ? (
+                <Empty>No filter data yet.</Empty>
+              ) : (
+                <ul className="space-y-1 text-sm">
+                  {filters.top_make_models.map((r) => (
+                    <li key={r.key} className="flex items-center justify-between gap-2 border-b border-border py-1 last:border-0">
+                      <span className="truncate">{r.key}</span>
+                      <span>{r.events}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+            <Card title="Top years">
+              {!filters || filters.top_years.length === 0 ? (
+                <Empty>No filter data yet.</Empty>
+              ) : (
+                <ul className="space-y-1 text-sm">
+                  {filters.top_years.map((r) => (
+                    <li key={r.key} className="flex items-center justify-between gap-2 border-b border-border py-1 last:border-0">
+                      <span className="truncate">{r.key}</span>
+                      <span>{r.events}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+          </div>
+
+          <Card title="Top clicked products">
+            {!filters || filters.top_products.length === 0 ? (
+              <Empty>No product-attributed clicks yet. Clicks from /parts tiles now log SKU + title.</Empty>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="py-1">Merchant</th>
+                    <th className="py-1">SKU</th>
+                    <th className="py-1">Title</th>
+                    <th className="py-1 text-right">Clicks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filters.top_products.map((r) => (
+                    <tr key={`${r.supplier_slug}:${r.sku}`} className="border-t border-border">
+                      <td className="py-1.5 font-mono text-xs">{r.supplier_slug}</td>
+                      <td className="py-1.5 font-mono text-xs">{r.sku}</td>
+                      <td className="py-1.5 truncate max-w-[420px]">{r.title ?? "—"}</td>
+                      <td className="py-1.5 text-right">{r.clicks}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </Card>
         </>
       )}
     </div>
   );
 }
+
 
 function Stat({ label, value, sub, icon }: { label: string; value: string; sub?: string; icon?: React.ReactNode }) {
   return (
