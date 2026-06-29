@@ -1712,8 +1712,11 @@ function SellPage() {
             {isAttrCategory(category) && (
               <div className="space-y-2 border-t border-border/60 pt-3">
                 <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  {CATEGORY_LABEL_MAP[category] ?? "Details"} — buyers filter by these
+                  {CATEGORY_LABEL_MAP[category] ?? "Details"} details
                 </h3>
+                <p className="text-[11px] text-muted-foreground">
+                  These attributes help buyers find your listing in search and filters.
+                </p>
                 <CategoryAttributesEditor
                   category={category}
                   value={categoryAttrs}
