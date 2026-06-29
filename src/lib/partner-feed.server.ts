@@ -88,6 +88,35 @@ async function fetchInvolveAsiaFeed(
   return items.filter((i) => i.sku && i.title && i.deeplink).slice(0, maxItems);
 }
 
+/**
+ * Adapter framework: dispatch fetch by feed.network.
+ * Add a new merchant network here once an integration is implemented.
+ */
+type FeedRow = {
+  id: string;
+  network: string;
+  merchant_slug: string;
+  country: string;
+  is_enabled: boolean;
+  max_items?: number | null;
+};
+
+type FeedAdapter = (feed: FeedRow) => Promise<FeedItem[]>;
+
+const ADAPTERS: Record<string, FeedAdapter> = {
+  involve_asia: (feed) => fetchInvolveAsiaFeed(feed.merchant_slug, feed.max_items ?? 500),
+  // Stubs — wire real implementations as credentials come online.
+  ebay_epn: async () => {
+    throw new Error("eBay Partner Network adapter not yet implemented");
+  },
+  amazon_paapi: async () => {
+    throw new Error("Amazon PA-API adapter not yet implemented");
+  },
+  manual_csv: async () => {
+    throw new Error("manual_csv requires file upload; not run by cron");
+  },
+};
+
 /** Run one feed: fetch + upsert + log status. */
 export async function syncFeed(feedId: string): Promise<{ ok: boolean; count: number; error?: string }> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -99,8 +128,20 @@ export async function syncFeed(feedId: string): Promise<{ ok: boolean; count: nu
   if (feedErr || !feed) return { ok: false, count: 0, error: feedErr?.message ?? "Feed not found" };
   if (!(feed as any).is_enabled) return { ok: false, count: 0, error: "Feed disabled" };
 
+  const network = String((feed as any).network);
+  const adapter = ADAPTERS[network];
+  if (!adapter) {
+    const msg = `No adapter for network "${network}"`;
+    await supabaseAdmin
+      .from("partner_product_feeds" as any)
+      .update({ last_synced_at: new Date().toISOString(), last_status: "error", last_error: msg })
+      .eq("id", feedId);
+    return { ok: false, count: 0, error: msg };
+  }
+
   try {
-    const items = await fetchInvolveAsiaFeed((feed as any).merchant_slug);
+    const items = await adapter(feed as FeedRow);
+
     if (items.length > 0) {
       const rows = items.map((i) => ({
         network: (feed as any).network,
