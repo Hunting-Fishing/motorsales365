@@ -1907,6 +1907,32 @@ function SellPage() {
 
           <section data-tab="media" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "media" ? "" : "hidden"}`}>
             <h2 className="text-sm font-semibold">Photos & video</h2>
+            <div className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-[11px] text-muted-foreground">
+              <div className="mb-1 font-semibold text-foreground">Review before publishing</div>
+              <ul className="grid gap-0.5 sm:grid-cols-2">
+                <li>
+                  <span className="text-muted-foreground">Title:</span>{" "}
+                  <span className="text-foreground">{title.trim() || <em className="text-amber-700">missing</em>}</span>
+                </li>
+                <li>
+                  <span className="text-muted-foreground">Price:</span>{" "}
+                  <span className="text-foreground">{priceHidden ? "Hidden" : price ? formatPHP(Number(price)) : <em className="text-amber-700">missing</em>}</span>
+                </li>
+                <li>
+                  <span className="text-muted-foreground">Category:</span>{" "}
+                  <span className="text-foreground capitalize">{category.replace(/_/g, " ")}</span>
+                </li>
+                <li>
+                  <span className="text-muted-foreground">Location:</span>{" "}
+                  <span className="text-foreground">{[city, region].filter(Boolean).join(", ") || <em className="text-amber-700">missing</em>}</span>
+                </li>
+                <li className="sm:col-span-2">
+                  <span className="text-muted-foreground">Plan:</span>{" "}
+                  <span className="text-foreground capitalize">{plan}</span>
+                  {selectedBoost ? <span className="text-muted-foreground"> · boost on</span> : null}
+                </li>
+              </ul>
+            </div>
             {(() => {
               const tierCaps: Record<
                 "free" | "standard" | "upgraded",
