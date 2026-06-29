@@ -23,11 +23,16 @@ Working:
 - `partner_product_feeds` table, admin page `/admin/parts/feeds` to enable/disable + manual sync.
 - `syncFeed` / `syncAllEnabledFeeds` honor `parts_countries.is_active`.
 - Country gating on outbound clicks (`affiliate_links.allowed_countries`).
+- **Hourly pg_cron** (`sync-parts-feeds-hourly`, :17 every hour) calls `/api/public/hooks/sync-parts-feeds` with the project anon key.
+- **Adapter framework**: `syncFeed` dispatches by `feed.network` via an `ADAPTERS` map. `involve_asia` live; `ebay_epn`, `amazon_paapi`, `manual_csv` are stubs that record a clear `last_error` until implemented.
 
 Gaps (significant):
-- **No cron schedule** for `syncAllEnabledFeeds`. There is no pg_cron job and no `/api/public/cron/*` route — feeds only refresh when an admin clicks "Sync now".
-- **Only one adapter (Involve Asia).** `syncFeed` hard-calls `fetchInvolveAsiaFeed` regardless of `feed.network`. eBay Partner Network, Amazon PA-API, Rakuten, AliExpress Portals, etc. aren't implemented.
-- **Involve Asia credentials** (`INVOLVE_ASIA_KEY`, `INVOLVE_ASIA_SECRET`) — need to confirm both secrets are set; without them every sync errors with "credentials not configured".
+- **Real eBay / Amazon adapters** still need credentials + implementation (stubs in place).
+- **Involve Asia credentials** (`INVOLVE_ASIA_API_KEY_NAME`, `INVOLVE_ASIA_API_SECRET`) — without them every sync errors with "credentials not configured".
+- No per-feed schedule / rate-limit / pagination cap visible in admin.
+- No image cache — we serve merchant CDN URLs directly; broken when merchants rotate.
+- No de-dupe across merchants for the same SKU/EAN.
+
 - No per-feed schedule / rate-limit / pagination cap visible in admin.
 - No image cache — we serve merchant CDN URLs directly; broken when merchants rotate.
 - No de-dupe across merchants for the same SKU/EAN.
