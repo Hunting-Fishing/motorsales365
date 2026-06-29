@@ -9,9 +9,12 @@ import {
 } from "@/lib/affiliate-analytics.functions";
 import {
   getPartsFilterAnalytics,
+  getMerchantDrilldown,
   type PartsFilterAnalytics,
   type FilterCtrRow,
+  type MerchantDrilldown,
 } from "@/lib/parts-analytics.functions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/admin/parts/analytics")({
   head: () => ({ meta: [{ title: "Parts click analytics — Admin" }] }),
