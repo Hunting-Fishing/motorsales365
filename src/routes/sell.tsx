@@ -975,14 +975,14 @@ function SellPage() {
             ] as const;
             const idx = TABS.findIndex((t) => t.key === activeTab);
             return (
-              <div className="sticky top-14 z-20 -mx-3 sm:mx-0 bg-background/95 backdrop-blur border-b border-border sm:rounded-xl sm:border sm:bg-card">
-                <div className="flex overflow-x-auto no-scrollbar px-1 py-1 gap-1">
+              <div className="sticky top-14 z-20 -mx-3 sm:mx-0 bg-background/95 backdrop-blur border-b border-border sm:rounded-lg sm:border sm:bg-card">
+                <div className="flex overflow-x-auto no-scrollbar px-1 pt-0.5 gap-0.5">
                   {TABS.map((t, i) => (
                     <button
                       key={t.key}
                       type="button"
                       onClick={() => setActiveTab(t.key)}
-                      className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                      className={`whitespace-nowrap rounded px-2 py-1 text-[11px] leading-none font-medium transition ${
                         activeTab === t.key
                           ? "bg-primary text-primary-foreground"
                           : i < idx
@@ -994,12 +994,8 @@ function SellPage() {
                     </button>
                   ))}
                 </div>
-                <div className="px-2 pb-2">
-                  <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
-                    <span>Step {idx + 1} of {TABS.length} — {TABS[idx]?.label}</span>
-                    <span>{Math.round(((idx + 1) / TABS.length) * 100)}%</span>
-                  </div>
-                  <Progress value={((idx + 1) / TABS.length) * 100} className="h-1.5" />
+                <div className="px-2 pb-1 pt-0.5">
+                  <Progress value={((idx + 1) / TABS.length) * 100} className="h-1" />
                 </div>
               </div>
 
