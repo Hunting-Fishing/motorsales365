@@ -291,6 +291,72 @@ function PartsAnalyticsPage() {
           </Card>
         </>
       )}
+
+      <Dialog open={!!drillSlug} onOpenChange={(o) => !o && setDrillSlug(null)}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-base">{drillSlug}</DialogTitle>
+            <DialogDescription>
+              Last {days} days · {drill ? `${drill.total_clicks} clicks (${drill.filtered_clicks} with vehicle filters)` : (drillLoading ? "loading…" : "")}
+            </DialogDescription>
+          </DialogHeader>
+          {drillLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+          {drill && (
+            <div className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <MiniList title="Top makes" rows={drill.top_makes} />
+                <MiniList title="Top make / model" rows={drill.top_make_models} />
+                <MiniList title="Top years" rows={drill.top_years} />
+              </div>
+              <section>
+                <h3 className="mb-2 text-sm font-semibold">Top products</h3>
+                {drill.top_products.length === 0 ? (
+                  <Empty>No product-attributed clicks for this merchant.</Empty>
+                ) : (
+                  <table className="w-full text-sm">
+                    <thead className="text-left text-xs uppercase text-muted-foreground">
+                      <tr>
+                        <th className="py-1">SKU</th>
+                        <th className="py-1">Title</th>
+                        <th className="py-1 text-right">Clicks</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {drill.top_products.map((p) => (
+                        <tr key={p.sku} className="border-t border-border">
+                          <td className="py-1.5 font-mono text-xs">{p.sku}</td>
+                          <td className="py-1.5 truncate max-w-[380px]">{p.title ?? "—"}</td>
+                          <td className="py-1.5 text-right">{p.clicks}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </section>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function MiniList({ title, rows }: { title: string; rows: Array<{ key: string; clicks: number }> }) {
+  return (
+    <div className="rounded-lg border border-border bg-card p-3">
+      <h4 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h4>
+      {rows.length === 0 ? (
+        <p className="text-xs text-muted-foreground">—</p>
+      ) : (
+        <ul className="space-y-1 text-sm">
+          {rows.map((r) => (
+            <li key={r.key} className="flex items-center justify-between gap-2 border-b border-border/60 py-0.5 last:border-0">
+              <span className="truncate">{r.key}</span>
+              <span className="text-xs tabular-nums text-muted-foreground">{r.clicks}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
