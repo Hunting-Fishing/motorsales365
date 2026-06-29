@@ -113,6 +113,13 @@ function PartsHub() {
                 <Tag className="mr-1 h-4 w-4" /> Sell a part
               </Link>
             </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/parts/categories">
+                <Tag className="mr-1 h-4 w-4" /> Browse by category
+              </Link>
+            </Button>
+
+
 
             <Button asChild variant="outline" size="sm">
               <Link to="/businesses">
