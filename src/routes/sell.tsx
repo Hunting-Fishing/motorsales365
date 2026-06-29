@@ -1907,6 +1907,32 @@ function SellPage() {
 
           <section data-tab="media" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "media" ? "" : "hidden"}`}>
             <h2 className="text-sm font-semibold">Photos & video</h2>
+            <div className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-[11px] text-muted-foreground">
+              <div className="mb-1 font-semibold text-foreground">Review before publishing</div>
+              <ul className="grid gap-0.5 sm:grid-cols-2">
+                <li>
+                  <span className="text-muted-foreground">Title:</span>{" "}
+                  <span className="text-foreground">{title.trim() || <em className="text-amber-700">missing</em>}</span>
+                </li>
+                <li>
+                  <span className="text-muted-foreground">Price:</span>{" "}
+                  <span className="text-foreground">{priceHidden ? "Hidden" : price ? formatPHP(Number(price)) : <em className="text-amber-700">missing</em>}</span>
+                </li>
+                <li>
+                  <span className="text-muted-foreground">Category:</span>{" "}
+                  <span className="text-foreground capitalize">{category.replace(/_/g, " ")}</span>
+                </li>
+                <li>
+                  <span className="text-muted-foreground">Location:</span>{" "}
+                  <span className="text-foreground">{[city, region].filter(Boolean).join(", ") || <em className="text-amber-700">missing</em>}</span>
+                </li>
+                <li className="sm:col-span-2">
+                  <span className="text-muted-foreground">Plan:</span>{" "}
+                  <span className="text-foreground capitalize">{plan}</span>
+                  {selectedBoost ? <span className="text-muted-foreground"> · boost on</span> : null}
+                </li>
+              </ul>
+            </div>
             {(() => {
               const tierCaps: Record<
                 "free" | "standard" | "upgraded",
@@ -2158,17 +2184,24 @@ function SellPage() {
           {(() => {
             const order = ["details", "location", "plan", "media"] as const;
             const i = order.indexOf(activeTab);
+            const detailsIssues: string[] = [
+              !title.trim() && "title",
+              !price && !priceHidden && "price",
+              category === "parts" && !partType && "part type",
+              category === "parts" && !partFits.trim() && "fits (vehicle)",
+              category === "used_part" && !usedPartSystem && "vehicle system",
+              category === "used_part" && !usedPartName.trim() && "part name",
+            ].filter(Boolean) as string[];
             const stepIssues: Record<(typeof order)[number], string[]> = {
-              details: [
-                !title.trim() && "title",
-                !price && "price",
-              ].filter(Boolean) as string[],
-              location: [!region && "region"].filter(Boolean) as string[],
+              details: detailsIssues,
+              location: [!region && "region", !city && "city"].filter(Boolean) as string[],
               plan: [],
-              media: [],
+              media: [photos.length === 0 && "at least 1 photo"].filter(Boolean) as string[],
             };
             const issues = stepIssues[activeTab];
             const canAdvance = issues.length === 0;
+            const isLast = i === order.length - 1;
+            const canSubmit = isLast && order.every((k) => stepIssues[k].length === 0);
             return (
               <div className="sticky bottom-0 z-30 -mx-3 flex flex-col items-stretch justify-between gap-2 border-t border-border bg-background/95 p-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:items-center sm:gap-3 sm:rounded-xl sm:border sm:bg-card sm:p-4">
                 <div className="flex items-center justify-between gap-3 sm:block">
@@ -2184,9 +2217,9 @@ function SellPage() {
                   <div className="hidden sm:block"><FormFeedbackLink formId="post-listing" /></div>
                 </div>
                 <div className="flex w-full flex-col gap-1 sm:w-auto">
-                  {!canAdvance && i < order.length - 1 && (
+                  {issues.length > 0 && (
                     <div className="text-[11px] text-amber-700">
-                      Add: {issues.join(", ")} to continue
+                      {isLast ? "Missing: " : "Add: "}{issues.join(", ")}{isLast ? "" : " to continue"}
                     </div>
                   )}
                   <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
@@ -2211,7 +2244,7 @@ function SellPage() {
                         <Button asChild type="button" variant="outline" size="sm" className="w-full sm:w-auto">
                           <Link to="/dashboard">Cancel</Link>
                         </Button>
-                        <Button type="submit" disabled={submitting} size="lg" className="w-full sm:w-auto">
+                        <Button type="submit" disabled={submitting || !canSubmit} size="lg" className="w-full sm:w-auto">
                           {submitting ? "Submitting…" : "Submit listing"}
                         </Button>
                       </>
