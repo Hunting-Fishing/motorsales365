@@ -74,6 +74,14 @@ export const Route = createFileRoute("/sitemap.xml")({
           entries.push({ path: `/browse/${c}`, changefreq: "daily", priority: "0.7" });
         }
 
+        // Parts category landing pages
+        const { PARTS_CATEGORIES } = await import("@/data/parts-categories");
+        entries.push({ path: "/parts/categories", changefreq: "weekly", priority: "0.7" });
+        for (const pc of PARTS_CATEGORIES) {
+          entries.push({ path: `/parts/c/${pc.slug}`, changefreq: "daily", priority: "0.7" });
+        }
+
+
         try {
           const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
           const key =
@@ -182,10 +190,24 @@ export const Route = createFileRoute("/sitemap.xml")({
                 priority: "0.6",
               });
             }
+            const { data: partnerProducts } = await (sb as any)
+              .from("partner_products")
+              .select("network, sku, updated_at")
+              .order("updated_at", { ascending: false })
+              .limit(2000);
+            for (const pp of partnerProducts ?? []) {
+              entries.push({
+                path: `/parts/p/${encodeURIComponent(pp.network)}/${encodeURIComponent(pp.sku)}`,
+                lastmod: pp.updated_at?.slice(0, 10),
+                changefreq: "weekly",
+                priority: "0.4",
+              });
+            }
           }
         } catch (err) {
           console.warn("[sitemap] dynamic entries failed", err);
         }
+
 
         const urls = entries.map((e) =>
           [
