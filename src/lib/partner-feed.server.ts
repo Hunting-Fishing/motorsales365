@@ -140,7 +140,7 @@ export async function syncFeed(feedId: string): Promise<{ ok: boolean; count: nu
   }
 
   try {
-    const items = await adapter(feed as FeedRow);
+    const items = await adapter(feed as unknown as FeedRow);
 
     if (items.length > 0) {
       const rows = items.map((i) => ({
