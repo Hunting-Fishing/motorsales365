@@ -2218,7 +2218,7 @@ function SellPage() {
                         <Button asChild type="button" variant="outline" size="sm" className="w-full sm:w-auto">
                           <Link to="/dashboard">Cancel</Link>
                         </Button>
-                        <Button type="submit" disabled={submitting} size="lg" className="w-full sm:w-auto">
+                        <Button type="submit" disabled={submitting || !canSubmit} size="lg" className="w-full sm:w-auto">
                           {submitting ? "Submitting…" : "Submit listing"}
                         </Button>
                       </>
