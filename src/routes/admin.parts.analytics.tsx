@@ -24,7 +24,6 @@ export const Route = createFileRoute("/admin/parts/analytics")({
 function PartsAnalyticsPage() {
   const fetchStats = useServerFn(getAffiliateAnalytics);
   const fetchFilters = useServerFn(getPartsFilterAnalytics);
-  const [days, setDays] = useState(30);
   const fetchDrill = useServerFn(getMerchantDrilldown);
   const [days, setDays] = useState(30);
   const [stats, setStats] = useState<AffiliateAnalytics | null>(null);
