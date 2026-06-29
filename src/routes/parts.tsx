@@ -194,6 +194,27 @@ function PartsHub() {
         </div>
 
 
+        {/* Prominent: Browse by category */}
+        <Link
+          to="/parts/categories"
+          className="group mb-4 flex items-center justify-between gap-4 rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 transition hover:border-primary hover:shadow-lg"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+              <Grid3x3 className="h-6 w-6" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-base font-bold sm:text-lg">Browse parts by category</h2>
+              <p className="text-xs text-muted-foreground sm:text-sm">
+                Brakes, engine, suspension, tires, electrical and more — live partner inventory.
+              </p>
+            </div>
+          </div>
+          <span className="hidden shrink-0 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground group-hover:bg-primary/90 sm:inline-flex">
+            Browse →
+          </span>
+        </Link>
+
         {/* Affiliate shop row — hidden until at least one supplier is active in admin */}
         <div className="mb-4">
           <AffiliateShopRow
