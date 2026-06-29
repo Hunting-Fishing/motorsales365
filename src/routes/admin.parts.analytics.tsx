@@ -25,9 +25,24 @@ function PartsAnalyticsPage() {
   const fetchStats = useServerFn(getAffiliateAnalytics);
   const fetchFilters = useServerFn(getPartsFilterAnalytics);
   const [days, setDays] = useState(30);
+  const fetchDrill = useServerFn(getMerchantDrilldown);
+  const [days, setDays] = useState(30);
   const [stats, setStats] = useState<AffiliateAnalytics | null>(null);
   const [filters, setFilters] = useState<PartsFilterAnalytics | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [drillSlug, setDrillSlug] = useState<string | null>(null);
+  const [drill, setDrill] = useState<MerchantDrilldown | null>(null);
+  const [drillLoading, setDrillLoading] = useState(false);
+
+  useEffect(() => {
+    if (!drillSlug) { setDrill(null); return; }
+    setDrill(null);
+    setDrillLoading(true);
+    fetchDrill({ data: { supplier_slug: drillSlug, rangeDays: days } })
+      .then(setDrill)
+      .catch((e) => setErr(e?.message ?? "Drilldown failed"))
+      .finally(() => setDrillLoading(false));
+  }, [drillSlug, days, fetchDrill]);
 
   useEffect(() => {
     setStats(null);
