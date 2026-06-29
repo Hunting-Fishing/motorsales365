@@ -1422,16 +1422,24 @@ function SellPage() {
                         placeholder="e.g. Toyota Vios 2015–2020"
                       />
                     </div>
-                    <div>
-                      <Label className="text-xs">Stock quantity</Label>
-                      <Input
-                        className="h-9 text-sm"
-                        type="number"
-                        min="0"
-                        value={partStock}
-                        onChange={(e) => setPartStock(e.target.value)}
-                      />
-                    </div>
+                    <details className="sm:col-span-2 lg:col-span-3 group">
+                      <summary className="cursor-pointer list-none text-xs font-medium text-primary hover:underline">
+                        + More options (stock, inventory)
+                      </summary>
+                      <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                        <div>
+                          <Label className="text-xs">Stock quantity</Label>
+                          <Input
+                            className="h-9 text-sm"
+                            type="number"
+                            min="0"
+                            value={partStock}
+                            onChange={(e) => setPartStock(e.target.value)}
+                            placeholder="e.g. 10"
+                          />
+                        </div>
+                      </div>
+                    </details>
                   </div>
                 ) : category === "used_part" ? (
                   <div className="space-y-2">
@@ -1838,48 +1846,62 @@ function SellPage() {
 
           </section>
 
-          <section data-tab="plan" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "plan" ? "" : "hidden"}`}>
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold">Add a boost (optional)</h2>
-              {selectedBoost && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedBoost("")}
-                  className="text-xs text-muted-foreground hover:underline"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Boost is purchased right after your listing payment for maximum visibility.
-            </p>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {boostOptions.map((b) => {
-                const active = selectedBoost === b.slug;
-                return (
-                  <button
-                    type="button"
-                    key={b.slug}
-                    onClick={() => setSelectedBoost(active ? "" : b.slug)}
-                    className={`rounded-lg border p-3 text-left text-sm transition ${
-                      active ? "border-primary bg-primary/5" : "border-border hover:bg-secondary/50"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium">{b.label}</span>
-                      <span className="text-foreground">{formatPHP(b.price_php)}</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {b.duration_days} day{b.duration_days === 1 ? "" : "s"}
-                    </div>
-                  </button>
-                );
-              })}
-              {boostOptions.length === 0 && (
-                <div className="text-xs text-muted-foreground">No boosts available right now.</div>
-              )}
-            </div>
+          <section data-tab="plan" className={`rounded-xl border border-border bg-card ${activeTab === "plan" ? "" : "hidden"}`}>
+            <details open={!!selectedBoost} className="group">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-2 p-2.5 sm:p-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold">Add a boost</span>
+                  <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">Optional</span>
+                  {selectedBoost && (
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                      {boostOptions.find((b) => b.slug === selectedBoost)?.label ?? "Selected"}
+                    </span>
+                  )}
+                </div>
+                <span className="text-xs text-muted-foreground group-open:hidden">Show options ▾</span>
+                <span className="hidden text-xs text-muted-foreground group-open:inline">Hide ▴</span>
+              </summary>
+              <div className="space-y-2 px-2.5 pb-2.5 sm:px-3 sm:pb-3">
+                <p className="text-xs text-muted-foreground">
+                  Boost is purchased right after your listing payment for maximum visibility.
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {boostOptions.map((b) => {
+                    const active = selectedBoost === b.slug;
+                    return (
+                      <button
+                        type="button"
+                        key={b.slug}
+                        onClick={() => setSelectedBoost(active ? "" : b.slug)}
+                        className={`rounded-lg border p-3 text-left text-sm transition ${
+                          active ? "border-primary bg-primary/5" : "border-border hover:bg-secondary/50"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-medium">{b.label}</span>
+                          <span className="text-foreground">{formatPHP(b.price_php)}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {b.duration_days} day{b.duration_days === 1 ? "" : "s"}
+                        </div>
+                      </button>
+                    );
+                  })}
+                  {boostOptions.length === 0 && (
+                    <div className="text-xs text-muted-foreground">No boosts available right now.</div>
+                  )}
+                  {selectedBoost && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedBoost("")}
+                      className="text-left text-xs text-muted-foreground hover:underline"
+                    >
+                      Clear boost selection
+                    </button>
+                  )}
+                </div>
+              </div>
+            </details>
           </section>
 
 
@@ -2133,30 +2155,54 @@ function SellPage() {
             </div>
           </section>
 
-          <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-border bg-card p-3 sm:p-4 sm:flex-row sm:items-center">
-            <div>
-              <div className="text-xs text-muted-foreground">Total listing fee</div>
-              <div className="font-display text-xl font-bold text-primary">
-                {formatPHP(totalFee)}
-              </div>
-              <div className="text-[11px] text-muted-foreground">
-                Listing publishes after payment is confirmed.
-              </div>
-            </div>
-            <div className="mb-1"><FormFeedbackLink formId="post-listing" /></div>
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
-              {(() => {
-                const order = ["details", "location", "plan", "media"] as const;
-                const i = order.indexOf(activeTab);
-                return (
-                  <>
+          {(() => {
+            const order = ["details", "location", "plan", "media"] as const;
+            const i = order.indexOf(activeTab);
+            const stepIssues: Record<(typeof order)[number], string[]> = {
+              details: [
+                !title.trim() && "title",
+                !price && "price",
+              ].filter(Boolean) as string[],
+              location: [!region && "region"].filter(Boolean) as string[],
+              plan: [],
+              media: [],
+            };
+            const issues = stepIssues[activeTab];
+            const canAdvance = issues.length === 0;
+            return (
+              <div className="sticky bottom-0 z-30 -mx-3 flex flex-col items-stretch justify-between gap-2 border-t border-border bg-background/95 p-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:items-center sm:gap-3 sm:rounded-xl sm:border sm:bg-card sm:p-4">
+                <div className="flex items-center justify-between gap-3 sm:block">
+                  <div>
+                    <div className="text-[11px] text-muted-foreground">Total fee</div>
+                    <div className="font-display text-lg font-bold text-primary sm:text-xl">
+                      {formatPHP(totalFee)}
+                    </div>
+                  </div>
+                  <div className="hidden text-[11px] text-muted-foreground sm:block">
+                    Publishes after payment is confirmed.
+                  </div>
+                  <div className="hidden sm:block"><FormFeedbackLink formId="post-listing" /></div>
+                </div>
+                <div className="flex w-full flex-col gap-1 sm:w-auto">
+                  {!canAdvance && i < order.length - 1 && (
+                    <div className="text-[11px] text-amber-700">
+                      Add: {issues.join(", ")} to continue
+                    </div>
+                  )}
+                  <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
                     {i > 0 && (
                       <Button type="button" variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setActiveTab(order[i - 1])}>
                         ← Back
                       </Button>
                     )}
                     {i < order.length - 1 && (
-                      <Button type="button" size="sm" className="w-full sm:w-auto" onClick={() => { setActiveTab(order[i + 1]); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="w-full sm:w-auto"
+                        disabled={!canAdvance}
+                        onClick={() => { setActiveTab(order[i + 1]); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      >
                         Next →
                       </Button>
                     )}
@@ -2170,11 +2216,11 @@ function SellPage() {
                         </Button>
                       </>
                     )}
-                  </>
-                );
-              })()}
-            </div>
-          </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
         </form>
       </div>
