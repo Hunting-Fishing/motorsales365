@@ -1038,24 +1038,24 @@ function SellPage() {
             <div className="space-y-2">
               <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Listing</h3>
               <div>
-                <Label htmlFor="title" className="text-xs">Title</Label>
+                <Label htmlFor="title" className="text-[11px]">Title</Label>
                 <Input
                   id="title"
                   required
-                  className="h-9 text-sm"
+                  className="h-8 text-sm"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="2019 Toyota Vios 1.3 E AT"
                 />
               </div>
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-2 grid-cols-2 sm:grid-cols-4">
                 <div>
-                  <Label className="text-xs">Category</Label>
+                  <Label className="text-[11px]">Category</Label>
                   <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger className="h-9 text-sm">
+                    <SelectTrigger className="h-8 text-xs">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="min-w-[14rem]">
                       {CATEGORIES.map((c) => (
                         <SelectItem key={c.slug} value={c.slug}>
                           {c.name}
@@ -1065,9 +1065,9 @@ function SellPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-xs">Condition</Label>
+                  <Label className="text-[11px]">Condition</Label>
                   <Select value={condition} onValueChange={setCondition}>
-                    <SelectTrigger className="h-9 text-sm">
+                    <SelectTrigger className="h-8 text-xs">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -1079,12 +1079,12 @@ function SellPage() {
                 </div>
                 {(category === "car" || category === "motorcycle" || category === "truck") ? (
                   <div>
-                    <Label className="text-xs">Registration</Label>
+                    <Label className="text-[11px]">Registration</Label>
                     <Select
                       value={registrationStatus}
                       onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
                     >
-                      <SelectTrigger className="h-9 text-sm">
+                      <SelectTrigger className="h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -1097,13 +1097,13 @@ function SellPage() {
                   </div>
                 ) : null}
                 <div>
-                  <Label className="text-xs">Seller type</Label>
-                  <div className="flex h-9 items-center gap-2 rounded-md border border-dashed border-border bg-muted/30 px-2.5 text-sm">
+                  <Label className="text-[11px]">Seller</Label>
+                  <div
+                    className="flex h-8 items-center rounded-md border border-dashed border-border bg-muted/30 px-2"
+                    title="Auto-detected from your profile — shown beside your avatar on the listing."
+                  >
                     <span className="inline-flex h-5 items-center rounded-full bg-primary/10 px-2 text-[11px] font-medium text-primary">
-                      {sellerType === "business" ? "Business / Dealer" : "Private seller"}
-                    </span>
-                    <span className="truncate text-[11px] text-muted-foreground">
-                      Auto-detected from your profile — shown beside your avatar on the listing.
+                      {sellerType === "business" ? "Business" : "Private"}
                     </span>
                   </div>
                 </div>
