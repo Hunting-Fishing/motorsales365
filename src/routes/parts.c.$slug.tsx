@@ -128,7 +128,7 @@ function CategoryPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {products.map((p) => (
+            {products.map((p: any) => (
               <Link
                 key={`${p.network}:${p.sku}`}
                 to="/parts/p/$network/$sku"

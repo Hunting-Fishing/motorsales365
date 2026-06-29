@@ -202,7 +202,7 @@ function ProductPage() {
         <section className="rounded-xl border border-border bg-card p-4">
           <h2 className="mb-3 text-sm font-semibold">More from {merchantLabel}</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {related.map((r) => (
+            {related.map((r: any) => (
               <Link
                 key={`${r.network}:${r.sku}`}
                 to="/parts/p/$network/$sku"

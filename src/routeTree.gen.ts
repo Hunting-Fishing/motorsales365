@@ -79,6 +79,7 @@ import { Route as PayManualRouteImport } from './routes/pay.manual'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
 import { Route as PassportPremiumCheckoutRouteImport } from './routes/passport-premium.checkout'
 import { Route as PartsSearchRouteImport } from './routes/parts.search'
+import { Route as PartsCategoriesRouteImport } from './routes/parts.categories'
 import { Route as PartnersPartsRouteImport } from './routes/partners.parts'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
@@ -172,6 +173,7 @@ import { Route as ShopDepartmentSlugRouteImport } from './routes/shop.department
 import { Route as ShopBrandSlugRouteImport } from './routes/shop.brand.$slug'
 import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
+import { Route as PartsCSlugRouteImport } from './routes/parts.c.$slug'
 import { Route as PartnersPartsOnboardingRouteImport } from './routes/partners.parts.onboarding'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
@@ -210,6 +212,7 @@ import { Route as AuthenticatedAccountTrustScoreRouteImport } from './routes/_au
 import { Route as AuthenticatedAccountRewardsRouteImport } from './routes/_authenticated/account.rewards'
 import { Route as AuthenticatedAccountDisputesRouteImport } from './routes/_authenticated/account.disputes'
 import { Route as DashboardBusinessBusinessIdIndexRouteImport } from './routes/dashboard.business.$businessId.index'
+import { Route as PartsPNetworkSkuRouteImport } from './routes/parts.p.$network.$sku'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -594,6 +597,11 @@ const PassportPremiumCheckoutRoute = PassportPremiumCheckoutRouteImport.update({
 const PartsSearchRoute = PartsSearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => PartsRoute,
+} as any)
+const PartsCategoriesRoute = PartsCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
   getParentRoute: () => PartsRoute,
 } as any)
 const PartnersPartsRoute = PartnersPartsRouteImport.update({
@@ -1065,6 +1073,11 @@ const PaymentsIdReceiptRoute = PaymentsIdReceiptRouteImport.update({
   path: '/$id/receipt',
   getParentRoute: () => PaymentsRoute,
 } as any)
+const PartsCSlugRoute = PartsCSlugRouteImport.update({
+  id: '/c/$slug',
+  path: '/c/$slug',
+  getParentRoute: () => PartsRoute,
+} as any)
 const PartnersPartsOnboardingRoute = PartnersPartsOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -1276,6 +1289,11 @@ const DashboardBusinessBusinessIdIndexRoute =
     path: '/',
     getParentRoute: () => DashboardBusinessBusinessIdRoute,
   } as any)
+const PartsPNetworkSkuRoute = PartsPNetworkSkuRouteImport.update({
+  id: '/p/$network/$sku',
+  path: '/p/$network/$sku',
+  getParentRoute: () => PartsRoute,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -1611,6 +1629,7 @@ export interface FileRoutesByFullPath {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
+  '/parts/categories': typeof PartsCategoriesRoute
   '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
@@ -1678,6 +1697,7 @@ export interface FileRoutesByFullPath {
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
+  '/parts/c/$slug': typeof PartsCSlugRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
@@ -1720,6 +1740,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
   '/dashboard/business/$businessId/': typeof DashboardBusinessBusinessIdIndexRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
@@ -1844,6 +1865,7 @@ export interface FileRoutesByTo {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
+  '/parts/categories': typeof PartsCategoriesRoute
   '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
@@ -1910,6 +1932,7 @@ export interface FileRoutesByTo {
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
+  '/parts/c/$slug': typeof PartsCSlugRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
@@ -1952,6 +1975,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdIndexRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
@@ -2083,6 +2107,7 @@ export interface FileRoutesById {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
+  '/parts/categories': typeof PartsCategoriesRoute
   '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
@@ -2150,6 +2175,7 @@ export interface FileRoutesById {
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
+  '/parts/c/$slug': typeof PartsCSlugRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
@@ -2192,6 +2218,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
   '/dashboard/business/$businessId/': typeof DashboardBusinessBusinessIdIndexRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
@@ -2323,6 +2350,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/listing/checkout'
     | '/partners/parts'
+    | '/parts/categories'
     | '/parts/search'
     | '/passport-premium/checkout'
     | '/passport/$slug'
@@ -2390,6 +2418,7 @@ export interface FileRouteTypes {
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
+    | '/parts/c/$slug'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/brand/$slug'
@@ -2432,6 +2461,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/parts/p/$network/$sku'
     | '/dashboard/business/$businessId/'
     | '/api/public/training-partners/$id/click'
   fileRoutesByTo: FileRoutesByTo
@@ -2556,6 +2586,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/listing/checkout'
     | '/partners/parts'
+    | '/parts/categories'
     | '/parts/search'
     | '/passport-premium/checkout'
     | '/passport/$slug'
@@ -2622,6 +2653,7 @@ export interface FileRouteTypes {
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
+    | '/parts/c/$slug'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/brand/$slug'
@@ -2664,6 +2696,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/parts/p/$network/$sku'
     | '/dashboard/business/$businessId'
     | '/api/public/training-partners/$id/click'
   id:
@@ -2794,6 +2827,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/listing/checkout'
     | '/partners/parts'
+    | '/parts/categories'
     | '/parts/search'
     | '/passport-premium/checkout'
     | '/passport/$slug'
@@ -2861,6 +2895,7 @@ export interface FileRouteTypes {
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
+    | '/parts/c/$slug'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/brand/$slug'
@@ -2903,6 +2938,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/parts/p/$network/$sku'
     | '/dashboard/business/$businessId/'
     | '/api/public/training-partners/$id/click'
   fileRoutesById: FileRoutesById
@@ -3521,6 +3557,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/parts/search'
       preLoaderRoute: typeof PartsSearchRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/parts/categories': {
+      id: '/parts/categories'
+      path: '/categories'
+      fullPath: '/parts/categories'
+      preLoaderRoute: typeof PartsCategoriesRouteImport
       parentRoute: typeof PartsRoute
     }
     '/partners/parts': {
@@ -4174,6 +4217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentsIdReceiptRouteImport
       parentRoute: typeof PaymentsRoute
     }
+    '/parts/c/$slug': {
+      id: '/parts/c/$slug'
+      path: '/c/$slug'
+      fullPath: '/parts/c/$slug'
+      preLoaderRoute: typeof PartsCSlugRouteImport
+      parentRoute: typeof PartsRoute
+    }
     '/partners/parts/onboarding': {
       id: '/partners/parts/onboarding'
       path: '/onboarding'
@@ -4439,6 +4489,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/business/$businessId/'
       preLoaderRoute: typeof DashboardBusinessBusinessIdIndexRouteImport
       parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/parts/p/$network/$sku': {
+      id: '/parts/p/$network/$sku'
+      path: '/p/$network/$sku'
+      fullPath: '/parts/p/$network/$sku'
+      preLoaderRoute: typeof PartsPNetworkSkuRouteImport
+      parentRoute: typeof PartsRoute
     }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
@@ -5037,11 +5094,17 @@ const ExportRouteWithChildren =
   ExportRoute._addFileChildren(ExportRouteChildren)
 
 interface PartsRouteChildren {
+  PartsCategoriesRoute: typeof PartsCategoriesRoute
   PartsSearchRoute: typeof PartsSearchRoute
+  PartsCSlugRoute: typeof PartsCSlugRoute
+  PartsPNetworkSkuRoute: typeof PartsPNetworkSkuRoute
 }
 
 const PartsRouteChildren: PartsRouteChildren = {
+  PartsCategoriesRoute: PartsCategoriesRoute,
   PartsSearchRoute: PartsSearchRoute,
+  PartsCSlugRoute: PartsCSlugRoute,
+  PartsPNetworkSkuRoute: PartsPNetworkSkuRoute,
 }
 
 const PartsRouteWithChildren = PartsRoute._addFileChildren(PartsRouteChildren)
