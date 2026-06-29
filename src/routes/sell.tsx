@@ -965,7 +965,7 @@ function SellPage() {
 
 
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+        <form onSubmit={handleSubmit} className="mt-3 space-y-2">
           {(() => {
             const TABS = [
               { key: "details", label: "Details" },
@@ -994,13 +994,11 @@ function SellPage() {
                     </button>
                   ))}
                 </div>
-                <div className="px-2 pb-1 pt-0.5">
-                  <Progress value={((idx + 1) / TABS.length) * 100} className="h-1" />
-                </div>
+                <Progress value={((idx + 1) / TABS.length) * 100} className="h-0.5 rounded-none" />
               </div>
-
             );
           })()}
+
           <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
             {/* Header */}
             <div className="flex items-center justify-between gap-2">
