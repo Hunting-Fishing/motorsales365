@@ -1715,7 +1715,7 @@ function SellPage() {
                   {CATEGORY_LABEL_MAP[category] ?? "Details"} details
                 </h3>
                 <p className="text-[11px] text-muted-foreground">
-                  These attributes help buyers find your listing in search and filters.
+                  These attributes help buyers find your listing in search.
                 </p>
                 <CategoryAttributesEditor
                   category={category}
