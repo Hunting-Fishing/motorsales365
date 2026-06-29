@@ -2158,17 +2158,24 @@ function SellPage() {
           {(() => {
             const order = ["details", "location", "plan", "media"] as const;
             const i = order.indexOf(activeTab);
+            const detailsIssues: string[] = [
+              !title.trim() && "title",
+              !price && !priceHidden && "price",
+              category === "parts" && !partType && "part type",
+              category === "parts" && !partFits.trim() && "fits (vehicle)",
+              category === "used_part" && !usedPartSystem && "vehicle system",
+              category === "used_part" && !usedPartName.trim() && "part name",
+            ].filter(Boolean) as string[];
             const stepIssues: Record<(typeof order)[number], string[]> = {
-              details: [
-                !title.trim() && "title",
-                !price && "price",
-              ].filter(Boolean) as string[],
-              location: [!region && "region"].filter(Boolean) as string[],
+              details: detailsIssues,
+              location: [!region && "region", !city && "city"].filter(Boolean) as string[],
               plan: [],
-              media: [],
+              media: [photos.length === 0 && "at least 1 photo"].filter(Boolean) as string[],
             };
             const issues = stepIssues[activeTab];
             const canAdvance = issues.length === 0;
+            const isLast = i === order.length - 1;
+            const canSubmit = isLast && order.every((k) => stepIssues[k].length === 0);
             return (
               <div className="sticky bottom-0 z-30 -mx-3 flex flex-col items-stretch justify-between gap-2 border-t border-border bg-background/95 p-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:items-center sm:gap-3 sm:rounded-xl sm:border sm:bg-card sm:p-4">
                 <div className="flex items-center justify-between gap-3 sm:block">
