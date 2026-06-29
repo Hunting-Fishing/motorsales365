@@ -1248,7 +1248,7 @@ function SellPage() {
                 {SERVICE_CATEGORIES.has(category) && (
                   <div className="space-y-1">
                     <p className="text-[11px] text-muted-foreground">
-                      Pick everything that applies — buyers filter by these tags.
+                      Pick everything that applies. These tags help buyers find your service.
                     </p>
                     <TagPicker
                       value={serviceTags}
