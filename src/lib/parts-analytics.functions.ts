@@ -177,3 +177,82 @@ export const getPartsFilterAnalytics = createServerFn({ method: "GET" })
       top_products: [...byProd.values()].sort((a, b) => b.clicks - a.clicks).slice(0, 25),
     };
   });
+
+export type MerchantDrilldown = {
+  supplier_slug: string;
+  range_days: number;
+  total_clicks: number;
+  filtered_clicks: number;
+  unfiltered_clicks: number;
+  top_makes: Array<{ key: string; clicks: number }>;
+  top_make_models: Array<{ key: string; clicks: number }>;
+  top_years: Array<{ key: string; clicks: number }>;
+  top_products: Array<{ sku: string; title: string | null; clicks: number }>;
+};
+
+/** Admin: per-merchant drilldown (top vehicles + products for one supplier_slug). */
+export const getMerchantDrilldown = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { supplier_slug: string; rangeDays?: number }) =>
+    z
+      .object({
+        supplier_slug: z.string().trim().min(1).max(80),
+        rangeDays: z.number().int().min(1).max(90).default(30),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }): Promise<MerchantDrilldown> => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+
+    const since = new Date(Date.now() - data.rangeDays * 24 * 60 * 60 * 1000).toISOString();
+    const { data: clicks } = await context.supabase
+      .from("affiliate_clicks" as any)
+      .select("partner_sku,product_title,vehicle_make,vehicle_model,vehicle_year")
+      .eq("supplier_slug", data.supplier_slug)
+      .gte("created_at", since)
+      .limit(5000);
+
+    const rows = ((clicks as any[]) ?? []) as Array<{
+      partner_sku: string | null;
+      product_title: string | null;
+      vehicle_make: string | null;
+      vehicle_model: string | null;
+      vehicle_year: number | null;
+    }>;
+
+    const byMake = new Map<string, number>();
+    const byMm = new Map<string, number>();
+    const byYr = new Map<string, number>();
+    const byProd = new Map<string, { sku: string; title: string | null; clicks: number }>();
+    let filtered = 0;
+    for (const c of rows) {
+      if (c.vehicle_make || c.vehicle_model || c.vehicle_year) filtered += 1;
+      if (c.vehicle_make) byMake.set(c.vehicle_make, (byMake.get(c.vehicle_make) ?? 0) + 1);
+      const mm = [c.vehicle_make, c.vehicle_model].filter(Boolean).join(" ").trim();
+      if (mm) byMm.set(mm, (byMm.get(mm) ?? 0) + 1);
+      if (c.vehicle_year) byYr.set(String(c.vehicle_year), (byYr.get(String(c.vehicle_year)) ?? 0) + 1);
+      if (c.partner_sku) {
+        const prev = byProd.get(c.partner_sku);
+        if (prev) prev.clicks += 1;
+        else byProd.set(c.partner_sku, { sku: c.partner_sku, title: c.product_title, clicks: 1 });
+      }
+    }
+    const toRows = (m: Map<string, number>, n = 15) =>
+      [...m.entries()].map(([key, clicks]) => ({ key, clicks })).sort((a, b) => b.clicks - a.clicks).slice(0, n);
+
+    return {
+      supplier_slug: data.supplier_slug,
+      range_days: data.rangeDays,
+      total_clicks: rows.length,
+      filtered_clicks: filtered,
+      unfiltered_clicks: rows.length - filtered,
+      top_makes: toRows(byMake),
+      top_make_models: toRows(byMm),
+      top_years: toRows(byYr),
+      top_products: [...byProd.values()].sort((a, b) => b.clicks - a.clicks).slice(0, 25),
+    };
+  });
