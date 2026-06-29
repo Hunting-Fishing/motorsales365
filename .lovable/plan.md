@@ -1,116 +1,77 @@
-# Parts System Audit
 
-Below is what's built vs. what's missing or not wired up across the Parts surface (storefront, partner feeds, affiliate revenue, B2B onboarding, OEM ordering, admin tools).
+# /sell cleanup plan
 
-## 1. Storefront / discovery — built but thin
+Goal: turn the 2,183-line monolithic form into a guided, mobile-friendly wizard with less visual noise, clearer errors, and a calmer plan/boost step. Parts ships first as the pilot; the shared shell then wraps the other 13 categories without rewriting their fields.
 
-Working:
-- `/parts` hub with Find / Browse / Order OEM tabs, vehicle wizard, partner product tiles, affiliate row.
-- `/parts/search` VIN + make/model/year search with JDM chassis code lookup.
-- Used parts browse pulls real listings, map/grid/density toggle.
-- `/wanted-parts` flow.
+## Phase 1 — Shared wizard shell (foundation)
 
-Gaps:
-- No category landing pages (e.g. `/parts/brakes`, `/parts/engine`) — wizard is the only entry path; bad for SEO.
-- No part-detail page for ingested `partner_products` rows — clicks go straight outbound, we never own the SERP.
-- No "compare OEM number" UX surfacing `parts_catalog` results next to affiliate tiles.
-- Used-parts listing card and partner-product card aren't unified — same query returns two visually different stacks.
-- No saved-part / price-drop alert on partner products.
+Build the chrome once, reuse everywhere.
 
-## 2. Partner feeds (Lazada / Shopee / AliExpress via Involve Asia)
+- New `src/components/sell/sell-wizard.tsx` — a 5-step shell:
+  1. **Category** (skipped if `?category=` is in the URL)
+  2. **Basics** (title, price, condition, photos primary upload)
+  3. **Details** (category-specific fields)
+  4. **Location & contact**
+  5. **Review & publish** (with plan picker collapsed inline)
+- Sticky mobile bottom bar with `Back` / `Next` / step indicator (1 of 5).
+- Each step shows only the fields it owns; a single "Show optional fields" toggle hides anything not required to publish.
+- Per-step validation: `Next` is enabled only when the step is valid; if disabled, a tooltip + small list under the button names what's missing (fixes "validation unclear").
+- Progress saved to `sessionStorage` keyed by category so a refresh doesn't lose work.
 
-Working:
-- `partner_product_feeds` table, admin page `/admin/parts/feeds` to enable/disable + manual sync.
-- `syncFeed` / `syncAllEnabledFeeds` honor `parts_countries.is_active`.
-- Country gating on outbound clicks (`affiliate_links.allowed_countries`).
-- **Hourly pg_cron** (`sync-parts-feeds-hourly`, :17 every hour) calls `/api/public/hooks/sync-parts-feeds` with the project anon key.
-- **Adapter framework**: `syncFeed` dispatches by `feed.network` via an `ADAPTERS` map. `involve_asia` live; `ebay_epn`, `amazon_paapi`, `manual_csv` are stubs that record a clear `last_error` until implemented.
+## Phase 2 — Parts pilot (current screen)
 
-Gaps (significant):
-- **Real eBay / Amazon adapters** still need credentials + implementation (stubs in place).
-- **Involve Asia credentials** (`INVOLVE_ASIA_API_KEY_NAME`, `INVOLVE_ASIA_API_SECRET`) — without them every sync errors with "credentials not configured".
-- No per-feed schedule / rate-limit / pagination cap visible in admin.
-- No image cache — we serve merchant CDN URLs directly; broken when merchants rotate.
-- No de-dupe across merchants for the same SKU/EAN.
+Apply the shell to `category=parts` first.
 
-- No per-feed schedule / rate-limit / pagination cap visible in admin.
-- No image cache — we serve merchant CDN URLs directly; broken when merchants rotate.
-- No de-dupe across merchants for the same SKU/EAN.
+- **Basics step**: Title, price, condition, OEM/Aftermarket, primary photo.
+- **Details step**:
+  - Required: Part type, brand, fits (vehicle picker).
+  - Optional (collapsed): Stock qty, OEM part #, warranty days, fitment rows.
+- **Location step**: Region/province/city + map picker, with contact phone underneath.
+- **Review step**:
+  - Summary cards of each step (tap to jump back).
+  - Plan picker as 3 simple cards (Free / Standard / Upgraded) with one-line value props; boost moved to a "Boost after publishing?" toggle that defers to a post-publish dialog (fixes "plan & boost overwhelming").
 
-## 3. Affiliate revenue / attribution
+## Phase 3 — Roll shell to other categories
 
-Working:
-- `/api/public/go/$slug` redirect with click logging, country gate.
-- `/api/public/postback/$network` with HMAC verification.
-- `affiliate_commission_rules`, `affiliate_conversions`, `/admin/parts/commissions` dashboard.
-- `affiliate_postback_secrets` table.
+Once Parts is validated, wrap each existing category block (car, motorcycle, towing, carwash, repair, bodyshop, salvage, drone, boat, airplane, equipment, used_part, other) in the same wizard. The category-specific JSX moves into the `Details` step as-is — no field logic changes, only layout and progressive disclosure.
 
-Gaps:
-- **No merchant has actually been configured to POST to our postback URL.** No documentation page or admin field showing the per-network postback URL + secret for ops to paste into Involve Asia / eBay dashboards.
-- `affiliate_commission_rules` seeded but per-merchant rates likely still placeholders — no UI to edit rates from admin (only insert-time).
-- No reconciliation report (postback conversions vs. clicks vs. merchant statement).
-- No payout / invoicing surface for when merchants actually pay.
-- Click→conversion attribution window not defined anywhere (`click_id` is optional on postback).
+- Cars/motorcycles: keep `VehicleQualityFields` + `CategoryAttributesEditor`, but split "Quality" into its own collapsible block under Details.
+- Service categories (towing, carwash, repair, bodyshop): group hours/coverage/payments under a "Service details" disclosure.
 
-## 4. B2B partner onboarding
+## Phase 4 — Copy + density pass
 
-Working:
-- `/partners/parts` info page, `/partners/parts/onboarding` form, document upload, admin review queue (`/admin/parts` applications tab).
-- `parts_supplier_applications`, `parts_supplier_contacts`, `parts_supplier_outreach`, `parts_supplier_tasks`.
-- `/admin/parts/outreach` pipeline view.
+- Strip duplicate help text; move long descriptions into popovers.
+- Shorten labels (e.g. "Mileage (km)" → "Mileage"; unit shown as suffix inside the input).
+- Tighten vertical rhythm: `space-y-4` → `space-y-3`, card padding `p-6` → `p-4` on mobile.
+- Larger tap targets on mobile (min 44px), bigger radio cards for category/plan.
 
-Gaps:
-- No supplier-side portal after approval — approved suppliers can't log in to upload inventory, see clicks, or get paid.
-- No automated email on application submit / approval (template not scaffolded).
-- No SLA / status badge on the storefront for approved suppliers.
-- No link from approved `parts_supplier_applications` row → live `parts_suppliers` entry (manual handoff today).
+## Phase 5 — Visual direction
 
-## 5. OEM ordering ("Order OEM" tab)
+Per your pick, I'll capture the current `/sell?category=parts` screen and generate 3 rendered design directions (palette/typography/layout locked from your follow-up answers, varying composition and density). You pick one, I apply it to the shell only — fields stay the same.
 
-Working:
-- `oem_parts_interest` capture form, `parts_catalog` admin CRUD, VIN decode (NHTSA + JDM table).
+## What does NOT change
 
-Gaps:
-- Labeled "Coming soon" — there is no actual ordering, payment, or fulfillment path.
-- No supplier matching: a captured interest record doesn't notify any supplier or create a quote request.
-- No bridge from `oem_parts_interest` → `part_quote_requests` (separate tables, not joined in any flow).
+- Submit logic, `submitListing` server function, uploads, pricing, boost products, plan limits, auth gating, SEO `head()`, ride prefill, VIN scan, fitment editor data shape.
+- All existing validation rules (Zod schema, vehicle quality issues) — only their presentation.
 
-## 6. Used parts (Banawe / salvage)
+## Technical notes
 
-Working:
-- `parts_wanted` + matches, browse, listing detail.
+- New files:
+  - `src/components/sell/sell-wizard.tsx` (shell, step state, sticky bar)
+  - `src/components/sell/steps/basics-step.tsx`
+  - `src/components/sell/steps/details-step.tsx` (renders category-specific block as children)
+  - `src/components/sell/steps/location-step.tsx`
+  - `src/components/sell/steps/review-step.tsx`
+  - `src/components/sell/plan-picker-compact.tsx`
+  - `src/components/sell/post-publish-boost-dialog.tsx`
+- `src/routes/sell.tsx` shrinks to: state hooks + submit handler + `<SellWizard category={category}>{categoryFieldsForCategory}</SellWizard>`. Target ~500 lines.
+- No DB changes, no server-function changes.
 
-Gaps:
-- No salvage-yard inventory ingest — yards must hand-list each part.
-- No "scrap a vehicle / I'm parting this out" workflow that auto-creates multiple listings from one VIN.
+## Rollout order in build mode
 
-## 7. Admin / analytics
+1. Build shell + Parts wizard end-to-end, ship behind same route (no flag — it replaces inline form for parts only first).
+2. Capture screenshot → design directions → you pick → apply to shell.
+3. Wrap remaining categories one batch at a time (cars + motorcycles, then services, then long-tail).
+4. Density/copy pass across all categories.
 
-Working:
-- `/admin/parts` (suppliers + applications), `/admin/parts/feeds`, `/admin/parts/outreach`, `/admin/parts/analytics` (CTR, filters, top makes/models/years, per-merchant breakdown), `/admin/parts/commissions`.
-
-Gaps:
-- No alerting when a feed last_status flips to `error` or item_count drops sharply.
-- No "feeds health" summary on the main admin index.
-- No data-quality report (% products missing image, price, brand).
-
-## 8. Cross-cutting / infra
-
-- No cron schedule for feed sync (called out above).
-- No background job runner for image re-validation, broken-link detection on `affiliate_links`.
-- No structured data (JSON-LD `Product` / `Offer`) on partner product tiles for SEO.
-- No analytics for `/parts/search` query strings → we don't know what users type but can't find.
-- `partner_products` has no fitment columns — we filter by ILIKE on `title`, which is noisy. Need parsed make/model/year per product (current parse only happens at click time via wizard).
-
----
-
-## Recommended next slices (pick any)
-
-1. **Cron + adapter framework** — add `/api/public/cron/sync-feeds` (token-gated), schedule via pg_cron hourly; refactor `syncFeed` to dispatch by `feed.network` (involve_asia, ebay_epn, amazon_paapi, manual_csv).
-2. **Postback ops page** — admin view that shows each network's postback URL + current secret + last 20 events, with "rotate secret" and copy-to-clipboard.
-3. **Category landing pages + Product detail** — own SEO for `/parts/{category}` and `/parts/p/{network}/{sku}`.
-4. **Supplier portal MVP** — `/dashboard/supplier` for approved partners to view clicks, conversions, and upload a CSV inventory.
-5. **OEM → quote bridge** — on `oem_parts_interest` insert, fan out a `part_quote_requests` row to matched salvage suppliers + email notify.
-6. **Feed health alerts** — daily job that posts to `ops_alerts` when a feed errors or item_count drops > 30%.
-
-Tell me which to build first (one or several) and I'll scope the implementation plan.
+Ask before I start: any category you want me to skip the wizard for (e.g. keep "Other" as a single flat form)?
