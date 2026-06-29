@@ -241,8 +241,13 @@ function PartsAnalyticsPage() {
                 </thead>
                 <tbody>
                   {filters.top_merchants.map((r) => (
-                    <tr key={r.supplier_slug} className="border-t border-border">
-                      <td className="py-1.5 font-mono text-xs">{r.supplier_slug}</td>
+                    <tr
+                      key={r.supplier_slug}
+                      className="cursor-pointer border-t border-border hover:bg-muted/40"
+                      onClick={() => setDrillSlug(r.supplier_slug)}
+                      title="Click to drill down"
+                    >
+                      <td className="py-1.5 font-mono text-xs text-primary underline-offset-2 hover:underline">{r.supplier_slug}</td>
                       <td className="py-1.5 text-right">{r.clicks}</td>
                       <td className="py-1.5 text-right">{r.filtered_clicks}</td>
                       <td className="py-1.5 text-right text-muted-foreground">{r.unfiltered_clicks}</td>
