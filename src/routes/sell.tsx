@@ -1098,15 +1098,14 @@ function SellPage() {
                 ) : null}
                 <div>
                   <Label className="text-xs">Seller type</Label>
-                  <Select value={sellerType} onValueChange={(v: any) => setSellerType(v)}>
-                    <SelectTrigger className="h-9 text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="private">Private seller</SelectItem>
-                      <SelectItem value="business">Business / Dealer</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex h-9 items-center gap-2 rounded-md border border-dashed border-border bg-muted/30 px-2.5 text-sm">
+                    <span className="inline-flex h-5 items-center rounded-full bg-primary/10 px-2 text-[11px] font-medium text-primary">
+                      {sellerType === "business" ? "Business / Dealer" : "Private seller"}
+                    </span>
+                    <span className="truncate text-[11px] text-muted-foreground">
+                      Auto-detected from your profile — shown beside your avatar on the listing.
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
