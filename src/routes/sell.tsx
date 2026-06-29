@@ -2191,9 +2191,9 @@ function SellPage() {
                   <div className="hidden sm:block"><FormFeedbackLink formId="post-listing" /></div>
                 </div>
                 <div className="flex w-full flex-col gap-1 sm:w-auto">
-                  {!canAdvance && i < order.length - 1 && (
+                  {issues.length > 0 && (
                     <div className="text-[11px] text-amber-700">
-                      Add: {issues.join(", ")} to continue
+                      {isLast ? "Missing: " : "Add: "}{issues.join(", ")}{isLast ? "" : " to continue"}
                     </div>
                   )}
                   <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
