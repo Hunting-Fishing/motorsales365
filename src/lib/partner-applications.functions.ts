@@ -116,7 +116,7 @@ export const getPartnerStorefront = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<PartnerStorefront | null> => {
     const sb = publicClient();
     const { data: row } = await sb
-      .from("parts_supplier_applications" as any)
+      .from("partner_storefronts_public" as any)
       .select(
         "storefront_slug,company_name,country,business_kind,website,storefront_blurb,storefront_logo_url,storefront_categories",
       )
@@ -131,7 +131,7 @@ export const listPartnerStorefronts = createServerFn({ method: "GET" }).handler(
   async (): Promise<PartnerStorefront[]> => {
     const sb = publicClient();
     const { data } = await sb
-      .from("parts_supplier_applications" as any)
+      .from("partner_storefronts_public" as any)
       .select(
         "storefront_slug,company_name,country,business_kind,website,storefront_blurb,storefront_logo_url,storefront_categories",
       )
