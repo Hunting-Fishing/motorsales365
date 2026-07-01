@@ -14,6 +14,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { InfluencerDisclosure } from "@/components/influencer-disclosure";
 
 const TITLE = "365 Partner Program — Earn referral commissions";
 const DESCRIPTION =
@@ -43,6 +44,7 @@ function PartnerProgramPage() {
       {/* Hero */}
       <section className="border-b border-border bg-gradient-to-br from-primary/10 via-background to-background">
         <div className="container mx-auto px-4 py-14 md:py-20">
+          <InfluencerDisclosure className="mb-6 max-w-3xl" />
           <Badge variant="secondary" className="mb-4">Independent partners · Philippines</Badge>
           <h1 className="font-display text-4xl font-bold md:text-5xl">365 Partner Program</h1>
           <p className="mt-4 max-w-2xl text-lg text-muted-foreground">

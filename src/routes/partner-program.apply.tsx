@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site-layout";
+import { InfluencerDisclosure } from "@/components/influencer-disclosure";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -101,6 +102,10 @@ function ApplyPage() {
           </Link>{" "}
           before applying.
         </p>
+
+        <InfluencerDisclosure className="mt-4" />
+
+
 
         <Card className="mt-6 p-6">
           <form onSubmit={onSubmit} className="space-y-4">

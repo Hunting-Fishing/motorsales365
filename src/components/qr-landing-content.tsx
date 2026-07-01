@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { getVisitorId, recordTouch } from "@/lib/referral";
 import { Button } from "@/components/ui/button";
+import { InfluencerDisclosure } from "@/components/influencer-disclosure";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -428,8 +429,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
   return (
     <TooltipProvider delayDuration={150}>
       <div className="container mx-auto max-w-7xl px-4 py-6 sm:py-10">
-
-
+        <InfluencerDisclosure className="mb-4" />
 
         {loading ? (
           <p className="text-center text-muted-foreground">Loading…</p>
@@ -810,6 +810,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
           </>
         )}
+        <InfluencerDisclosure variant="footer" />
       </div>
     </TooltipProvider>
   );

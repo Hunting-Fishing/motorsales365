@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
 import { getMyPartnerProgramProfile } from "@/lib/partner-program.functions";
 import { formatPHP } from "@/lib/format";
+import { InfluencerDisclosure } from "@/components/influencer-disclosure";
 
 export const Route = createFileRoute("/dashboard/partner-program")({
   component: PartnerDashboard,
@@ -69,6 +70,17 @@ function PartnerDashboard() {
             {partner.active ? "Active" : "Paused"}
           </Badge>
         </div>
+
+        <InfluencerDisclosure
+          className="mt-4"
+          partnerName={partner.display_name}
+        />
+        <p className="mt-2 text-xs text-muted-foreground">
+          Use this disclosure snippet on every post, video, or channel where you share your
+          link — required for FTC / PH DTI compliance and program terms.
+        </p>
+
+
 
         <div className="mt-6 grid gap-4 md:grid-cols-[240px_1fr]">
           <Card className="flex flex-col items-center gap-3 p-4">
