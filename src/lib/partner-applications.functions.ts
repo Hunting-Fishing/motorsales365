@@ -121,7 +121,6 @@ export const getPartnerStorefront = createServerFn({ method: "GET" })
         "storefront_slug,company_name,country,business_kind,website,storefront_blurb,storefront_logo_url,storefront_categories",
       )
       .eq("storefront_slug", data.slug)
-      .eq("storefront_published", true)
       .maybeSingle();
     return (row as any) ?? null;
   });
@@ -135,7 +134,6 @@ export const listPartnerStorefronts = createServerFn({ method: "GET" }).handler(
       .select(
         "storefront_slug,company_name,country,business_kind,website,storefront_blurb,storefront_logo_url,storefront_categories",
       )
-      .eq("storefront_published", true)
       .order("company_name", { ascending: true });
     return ((data as any) ?? []) as PartnerStorefront[];
   },
