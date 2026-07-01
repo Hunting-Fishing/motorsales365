@@ -71,6 +71,17 @@ function PartnerDashboard() {
           </Badge>
         </div>
 
+        <InfluencerDisclosure
+          className="mt-4"
+          partnerName={partner.display_name}
+        />
+        <p className="mt-2 text-xs text-muted-foreground">
+          Use this disclosure snippet on every post, video, or channel where you share your
+          link — required for FTC / PH DTI compliance and program terms.
+        </p>
+
+
+
         <div className="mt-6 grid gap-4 md:grid-cols-[240px_1fr]">
           <Card className="flex flex-col items-center gap-3 p-4">
             <QRCodeCanvas value={link} size={200} includeMargin />
