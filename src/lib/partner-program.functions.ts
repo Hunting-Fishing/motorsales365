@@ -364,3 +364,168 @@ export const adminListPayoutCandidates = createServerFn({ method: "GET" })
     }
     return Array.from(map.values()).sort((a, b) => b.total - a.total);
   });
+
+/* ============================================================
+ * Partner performance overview (admin)
+ * Aggregates clicks, signups, commissions, chargebacks, payouts
+ * per partner. Exportable via the admin UI.
+ * ============================================================ */
+
+export const adminListPartnerOverview = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureAdmin(context);
+    const sb = context.supabase;
+
+    const [partnersRes, eventsRes, payoutsRes, visitsRes, signupsRes] = await Promise.all([
+      sb.from("partner_program_partners" as any)
+        .select("id, user_id, display_name, referral_code, active, payout_method, created_at")
+        .limit(2000),
+      sb.from("partner_program_commission_events" as any)
+        .select("partner_id, event_type, commission_php, amount_php, status, event_at")
+        .limit(20000),
+      sb.from("partner_program_payouts" as any)
+        .select("id, partner_id, amount_php, status, method, reference, created_at, paid_at")
+        .order("created_at", { ascending: false })
+        .limit(5000),
+      sb.from("referral_visits" as any)
+        .select("credited_referral_code, first_seen_at")
+        .not("credited_referral_code", "is", null)
+        .limit(50000),
+      sb.from("user_referrals" as any)
+        .select("credited_referral_code, signup_date")
+        .not("credited_referral_code", "is", null)
+        .limit(50000),
+    ]);
+
+    if (partnersRes.error) throw partnersRes.error;
+    const partners = (partnersRes.data as any[]) ?? [];
+    const events = (eventsRes.data as any[]) ?? [];
+    const payouts = (payoutsRes.data as any[]) ?? [];
+    const visits = (visitsRes.data as any[]) ?? [];
+    const signups = (signupsRes.data as any[]) ?? [];
+
+    const clicksByCode = new Map<string, number>();
+    for (const v of visits) {
+      const c = String(v.credited_referral_code).toUpperCase();
+      clicksByCode.set(c, (clicksByCode.get(c) ?? 0) + 1);
+    }
+    const signupsByCode = new Map<string, number>();
+    for (const s of signups) {
+      const c = String(s.credited_referral_code).toUpperCase();
+      signupsByCode.set(c, (signupsByCode.get(c) ?? 0) + 1);
+    }
+
+    const byPartner = new Map<string, any>();
+    for (const p of partners) {
+      byPartner.set(p.id, {
+        partner_id: p.id,
+        display_name: p.display_name,
+        referral_code: p.referral_code,
+        active: p.active,
+        payout_method: p.payout_method,
+        created_at: p.created_at,
+        clicks: clicksByCode.get(String(p.referral_code).toUpperCase()) ?? 0,
+        signups: signupsByCode.get(String(p.referral_code).toUpperCase()) ?? 0,
+        events_total: 0,
+        commission_pending: 0,
+        commission_approved: 0,
+        commission_paid: 0,
+        commission_clawed_back: 0,
+        chargebacks: 0,
+        payouts_paid_total: 0,
+        payouts_pending_total: 0,
+        last_event_at: null as string | null,
+      });
+    }
+
+    for (const e of events) {
+      const row = byPartner.get(e.partner_id);
+      if (!row) continue;
+      row.events_total += 1;
+      const amt = Number(e.commission_php) || 0;
+      if (e.status === "pending") row.commission_pending += amt;
+      else if (e.status === "approved") row.commission_approved += amt;
+      else if (e.status === "paid") row.commission_paid += amt;
+      else if (e.status === "clawed_back") {
+        row.commission_clawed_back += amt;
+        row.chargebacks += 1;
+      }
+      if (!row.last_event_at || new Date(e.event_at) > new Date(row.last_event_at)) {
+        row.last_event_at = e.event_at;
+      }
+    }
+
+    for (const p of payouts) {
+      const row = byPartner.get(p.partner_id);
+      if (!row) continue;
+      const amt = Number(p.amount_php) || 0;
+      if (p.status === "paid") row.payouts_paid_total += amt;
+      else if (p.status === "pending" || p.status === "processing") row.payouts_pending_total += amt;
+    }
+
+    const rows = Array.from(byPartner.values()).sort(
+      (a, b) => b.commission_paid + b.commission_approved - (a.commission_paid + a.commission_approved),
+    );
+
+    return {
+      rows,
+      totals: {
+        partners: rows.length,
+        clicks: rows.reduce((s, r) => s + r.clicks, 0),
+        signups: rows.reduce((s, r) => s + r.signups, 0),
+        commission_paid: rows.reduce((s, r) => s + r.commission_paid, 0),
+        commission_approved: rows.reduce((s, r) => s + r.commission_approved, 0),
+        commission_pending: rows.reduce((s, r) => s + r.commission_pending, 0),
+        chargebacks: rows.reduce((s, r) => s + r.chargebacks, 0),
+        clawed_back: rows.reduce((s, r) => s + r.commission_clawed_back, 0),
+      },
+    };
+  });
+
+export const adminGetPartnerHistory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { partner_id: string }) => d)
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const sb = context.supabase;
+    const [partnerRes, eventsRes, payoutsRes] = await Promise.all([
+      sb.from("partner_program_partners" as any)
+        .select("id, display_name, referral_code, user_id, payout_method, payout_details, active, created_at")
+        .eq("id", data.partner_id).maybeSingle(),
+      sb.from("partner_program_commission_events" as any)
+        .select("*")
+        .eq("partner_id", data.partner_id)
+        .order("event_at", { ascending: false })
+        .limit(1000),
+      sb.from("partner_program_payouts" as any)
+        .select("*")
+        .eq("partner_id", data.partner_id)
+        .order("created_at", { ascending: false })
+        .limit(500),
+    ]);
+    if (partnerRes.error) throw partnerRes.error;
+    const partner = partnerRes.data as any;
+
+    let clicks = 0, signups = 0;
+    if (partner?.referral_code) {
+      const [vRes, sRes] = await Promise.all([
+        sb.from("referral_visits" as any)
+          .select("id", { count: "exact", head: true })
+          .eq("credited_referral_code", partner.referral_code),
+        sb.from("user_referrals" as any)
+          .select("id", { count: "exact", head: true })
+          .eq("credited_referral_code", partner.referral_code),
+      ]);
+      clicks = vRes.count ?? 0;
+      signups = sRes.count ?? 0;
+    }
+
+    return {
+      partner,
+      clicks,
+      signups,
+      events: (eventsRes.data as any[]) ?? [],
+      payouts: (payoutsRes.data as any[]) ?? [],
+    };
+  });
