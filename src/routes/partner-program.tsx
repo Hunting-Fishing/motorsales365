@@ -14,6 +14,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { InfluencerDisclosure } from "@/components/influencer-disclosure";
 
 const TITLE = "365 Partner Program — Earn referral commissions";
 const DESCRIPTION =
