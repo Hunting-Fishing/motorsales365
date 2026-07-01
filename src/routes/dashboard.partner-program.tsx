@@ -6,7 +6,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Copy } from "lucide-react";
+import { Copy, CheckCircle2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
 import { getMyPartnerProgramProfile } from "@/lib/partner-program.functions";
@@ -79,6 +79,94 @@ function PartnerDashboard() {
           Use this disclosure snippet on every post, video, or channel where you share your
           link — required for FTC / PH DTI compliance and program terms.
         </p>
+
+        {/* Disclosure verification */}
+        <Card className="mt-6">
+          <div className="flex items-center justify-between gap-3 border-b border-border p-4">
+            <div>
+              <h2 className="font-semibold">Disclosure verification</h2>
+              <p className="text-xs text-muted-foreground">
+                Exact previews of what visitors see on your referral surfaces.
+              </p>
+            </div>
+            <Badge className="bg-green-600 hover:bg-green-600">
+              <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> Live on your referral pages
+            </Badge>
+          </div>
+
+          <div className="grid gap-4 p-4 md:grid-cols-2">
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Banner (top of referral landing)
+              </p>
+              <InfluencerDisclosure variant="banner" partnerName={partner.display_name} />
+            </div>
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Inline (in cards / posts)
+              </p>
+              <div className="rounded-md border border-border bg-card p-3">
+                <InfluencerDisclosure variant="inline" partnerName={partner.display_name} />
+              </div>
+            </div>
+            <div className="md:col-span-2">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Footer (bottom of referral landing)
+              </p>
+              <div className="rounded-md border border-border bg-card px-4 pb-3">
+                <InfluencerDisclosure variant="footer" partnerName={partner.display_name} />
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-border p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Where it appears
+            </p>
+            <ul className="mt-2 space-y-1.5 text-sm">
+              {[
+                `Your referral landing page (/r/${partner.referral_code}) — top banner + footer`,
+                "Partner Program overview page",
+                "Partner application page",
+                "This dashboard",
+              ].map((label) => (
+                <li key={label} className="flex items-start gap-2">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
+                  <span>{label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border p-4">
+            <div className="flex-1 min-w-[220px]">
+              <p className="text-xs text-muted-foreground">Copy-ready snippet for your posts</p>
+              <code className="mt-1 block text-sm">
+                I may earn a commission if you sign up through my 365 Motor Sales link.
+              </code>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  copy("I may earn a commission if you sign up through my 365 Motor Sales link.")
+                }
+              >
+                <Copy className="mr-1 h-3.5 w-3.5" /> Copy snippet
+              </Button>
+              <Button size="sm" asChild>
+                <a
+                  href={`/r/${partner.referral_code}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="mr-1 h-3.5 w-3.5" /> View live
+                </a>
+              </Button>
+            </div>
+          </div>
+        </Card>
 
 
 
