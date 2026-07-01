@@ -29,6 +29,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as PartsRouteImport } from './routes/parts'
 import { Route as PartnerTrainingRouteImport } from './routes/partner-training'
+import { Route as PartnerProgramRouteImport } from './routes/partner-program'
 import { Route as MyQrRouteImport } from './routes/my-qr'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as LoginRouteImport } from './routes/login'
@@ -81,6 +82,8 @@ import { Route as PassportPremiumCheckoutRouteImport } from './routes/passport-p
 import { Route as PartsSearchRouteImport } from './routes/parts.search'
 import { Route as PartsCategoriesRouteImport } from './routes/parts.categories'
 import { Route as PartnersPartsRouteImport } from './routes/partners.parts'
+import { Route as PartnerProgramTermsRouteImport } from './routes/partner-program.terms'
+import { Route as PartnerProgramApplyRouteImport } from './routes/partner-program.apply'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnMechanicsRouteImport } from './routes/learn.mechanics'
@@ -109,6 +112,7 @@ import { Route as DashboardReferralRouteImport } from './routes/dashboard.referr
 import { Route as DashboardQrAdsRouteImport } from './routes/dashboard.qr-ads'
 import { Route as DashboardPromoterResourcesRouteImport } from './routes/dashboard.promoter-resources'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
+import { Route as DashboardPartnerProgramRouteImport } from './routes/dashboard.partner-program'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
 import { Route as DashboardLearningRouteImport } from './routes/dashboard.learning'
@@ -148,6 +152,7 @@ import { Route as AdminPermissionsRouteImport } from './routes/admin.permissions
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminPartsRouteImport } from './routes/admin.parts'
+import { Route as AdminPartnerProgramRouteImport } from './routes/admin.partner-program'
 import { Route as AdminLocationCorrectionsRouteImport } from './routes/admin.location-corrections'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminLeadOffersRouteImport } from './routes/admin.lead-offers'
@@ -348,6 +353,11 @@ const PartsRoute = PartsRouteImport.update({
 const PartnerTrainingRoute = PartnerTrainingRouteImport.update({
   id: '/partner-training',
   path: '/partner-training',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerProgramRoute = PartnerProgramRouteImport.update({
+  id: '/partner-program',
+  path: '/partner-program',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyQrRoute = MyQrRouteImport.update({
@@ -609,6 +619,16 @@ const PartnersPartsRoute = PartnersPartsRouteImport.update({
   path: '/partners/parts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerProgramTermsRoute = PartnerProgramTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => PartnerProgramRoute,
+} as any)
+const PartnerProgramApplyRoute = PartnerProgramApplyRouteImport.update({
+  id: '/apply',
+  path: '/apply',
+  getParentRoute: () => PartnerProgramRoute,
+} as any)
 const ListingCheckoutRoute = ListingCheckoutRouteImport.update({
   id: '/listing/checkout',
   path: '/listing/checkout',
@@ -748,6 +768,11 @@ const DashboardPromoterResourcesRoute =
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPartnerProgramRoute = DashboardPartnerProgramRouteImport.update({
+  id: '/partner-program',
+  path: '/partner-program',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardMessagesRoute = DashboardMessagesRouteImport.update({
@@ -944,6 +969,11 @@ const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
 const AdminPartsRoute = AdminPartsRouteImport.update({
   id: '/parts',
   path: '/parts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPartnerProgramRoute = AdminPartnerProgramRouteImport.update({
+  id: '/partner-program',
+  path: '/partner-program',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLocationCorrectionsRoute =
@@ -1523,6 +1553,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
+  '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
   '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
@@ -1561,6 +1592,7 @@ export interface FileRoutesByFullPath {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/partner-program': typeof AdminPartnerProgramRoute
   '/admin/parts': typeof AdminPartsRouteWithChildren
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -1600,6 +1632,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
   '/dashboard/qr-ads': typeof DashboardQrAdsRoute
@@ -1628,6 +1661,8 @@ export interface FileRoutesByFullPath {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/partner-program/apply': typeof PartnerProgramApplyRoute
+  '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/search': typeof PartsSearchRoute
@@ -1761,6 +1796,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
+  '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
   '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
@@ -1798,6 +1834,7 @@ export interface FileRoutesByTo {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/partner-program': typeof AdminPartnerProgramRoute
   '/admin/parts': typeof AdminPartsRouteWithChildren
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -1837,6 +1874,7 @@ export interface FileRoutesByTo {
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
   '/dashboard/qr-ads': typeof DashboardQrAdsRoute
@@ -1864,6 +1902,8 @@ export interface FileRoutesByTo {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/partner-program/apply': typeof PartnerProgramApplyRoute
+  '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/search': typeof PartsSearchRoute
@@ -2001,6 +2041,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
+  '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
   '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
@@ -2039,6 +2080,7 @@ export interface FileRoutesById {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/partner-program': typeof AdminPartnerProgramRoute
   '/admin/parts': typeof AdminPartsRouteWithChildren
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -2078,6 +2120,7 @@ export interface FileRoutesById {
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
   '/dashboard/qr-ads': typeof DashboardQrAdsRoute
@@ -2106,6 +2149,8 @@ export interface FileRoutesById {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/partner-program/apply': typeof PartnerProgramApplyRoute
+  '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/search': typeof PartsSearchRoute
@@ -2244,6 +2289,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/map'
     | '/my-qr'
+    | '/partner-program'
     | '/partner-training'
     | '/parts'
     | '/payments'
@@ -2282,6 +2328,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/partner-program'
     | '/admin/parts'
     | '/admin/payments'
     | '/admin/performance'
@@ -2321,6 +2368,7 @@ export interface FileRouteTypes {
     | '/dashboard/learning'
     | '/dashboard/likes'
     | '/dashboard/messages'
+    | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
     | '/dashboard/qr-ads'
@@ -2349,6 +2397,8 @@ export interface FileRouteTypes {
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
+    | '/partner-program/apply'
+    | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/search'
@@ -2482,6 +2532,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/map'
     | '/my-qr'
+    | '/partner-program'
     | '/partner-training'
     | '/parts'
     | '/payments'
@@ -2519,6 +2570,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/partner-program'
     | '/admin/parts'
     | '/admin/payments'
     | '/admin/performance'
@@ -2558,6 +2610,7 @@ export interface FileRouteTypes {
     | '/dashboard/learning'
     | '/dashboard/likes'
     | '/dashboard/messages'
+    | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
     | '/dashboard/qr-ads'
@@ -2585,6 +2638,8 @@ export interface FileRouteTypes {
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
+    | '/partner-program/apply'
+    | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/search'
@@ -2721,6 +2776,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/map'
     | '/my-qr'
+    | '/partner-program'
     | '/partner-training'
     | '/parts'
     | '/payments'
@@ -2759,6 +2815,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/partner-program'
     | '/admin/parts'
     | '/admin/payments'
     | '/admin/performance'
@@ -2798,6 +2855,7 @@ export interface FileRouteTypes {
     | '/dashboard/learning'
     | '/dashboard/likes'
     | '/dashboard/messages'
+    | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
     | '/dashboard/qr-ads'
@@ -2826,6 +2884,8 @@ export interface FileRouteTypes {
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
+    | '/partner-program/apply'
+    | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/search'
@@ -2964,6 +3024,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
   MyQrRoute: typeof MyQrRoute
+  PartnerProgramRoute: typeof PartnerProgramRouteWithChildren
   PartnerTrainingRoute: typeof PartnerTrainingRoute
   PartsRoute: typeof PartsRouteWithChildren
   PaymentsRoute: typeof PaymentsRouteWithChildren
@@ -3207,6 +3268,13 @@ declare module '@tanstack/react-router' {
       path: '/partner-training'
       fullPath: '/partner-training'
       preLoaderRoute: typeof PartnerTrainingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner-program': {
+      id: '/partner-program'
+      path: '/partner-program'
+      fullPath: '/partner-program'
+      preLoaderRoute: typeof PartnerProgramRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-qr': {
@@ -3573,6 +3641,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartnersPartsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partner-program/terms': {
+      id: '/partner-program/terms'
+      path: '/terms'
+      fullPath: '/partner-program/terms'
+      preLoaderRoute: typeof PartnerProgramTermsRouteImport
+      parentRoute: typeof PartnerProgramRoute
+    }
+    '/partner-program/apply': {
+      id: '/partner-program/apply'
+      path: '/apply'
+      fullPath: '/partner-program/apply'
+      preLoaderRoute: typeof PartnerProgramApplyRouteImport
+      parentRoute: typeof PartnerProgramRoute
+    }
     '/listing/checkout': {
       id: '/listing/checkout'
       path: '/listing/checkout'
@@ -3767,6 +3849,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/dashboard/profile'
       preLoaderRoute: typeof DashboardProfileRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/partner-program': {
+      id: '/dashboard/partner-program'
+      path: '/partner-program'
+      fullPath: '/dashboard/partner-program'
+      preLoaderRoute: typeof DashboardPartnerProgramRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/messages': {
@@ -4040,6 +4129,13 @@ declare module '@tanstack/react-router' {
       path: '/parts'
       fullPath: '/admin/parts'
       preLoaderRoute: typeof AdminPartsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/partner-program': {
+      id: '/admin/partner-program'
+      path: '/partner-program'
+      fullPath: '/admin/partner-program'
+      preLoaderRoute: typeof AdminPartnerProgramRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/location-corrections': {
@@ -4862,6 +4958,7 @@ interface AdminRouteChildren {
   AdminLeadOffersRoute: typeof AdminLeadOffersRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminLocationCorrectionsRoute: typeof AdminLocationCorrectionsRoute
+  AdminPartnerProgramRoute: typeof AdminPartnerProgramRoute
   AdminPartsRoute: typeof AdminPartsRouteWithChildren
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
@@ -4905,6 +5002,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLeadOffersRoute: AdminLeadOffersRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminLocationCorrectionsRoute: AdminLocationCorrectionsRoute,
+  AdminPartnerProgramRoute: AdminPartnerProgramRoute,
   AdminPartsRoute: AdminPartsRouteWithChildren,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
@@ -5006,6 +5104,7 @@ interface DashboardRouteChildren {
   DashboardLearningRoute: typeof DashboardLearningRoute
   DashboardLikesRoute: typeof DashboardLikesRoute
   DashboardMessagesRoute: typeof DashboardMessagesRoute
+  DashboardPartnerProgramRoute: typeof DashboardPartnerProgramRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardPromoterResourcesRoute: typeof DashboardPromoterResourcesRoute
   DashboardQrAdsRoute: typeof DashboardQrAdsRoute
@@ -5039,6 +5138,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLearningRoute: DashboardLearningRoute,
   DashboardLikesRoute: DashboardLikesRoute,
   DashboardMessagesRoute: DashboardMessagesRoute,
+  DashboardPartnerProgramRoute: DashboardPartnerProgramRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardPromoterResourcesRoute: DashboardPromoterResourcesRoute,
   DashboardQrAdsRoute: DashboardQrAdsRoute,
@@ -5092,6 +5192,20 @@ const ExportRouteChildren: ExportRouteChildren = {
 
 const ExportRouteWithChildren =
   ExportRoute._addFileChildren(ExportRouteChildren)
+
+interface PartnerProgramRouteChildren {
+  PartnerProgramApplyRoute: typeof PartnerProgramApplyRoute
+  PartnerProgramTermsRoute: typeof PartnerProgramTermsRoute
+}
+
+const PartnerProgramRouteChildren: PartnerProgramRouteChildren = {
+  PartnerProgramApplyRoute: PartnerProgramApplyRoute,
+  PartnerProgramTermsRoute: PartnerProgramTermsRoute,
+}
+
+const PartnerProgramRouteWithChildren = PartnerProgramRoute._addFileChildren(
+  PartnerProgramRouteChildren,
+)
 
 interface PartsRouteChildren {
   PartsCategoriesRoute: typeof PartsCategoriesRoute
@@ -5188,6 +5302,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MapRoute: MapRoute,
   MyQrRoute: MyQrRoute,
+  PartnerProgramRoute: PartnerProgramRouteWithChildren,
   PartnerTrainingRoute: PartnerTrainingRoute,
   PartsRoute: PartsRouteWithChildren,
   PaymentsRoute: PaymentsRouteWithChildren,
