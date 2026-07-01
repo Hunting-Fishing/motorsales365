@@ -10826,6 +10826,39 @@ export type Database = {
           },
         ]
       }
+      partner_storefronts_public: {
+        Row: {
+          business_kind: string | null
+          company_name: string | null
+          country: string | null
+          storefront_blurb: string | null
+          storefront_categories: string[] | null
+          storefront_logo_url: string | null
+          storefront_slug: string | null
+          website: string | null
+        }
+        Insert: {
+          business_kind?: string | null
+          company_name?: string | null
+          country?: string | null
+          storefront_blurb?: string | null
+          storefront_categories?: string[] | null
+          storefront_logo_url?: string | null
+          storefront_slug?: string | null
+          website?: string | null
+        }
+        Update: {
+          business_kind?: string | null
+          company_name?: string | null
+          country?: string | null
+          storefront_blurb?: string | null
+          storefront_categories?: string[] | null
+          storefront_logo_url?: string | null
+          storefront_slug?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       public_profiles: {
         Row: {
           avatar_url: string | null
@@ -10946,6 +10979,41 @@ export type Database = {
         }
         Relationships: []
       }
+      wanted_post_responses_public: {
+        Row: {
+          business_id: string | null
+          created_at: string | null
+          id: string | null
+          listing_id: string | null
+          message: string | null
+          updated_at: string | null
+          user_id: string | null
+          wanted_post_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wanted_post_responses_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wanted_post_responses_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wanted_post_responses_wanted_post_id_fkey"
+            columns: ["wanted_post_id"]
+            isOneToOne: false
+            referencedRelation: "wanted_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_org_invite: { Args: { _token: string }; Returns: Json }
@@ -11010,6 +11078,7 @@ export type Database = {
           priority: number
         }[]
       }
+      email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
