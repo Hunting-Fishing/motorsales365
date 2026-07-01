@@ -199,6 +199,7 @@ import { Route as AdminPartsOutreachRouteImport } from './routes/admin.parts.out
 import { Route as AdminPartsFeedsRouteImport } from './routes/admin.parts.feeds'
 import { Route as AdminPartsCommissionsRouteImport } from './routes/admin.parts.commissions'
 import { Route as AdminPartsAnalyticsRouteImport } from './routes/admin.parts.analytics'
+import { Route as AdminPartnerProgramOverviewRouteImport } from './routes/admin.partner-program.overview'
 import { Route as AdminPartnerProgramLedgerRouteImport } from './routes/admin.partner-program.ledger'
 import { Route as AdminAdvertisementsSlotsRouteImport } from './routes/admin.advertisements.slots'
 import { Route as AdminAdvertisementsQrAdsRouteImport } from './routes/admin.advertisements.qr-ads'
@@ -1212,6 +1213,12 @@ const AdminPartsAnalyticsRoute = AdminPartsAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminPartsRoute,
 } as any)
+const AdminPartnerProgramOverviewRoute =
+  AdminPartnerProgramOverviewRouteImport.update({
+    id: '/overview',
+    path: '/overview',
+    getParentRoute: () => AdminPartnerProgramRoute,
+  } as any)
 const AdminPartnerProgramLedgerRoute =
   AdminPartnerProgramLedgerRouteImport.update({
     id: '/ledger',
@@ -1720,6 +1727,7 @@ export interface FileRoutesByFullPath {
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/partner-program/ledger': typeof AdminPartnerProgramLedgerRoute
+  '/admin/partner-program/overview': typeof AdminPartnerProgramOverviewRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
@@ -1962,6 +1970,7 @@ export interface FileRoutesByTo {
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/partner-program/ledger': typeof AdminPartnerProgramLedgerRoute
+  '/admin/partner-program/overview': typeof AdminPartnerProgramOverviewRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
@@ -2210,6 +2219,7 @@ export interface FileRoutesById {
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/partner-program/ledger': typeof AdminPartnerProgramLedgerRoute
+  '/admin/partner-program/overview': typeof AdminPartnerProgramOverviewRoute
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
@@ -2459,6 +2469,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/slots'
     | '/admin/partner-program/ledger'
+    | '/admin/partner-program/overview'
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
     | '/admin/parts/feeds'
@@ -2701,6 +2712,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/slots'
     | '/admin/partner-program/ledger'
+    | '/admin/partner-program/overview'
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
     | '/admin/parts/feeds'
@@ -2948,6 +2960,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/slots'
     | '/admin/partner-program/ledger'
+    | '/admin/partner-program/overview'
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
     | '/admin/parts/feeds'
@@ -4473,6 +4486,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPartsAnalyticsRouteImport
       parentRoute: typeof AdminPartsRoute
     }
+    '/admin/partner-program/overview': {
+      id: '/admin/partner-program/overview'
+      path: '/overview'
+      fullPath: '/admin/partner-program/overview'
+      preLoaderRoute: typeof AdminPartnerProgramOverviewRouteImport
+      parentRoute: typeof AdminPartnerProgramRoute
+    }
     '/admin/partner-program/ledger': {
       id: '/admin/partner-program/ledger'
       path: '/ledger'
@@ -4943,10 +4963,12 @@ const AdminAdvertisementsRouteWithChildren =
 
 interface AdminPartnerProgramRouteChildren {
   AdminPartnerProgramLedgerRoute: typeof AdminPartnerProgramLedgerRoute
+  AdminPartnerProgramOverviewRoute: typeof AdminPartnerProgramOverviewRoute
 }
 
 const AdminPartnerProgramRouteChildren: AdminPartnerProgramRouteChildren = {
   AdminPartnerProgramLedgerRoute: AdminPartnerProgramLedgerRoute,
+  AdminPartnerProgramOverviewRoute: AdminPartnerProgramOverviewRoute,
 }
 
 const AdminPartnerProgramRouteWithChildren =
