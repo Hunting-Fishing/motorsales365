@@ -103,6 +103,10 @@ function ApplyPage() {
           before applying.
         </p>
 
+        <InfluencerDisclosure className="mt-4" />
+
+
+
         <Card className="mt-6 p-6">
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
