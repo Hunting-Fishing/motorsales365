@@ -5882,6 +5882,11 @@ export type Database = {
       partner_program_commission_events: {
         Row: {
           amount_php: number
+          approved_at: string | null
+          approved_by: string | null
+          clawed_back_at: string | null
+          clawed_back_by: string | null
+          clawed_back_reason: string | null
           cleared_at: string | null
           commission_php: number
           created_at: string
@@ -5889,12 +5894,19 @@ export type Database = {
           event_type: string
           id: string
           notes: string | null
+          paid_at: string | null
           partner_id: string
+          payout_id: string | null
           source_ref: string | null
           status: string
         }
         Insert: {
           amount_php?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          clawed_back_at?: string | null
+          clawed_back_by?: string | null
+          clawed_back_reason?: string | null
           cleared_at?: string | null
           commission_php?: number
           created_at?: string
@@ -5902,12 +5914,19 @@ export type Database = {
           event_type: string
           id?: string
           notes?: string | null
+          paid_at?: string | null
           partner_id: string
+          payout_id?: string | null
           source_ref?: string | null
           status?: string
         }
         Update: {
           amount_php?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          clawed_back_at?: string | null
+          clawed_back_by?: string | null
+          clawed_back_reason?: string | null
           cleared_at?: string | null
           commission_php?: number
           created_at?: string
@@ -5915,7 +5934,9 @@ export type Database = {
           event_type?: string
           id?: string
           notes?: string | null
+          paid_at?: string | null
           partner_id?: string
+          payout_id?: string | null
           source_ref?: string | null
           status?: string
         }
@@ -5925,6 +5946,13 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "partner_program_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_program_commission_events_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "partner_program_payouts"
             referencedColumns: ["id"]
           },
         ]
@@ -5978,6 +6006,59 @@ export type Database = {
             columns: ["application_id"]
             isOneToOne: false
             referencedRelation: "partner_program_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_program_payouts: {
+        Row: {
+          amount_php: number
+          created_at: string
+          created_by: string | null
+          id: string
+          method: string
+          notes: string | null
+          paid_at: string | null
+          paid_by: string | null
+          partner_id: string
+          reference: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_php?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          method?: string
+          notes?: string | null
+          paid_at?: string | null
+          paid_by?: string | null
+          partner_id: string
+          reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_php?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          method?: string
+          notes?: string | null
+          paid_at?: string | null
+          paid_by?: string | null
+          partner_id?: string
+          reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_program_payouts_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partner_program_partners"
             referencedColumns: ["id"]
           },
         ]
@@ -11466,6 +11547,10 @@ export type Database = {
           referral_code: string
           staff_referral_id: string
         }[]
+      }
+      pp_recompute_payout_total: {
+        Args: { _payout_id: string }
+        Returns: undefined
       }
       preview_org_invite: { Args: { _token: string }; Returns: Json }
       preview_referral_discount: {
