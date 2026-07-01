@@ -50,9 +50,14 @@ function LedgerPage() {
               Approve commissions, handle refunds/chargebacks, and process payouts.
             </p>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/admin/partner-program">Applications</Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to="/admin/partner-program">Applications</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/admin/partner-program/overview">Performance</Link>
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="events" className="mt-6">
