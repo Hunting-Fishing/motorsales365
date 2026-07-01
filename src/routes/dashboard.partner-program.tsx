@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
 import { getMyPartnerProgramProfile } from "@/lib/partner-program.functions";
 import { formatPHP } from "@/lib/format";
+import { InfluencerDisclosure } from "@/components/influencer-disclosure";
 
 export const Route = createFileRoute("/dashboard/partner-program")({
   component: PartnerDashboard,
