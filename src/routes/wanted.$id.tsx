@@ -69,16 +69,31 @@ function WantedDetail() {
       const [{ data: p }, { data: r }] = await Promise.all([
         (supabase as any).from("wanted_posts").select("*").eq("id", id).maybeSingle(),
         (supabase as any)
-          .from("wanted_post_responses")
+          .from("wanted_post_responses_public")
           .select("*")
           .eq("wanted_post_id", id)
           .order("created_at", { ascending: false }),
       ]);
+      let rows = (r ?? []) as Response[];
+      // contact_value is only visible to the responder or the wanted-post owner
+      // (RLS on the base table enforces this).
+      if (user) {
+        const { data: withContact } = await (supabase as any)
+          .from("wanted_post_responses")
+          .select("id,contact_value")
+          .eq("wanted_post_id", id);
+        if (withContact) {
+          const byId = new Map<string, string | null>(
+            (withContact as any[]).map((x) => [x.id, x.contact_value ?? null]),
+          );
+          rows = rows.map((row) => ({ ...row, contact_value: byId.get(row.id) ?? null }));
+        }
+      }
       setPost(p as WantedPost | null);
-      setResponses((r ?? []) as Response[]);
+      setResponses(rows);
       setLoading(false);
     })();
-  }, [id, refreshKey]);
+  }, [id, refreshKey, user]);
 
   async function submitResponse(e: React.FormEvent) {
     e.preventDefault();
