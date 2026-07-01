@@ -5813,6 +5813,175 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_program_applications: {
+        Row: {
+          admin_notes: string | null
+          agreed_terms: boolean
+          agreed_terms_at: string | null
+          audience_band: string | null
+          channel_type: string
+          city: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          phone: string | null
+          pitch: string | null
+          platforms: string[]
+          region: string | null
+          reviewed_at: string | null
+          reviewer_id: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          agreed_terms?: boolean
+          agreed_terms_at?: string | null
+          audience_band?: string | null
+          channel_type: string
+          city?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          pitch?: string | null
+          platforms?: string[]
+          region?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          agreed_terms?: boolean
+          agreed_terms_at?: string | null
+          audience_band?: string | null
+          channel_type?: string
+          city?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          pitch?: string | null
+          platforms?: string[]
+          region?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      partner_program_commission_events: {
+        Row: {
+          amount_php: number
+          cleared_at: string | null
+          commission_php: number
+          created_at: string
+          event_at: string
+          event_type: string
+          id: string
+          notes: string | null
+          partner_id: string
+          source_ref: string | null
+          status: string
+        }
+        Insert: {
+          amount_php?: number
+          cleared_at?: string | null
+          commission_php?: number
+          created_at?: string
+          event_at?: string
+          event_type: string
+          id?: string
+          notes?: string | null
+          partner_id: string
+          source_ref?: string | null
+          status?: string
+        }
+        Update: {
+          amount_php?: number
+          cleared_at?: string | null
+          commission_php?: number
+          created_at?: string
+          event_at?: string
+          event_type?: string
+          id?: string
+          notes?: string | null
+          partner_id?: string
+          source_ref?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_program_commission_events_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partner_program_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_program_partners: {
+        Row: {
+          active: boolean
+          agreed_terms_at: string | null
+          agreed_terms_version: string | null
+          application_id: string | null
+          created_at: string
+          display_name: string
+          id: string
+          payout_details: Json
+          payout_method: string | null
+          referral_code: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          agreed_terms_at?: string | null
+          agreed_terms_version?: string | null
+          application_id?: string | null
+          created_at?: string
+          display_name: string
+          id?: string
+          payout_details?: Json
+          payout_method?: string | null
+          referral_code: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          agreed_terms_at?: string | null
+          agreed_terms_version?: string | null
+          application_id?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          payout_details?: Json
+          payout_method?: string | null
+          referral_code?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_program_partners_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "partner_program_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parts_catalog: {
         Row: {
           active: boolean
