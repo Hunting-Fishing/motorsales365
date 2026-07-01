@@ -36,10 +36,17 @@ function AdminPartnerProgram() {
   return (
     <SiteLayout>
       <div className="container mx-auto max-w-5xl px-4 py-8">
-        <h1 className="font-display text-3xl font-bold">Partner Program applications</h1>
-        <p className="text-sm text-muted-foreground">
-          Review and approve independent partner applications.
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-display text-3xl font-bold">Partner Program applications</h1>
+            <p className="text-sm text-muted-foreground">
+              Review and approve independent partner applications.
+            </p>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <a href="/admin/partner-program/ledger">Commission ledger →</a>
+          </Button>
+        </div>
 
         <div className="mt-6 space-y-3">
           {isLoading ? (

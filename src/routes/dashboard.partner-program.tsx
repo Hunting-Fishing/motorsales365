@@ -124,6 +124,33 @@ function PartnerDashboard() {
           </div>
         </Card>
 
+        <Card className="mt-6">
+          <div className="border-b border-border p-4">
+            <h2 className="font-semibold">Payout history</h2>
+          </div>
+          <div className="divide-y divide-border">
+            {((data as any).payouts ?? []).length === 0 ? (
+              <p className="p-6 text-center text-sm text-muted-foreground">No payouts yet.</p>
+            ) : (
+              (data as any).payouts.map((p: any) => (
+                <div key={p.id} className="flex items-center justify-between gap-3 p-3 text-sm">
+                  <div>
+                    <p className="font-medium capitalize">{p.method}{p.reference ? ` · ${p.reference}` : ""}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(p.created_at).toLocaleDateString()}
+                      {p.paid_at ? ` · paid ${new Date(p.paid_at).toLocaleDateString()}` : ""}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold">{formatPHP(Number(p.amount_php))}</p>
+                    <Badge variant="outline" className="mt-1 capitalize">{p.status}</Badge>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
+
         <Card className="mt-6 border-amber-500/40 bg-amber-50/40 p-4 dark:bg-amber-950/20">
           <p className="text-sm font-semibold">Disclosure reminder</p>
           <p className="mt-1 text-sm text-muted-foreground">
