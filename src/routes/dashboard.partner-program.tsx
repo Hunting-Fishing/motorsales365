@@ -21,6 +21,10 @@ export const Route = createFileRoute("/dashboard/partner-program")({
   component: PartnerDashboard,
 });
 
+/** Shared card interaction pattern across the partner dashboard. */
+const INTERACTIVE_CARD =
+  "rounded-2xl border-border/70 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md active:translate-y-0 active:shadow-sm";
+
 function PartnerDashboard() {
   const fetchProfile = useServerFn(getMyPartnerProgramProfile);
   const { trackCta } = usePromoterAnalytics("dashboard_partner_program");
@@ -33,10 +37,33 @@ function PartnerDashboard() {
   if (isLoading) {
     return (
       <SiteLayout>
-        <div className="container mx-auto px-4 py-10">Loading…</div>
+        <div
+          className="container mx-auto max-w-5xl px-4 py-8"
+          role="status"
+          aria-label="Loading your partner dashboard"
+        >
+          {/* Hero skeleton */}
+          <Skeleton className="h-40 w-full rounded-3xl" />
+
+          {/* QR + stats skeleton */}
+          <div className="mt-6 grid gap-4 md:grid-cols-[260px_1fr]">
+            <Skeleton className="h-[300px] rounded-2xl" />
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-24 rounded-2xl" />
+              ))}
+            </div>
+          </div>
+
+          {/* Section skeletons */}
+          <Skeleton className="mt-6 h-72 rounded-2xl" />
+          <Skeleton className="mt-6 h-48 rounded-2xl" />
+          <Skeleton className="mt-6 h-40 rounded-2xl" />
+        </div>
       </SiteLayout>
     );
   }
+
 
   if (!data?.partner) {
     return (
