@@ -22,6 +22,11 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { siteOrigin } from "@/lib/site-config";
+import {
+  usePromoterAnalytics,
+  useDisclosureImpressionOnVisible,
+} from "@/lib/use-promoter-analytics";
+
 
 export const Route = createFileRoute("/dashboard/promoter-resources")({
   head: () => ({
@@ -165,6 +170,12 @@ const WALKTHROUGH = [
 function PromoterResources() {
   const [code, setCode] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const { trackCta } = usePromoterAnalytics("promoter_resources");
+  const complianceStripRef = useDisclosureImpressionOnVisible(
+    "promoter_resources",
+    "compliance_strip",
+    code,
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -198,6 +209,7 @@ function PromoterResources() {
 
   return (
     <div className="space-y-6">
+
       {/* Premium hero */}
       <header className="relative overflow-hidden rounded-3xl bg-slate-950 p-6 text-white shadow-xl sm:p-8">
         <div className="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full bg-primary/40 blur-3xl" />
@@ -214,7 +226,7 @@ function PromoterResources() {
             </p>
           </div>
           <div className="col-span-2 flex flex-wrap gap-2 sm:col-auto">
-            <Link to="/dashboard/referral">
+            <Link to="/dashboard/referral" onClick={() => trackCta("my_qr_stats", { partner_code: code })}>
               <Button
                 size="sm"
                 variant="outline"
@@ -224,7 +236,7 @@ function PromoterResources() {
                 <QrCode className="mr-1.5 h-4 w-4" aria-hidden="true" /> My QR &amp; stats
               </Button>
             </Link>
-            <Link to="/resources/qr-landing">
+            <Link to="/resources/qr-landing" onClick={() => trackCta("preview_scanner", { partner_code: code, meta: { location: "hero" } })}>
               <Button
                 size="sm"
                 aria-label="Preview the landing page visitors see after scanning"
@@ -233,6 +245,7 @@ function PromoterResources() {
                 <Eye className="mr-1.5 h-4 w-4" aria-hidden="true" /> Preview scanner view
               </Button>
             </Link>
+
           </div>
 
         </div>
@@ -251,10 +264,12 @@ function PromoterResources() {
 
       {/* Compliance strip — mobile-safe grid, stacks button below */}
       <aside
+        ref={complianceStripRef as React.RefObject<HTMLElement>}
         role="region"
         aria-labelledby="promoter-disclosure-title"
         className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-50 to-amber-100/40 p-4 shadow-sm dark:from-amber-950/30 dark:to-amber-950/10 dark:border-amber-500/20 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center"
       >
+
         <div
           aria-hidden="true"
           className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-300"
@@ -274,10 +289,12 @@ function PromoterResources() {
             <Link
               to="/partner-program/terms"
               className="font-semibold underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2 rounded"
+              onClick={() => trackCta("terms", { partner_code: code, meta: { location: "compliance_strip" } })}
             >
               Partner Terms
             </Link>
             .
+
           </p>
         </div>
         <div className="col-span-2 sm:col-auto">
@@ -287,12 +304,14 @@ function PromoterResources() {
             aria-label="Copy the required disclosure snippet to your clipboard"
             className="w-full border-amber-500/50 bg-white/70 text-amber-950 hover:bg-white focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2 sm:w-auto dark:bg-amber-950/30 dark:text-amber-100 dark:hover:bg-amber-950/50"
             onClick={() => {
+              trackCta("copy_snippet", { partner_code: code, meta: { location: "compliance_strip" } });
               navigator.clipboard
                 .writeText(
                   "Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner",
                 )
                 .then(() => toast.success("Snippet copied"));
             }}
+
           >
             <Copy className="mr-1.5 h-4 w-4" aria-hidden="true" /> Copy snippet
           </Button>
