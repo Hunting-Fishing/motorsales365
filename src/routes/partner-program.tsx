@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { InfluencerDisclosure } from "@/components/influencer-disclosure";
+import { usePromoterAnalytics } from "@/lib/use-promoter-analytics";
+
 
 const TITLE = "365 Partner Program — Earn referral commissions";
 const DESCRIPTION =
@@ -38,6 +40,7 @@ function copy(text: string) {
   navigator.clipboard.writeText(text).then(() => toast.success("Copied"));
 }
 
+
 const HOW_IT_WORKS = [
   {
     icon: QrCode,
@@ -60,6 +63,7 @@ const HOW_IT_WORKS = [
 ];
 
 function PartnerProgramPage() {
+  const { trackCta } = usePromoterAnalytics("partner_program");
   return (
     <SiteLayout>
       {/* Hero — premium dark panel */}
@@ -68,8 +72,9 @@ function PartnerProgramPage() {
         <div className="pointer-events-none absolute -bottom-32 -left-16 h-[320px] w-[320px] rounded-full bg-amber-500/20 blur-[110px]" />
         <div className="container relative mx-auto px-4 py-14 md:py-24">
           <div className="max-w-3xl">
-            <InfluencerDisclosure className="mb-8" />
+            <InfluencerDisclosure className="mb-8" analyticsSurface="partner_program" />
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white/80 backdrop-blur">
+
               Independent partners · Philippines
             </span>
             <h1 className="font-display mt-5 text-4xl font-bold leading-[1.05] md:text-6xl">
@@ -88,7 +93,7 @@ function PartnerProgramPage() {
                 size="lg"
                 className="shadow-lg shadow-primary/30 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >
-                <Link to="/partner-program/apply" aria-label="Apply to become a 365 Motor Sales partner">Apply to become a Partner</Link>
+                <Link to="/partner-program/apply" aria-label="Apply to become a 365 Motor Sales partner" onClick={() => trackCta("apply", { meta: { location: "hero" } })}>Apply to become a Partner</Link>
               </Button>
               <Button
                 asChild
@@ -96,7 +101,7 @@ function PartnerProgramPage() {
                 variant="outline"
                 className="border-white/25 bg-white/5 text-white hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >
-                <Link to="/partner-program/terms" aria-label="Read the Partner Program terms">Read the Partner Terms</Link>
+                <Link to="/partner-program/terms" aria-label="Read the Partner Program terms" onClick={() => trackCta("terms", { meta: { location: "hero" } })}>Read the Partner Terms</Link>
               </Button>
             </div>
             <p className="mt-4 text-xs text-white/75">
@@ -237,9 +242,17 @@ function PartnerProgramPage() {
           ].map((t) => (
             <div key={t} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
               <code className="text-sm">{t}</code>
-              <Button size="sm" variant="ghost" onClick={() => copy(t)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  trackCta("copy_snippet", { meta: { snippet: t } });
+                  copy(t);
+                }}
+              >
                 <Copy className="mr-1 h-3.5 w-3.5" /> Copy
               </Button>
+
             </div>
           ))}
         </div>
@@ -287,12 +300,13 @@ function PartnerProgramPage() {
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button asChild size="lg">
-              <Link to="/partner-program/apply">Apply now</Link>
+              <Link to="/partner-program/apply" onClick={() => trackCta("apply", { meta: { location: "footer" } })}>Apply now</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link to="/partner-program/terms">Partner Terms</Link>
+              <Link to="/partner-program/terms" onClick={() => trackCta("terms", { meta: { location: "footer" } })}>Partner Terms</Link>
             </Button>
           </div>
+
         </div>
       </section>
     </SiteLayout>

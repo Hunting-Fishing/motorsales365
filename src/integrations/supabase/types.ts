@@ -7464,6 +7464,51 @@ export type Database = {
           },
         ]
       }
+      promoter_analytics_events: {
+        Row: {
+          created_at: string
+          cta_id: string | null
+          event: string
+          id: string
+          meta: Json | null
+          partner_code: string | null
+          path: string | null
+          referrer: string | null
+          session_hash: string | null
+          surface: string
+          user_id: string | null
+          variant: string | null
+        }
+        Insert: {
+          created_at?: string
+          cta_id?: string | null
+          event: string
+          id?: string
+          meta?: Json | null
+          partner_code?: string | null
+          path?: string | null
+          referrer?: string | null
+          session_hash?: string | null
+          surface: string
+          user_id?: string | null
+          variant?: string | null
+        }
+        Update: {
+          created_at?: string
+          cta_id?: string | null
+          event?: string
+          id?: string
+          meta?: Json | null
+          partner_code?: string | null
+          path?: string | null
+          referrer?: string | null
+          session_hash?: string | null
+          surface?: string
+          user_id?: string | null
+          variant?: string | null
+        }
+        Relationships: []
+      }
       promotions: {
         Row: {
           active: boolean

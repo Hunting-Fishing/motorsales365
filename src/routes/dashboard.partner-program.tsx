@@ -12,6 +12,8 @@ import { siteOrigin } from "@/lib/site-config";
 import { getMyPartnerProgramProfile } from "@/lib/partner-program.functions";
 import { formatPHP } from "@/lib/format";
 import { InfluencerDisclosure } from "@/components/influencer-disclosure";
+import { usePromoterAnalytics } from "@/lib/use-promoter-analytics";
+
 
 export const Route = createFileRoute("/dashboard/partner-program")({
   component: PartnerDashboard,
@@ -19,10 +21,12 @@ export const Route = createFileRoute("/dashboard/partner-program")({
 
 function PartnerDashboard() {
   const fetchProfile = useServerFn(getMyPartnerProgramProfile);
+  const { trackCta } = usePromoterAnalytics("dashboard_partner_program");
   const { data, isLoading } = useQuery({
     queryKey: ["partner-program", "me"],
     queryFn: () => fetchProfile({}),
   });
+
 
   if (isLoading) {
     return (
@@ -102,7 +106,11 @@ function PartnerDashboard() {
               variant="outline"
               aria-label="Copy referral link to clipboard"
               className="w-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-              onClick={() => copy(link)}
+              onClick={() => {
+                trackCta("copy_link", { partner_code: partner.referral_code });
+                copy(link);
+              }}
+
             >
               <Copy className="mr-1 h-3.5 w-3.5" aria-hidden="true" /> Copy link
             </Button>
@@ -144,14 +152,14 @@ function PartnerDashboard() {
               <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                 Banner (top of referral landing)
               </p>
-              <InfluencerDisclosure variant="banner" partnerName={partner.display_name} />
+              <InfluencerDisclosure variant="banner" partnerName={partner.display_name} analyticsSurface="dashboard_partner_program" partnerCode={partner.referral_code} />
             </div>
             <div>
               <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                 Inline (in cards / posts)
               </p>
               <div className="rounded-2xl border border-border bg-card p-3">
-                <InfluencerDisclosure variant="inline" partnerName={partner.display_name} />
+                <InfluencerDisclosure variant="inline" partnerName={partner.display_name} analyticsSurface="dashboard_partner_program" partnerCode={partner.referral_code} />
               </div>
             </div>
             <div className="md:col-span-2">
@@ -159,7 +167,7 @@ function PartnerDashboard() {
                 Footer (bottom of referral landing)
               </p>
               <div className="rounded-2xl border border-border bg-card px-4 pb-3">
-                <InfluencerDisclosure variant="footer" partnerName={partner.display_name} />
+                <InfluencerDisclosure variant="footer" partnerName={partner.display_name} analyticsSurface="dashboard_partner_program" partnerCode={partner.referral_code} />
               </div>
             </div>
           </div>
@@ -196,9 +204,10 @@ function PartnerDashboard() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() =>
-                  copy("I may earn a commission if you sign up through my 365 Motor Sales link.")
-                }
+                onClick={() => {
+                  trackCta("copy_snippet", { partner_code: partner.referral_code, meta: { location: "disclosure_verification" } });
+                  copy("I may earn a commission if you sign up through my 365 Motor Sales link.");
+                }}
               >
                 <Copy className="mr-1 h-3.5 w-3.5" /> Copy
               </Button>
@@ -207,10 +216,12 @@ function PartnerDashboard() {
                   href={`/r/${partner.referral_code}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackCta("view_live", { partner_code: partner.referral_code })}
                 >
                   <ExternalLink className="mr-1 h-3.5 w-3.5" /> View live
                 </a>
               </Button>
+
             </div>
           </div>
         </Card>
@@ -275,7 +286,7 @@ function PartnerDashboard() {
         </Card>
 
         <div className="mt-6">
-          <InfluencerDisclosure />
+          <InfluencerDisclosure analyticsSurface="dashboard_partner_program" partnerCode={partner.referral_code} />
         </div>
 
       </div>

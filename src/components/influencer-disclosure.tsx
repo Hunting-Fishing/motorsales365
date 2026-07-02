@@ -1,5 +1,11 @@
+import type React from "react";
 import { ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+import {
+  useDisclosureImpressionOnVisible,
+  type PromoterSurface,
+} from "@/lib/use-promoter-analytics";
 
 type Variant = "banner" | "inline" | "footer";
 
@@ -7,16 +13,31 @@ type Variant = "banner" | "inline" | "footer";
  * FTC / PH DTI-style disclosure for partner/affiliate/referral pages.
  * Use `banner` at top of partner landing pages, `inline` inside cards/content,
  * and `footer` at the bottom of referral landings.
+ *
+ * Pass `analyticsSurface` to log a one-per-session impression event when the
+ * disclosure enters the viewport.
  */
 export function InfluencerDisclosure({
   variant = "banner",
   partnerName,
   className,
+  analyticsSurface,
+  partnerCode,
 }: {
   variant?: Variant;
   partnerName?: string;
   className?: string;
+  analyticsSurface?: PromoterSurface;
+  partnerCode?: string | null;
 }) {
+  // Fire an impression once when visible; no-op when analyticsSurface is omitted.
+  const trackedRef = useDisclosureImpressionOnVisible(
+    analyticsSurface ?? null,
+    variant,
+    partnerCode ?? null,
+  );
+
+
   const who = partnerName ? `${partnerName} is` : "This link is shared by";
   const message =
     variant === "footer"
@@ -25,7 +46,10 @@ export function InfluencerDisclosure({
 
   if (variant === "inline") {
     return (
-      <p className={cn("text-xs italic text-muted-foreground", className)}>
+      <p
+        ref={trackedRef as React.RefObject<HTMLParagraphElement>}
+        className={cn("text-xs italic text-muted-foreground", className)}
+      >
         {message}
       </p>
     );
@@ -34,6 +58,7 @@ export function InfluencerDisclosure({
   if (variant === "footer") {
     return (
       <div
+        ref={trackedRef as React.RefObject<HTMLDivElement>}
         className={cn(
           "mt-6 border-t border-border/60 pt-3 text-center text-[11px] leading-snug text-muted-foreground",
           className,
@@ -47,6 +72,7 @@ export function InfluencerDisclosure({
   // banner — mobile-first: icon + text stack cleanly, no truncation
   return (
     <div
+      ref={trackedRef as React.RefObject<HTMLDivElement>}
       role="note"
       aria-label="Affiliate disclosure"
       className={cn(
@@ -68,3 +94,4 @@ export function InfluencerDisclosure({
     </div>
   );
 }
+
