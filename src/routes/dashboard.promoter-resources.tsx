@@ -451,7 +451,7 @@ function AdCard({
   };
 
   return (
-    <div className="group rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+    <div className={INTERACTIVE_CARD}>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <div className="min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">{example.channel}</p>
