@@ -332,3 +332,23 @@ function PartnerDashboard() {
     </SiteLayout>
   );
 }
+
+function EmptyState({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 p-8 text-center">
+      <div className="grid h-10 w-10 place-items-center rounded-xl bg-muted text-muted-foreground">
+        {icon}
+      </div>
+      <p className="text-sm font-medium">{title}</p>
+      <p className="max-w-sm text-xs text-muted-foreground">{body}</p>
+    </div>
+  );
+}
