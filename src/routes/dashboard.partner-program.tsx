@@ -6,8 +6,10 @@ import { SiteLayout } from "@/components/site-layout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Copy, CheckCircle2, ExternalLink } from "lucide-react";
+import { Copy, CheckCircle2, ExternalLink, Inbox, Wallet } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+
 import { siteOrigin } from "@/lib/site-config";
 import { getMyPartnerProgramProfile } from "@/lib/partner-program.functions";
 import { formatPHP } from "@/lib/format";
