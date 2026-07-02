@@ -1,37 +1,45 @@
-## Goal
-Give partners a clear, at-a-glance confirmation that the FTC/DTI disclosure banner is live and being reused correctly across their referral surfaces.
+# Partner/Influencer disclosure audit
 
-## Where
-`src/routes/dashboard.partner-program.tsx` — add a new "Disclosure verification" Card, placed just below the existing `InfluencerDisclosure` (before the QR/stats grid).
+I re-read every file we touched for the Partner Program disclosure work (`influencer-disclosure.tsx`, `partner-program.tsx`, `partner-program.apply.tsx`, `dashboard.partner-program.tsx`, `qr-landing-content.tsx`, `dashboard.promoter-resources.tsx`, `partner-program.functions.ts`). It's wired in the right places, but there are three real issues to fix and one nice‑to‑have.
 
-## What the section shows
-1. **Header row**
-   - Title: "Disclosure verification"
-   - Status pill: green "Live on your referral pages" (static — the banner is always rendered on `/r/:code`, partner-program pages, and this dashboard).
+## Issues found
 
-2. **Live previews** (rendered using the real `<InfluencerDisclosure />` component so partners see the exact same markup buyers see):
-   - Label "Banner (top of referral landing)" → `<InfluencerDisclosure variant="banner" partnerName={partner.display_name} />`
-   - Label "Inline (in cards / posts)" → `<InfluencerDisclosure variant="inline" partnerName={partner.display_name} />`
-   - Label "Footer (bottom of referral landing)" → `<InfluencerDisclosure variant="footer" partnerName={partner.display_name} />`
+1. **QR landing shows a generic disclosure even though we know the partner.** `src/components/qr-landing-content.tsx` renders `<InfluencerDisclosure className="mb-4" />` and `<InfluencerDisclosure variant="footer" />` with no `partnerName`, so visitors see *"This link is shared by an independent partner…"* instead of *"Maria is an independent partner…"*. The referral code loads the partner record already — we should pass its display name through.
 
-3. **Where it appears checklist** (static list with check icons):
-   - Your referral landing page (`/r/{referral_code}`) — top banner + footer
-   - Partner Program overview page
-   - Partner application page
-   - This dashboard
+2. **Partner dashboard has two overlapping disclosure blocks.** `dashboard.partner-program.tsx` renders a full banner at line 74 and then the "Disclosure verification" card (which itself contains a banner preview) directly below. Feels doubled. Keep the verification card (it's the useful one) and demote the top block to a one‑line reminder, or drop it entirely.
 
-4. **"View live on your referral page" button** → opens `/r/{partner.referral_code}` in a new tab so partners can visually confirm.
+3. **Copy‑paste ad templates in `/dashboard/promoter-resources` don't include the required disclosure.** Every template in `AD_EXAMPLES` (FB posts, SMS, WhatsApp, email signature, card back) ships without the *"I may earn a commission…"* line. Partners who paste these are technically posting non‑compliant copy. The Partner Program memory rule requires the disclosure snippet on every shared post.
 
-5. **Copy-ready disclosure snippet** (for their own posts): reuse the existing wording
-   `"I may earn a commission if you sign up through my 365 Motor Sales link."`
-   with a Copy button (uses existing `toast` + clipboard pattern already in the file).
+## Nice‑to‑have
 
-## Non-goals
-- No schema changes, no server functions, no new dependencies.
-- No changes to `InfluencerDisclosure` component itself — we render it as-is so the preview is guaranteed identical to production.
-- No changes to other routes.
+4. Promoter‑resources page also has no reminder/link back to `/partner-program/terms` or the disclosure snippet card — add a small compliance strip at the top so partners know it's required before they grab templates.
 
-## Technical notes
-- Purely presentational edit in one file.
-- Uses existing imports (`Card`, `Button`, `Copy`, `toast`, `InfluencerDisclosure`) plus adds `CheckCircle2` and `ExternalLink` from `lucide-react`.
-- Uses `siteOrigin()` already imported to build the referral URL for the "View live" button.
+## Changes
+
+### `src/components/qr-landing-content.tsx`
+- After the partner record loads (already fetched by `code`), capture `partner.display_name` (or existing equivalent field) into local state.
+- Pass `partnerName={displayName}` to both the top banner (line 432) and the footer (line 813). When `displayName` is still null (loading / not found), keep the generic fallback the component already handles.
+
+### `src/routes/dashboard.partner-program.tsx`
+- Remove the standalone `<InfluencerDisclosure className="mt-4" ... />` + the paragraph beneath it (lines 74–82). The "Disclosure verification" card already shows all three variants and the copy‑ready snippet, so the top block is redundant.
+- Leave the amber "Disclosure reminder" card at the bottom as the single call‑to‑action.
+
+### `src/routes/dashboard.promoter-resources.tsx`
+- Append the disclosure line to each template body so pasted copy is compliant by default:
+  - FB / community / WhatsApp / Messenger posts: add a final line `Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner`.
+  - SMS/Viber: append `(I may earn a commission.)` (keeps it short for 160 chars).
+  - Email signature: add `(Affiliate link — I may earn a commission.)` under the URL.
+  - Business card back: no change (physical print, disclosure lives on the landing page).
+- Add a compact amber notice above the `Tabs` block: "Disclosure required — every post using your link must include the snippet below" with a link to `/partner-program/terms` and the copy‑snippet button reused from the dashboard.
+
+### No changes needed
+- `src/components/influencer-disclosure.tsx` — component API is fine.
+- `src/routes/partner-program.tsx` / `partner-program.apply.tsx` — hero placement is correct.
+- Server functions and DB schema — no changes.
+
+## Verification
+
+- Load `/r/<some active code>` in the preview and confirm the banner reads *"Disclosure: <Partner name> is an independent partner…"* instead of the generic wording.
+- Open `/dashboard/partner-program` and confirm only the verification card + bottom reminder remain (no duplicate top banner).
+- Open `/dashboard/promoter-resources`, copy the FB long post, and confirm the pasted text ends with the disclosure line and hashtag.
+- Run `bun run build:dev` to make sure nothing regressed.

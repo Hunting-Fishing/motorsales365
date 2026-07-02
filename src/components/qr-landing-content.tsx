@@ -429,7 +429,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
   return (
     <TooltipProvider delayDuration={150}>
       <div className="container mx-auto max-w-7xl px-4 py-6 sm:py-10">
-        <InfluencerDisclosure className="mb-4" />
+        <InfluencerDisclosure className="mb-4" partnerName={staffName ?? undefined} />
 
         {loading ? (
           <p className="text-center text-muted-foreground">Loading…</p>
@@ -810,7 +810,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
           </>
         )}
-        <InfluencerDisclosure variant="footer" />
+        <InfluencerDisclosure variant="footer" partnerName={staffName ?? undefined} />
       </div>
     </TooltipProvider>
   );

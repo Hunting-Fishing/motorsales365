@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
+  AlertTriangle,
   ArrowRight,
   Check,
   Copy,
@@ -47,7 +48,9 @@ const AD_EXAMPLES: AdExample[] = [
 365 Motor Sales is the marketplace built for Philippine vehicles, parts and motor businesses. Real filters. Verified sellers. Boosts from ₱99 for 7 days.
 
 Scan or tap → ${link}
-#365MotorSales #BuyAndSellPH`,
+#365MotorSales #BuyAndSellPH
+
+Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner`,
   },
   {
     channel: "Long FB / community post",
@@ -63,12 +66,14 @@ I've been using 365 Motor Sales and it's honestly a better fit than Facebook Mar
 If you're buying, selling, or running a shop, take a look:
 ${link}
 
-Free to join, free to list — boosts are optional.`,
+Free to join, free to list — boosts are optional.
+
+Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner`,
   },
   {
     channel: "SMS / Viber",
     title: "SMS or Viber blast",
-    body: (link) => `Looking to buy/sell a vehicle or parts? Try 365 Motor Sales — PH's motor marketplace with verified sellers. Free to list. ${link}`,
+    body: (link) => `Looking to buy/sell a vehicle or parts? Try 365 Motor Sales — PH's motor marketplace with verified sellers. Free to list. ${link} (I may earn a commission.)`,
   },
   {
     channel: "Email signature",
@@ -76,7 +81,8 @@ Free to join, free to list — boosts are optional.`,
     body: (link) =>
       `--
 Find your next ride on 365 Motor Sales — the Philippine motor marketplace.
-${link}`,
+${link}
+(Affiliate link — I may earn a commission.)`,
   },
   {
     channel: "Business card back",
@@ -88,7 +94,9 @@ ${link}`,
   {
     channel: "WhatsApp / Messenger",
     title: "1-to-1 WhatsApp / Messenger",
-    body: (link) => `Hey 👋 — if you're shopping for a car / bike / parts here in PH, check 365 Motor Sales. Verified sellers and proper filters, not a Facebook feed. ${link}`,
+    body: (link) => `Hey 👋 — if you're shopping for a car / bike / parts here in PH, check 365 Motor Sales. Verified sellers and proper filters, not a Facebook feed. ${link}
+
+(Heads up: I may earn a commission if you sign up.)`,
   },
 ];
 
@@ -216,6 +224,38 @@ function PromoterResources() {
           create your code so your link tracks scans and signups.
         </div>
       )}
+
+      <div className="flex flex-wrap items-start gap-3 rounded-xl border border-amber-500/40 bg-amber-50/60 p-4 dark:bg-amber-950/20">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+        <div className="flex-1 text-sm">
+          <p className="font-semibold text-amber-950 dark:text-amber-100">
+            Disclosure required on every post
+          </p>
+          <p className="mt-1 text-amber-900/80 dark:text-amber-100/80">
+            Templates below already include the required snippet. Keep it in when you paste — it's
+            an FTC / PH DTI rule and part of the{" "}
+            <Link to="/partner-program/terms" className="underline">
+              Partner Terms
+            </Link>
+            .
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            navigator.clipboard
+              .writeText(
+                "Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner",
+              )
+              .then(() => toast.success("Snippet copied"));
+          }}
+        >
+          <Copy className="mr-1.5 h-4 w-4" /> Copy snippet
+        </Button>
+      </div>
+
+
 
       <Tabs defaultValue="ads" className="w-full">
         <TabsList>
