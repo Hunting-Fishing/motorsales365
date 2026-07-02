@@ -12,6 +12,8 @@ import { siteOrigin } from "@/lib/site-config";
 import { getMyPartnerProgramProfile } from "@/lib/partner-program.functions";
 import { formatPHP } from "@/lib/format";
 import { InfluencerDisclosure } from "@/components/influencer-disclosure";
+import { usePromoterAnalytics } from "@/lib/use-promoter-analytics";
+
 
 export const Route = createFileRoute("/dashboard/partner-program")({
   component: PartnerDashboard,
@@ -19,10 +21,12 @@ export const Route = createFileRoute("/dashboard/partner-program")({
 
 function PartnerDashboard() {
   const fetchProfile = useServerFn(getMyPartnerProgramProfile);
+  const { trackCta } = usePromoterAnalytics("dashboard_partner_program");
   const { data, isLoading } = useQuery({
     queryKey: ["partner-program", "me"],
     queryFn: () => fetchProfile({}),
   });
+
 
   if (isLoading) {
     return (
