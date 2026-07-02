@@ -27,6 +27,8 @@ import {
   type OverviewRevenue,
   type TopReferrer,
 } from "@/lib/admin-overview.functions";
+import { OverviewTrends } from "@/components/admin/overview-trends";
+
 
 export const Route = createFileRoute("/admin/")({
   component: AdminOverview,
@@ -142,8 +144,12 @@ function AdminOverview() {
         </div>
       </Section>
 
+      {/* TRENDS — spot changes at a glance for 7d/30d */}
+      <OverviewTrends />
+
       {/* USER ACTIVITY */}
       <Section title="User activity" subtitle="Registrations, verified sellers and account state.">
+
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
           <SnapshotCard icon={Users} label="Total users" value={fmt(d.users.total)} />
           <WindowCard icon={UserPlus} label="New signups" window={d.users.signups} />
