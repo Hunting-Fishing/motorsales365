@@ -325,26 +325,26 @@ function PromoterResources() {
         <TabsContent value="walkthrough" className="mt-6 space-y-5">
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {WALKTHROUGH.map((s) => (
-              <div key={s.step} className="rounded-xl border border-border bg-card p-4">
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-primary/15 text-sm font-bold text-primary">
+              <div key={s.step} className="rounded-2xl border border-border/70 bg-card p-5 shadow-sm">
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/15 text-sm font-bold text-primary">
                   {s.step}
                 </span>
                 <h3 className="mt-3 text-sm font-semibold">{s.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{s.body}</p>
+                <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{s.body}</p>
               </div>
             ))}
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-5">
-            <div>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 to-primary/5 p-5 sm:flex sm:flex-wrap sm:justify-between">
+            <div className="min-w-0">
               <h3 className="font-display text-lg font-bold">See it for yourself</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Open the same page a new scanner sees — tracking and lead submissions are disabled
                 in preview.
               </p>
             </div>
-            <Link to="/resources/qr-landing">
-              <Button>
+            <Link to="/resources/qr-landing" className="col-span-2 shrink-0 sm:col-auto">
+              <Button className="w-full sm:w-auto">
                 Open scanner preview <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -366,13 +366,13 @@ function AdCard({ example, link, code }: { example: AdExample; link: string; cod
     }
   };
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">{example.channel}</p>
-          <h3 className="mt-1 text-sm font-semibold">{example.title}</h3>
+    <div className="group rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">{example.channel}</p>
+          <h3 className="mt-1 truncate text-sm font-semibold">{example.title}</h3>
         </div>
-        <Button size="sm" variant="outline" onClick={onCopy}>
+        <Button size="sm" variant="outline" className="shrink-0" onClick={onCopy}>
           <Copy className="mr-1.5 h-4 w-4" /> Copy
         </Button>
       </div>
@@ -380,9 +380,10 @@ function AdCard({ example, link, code }: { example: AdExample; link: string; cod
         value={text}
         readOnly
         rows={Math.min(12, Math.max(4, text.split("\n").length + 1))}
-        className="mt-3 font-mono text-xs"
+        className="mt-3 rounded-xl border-border/60 bg-muted/30 font-mono text-xs"
         onFocus={(e) => e.currentTarget.select()}
       />
     </div>
   );
 }
+
