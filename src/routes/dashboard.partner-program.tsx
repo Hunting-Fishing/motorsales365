@@ -209,8 +209,8 @@ function PartnerDashboard() {
         </Card>
 
 
-        <Card className="mt-6">
-          <div className="border-b border-border p-4">
+        <Card className="mt-6 overflow-hidden rounded-2xl border-border/70 shadow-sm">
+          <div className="border-b border-border p-5">
             <h2 className="font-semibold">Commission events</h2>
             <p className="text-xs text-muted-foreground">
               Aggregated line items only — no customer personal information is shown.
@@ -218,18 +218,18 @@ function PartnerDashboard() {
           </div>
           <div className="divide-y divide-border">
             {events.length === 0 ? (
-              <p className="p-6 text-center text-sm text-muted-foreground">No events yet.</p>
+              <p className="p-8 text-center text-sm text-muted-foreground">No events yet.</p>
             ) : (
               events.map((e: any) => (
-                <div key={e.id} className="flex items-center justify-between gap-3 p-3 text-sm">
-                  <div>
-                    <p className="font-medium capitalize">{e.event_type.replace(/_/g, " ")}</p>
+                <div key={e.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 text-sm">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium capitalize">{e.event_type.replace(/_/g, " ")}</p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(e.event_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold">{formatPHP(Number(e.commission_php))}</p>
+                    <p className="font-semibold tabular-nums">{formatPHP(Number(e.commission_php))}</p>
                     <Badge variant="outline" className="mt-1 capitalize">
                       {String(e.status).replace(/_/g, " ")}
                     </Badge>
@@ -240,25 +240,25 @@ function PartnerDashboard() {
           </div>
         </Card>
 
-        <Card className="mt-6">
-          <div className="border-b border-border p-4">
+        <Card className="mt-6 overflow-hidden rounded-2xl border-border/70 shadow-sm">
+          <div className="border-b border-border p-5">
             <h2 className="font-semibold">Payout history</h2>
           </div>
           <div className="divide-y divide-border">
             {((data as any).payouts ?? []).length === 0 ? (
-              <p className="p-6 text-center text-sm text-muted-foreground">No payouts yet.</p>
+              <p className="p-8 text-center text-sm text-muted-foreground">No payouts yet.</p>
             ) : (
               (data as any).payouts.map((p: any) => (
-                <div key={p.id} className="flex items-center justify-between gap-3 p-3 text-sm">
-                  <div>
-                    <p className="font-medium capitalize">{p.method}{p.reference ? ` · ${p.reference}` : ""}</p>
+                <div key={p.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 text-sm">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium capitalize">{p.method}{p.reference ? ` · ${p.reference}` : ""}</p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(p.created_at).toLocaleDateString()}
                       {p.paid_at ? ` · paid ${new Date(p.paid_at).toLocaleDateString()}` : ""}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold">{formatPHP(Number(p.amount_php))}</p>
+                    <p className="font-semibold tabular-nums">{formatPHP(Number(p.amount_php))}</p>
                     <Badge variant="outline" className="mt-1 capitalize">{p.status}</Badge>
                   </div>
                 </div>
@@ -267,14 +267,10 @@ function PartnerDashboard() {
           </div>
         </Card>
 
-        <Card className="mt-6 border-amber-500/40 bg-amber-50/40 p-4 dark:bg-amber-950/20">
-          <p className="text-sm font-semibold">Disclosure reminder</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            When posting with your link, include:{" "}
-            <em>"I may earn a commission if you sign up through my 365 Motor Sales link."</em>{" "}
-            plus <code>#365MotorSalesPartner</code>.
-          </p>
-        </Card>
+        <div className="mt-6">
+          <InfluencerDisclosure />
+        </div>
+
       </div>
     </SiteLayout>
   );
