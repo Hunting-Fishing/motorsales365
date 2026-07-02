@@ -298,7 +298,8 @@ function PromoterResources() {
           </Button>
 
         </div>
-      </div>
+      </aside>
+
 
 
 
