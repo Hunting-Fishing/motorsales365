@@ -265,8 +265,13 @@ function PartnerDashboard() {
           </div>
           <div className="divide-y divide-border">
             {events.length === 0 ? (
-              <p className="p-8 text-center text-sm text-muted-foreground">No events yet.</p>
+              <EmptyState
+                icon={<Inbox className="h-6 w-6" aria-hidden="true" />}
+                title="No commission events yet"
+                body="Once a referred user takes a qualifying action, it will appear here."
+              />
             ) : (
+
               events.map((e: any) => (
                 <div key={e.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 text-sm">
                   <div className="min-w-0">
@@ -293,8 +298,13 @@ function PartnerDashboard() {
           </div>
           <div className="divide-y divide-border">
             {((data as any).payouts ?? []).length === 0 ? (
-              <p className="p-8 text-center text-sm text-muted-foreground">No payouts yet.</p>
+              <EmptyState
+                icon={<Wallet className="h-6 w-6" aria-hidden="true" />}
+                title="No payouts yet"
+                body="Approved commissions become payable once they clear the refund window."
+              />
             ) : (
+
               (data as any).payouts.map((p: any) => (
                 <div key={p.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 text-sm">
                   <div className="min-w-0">
