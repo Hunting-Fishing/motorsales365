@@ -71,14 +71,6 @@ function PartnerDashboard() {
           </Badge>
         </div>
 
-        <InfluencerDisclosure
-          className="mt-4"
-          partnerName={partner.display_name}
-        />
-        <p className="mt-2 text-xs text-muted-foreground">
-          Use this disclosure snippet on every post, video, or channel where you share your
-          link — required for FTC / PH DTI compliance and program terms.
-        </p>
 
         {/* Disclosure verification */}
         <Card className="mt-6">
