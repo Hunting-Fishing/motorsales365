@@ -192,68 +192,84 @@ function PromoterResources() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-            Promote &amp; Earn
-          </p>
-          <h1 className="font-display mt-1 text-2xl font-bold sm:text-3xl">Promoter resources</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Everything you need to share 365 Motor Sales — copy/paste ad templates, QR placement
-            ideas, and a walkthrough of what a new visitor sees when they scan your code.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link to="/dashboard/referral">
-            <Button size="sm" variant="outline">
-              <QrCode className="mr-1.5 h-4 w-4" /> My QR &amp; stats
-            </Button>
-          </Link>
-          <Link to="/resources/qr-landing">
-            <Button size="sm">
-              <Eye className="mr-1.5 h-4 w-4" /> Preview scanner view
-            </Button>
-          </Link>
+      {/* Premium hero */}
+      <header className="relative overflow-hidden rounded-3xl bg-slate-950 p-6 text-white shadow-xl sm:p-8">
+        <div className="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full bg-primary/40 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -left-10 h-56 w-56 rounded-full bg-amber-500/20 blur-3xl" />
+        <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 sm:flex sm:flex-wrap sm:justify-between">
+          <div className="min-w-0 max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white/80">
+              Promote &amp; earn
+            </span>
+            <h1 className="font-display mt-3 text-2xl font-bold sm:text-4xl">Promoter resources</h1>
+            <p className="mt-2 text-sm text-white/70 sm:text-base">
+              Copy-ready ad templates, QR placement ideas, and a walkthrough of what a new visitor
+              sees when they scan your code.
+            </p>
+          </div>
+          <div className="col-span-2 flex flex-wrap gap-2 sm:col-auto">
+            <Link to="/dashboard/referral">
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+              >
+                <QrCode className="mr-1.5 h-4 w-4" /> My QR &amp; stats
+              </Button>
+            </Link>
+            <Link to="/resources/qr-landing">
+              <Button size="sm" className="shadow-lg shadow-primary/30">
+                <Eye className="mr-1.5 h-4 w-4" /> Preview scanner view
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
       {loaded && !code && (
-        <div className="rounded-xl border border-dashed border-border bg-card p-4 text-sm text-muted-foreground">
+        <div className="rounded-2xl border border-dashed border-border bg-card p-4 text-sm text-muted-foreground">
           You don&apos;t have a personal referral code yet. The examples below use a{" "}
           <code className="rounded bg-muted px-1">YOUR-CODE</code> placeholder — ask an admin to
           create your code so your link tracks scans and signups.
         </div>
       )}
 
-      <div className="flex flex-wrap items-start gap-3 rounded-xl border border-amber-500/40 bg-amber-50/60 p-4 dark:bg-amber-950/20">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-        <div className="flex-1 text-sm">
-          <p className="font-semibold text-amber-950 dark:text-amber-100">
+      {/* Compliance strip — mobile-safe grid, stacks button below */}
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-50 to-amber-100/40 p-4 shadow-sm dark:from-amber-950/30 dark:to-amber-950/10 dark:border-amber-500/20 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center">
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-300">
+          <AlertTriangle className="h-4 w-4" />
+        </div>
+        <div className="min-w-0 text-sm">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
             Disclosure required on every post
           </p>
-          <p className="mt-1 text-amber-900/80 dark:text-amber-100/80">
+          <p className="mt-1 text-amber-950/90 dark:text-amber-100/90">
             Templates below already include the required snippet. Keep it in when you paste — it's
             an FTC / PH DTI rule and part of the{" "}
-            <Link to="/partner-program/terms" className="underline">
+            <Link to="/partner-program/terms" className="font-semibold underline underline-offset-2">
               Partner Terms
             </Link>
             .
           </p>
         </div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => {
-            navigator.clipboard
-              .writeText(
-                "Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner",
-              )
-              .then(() => toast.success("Snippet copied"));
-          }}
-        >
-          <Copy className="mr-1.5 h-4 w-4" /> Copy snippet
-        </Button>
+        <div className="col-span-2 sm:col-auto">
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full border-amber-500/40 bg-white/60 hover:bg-white sm:w-auto dark:bg-amber-950/30 dark:hover:bg-amber-950/50"
+            onClick={() => {
+              navigator.clipboard
+                .writeText(
+                  "Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner",
+                )
+                .then(() => toast.success("Snippet copied"));
+            }}
+          >
+            <Copy className="mr-1.5 h-4 w-4" /> Copy snippet
+          </Button>
+        </div>
       </div>
+
 
 
 
@@ -285,47 +301,50 @@ function PromoterResources() {
         <TabsContent value="placement" className="mt-6">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {PLACEMENT_TIPS.map(({ Icon, title, body }) => (
-              <div key={title} className="rounded-xl border border-border bg-card p-4">
-                <Icon className="h-4 w-4 text-primary" />
-                <h3 className="mt-2 text-sm font-semibold">{title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+              <div key={title} className="group rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-3 text-sm font-semibold">{title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{body}</p>
               </div>
             ))}
           </div>
-          <div className="mt-5 rounded-xl border border-border bg-card p-4">
+          <div className="mt-5 rounded-2xl border border-border/70 bg-card p-5 shadow-sm">
             <h3 className="text-sm font-semibold">Quality rules of thumb</h3>
-            <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
-              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Print at least 4–5cm wide for reliable phone scans.</li>
-              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Keep a clear quiet zone (margin) around the QR — no overlapping graphics.</li>
-              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Dark QR on light background prints best. Avoid low-contrast pairs.</li>
-              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Test scan after printing — from 30cm and from 1m.</li>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Print at least 4–5cm wide for reliable phone scans.</li>
+              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Keep a clear quiet zone (margin) around the QR — no overlapping graphics.</li>
+              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Dark QR on light background prints best. Avoid low-contrast pairs.</li>
+              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Test scan after printing — from 30cm and from 1m.</li>
             </ul>
           </div>
         </TabsContent>
 
+
         <TabsContent value="walkthrough" className="mt-6 space-y-5">
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {WALKTHROUGH.map((s) => (
-              <div key={s.step} className="rounded-xl border border-border bg-card p-4">
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-primary/15 text-sm font-bold text-primary">
+              <div key={s.step} className="rounded-2xl border border-border/70 bg-card p-5 shadow-sm">
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/15 text-sm font-bold text-primary">
                   {s.step}
                 </span>
                 <h3 className="mt-3 text-sm font-semibold">{s.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{s.body}</p>
+                <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{s.body}</p>
               </div>
             ))}
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-5">
-            <div>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 to-primary/5 p-5 sm:flex sm:flex-wrap sm:justify-between">
+            <div className="min-w-0">
               <h3 className="font-display text-lg font-bold">See it for yourself</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Open the same page a new scanner sees — tracking and lead submissions are disabled
                 in preview.
               </p>
             </div>
-            <Link to="/resources/qr-landing">
-              <Button>
+            <Link to="/resources/qr-landing" className="col-span-2 shrink-0 sm:col-auto">
+              <Button className="w-full sm:w-auto">
                 Open scanner preview <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -347,13 +366,13 @@ function AdCard({ example, link, code }: { example: AdExample; link: string; cod
     }
   };
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">{example.channel}</p>
-          <h3 className="mt-1 text-sm font-semibold">{example.title}</h3>
+    <div className="group rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">{example.channel}</p>
+          <h3 className="mt-1 truncate text-sm font-semibold">{example.title}</h3>
         </div>
-        <Button size="sm" variant="outline" onClick={onCopy}>
+        <Button size="sm" variant="outline" className="shrink-0" onClick={onCopy}>
           <Copy className="mr-1.5 h-4 w-4" /> Copy
         </Button>
       </div>
@@ -361,9 +380,10 @@ function AdCard({ example, link, code }: { example: AdExample; link: string; cod
         value={text}
         readOnly
         rows={Math.min(12, Math.max(4, text.split("\n").length + 1))}
-        className="mt-3 font-mono text-xs"
+        className="mt-3 rounded-xl border-border/60 bg-muted/30 font-mono text-xs"
         onFocus={(e) => e.currentTarget.select()}
       />
     </div>
   );
 }
+

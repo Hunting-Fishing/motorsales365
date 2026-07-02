@@ -1,4 +1,4 @@
-import { Info } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Variant = "banner" | "inline" | "footer";
@@ -44,17 +44,27 @@ export function InfluencerDisclosure({
     );
   }
 
+  // banner — mobile-first: icon + text stack cleanly, no truncation
   return (
     <div
       role="note"
       aria-label="Affiliate disclosure"
       className={cn(
-        "flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-50/60 px-3 py-2 text-xs text-amber-950 dark:bg-amber-950/20 dark:text-amber-100",
+        "flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-50 to-amber-100/40 px-4 py-3 shadow-sm dark:from-amber-950/30 dark:to-amber-950/10 dark:border-amber-500/20",
         className,
       )}
     >
-      <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-      <p>{message}</p>
+      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-300">
+        <ShieldCheck className="h-4 w-4" aria-hidden />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
+          Compliance disclosure
+        </p>
+        <p className="mt-0.5 text-xs leading-relaxed text-amber-950/90 dark:text-amber-100/90">
+          {message}
+        </p>
+      </div>
     </div>
   );
 }

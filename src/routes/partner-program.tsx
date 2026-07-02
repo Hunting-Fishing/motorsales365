@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
 import {
   QrCode,
   Share2,
@@ -38,76 +38,123 @@ function copy(text: string) {
   navigator.clipboard.writeText(text).then(() => toast.success("Copied"));
 }
 
+const HOW_IT_WORKS = [
+  {
+    icon: QrCode,
+    title: "Get your QR & link",
+    body: "Once approved you receive a unique QR code and referral link tied to your account.",
+    tone: "bg-primary/10 text-primary",
+  },
+  {
+    icon: Share2,
+    title: "Share it your way",
+    body: "Post it, print it, wear it on optional swag. You choose when, where, and how — no scripts, no hours.",
+    tone: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  },
+  {
+    icon: Coins,
+    title: "Earn on real conversions",
+    body: "When your referral becomes a paying seller, business, advertiser, or shop buyer, you earn commission.",
+    tone: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+  },
+];
+
 function PartnerProgramPage() {
   return (
     <SiteLayout>
-      {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-br from-primary/10 via-background to-background">
-        <div className="container mx-auto px-4 py-14 md:py-20">
-          <InfluencerDisclosure className="mb-6 max-w-3xl" />
-          <Badge variant="secondary" className="mb-4">Independent partners · Philippines</Badge>
-          <h1 className="font-display text-4xl font-bold md:text-5xl">365 Partner Program</h1>
-          <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-            Earn referral commissions by promoting 365 Motor Sales through your own QR code,
-            referral link, or content. Commission-only. No quotas, no schedule, no downline.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link to="/partner-program/apply">Apply to become a Partner</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/partner-program/terms">Read the Partner Terms</Link>
-            </Button>
+      {/* Hero — premium dark panel */}
+      <section className="relative overflow-hidden border-b border-border bg-slate-950 text-white">
+        <div className="pointer-events-none absolute -top-32 right-0 h-[420px] w-[420px] rounded-full bg-primary/40 blur-[120px]" />
+        <div className="pointer-events-none absolute -bottom-32 -left-16 h-[320px] w-[320px] rounded-full bg-amber-500/20 blur-[110px]" />
+        <div className="container relative mx-auto px-4 py-14 md:py-24">
+          <div className="max-w-3xl">
+            <InfluencerDisclosure className="mb-8" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white/80 backdrop-blur">
+              Independent partners · Philippines
+            </span>
+            <h1 className="font-display mt-5 text-4xl font-bold leading-[1.05] md:text-6xl">
+              Grow your influence.{" "}
+              <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
+                Earn on real conversions.
+              </span>
+            </h1>
+            <p className="mt-5 max-w-2xl text-base text-white/70 md:text-lg">
+              Promote 365 Motor Sales through your own QR code, referral link, or content.
+              Commission-only. No quotas, no schedule, no downline.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg" className="shadow-lg shadow-primary/30">
+                <Link to="/partner-program/apply">Apply to become a Partner</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+              >
+                <Link to="/partner-program/terms">Read the Partner Terms</Link>
+              </Button>
+            </div>
+            <p className="mt-4 text-xs text-white/50">
+              This is a referral program for independent partners — not an employment offer.
+            </p>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">
-            This is a referral program for independent partners — not an employment offer.
-          </p>
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="container mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold">How it works</h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {[
-            { icon: QrCode, title: "Get your QR & link", body: "Once approved you receive a unique QR code and referral link tied to your account." },
-            { icon: Share2, title: "Share it your way", body: "Post it, print it, wear it on optional swag. You choose when, where, and how — no scripts, no hours." },
-            { icon: Coins, title: "Earn on real conversions", body: "When your referral becomes a paying seller, business, advertiser, or shop buyer, you earn commission." },
-          ].map(({ icon: Icon, title, body }) => (
-            <Card key={title} className="p-5">
-              <Icon className="h-6 w-6 text-primary" />
-              <h3 className="mt-3 font-semibold">{title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+      {/* How it works — floating card grid overlapping hero */}
+      <section className="container mx-auto px-4 -mt-8 md:-mt-14 relative z-10">
+        <div className="grid gap-4 md:grid-cols-3">
+          {HOW_IT_WORKS.map(({ icon: Icon, title, body, tone }, i) => (
+            <Card
+              key={title}
+              className="rounded-2xl border-border/70 bg-card p-6 shadow-xl shadow-slate-900/5"
+            >
+              <div className={`grid h-11 w-11 place-items-center rounded-xl ${tone}`}>
+                <Icon className="h-5 w-5" />
+              </div>
+              <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                Step {i + 1}
+              </p>
+              <h3 className="mt-1 font-semibold text-base">{title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{body}</p>
             </Card>
           ))}
         </div>
       </section>
 
       {/* Qualifying events */}
-      <section className="border-t border-border bg-secondary/30">
-        <div className="container mx-auto px-4 py-12">
-          <h2 className="text-2xl font-bold">What you can earn on</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+      <section className="container mx-auto px-4 py-14 md:py-20">
+        <div className="max-w-2xl">
+          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">Commissions</p>
+          <h2 className="font-display mt-2 text-3xl font-bold md:text-4xl">What you can earn on</h2>
+          <p className="mt-3 text-sm text-muted-foreground">
             Commissions clear after our refund/chargeback window. Rates are set per program and shown in your dashboard.
           </p>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              "Paid seller subscription",
-              "Paid boost / promoted listing",
-              "Verified business signup",
-              "Advertiser or sponsor purchase",
-              "Shop purchase (where enabled)",
-              "Qualified premium account upgrade",
-            ].map((label) => (
-              <div key={label} className="flex items-center gap-2 rounded-md border border-border bg-card p-3 text-sm">
-                <CheckCircle2 className="h-4 w-4 text-primary" /> {label}
-              </div>
-            ))}
-          </div>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Partners may earn commissions when qualified users sign up or purchase — earnings vary and are not guaranteed.
-          </p>
         </div>
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            "Paid seller subscription",
+            "Paid boost / promoted listing",
+            "Verified business signup",
+            "Advertiser or sponsor purchase",
+            "Shop purchase (where enabled)",
+            "Qualified premium account upgrade",
+          ].map((label) => (
+            <div
+              key={label}
+              className="group flex items-center gap-3 rounded-2xl border border-border/70 bg-card p-4 text-sm shadow-sm transition hover:border-primary/40 hover:shadow-md"
+            >
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="h-4 w-4" />
+              </div>
+              <span className="font-medium">{label}</span>
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 text-xs text-muted-foreground">
+          Partners may earn commissions when qualified users sign up or purchase — earnings vary and are not guaranteed.
+        </p>
       </section>
 
       {/* Allowed / Not allowed */}
