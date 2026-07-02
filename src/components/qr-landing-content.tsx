@@ -810,7 +810,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
           </>
         )}
-        <InfluencerDisclosure variant="footer" />
+        <InfluencerDisclosure variant="footer" partnerName={staffName ?? undefined} />
       </div>
     </TooltipProvider>
   );
