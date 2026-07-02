@@ -47,7 +47,9 @@ const AD_EXAMPLES: AdExample[] = [
 365 Motor Sales is the marketplace built for Philippine vehicles, parts and motor businesses. Real filters. Verified sellers. Boosts from ₱99 for 7 days.
 
 Scan or tap → ${link}
-#365MotorSales #BuyAndSellPH`,
+#365MotorSales #BuyAndSellPH
+
+Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner`,
   },
   {
     channel: "Long FB / community post",
@@ -63,12 +65,14 @@ I've been using 365 Motor Sales and it's honestly a better fit than Facebook Mar
 If you're buying, selling, or running a shop, take a look:
 ${link}
 
-Free to join, free to list — boosts are optional.`,
+Free to join, free to list — boosts are optional.
+
+Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner`,
   },
   {
     channel: "SMS / Viber",
     title: "SMS or Viber blast",
-    body: (link) => `Looking to buy/sell a vehicle or parts? Try 365 Motor Sales — PH's motor marketplace with verified sellers. Free to list. ${link}`,
+    body: (link) => `Looking to buy/sell a vehicle or parts? Try 365 Motor Sales — PH's motor marketplace with verified sellers. Free to list. ${link} (I may earn a commission.)`,
   },
   {
     channel: "Email signature",
@@ -76,7 +80,8 @@ Free to join, free to list — boosts are optional.`,
     body: (link) =>
       `--
 Find your next ride on 365 Motor Sales — the Philippine motor marketplace.
-${link}`,
+${link}
+(Affiliate link — I may earn a commission.)`,
   },
   {
     channel: "Business card back",
