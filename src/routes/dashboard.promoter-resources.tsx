@@ -421,16 +421,28 @@ function PromoterResources() {
   );
 }
 
-function AdCard({ example, link, code }: { example: AdExample; link: string; code: string }) {
+function AdCard({
+  example,
+  link,
+  code,
+  onCopy: onCopyTrack,
+}: {
+  example: AdExample;
+  link: string;
+  code: string;
+  onCopy?: (channel: string) => void;
+}) {
   const text = example.body(link, code);
   const onCopy = async () => {
     try {
       await navigator.clipboard.writeText(text);
+      onCopyTrack?.(example.channel);
       toast.success("Copied to clipboard");
     } catch {
       toast.error("Could not copy");
     }
   };
+
   return (
     <div className="group rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
