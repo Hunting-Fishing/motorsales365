@@ -31,8 +31,7 @@ export default defineConfig({
       __BUILD_ID__: JSON.stringify(BUILD_ID),
     },
     build: {
-      // Keep Rollup's per-chunk cache across builds (faster re-bundles).
-      cache: true,
+      // Rollup keeps its per-chunk cache in-memory during watch/dev builds.
     },
     optimizeDeps: {
       // Persist pre-bundled deps across restarts.
