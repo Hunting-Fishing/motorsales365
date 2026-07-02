@@ -21,7 +21,9 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { Textarea } from "@/components/ui/textarea";
 import { siteOrigin } from "@/lib/site-config";
 import {
@@ -39,6 +41,11 @@ export const Route = createFileRoute("/dashboard/promoter-resources")({
   }),
   component: PromoterResources,
 });
+
+/** Shared card interaction pattern: hover lift + press feedback + focus ring. */
+const INTERACTIVE_CARD =
+  "group rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md active:translate-y-0 active:shadow-sm focus-within:ring-2 focus-within:ring-primary/40 focus-within:ring-offset-2";
+
 
 type AdExample = {
   channel: string;
@@ -253,6 +260,22 @@ function PromoterResources() {
         </div>
       </header>
 
+      {!loaded && (
+        <div
+          role="status"
+          aria-label="Loading your referral code"
+          className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-9 w-9 rounded-xl" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-3 w-1/3" />
+              <Skeleton className="h-3 w-2/3" />
+            </div>
+          </div>
+        </div>
+      )}
+
       {loaded && !code && (
         <div
           role="status"
@@ -263,6 +286,7 @@ function PromoterResources() {
           create your code so your link tracks scans and signups.
         </div>
       )}
+
 
       {/* Compliance strip — mobile-safe grid, stacks button below */}
       <aside
@@ -362,7 +386,7 @@ function PromoterResources() {
         <TabsContent value="placement" className="mt-6">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {PLACEMENT_TIPS.map(({ Icon, title, body }) => (
-              <div key={title} className="group rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+              <div key={title} className={INTERACTIVE_CARD}>
                 <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
@@ -386,7 +410,7 @@ function PromoterResources() {
         <TabsContent value="walkthrough" className="mt-6 space-y-5">
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {WALKTHROUGH.map((s) => (
-              <div key={s.step} className="rounded-2xl border border-border/70 bg-card p-5 shadow-sm">
+              <div key={s.step} className={INTERACTIVE_CARD}>
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/15 text-sm font-bold text-primary">
                   {s.step}
                 </span>
@@ -444,7 +468,7 @@ function AdCard({
   };
 
   return (
-    <div className="group rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+    <div className={INTERACTIVE_CARD}>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <div className="min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">{example.channel}</p>

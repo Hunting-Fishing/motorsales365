@@ -1,4 +1,6 @@
+import type React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { QRCodeCanvas } from "qrcode.react";
@@ -6,8 +8,10 @@ import { SiteLayout } from "@/components/site-layout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Copy, CheckCircle2, ExternalLink } from "lucide-react";
+import { Copy, CheckCircle2, ExternalLink, Inbox, Wallet } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+
 import { siteOrigin } from "@/lib/site-config";
 import { getMyPartnerProgramProfile } from "@/lib/partner-program.functions";
 import { formatPHP } from "@/lib/format";
@@ -18,6 +22,10 @@ import { usePromoterAnalytics } from "@/lib/use-promoter-analytics";
 export const Route = createFileRoute("/dashboard/partner-program")({
   component: PartnerDashboard,
 });
+
+/** Shared card interaction pattern across the partner dashboard. */
+const INTERACTIVE_CARD =
+  "rounded-2xl border-border/70 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md active:translate-y-0 active:shadow-sm";
 
 function PartnerDashboard() {
   const fetchProfile = useServerFn(getMyPartnerProgramProfile);
@@ -31,10 +39,33 @@ function PartnerDashboard() {
   if (isLoading) {
     return (
       <SiteLayout>
-        <div className="container mx-auto px-4 py-10">Loading…</div>
+        <div
+          className="container mx-auto max-w-5xl px-4 py-8"
+          role="status"
+          aria-label="Loading your partner dashboard"
+        >
+          {/* Hero skeleton */}
+          <Skeleton className="h-40 w-full rounded-3xl" />
+
+          {/* QR + stats skeleton */}
+          <div className="mt-6 grid gap-4 md:grid-cols-[260px_1fr]">
+            <Skeleton className="h-[300px] rounded-2xl" />
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-24 rounded-2xl" />
+              ))}
+            </div>
+          </div>
+
+          {/* Section skeletons */}
+          <Skeleton className="mt-6 h-72 rounded-2xl" />
+          <Skeleton className="mt-6 h-48 rounded-2xl" />
+          <Skeleton className="mt-6 h-40 rounded-2xl" />
+        </div>
       </SiteLayout>
     );
   }
+
 
   if (!data?.partner) {
     return (
@@ -123,7 +154,7 @@ function PartnerDashboard() {
               { label: "Paid", value: totals.paid, tile: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
               { label: "Clawed back", value: totals.clawed_back, tile: "bg-destructive/10 text-destructive" },
             ].map((s) => (
-              <Card key={s.label} className="rounded-2xl border-border/70 p-4 shadow-sm">
+              <Card key={s.label} className={`p-4 ${INTERACTIVE_CARD}`}>
                 <span className={`inline-block rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${s.tile}`}>
                   {s.label}
                 </span>
@@ -236,8 +267,13 @@ function PartnerDashboard() {
           </div>
           <div className="divide-y divide-border">
             {events.length === 0 ? (
-              <p className="p-8 text-center text-sm text-muted-foreground">No events yet.</p>
+              <EmptyState
+                icon={<Inbox className="h-6 w-6" aria-hidden="true" />}
+                title="No commission events yet"
+                body="Once a referred user takes a qualifying action, it will appear here."
+              />
             ) : (
+
               events.map((e: any) => (
                 <div key={e.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 text-sm">
                   <div className="min-w-0">
@@ -264,8 +300,13 @@ function PartnerDashboard() {
           </div>
           <div className="divide-y divide-border">
             {((data as any).payouts ?? []).length === 0 ? (
-              <p className="p-8 text-center text-sm text-muted-foreground">No payouts yet.</p>
+              <EmptyState
+                icon={<Wallet className="h-6 w-6" aria-hidden="true" />}
+                title="No payouts yet"
+                body="Approved commissions become payable once they clear the refund window."
+              />
             ) : (
+
               (data as any).payouts.map((p: any) => (
                 <div key={p.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 text-sm">
                   <div className="min-w-0">
@@ -291,5 +332,25 @@ function PartnerDashboard() {
 
       </div>
     </SiteLayout>
+  );
+}
+
+function EmptyState({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 p-8 text-center">
+      <div className="grid h-10 w-10 place-items-center rounded-xl bg-muted text-muted-foreground">
+        {icon}
+      </div>
+      <p className="text-sm font-medium">{title}</p>
+      <p className="max-w-sm text-xs text-muted-foreground">{body}</p>
+    </div>
   );
 }
