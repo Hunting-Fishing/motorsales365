@@ -301,23 +301,26 @@ function PromoterResources() {
         <TabsContent value="placement" className="mt-6">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {PLACEMENT_TIPS.map(({ Icon, title, body }) => (
-              <div key={title} className="rounded-xl border border-border bg-card p-4">
-                <Icon className="h-4 w-4 text-primary" />
-                <h3 className="mt-2 text-sm font-semibold">{title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+              <div key={title} className="group rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-3 text-sm font-semibold">{title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{body}</p>
               </div>
             ))}
           </div>
-          <div className="mt-5 rounded-xl border border-border bg-card p-4">
+          <div className="mt-5 rounded-2xl border border-border/70 bg-card p-5 shadow-sm">
             <h3 className="text-sm font-semibold">Quality rules of thumb</h3>
-            <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
-              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Print at least 4–5cm wide for reliable phone scans.</li>
-              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Keep a clear quiet zone (margin) around the QR — no overlapping graphics.</li>
-              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Dark QR on light background prints best. Avoid low-contrast pairs.</li>
-              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Test scan after printing — from 30cm and from 1m.</li>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Print at least 4–5cm wide for reliable phone scans.</li>
+              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Keep a clear quiet zone (margin) around the QR — no overlapping graphics.</li>
+              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Dark QR on light background prints best. Avoid low-contrast pairs.</li>
+              <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Test scan after printing — from 30cm and from 1m.</li>
             </ul>
           </div>
         </TabsContent>
+
 
         <TabsContent value="walkthrough" className="mt-6 space-y-5">
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
