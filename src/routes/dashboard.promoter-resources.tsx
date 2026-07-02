@@ -42,6 +42,11 @@ export const Route = createFileRoute("/dashboard/promoter-resources")({
   component: PromoterResources,
 });
 
+/** Shared card interaction pattern: hover lift + press feedback + focus ring. */
+const INTERACTIVE_CARD =
+  "group rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md active:translate-y-0 active:shadow-sm focus-within:ring-2 focus-within:ring-primary/40 focus-within:ring-offset-2";
+
+
 type AdExample = {
   channel: string;
   title: string;
