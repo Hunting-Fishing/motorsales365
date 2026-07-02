@@ -59,85 +59,133 @@ function PartnerDashboard() {
   return (
     <SiteLayout>
       <div className="container mx-auto max-w-5xl px-4 py-8">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="font-display text-3xl font-bold">Partner dashboard</h1>
-            <p className="text-sm text-muted-foreground">
-              {partner.display_name} · Code <code>{partner.referral_code}</code>
-            </p>
+        {/* Premium header */}
+        <div className="relative overflow-hidden rounded-3xl bg-slate-950 p-6 text-white shadow-xl md:p-8">
+          <div className="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full bg-primary/40 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 -left-10 h-56 w-56 rounded-full bg-amber-500/20 blur-3xl" />
+          <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 sm:flex sm:flex-wrap sm:justify-between">
+            <div className="min-w-0">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white/80">
+                Partner dashboard
+              </span>
+              <h1 className="font-display mt-3 truncate text-2xl font-bold sm:text-4xl">
+                {partner.display_name}
+              </h1>
+              <p className="mt-1 text-sm text-white/60">
+                Referral code{" "}
+                <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs font-semibold text-white">
+                  {partner.referral_code}
+                </code>
+              </p>
+            </div>
+            <Badge
+              className={
+                partner.active
+                  ? "shrink-0 bg-emerald-500 text-white hover:bg-emerald-500"
+                  : "shrink-0 bg-white/15 text-white hover:bg-white/15"
+              }
+            >
+              {partner.active ? "● Active" : "Paused"}
+            </Badge>
           </div>
-          <Badge variant={partner.active ? "default" : "secondary"}>
-            {partner.active ? "Active" : "Paused"}
-          </Badge>
         </div>
 
+        {/* QR + stats overlap */}
+        <div className="mt-6 grid gap-4 md:grid-cols-[260px_1fr]">
+          <Card className="flex flex-col items-center gap-3 rounded-2xl border-border/70 p-5 shadow-sm">
+            <div className="rounded-2xl border border-border/60 bg-white p-3">
+              <QRCodeCanvas value={link} size={200} includeMargin />
+            </div>
+            <p className="text-xs text-muted-foreground text-center break-all">{link}</p>
+            <Button size="sm" variant="outline" className="w-full" onClick={() => copy(link)}>
+              <Copy className="mr-1 h-3.5 w-3.5" /> Copy link
+            </Button>
+          </Card>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {[
+              { label: "Pending", value: totals.pending, tile: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+              { label: "Approved", value: totals.approved, tile: "bg-primary/10 text-primary" },
+              { label: "Paid", value: totals.paid, tile: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+              { label: "Clawed back", value: totals.clawed_back, tile: "bg-destructive/10 text-destructive" },
+            ].map((s) => (
+              <Card key={s.label} className="rounded-2xl border-border/70 p-4 shadow-sm">
+                <span className={`inline-block rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${s.tile}`}>
+                  {s.label}
+                </span>
+                <p className="mt-3 text-xl font-bold tabular-nums">{formatPHP(s.value)}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
 
         {/* Disclosure verification */}
-        <Card className="mt-6">
-          <div className="flex items-center justify-between gap-3 border-b border-border p-4">
+        <Card className="mt-6 overflow-hidden rounded-2xl border-border/70 shadow-sm">
+          <div className="flex items-center justify-between gap-3 border-b border-border p-5">
             <div>
               <h2 className="font-semibold">Disclosure verification</h2>
               <p className="text-xs text-muted-foreground">
                 Exact previews of what visitors see on your referral surfaces.
               </p>
             </div>
-            <Badge className="bg-green-600 hover:bg-green-600">
-              <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> Live on your referral pages
+            <Badge className="shrink-0 bg-emerald-600 hover:bg-emerald-600">
+              <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> Live
             </Badge>
           </div>
 
-          <div className="grid gap-4 p-4 md:grid-cols-2">
+          <div className="grid gap-4 p-5 md:grid-cols-2">
             <div>
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                 Banner (top of referral landing)
               </p>
               <InfluencerDisclosure variant="banner" partnerName={partner.display_name} />
             </div>
             <div>
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                 Inline (in cards / posts)
               </p>
-              <div className="rounded-md border border-border bg-card p-3">
+              <div className="rounded-2xl border border-border bg-card p-3">
                 <InfluencerDisclosure variant="inline" partnerName={partner.display_name} />
               </div>
             </div>
             <div className="md:col-span-2">
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                 Footer (bottom of referral landing)
               </p>
-              <div className="rounded-md border border-border bg-card px-4 pb-3">
+              <div className="rounded-2xl border border-border bg-card px-4 pb-3">
                 <InfluencerDisclosure variant="footer" partnerName={partner.display_name} />
               </div>
             </div>
           </div>
 
-          <div className="border-t border-border p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <div className="border-t border-border bg-muted/30 p-5">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
               Where it appears
             </p>
-            <ul className="mt-2 space-y-1.5 text-sm">
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
               {[
                 `Your referral landing page (/r/${partner.referral_code}) — top banner + footer`,
                 "Partner Program overview page",
                 "Partner application page",
                 "This dashboard",
               ].map((label) => (
-                <li key={label} className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
+                <li key={label} className="flex items-start gap-2 text-sm">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                   <span>{label}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border p-4">
-            <div className="flex-1 min-w-[220px]">
-              <p className="text-xs text-muted-foreground">Copy-ready snippet for your posts</p>
-              <code className="mt-1 block text-sm">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-border p-5 sm:flex sm:flex-wrap sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                Copy-ready snippet
+              </p>
+              <code className="mt-1 block truncate text-sm sm:whitespace-normal">
                 I may earn a commission if you sign up through my 365 Motor Sales link.
               </code>
             </div>
-            <div className="flex gap-2">
+            <div className="col-span-2 flex shrink-0 gap-2">
               <Button
                 size="sm"
                 variant="outline"
@@ -145,7 +193,7 @@ function PartnerDashboard() {
                   copy("I may earn a commission if you sign up through my 365 Motor Sales link.")
                 }
               >
-                <Copy className="mr-1 h-3.5 w-3.5" /> Copy snippet
+                <Copy className="mr-1 h-3.5 w-3.5" /> Copy
               </Button>
               <Button size="sm" asChild>
                 <a
@@ -160,30 +208,6 @@ function PartnerDashboard() {
           </div>
         </Card>
 
-
-
-        <div className="mt-6 grid gap-4 md:grid-cols-[240px_1fr]">
-          <Card className="flex flex-col items-center gap-3 p-4">
-            <QRCodeCanvas value={link} size={200} includeMargin />
-            <p className="text-xs text-muted-foreground text-center break-all">{link}</p>
-            <Button size="sm" variant="outline" onClick={() => copy(link)}>
-              <Copy className="mr-1 h-3.5 w-3.5" /> Copy link
-            </Button>
-          </Card>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {[
-              { label: "Pending", value: totals.pending, tone: "text-amber-600" },
-              { label: "Approved", value: totals.approved, tone: "text-primary" },
-              { label: "Paid", value: totals.paid, tone: "text-green-600" },
-              { label: "Clawed back", value: totals.clawed_back, tone: "text-destructive" },
-            ].map((s) => (
-              <Card key={s.label} className="p-4">
-                <p className="text-xs text-muted-foreground">{s.label}</p>
-                <p className={`mt-1 text-xl font-bold ${s.tone}`}>{formatPHP(s.value)}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
 
         <Card className="mt-6">
           <div className="border-b border-border p-4">
