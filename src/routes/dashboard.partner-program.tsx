@@ -97,9 +97,16 @@ function PartnerDashboard() {
               <QRCodeCanvas value={link} size={200} includeMargin />
             </div>
             <p className="text-xs text-muted-foreground text-center break-all">{link}</p>
-            <Button size="sm" variant="outline" className="w-full" onClick={() => copy(link)}>
-              <Copy className="mr-1 h-3.5 w-3.5" /> Copy link
+            <Button
+              size="sm"
+              variant="outline"
+              aria-label="Copy referral link to clipboard"
+              className="w-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              onClick={() => copy(link)}
+            >
+              <Copy className="mr-1 h-3.5 w-3.5" aria-hidden="true" /> Copy link
             </Button>
+
           </Card>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {[
