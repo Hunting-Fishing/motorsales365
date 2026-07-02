@@ -152,7 +152,7 @@ function PartnerDashboard() {
               { label: "Paid", value: totals.paid, tile: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
               { label: "Clawed back", value: totals.clawed_back, tile: "bg-destructive/10 text-destructive" },
             ].map((s) => (
-              <Card key={s.label} className="rounded-2xl border-border/70 p-4 shadow-sm">
+              <Card key={s.label} className={`p-4 ${INTERACTIVE_CARD}`}>
                 <span className={`inline-block rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${s.tile}`}>
                   {s.label}
                 </span>
