@@ -73,7 +73,9 @@ Disclosure: I may earn a commission if you sign up through my 365 Motor Sales li
   {
     channel: "SMS / Viber",
     title: "SMS or Viber blast",
-    body: (link) => `Looking to buy/sell a vehicle or parts? Try 365 Motor Sales — PH's motor marketplace with verified sellers. Free to list. ${link} (I may earn a commission.)`,
+    body: (link) => `Looking to buy/sell a vehicle or parts? Try 365 Motor Sales — PH's motor marketplace with verified sellers. Free to list. ${link}
+
+Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner`,
   },
   {
     channel: "Email signature",
@@ -82,23 +84,27 @@ Disclosure: I may earn a commission if you sign up through my 365 Motor Sales li
       `--
 Find your next ride on 365 Motor Sales — the Philippine motor marketplace.
 ${link}
-(Affiliate link — I may earn a commission.)`,
+
+Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner`,
   },
   {
     channel: "Business card back",
     title: "Business card / flyer caption",
     body: (link, code) => `Scan to browse vehicles, parts and motor shops near you.
 Code: ${code}
-${link}`,
+${link}
+
+Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner`,
   },
   {
     channel: "WhatsApp / Messenger",
     title: "1-to-1 WhatsApp / Messenger",
     body: (link) => `Hey 👋 — if you're shopping for a car / bike / parts here in PH, check 365 Motor Sales. Verified sellers and proper filters, not a Facebook feed. ${link}
 
-(Heads up: I may earn a commission if you sign up.)`,
+Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner`,
   },
 ];
+
 
 const PLACEMENT_TIPS = [
   {
