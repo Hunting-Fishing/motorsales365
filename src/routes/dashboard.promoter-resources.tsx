@@ -345,8 +345,17 @@ function PromoterResources() {
           </p>
           <div className="grid gap-4 lg:grid-cols-2">
             {AD_EXAMPLES.map((ex) => (
-              <AdCard key={ex.title} example={ex} link={link} code={displayCode} />
+              <AdCard
+                key={ex.title}
+                example={ex}
+                link={link}
+                code={displayCode}
+                onCopy={(channel) =>
+                  trackCta("copy_template", { partner_code: code, meta: { channel } })
+                }
+              />
             ))}
+
           </div>
         </TabsContent>
 
@@ -395,11 +404,16 @@ function PromoterResources() {
                 in preview.
               </p>
             </div>
-            <Link to="/resources/qr-landing" className="col-span-2 shrink-0 sm:col-auto">
+            <Link
+              to="/resources/qr-landing"
+              className="col-span-2 shrink-0 sm:col-auto"
+              onClick={() => trackCta("preview_scanner", { partner_code: code, meta: { location: "walkthrough" } })}
+            >
               <Button className="w-full sm:w-auto">
                 Open scanner preview <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
+
           </div>
         </TabsContent>
       </Tabs>
