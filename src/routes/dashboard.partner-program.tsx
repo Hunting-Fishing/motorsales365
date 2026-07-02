@@ -286,7 +286,7 @@ function PartnerDashboard() {
         </Card>
 
         <div className="mt-6">
-          <InfluencerDisclosure />
+          <InfluencerDisclosure analyticsSurface="dashboard_partner_program" partnerCode={partner.referral_code} />
         </div>
 
       </div>
