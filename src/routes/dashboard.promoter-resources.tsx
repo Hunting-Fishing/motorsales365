@@ -225,6 +225,38 @@ function PromoterResources() {
         </div>
       )}
 
+      <div className="flex flex-wrap items-start gap-3 rounded-xl border border-amber-500/40 bg-amber-50/60 p-4 dark:bg-amber-950/20">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+        <div className="flex-1 text-sm">
+          <p className="font-semibold text-amber-950 dark:text-amber-100">
+            Disclosure required on every post
+          </p>
+          <p className="mt-1 text-amber-900/80 dark:text-amber-100/80">
+            Templates below already include the required snippet. Keep it in when you paste — it's
+            an FTC / PH DTI rule and part of the{" "}
+            <Link to="/partner-program/terms" className="underline">
+              Partner Terms
+            </Link>
+            .
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            navigator.clipboard
+              .writeText(
+                "Disclosure: I may earn a commission if you sign up through my 365 Motor Sales link. #365MotorSalesPartner",
+              )
+              .then(() => toast.success("Snippet copied"));
+          }}
+        >
+          <Copy className="mr-1.5 h-4 w-4" /> Copy snippet
+        </Button>
+      </div>
+
+
+
       <Tabs defaultValue="ads" className="w-full">
         <TabsList>
           <TabsTrigger value="ads">
