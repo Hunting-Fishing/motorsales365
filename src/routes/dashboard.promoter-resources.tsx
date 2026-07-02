@@ -260,6 +260,22 @@ function PromoterResources() {
         </div>
       </header>
 
+      {!loaded && (
+        <div
+          role="status"
+          aria-label="Loading your referral code"
+          className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-9 w-9 rounded-xl" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-3 w-1/3" />
+              <Skeleton className="h-3 w-2/3" />
+            </div>
+          </div>
+        </div>
+      )}
+
       {loaded && !code && (
         <div
           role="status"
@@ -270,6 +286,7 @@ function PromoterResources() {
           create your code so your link tracks scans and signups.
         </div>
       )}
+
 
       {/* Compliance strip — mobile-safe grid, stacks button below */}
       <aside
