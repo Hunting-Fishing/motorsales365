@@ -208,7 +208,7 @@ function PromoterResources() {
               Promote &amp; earn
             </span>
             <h1 className="font-display mt-3 text-2xl font-bold sm:text-4xl">Promoter resources</h1>
-            <p className="mt-2 text-sm text-white/70 sm:text-base">
+            <p className="mt-2 text-sm text-white/85 sm:text-base">
               Copy-ready ad templates, QR placement ideas, and a walkthrough of what a new visitor
               sees when they scan your code.
             </p>
@@ -218,22 +218,31 @@ function PromoterResources() {
               <Button
                 size="sm"
                 variant="outline"
-                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                aria-label="Open my QR code and referral stats"
+                className="border-white/25 bg-white/5 text-white hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >
-                <QrCode className="mr-1.5 h-4 w-4" /> My QR &amp; stats
+                <QrCode className="mr-1.5 h-4 w-4" aria-hidden="true" /> My QR &amp; stats
               </Button>
             </Link>
             <Link to="/resources/qr-landing">
-              <Button size="sm" className="shadow-lg shadow-primary/30">
-                <Eye className="mr-1.5 h-4 w-4" /> Preview scanner view
+              <Button
+                size="sm"
+                aria-label="Preview the landing page visitors see after scanning"
+                className="shadow-lg shadow-primary/30 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+              >
+                <Eye className="mr-1.5 h-4 w-4" aria-hidden="true" /> Preview scanner view
               </Button>
             </Link>
           </div>
+
         </div>
       </header>
 
       {loaded && !code && (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-4 text-sm text-muted-foreground">
+        <div
+          role="status"
+          className="rounded-2xl border border-dashed border-border bg-card p-4 text-sm text-muted-foreground"
+        >
           You don&apos;t have a personal referral code yet. The examples below use a{" "}
           <code className="rounded bg-muted px-1">YOUR-CODE</code> placeholder — ask an admin to
           create your code so your link tracks scans and signups.
@@ -241,18 +250,31 @@ function PromoterResources() {
       )}
 
       {/* Compliance strip — mobile-safe grid, stacks button below */}
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-50 to-amber-100/40 p-4 shadow-sm dark:from-amber-950/30 dark:to-amber-950/10 dark:border-amber-500/20 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-300">
+      <aside
+        role="region"
+        aria-labelledby="promoter-disclosure-title"
+        className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-50 to-amber-100/40 p-4 shadow-sm dark:from-amber-950/30 dark:to-amber-950/10 dark:border-amber-500/20 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center"
+      >
+        <div
+          aria-hidden="true"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-300"
+        >
           <AlertTriangle className="h-4 w-4" />
         </div>
         <div className="min-w-0 text-sm">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
+          <p
+            id="promoter-disclosure-title"
+            className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-800 dark:text-amber-300"
+          >
             Disclosure required on every post
           </p>
-          <p className="mt-1 text-amber-950/90 dark:text-amber-100/90">
+          <p className="mt-1 text-amber-950 dark:text-amber-100/90">
             Templates below already include the required snippet. Keep it in when you paste — it's
             an FTC / PH DTI rule and part of the{" "}
-            <Link to="/partner-program/terms" className="font-semibold underline underline-offset-2">
+            <Link
+              to="/partner-program/terms"
+              className="font-semibold underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2 rounded"
+            >
               Partner Terms
             </Link>
             .
@@ -262,7 +284,8 @@ function PromoterResources() {
           <Button
             size="sm"
             variant="outline"
-            className="w-full border-amber-500/40 bg-white/60 hover:bg-white sm:w-auto dark:bg-amber-950/30 dark:hover:bg-amber-950/50"
+            aria-label="Copy the required disclosure snippet to your clipboard"
+            className="w-full border-amber-500/50 bg-white/70 text-amber-950 hover:bg-white focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2 sm:w-auto dark:bg-amber-950/30 dark:text-amber-100 dark:hover:bg-amber-950/50"
             onClick={() => {
               navigator.clipboard
                 .writeText(
@@ -271,10 +294,12 @@ function PromoterResources() {
                 .then(() => toast.success("Snippet copied"));
             }}
           >
-            <Copy className="mr-1.5 h-4 w-4" /> Copy snippet
+            <Copy className="mr-1.5 h-4 w-4" aria-hidden="true" /> Copy snippet
           </Button>
+
         </div>
-      </div>
+      </aside>
+
 
 
 

@@ -71,7 +71,7 @@ function PartnerDashboard() {
               <h1 className="font-display mt-3 truncate text-2xl font-bold sm:text-4xl">
                 {partner.display_name}
               </h1>
-              <p className="mt-1 text-sm text-white/60">
+              <p className="mt-1 text-sm text-white/80">
                 Referral code{" "}
                 <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs font-semibold text-white">
                   {partner.referral_code}
@@ -97,9 +97,16 @@ function PartnerDashboard() {
               <QRCodeCanvas value={link} size={200} includeMargin />
             </div>
             <p className="text-xs text-muted-foreground text-center break-all">{link}</p>
-            <Button size="sm" variant="outline" className="w-full" onClick={() => copy(link)}>
-              <Copy className="mr-1 h-3.5 w-3.5" /> Copy link
+            <Button
+              size="sm"
+              variant="outline"
+              aria-label="Copy referral link to clipboard"
+              className="w-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              onClick={() => copy(link)}
+            >
+              <Copy className="mr-1 h-3.5 w-3.5" aria-hidden="true" /> Copy link
             </Button>
+
           </Card>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {[
