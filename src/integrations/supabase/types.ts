@@ -11267,6 +11267,7 @@ export type Database = {
     }
     Functions: {
       accept_org_invite: { Args: { _token: string }; Returns: Json }
+      admin_overview: { Args: never; Returns: Json }
       admin_pending_counts: { Args: never; Returns: Json }
       apply_referral_redemption: {
         Args: {
