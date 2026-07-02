@@ -93,7 +93,9 @@ ${link}`,
   {
     channel: "WhatsApp / Messenger",
     title: "1-to-1 WhatsApp / Messenger",
-    body: (link) => `Hey 👋 — if you're shopping for a car / bike / parts here in PH, check 365 Motor Sales. Verified sellers and proper filters, not a Facebook feed. ${link}`,
+    body: (link) => `Hey 👋 — if you're shopping for a car / bike / parts here in PH, check 365 Motor Sales. Verified sellers and proper filters, not a Facebook feed. ${link}
+
+(Heads up: I may earn a commission if you sign up.)`,
   },
 ];
 
