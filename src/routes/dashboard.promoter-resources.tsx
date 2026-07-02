@@ -369,7 +369,7 @@ function PromoterResources() {
         <TabsContent value="placement" className="mt-6">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {PLACEMENT_TIPS.map(({ Icon, title, body }) => (
-              <div key={title} className="group rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+              <div key={title} className={INTERACTIVE_CARD}>
                 <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
@@ -393,7 +393,7 @@ function PromoterResources() {
         <TabsContent value="walkthrough" className="mt-6 space-y-5">
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {WALKTHROUGH.map((s) => (
-              <div key={s.step} className="rounded-2xl border border-border/70 bg-card p-5 shadow-sm">
+              <div key={s.step} className={INTERACTIVE_CARD}>
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/15 text-sm font-bold text-primary">
                   {s.step}
                 </span>
