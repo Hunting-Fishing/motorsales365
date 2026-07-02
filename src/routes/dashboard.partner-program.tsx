@@ -71,7 +71,7 @@ function PartnerDashboard() {
               <h1 className="font-display mt-3 truncate text-2xl font-bold sm:text-4xl">
                 {partner.display_name}
               </h1>
-              <p className="mt-1 text-sm text-white/60">
+              <p className="mt-1 text-sm text-white/80">
                 Referral code{" "}
                 <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs font-semibold text-white">
                   {partner.referral_code}
