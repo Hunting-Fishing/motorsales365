@@ -208,7 +208,7 @@ function PromoterResources() {
               Promote &amp; earn
             </span>
             <h1 className="font-display mt-3 text-2xl font-bold sm:text-4xl">Promoter resources</h1>
-            <p className="mt-2 text-sm text-white/70 sm:text-base">
+            <p className="mt-2 text-sm text-white/85 sm:text-base">
               Copy-ready ad templates, QR placement ideas, and a walkthrough of what a new visitor
               sees when they scan your code.
             </p>
@@ -218,17 +218,23 @@ function PromoterResources() {
               <Button
                 size="sm"
                 variant="outline"
-                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                aria-label="Open my QR code and referral stats"
+                className="border-white/25 bg-white/5 text-white hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >
-                <QrCode className="mr-1.5 h-4 w-4" /> My QR &amp; stats
+                <QrCode className="mr-1.5 h-4 w-4" aria-hidden="true" /> My QR &amp; stats
               </Button>
             </Link>
             <Link to="/resources/qr-landing">
-              <Button size="sm" className="shadow-lg shadow-primary/30">
-                <Eye className="mr-1.5 h-4 w-4" /> Preview scanner view
+              <Button
+                size="sm"
+                aria-label="Preview the landing page visitors see after scanning"
+                className="shadow-lg shadow-primary/30 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+              >
+                <Eye className="mr-1.5 h-4 w-4" aria-hidden="true" /> Preview scanner view
               </Button>
             </Link>
           </div>
+
         </div>
       </header>
 
