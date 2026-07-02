@@ -13,10 +13,29 @@ const BUILD_ID = `${new Date().toISOString().slice(0, 19).replace(/[-:T]/g, "")}
 export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
+    // Persist Nitro's build artifacts between runs so unchanged routes/chunks
+    // don't have to be re-rendered/re-bundled on every build.
+    nitro: {
+      storage: {
+        build: { driver: "fs", base: "node_modules/.cache/nitro/build" },
+      },
+      devStorage: {
+        build: { driver: "fs", base: "node_modules/.cache/nitro/build-dev" },
+      },
+    },
   },
   vite: {
+    // Explicit cacheDir so Vite's dep-optimizer + transform cache is reused.
+    cacheDir: "node_modules/.cache/vite",
     define: {
       __BUILD_ID__: JSON.stringify(BUILD_ID),
+    },
+    build: {
+      // Rollup keeps its per-chunk cache in-memory during watch/dev builds.
+    },
+    optimizeDeps: {
+      // Persist pre-bundled deps across restarts.
+      holdUntilCrawlEnd: false,
     },
   },
 });
