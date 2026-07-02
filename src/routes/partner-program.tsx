@@ -78,26 +78,31 @@ function PartnerProgramPage() {
                 Earn on real conversions.
               </span>
             </h1>
-            <p className="mt-5 max-w-2xl text-base text-white/70 md:text-lg">
+            <p className="mt-5 max-w-2xl text-base text-white/85 md:text-lg">
               Promote 365 Motor Sales through your own QR code, referral link, or content.
               Commission-only. No quotas, no schedule, no downline.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="shadow-lg shadow-primary/30">
-                <Link to="/partner-program/apply">Apply to become a Partner</Link>
+              <Button
+                asChild
+                size="lg"
+                className="shadow-lg shadow-primary/30 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+              >
+                <Link to="/partner-program/apply" aria-label="Apply to become a 365 Motor Sales partner">Apply to become a Partner</Link>
               </Button>
               <Button
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                className="border-white/25 bg-white/5 text-white hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >
-                <Link to="/partner-program/terms">Read the Partner Terms</Link>
+                <Link to="/partner-program/terms" aria-label="Read the Partner Program terms">Read the Partner Terms</Link>
               </Button>
             </div>
-            <p className="mt-4 text-xs text-white/50">
+            <p className="mt-4 text-xs text-white/75">
               This is a referral program for independent partners — not an employment offer.
             </p>
+
           </div>
         </div>
       </section>
