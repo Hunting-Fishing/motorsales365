@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
-import { computeClubDiscountStatus, logClubDiscountGrant } from "@/lib/club-discount.server";
+import { computeClubDiscountStatus, logClubDiscountGrant, resolveClubCouponDuration } from "@/lib/club-discount.server";
 
 function validateEnv(env: StripeEnv): StripeEnv {
   if (env !== "sandbox" && env !== "live") throw new Error("Invalid environment");
@@ -97,7 +97,7 @@ export const createPassportPremiumCheckout = createServerFn({ method: "POST" })
     if (clubStatus.eligible && clubStatus.pct > 0) {
       const coupon = await stripe.coupons.create({
         percent_off: clubStatus.pct,
-        duration: "once",
+        duration: resolveClubCouponDuration(false, clubStatus),
         name: `Club member ${clubStatus.pct}% off`,
         metadata: { kind: "club_member", userId, clubId: clubStatus.clubId ?? "" },
       });
