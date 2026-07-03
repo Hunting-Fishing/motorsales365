@@ -19,6 +19,7 @@ import {
   MapPin,
   Truck,
   Globe,
+  BadgePercent,
   type LucideIcon,
 } from "lucide-react";
 
@@ -68,6 +69,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { to: "/admin/service-suggestions", label: "Service suggestions", Icon: Sparkles, roles: ["admin"], info: "Approve user-submitted services into the shared catalog.", section: "Businesses" },
   { to: "/admin/service-suggestion-audit", label: "Service audit log", Icon: Sparkles, roles: ["admin"], info: "History of decisions on service suggestions.", section: "Businesses" },
   { to: "/admin/clubs", label: "Clubs", Icon: ShieldCheck, roles: ["admin", "moderator"], info: "Review club applications and accreditation documents.", section: "Businesses" },
+  { to: "/admin/discount-audits", label: "Discount audits", Icon: BadgePercent, roles: ["admin"], info: "Every club-member discount applied — by user, club, purchase type, and date.", section: "Businesses" },
 
   // LISTINGS & MODERATION
   { to: "/admin/listings", label: "Listings", Icon: ListChecks, roles: ["admin", "moderator", "support"], info: "Moderate vehicle/service listings.", section: "Listings & Moderation" },
