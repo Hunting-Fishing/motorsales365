@@ -1,13 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import ogRides from "@/assets/og/rides.jpg";
 import { useEffect, useMemo, useState } from "react";
-import { Search, Sparkles } from "lucide-react";
+import { Search, Sparkles, Users } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { AdCarousel } from "@/components/ads/ad-carousel";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RideCard, type RideCardData } from "@/components/rides/ride-card";
+import { ClubCard, type ClubCardData } from "@/components/clubs/club-card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
 
 export const Route = createFileRoute("/rides/")({
   head: () => ({
