@@ -217,6 +217,7 @@ import { Route as AdminAdvertisementsAnalyticsRouteImport } from './routes/admin
 import { Route as AuthenticatedDisputeReportIdRouteImport } from './routes/_authenticated/dispute.$reportId'
 import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './routes/_authenticated/dashboard.staff-requests'
 import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
+import { Route as AuthenticatedDashboardClubsRouteImport } from './routes/_authenticated/dashboard.clubs'
 import { Route as AuthenticatedDashboardClaimBusinessRouteImport } from './routes/_authenticated/dashboard.claim-business'
 import { Route as AuthenticatedAccountTrustScoreRouteImport } from './routes/_authenticated/account.trust-score'
 import { Route as AuthenticatedAccountRewardsRouteImport } from './routes/_authenticated/account.rewards'
@@ -1321,6 +1322,12 @@ const AuthenticatedDashboardPartsWantedRoute =
     path: '/dashboard/parts-wanted',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardClubsRoute =
+  AuthenticatedDashboardClubsRouteImport.update({
+    id: '/dashboard/clubs',
+    path: '/dashboard/clubs',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardClaimBusinessRoute =
   AuthenticatedDashboardClaimBusinessRouteImport.update({
     id: '/dashboard/claim-business',
@@ -1734,6 +1741,7 @@ export interface FileRoutesByFullPath {
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
+  '/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
@@ -1980,6 +1988,7 @@ export interface FileRoutesByTo {
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
+  '/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
@@ -2232,6 +2241,7 @@ export interface FileRoutesById {
   '/_authenticated/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/_authenticated/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/_authenticated/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
+  '/_authenticated/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/_authenticated/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/_authenticated/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
@@ -2485,6 +2495,7 @@ export interface FileRouteTypes {
     | '/account/rewards'
     | '/account/trust-score'
     | '/dashboard/claim-business'
+    | '/dashboard/clubs'
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
@@ -2731,6 +2742,7 @@ export interface FileRouteTypes {
     | '/account/rewards'
     | '/account/trust-score'
     | '/dashboard/claim-business'
+    | '/dashboard/clubs'
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
@@ -2982,6 +2994,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account/rewards'
     | '/_authenticated/account/trust-score'
     | '/_authenticated/dashboard/claim-business'
+    | '/_authenticated/dashboard/clubs'
     | '/_authenticated/dashboard/parts-wanted'
     | '/_authenticated/dashboard/staff-requests'
     | '/_authenticated/dispute/$reportId'
@@ -4651,6 +4664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardPartsWantedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/clubs': {
+      id: '/_authenticated/dashboard/clubs'
+      path: '/dashboard/clubs'
+      fullPath: '/dashboard/clubs'
+      preLoaderRoute: typeof AuthenticatedDashboardClubsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/claim-business': {
       id: '/_authenticated/dashboard/claim-business'
       path: '/dashboard/claim-business'
@@ -4953,6 +4973,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRewardsRoute: typeof AuthenticatedAccountRewardsRoute
   AuthenticatedAccountTrustScoreRoute: typeof AuthenticatedAccountTrustScoreRoute
   AuthenticatedDashboardClaimBusinessRoute: typeof AuthenticatedDashboardClaimBusinessRoute
+  AuthenticatedDashboardClubsRoute: typeof AuthenticatedDashboardClubsRoute
   AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
   AuthenticatedDashboardStaffRequestsRoute: typeof AuthenticatedDashboardStaffRequestsRoute
   AuthenticatedDisputeReportIdRoute: typeof AuthenticatedDisputeReportIdRoute
@@ -4964,6 +4985,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountTrustScoreRoute: AuthenticatedAccountTrustScoreRoute,
   AuthenticatedDashboardClaimBusinessRoute:
     AuthenticatedDashboardClaimBusinessRoute,
+  AuthenticatedDashboardClubsRoute: AuthenticatedDashboardClubsRoute,
   AuthenticatedDashboardPartsWantedRoute:
     AuthenticatedDashboardPartsWantedRoute,
   AuthenticatedDashboardStaffRequestsRoute:
