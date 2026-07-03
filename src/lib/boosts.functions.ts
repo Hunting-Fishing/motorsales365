@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
+import { computeClubDiscountStatus, logClubDiscountGrant } from "@/lib/club-discount.server";
 
 function validateEnv(env: StripeEnv): StripeEnv {
   if (env !== "sandbox" && env !== "live") throw new Error("Invalid environment");
@@ -91,6 +92,27 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
 
     const productName = `${(product as any).label} — ${(listing as any).title}`;
 
+    // Club member discount (verified clubs only). Applied as a Stripe coupon
+    // so it shows on the checkout, receipt, and subsequent recurring
+    // invoices.
+    const clubStatus = await computeClubDiscountStatus(supabase, userId);
+    let discountsArg: any = undefined;
+    let clubCouponId: string | null = null;
+    if (clubStatus.eligible && clubStatus.pct > 0) {
+      const coupon = await stripe.coupons.create({
+        percent_off: clubStatus.pct,
+        duration: isRecurring ? "forever" : "once",
+        name: `Club member ${clubStatus.pct}% off`,
+        metadata: {
+          kind: "club_member",
+          userId,
+          clubId: clubStatus.clubId ?? "",
+        },
+      });
+      discountsArg = [{ coupon: coupon.id }];
+      clubCouponId = coupon.id;
+    }
+
     const session = await stripe.checkout.sessions.create({
       line_items: [{ price: stripePrice.id, quantity: 1 }],
       mode: isRecurring ? "subscription" : "payment",
@@ -100,6 +122,7 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
       // End-to-end tax/fraud/disputes handled by Stripe. Conflicts with
       // customer_update and payment_intent_data, so those are omitted.
       managed_payments: { enabled: true },
+      ...(discountsArg ? { discounts: discountsArg } : {}),
       metadata: {
         userId,
         kind: "boost",
@@ -108,6 +131,13 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
         lookup_key: lookupKey,
         productName,
         managed_payments: "true",
+        ...(clubCouponId
+          ? {
+              club_member_discount_pct: String(clubStatus.pct),
+              club_member_club_id: clubStatus.clubId ?? "",
+              club_member_coupon_id: clubCouponId,
+            }
+          : {}),
       },
       ...(isRecurring && {
         subscription_data: {
@@ -117,10 +147,25 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
             boostSlug: data.boostSlug,
             listingId: data.listingId,
             lookup_key: lookupKey,
+            ...(clubCouponId ? { club_member_discount_pct: String(clubStatus.pct) } : {}),
           },
         },
       }),
     } as any);
+
+    if (clubStatus.eligible && clubCouponId) {
+      const unit = Number((stripePrice.unit_amount ?? 0)) / 100;
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await logClubDiscountGrant(supabaseAdmin, {
+        userId,
+        clubId: clubStatus.clubId,
+        scope: "boost",
+        originalAmountPhp: unit,
+        discountAmountPhp: Math.round(((unit * clubStatus.pct) / 100) * 100) / 100,
+        discountPct: clubStatus.pct,
+        metadata: { session_id: (session as any).id, coupon_id: clubCouponId, boost_slug: data.boostSlug },
+      });
+    }
 
     return session.client_secret;
   });

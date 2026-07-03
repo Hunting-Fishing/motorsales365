@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { GCashDirectNote } from "@/components/checkout/gcash-direct-note";
+import { ClubDiscountNote } from "@/components/clubs/club-discount-note";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createBusinessSubscriptionCheckout } from "@/lib/business-subscriptions.functions";
 import { useAuth } from "@/hooks/use-auth";
@@ -79,6 +80,7 @@ function BusinessCheckoutPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           Secure payment via Stripe. Your business tier activates as soon as payment clears.
         </p>
+        <div className="mt-4"><ClubDiscountNote /></div>
         <div id="checkout" className="mt-6 min-h-[600px]">
           <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
             <EmbeddedCheckout />

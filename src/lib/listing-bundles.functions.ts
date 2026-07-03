@@ -3,6 +3,11 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import {
+  computeClubDiscountStatus,
+  computeDiscountAmountPhp,
+  logClubDiscountGrant,
+} from "@/lib/club-discount.server";
 
 // PUBLIC: list active bundles
 export const listListingBundles = createServerFn({ method: "GET" })
@@ -43,7 +48,7 @@ export const purchaseBundle = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { userId } = context;
+    const { userId, supabase } = context;
     const { data: bundle, error: bErr } = await supabaseAdmin
       .from("listing_bundles")
       .select("*")
@@ -52,6 +57,15 @@ export const purchaseBundle = createServerFn({ method: "POST" })
       .maybeSingle();
     if (bErr) throw new Error(bErr.message);
     if (!bundle) throw new Error("Bundle not found.");
+
+    const originalPrice = Number((bundle as any).price_php ?? 0);
+    const clubStatus = await computeClubDiscountStatus(supabase, userId);
+    let discountAmount = 0;
+    let pricePaid = originalPrice;
+    if (clubStatus.eligible && clubStatus.pct > 0) {
+      discountAmount = computeDiscountAmountPhp(originalPrice, clubStatus.pct);
+      pricePaid = Math.max(0, Math.round((originalPrice - discountAmount) * 100) / 100);
+    }
 
     const expiresAt = new Date(Date.now() + ((bundle as any).duration_days ?? 30) * 24 * 60 * 60 * 1000);
     const { data: row, error } = await supabaseAdmin
@@ -63,12 +77,32 @@ export const purchaseBundle = createServerFn({ method: "POST" })
         listing_credits_remaining: (bundle as any).listing_credits,
         boost_credits_remaining: (bundle as any).boost_credits,
         expires_at: expiresAt.toISOString(),
-        price_paid_php: (bundle as any).price_php,
+        price_paid_php: pricePaid,
       })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
-    return { id: (row as any).id, expiresAt: expiresAt.toISOString() };
+
+    if (discountAmount > 0) {
+      await logClubDiscountGrant(supabaseAdmin, {
+        userId,
+        clubId: clubStatus.clubId,
+        scope: "bundle",
+        originalAmountPhp: originalPrice,
+        discountAmountPhp: discountAmount,
+        discountPct: clubStatus.pct,
+        metadata: { bundle_id: data.bundleId, purchase_id: (row as any).id },
+      });
+    }
+
+    return {
+      id: (row as any).id,
+      expiresAt: expiresAt.toISOString(),
+      originalPricePhp: originalPrice,
+      pricePaidPhp: pricePaid,
+      clubDiscountPhp: discountAmount,
+      clubDiscountPct: discountAmount > 0 ? clubStatus.pct : 0,
+    };
   });
 
 // ADMIN: upsert

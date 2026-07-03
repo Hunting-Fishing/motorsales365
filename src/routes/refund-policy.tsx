@@ -94,8 +94,15 @@ function RefundPage() {
           most recent month in full.
         </p>
 
+        <h2 className="mt-6 text-xl font-semibold">Club member discount</h2>
+        <p className="mt-2 text-muted-foreground">
+          Where a purchase was made with the 5% club member discount applied, any refund is
+          computed on the actual amount paid (discounted amount), not the original list price. The
+          discount itself has no cash value and is not refundable separately.
+        </p>
+
         <p className="mt-6 text-xs text-muted-foreground">
-          Last updated: June 13, 2026 (added Shop Manager subscription add-on)
+          Last updated: July 3, 2026 (added Club Member Discount)
         </p>
 
 

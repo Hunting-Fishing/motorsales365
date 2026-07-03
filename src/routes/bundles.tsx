@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { listListingBundles, purchaseBundle } from "@/lib/listing-bundles.functions";
+import { ClubDiscountNote } from "@/components/clubs/club-discount-note";
+import { useClubDiscountStatus } from "@/hooks/use-club-discount";
 
 export const Route = createFileRoute("/bundles")({
   component: BundlesPage,
@@ -32,6 +34,8 @@ function BundlesPage() {
   const [bundles, setBundles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [buying, setBuying] = useState<string | null>(null);
+  const { data: clubStatus } = useClubDiscountStatus();
+  const discountPct = clubStatus?.eligible ? clubStatus.pct : 0;
 
   useEffect(() => {
     (async () => {
@@ -54,8 +58,14 @@ function BundlesPage() {
     if (!confirm("Confirm purchase? Credits will be added to your account.")) return;
     setBuying(bundleId);
     try {
-      await purchaseBundle({ data: { bundleId } });
-      toast.success("Bundle purchased — credits available now.");
+      const res: any = await purchaseBundle({ data: { bundleId } });
+      if (res?.clubDiscountPhp > 0) {
+        toast.success(
+          `Bundle purchased — club member ${res.clubDiscountPct}% off (₱${Number(res.clubDiscountPhp).toLocaleString()} saved).`,
+        );
+      } else {
+        toast.success("Bundle purchased — credits available now.");
+      }
     } catch (e: any) {
       toast.error(e.message ?? "Purchase failed");
     } finally {
@@ -78,6 +88,10 @@ function BundlesPage() {
           </p>
         </div>
 
+        <div className="mx-auto mb-8 max-w-xl">
+          <ClubDiscountNote />
+        </div>
+
         {loading ? (
           <div className="text-center text-sm text-muted-foreground">Loading bundles…</div>
         ) : bundles.length === 0 ? (
@@ -86,13 +100,30 @@ function BundlesPage() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-3">
-            {bundles.map((b) => (
+            {bundles.map((b) => {
+              const price = Number(b.price_php);
+              const discounted = discountPct > 0 ? Math.round(price * (1 - discountPct / 100) * 100) / 100 : price;
+              return (
               <div key={b.id} className="rounded-2xl border bg-card p-6 flex flex-col">
                 <h2 className="text-xl font-bold mb-1">{b.name}</h2>
                 {b.description && <p className="text-sm text-muted-foreground mb-4">{b.description}</p>}
-                <div className="text-3xl font-bold mb-1">
-                  ₱{Number(b.price_php).toLocaleString()}
-                </div>
+                {discountPct > 0 ? (
+                  <>
+                    <div className="text-3xl font-bold mb-1">
+                      ₱{discounted.toLocaleString()}
+                      <span className="ml-2 text-base font-normal text-muted-foreground line-through">
+                        ₱{price.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="text-xs text-emerald-600 mb-4">
+                      Club member {discountPct}% off applied
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-3xl font-bold mb-1">
+                    ₱{price.toLocaleString()}
+                  </div>
+                )}
                 <div className="text-xs text-muted-foreground mb-5">
                   for {b.duration_days} days
                 </div>
@@ -114,7 +145,8 @@ function BundlesPage() {
                   {buying === b.id ? "Processing…" : "Buy bundle"}
                 </Button>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

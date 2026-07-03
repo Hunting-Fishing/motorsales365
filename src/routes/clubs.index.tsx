@@ -84,9 +84,14 @@ function ClubsIndexPage() {
             reviewed with formal documentation — LTO accreditation, SEC / DTI registration or
             equivalent — so you know who you're riding with.
           </p>
-          <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
-            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-            Group perks coming soon — insurance rates, parts discounts, event access.
+          <div className="mt-4 flex flex-wrap gap-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              Verified members save 5% on 365 ads, boosts & plans
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
+              More perks coming soon — insurance rates, parts discounts, event access.
+            </div>
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">

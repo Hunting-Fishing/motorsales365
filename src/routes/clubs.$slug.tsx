@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { BadgeCheck, CalendarRange, Globe, Mail, MapPin, Phone, ShieldCheck, Users } from "lucide-react";
+import { BadgeCheck, BadgePercent, CalendarRange, Globe, Mail, MapPin, Phone, ShieldCheck, Users } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -322,9 +322,20 @@ function ClubDetailPage() {
           </div>
 
           <aside className="space-y-4">
+            {club.verified && (
+              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+                <div className="flex items-center gap-2 font-semibold text-emerald-700">
+                  <BadgePercent className="h-4 w-4" /> 5% off 365 ads, boosts & plans
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Active members of this verified club save 5% on internal 365 purchases: ad
+                  packages, listing boosts, dealer bundles, business plans and Passport Premium.
+                </p>
+              </div>
+            )}
             <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
               <div className="flex items-center gap-2 font-semibold text-primary">
-                <ShieldCheck className="h-4 w-4" /> Group perks — coming soon
+                <ShieldCheck className="h-4 w-4" /> More group perks — coming soon
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
                 We're negotiating group rates for insurance, parts discounts and event access for

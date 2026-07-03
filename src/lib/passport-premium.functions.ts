@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
+import { computeClubDiscountStatus, logClubDiscountGrant } from "@/lib/club-discount.server";
 
 function validateEnv(env: StripeEnv): StripeEnv {
   if (env !== "sandbox" && env !== "live") throw new Error("Invalid environment");
@@ -90,6 +91,20 @@ export const createPassportPremiumCheckout = createServerFn({ method: "POST" })
     const vehicleLabel = [v.year, v.make, v.model].filter(Boolean).join(" ") || "Vehicle";
     const productName = `${(product as any).label} — ${vehicleLabel}`;
 
+    const clubStatus = await computeClubDiscountStatus(supabase, userId);
+    let discountsArg: any = undefined;
+    let clubCouponId: string | null = null;
+    if (clubStatus.eligible && clubStatus.pct > 0) {
+      const coupon = await stripe.coupons.create({
+        percent_off: clubStatus.pct,
+        duration: "once",
+        name: `Club member ${clubStatus.pct}% off`,
+        metadata: { kind: "club_member", userId, clubId: clubStatus.clubId ?? "" },
+      });
+      discountsArg = [{ coupon: coupon.id }];
+      clubCouponId = coupon.id;
+    }
+
     const session = await stripe.checkout.sessions.create({
       line_items: [{ price: stripePrice.id, quantity: 1 }],
       mode: "payment",
@@ -97,6 +112,7 @@ export const createPassportPremiumCheckout = createServerFn({ method: "POST" })
       return_url: data.returnUrl,
       customer: customerId,
       managed_payments: { enabled: true },
+      ...(discountsArg ? { discounts: discountsArg } : {}),
       metadata: {
         userId,
         kind: "passport_premium",
@@ -105,8 +121,29 @@ export const createPassportPremiumCheckout = createServerFn({ method: "POST" })
         lookup_key: lookupKey,
         productName,
         managed_payments: "true",
+        ...(clubCouponId
+          ? {
+              club_member_discount_pct: String(clubStatus.pct),
+              club_member_club_id: clubStatus.clubId ?? "",
+              club_member_coupon_id: clubCouponId,
+            }
+          : {}),
       },
     } as any);
+
+    if (clubStatus.eligible && clubCouponId) {
+      const unit = Number(stripePrice.unit_amount ?? 0) / 100;
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await logClubDiscountGrant(supabaseAdmin, {
+        userId,
+        clubId: clubStatus.clubId,
+        scope: "passport_premium",
+        originalAmountPhp: unit,
+        discountAmountPhp: Math.round(((unit * clubStatus.pct) / 100) * 100) / 100,
+        discountPct: clubStatus.pct,
+        metadata: { session_id: (session as any).id, coupon_id: clubCouponId, product_slug: data.productSlug },
+      });
+    }
 
     return session.client_secret;
   });

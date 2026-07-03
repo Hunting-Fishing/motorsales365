@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "July 3, 2026 (added Clubs — accredited motoring groups requiring formal documentation and admin approval before publishing)";
+  const lastUpdated = "July 3, 2026 (added Club Member Discount — 5% off internal 365 purchases for active members of verified clubs)";
 
   return (
     <SiteLayout>
@@ -527,6 +527,20 @@ function TermsPage() {
             <strong>Independence.</strong> A Club listed on the Platform is not an agent, employee,
             or partner of 365 MotorSales. We do not endorse individual clubs beyond confirming that
             the accreditation documents on file appear valid at review time.
+          </li>
+          <li>
+            <strong>Club Member Discount.</strong> Active members of verified clubs (status
+            "active", verification confirmed by admin review of accreditation documents) receive a
+            5% discount on internal 365 MotorSales purchases only: ad packages, listing boosts,
+            dealer bundles, business subscription plans, and Passport Premium. The discount does
+            not apply to affiliate links, partner products, third-party inspection or towing fees,
+            parts marketplace sales, or any item routed through outside sellers. The discount does
+            not stack with promotional codes, staff promotions, or the multi-business discount; the
+            larger discount applies. The discount rate may be changed or the program withdrawn at
+            any time. Membership must be active at the time of purchase — leaving a club, being
+            removed, or a club losing verified status removes eligibility immediately for future
+            purchases. The discount has no cash value and cannot be exchanged, transferred, or
+            refunded separately from the underlying purchase.
           </li>
         </ul>
 
