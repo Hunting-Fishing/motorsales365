@@ -19,7 +19,7 @@ import {
   Inbox,
   Building2,
   CreditCard,
-  UserCog,
+  
   Megaphone,
   ShieldCheck,
   QrCode,
@@ -278,94 +278,71 @@ export function SiteHeader() {
           )}
 
 
-          {user && !loading && realIsAdmin && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2">
-                  <Eye className="h-4 w-4" />
-                  <span className="hidden md:inline">
-                    View as:{" "}
-                    {SELLER_VIEW_OPTIONS.find((o) => o.value === effectiveSellerType)?.label ??
-                      effectiveSellerType}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                {SELLER_VIEW_OPTIONS.map((o) => (
-                  <DropdownMenuItem
-                    key={o.value}
-                    onClick={() =>
-                      setSimulatedSellerType(o.value === realSellerType ? null : o.value)
-                    }
-                  >
-                    {effectiveSellerType === o.value ? "✓ " : "  "}
-                    {o.label}
+          {user && !loading && realIsAdmin && (() => {
+            const activeRolePersona = ROLE_SIM_OPTIONS.find(
+              (o) => (simulatedRoles ?? []).includes(o.value),
+            );
+            const activeSellerPersona = simulatedSellerType
+              ? SELLER_VIEW_OPTIONS.find((o) => o.value === simulatedSellerType)
+              : null;
+            const label = activeRolePersona?.label
+              ?? activeSellerPersona?.label
+              ?? `${SELLER_VIEW_OPTIONS.find((o) => o.value === effectiveSellerType)?.label ?? effectiveSellerType}`;
+            const setSellerPersona = (v: SellerType) => {
+              setSimulatedRoles(null);
+              setSimulatedSellerType(v === realSellerType ? null : v);
+            };
+            const setRolePersona = (v: AppRole) => {
+              setSimulatedSellerType(null);
+              setSimulatedRoles([v]);
+            };
+            const resetAll = () => {
+              setSimulatedSellerType(null);
+              setSimulatedRoles(null);
+            };
+            return (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2" title="Preview app as any persona (UI only)">
+                    <Eye className="h-4 w-4" />
+                    <span className="hidden md:inline">View as: {label}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64 max-h-[70vh] overflow-y-auto">
+                  <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Seller personas
+                  </div>
+                  {SELLER_VIEW_OPTIONS.map((o) => {
+                    const active = !activeRolePersona && effectiveSellerType === o.value;
+                    return (
+                      <DropdownMenuItem key={`s-${o.value}`} onClick={() => setSellerPersona(o.value)}>
+                        {active ? "✓ " : "  "}{o.label}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                  <DropdownMenuSeparator />
+                  <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Role personas
+                  </div>
+                  {ROLE_SIM_OPTIONS.map((o) => {
+                    const active = (simulatedRoles ?? []).includes(o.value) && (simulatedRoles ?? []).length === 1;
+                    return (
+                      <DropdownMenuItem key={`r-${o.value}`} onClick={() => setRolePersona(o.value)}>
+                        {active ? "✓ " : "  "}{o.label}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={resetAll}>
+                    Reset to my real admin account
                   </DropdownMenuItem>
-                ))}
-                {simulatedSellerType && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setSimulatedSellerType(null)}>
-                      Reset to my account ({realSellerType})
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          {/* Role simulator — real admins only */}
-          {user && !loading && realIsAdmin && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2" title="Simulate staff roles (UI only)">
-                  <UserCog className="h-4 w-4" />
-                  <span className="hidden lg:inline">
-                    Role:{" "}
-                    {simulatedRoles && simulatedRoles.length > 0
-                      ? simulatedRoles.join(", ")
-                      : "Admin (real)"}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64">
-                <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Simulate role (UI only)
-                </div>
-                {ROLE_SIM_OPTIONS.map((o) => {
-                  const active = (simulatedRoles ?? []).includes(o.value);
-                  return (
-                    <DropdownMenuItem
-                      key={o.value}
-                      onSelect={(e) => {
-                        e.preventDefault();
-                        const current = simulatedRoles ?? [];
-                        const next = active
-                          ? current.filter((r) => r !== o.value)
-                          : [...current, o.value];
-                        setSimulatedRoles(next.length ? next : null);
-                      }}
-                    >
-                      {active ? "✓ " : "  "}
-                      {o.label}
-                    </DropdownMenuItem>
-                  );
-                })}
-                {simulatedRoles && simulatedRoles.length > 0 && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={() => setSimulatedRoles(null)}>
-                      Reset to my real roles
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuSeparator />
-                <div className="px-2 py-1 text-[10px] text-muted-foreground">
-                  Effective: {effectiveRoles.join(", ") || "none"}
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+                  <div className="px-2 py-1 text-[10px] text-muted-foreground">
+                    Effective roles: {effectiveRoles.join(", ") || "none"}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            );
+          })()}
 
           {loading ? (
             <div
