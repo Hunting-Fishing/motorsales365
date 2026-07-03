@@ -108,18 +108,33 @@ test.describe("auth session recovery (real browser)", () => {
     expect(remaining).toBeNull();
   }
 
+  async function waitForAuthBootstrap(page: Page) {
+    // AuthProvider logs a structured "bootstrap.ok" line once it has finished
+    // validating the persisted session with Supabase. Waiting on that log is
+    // more reliable than polling DOM for a signed-in indicator because it
+    // guarantees the onAuthStateChange subscriber is registered before we
+    // synthesize failure events.
+    await page.waitForEvent("console", {
+      predicate: (msg) => {
+        const t = msg.text();
+        return t.startsWith("[auth]") && t.includes('"bootstrap.ok"');
+      },
+      timeout: 20_000,
+    });
+  }
+
   test("refresh failure (TOKEN_REFRESHED, null) triggers toast + Try again + redirect", async ({
     context,
     page,
   }) => {
     await restoreSession(context, page);
+    const bootstrapWait = page.waitForEvent("console", {
+      predicate: (m) =>
+        m.text().startsWith("[auth]") && m.text().includes('"bootstrap.ok"'),
+      timeout: 20_000,
+    });
     await page.goto("/?e2e=refresh", { waitUntil: "domcontentloaded" });
-
-    // Wait for AuthProvider to bootstrap a signed-in user.
-    await page.waitForFunction(
-      (key) => !!window.localStorage.getItem(key as string),
-      storageKey!,
-    );
+    await bootstrapWait;
 
     await fireAuthEvent(page, "TOKEN_REFRESHED");
     await assertRecoveryFlow(page, "/");
@@ -130,12 +145,13 @@ test.describe("auth session recovery (real browser)", () => {
     page,
   }) => {
     await restoreSession(context, page);
+    const bootstrapWait = page.waitForEvent("console", {
+      predicate: (m) =>
+        m.text().startsWith("[auth]") && m.text().includes('"bootstrap.ok"'),
+      timeout: 20_000,
+    });
     await page.goto("/?e2e=signout", { waitUntil: "domcontentloaded" });
-
-    await page.waitForFunction(
-      (key) => !!window.localStorage.getItem(key as string),
-      storageKey!,
-    );
+    await bootstrapWait;
 
     await fireAuthEvent(page, "SIGNED_OUT");
     await assertRecoveryFlow(page, "/");
