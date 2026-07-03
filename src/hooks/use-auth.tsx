@@ -400,9 +400,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         effectiveSellerType,
         simulatedSellerType,
         setSimulatedSellerType,
+        hasRole: (role) => effectiveRoles.includes(role),
+        hasAnyRole: (rs) => rs.some((r) => effectiveRoles.includes(r)),
         refreshSession,
         signOut,
       }}
+
     >
       {children}
     </AuthContext.Provider>
