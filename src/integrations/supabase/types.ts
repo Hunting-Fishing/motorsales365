@@ -3234,6 +3234,316 @@ export type Database = {
         }
         Relationships: []
       }
+      club_documents: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["club_document_kind"]
+          original_filename: string | null
+          storage_path: string
+          uploaded_by: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          kind: Database["public"]["Enums"]["club_document_kind"]
+          original_filename?: string | null
+          storage_path: string
+          uploaded_by: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["club_document_kind"]
+          original_filename?: string | null
+          storage_path?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_documents_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_event_rsvps: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          response: Database["public"]["Enums"]["club_rsvp_response"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          response?: Database["public"]["Enums"]["club_rsvp_response"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          response?: Database["public"]["Enums"]["club_rsvp_response"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_event_rsvps_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "club_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_events: {
+        Row: {
+          club_id: string
+          cover_url: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          ends_at: string | null
+          id: string
+          meetup_lat: number | null
+          meetup_lng: number | null
+          meetup_location: string | null
+          starts_at: string
+          status: Database["public"]["Enums"]["club_event_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          cover_url?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          meetup_lat?: number | null
+          meetup_lng?: number | null
+          meetup_location?: string | null
+          starts_at: string
+          status?: Database["public"]["Enums"]["club_event_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          meetup_lat?: number | null
+          meetup_lng?: number | null
+          meetup_location?: string | null
+          starts_at?: string
+          status?: Database["public"]["Enums"]["club_event_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_events_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_members: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          joined_at: string | null
+          role: Database["public"]["Enums"]["club_member_role"]
+          status: Database["public"]["Enums"]["club_member_status"]
+          user_id: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          joined_at?: string | null
+          role?: Database["public"]["Enums"]["club_member_role"]
+          status?: Database["public"]["Enums"]["club_member_status"]
+          user_id: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          joined_at?: string | null
+          role?: Database["public"]["Enums"]["club_member_role"]
+          status?: Database["public"]["Enums"]["club_member_status"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_members_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_posts: {
+        Row: {
+          author_id: string
+          body: string
+          club_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          club_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          club_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_posts_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_rides: {
+        Row: {
+          added_by: string
+          club_id: string
+          created_at: string
+          id: string
+          ride_id: string
+        }
+        Insert: {
+          added_by: string
+          club_id: string
+          created_at?: string
+          id?: string
+          ride_id: string
+        }
+        Update: {
+          added_by?: string
+          club_id?: string
+          created_at?: string
+          id?: string
+          ride_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_rides_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_rides_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clubs: {
+        Row: {
+          city: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          logo_url: string | null
+          member_count: number
+          name: string
+          owner_id: string
+          region: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          slug: string
+          status: Database["public"]["Enums"]["club_status"]
+          type: Database["public"]["Enums"]["club_type"]
+          updated_at: string
+          verified: boolean
+          website_url: string | null
+        }
+        Insert: {
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          member_count?: number
+          name: string
+          owner_id: string
+          region?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["club_status"]
+          type?: Database["public"]["Enums"]["club_type"]
+          updated_at?: string
+          verified?: boolean
+          website_url?: string | null
+        }
+        Update: {
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          member_count?: number
+          name?: string
+          owner_id?: string
+          region?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["club_status"]
+          type?: Database["public"]["Enums"]["club_type"]
+          updated_at?: string
+          verified?: boolean
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       course_certificates: {
         Row: {
           code: string
@@ -11534,6 +11844,14 @@ export type Database = {
         Args: { _business: string; _user: string }
         Returns: boolean
       }
+      is_club_admin: {
+        Args: { _club: string; _user: string }
+        Returns: boolean
+      }
+      is_club_member: {
+        Args: { _club: string; _user: string }
+        Returns: boolean
+      }
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
@@ -11755,6 +12073,24 @@ export type Database = {
         | "clerk"
       business_status: "pending" | "active" | "rejected" | "hidden" | "archived"
       business_tier: "free" | "listed" | "featured" | "premium"
+      club_document_kind:
+        | "lto_accreditation"
+        | "sec_incorporation"
+        | "dti_business_permit"
+        | "other"
+      club_event_status: "scheduled" | "cancelled" | "completed"
+      club_member_role: "owner" | "admin" | "member"
+      club_member_status: "pending" | "active" | "banned"
+      club_rsvp_response: "going" | "maybe" | "no"
+      club_status: "pending" | "active" | "rejected" | "suspended"
+      club_type:
+        | "motorcycle_riding"
+        | "car_club"
+        | "off_road"
+        | "truck_club"
+        | "brand_owners"
+        | "general_motoring"
+        | "other"
       course_level: "beginner" | "intermediate" | "advanced"
       course_status: "draft" | "published" | "archived"
       enrollment_source: "purchase" | "subscription" | "admin_grant"
@@ -12119,6 +12455,26 @@ export const Constants = {
       ],
       business_status: ["pending", "active", "rejected", "hidden", "archived"],
       business_tier: ["free", "listed", "featured", "premium"],
+      club_document_kind: [
+        "lto_accreditation",
+        "sec_incorporation",
+        "dti_business_permit",
+        "other",
+      ],
+      club_event_status: ["scheduled", "cancelled", "completed"],
+      club_member_role: ["owner", "admin", "member"],
+      club_member_status: ["pending", "active", "banned"],
+      club_rsvp_response: ["going", "maybe", "no"],
+      club_status: ["pending", "active", "rejected", "suspended"],
+      club_type: [
+        "motorcycle_riding",
+        "car_club",
+        "off_road",
+        "truck_club",
+        "brand_owners",
+        "general_motoring",
+        "other",
+      ],
       course_level: ["beginner", "intermediate", "advanced"],
       course_status: ["draft", "published", "archived"],
       enrollment_source: ["purchase", "subscription", "admin_grant"],
