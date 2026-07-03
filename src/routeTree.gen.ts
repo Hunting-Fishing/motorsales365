@@ -58,6 +58,7 @@ import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
 import { Route as DispatchIndexRouteImport } from './routes/dispatch.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as ClubsIndexRouteImport } from './routes/clubs.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as WantedNewRouteImport } from './routes/wanted.new'
@@ -500,6 +501,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+const ClubsIndexRoute = ClubsIndexRouteImport.update({
+  id: '/clubs/',
+  path: '/clubs/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BusinessesIndexRoute = BusinessesIndexRouteImport.update({
   id: '/businesses/',
@@ -1701,6 +1707,7 @@ export interface FileRoutesByFullPath {
   '/wanted/new': typeof WantedNewRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
+  '/clubs/': typeof ClubsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
   '/games/': typeof GamesIndexRoute
@@ -1944,6 +1951,7 @@ export interface FileRoutesByTo {
   '/wanted/new': typeof WantedNewRoute
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
+  '/clubs': typeof ClubsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dispatch': typeof DispatchIndexRoute
   '/games': typeof GamesIndexRoute
@@ -2193,6 +2201,7 @@ export interface FileRoutesById {
   '/wanted/new': typeof WantedNewRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
+  '/clubs/': typeof ClubsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
   '/games/': typeof GamesIndexRoute
@@ -2443,6 +2452,7 @@ export interface FileRouteTypes {
     | '/wanted/new'
     | '/admin/'
     | '/businesses/'
+    | '/clubs/'
     | '/dashboard/'
     | '/dispatch/'
     | '/games/'
@@ -2686,6 +2696,7 @@ export interface FileRouteTypes {
     | '/wanted/new'
     | '/admin'
     | '/businesses'
+    | '/clubs'
     | '/dashboard'
     | '/dispatch'
     | '/games'
@@ -2934,6 +2945,7 @@ export interface FileRouteTypes {
     | '/wanted/new'
     | '/admin/'
     | '/businesses/'
+    | '/clubs/'
     | '/dashboard/'
     | '/dispatch/'
     | '/games/'
@@ -3112,6 +3124,7 @@ export interface RootRouteChildren {
   WantedIdRoute: typeof WantedIdRoute
   WantedNewRoute: typeof WantedNewRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
+  ClubsIndexRoute: typeof ClubsIndexRoute
   GamesIndexRoute: typeof GamesIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
@@ -3498,6 +3511,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/clubs/': {
+      id: '/clubs/'
+      path: '/clubs'
+      fullPath: '/clubs/'
+      preLoaderRoute: typeof ClubsIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/businesses/': {
       id: '/businesses/'
@@ -5417,6 +5437,7 @@ const rootRouteChildren: RootRouteChildren = {
   WantedIdRoute: WantedIdRoute,
   WantedNewRoute: WantedNewRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
+  ClubsIndexRoute: ClubsIndexRoute,
   GamesIndexRoute: GamesIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
