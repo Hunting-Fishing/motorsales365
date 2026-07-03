@@ -113,6 +113,7 @@ function BillingPage() {
   const [loadingInvoice, setLoadingInvoice] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
   const [defaultPmId, setDefaultPmId] = useState<string | null>(null);
+  const [grantsByPayment, setGrantsByPayment] = useState<Record<string, ClubGrantRow>>({});
 
   const env = getStripeEnvironment();
 
