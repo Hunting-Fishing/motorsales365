@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
+import { computeClubDiscountStatus, logClubDiscountGrant } from "@/lib/club-discount.server";
 
 function validateEnv(env: StripeEnv): StripeEnv {
   if (env !== "sandbox" && env !== "live") throw new Error("Invalid environment");
@@ -107,7 +108,13 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
     // it shows on the checkout, on Stripe invoices and on subscription
     // renewals (forever — duration=forever). `managed_payments` is
     // compatible with `discounts`.
+    // Discounts do not stack: multi-business (10/15/20%) always beats the
+    // 5% club-member discount, so we only apply the club discount when the
+    // multi-business discount is zero.
     let discountStripeArg: any = undefined;
+    let appliedPercentOff = discount.percentOff;
+    let appliedKind: "multi_business" | "club_member" | null = discount.percentOff > 0 ? "multi_business" : null;
+    let clubStatus = { eligible: false, pct: 0, clubId: null as string | null, clubName: null as string | null, clubSlug: null as string | null, enabled: false };
     if (discount.percentOff > 0) {
       const coupon = await stripe.coupons.create({
         percent_off: discount.percentOff,
@@ -121,6 +128,19 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
         },
       });
       discountStripeArg = [{ coupon: coupon.id }];
+    } else {
+      clubStatus = await computeClubDiscountStatus(supabase, userId);
+      if (clubStatus.eligible && clubStatus.pct > 0) {
+        const coupon = await stripe.coupons.create({
+          percent_off: clubStatus.pct,
+          duration: "forever",
+          name: `Club member ${clubStatus.pct}% off`,
+          metadata: { kind: "club_member", userId, clubId: clubStatus.clubId ?? "" },
+        });
+        discountStripeArg = [{ coupon: coupon.id }];
+        appliedPercentOff = clubStatus.pct;
+        appliedKind = "club_member";
+      }
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -142,6 +162,12 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
         managed_payments: "true",
         multi_business_percent_off: String(discount.percentOff),
         multi_business_ordinal: String(discount.ordinal),
+        ...(appliedKind === "club_member"
+          ? {
+              club_member_discount_pct: String(clubStatus.pct),
+              club_member_club_id: clubStatus.clubId ?? "",
+            }
+          : {}),
       },
       subscription_data: {
         description: productName,
@@ -152,9 +178,24 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
           planSlug: data.planSlug,
           lookup_key: lookupKey,
           multi_business_percent_off: String(discount.percentOff),
+          ...(appliedKind === "club_member" ? { club_member_discount_pct: String(clubStatus.pct) } : {}),
         },
       },
     } as any);
+
+    if (appliedKind === "club_member" && clubStatus.eligible) {
+      const unit = Number(stripePrice.unit_amount ?? 0) / 100;
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await logClubDiscountGrant(supabaseAdmin, {
+        userId,
+        clubId: clubStatus.clubId,
+        scope: "subscription",
+        originalAmountPhp: unit,
+        discountAmountPhp: Math.round(((unit * clubStatus.pct) / 100) * 100) / 100,
+        discountPct: clubStatus.pct,
+        metadata: { session_id: (session as any).id, plan_slug: data.planSlug, business_id: data.businessId },
+      });
+    }
 
     return session.client_secret;
   });

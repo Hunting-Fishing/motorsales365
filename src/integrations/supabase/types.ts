@@ -3363,6 +3363,70 @@ export type Database = {
           },
         ]
       }
+      club_member_discount_grants: {
+        Row: {
+          applied_at: string
+          club_id: string | null
+          discount_amount_php: number
+          discount_pct: number
+          id: string
+          line_item_id: string | null
+          metadata: Json
+          original_amount_php: number
+          payment_id: string | null
+          scope: string
+          user_id: string
+        }
+        Insert: {
+          applied_at?: string
+          club_id?: string | null
+          discount_amount_php: number
+          discount_pct: number
+          id?: string
+          line_item_id?: string | null
+          metadata?: Json
+          original_amount_php: number
+          payment_id?: string | null
+          scope: string
+          user_id: string
+        }
+        Update: {
+          applied_at?: string
+          club_id?: string | null
+          discount_amount_php?: number
+          discount_pct?: number
+          id?: string
+          line_item_id?: string | null
+          metadata?: Json
+          original_amount_php?: number
+          payment_id?: string | null
+          scope?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_member_discount_grants_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_member_discount_grants_line_item_id_fkey"
+            columns: ["line_item_id"]
+            isOneToOne: false
+            referencedRelation: "payment_line_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_member_discount_grants_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_members: {
         Row: {
           club_id: string
@@ -11966,6 +12030,7 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      user_has_verified_club: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       account_status: "active" | "paused" | "banned"

@@ -1,0 +1,124 @@
+/**
+ * Club Member Discount helpers (server-only).
+ *
+ * Verified-club members get a percentage discount on internal, 365-controlled
+ * purchases (ad packages, listing boosts, bundles, subscription tiers,
+ * passport premium). Config lives in `pricing_settings` so the rate can be
+ * tuned without a redeploy. Eligibility is determined by the SQL helper
+ * `public.user_has_verified_club`.
+ */
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+export type ClubDiscountConfig = { enabled: boolean; pct: number };
+
+export type ClubDiscountStatus = {
+  enabled: boolean;
+  pct: number;
+  eligible: boolean;
+  /** First verified, active club the user is an active member of, if any. */
+  clubId: string | null;
+  clubName: string | null;
+  clubSlug: string | null;
+};
+
+export type ClubDiscountScope =
+  | "ad_order"
+  | "boost"
+  | "bundle"
+  | "subscription"
+  | "passport_premium"
+  | "promotion";
+
+export async function getClubDiscountConfig(
+  supabase: SupabaseClient<any, any, any>,
+): Promise<ClubDiscountConfig> {
+  const { data, error } = await supabase
+    .from("pricing_settings")
+    .select("key, value")
+    .in("key", ["club_member_discount_pct", "club_member_discount_enabled"]);
+  if (error) return { enabled: false, pct: 0 };
+  const map = new Map<string, number>((data ?? []).map((r: any) => [r.key, Number(r.value)]));
+  const pct = Math.max(0, Math.min(100, map.get("club_member_discount_pct") ?? 0));
+  const enabled = (map.get("club_member_discount_enabled") ?? 0) > 0 && pct > 0;
+  return { enabled, pct };
+}
+
+/**
+ * Look up the user's discount status. Returns `eligible=false` when disabled
+ * globally or when the user is not an active member of a verified club.
+ */
+export async function computeClubDiscountStatus(
+  supabase: SupabaseClient<any, any, any>,
+  userId: string,
+): Promise<ClubDiscountStatus> {
+  const cfg = await getClubDiscountConfig(supabase);
+  if (!cfg.enabled || !userId) {
+    return { enabled: cfg.enabled, pct: cfg.pct, eligible: false, clubId: null, clubName: null, clubSlug: null };
+  }
+  const { data: rows } = await supabase
+    .from("club_members")
+    .select("club_id, status, clubs!inner(id, name, slug, status, verified)")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .eq("clubs.status", "active")
+    .eq("clubs.verified", true)
+    .limit(1);
+  const row: any = rows?.[0];
+  if (!row) {
+    return { enabled: cfg.enabled, pct: cfg.pct, eligible: false, clubId: null, clubName: null, clubSlug: null };
+  }
+  const club = row.clubs;
+  return {
+    enabled: cfg.enabled,
+    pct: cfg.pct,
+    eligible: true,
+    clubId: club?.id ?? row.club_id ?? null,
+    clubName: club?.name ?? null,
+    clubSlug: club?.slug ?? null,
+  };
+}
+
+/**
+ * Compute a peso discount amount from a subtotal + percent.
+ * Rounds to 2 decimals (matches other pricing rounding in the app).
+ */
+export function computeDiscountAmountPhp(subtotalPhp: number, pct: number): number {
+  if (!subtotalPhp || !pct || pct <= 0) return 0;
+  const raw = (subtotalPhp * pct) / 100;
+  return Math.round(raw * 100) / 100;
+}
+
+/**
+ * Insert an audit row into `club_member_discount_grants`. Best-effort — never
+ * throws, since we don't want an audit-log write to block a checkout.
+ */
+export async function logClubDiscountGrant(
+  admin: SupabaseClient<any, any, any>,
+  args: {
+    userId: string;
+    clubId: string | null;
+    scope: ClubDiscountScope;
+    originalAmountPhp: number;
+    discountAmountPhp: number;
+    discountPct: number;
+    paymentId?: string | null;
+    lineItemId?: string | null;
+    metadata?: Record<string, unknown>;
+  },
+): Promise<void> {
+  try {
+    await admin.from("club_member_discount_grants").insert({
+      user_id: args.userId,
+      club_id: args.clubId,
+      scope: args.scope,
+      payment_id: args.paymentId ?? null,
+      line_item_id: args.lineItemId ?? null,
+      original_amount_php: args.originalAmountPhp,
+      discount_amount_php: args.discountAmountPhp,
+      discount_pct: args.discountPct,
+      metadata: args.metadata ?? {},
+    });
+  } catch {
+    // best-effort audit log
+  }
+}
