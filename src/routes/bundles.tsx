@@ -145,7 +145,8 @@ function BundlesPage() {
                   {buying === b.id ? "Processing…" : "Buy bundle"}
                 </Button>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
