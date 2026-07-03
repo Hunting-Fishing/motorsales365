@@ -15,8 +15,8 @@ vi.mock("@/lib/email/send", () => ({
 }));
 
 // ---- Sonner toast spy ----------------------------------------------------
-const toastError = vi.fn(() => "toast-id-1");
-const toastDismiss = vi.fn();
+const toastError = vi.fn<(msg: string, opts: any) => string>(() => "toast-id-1");
+const toastDismiss = vi.fn<(id: any) => void>();
 vi.mock("sonner", () => ({
   toast: {
     error: (msg: string, opts: any) => toastError(msg, opts),
