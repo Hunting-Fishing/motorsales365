@@ -265,62 +265,120 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const lastUidRef = useRef<string | null>(null);
   const welcomeCheckedRef = useRef(new Set<string>());
 
-  const loadRoles = useCallback(async (uid: string) => {
-    setRolesLoading(true);
-    const started = Date.now();
-    try {
-      const timeout = new Promise<"timeout">((resolve) =>
-        setTimeout(() => resolve("timeout"), 8000),
-      );
-      const query = Promise.all([
-        supabase.from("user_roles").select("role").eq("user_id", uid),
-        supabase.from("profiles").select("seller_type, full_name").eq("id", uid).maybeSingle(),
-      ]);
-      const result = await Promise.race([query, timeout]);
-      if (result === "timeout") {
-        authLog("warn", {
-          event: "loadRoles.timeout",
-          uid,
-          durationMs: Date.now() - started,
-        });
-        setRoles([]);
-        setRealSellerType("private");
-        setProfileName(null);
-        return;
-      }
-      const [{ data: roleRows, error: rolesErr }, { data: profileRow, error: profErr }] = result;
-      if (rolesErr || profErr) {
-        authLog("warn", {
-          event: "loadRoles.partial_error",
-          uid,
-          durationMs: Date.now() - started,
-          rolesError: rolesErr?.message,
-          profileError: profErr?.message,
-        });
-      }
-      const roleList = (roleRows ?? []).map((r: any) => r.role);
-      setRoles(roleList);
-      const st = (profileRow as any)?.seller_type;
-      setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
-      setProfileName((profileRow as any)?.full_name ?? null);
-      authLog("info", {
-        event: "loadRoles.ok",
-        uid,
-        durationMs: Date.now() - started,
-        roleCount: roleList.length,
-      });
-    } catch (err) {
-      authLog("error", {
-        event: "loadRoles.failed",
-        uid,
-        durationMs: Date.now() - started,
-        error: errMsg(err),
-      });
-      setRoles([]);
-    } finally {
-      setRolesLoading(false);
+  // Track in-flight retry timers per uid so a new session (or sign-out) can
+  // cancel a pending retry cleanly and we don't leak overlapping loops.
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const retryUidRef = useRef<string | null>(null);
+
+  const cancelPendingRetry = useCallback(() => {
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
     }
+    retryUidRef.current = null;
   }, []);
+
+  const loadRoles = useCallback(
+    async (uid: string, attempt = 0): Promise<void> => {
+      // A newer session for a different uid supersedes any pending retry.
+      if (retryUidRef.current && retryUidRef.current !== uid) cancelPendingRetry();
+      setRolesLoading(true);
+      const started = Date.now();
+      // Backoff schedule: 1s, 2s, 4s (max 3 retries after initial attempt).
+      const MAX_ATTEMPTS = 3;
+      const scheduleRetry = (reason: string) => {
+        if (attempt >= MAX_ATTEMPTS) {
+          authLog("error", {
+            event: "loadRoles.retry_exhausted",
+            uid,
+            attempt,
+            reason,
+          });
+          setRolesLoading(false);
+          return;
+        }
+        const delay = Math.min(1000 * 2 ** attempt, 8000);
+        authLog("warn", {
+          event: "loadRoles.retry_scheduled",
+          uid,
+          attempt: attempt + 1,
+          delayMs: delay,
+          reason,
+        });
+        cancelPendingRetry();
+        retryUidRef.current = uid;
+        retryTimerRef.current = setTimeout(() => {
+          retryTimerRef.current = null;
+          // Skip if the session changed while we were waiting.
+          if (lastUidRef.current !== uid) return;
+          void loadRoles(uid, attempt + 1);
+        }, delay);
+      };
+
+      try {
+        const timeout = new Promise<"timeout">((resolve) =>
+          setTimeout(() => resolve("timeout"), 8000),
+        );
+        const query = Promise.all([
+          supabase.from("user_roles").select("role").eq("user_id", uid),
+          supabase.from("profiles").select("seller_type, full_name").eq("id", uid).maybeSingle(),
+        ]);
+        const result = await Promise.race([query, timeout]);
+        if (result === "timeout") {
+          authLog("warn", {
+            event: "loadRoles.timeout",
+            uid,
+            attempt,
+            durationMs: Date.now() - started,
+          });
+          scheduleRetry("timeout");
+          return;
+        }
+        const [{ data: roleRows, error: rolesErr }, { data: profileRow, error: profErr }] = result;
+        if (rolesErr || profErr) {
+          authLog("warn", {
+            event: "loadRoles.partial_error",
+            uid,
+            attempt,
+            durationMs: Date.now() - started,
+            rolesError: rolesErr?.message,
+            profileError: profErr?.message,
+          });
+          // Retry only when we got no roles back at all — a partial success
+          // (roles loaded, profile 500) is still usable and shouldn't loop.
+          if (rolesErr && !roleRows) {
+            scheduleRetry(rolesErr.message || "roles_error");
+            return;
+          }
+        }
+        const roleList = (roleRows ?? []).map((r: any) => r.role);
+        setRoles(roleList);
+        const st = (profileRow as any)?.seller_type;
+        setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
+        setProfileName((profileRow as any)?.full_name ?? null);
+        cancelPendingRetry();
+        authLog("info", {
+          event: "loadRoles.ok",
+          uid,
+          attempt,
+          durationMs: Date.now() - started,
+          roleCount: roleList.length,
+        });
+        setRolesLoading(false);
+      } catch (err) {
+        authLog("error", {
+          event: "loadRoles.failed",
+          uid,
+          attempt,
+          durationMs: Date.now() - started,
+          error: errMsg(err),
+        });
+        scheduleRetry(errMsg(err));
+      }
+    },
+    [cancelPendingRetry],
+  );
+
 
 
   const handleSession = useCallback(
@@ -344,14 +402,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }, 0);
       } else if (!uid) {
         lastUidRef.current = null;
+        cancelPendingRetry();
         setRoles([]);
         setRealSellerType("private");
         setProfileName(null);
         setRolesLoading(false);
       }
     },
-    [loadRoles],
+    [loadRoles, cancelPendingRetry],
   );
+
+  // Clear any pending retry when the provider unmounts.
+  useEffect(() => () => cancelPendingRetry(), [cancelPendingRetry]);
 
   // The header "Signing you in…" pill is gated on authLoading only.
   // Roles arriving late shouldn't keep the pill spinning; role-gated
