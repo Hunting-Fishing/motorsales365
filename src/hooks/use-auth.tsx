@@ -189,10 +189,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profileName, setProfileName] = useState<string | null>(null);
 
   const [realSellerType, setRealSellerType] = useState<SellerType>("private");
-  const [simulatedRoles, setSimulatedRolesState] = useState<AppRole[] | null>(() => loadSim());
-  const [simulatedSellerType, setSimulatedSellerTypeState] = useState<SellerType | null>(() =>
-    loadSimSellerType(),
-  );
+  // Initialize as null to match SSR output, then hydrate from localStorage
+  // after mount so the persona survives refreshes without a hydration mismatch.
+  const [simulatedRoles, setSimulatedRolesState] = useState<AppRole[] | null>(null);
+  const [simulatedSellerType, setSimulatedSellerTypeState] = useState<SellerType | null>(null);
+
+  useEffect(() => {
+    const r = loadSim();
+    if (r && r.length > 0) setSimulatedRolesState(r);
+    const s = loadSimSellerType();
+    if (s) setSimulatedSellerTypeState(s);
+  }, []);
+
   const lastUidRef = useRef<string | null>(null);
   const welcomeCheckedRef = useRef(new Set<string>());
 
