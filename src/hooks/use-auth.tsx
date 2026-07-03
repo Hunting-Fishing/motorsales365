@@ -210,6 +210,10 @@ interface AuthContextValue {
   };
   refreshSession: (session?: Session | null) => Promise<Session | null>;
   signOut: () => Promise<void>;
+  /** Non-null when the last auth bootstrap/refresh failed and the user needs to re-auth. */
+  authError: AuthErrorKind | null;
+  /** Clears local session state and sends the user back to /auth to sign in again. */
+  retryAuth: () => Promise<void>;
 
 }
 
