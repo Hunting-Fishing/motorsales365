@@ -164,8 +164,9 @@ export function computeDiscountAmountPhp(subtotalPhp: number, pct: number): numb
 }
 
 /**
- * Insert an audit row into `club_member_discount_grants`. Best-effort — never
- * throws, since we don't want an audit-log write to block a checkout.
+ * Insert an audit row into `club_member_discount_grants` and best-effort
+ * notify the user by email. Never throws — audit/email failures must not
+ * block a checkout.
  */
 export async function logClubDiscountGrant(
   admin: SupabaseClient<any, any, any>,
@@ -178,6 +179,7 @@ export async function logClubDiscountGrant(
     discountPct: number;
     paymentId?: string | null;
     lineItemId?: string | null;
+    productLabel?: string | null;
     metadata?: Record<string, unknown>;
   },
 ): Promise<void> {
@@ -195,5 +197,112 @@ export async function logClubDiscountGrant(
     });
   } catch {
     // best-effort audit log
+  }
+  // Best-effort user notification. Never let email failures bubble up.
+  try {
+    const { enqueueTransactionalEmailServer } = await import("@/lib/email/server-enqueue.server");
+    const recipient = await lookupUserEmail(admin, args.userId);
+    if (!recipient) return;
+    const { email, fullName } = recipient;
+    const clubName = args.clubId ? await lookupClubName(admin, args.clubId) : null;
+    const final = Math.max(0, args.originalAmountPhp - args.discountAmountPhp);
+    await enqueueTransactionalEmailServer({
+      templateName: "club-discount-applied",
+      recipientEmail: email,
+      idempotencyKey: `club-disc-applied-${args.userId}-${args.scope}-${args.paymentId ?? Date.now()}`,
+      templateData: {
+        name: fullName ?? undefined,
+        clubName: clubName ?? undefined,
+        pct: args.discountPct,
+        scopeLabel: SCOPE_LABEL[args.scope] ?? args.scope,
+        productLabel: args.productLabel ?? undefined,
+        originalAmountPhp: args.originalAmountPhp,
+        discountAmountPhp: args.discountAmountPhp,
+        finalAmountPhp: final,
+      },
+    });
+  } catch {
+    // best-effort email
+  }
+}
+
+const SCOPE_LABEL: Record<ClubDiscountScope, string> = {
+  ad_order: "ad order",
+  boost: "listing boost",
+  bundle: "listing bundle",
+  subscription: "subscription",
+  passport_premium: "Passport Premium",
+  promotion: "promotion",
+};
+
+async function lookupUserEmail(
+  admin: SupabaseClient<any, any, any>,
+  userId: string,
+): Promise<{ email: string; fullName: string | null } | null> {
+  try {
+    const { data: prof } = await admin
+      .from("profiles")
+      .select("full_name")
+      .eq("id", userId)
+      .maybeSingle();
+    const fullName = (prof as any)?.full_name ?? null;
+    const { data: userRes, error } = await (admin as any).auth.admin.getUserById(userId);
+    if (error) return null;
+    const email = userRes?.user?.email ?? null;
+    if (!email) return null;
+    return { email, fullName };
+  } catch {
+    return null;
+  }
+}
+
+async function lookupClubName(
+  admin: SupabaseClient<any, any, any>,
+  clubId: string,
+): Promise<string | null> {
+  try {
+    const { data } = await admin
+      .from("clubs" as never)
+      .select("name")
+      .eq("id", clubId)
+      .maybeSingle();
+    return (data as any)?.name ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Notify a single user that they've become eligible for the club discount.
+ * Best-effort. Skipped when the user isn't currently eligible per config,
+ * so it's safe to call after membership/club approval regardless of order.
+ */
+export async function notifyClubDiscountEligible(
+  admin: SupabaseClient<any, any, any>,
+  userId: string,
+  reason: "club_verified" | "membership_approved",
+  opts?: { clubId?: string | null },
+): Promise<void> {
+  try {
+    const status = await computeClubDiscountStatus(admin, userId);
+    if (!status.eligible || !status.enabled) return;
+    const recipient = await lookupUserEmail(admin, userId);
+    if (!recipient) return;
+    const clubName = status.clubName ?? (opts?.clubId ? await lookupClubName(admin, opts.clubId) : null);
+    const clubKey = opts?.clubId ?? status.clubId ?? "none";
+    const { enqueueTransactionalEmailServer } = await import("@/lib/email/server-enqueue.server");
+    await enqueueTransactionalEmailServer({
+      templateName: "club-discount-eligible",
+      recipientEmail: recipient.email,
+      idempotencyKey: `club-disc-eligible-${userId}-${clubKey}-${reason}`,
+      templateData: {
+        name: recipient.fullName ?? undefined,
+        clubName: clubName ?? undefined,
+        pct: status.pct,
+        reason,
+      },
+    });
+  } catch {
+    // best-effort
   }
 }

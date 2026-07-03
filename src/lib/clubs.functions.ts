@@ -250,11 +250,23 @@ export const respondToJoinRequest = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     if (data.decision === "approve") {
+      const { data: memRow } = await supabase
+        .from("club_members" as never)
+        .select("user_id, club_id")
+        .eq("id", data.member_id)
+        .maybeSingle();
       const { error } = await supabase
         .from("club_members" as never)
         .update({ status: "active", joined_at: new Date().toISOString() } as never)
         .eq("id", data.member_id);
       if (error) throw new Error(error.message);
+      const uid = (memRow as any)?.user_id;
+      const cid = (memRow as any)?.club_id ?? null;
+      if (uid) {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { notifyClubDiscountEligible } = await import("@/lib/club-discount.server");
+        await notifyClubDiscountEligible(supabaseAdmin, uid, "membership_approved", { clubId: cid });
+      }
     } else {
       const { error } = await supabase
         .from("club_members" as never)
@@ -419,5 +431,24 @@ export const reviewClubApplication = createServerFn({ method: "POST" })
       .update(patch as never)
       .eq("id", data.club_id);
     if (error) throw new Error(error.message);
+
+    // On approval, notify all active members that they're now eligible.
+    if (data.decision === "approve") {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { notifyClubDiscountEligible } = await import("@/lib/club-discount.server");
+      const { data: members } = await supabaseAdmin
+        .from("club_members" as never)
+        .select("user_id")
+        .eq("club_id", data.club_id)
+        .eq("status", "active");
+      const uids = Array.from(
+        new Set(((members ?? []) as any[]).map((m) => m.user_id).filter(Boolean)),
+      );
+      for (const uid of uids) {
+        await notifyClubDiscountEligible(supabaseAdmin, uid, "club_verified", {
+          clubId: data.club_id,
+        });
+      }
+    }
     return { ok: true };
   });

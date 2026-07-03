@@ -38,6 +38,8 @@ import { template as verificationRejected } from "./verification-rejected";
 import { template as bookingStatusChanged } from "./booking-status-changed";
 import { template as opsAlertsDigest } from "./ops-alerts-digest";
 import { template as partsWantedMatch } from "./parts-wanted-match";
+import { template as clubDiscountEligible } from "./club-discount-eligible";
+import { template as clubDiscountApplied } from "./club-discount-applied";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "signup-welcome": signupWelcome,
@@ -69,4 +71,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "parts-wanted-match": partsWantedMatch,
   "ad-creative-approved": adCreativeApproved,
   "ad-creative-rejected": adCreativeRejected,
+  "club-discount-eligible": clubDiscountEligible,
+  "club-discount-applied": clubDiscountApplied,
 };
