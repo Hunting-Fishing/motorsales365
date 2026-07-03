@@ -1386,7 +1386,10 @@ function BillingPage() {
                           <span className="text-muted-foreground">—</span>
                         )}
                       </td>
-                      <td className="p-3 font-medium">{formatPHP(p.amount_php)}</td>
+                      <td className="p-3 font-medium">
+                        <div>{formatPHP(p.amount_php)}</div>
+                        <ClubDiscountBadgeForPayment paymentId={p.id} />
+                      </td>
                       <td className="p-3">
                         <Badge variant={p.status === "paid" ? "default" : "secondary"}>
                           {p.status}
