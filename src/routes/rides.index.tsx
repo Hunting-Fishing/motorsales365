@@ -1,13 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import ogRides from "@/assets/og/rides.jpg";
 import { useEffect, useMemo, useState } from "react";
-import { Search, Sparkles } from "lucide-react";
+import { Search, Sparkles, Users } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { AdCarousel } from "@/components/ads/ad-carousel";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RideCard, type RideCardData } from "@/components/rides/ride-card";
+import { ClubCard, type ClubCardData } from "@/components/clubs/club-card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
 
 export const Route = createFileRoute("/rides/")({
   head: () => ({
@@ -149,26 +152,96 @@ function RidesHubPage() {
 
       <div className="container mx-auto px-4 py-8">
         <AdCarousel placement="rides_top" className="mb-6" />
-        {loading ? (
-          <div className="p-12 text-center text-muted-foreground">Loading…</div>
-        ) : filtered.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center">
-            <h2 className="font-display text-xl font-semibold">No rides yet</h2>
-            <p className="mt-2 text-muted-foreground">
-              Be the first to share your build with the community.
-            </p>
-            <Button asChild className="mt-4">
-              <Link to="/dashboard/rides">Add your ride</Link>
-            </Button>
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filtered.map((r) => (
-              <RideCard key={r.id} ride={r} />
-            ))}
-          </div>
-        )}
+        <Tabs defaultValue="rides">
+          <TabsList>
+            <TabsTrigger value="rides">
+              <Sparkles className="mr-2 h-4 w-4" /> Rides
+            </TabsTrigger>
+            <TabsTrigger value="clubs">
+              <Users className="mr-2 h-4 w-4" /> Clubs
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="rides" className="mt-6">
+            {loading ? (
+              <div className="p-12 text-center text-muted-foreground">Loading…</div>
+            ) : filtered.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center">
+                <h2 className="font-display text-xl font-semibold">No rides yet</h2>
+                <p className="mt-2 text-muted-foreground">
+                  Be the first to share your build with the community.
+                </p>
+                <Button asChild className="mt-4">
+                  <Link to="/dashboard/rides">Add your ride</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {filtered.map((r) => (
+                  <RideCard key={r.id} ride={r} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          <TabsContent value="clubs" className="mt-6">
+            <ClubsTab />
+          </TabsContent>
+        </Tabs>
       </div>
     </SiteLayout>
+  );
+}
+
+function ClubsTab() {
+  const [clubs, setClubs] = useState<ClubCardData[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("clubs")
+        .select("id,slug,name,type,verified,logo_url,cover_url,member_count,region,city")
+        .eq("status", "active")
+        .order("member_count", { ascending: false })
+        .limit(24);
+      setClubs((data ?? []) as ClubCardData[]);
+      setLoading(false);
+    })();
+  }, []);
+
+  return (
+    <div>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <p className="max-w-xl text-sm text-muted-foreground">
+          Accredited motoring clubs — riding groups, car clubs and off-road crews. Every club is
+          verified with formal documentation.
+        </p>
+        <div className="flex gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/clubs">Browse all clubs</Link>
+          </Button>
+          <Button asChild size="sm">
+            <Link to="/clubs/apply">Apply for a club</Link>
+          </Button>
+        </div>
+      </div>
+      {loading ? (
+        <div className="p-12 text-center text-muted-foreground">Loading…</div>
+      ) : clubs.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center">
+          <h2 className="font-display text-xl font-semibold">No clubs yet</h2>
+          <p className="mt-2 text-muted-foreground">
+            Be the first accredited club on 365 MotorSales.
+          </p>
+          <Button asChild className="mt-4">
+            <Link to="/clubs/apply">Apply for a club</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {clubs.map((c) => (
+            <ClubCard key={c.id} club={c} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

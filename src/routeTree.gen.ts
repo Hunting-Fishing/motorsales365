@@ -58,6 +58,7 @@ import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
 import { Route as DispatchIndexRouteImport } from './routes/dispatch.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as ClubsIndexRouteImport } from './routes/clubs.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as WantedNewRouteImport } from './routes/wanted.new'
@@ -123,6 +124,8 @@ import { Route as DashboardBoostsRouteImport } from './routes/dashboard.boosts'
 import { Route as DashboardBlockedRouteImport } from './routes/dashboard.blocked'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as DashboardAdsRouteImport } from './routes/dashboard.ads'
+import { Route as ClubsApplyRouteImport } from './routes/clubs.apply'
+import { Route as ClubsSlugRouteImport } from './routes/clubs.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CCodeRouteImport } from './routes/c.$code'
 import { Route as BusinessesSubmitRouteImport } from './routes/businesses.submit'
@@ -164,6 +167,7 @@ import { Route as AdminDispatchRouteImport } from './routes/admin.dispatch'
 import { Route as AdminDiscoverBusinessesRouteImport } from './routes/admin.discover-businesses'
 import { Route as AdminDiagnosticsRouteImport } from './routes/admin.diagnostics'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
+import { Route as AdminClubsRouteImport } from './routes/admin.clubs'
 import { Route as AdminClaimsRouteImport } from './routes/admin.claims'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
@@ -214,6 +218,7 @@ import { Route as AdminAdvertisementsAnalyticsRouteImport } from './routes/admin
 import { Route as AuthenticatedDisputeReportIdRouteImport } from './routes/_authenticated/dispute.$reportId'
 import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './routes/_authenticated/dashboard.staff-requests'
 import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
+import { Route as AuthenticatedDashboardClubsRouteImport } from './routes/_authenticated/dashboard.clubs'
 import { Route as AuthenticatedDashboardClaimBusinessRouteImport } from './routes/_authenticated/dashboard.claim-business'
 import { Route as AuthenticatedAccountTrustScoreRouteImport } from './routes/_authenticated/account.trust-score'
 import { Route as AuthenticatedAccountRewardsRouteImport } from './routes/_authenticated/account.rewards'
@@ -255,6 +260,7 @@ import { Route as ApiPublicGoSlugRouteImport } from './routes/api/public/go.$slu
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 import { Route as ApiPublicFlashcardsContentRouteImport } from './routes/api/public/flashcards.content'
 import { Route as AdminAdvertisementsAnalyticsCodeRouteImport } from './routes/admin.advertisements.analytics.$code'
+import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
@@ -500,6 +506,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+const ClubsIndexRoute = ClubsIndexRouteImport.update({
+  id: '/clubs/',
+  path: '/clubs/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BusinessesIndexRoute = BusinessesIndexRouteImport.update({
   id: '/businesses/',
@@ -827,6 +838,16 @@ const DashboardAdsRoute = DashboardAdsRouteImport.update({
   path: '/ads',
   getParentRoute: () => DashboardRoute,
 } as any)
+const ClubsApplyRoute = ClubsApplyRouteImport.update({
+  id: '/clubs/apply',
+  path: '/clubs/apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClubsSlugRoute = ClubsSlugRouteImport.update({
+  id: '/clubs/$slug',
+  path: '/clubs/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   id: '/checkout/return',
   path: '/checkout/return',
@@ -1032,6 +1053,11 @@ const AdminDiagnosticsRoute = AdminDiagnosticsRouteImport.update({
 const AdminCurrenciesRoute = AdminCurrenciesRouteImport.update({
   id: '/currencies',
   path: '/currencies',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminClubsRoute = AdminClubsRouteImport.update({
+  id: '/clubs',
+  path: '/clubs',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminClaimsRoute = AdminClaimsRouteImport.update({
@@ -1303,6 +1329,12 @@ const AuthenticatedDashboardPartsWantedRoute =
     path: '/dashboard/parts-wanted',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardClubsRoute =
+  AuthenticatedDashboardClubsRouteImport.update({
+    id: '/dashboard/clubs',
+    path: '/dashboard/clubs',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardClaimBusinessRoute =
   AuthenticatedDashboardClaimBusinessRouteImport.update({
     id: '/dashboard/claim-business',
@@ -1540,6 +1572,12 @@ const AdminAdvertisementsAnalyticsCodeRoute =
     path: '/$code',
     getParentRoute: () => AdminAdvertisementsAnalyticsRoute,
   } as any)
+const AuthenticatedDashboardClubsIdRoute =
+  AuthenticatedDashboardClubsIdRouteImport.update({
+    id: '/dashboard/clubs_/$id',
+    path: '/dashboard/clubs/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicTrainingPartnersIdClickRoute =
   ApiPublicTrainingPartnersIdClickRouteImport.update({
     id: '/api/public/training-partners/$id/click',
@@ -1595,6 +1633,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
+  '/admin/clubs': typeof AdminClubsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
@@ -1636,6 +1675,8 @@ export interface FileRoutesByFullPath {
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/clubs/$slug': typeof ClubsSlugRoute
+  '/clubs/apply': typeof ClubsApplyRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/blocked': typeof DashboardBlockedRoute
@@ -1701,6 +1742,7 @@ export interface FileRoutesByFullPath {
   '/wanted/new': typeof WantedNewRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
+  '/clubs/': typeof ClubsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
   '/games/': typeof GamesIndexRoute
@@ -1713,6 +1755,7 @@ export interface FileRoutesByFullPath {
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
+  '/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
@@ -1756,6 +1799,7 @@ export interface FileRoutesByFullPath {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
+  '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -1839,6 +1883,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
+  '/admin/clubs': typeof AdminClubsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
@@ -1880,6 +1925,8 @@ export interface FileRoutesByTo {
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/clubs/$slug': typeof ClubsSlugRoute
+  '/clubs/apply': typeof ClubsApplyRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/blocked': typeof DashboardBlockedRoute
@@ -1944,6 +1991,7 @@ export interface FileRoutesByTo {
   '/wanted/new': typeof WantedNewRoute
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
+  '/clubs': typeof ClubsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dispatch': typeof DispatchIndexRoute
   '/games': typeof GamesIndexRoute
@@ -1956,6 +2004,7 @@ export interface FileRoutesByTo {
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
+  '/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
@@ -1998,6 +2047,7 @@ export interface FileRoutesByTo {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
+  '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -2087,6 +2137,7 @@ export interface FileRoutesById {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
+  '/admin/clubs': typeof AdminClubsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
@@ -2128,6 +2179,8 @@ export interface FileRoutesById {
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/clubs/$slug': typeof ClubsSlugRoute
+  '/clubs/apply': typeof ClubsApplyRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/blocked': typeof DashboardBlockedRoute
@@ -2193,6 +2246,7 @@ export interface FileRoutesById {
   '/wanted/new': typeof WantedNewRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
+  '/clubs/': typeof ClubsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
   '/games/': typeof GamesIndexRoute
@@ -2205,6 +2259,7 @@ export interface FileRoutesById {
   '/_authenticated/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/_authenticated/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/_authenticated/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
+  '/_authenticated/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/_authenticated/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/_authenticated/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
@@ -2248,6 +2303,7 @@ export interface FileRoutesById {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
+  '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -2337,6 +2393,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/claims'
+    | '/admin/clubs'
     | '/admin/currencies'
     | '/admin/diagnostics'
     | '/admin/discover-businesses'
@@ -2378,6 +2435,8 @@ export interface FileRouteTypes {
     | '/businesses/submit'
     | '/c/$code'
     | '/checkout/return'
+    | '/clubs/$slug'
+    | '/clubs/apply'
     | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/blocked'
@@ -2443,6 +2502,7 @@ export interface FileRouteTypes {
     | '/wanted/new'
     | '/admin/'
     | '/businesses/'
+    | '/clubs/'
     | '/dashboard/'
     | '/dispatch/'
     | '/games/'
@@ -2455,6 +2515,7 @@ export interface FileRouteTypes {
     | '/account/rewards'
     | '/account/trust-score'
     | '/dashboard/claim-business'
+    | '/dashboard/clubs'
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
@@ -2498,6 +2559,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/dashboard/team/'
+    | '/dashboard/clubs/$id'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
@@ -2581,6 +2643,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/claims'
+    | '/admin/clubs'
     | '/admin/currencies'
     | '/admin/diagnostics'
     | '/admin/discover-businesses'
@@ -2622,6 +2685,8 @@ export interface FileRouteTypes {
     | '/businesses/submit'
     | '/c/$code'
     | '/checkout/return'
+    | '/clubs/$slug'
+    | '/clubs/apply'
     | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/blocked'
@@ -2686,6 +2751,7 @@ export interface FileRouteTypes {
     | '/wanted/new'
     | '/admin'
     | '/businesses'
+    | '/clubs'
     | '/dashboard'
     | '/dispatch'
     | '/games'
@@ -2698,6 +2764,7 @@ export interface FileRouteTypes {
     | '/account/rewards'
     | '/account/trust-score'
     | '/dashboard/claim-business'
+    | '/dashboard/clubs'
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
@@ -2740,6 +2807,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements'
     | '/dashboard/team'
+    | '/dashboard/clubs/$id'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
@@ -2828,6 +2896,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/claims'
+    | '/admin/clubs'
     | '/admin/currencies'
     | '/admin/diagnostics'
     | '/admin/discover-businesses'
@@ -2869,6 +2938,8 @@ export interface FileRouteTypes {
     | '/businesses/submit'
     | '/c/$code'
     | '/checkout/return'
+    | '/clubs/$slug'
+    | '/clubs/apply'
     | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/blocked'
@@ -2934,6 +3005,7 @@ export interface FileRouteTypes {
     | '/wanted/new'
     | '/admin/'
     | '/businesses/'
+    | '/clubs/'
     | '/dashboard/'
     | '/dispatch/'
     | '/games/'
@@ -2946,6 +3018,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account/rewards'
     | '/_authenticated/account/trust-score'
     | '/_authenticated/dashboard/claim-business'
+    | '/_authenticated/dashboard/clubs'
     | '/_authenticated/dashboard/parts-wanted'
     | '/_authenticated/dashboard/staff-requests'
     | '/_authenticated/dispute/$reportId'
@@ -2989,6 +3062,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/dashboard/team/'
+    | '/_authenticated/dashboard/clubs_/$id'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
@@ -3080,6 +3154,8 @@ export interface RootRouteChildren {
   BusinessesSubmitRoute: typeof BusinessesSubmitRoute
   CCodeRoute: typeof CCodeRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
+  ClubsSlugRoute: typeof ClubsSlugRoute
+  ClubsApplyRoute: typeof ClubsApplyRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GoProductIdRoute: typeof GoProductIdRoute
   HelpPayWithGcashRoute: typeof HelpPayWithGcashRoute
@@ -3112,6 +3188,7 @@ export interface RootRouteChildren {
   WantedIdRoute: typeof WantedIdRoute
   WantedNewRoute: typeof WantedNewRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
+  ClubsIndexRoute: typeof ClubsIndexRoute
   GamesIndexRoute: typeof GamesIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
@@ -3498,6 +3575,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/clubs/': {
+      id: '/clubs/'
+      path: '/clubs'
+      fullPath: '/clubs/'
+      preLoaderRoute: typeof ClubsIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/businesses/': {
       id: '/businesses/'
@@ -3954,6 +4038,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/clubs/apply': {
+      id: '/clubs/apply'
+      path: '/clubs/apply'
+      fullPath: '/clubs/apply'
+      preLoaderRoute: typeof ClubsApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clubs/$slug': {
+      id: '/clubs/$slug'
+      path: '/clubs/$slug'
+      fullPath: '/clubs/$slug'
+      preLoaderRoute: typeof ClubsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout/return': {
       id: '/checkout/return'
       path: '/checkout/return'
@@ -4239,6 +4337,13 @@ declare module '@tanstack/react-router' {
       path: '/currencies'
       fullPath: '/admin/currencies'
       preLoaderRoute: typeof AdminCurrenciesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/clubs': {
+      id: '/admin/clubs'
+      path: '/clubs'
+      fullPath: '/admin/clubs'
+      preLoaderRoute: typeof AdminClubsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/claims': {
@@ -4591,6 +4696,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardPartsWantedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/clubs': {
+      id: '/_authenticated/dashboard/clubs'
+      path: '/dashboard/clubs'
+      fullPath: '/dashboard/clubs'
+      preLoaderRoute: typeof AuthenticatedDashboardClubsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/claim-business': {
       id: '/_authenticated/dashboard/claim-business'
       path: '/dashboard/claim-business'
@@ -4878,6 +4990,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisementsAnalyticsCodeRouteImport
       parentRoute: typeof AdminAdvertisementsAnalyticsRoute
     }
+    '/_authenticated/dashboard/clubs_/$id': {
+      id: '/_authenticated/dashboard/clubs_/$id'
+      path: '/dashboard/clubs/$id'
+      fullPath: '/dashboard/clubs/$id'
+      preLoaderRoute: typeof AuthenticatedDashboardClubsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/training-partners/$id/click': {
       id: '/api/public/training-partners/$id/click'
       path: '/api/public/training-partners/$id/click'
@@ -4893,9 +5012,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRewardsRoute: typeof AuthenticatedAccountRewardsRoute
   AuthenticatedAccountTrustScoreRoute: typeof AuthenticatedAccountTrustScoreRoute
   AuthenticatedDashboardClaimBusinessRoute: typeof AuthenticatedDashboardClaimBusinessRoute
+  AuthenticatedDashboardClubsRoute: typeof AuthenticatedDashboardClubsRoute
   AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
   AuthenticatedDashboardStaffRequestsRoute: typeof AuthenticatedDashboardStaffRequestsRoute
   AuthenticatedDisputeReportIdRoute: typeof AuthenticatedDisputeReportIdRoute
+  AuthenticatedDashboardClubsIdRoute: typeof AuthenticatedDashboardClubsIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -4904,11 +5025,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountTrustScoreRoute: AuthenticatedAccountTrustScoreRoute,
   AuthenticatedDashboardClaimBusinessRoute:
     AuthenticatedDashboardClaimBusinessRoute,
+  AuthenticatedDashboardClubsRoute: AuthenticatedDashboardClubsRoute,
   AuthenticatedDashboardPartsWantedRoute:
     AuthenticatedDashboardPartsWantedRoute,
   AuthenticatedDashboardStaffRequestsRoute:
     AuthenticatedDashboardStaffRequestsRoute,
   AuthenticatedDisputeReportIdRoute: AuthenticatedDisputeReportIdRoute,
+  AuthenticatedDashboardClubsIdRoute: AuthenticatedDashboardClubsIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -5000,6 +5123,7 @@ interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminClaimsRoute: typeof AdminClaimsRoute
+  AdminClubsRoute: typeof AdminClubsRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
   AdminDiagnosticsRoute: typeof AdminDiagnosticsRoute
   AdminDiscoverBusinessesRoute: typeof AdminDiscoverBusinessesRoute
@@ -5044,6 +5168,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminClaimsRoute: AdminClaimsRoute,
+  AdminClubsRoute: AdminClubsRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
   AdminDiagnosticsRoute: AdminDiagnosticsRoute,
   AdminDiscoverBusinessesRoute: AdminDiscoverBusinessesRoute,
@@ -5385,6 +5510,8 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessesSubmitRoute: BusinessesSubmitRoute,
   CCodeRoute: CCodeRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
+  ClubsSlugRoute: ClubsSlugRoute,
+  ClubsApplyRoute: ClubsApplyRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GoProductIdRoute: GoProductIdRoute,
   HelpPayWithGcashRoute: HelpPayWithGcashRoute,
@@ -5417,6 +5544,7 @@ const rootRouteChildren: RootRouteChildren = {
   WantedIdRoute: WantedIdRoute,
   WantedNewRoute: WantedNewRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
+  ClubsIndexRoute: ClubsIndexRoute,
   GamesIndexRoute: GamesIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,

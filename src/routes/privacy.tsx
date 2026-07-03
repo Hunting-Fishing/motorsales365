@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "June 15, 2026 (clarified retention of trust-score events, dispute submissions, and dispute evidence files: kept for the lifetime of the account plus 2 years to support audit trails and possible re-opening; dispute evidence is uploaded to our Lovable Cloud storage and accessible only to the uploader and our moderation team.)";
+  const lastUpdated = "July 3, 2026 (added Clubs feature: accreditation documents uploaded to a private Lovable Cloud bucket, visible only to the club's owner/admins and our moderation team; retained while the club is active; deleted on rejection or removal request.)";
 
   return (
     <SiteLayout>
@@ -39,6 +39,17 @@ function PrivacyPage() {
             Terms &amp; Conditions
           </Link>
           .
+        </p>
+
+        <p className="mt-3 text-muted-foreground">
+          <strong>Club accreditation documents.</strong> When you apply to list a Club at{" "}
+          <Link className="text-primary underline" to="/clubs/apply">/clubs/apply</Link>, we collect
+          the formal documents you upload (e.g., LTO Accreditation, SEC Certificate of
+          Incorporation, DTI / Business Permit) along with the contact details you supply. These
+          documents are stored in a private Lovable Cloud storage bucket and are visible only to
+          the club's owner/admins and our moderation team. They are retained while the Club remains
+          on the Platform and are deleted upon rejection or upon your removal request, subject to
+          any legal-retention obligations.
         </p>
 
         <p className="mt-3 text-muted-foreground">
