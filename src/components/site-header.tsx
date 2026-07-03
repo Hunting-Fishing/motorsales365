@@ -1,5 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
 import {
   Menu,
   Plus,
@@ -92,13 +95,34 @@ export function SiteHeader() {
     effectiveRoles,
     simulatedRoles,
     setSimulatedRoles,
+    resetPersona,
+    realRoles,
   } = useAuth();
+
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const personaActive = !!(simulatedRoles && simulatedRoles.length > 0) || !!simulatedSellerType;
+
+  const handleResetPersona = async () => {
+    const result = resetPersona();
+    // Force every cached query to refetch under the real admin identity so
+    // no on-screen data is still scoped to the simulated role.
+    await queryClient.invalidateQueries();
+    if (result.ok) {
+      toast.success("Back to real admin", {
+        description: `Effective roles: ${result.realRoles.join(", ") || "admin"} · seller: ${result.realSellerType}`,
+      });
+    } else {
+      toast.error("Persona reset incomplete — please refresh the page.");
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
     navigate({ to: "/" });
   };
+
 
   const { list: myBusinesses, setup: businessSetup } = useMyBusinesses(user?.id);
 
@@ -296,18 +320,28 @@ export function SiteHeader() {
               setSimulatedSellerType(null);
               setSimulatedRoles([v]);
             };
-            const resetAll = () => {
-              setSimulatedSellerType(null);
-              setSimulatedRoles(null);
-            };
             return (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2" title="Preview app as any persona (UI only)">
-                    <Eye className="h-4 w-4" />
-                    <span className="hidden md:inline">View as: {label}</span>
+              <div className="hidden md:inline-flex items-center gap-1">
+                {personaActive && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleResetPersona}
+                    className="gap-1.5"
+                    title="Clear persona and refetch all data as real admin"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                    Reset
                   </Button>
-                </DropdownMenuTrigger>
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2" title="Preview app as any persona (UI only)">
+                      <Eye className="h-4 w-4" />
+                      <span className="hidden md:inline">View as: {label}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+
                 <DropdownMenuContent align="end" className="w-64 max-h-[70vh] overflow-y-auto">
                   <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                     Seller personas
@@ -333,15 +367,19 @@ export function SiteHeader() {
                     );
                   })}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={resetAll}>
+                  <DropdownMenuItem onClick={handleResetPersona}>
                     Reset to my real admin account
                   </DropdownMenuItem>
                   <div className="px-2 py-1 text-[10px] text-muted-foreground">
                     Effective roles: {effectiveRoles.join(", ") || "none"}
+                    <br />
+                    Real roles: {realRoles.join(", ") || "none"}
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </div>
             );
+
           })()}
 
           {loading ? (
