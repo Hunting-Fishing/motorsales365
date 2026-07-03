@@ -52,7 +52,7 @@ import {
   detachPaymentMethod,
   getInvoiceDetails,
 } from "@/utils/payments.functions";
-import { ClubDiscountBadgeForPayment } from "@/components/clubs/applied-club-discount";
+import { BadgePercent, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/billing")({
   component: BillingPage,
