@@ -607,6 +607,11 @@ function ReceiptPage() {
                 );
               })()}
 
+          <div className="mt-6">
+            <ClubDiscountForPayment paymentId={payment.id} />
+          </div>
+
+
           <footer className="mt-8 border-t border-border pt-4 text-xs text-muted-foreground">
             Thank you for using 365 Motorsales. For questions about this {docLabel.toLowerCase()},
             email{" "}
