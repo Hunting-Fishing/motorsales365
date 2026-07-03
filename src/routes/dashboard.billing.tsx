@@ -52,6 +52,7 @@ import {
   detachPaymentMethod,
   getInvoiceDetails,
 } from "@/utils/payments.functions";
+import { ClubDiscountBadgeForPayment } from "@/components/clubs/applied-club-discount";
 
 export const Route = createFileRoute("/dashboard/billing")({
   component: BillingPage,
