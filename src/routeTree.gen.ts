@@ -165,6 +165,7 @@ import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-fl
 import { Route as AdminEducationRouteImport } from './routes/admin.education'
 import { Route as AdminDispatchRouteImport } from './routes/admin.dispatch'
 import { Route as AdminDiscoverBusinessesRouteImport } from './routes/admin.discover-businesses'
+import { Route as AdminDiscountAuditsRouteImport } from './routes/admin.discount-audits'
 import { Route as AdminDiagnosticsRouteImport } from './routes/admin.diagnostics'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
 import { Route as AdminClubsRouteImport } from './routes/admin.clubs'
@@ -1045,6 +1046,11 @@ const AdminDiscoverBusinessesRoute = AdminDiscoverBusinessesRouteImport.update({
   path: '/discover-businesses',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDiscountAuditsRoute = AdminDiscountAuditsRouteImport.update({
+  id: '/discount-audits',
+  path: '/discount-audits',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDiagnosticsRoute = AdminDiagnosticsRouteImport.update({
   id: '/diagnostics',
   path: '/diagnostics',
@@ -1636,6 +1642,7 @@ export interface FileRoutesByFullPath {
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
+  '/admin/discount-audits': typeof AdminDiscountAuditsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/education': typeof AdminEducationRoute
@@ -1886,6 +1893,7 @@ export interface FileRoutesByTo {
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
+  '/admin/discount-audits': typeof AdminDiscountAuditsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/education': typeof AdminEducationRoute
@@ -2140,6 +2148,7 @@ export interface FileRoutesById {
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
+  '/admin/discount-audits': typeof AdminDiscountAuditsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/education': typeof AdminEducationRoute
@@ -2396,6 +2405,7 @@ export interface FileRouteTypes {
     | '/admin/clubs'
     | '/admin/currencies'
     | '/admin/diagnostics'
+    | '/admin/discount-audits'
     | '/admin/discover-businesses'
     | '/admin/dispatch'
     | '/admin/education'
@@ -2646,6 +2656,7 @@ export interface FileRouteTypes {
     | '/admin/clubs'
     | '/admin/currencies'
     | '/admin/diagnostics'
+    | '/admin/discount-audits'
     | '/admin/discover-businesses'
     | '/admin/dispatch'
     | '/admin/education'
@@ -2899,6 +2910,7 @@ export interface FileRouteTypes {
     | '/admin/clubs'
     | '/admin/currencies'
     | '/admin/diagnostics'
+    | '/admin/discount-audits'
     | '/admin/discover-businesses'
     | '/admin/dispatch'
     | '/admin/education'
@@ -4325,6 +4337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDiscoverBusinessesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/discount-audits': {
+      id: '/admin/discount-audits'
+      path: '/discount-audits'
+      fullPath: '/admin/discount-audits'
+      preLoaderRoute: typeof AdminDiscountAuditsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/diagnostics': {
       id: '/admin/diagnostics'
       path: '/diagnostics'
@@ -5126,6 +5145,7 @@ interface AdminRouteChildren {
   AdminClubsRoute: typeof AdminClubsRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
   AdminDiagnosticsRoute: typeof AdminDiagnosticsRoute
+  AdminDiscountAuditsRoute: typeof AdminDiscountAuditsRoute
   AdminDiscoverBusinessesRoute: typeof AdminDiscoverBusinessesRoute
   AdminDispatchRoute: typeof AdminDispatchRoute
   AdminEducationRoute: typeof AdminEducationRoute
@@ -5171,6 +5191,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminClubsRoute: AdminClubsRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
   AdminDiagnosticsRoute: AdminDiagnosticsRoute,
+  AdminDiscountAuditsRoute: AdminDiscountAuditsRoute,
   AdminDiscoverBusinessesRoute: AdminDiscoverBusinessesRoute,
   AdminDispatchRoute: AdminDispatchRoute,
   AdminEducationRoute: AdminEducationRoute,
