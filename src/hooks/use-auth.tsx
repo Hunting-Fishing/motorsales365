@@ -722,6 +722,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         refreshSession,
         signOut,
+        authError,
+        retryAuth,
 
       }}
 
