@@ -1408,8 +1408,12 @@ function BillingPage() {
                 {payments.map((p) => {
                   const linked = p.listing_id ? listings.find((l) => l.id === p.listing_id) : null;
                   const docLabel = p.status === "paid" ? "Receipt" : "Invoice";
+                  const grant = grantsByPayment[p.id];
+                  const clubName = grant?.club?.name ?? null;
+                  const clubSlug = grant?.club?.slug ?? null;
+                  const scope = grant ? (CLUB_SCOPE_LABEL[grant.scope] ?? grant.scope) : null;
                   return (
-                    <tr key={p.id} className="border-t border-border">
+                    <tr key={p.id} className="border-t border-border align-top">
                       <td className="p-3">{formatDate(p.created_at)}</td>
                       <td className="p-3 capitalize">{p.kind}</td>
                       <td className="p-3">
@@ -1428,8 +1432,41 @@ function BillingPage() {
                         )}
                       </td>
                       <td className="p-3 font-medium">
-                        <div>{formatPHP(p.amount_php)}</div>
-                        <ClubDiscountBadgeForPayment paymentId={p.id} />
+                        {grant ? (
+                          <>
+                            <div className="text-muted-foreground line-through">
+                              {formatPHP(grant.original_amount_php)}
+                            </div>
+                            <div>{formatPHP(p.amount_php)}</div>
+                            <div className="mt-1 flex flex-col gap-1 text-xs font-normal">
+                              <span className="inline-flex w-fit items-center gap-1 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 font-medium text-emerald-700">
+                                <BadgePercent className="h-3 w-3" />
+                                Club {grant.discount_pct}% off · saved{" "}
+                                {formatPHP(grant.discount_amount_php)}
+                              </span>
+                              <span className="inline-flex items-start gap-1 text-muted-foreground">
+                                <Sparkles className="mt-0.5 h-3 w-3 text-emerald-600" />
+                                <span>
+                                  Eligible as verified member of{" "}
+                                  {clubSlug ? (
+                                    <Link
+                                      to="/clubs/$slug"
+                                      params={{ slug: clubSlug }}
+                                      className="underline hover:text-foreground"
+                                    >
+                                      {clubName ?? "your club"}
+                                    </Link>
+                                  ) : (
+                                    (clubName ?? "your club")
+                                  )}
+                                  {scope ? ` — applied to this ${scope}.` : "."}
+                                </span>
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <div>{formatPHP(p.amount_php)}</div>
+                        )}
                       </td>
                       <td className="p-3">
                         <Badge variant={p.status === "paid" ? "default" : "secondary"}>
