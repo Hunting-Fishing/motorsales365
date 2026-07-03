@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
-import { computeClubDiscountStatus, logClubDiscountGrant, resolveClubCouponDuration } from "@/lib/club-discount.server";
+import { assertClubDiscountEligibility, computeClubDiscountStatus, logClubDiscountGrant, resolveClubCouponDuration } from "@/lib/club-discount.server";
 
 function validateEnv(env: StripeEnv): StripeEnv {
   if (env !== "sandbox" && env !== "live") throw new Error("Invalid environment");
@@ -50,7 +50,7 @@ async function resolveOrCreateCustomer(
 export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (data: { businessId: string; planSlug: string; returnUrl: string; environment: StripeEnv }) => {
+    (data: { businessId: string; planSlug: string; returnUrl: string; environment: StripeEnv; expectClubDiscount?: boolean }) => {
       if (!/^[0-9a-f-]{36}$/i.test(data.businessId)) throw new Error("Invalid businessId");
       if (!/^[a-z0-9_]+$/.test(data.planSlug)) throw new Error("Invalid planSlug");
       validateEnv(data.environment);
@@ -141,6 +141,9 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
         appliedPercentOff = clubStatus.pct;
         appliedKind = "club_member";
       }
+      // Multi-business discount always wins over club discount, so we only
+      // enforce the "expected but not eligible" check in this branch.
+      assertClubDiscountEligibility(data.expectClubDiscount, clubStatus);
     }
 
     const session = await stripe.checkout.sessions.create({

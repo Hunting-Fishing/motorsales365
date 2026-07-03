@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
-import { computeClubDiscountStatus, logClubDiscountGrant, resolveClubCouponDuration } from "@/lib/club-discount.server";
+import { assertClubDiscountEligibility, computeClubDiscountStatus, logClubDiscountGrant, resolveClubCouponDuration } from "@/lib/club-discount.server";
 
 function validateEnv(env: StripeEnv): StripeEnv {
   if (env !== "sandbox" && env !== "live") throw new Error("Invalid environment");
@@ -48,7 +48,7 @@ async function resolveOrCreateCustomer(
 export const createPassportPremiumCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (data: { productSlug: string; vehicleId: string; returnUrl: string; environment: StripeEnv }) => {
+    (data: { productSlug: string; vehicleId: string; returnUrl: string; environment: StripeEnv; expectClubDiscount?: boolean }) => {
       if (!/^[a-z0-9_]+$/.test(data.productSlug)) throw new Error("Invalid productSlug");
       if (!/^[0-9a-f-]{36}$/i.test(data.vehicleId)) throw new Error("Invalid vehicleId");
       validateEnv(data.environment);
@@ -92,6 +92,7 @@ export const createPassportPremiumCheckout = createServerFn({ method: "POST" })
     const productName = `${(product as any).label} — ${vehicleLabel}`;
 
     const clubStatus = await computeClubDiscountStatus(supabase, userId);
+    assertClubDiscountEligibility(data.expectClubDiscount, clubStatus);
     let discountsArg: any = undefined;
     let clubCouponId: string | null = null;
     if (clubStatus.eligible && clubStatus.pct > 0) {

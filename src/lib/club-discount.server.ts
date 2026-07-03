@@ -95,6 +95,28 @@ export function resolveClubCouponDuration(
 }
 
 /**
+ * Human-readable error thrown when a purchase was initiated expecting the
+ * club-member discount but the user is no longer eligible at the moment of
+ * checkout (membership ended, club unverified, config toggled off, etc).
+ */
+export const CLUB_DISCOUNT_INELIGIBLE_MESSAGE =
+  "You're no longer eligible for the club-member discount. This can happen if your membership ended, your club lost verified status, or the discount was turned off. Refresh the page and try again — the current price will be shown without the discount.";
+
+/**
+ * Throw `CLUB_DISCOUNT_INELIGIBLE_MESSAGE` when the caller expected the club
+ * discount but the server-side re-check disagrees. No-op when the caller
+ * didn't claim eligibility, so this is safe to call unconditionally.
+ */
+export function assertClubDiscountEligibility(
+  expected: boolean | undefined,
+  status: Pick<ClubDiscountStatus, "eligible">,
+): void {
+  if (expected && !status.eligible) {
+    throw new Error(CLUB_DISCOUNT_INELIGIBLE_MESSAGE);
+  }
+}
+
+/**
  * Look up the user's discount status. Returns `eligible=false` when disabled
  * globally or when the user has no qualifying club membership per the current
  * config.
