@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { getListingCheckoutStatus } from "@/lib/listing-payment.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
+import { RecentClubDiscountNote } from "@/components/clubs/applied-club-discount";
 
 export const Route = createFileRoute("/checkout/return")({
   validateSearch: (
@@ -129,6 +130,9 @@ function CheckoutReturn() {
               ? "Your listing will activate within a few seconds."
               : "We couldn’t find a session reference, but if you completed the form your payment is on its way."}
         </p>
+        <div className="mx-auto mt-6 max-w-md text-left">
+          <RecentClubDiscountNote />
+        </div>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           {chainingToBoost ? (
             <Button asChild>
