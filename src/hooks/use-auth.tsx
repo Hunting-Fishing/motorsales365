@@ -507,6 +507,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             error: error ? errMsg(error) : "no_user",
             errorStatus: (error as any)?.status,
           });
+          // Only flag as an error worth surfacing if we actually had a
+          // persisted session token that failed to validate. First-time
+          // visitors with no token shouldn't see a re-auth toast.
+          const hadPersistedToken =
+            typeof window !== "undefined" &&
+            Object.keys(window.localStorage ?? {}).some((k) => k.startsWith("sb-"));
+          if (hadPersistedToken) setAuthError("refresh_failed");
           try {
             await supabase.auth.signOut({ scope: "local" });
           } catch (e) {
