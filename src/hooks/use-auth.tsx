@@ -8,8 +8,11 @@ import {
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
+
+export type AuthErrorKind = "refresh_failed" | "bootstrap_failed" | "safety_timeout";
 
 /**
  * Structured auth logger. Emits a single-line JSON payload prefixed with
