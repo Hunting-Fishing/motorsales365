@@ -69,6 +69,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { to: "/admin/service-suggestions", label: "Service suggestions", Icon: Sparkles, roles: ["admin"], info: "Approve user-submitted services into the shared catalog.", section: "Businesses" },
   { to: "/admin/service-suggestion-audit", label: "Service audit log", Icon: Sparkles, roles: ["admin"], info: "History of decisions on service suggestions.", section: "Businesses" },
   { to: "/admin/clubs", label: "Clubs", Icon: ShieldCheck, roles: ["admin", "moderator"], info: "Review club applications and accreditation documents.", section: "Businesses" },
+  { to: "/admin/club-discount", label: "Club discount", Icon: BadgePercent, roles: ["admin"], info: "Configure the club-member discount %, eligible club statuses, and Stripe coupon behavior.", section: "Businesses" },
   { to: "/admin/discount-audits", label: "Discount audits", Icon: BadgePercent, roles: ["admin"], info: "Every club-member discount applied — by user, club, purchase type, and date.", section: "Businesses" },
 
   // LISTINGS & MODERATION
