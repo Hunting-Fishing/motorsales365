@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { listMyClubs } from "@/lib/clubs.functions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ClubDiscountNote } from "@/components/clubs/club-discount-note";
 
 export const Route = createFileRoute("/_authenticated/dashboard/clubs")({
   head: () => ({ meta: [{ title: "My Clubs — 365 MotorSales" }] }),
