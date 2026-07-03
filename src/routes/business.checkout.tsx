@@ -80,6 +80,7 @@ function BusinessCheckoutPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           Secure payment via Stripe. Your business tier activates as soon as payment clears.
         </p>
+        <div className="mt-4"><ClubDiscountNote /></div>
         <div id="checkout" className="mt-6 min-h-[600px]">
           <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
             <EmbeddedCheckout />
