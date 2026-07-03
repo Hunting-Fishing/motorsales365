@@ -150,8 +150,21 @@ interface AuthContextValue {
   hasRole: (role: AppRole) => boolean;
   /** True if the effective (persona-aware) roles include any of `roles`. */
   hasAnyRole: (roles: readonly AppRole[]) => boolean;
+  /**
+   * Clear any persona simulation and return to the real admin identity.
+   * Returns a verification object confirming the effective roles/seller-type
+   * now match the real user's — callers can surface this to prove scope reset.
+   */
+  resetPersona: () => {
+    ok: boolean;
+    effectiveRoles: AppRole[];
+    realRoles: AppRole[];
+    effectiveSellerType: SellerType;
+    realSellerType: SellerType;
+  };
   refreshSession: (session?: Session | null) => Promise<Session | null>;
   signOut: () => Promise<void>;
+
 }
 
 
