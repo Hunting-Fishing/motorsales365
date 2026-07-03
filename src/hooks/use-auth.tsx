@@ -11,6 +11,49 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
 
+/**
+ * Structured auth logger. Emits a single-line JSON payload prefixed with
+ * `[auth]` so hanging sign-in reports can be grep'd from browser logs or
+ * shipped to an aggregator later. Keep fields stable — don't rename keys
+ * without updating any dashboards that consume them.
+ */
+type AuthLogLevel = "info" | "warn" | "error";
+type AuthLogFields = {
+  event: string;
+  uid?: string | null;
+  email?: string | null;
+  route?: string;
+  durationMs?: number;
+  error?: string;
+  [k: string]: unknown;
+};
+function currentRoute(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  return window.location.pathname + window.location.search;
+}
+function authLog(level: AuthLogLevel, fields: AuthLogFields) {
+  const payload = {
+    ts: new Date().toISOString(),
+    route: currentRoute(),
+    ...fields,
+  };
+  const fn = level === "error" ? console.error : level === "warn" ? console.warn : console.info;
+  try {
+    fn("[auth]", JSON.stringify(payload));
+  } catch {
+    fn("[auth]", payload);
+  }
+}
+function errMsg(e: unknown): string {
+  if (!e) return "unknown";
+  if (e instanceof Error) return e.message;
+  try {
+    return typeof e === "string" ? e : JSON.stringify(e);
+  } catch {
+    return String(e);
+  }
+}
+
 function normalizePhPhone(raw?: string): string | undefined {
   if (!raw) return undefined;
   const d = raw.replace(/[^0-9+]/g, "");
@@ -224,10 +267,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadRoles = useCallback(async (uid: string) => {
     setRolesLoading(true);
+    const started = Date.now();
     try {
-      // Race the queries against a timeout so a wedged PostgREST call
-      // (e.g. supabase-js stuck on a failed token refresh) can't leave
-      // rolesLoading=true forever.
       const timeout = new Promise<"timeout">((resolve) =>
         setTimeout(() => resolve("timeout"), 8000),
       );
@@ -237,24 +278,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ]);
       const result = await Promise.race([query, timeout]);
       if (result === "timeout") {
-        console.warn("[auth] loadRoles timed out; continuing with empty roles");
+        authLog("warn", {
+          event: "loadRoles.timeout",
+          uid,
+          durationMs: Date.now() - started,
+        });
         setRoles([]);
         setRealSellerType("private");
         setProfileName(null);
         return;
       }
-      const [{ data: roleRows }, { data: profileRow }] = result;
-      setRoles((roleRows ?? []).map((r: any) => r.role));
+      const [{ data: roleRows, error: rolesErr }, { data: profileRow, error: profErr }] = result;
+      if (rolesErr || profErr) {
+        authLog("warn", {
+          event: "loadRoles.partial_error",
+          uid,
+          durationMs: Date.now() - started,
+          rolesError: rolesErr?.message,
+          profileError: profErr?.message,
+        });
+      }
+      const roleList = (roleRows ?? []).map((r: any) => r.role);
+      setRoles(roleList);
       const st = (profileRow as any)?.seller_type;
       setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
       setProfileName((profileRow as any)?.full_name ?? null);
+      authLog("info", {
+        event: "loadRoles.ok",
+        uid,
+        durationMs: Date.now() - started,
+        roleCount: roleList.length,
+      });
     } catch (err) {
-      console.warn("[auth] loadRoles failed", err);
+      authLog("error", {
+        event: "loadRoles.failed",
+        uid,
+        durationMs: Date.now() - started,
+        error: errMsg(err),
+      });
       setRoles([]);
     } finally {
       setRolesLoading(false);
     }
   }, []);
+
 
   const handleSession = useCallback(
     (newSession: Session | null) => {
@@ -307,6 +374,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    const bootStarted = Date.now();
+    authLog("info", { event: "bootstrap.start" });
 
     // Safety timeout: if bootstrap never resolves (network stall, wedged
     // supabase client), release the UI after 8s. Any real session will
@@ -314,7 +383,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const safetyTimer = setTimeout(() => {
       if (cancelled) return;
       setAuthLoading((prev) => {
-        if (prev) console.warn("[auth] bootstrap safety timeout fired");
+        if (prev) {
+          authLog("error", {
+            event: "bootstrap.safety_timeout",
+            durationMs: Date.now() - bootStarted,
+          });
+        }
         return false;
       });
     }, 8000);
@@ -323,8 +397,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Supabase emits INITIAL_SESSION from the persisted storage token.
     const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (cancelled) return;
+      authLog("info", {
+        event: "authStateChange",
+        supabaseEvent: event,
+        uid: newSession?.user?.id ?? null,
+        email: newSession?.user?.email ?? null,
+        hasSession: !!newSession,
+      });
       // Refresh failed / signed out / no session on init → hard reset.
       if (event === "SIGNED_OUT" || !newSession) {
+        if (event === "TOKEN_REFRESHED" && !newSession) {
+          authLog("error", { event: "token_refresh.failed" });
+        }
         handleSession(null);
         setAuthLoading(false);
         setRolesLoading(false);
@@ -343,27 +427,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data: userData, error } = await supabase.auth.getUser();
         if (cancelled) return;
         if (error || !userData.user) {
-          // Clear the dead token from localStorage without a network round-trip.
+          authLog("warn", {
+            event: "bootstrap.getUser_failed",
+            durationMs: Date.now() - bootStarted,
+            error: error ? errMsg(error) : "no_user",
+            errorStatus: (error as any)?.status,
+          });
           try {
             await supabase.auth.signOut({ scope: "local" });
-          } catch {
-            // ignore; handleSession(null) below still renders signed-out
+          } catch (e) {
+            authLog("warn", { event: "bootstrap.local_signout_failed", error: errMsg(e) });
           }
           handleSession(null);
         } else {
           const { data: sessData } = await supabase.auth.getSession();
           if (cancelled) return;
+          authLog("info", {
+            event: "bootstrap.ok",
+            uid: userData.user.id,
+            email: userData.user.email,
+            durationMs: Date.now() - bootStarted,
+            hasSession: !!sessData.session,
+          });
           handleSession(sessData.session ?? null);
         }
       } catch (err) {
         if (cancelled) return;
-        console.warn("[auth] bootstrap failed", err);
+        authLog("error", {
+          event: "bootstrap.exception",
+          durationMs: Date.now() - bootStarted,
+          error: errMsg(err),
+        });
         try {
           await supabase.auth.signOut({ scope: "local" });
-        } catch {
-          // ignore
+        } catch (e) {
+          authLog("warn", { event: "bootstrap.local_signout_failed", error: errMsg(e) });
         }
         handleSession(null);
+
       } finally {
         if (!cancelled) setAuthLoading(false);
       }
