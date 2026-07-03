@@ -565,7 +565,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     handleSession(null);
     setAuthLoading(false);
+    setAuthError(null);
   };
+
+  const retryAuth = useCallback(async () => {
+    authLog("info", { event: "retryAuth.start" });
+    try {
+      await supabase.auth.signOut({ scope: "local" });
+    } catch (e) {
+      authLog("warn", { event: "retryAuth.local_signout_failed", error: errMsg(e) });
+    }
+    handleSession(null);
+    setAuthError(null);
+    setAuthLoading(false);
+    if (typeof window !== "undefined") {
+      const next = encodeURIComponent(window.location.pathname + window.location.search);
+      window.location.assign(`/auth?next=${next}`);
+    }
+  }, [handleSession]);
+
+  // Surface a persistent toast with a "Try again" action whenever we detect
+  // a broken session. Dedupes so we never stack multiple error toasts.
+  useEffect(() => {
+    if (!authError) {
+      if (authErrorToastRef.current !== null) {
+        toast.dismiss(authErrorToastRef.current);
+        authErrorToastRef.current = null;
+      }
+      return;
+    }
+    if (authErrorToastRef.current !== null) return;
+    const message =
+      authError === "refresh_failed"
+        ? "Your session expired"
+        : authError === "safety_timeout"
+        ? "Sign-in is taking too long"
+        : "We couldn't verify your session";
+    authErrorToastRef.current = toast.error(message, {
+      description: "Please sign in again to continue.",
+      duration: Infinity,
+      action: {
+        label: "Try again",
+        onClick: () => {
+          void retryAuth();
+        },
+      },
+    });
+  }, [authError, retryAuth]);
 
   const realRoles = roles as AppRole[];
   const realIsAdmin = realRoles.includes("admin");
