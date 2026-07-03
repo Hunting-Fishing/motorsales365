@@ -92,7 +92,10 @@ export function SiteHeader() {
     effectiveRoles,
     simulatedRoles,
     setSimulatedRoles,
+    resetPersona,
+    realRoles,
   } = useAuth();
+
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
