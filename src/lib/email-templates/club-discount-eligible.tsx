@@ -17,14 +17,14 @@ const ClubDiscountEligible = ({ name, clubName, pct, reason }: Props) => {
   return (
     <Html lang="en">
       <Head />
-      <Preview>You're now eligible for the {pct ?? 5}% club-member discount.</Preview>
+      <Preview>You're now eligible for the {`${pct ?? 5}%`} club-member discount.</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={brandBar} />
-          <Heading style={h1}>You're eligible for {pct ?? 5}% off</Heading>
+          <Heading style={h1}>You're eligible for {`${pct ?? 5}%`} off</Heading>
           <Text style={text}>
             {name ? `Hi ${name}, ` : "Hi there, "}good news — {reasonText}. As a verified club
-            member, you now get a {pct ?? 5}% discount on internal {SITE_NAME} purchases.
+            member, you now get a {`${pct ?? 5}%`} discount on internal {SITE_NAME} purchases.
           </Text>
           <Section style={card}>
             <Text style={{ ...text, fontWeight: 600, margin: "0 0 6px" }}>What's included</Text>

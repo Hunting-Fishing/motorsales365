@@ -27,13 +27,13 @@ const ClubDiscountApplied = ({
 }: Props) => (
   <Html lang="en">
     <Head />
-    <Preview>Your {pct ?? 5}% club discount was applied.</Preview>
+    <Preview>Your {`${pct ?? 5}%`} club discount was applied.</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={brandBar} />
         <Heading style={h1}>Club discount applied</Heading>
         <Text style={text}>
-          {name ? `Hi ${name}, we` : "We"} applied your {pct ?? 5}% club-member discount to your
+          {name ? `Hi ${name}, we` : "We"} applied your {`${pct ?? 5}%`} club-member discount to your
           recent {scopeLabel ?? "purchase"} at {SITE_NAME}.
         </Text>
         <Section style={card}>
@@ -42,7 +42,7 @@ const ClubDiscountApplied = ({
           )}
           <Text style={{ ...text, margin: "0 0 4px" }}>Subtotal: {peso(originalAmountPhp)}</Text>
           <Text style={{ ...text, margin: "0 0 4px", color: "#059669", fontWeight: 600 }}>
-            Club discount ({pct ?? 5}%): −{peso(discountAmountPhp)}
+            Club discount ({`${pct ?? 5}%`}): −{peso(discountAmountPhp)}
           </Text>
           {typeof finalAmountPhp === "number" && (
             <Text style={{ ...text, fontSize: "18px", fontWeight: 700, color: "#0f172a", margin: "8px 0 0" }}>
