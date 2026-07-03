@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { GCashDirectNote } from "@/components/checkout/gcash-direct-note";
+import { ClubDiscountNote } from "@/components/clubs/club-discount-note";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createBusinessSubscriptionCheckout } from "@/lib/business-subscriptions.functions";
 import { useAuth } from "@/hooks/use-auth";
