@@ -297,8 +297,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [rolesLoading, setRolesLoading] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
   const [profileName, setProfileName] = useState<string | null>(null);
-  const [authError, setAuthError] = useState<AuthErrorKind | null>(null);
+  const [authError, setAuthError] = useState<AuthErrorKind | null>(() => loadPersistedAuthError());
   const authErrorToastRef = useRef<string | number | null>(null);
+
+  useEffect(() => {
+    persistAuthError(authError);
+  }, [authError]);
+
 
   const [realSellerType, setRealSellerType] = useState<SellerType>("private");
   // Initialize as null to match SSR output, then hydrate from localStorage
