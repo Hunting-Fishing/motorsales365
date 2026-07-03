@@ -415,8 +415,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSimulatedSellerType,
         hasRole: (role) => effectiveRoles.includes(role),
         hasAnyRole: (rs) => rs.some((r) => effectiveRoles.includes(r)),
+        resetPersona: () => {
+          setSimulatedRoles(null);
+          setSimulatedSellerType(null);
+          return {
+            ok:
+              JSON.stringify([...effectiveRoles].sort()) ===
+                JSON.stringify([...realRoles].sort()) &&
+              effectiveSellerType === realSellerType,
+            effectiveRoles: realRoles,
+            realRoles,
+            effectiveSellerType: realSellerType,
+            realSellerType,
+          };
+        },
         refreshSession,
         signOut,
+
       }}
 
     >
