@@ -58,8 +58,14 @@ function BundlesPage() {
     if (!confirm("Confirm purchase? Credits will be added to your account.")) return;
     setBuying(bundleId);
     try {
-      await purchaseBundle({ data: { bundleId } });
-      toast.success("Bundle purchased — credits available now.");
+      const res: any = await purchaseBundle({ data: { bundleId } });
+      if (res?.clubDiscountPhp > 0) {
+        toast.success(
+          `Bundle purchased — club member ${res.clubDiscountPct}% off (₱${Number(res.clubDiscountPhp).toLocaleString()} saved).`,
+        );
+      } else {
+        toast.success("Bundle purchased — credits available now.");
+      }
     } catch (e: any) {
       toast.error(e.message ?? "Purchase failed");
     } finally {
