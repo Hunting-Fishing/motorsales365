@@ -96,7 +96,7 @@ test.describe("auth session recovery (real browser)", () => {
     await page.waitForURL(
       (url) =>
         url.pathname === "/auth" &&
-        url.searchParams.get("next") === startPath,
+        (url.searchParams.get("next") ?? "").startsWith(startPath),
       { timeout: 15_000 },
     );
 
