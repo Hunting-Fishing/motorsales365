@@ -114,7 +114,7 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
     let discountStripeArg: any = undefined;
     let appliedPercentOff = discount.percentOff;
     let appliedKind: "multi_business" | "club_member" | null = discount.percentOff > 0 ? "multi_business" : null;
-    let clubStatus = { eligible: false, pct: 0, clubId: null as string | null, clubName: null as string | null, clubSlug: null as string | null, enabled: false };
+    let clubStatus = { eligible: false, pct: 0, clubId: null as string | null, clubName: null as string | null, clubSlug: null as string | null, enabled: false, couponDuration: "auto" as const, requireVerified: true, includePendingClubs: false, includePendingMembers: false };
     if (discount.percentOff > 0) {
       const coupon = await stripe.coupons.create({
         percent_off: discount.percentOff,
