@@ -19,7 +19,7 @@ import {
   Inbox,
   Building2,
   CreditCard,
-  UserCog,
+  
   Megaphone,
   ShieldCheck,
   QrCode,
