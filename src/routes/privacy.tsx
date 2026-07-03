@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "June 15, 2026 (clarified retention of trust-score events, dispute submissions, and dispute evidence files: kept for the lifetime of the account plus 2 years to support audit trails and possible re-opening; dispute evidence is uploaded to our Lovable Cloud storage and accessible only to the uploader and our moderation team.)";
+  const lastUpdated = "July 3, 2026 (added Clubs feature: accreditation documents uploaded to a private Lovable Cloud bucket, visible only to the club's owner/admins and our moderation team; retained while the club is active; deleted on rejection or removal request.)";
 
   return (
     <SiteLayout>
