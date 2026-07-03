@@ -141,6 +141,9 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
         appliedPercentOff = clubStatus.pct;
         appliedKind = "club_member";
       }
+      // Multi-business discount always wins over club discount, so we only
+      // enforce the "expected but not eligible" check in this branch.
+      assertClubDiscountEligibility(data.expectClubDiscount, clubStatus);
     }
 
     const session = await stripe.checkout.sessions.create({
