@@ -486,6 +486,50 @@ function TermsPage() {
           school is strictly between you and that school.
         </p>
 
+        <h2 className="mt-6 text-xl font-semibold">15b. Clubs (accredited motoring groups)</h2>
+        <p className="mt-2 text-muted-foreground">
+          365 MotorSales offers a curated <strong>Clubs</strong> feature at{" "}
+          <Link className="text-primary underline" to="/clubs">/clubs</Link> for motorcycle riding
+          clubs, car clubs, off-road groups and similar motoring organizations. To keep the
+          directory high-signal, Clubs must be approved before being publicly listed and are subject
+          to the following:
+        </p>
+        <ul className="mt-2 list-disc pl-6 text-muted-foreground">
+          <li>
+            <strong>Accreditation required.</strong> Applicants must upload at least one formal
+            document — LTO Accreditation, SEC Certificate of Incorporation, DTI registration /
+            Business Permit, or an equivalent formal government or organizational document at our
+            discretion.
+          </li>
+          <li>
+            <strong>Admin review.</strong> Applications start as "pending" and are hidden from the
+            public until approved by our team. We may reject or request changes at our sole
+            discretion.
+          </li>
+          <li>
+            <strong>Ongoing accuracy.</strong> Owners are responsible for keeping information (name,
+            leadership, contact details, activities) accurate. Misrepresentation, expired
+            accreditation, or activities inconsistent with the club's stated purpose may result in
+            suspension or removal.
+          </li>
+          <li>
+            <strong>Conduct.</strong> Clubs must comply with these Terms and our Community
+            Guidelines. Use of the Clubs feature for MLM/pyramid schemes, political or religious
+            recruitment, or unlawful activity is prohibited.
+          </li>
+          <li>
+            <strong>Group perks (future).</strong> Any group benefits we discuss (e.g., insurance
+            rates, parts discounts, event access) are aspirational and, when launched, will be
+            offered under separate terms of the relevant provider or partner. Nothing in the Clubs
+            feature constitutes an insurance, financial, or discount offer today.
+          </li>
+          <li>
+            <strong>Independence.</strong> A Club listed on the Platform is not an agent, employee,
+            or partner of 365 MotorSales. We do not endorse individual clubs beyond confirming that
+            the accreditation documents on file appear valid at review time.
+          </li>
+        </ul>
+
         <h2 className="mt-6 text-xl font-semibold">15. Privacy &amp; data protection</h2>
         <p className="mt-2 text-muted-foreground">
           Our processing of personal data is described in our{" "}
