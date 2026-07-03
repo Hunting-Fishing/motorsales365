@@ -54,6 +54,26 @@ import {
 } from "@/utils/payments.functions";
 import { BadgePercent, Sparkles } from "lucide-react";
 
+type ClubGrantRow = {
+  id: string;
+  payment_id: string | null;
+  scope: string;
+  discount_pct: number;
+  discount_amount_php: number;
+  original_amount_php: number;
+  applied_at: string;
+  club: { name: string | null; slug: string | null; verified: boolean | null } | null;
+};
+
+const CLUB_SCOPE_LABEL: Record<string, string> = {
+  ad_order: "ad order",
+  boost: "listing boost",
+  bundle: "listing bundle",
+  subscription: "subscription",
+  passport_premium: "Passport Premium",
+  promotion: "promotion",
+};
+
 export const Route = createFileRoute("/dashboard/billing")({
   component: BillingPage,
 });
