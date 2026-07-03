@@ -3,19 +3,27 @@
  *
  * Verified-club members get a percentage discount on internal, 365-controlled
  * purchases (ad packages, listing boosts, bundles, subscription tiers,
- * passport premium). Config lives in `pricing_settings` so the rate can be
- * tuned without a redeploy. Eligibility is determined by the SQL helper
- * `public.user_has_verified_club`.
+ * passport premium). Config lives in `pricing_settings` so the rate and
+ * eligibility knobs can be tuned without a redeploy. Eligibility is
+ * determined by the SQL helper `public.user_has_verified_club` OR, when
+ * relaxed via config, by a direct join against `club_members` + `clubs`.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export type ClubDiscountConfig = { enabled: boolean; pct: number };
+export type ClubCouponDuration = "auto" | "once" | "forever";
 
-export type ClubDiscountStatus = {
+export type ClubDiscountConfig = {
   enabled: boolean;
   pct: number;
+  couponDuration: ClubCouponDuration;
+  requireVerified: boolean;
+  includePendingClubs: boolean;
+  includePendingMembers: boolean;
+};
+
+export type ClubDiscountStatus = ClubDiscountConfig & {
   eligible: boolean;
-  /** First verified, active club the user is an active member of, if any. */
+  /** First qualifying club the user is a member of, if any. */
   clubId: string | null;
   clubName: string | null;
   clubSlug: string | null;
@@ -29,48 +37,93 @@ export type ClubDiscountScope =
   | "passport_premium"
   | "promotion";
 
+const CONFIG_KEYS = [
+  "club_member_discount_pct",
+  "club_member_discount_enabled",
+  "club_member_discount_coupon_duration",
+  "club_member_discount_require_verified",
+  "club_member_discount_include_pending_clubs",
+  "club_member_discount_include_pending_members",
+] as const;
+
+function couponDurationFromValue(v: number | undefined): ClubCouponDuration {
+  if (v === 1) return "once";
+  if (v === 2) return "forever";
+  return "auto";
+}
+
 export async function getClubDiscountConfig(
   supabase: SupabaseClient<any, any, any>,
 ): Promise<ClubDiscountConfig> {
+  const fallback: ClubDiscountConfig = {
+    enabled: false,
+    pct: 0,
+    couponDuration: "auto",
+    requireVerified: true,
+    includePendingClubs: false,
+    includePendingMembers: false,
+  };
   const { data, error } = await supabase
     .from("pricing_settings")
     .select("key, value")
-    .in("key", ["club_member_discount_pct", "club_member_discount_enabled"]);
-  if (error) return { enabled: false, pct: 0 };
+    .in("key", CONFIG_KEYS as unknown as string[]);
+  if (error) return fallback;
   const map = new Map<string, number>((data ?? []).map((r: any) => [r.key, Number(r.value)]));
   const pct = Math.max(0, Math.min(100, map.get("club_member_discount_pct") ?? 0));
   const enabled = (map.get("club_member_discount_enabled") ?? 0) > 0 && pct > 0;
-  return { enabled, pct };
+  return {
+    enabled,
+    pct,
+    couponDuration: couponDurationFromValue(map.get("club_member_discount_coupon_duration")),
+    requireVerified: (map.get("club_member_discount_require_verified") ?? 1) > 0,
+    includePendingClubs: (map.get("club_member_discount_include_pending_clubs") ?? 0) > 0,
+    includePendingMembers: (map.get("club_member_discount_include_pending_members") ?? 0) > 0,
+  };
+}
+
+/**
+ * Resolve the Stripe coupon `duration` for a given checkout mode using the
+ * admin config. `auto` means "once for one-time, forever for subscriptions".
+ */
+export function resolveClubCouponDuration(
+  isRecurring: boolean,
+  config: Pick<ClubDiscountConfig, "couponDuration">,
+): "once" | "forever" {
+  if (config.couponDuration === "once") return "once";
+  if (config.couponDuration === "forever") return "forever";
+  return isRecurring ? "forever" : "once";
 }
 
 /**
  * Look up the user's discount status. Returns `eligible=false` when disabled
- * globally or when the user is not an active member of a verified club.
+ * globally or when the user has no qualifying club membership per the current
+ * config.
  */
 export async function computeClubDiscountStatus(
   supabase: SupabaseClient<any, any, any>,
   userId: string,
 ): Promise<ClubDiscountStatus> {
   const cfg = await getClubDiscountConfig(supabase);
-  if (!cfg.enabled || !userId) {
-    return { enabled: cfg.enabled, pct: cfg.pct, eligible: false, clubId: null, clubName: null, clubSlug: null };
-  }
-  const { data: rows } = await supabase
+  const empty = { eligible: false, clubId: null, clubName: null, clubSlug: null };
+  if (!cfg.enabled || !userId) return { ...cfg, ...empty };
+
+  const memberStatuses = cfg.includePendingMembers ? ["active", "pending"] : ["active"];
+  const clubStatuses = cfg.includePendingClubs ? ["active", "pending"] : ["active"];
+
+  let query = supabase
     .from("club_members")
     .select("club_id, status, clubs!inner(id, name, slug, status, verified)")
     .eq("user_id", userId)
-    .eq("status", "active")
-    .eq("clubs.status", "active")
-    .eq("clubs.verified", true)
-    .limit(1);
+    .in("status", memberStatuses)
+    .in("clubs.status", clubStatuses);
+  if (cfg.requireVerified) query = query.eq("clubs.verified", true);
+
+  const { data: rows } = await query.limit(1);
   const row: any = rows?.[0];
-  if (!row) {
-    return { enabled: cfg.enabled, pct: cfg.pct, eligible: false, clubId: null, clubName: null, clubSlug: null };
-  }
+  if (!row) return { ...cfg, ...empty };
   const club = row.clubs;
   return {
-    enabled: cfg.enabled,
-    pct: cfg.pct,
+    ...cfg,
     eligible: true,
     clubId: club?.id ?? row.club_id ?? null,
     clubName: club?.name ?? null,
