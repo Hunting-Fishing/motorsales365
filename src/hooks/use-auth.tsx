@@ -624,6 +624,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
   const signOut = async () => {
+    signOutInitiatedRef.current = true;
     await supabase.auth.signOut();
     handleSession(null);
     setAuthLoading(false);
@@ -632,6 +633,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const retryAuth = useCallback(async () => {
     authLog("info", { event: "retryAuth.start" });
+    signOutInitiatedRef.current = true;
     try {
       await supabase.auth.signOut({ scope: "local" });
     } catch (e) {
