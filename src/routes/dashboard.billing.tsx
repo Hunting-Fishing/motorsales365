@@ -135,7 +135,27 @@ function BillingPage() {
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .then(({ data }) => setPayments(data ?? []));
+      .then(async ({ data }) => {
+        const rows = data ?? [];
+        setPayments(rows);
+        const ids = rows.map((p: any) => p.id).filter(Boolean);
+        if (ids.length === 0) {
+          setGrantsByPayment({});
+          return;
+        }
+        const { data: grants } = await supabase
+          .from("club_member_discount_grants")
+          .select(
+            "id,payment_id,scope,discount_pct,discount_amount_php,original_amount_php,applied_at,club:clubs(name,slug,verified)",
+          )
+          .in("payment_id", ids as string[])
+          .order("applied_at", { ascending: false });
+        const map: Record<string, ClubGrantRow> = {};
+        for (const g of (grants ?? []) as any[]) {
+          if (g.payment_id && !map[g.payment_id]) map[g.payment_id] = g as ClubGrantRow;
+        }
+        setGrantsByPayment(map);
+      });
     reloadSubs();
     listInvoices({ data: { environment: env, limit: 20 } })
       .then((res) => setInvoices(res.invoices ?? []))
