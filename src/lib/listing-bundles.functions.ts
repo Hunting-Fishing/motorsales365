@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
+  assertClubDiscountEligibility,
   computeClubDiscountStatus,
   computeDiscountAmountPhp,
   logClubDiscountGrant,
@@ -39,11 +40,12 @@ export const listMyBundlePurchases = createServerFn({ method: "GET" })
 // AUTHENTICATED: purchase a bundle (records intent; payment handled via existing payments flow downstream)
 export const purchaseBundle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { bundleId: string; businessId?: string }) =>
+  .inputValidator((input: { bundleId: string; businessId?: string; expectClubDiscount?: boolean }) =>
     z
       .object({
         bundleId: z.string().uuid(),
         businessId: z.string().uuid().optional(),
+        expectClubDiscount: z.boolean().optional(),
       })
       .parse(input),
   )
@@ -60,6 +62,7 @@ export const purchaseBundle = createServerFn({ method: "POST" })
 
     const originalPrice = Number((bundle as any).price_php ?? 0);
     const clubStatus = await computeClubDiscountStatus(supabase, userId);
+    assertClubDiscountEligibility(data.expectClubDiscount, clubStatus);
     let discountAmount = 0;
     let pricePaid = originalPrice;
     if (clubStatus.eligible && clubStatus.pct > 0) {
