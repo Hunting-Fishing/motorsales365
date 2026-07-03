@@ -516,25 +516,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Supabase emits INITIAL_SESSION from the persisted storage token.
     const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (cancelled) return;
+      const hadUser = !!lastUidRef.current;
       authLog("info", {
         event: "authStateChange",
         supabaseEvent: event,
         uid: newSession?.user?.id ?? null,
         email: newSession?.user?.email ?? null,
         hasSession: !!newSession,
+        hadUser,
       });
       // Refresh failed / signed out / no session on init → hard reset.
+      // Detect refresh failures via either:
+      //   - TOKEN_REFRESHED with no session, or
+      //   - SIGNED_OUT that we didn't initiate (we had a user, but no
+      //     explicit signOut call ran — treat as an unexpected boot).
       if (event === "SIGNED_OUT" || !newSession) {
-        if (event === "TOKEN_REFRESHED" && !newSession) {
-          authLog("error", { event: "token_refresh.failed" });
+        const refreshFailed =
+          (event === "TOKEN_REFRESHED" && !newSession) ||
+          (event === "SIGNED_OUT" && hadUser && !signOutInitiatedRef.current);
+        if (refreshFailed) {
+          authLog("error", { event: "token_refresh.failed", supabaseEvent: event });
           setAuthError("refresh_failed");
         }
+        signOutInitiatedRef.current = false;
         handleSession(null);
         setAuthLoading(false);
         setRolesLoading(false);
         return;
       }
-      // Successful (re-)authentication clears any prior error.
+      // Successful (re-)authentication (SIGNED_IN, TOKEN_REFRESHED w/ session,
+      // USER_UPDATED, INITIAL_SESSION) clears any prior error state so the
+      // header pill switches out of the "needs login" mode.
       setAuthError(null);
       handleSession(newSession);
       setAuthLoading(false);
