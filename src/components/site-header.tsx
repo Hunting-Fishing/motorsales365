@@ -100,11 +100,29 @@ export function SiteHeader() {
   } = useAuth();
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const personaActive = !!(simulatedRoles && simulatedRoles.length > 0) || !!simulatedSellerType;
+
+  const handleResetPersona = async () => {
+    const result = resetPersona();
+    // Force every cached query to refetch under the real admin identity so
+    // no on-screen data is still scoped to the simulated role.
+    await queryClient.invalidateQueries();
+    if (result.ok) {
+      toast.success("Back to real admin", {
+        description: `Effective roles: ${result.realRoles.join(", ") || "admin"} · seller: ${result.realSellerType}`,
+      });
+    } else {
+      toast.error("Persona reset incomplete — please refresh the page.");
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
     navigate({ to: "/" });
   };
+
 
   const { list: myBusinesses, setup: businessSetup } = useMyBusinesses(user?.id);
 
