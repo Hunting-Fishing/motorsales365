@@ -320,6 +320,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const lastUidRef = useRef<string | null>(null);
   const welcomeCheckedRef = useRef(new Set<string>());
+  // True when we called signOut() locally — lets the auth listener distinguish
+  // an intentional sign-out from an unexpected one caused by refresh failure.
+  const signOutInitiatedRef = useRef(false);
 
   // Track in-flight retry timers per uid so a new session (or sign-out) can
   // cancel a pending retry cleanly and we don't leak overlapping loops.
