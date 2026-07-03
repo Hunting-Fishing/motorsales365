@@ -11,6 +11,49 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
 
+/**
+ * Structured auth logger. Emits a single-line JSON payload prefixed with
+ * `[auth]` so hanging sign-in reports can be grep'd from browser logs or
+ * shipped to an aggregator later. Keep fields stable — don't rename keys
+ * without updating any dashboards that consume them.
+ */
+type AuthLogLevel = "info" | "warn" | "error";
+type AuthLogFields = {
+  event: string;
+  uid?: string | null;
+  email?: string | null;
+  route?: string;
+  durationMs?: number;
+  error?: string;
+  [k: string]: unknown;
+};
+function currentRoute(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  return window.location.pathname + window.location.search;
+}
+function authLog(level: AuthLogLevel, fields: AuthLogFields) {
+  const payload = {
+    ts: new Date().toISOString(),
+    route: currentRoute(),
+    ...fields,
+  };
+  const fn = level === "error" ? console.error : level === "warn" ? console.warn : console.info;
+  try {
+    fn("[auth]", JSON.stringify(payload));
+  } catch {
+    fn("[auth]", payload);
+  }
+}
+function errMsg(e: unknown): string {
+  if (!e) return "unknown";
+  if (e instanceof Error) return e.message;
+  try {
+    return typeof e === "string" ? e : JSON.stringify(e);
+  } catch {
+    return String(e);
+  }
+}
+
 function normalizePhPhone(raw?: string): string | undefined {
   if (!raw) return undefined;
   const d = raw.replace(/[^0-9+]/g, "");
