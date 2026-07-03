@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { listListingBundles, purchaseBundle } from "@/lib/listing-bundles.functions";
+import { ClubDiscountNote } from "@/components/clubs/club-discount-note";
+import { useClubDiscountStatus } from "@/hooks/use-club-discount";
 
 export const Route = createFileRoute("/bundles")({
   component: BundlesPage,
