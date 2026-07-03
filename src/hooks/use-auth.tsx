@@ -463,10 +463,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (e) {
           authLog("warn", { event: "bootstrap.local_signout_failed", error: errMsg(e) });
         }
-
-          // ignore
-        }
         handleSession(null);
+
       } finally {
         if (!cancelled) setAuthLoading(false);
       }
