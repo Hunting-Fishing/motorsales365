@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
-import { computeClubDiscountStatus, logClubDiscountGrant, resolveClubCouponDuration } from "@/lib/club-discount.server";
+import { assertClubDiscountEligibility, computeClubDiscountStatus, logClubDiscountGrant, resolveClubCouponDuration } from "@/lib/club-discount.server";
 
 function validateEnv(env: StripeEnv): StripeEnv {
   if (env !== "sandbox" && env !== "live") throw new Error("Invalid environment");
@@ -49,7 +49,7 @@ async function resolveOrCreateCustomer(
 export const createBoostCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (data: { boostSlug: string; listingId: string; returnUrl: string; environment: StripeEnv }) => {
+    (data: { boostSlug: string; listingId: string; returnUrl: string; environment: StripeEnv; expectClubDiscount?: boolean }) => {
       if (!/^[a-z0-9_]+$/.test(data.boostSlug)) throw new Error("Invalid boostSlug");
       if (!/^[0-9a-f-]{36}$/i.test(data.listingId)) throw new Error("Invalid listingId");
       validateEnv(data.environment);
@@ -96,6 +96,7 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
     // so it shows on the checkout, receipt, and subsequent recurring
     // invoices.
     const clubStatus = await computeClubDiscountStatus(supabase, userId);
+    assertClubDiscountEligibility(data.expectClubDiscount, clubStatus);
     let discountsArg: any = undefined;
     let clubCouponId: string | null = null;
     if (clubStatus.eligible && clubStatus.pct > 0) {
