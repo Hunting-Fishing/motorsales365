@@ -67,6 +67,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { to: "/admin/type-suggestions", label: "Type suggestions", Icon: Sparkles, roles: ["admin"], info: "Review user-submitted new business types.", section: "Businesses" },
   { to: "/admin/service-suggestions", label: "Service suggestions", Icon: Sparkles, roles: ["admin"], info: "Approve user-submitted services into the shared catalog.", section: "Businesses" },
   { to: "/admin/service-suggestion-audit", label: "Service audit log", Icon: Sparkles, roles: ["admin"], info: "History of decisions on service suggestions.", section: "Businesses" },
+  { to: "/admin/clubs", label: "Clubs", Icon: ShieldCheck, roles: ["admin", "moderator"], info: "Review club applications and accreditation documents.", section: "Businesses" },
 
   // LISTINGS & MODERATION
   { to: "/admin/listings", label: "Listings", Icon: ListChecks, roles: ["admin", "moderator", "support"], info: "Moderate vehicle/service listings.", section: "Listings & Moderation" },
