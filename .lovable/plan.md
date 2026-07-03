@@ -1,52 +1,129 @@
 
-## Problem
+# Clubs — accredited groups for Rides
 
-Users (Jocelyn, and you) see the header pill "Signing you in…" stuck indefinitely on `/login` and other pages.
+Positioning: Clubs are curated, document-verified groups (LTO / SEC / DTI / other formal accreditation). Not open FB-style groups. Every club is admin-reviewed before it goes live. Future value: negotiated insurance rates, parts discounts, event partnerships.
 
-The network log confirms the cause:
+## User-facing surfaces
 
-```
-POST /auth/v1/token?grant_type=refresh_token
-→ 400 { "code": "refresh_token_not_found" }
-```
+- **`/clubs`** — public directory. Search, filter by type (riding club, car club, off-road, brand, region), verified-only toggle. Featured/curated rows on top.
+- **`/clubs/$slug`** — public club page: cover, logo, verified badge, description, region, membership count, upcoming events, member rides, "Group perks — coming soon" section, Join / Request-to-join CTA.
+- **`/clubs/apply`** — application form (must be signed in). Basic info + document upload. Goes to admin queue.
+- **`/rides`** — add a **Clubs** tab alongside Rides, plus a "Featured Clubs" strip above the ride grid so discovery cross-flows.
+- **`/dashboard/clubs`** — my clubs (owned + joined). Manage members, events, posts, application status.
+- **`/dashboard/clubs/$id/*`** — owner/admin workspace: `members`, `events`, `settings`, `documents`.
+- **`/admin/clubs`** — admin review queue for pending applications; approve / request changes / reject with note.
 
-The browser has a persisted Supabase session whose refresh token is no longer valid on the server (rotated/expired/revoked). Our current bootstrap in `src/hooks/use-auth.tsx` cannot recover from that:
+## Application & verification flow
 
-1. `onAuthStateChange` fires `INITIAL_SESSION` with the stale session — we set `rolesLoading = true` and fire `loadRoles`.
-2. Those PostgREST calls use the expired access token. `supabase-js` tries to auto-refresh, the refresh 400s, and the pending queries end up waiting on the internal refresh lock — they never resolve.
-3. `loading = authLoading || (user && rolesLoading)` stays `true`. The pill spins forever.
+1. User submits `/clubs/apply` with: name, type, region, description, logo, cover, contact email, and at least one accreditation document.
+2. Row created in `clubs` with `status = 'pending'`. Not publicly listed.
+3. Admin reviews at `/admin/clubs`, views documents (signed URLs), then approves → `status = 'active'` and `verified = true`, or rejects with reason (visible to applicant in `/dashboard/clubs`).
+4. Approved club becomes publicly visible with a Verified badge and unlocks perks placeholder.
 
-There is no timeout, no "refresh failed → sign out locally" recovery, and no safety net if `getUser()` / `getSession()` themselves stall.
+## v1 feature set (per approved club)
 
-## Fix
+- **Members** — request-to-join; owner/admin approves. Roles: `owner`, `admin`, `member`.
+- **Events / group rides** — title, date, meetup location, description, RSVP list.
+- **Attached rides** — members can showcase Rides (from existing `rides` table) on the club page.
+- **Perks placeholder** — static "Group perks coming soon: insurance, parts discounts, event access" block that admins can later populate.
+- **Announcements** — owner/admin-only posts (keeps signal high, avoids FB-noise feed).
 
-Only touch `src/hooks/use-auth.tsx`. No schema or UI changes.
+## Design & UX
 
-1. **Detect and clear a dead session on boot.**
-   In the bootstrap effect, when `getUser()` returns an auth error OR `getSession()` returns null while local storage still holds a token, call `supabase.auth.signOut({ scope: "local" })`. That wipes the bad token from `localStorage` without a network round-trip, then let `handleSession(null)` + `setAuthLoading(false)` render the signed-out UI.
+- Reuse existing tokens (no new palette). Same card/grid rhythm as `rides.index.tsx` and `businesses.index.tsx`.
+- Verified badge reuses `verified-badge.tsx` pattern.
+- Club card: cover image, logo overlay, name, verified check, type/region chips, member count.
 
-2. **Listen for refresh failures at runtime.**
-   Also treat the `SIGNED_OUT` event and any `INITIAL_SESSION` / `TOKEN_REFRESHED` event that arrives with `newSession === null` as a hard reset: `handleSession(null)`, `setAuthLoading(false)`, `setRolesLoading(false)`.
+## Technical section
 
-3. **Safety timeouts (belt & suspenders).**
-   - `authLoading` — force `false` after 8s if the bootstrap has not resolved (network stall).
-   - `rolesLoading` — race `loadRoles`'s queries against an 8s timeout so a hung PostgREST call can't wedge the UI; on timeout we set roles to `[]` and log a warning. The real values will populate on the next successful fetch (query invalidation on next auth event).
+### Data model (migration)
 
-4. **Don't gate the "Signing you in…" pill on `rolesLoading` alone.**
-   Change the derived `loading` to `authLoading` only. Roles arriving late shouldn't keep showing "Signing you in…" — that message is misleading once the session is confirmed. Role-gated routes already check `rolesLoading` separately (`/admin` route redirect logic) so this doesn't loosen access control; it only fixes the header UX.
+Enums:
+- `club_type`: `motorcycle_riding`, `car_club`, `off_road`, `truck_club`, `brand_owners`, `general_motoring`, `other`
+- `club_status`: `pending`, `active`, `rejected`, `suspended`
+- `club_member_role`: `owner`, `admin`, `member`
+- `club_member_status`: `pending`, `active`, `banned`
+- `club_document_kind`: `lto_accreditation`, `sec_incorporation`, `dti_business_permit`, `other`
 
-## Files touched
+Tables (all in `public`, with grants + RLS as per project rules):
 
-- `src/hooks/use-auth.tsx` — bootstrap effect, `handleSession`, `loading` derivation, add timeouts.
+- `clubs`: id, owner_id, slug (unique), name, type (club_type), description, region, city, logo_url, cover_url, contact_email, contact_phone, website_url, status, verified bool, member_count int, review_notes, reviewed_by, reviewed_at, created_at, updated_at.
+- `club_documents`: id, club_id, kind (club_document_kind), storage_path, original_filename, uploaded_by, created_at. Private storage bucket.
+- `club_members`: id, club_id, user_id, role, status, joined_at, created_at. Unique(club_id, user_id).
+- `club_events`: id, club_id, created_by, title, description, starts_at, ends_at, meetup_location, meetup_lat, meetup_lng, cover_url, status, created_at, updated_at.
+- `club_event_rsvps`: id, event_id, user_id, response (going/maybe/no), created_at. Unique(event_id, user_id).
+- `club_rides`: id, club_id, ride_id, added_by, created_at. Unique(club_id, ride_id). Links to existing `rides`.
+- `club_posts`: id, club_id, author_id, body, created_at (owner/admin only).
 
-## Verification
+### RLS (summary, plain English)
 
-- Reproduce: in DevTools, edit the persisted `sb-…-auth-token` refresh_token to gibberish, reload → header should settle into signed-out state within ~1s, not spin forever.
-- Normal signed-in refresh: reload while logged in → pill briefly shows, then resolves to the account chip.
-- Signed-out cold load: no pill flash beyond initial mount.
-- No regression on `/admin` (role gate still waits for roles before deciding).
+- **clubs**: anyone can read rows where `status = 'active'`; owner + club admins can read their own regardless of status; owner + admins can update; only owner can delete; insert requires `auth.uid() = owner_id`. Admin role bypasses via `has_role`.
+- **club_documents**: only owner/admins of the club, and platform admins, can read; only owner/admins can insert.
+- **club_members**: public can see roster of active clubs; user can insert their own pending join request; owner/admins can update/approve/remove; user can delete their own membership.
+- **club_events**: public read for active clubs; owner/admins insert/update/delete.
+- **club_event_rsvps**: user manages their own; club members can read roster.
+- **club_rides**: member self-adds their own ride; owner/admins can remove.
+- **club_posts**: public read for active clubs; owner/admins write.
 
-## Out of scope
+Helper SECURITY DEFINER function `is_club_admin(_user, _club)` to avoid recursive RLS.
 
-- Not changing any RLS, migrations, or the sign-in flow itself.
-- Not touching the persona switcher or protected routes.
+Trigger: `club_members` insert/delete of `status = 'active'` updates `clubs.member_count`.
+
+### Storage
+
+- Bucket `club-docs` (private) — accreditation files. RLS on `storage.objects` limits SELECT to owner/admins + platform admins.
+- Bucket `club-media` (public) — logos, covers, event images.
+
+### Server functions (`src/lib/clubs.functions.ts`)
+
+- `applyForClub` — validate input, insert `clubs` row (`status='pending'`) + `club_documents` rows referencing already-uploaded storage paths.
+- `listPublicClubs` — public read via publishable server client for `status='active'` (safe columns).
+- `getClub(slug)` — public detail for active clubs.
+- `requestJoinClub`, `respondToJoinRequest`, `leaveClub`.
+- `createEvent`, `updateEvent`, `rsvpEvent`.
+- `attachRideToClub`, `detachRideFromClub`.
+- `listMyClubs` (owned + joined).
+- Admin-guarded (`has_role(admin)`): `listPendingClubs`, `reviewClubApplication(id, decision, notes)`.
+
+### Routes to add
+
+- `src/routes/clubs.index.tsx` (public + SSR + head meta)
+- `src/routes/clubs.$slug.tsx` (public + head + og:image from cover)
+- `src/routes/clubs.apply.tsx` (public route with sign-in CTA, or gated form)
+- `src/routes/_authenticated/dashboard.clubs.tsx`
+- `src/routes/_authenticated/dashboard.clubs_.$id.tsx` (+ `.members`, `.events`, `.documents`, `.settings` children)
+- `src/routes/admin.clubs.tsx` (admin review queue)
+- Rides tab integration: extend `rides.index.tsx` with a `Clubs` tab and a "Featured clubs" strip.
+
+### Components (`src/components/clubs/`)
+
+- `club-card.tsx`, `club-hero.tsx`, `club-directory-filters.tsx`
+- `club-application-form.tsx` (with `club-document-uploader.tsx`)
+- `club-members-list.tsx`, `join-request-button.tsx`
+- `club-events-list.tsx`, `club-event-form.tsx`
+- `club-rides-strip.tsx` (reuses `ride-card.tsx`)
+- `admin-club-review-card.tsx`
+
+### Policy touch-points
+
+- Update `/terms`: add Clubs section (accreditation required, admin review, suspension, no MLM/political/religious recruitment, perks are future/negotiated separately).
+- Update `/privacy`: uploaded accreditation documents are stored privately, retained while club is active, deleted on rejection/removal request.
+- Bump "Last updated" on both.
+
+### Out of scope for v1 (call out explicitly)
+
+- Member-to-member chat/feed.
+- Paid memberships or dues.
+- Live activation of insurance/parts discounts (perks placeholder only).
+- Multi-chapter hierarchy.
+- Public event ticketing / payments.
+
+## Rollout order
+
+1. Migration (tables, enums, RLS, grants, trigger, helper fn) + storage buckets.
+2. Server functions + admin review server functions.
+3. Public routes (`/clubs`, `/clubs/$slug`, `/clubs/apply`).
+4. Dashboard routes (my clubs, manage members/events/documents).
+5. Admin review queue.
+6. Rides tab integration + featured strip.
+7. Terms & Privacy updates.
