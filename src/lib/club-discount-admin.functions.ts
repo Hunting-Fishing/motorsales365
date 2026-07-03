@@ -73,14 +73,14 @@ export const listClubDiscountGrants = createServerFn({ method: "POST" })
     if (ids.length) {
       const { data: profs } = await supabase
         .from("profiles")
-        .select("id,full_name,first_name,last_name,email")
+        .select("id,full_name,first_name,last_name,personal_email")
         .in("id", ids);
       for (const p of (profs ?? []) as any[]) {
         const fullName =
           p.full_name ||
           [p.first_name, p.last_name].filter(Boolean).join(" ") ||
           null;
-        profileById.set(p.id, { full_name: fullName, email: p.email ?? null });
+        profileById.set(p.id, { full_name: fullName, email: p.personal_email ?? null });
       }
     }
 
