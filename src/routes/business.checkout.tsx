@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
@@ -10,6 +11,7 @@ import { ClubDiscountNote } from "@/components/clubs/club-discount-note";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createBusinessSubscriptionCheckout } from "@/lib/business-subscriptions.functions";
 import { useAuth } from "@/hooks/use-auth";
+import { useClubDiscountStatus } from "@/hooks/use-club-discount";
 
 export const Route = createFileRoute("/business/checkout")({
   validateSearch: (
@@ -31,6 +33,8 @@ function BusinessCheckoutPage() {
   const { businessId, planSlug } = Route.useSearch();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { data: clubStatus, refetch: refetchClub } = useClubDiscountStatus();
+  const [clubError, setClubError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -54,16 +58,28 @@ function BusinessCheckoutPage() {
   }
 
   const fetchClientSecret = async (): Promise<string> => {
-    const secret = await createBusinessSubscriptionCheckout({
-      data: {
-        businessId,
-        planSlug,
-        returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
-        environment: getStripeEnvironment(),
-      },
-    });
-    if (!secret) throw new Error("No client secret returned");
-    return secret;
+    try {
+      const secret = await createBusinessSubscriptionCheckout({
+        data: {
+          businessId,
+          planSlug,
+          returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+          environment: getStripeEnvironment(),
+          expectClubDiscount: !!clubStatus?.eligible,
+        },
+      });
+      if (!secret) throw new Error("No client secret returned");
+      setClubError(null);
+      return secret;
+    } catch (e: any) {
+      const msg = e?.message ?? "Checkout failed";
+      if (msg.toLowerCase().includes("club-member discount")) {
+        setClubError(msg);
+        void refetchClub();
+      }
+      toast.error(msg);
+      throw e;
+    }
   };
 
   return (
