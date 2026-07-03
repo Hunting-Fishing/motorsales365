@@ -824,7 +824,7 @@ export function SiteHeader() {
                     {isStaff && (
                       <>
                         <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                          {isAdmin ? "365 Staff" : "Sales Rep"}
+                          {isAdmin ? "365 Staff" : isAdvertising ? "Partner / Advertising" : isModerator ? "Moderation" : isSupport ? "Support" : "Sales Rep"}
                         </p>
                         <div className="flex flex-col gap-0.5">
                           {isSales && (
@@ -855,6 +855,74 @@ export function SiteHeader() {
                               </SheetClose>
                             </>
                           )}
+                          {(isAdvertising || isAdmin) && (
+                            <>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin/advertisements"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Megaphone className="h-4 w-4" /> Advertisements
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin/advertisements/analytics"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <QrCode className="h-4 w-4" /> QR analytics
+                                </Link>
+                              </SheetClose>
+                            </>
+                          )}
+                          {(isModerator || isAdmin) && (
+                            <>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin/listings"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <ListChecks className="h-4 w-4" /> Moderate listings
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin/businesses"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Building2 className="h-4 w-4" /> Business directory
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin/verifications"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <ShieldCheck className="h-4 w-4" /> Verifications
+                                </Link>
+                              </SheetClose>
+                            </>
+                          )}
+                          {(isSupport || isAdmin) && (
+                            <>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin/reports"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <LifeBuoy className="h-4 w-4" /> Activity &amp; reports
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin/qr-leads"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Inbox className="h-4 w-4" /> QR leads
+                                </Link>
+                              </SheetClose>
+                            </>
+                          )}
                           {isAdmin && (
                             <>
                               <SheetClose asChild>
@@ -878,6 +946,7 @@ export function SiteHeader() {
                         </div>
                       </>
                     )}
+
                   </>
                 )}
               </div>
