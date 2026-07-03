@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { BadgeCheck, CalendarRange, Globe, Mail, MapPin, Phone, ShieldCheck, Users } from "lucide-react";
+import { BadgeCheck, BadgePercent, CalendarRange, Globe, Mail, MapPin, Phone, ShieldCheck, Users } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
