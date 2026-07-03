@@ -643,8 +643,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuthError(null);
     setAuthLoading(false);
     if (typeof window !== "undefined") {
-      const next = encodeURIComponent(window.location.pathname + window.location.search);
-      window.location.assign(`/auth?next=${next}`);
+      const pathname = window.location.pathname || "/";
+      const search = window.location.search || "";
+      // Avoid nesting `/auth?next=/auth?next=...` when we're already on the
+      // sign-in route. Preserve an existing `next` if present, otherwise go home.
+      let nextRaw = `${pathname}${search}`;
+      if (pathname === "/auth") {
+        const existing = new URLSearchParams(search).get("next");
+        nextRaw = existing && !existing.startsWith("/auth") ? existing : "/";
+      }
+      window.location.assign(`/auth?next=${encodeURIComponent(nextRaw)}`);
     }
   }, [handleSession]);
 
