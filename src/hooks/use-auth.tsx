@@ -225,14 +225,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadRoles = useCallback(async (uid: string) => {
     setRolesLoading(true);
     try {
-      const [{ data: roleRows }, { data: profileRow }] = await Promise.all([
+      // Race the queries against a timeout so a wedged PostgREST call
+      // (e.g. supabase-js stuck on a failed token refresh) can't leave
+      // rolesLoading=true forever.
+      const timeout = new Promise<"timeout">((resolve) =>
+        setTimeout(() => resolve("timeout"), 8000),
+      );
+      const query = Promise.all([
         supabase.from("user_roles").select("role").eq("user_id", uid),
         supabase.from("profiles").select("seller_type, full_name").eq("id", uid).maybeSingle(),
       ]);
+      const result = await Promise.race([query, timeout]);
+      if (result === "timeout") {
+        console.warn("[auth] loadRoles timed out; continuing with empty roles");
+        setRoles([]);
+        setRealSellerType("private");
+        setProfileName(null);
+        return;
+      }
+      const [{ data: roleRows }, { data: profileRow }] = result;
       setRoles((roleRows ?? []).map((r: any) => r.role));
       const st = (profileRow as any)?.seller_type;
       setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
       setProfileName((profileRow as any)?.full_name ?? null);
+    } catch (err) {
+      console.warn("[auth] loadRoles failed", err);
+      setRoles([]);
     } finally {
       setRolesLoading(false);
     }
@@ -268,7 +286,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [loadRoles],
   );
 
-  const loading = authLoading || (!!user && rolesLoading);
+  // The header "Signing you in…" pill is gated on authLoading only.
+  // Roles arriving late shouldn't keep the pill spinning; role-gated
+  // routes check rolesLoading separately.
+  const loading = authLoading;
+
 
   const refreshSession = useCallback(
     async (providedSession?: Session | null) => {
