@@ -459,6 +459,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             event: "bootstrap.safety_timeout",
             durationMs: Date.now() - bootStarted,
           });
+          setAuthError("safety_timeout");
         }
         return false;
       });
