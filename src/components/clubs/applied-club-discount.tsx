@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { BadgePercent, Sparkles } from "lucide-react";
+import { BadgePercent, Sparkles, ShieldCheck, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +15,7 @@ export type ClubGrant = {
   original_amount_php: number;
   payment_id: string | null;
   applied_at: string;
-  club?: { name: string | null; slug: string | null } | null;
+  club?: { name: string | null; slug: string | null; verified?: boolean | null } | null;
 };
 
 const scopeLabel: Record<string, string> = {
@@ -27,35 +27,62 @@ const scopeLabel: Record<string, string> = {
   promotion: "promotion",
 };
 
+function formatAppliedAt(iso: string): string {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  } catch {
+    return iso;
+  }
+}
+
 /**
  * Emerald note used on checkout confirmation + receipts.
- * Explains WHY the discount applied (verified club membership).
+ * Explains WHY the discount applied (verified club membership)
+ * and WHEN it was applied.
  */
 export function ClubDiscountAppliedNote({ grant }: { grant: ClubGrant }) {
   const clubName = grant.club?.name ?? "your verified club";
   const scope = scopeLabel[grant.scope] ?? grant.scope.replace(/_/g, " ");
+  const appliedAt = formatAppliedAt(grant.applied_at);
   return (
     <div className="flex items-start gap-2 rounded-md border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-sm">
-      <Sparkles className="mt-0.5 h-4 w-4 text-emerald-600" />
-      <div>
+      <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" />
+      <div className="min-w-0 flex-1">
         <div className="font-medium text-emerald-700">
           Club member {grant.discount_pct}% off applied · saved{" "}
           {formatPHP(grant.discount_amount_php)}
         </div>
-        <div className="text-xs text-muted-foreground">
-          Eligible as an active member of{" "}
-          {grant.club?.slug ? (
-            <Link
-              to="/clubs/$slug"
-              params={{ slug: grant.club.slug }}
-              className="underline hover:text-foreground"
-            >
-              {clubName}
-            </Link>
-          ) : (
-            clubName
-          )}{" "}
-          — applied to this {scope}. Original {formatPHP(grant.original_amount_php)}.
+        <div className="mt-1 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5">
+            <ShieldCheck className="h-3 w-3 text-emerald-600" />
+            <span>
+              Eligibility: verified club membership in{" "}
+              {grant.club?.slug ? (
+                <Link
+                  to="/clubs/$slug"
+                  params={{ slug: grant.club.slug }}
+                  className="font-medium underline hover:text-foreground"
+                >
+                  {clubName}
+                </Link>
+              ) : (
+                <span className="font-medium">{clubName}</span>
+              )}
+              .
+            </span>
+          </div>
+          <div className="mt-0.5">
+            Applied to this {scope}. Original amount{" "}
+            {formatPHP(grant.original_amount_php)}.
+          </div>
+          <div className="mt-0.5 flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            <span>Applied {appliedAt}</span>
+          </div>
         </div>
       </div>
     </div>
