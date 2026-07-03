@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "July 3, 2026 (added Clubs — accredited motoring groups requiring formal documentation and admin approval before publishing)";
+  const lastUpdated = "July 3, 2026 (added Club Member Discount — 5% off internal 365 purchases for active members of verified clubs)";
 
   return (
     <SiteLayout>
