@@ -374,6 +374,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    const bootStarted = Date.now();
+    authLog("info", { event: "bootstrap.start" });
 
     // Safety timeout: if bootstrap never resolves (network stall, wedged
     // supabase client), release the UI after 8s. Any real session will
@@ -381,7 +383,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const safetyTimer = setTimeout(() => {
       if (cancelled) return;
       setAuthLoading((prev) => {
-        if (prev) console.warn("[auth] bootstrap safety timeout fired");
+        if (prev) {
+          authLog("error", {
+            event: "bootstrap.safety_timeout",
+            durationMs: Date.now() - bootStarted,
+          });
+        }
         return false;
       });
     }, 8000);
@@ -390,8 +397,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Supabase emits INITIAL_SESSION from the persisted storage token.
     const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (cancelled) return;
+      authLog("info", {
+        event: "authStateChange",
+        supabaseEvent: event,
+        uid: newSession?.user?.id ?? null,
+        email: newSession?.user?.email ?? null,
+        hasSession: !!newSession,
+      });
       // Refresh failed / signed out / no session on init → hard reset.
       if (event === "SIGNED_OUT" || !newSession) {
+        if (event === "TOKEN_REFRESHED" && !newSession) {
+          authLog("error", { event: "token_refresh.failed" });
+        }
         handleSession(null);
         setAuthLoading(false);
         setRolesLoading(false);
@@ -410,24 +427,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data: userData, error } = await supabase.auth.getUser();
         if (cancelled) return;
         if (error || !userData.user) {
-          // Clear the dead token from localStorage without a network round-trip.
+          authLog("warn", {
+            event: "bootstrap.getUser_failed",
+            durationMs: Date.now() - bootStarted,
+            error: error ? errMsg(error) : "no_user",
+            errorStatus: (error as any)?.status,
+          });
           try {
             await supabase.auth.signOut({ scope: "local" });
-          } catch {
-            // ignore; handleSession(null) below still renders signed-out
+          } catch (e) {
+            authLog("warn", { event: "bootstrap.local_signout_failed", error: errMsg(e) });
           }
           handleSession(null);
         } else {
           const { data: sessData } = await supabase.auth.getSession();
           if (cancelled) return;
+          authLog("info", {
+            event: "bootstrap.ok",
+            uid: userData.user.id,
+            email: userData.user.email,
+            durationMs: Date.now() - bootStarted,
+            hasSession: !!sessData.session,
+          });
           handleSession(sessData.session ?? null);
         }
       } catch (err) {
         if (cancelled) return;
-        console.warn("[auth] bootstrap failed", err);
+        authLog("error", {
+          event: "bootstrap.exception",
+          durationMs: Date.now() - bootStarted,
+          error: errMsg(err),
+        });
         try {
           await supabase.auth.signOut({ scope: "local" });
-        } catch {
+        } catch (e) {
+          authLog("warn", { event: "bootstrap.local_signout_failed", error: errMsg(e) });
+        }
+
           // ignore
         }
         handleSession(null);
