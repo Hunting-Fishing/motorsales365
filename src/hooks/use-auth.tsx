@@ -561,6 +561,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // renders as signed-out instead of hanging on the bad token.
     (async () => {
       try {
+        // Cheap local check first — avoids a 400 "Auth session missing!"
+        // network call for signed-out visitors (which is expected but
+        // pollutes the console and network tab).
+        const { data: sessPre } = await supabase.auth.getSession();
+        if (cancelled) return;
+        if (!sessPre.session) {
+          authLog("info", {
+            event: "bootstrap.no_session",
+            durationMs: Date.now() - bootStarted,
+          });
+          handleSession(null);
+          return;
+        }
+
         const { data: userData, error } = await supabase.auth.getUser();
         if (cancelled) return;
         if (error || !userData.user) {
@@ -570,13 +584,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             error: error ? errMsg(error) : "no_user",
             errorStatus: (error as any)?.status,
           });
-          // Only flag as an error worth surfacing if we actually had a
-          // persisted session token that failed to validate. First-time
-          // visitors with no token shouldn't see a re-auth toast.
-          const hadPersistedToken =
-            typeof window !== "undefined" &&
-            Object.keys(window.localStorage ?? {}).some((k) => k.startsWith("sb-"));
-          if (hadPersistedToken) setAuthError("refresh_failed");
+          // We had a persisted session that failed to validate → surface
+          // re-auth toast and clear the bad token.
+          setAuthError("refresh_failed");
           try {
             await supabase.auth.signOut({ scope: "local" });
           } catch (e) {
@@ -595,6 +605,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
           handleSession(sessData.session ?? null);
         }
+
       } catch (err) {
         if (cancelled) return;
         authLog("error", {
