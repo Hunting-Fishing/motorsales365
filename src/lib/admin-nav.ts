@@ -19,6 +19,7 @@ import {
   MapPin,
   Truck,
   Globe,
+  BadgePercent,
   type LucideIcon,
 } from "lucide-react";
 
