@@ -402,14 +402,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }, 0);
       } else if (!uid) {
         lastUidRef.current = null;
+        cancelPendingRetry();
         setRoles([]);
         setRealSellerType("private");
         setProfileName(null);
         setRolesLoading(false);
       }
     },
-    [loadRoles],
+    [loadRoles, cancelPendingRetry],
   );
+
+  // Clear any pending retry when the provider unmounts.
+  useEffect(() => () => cancelPendingRetry(), [cancelPendingRetry]);
 
   // The header "Signing you in…" pill is gated on authLoading only.
   // Roles arriving late shouldn't keep the pill spinning; role-gated
