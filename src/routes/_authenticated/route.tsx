@@ -55,6 +55,13 @@ function AuthenticatedGuard() {
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ location }) => {
+    // Cheap local session check first to avoid a 400 "Auth session missing!"
+    // for signed-out visitors before we decide to redirect.
+    const { data: sessData } = await supabase.auth.getSession();
+    if (!sessData.session) {
+      const next = buildNext(location.pathname, location.searchStr);
+      throw redirect({ to: SIGN_IN_ROUTE, search: { next } as any });
+    }
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) {
       const next = buildNext(location.pathname, location.searchStr);
@@ -65,5 +72,6 @@ export const Route = createFileRoute("/_authenticated")({
     }
     return { user: data.user };
   },
+
   component: AuthenticatedGuard,
 });
