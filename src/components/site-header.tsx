@@ -367,15 +367,19 @@ export function SiteHeader() {
                     );
                   })}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={resetAll}>
+                  <DropdownMenuItem onClick={handleResetPersona}>
                     Reset to my real admin account
                   </DropdownMenuItem>
                   <div className="px-2 py-1 text-[10px] text-muted-foreground">
                     Effective roles: {effectiveRoles.join(", ") || "none"}
+                    <br />
+                    Real roles: {realRoles.join(", ") || "none"}
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </div>
             );
+
           })()}
 
           {loading ? (
