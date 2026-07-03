@@ -42,6 +42,17 @@ function PrivacyPage() {
         </p>
 
         <p className="mt-3 text-muted-foreground">
+          <strong>Club accreditation documents.</strong> When you apply to list a Club at{" "}
+          <Link className="text-primary underline" to="/clubs/apply">/clubs/apply</Link>, we collect
+          the formal documents you upload (e.g., LTO Accreditation, SEC Certificate of
+          Incorporation, DTI / Business Permit) along with the contact details you supply. These
+          documents are stored in a private Lovable Cloud storage bucket and are visible only to
+          the club's owner/admins and our moderation team. They are retained while the Club remains
+          on the Platform and are deleted upon rejection or upon your removal request, subject to
+          any legal-retention obligations.
+        </p>
+
+        <p className="mt-3 text-muted-foreground">
           <strong>Appointment bookings.</strong> When you book a service through a business
           mini-site, we collect your name, contact details, requested time, and any notes you
           provide, and disclose them to that business so they can fulfil the appointment. The
