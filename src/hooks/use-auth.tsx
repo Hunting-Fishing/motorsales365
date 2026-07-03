@@ -146,9 +146,14 @@ interface AuthContextValue {
   effectiveSellerType: SellerType;
   simulatedSellerType: SellerType | null;
   setSimulatedSellerType: (next: SellerType | null) => void;
+  /** True if the effective (persona-aware) roles include `role`. */
+  hasRole: (role: AppRole) => boolean;
+  /** True if the effective (persona-aware) roles include any of `roles`. */
+  hasAnyRole: (roles: readonly AppRole[]) => boolean;
   refreshSession: (session?: Session | null) => Promise<Session | null>;
   signOut: () => Promise<void>;
 }
+
 
 const SIM_KEY = "sandbox.roles";
 const SIM_SELLER_KEY = "sandbox.sellerType";
@@ -395,9 +400,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         effectiveSellerType,
         simulatedSellerType,
         setSimulatedSellerType,
+        hasRole: (role) => effectiveRoles.includes(role),
+        hasAnyRole: (rs) => rs.some((r) => effectiveRoles.includes(r)),
         refreshSession,
         signOut,
       }}
+
     >
       {children}
     </AuthContext.Provider>

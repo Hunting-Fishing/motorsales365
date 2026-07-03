@@ -33,18 +33,23 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminLayout() {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, realIsAdmin, effectiveRoles, hasAnyRole, loading } = useAuth();
   const navigate = useNavigate();
-  const hasAccess = isAdmin;
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  // Any staff persona (real or simulated by a real admin) may enter the console;
+  // the sidebar and per-page checks then narrow what's visible per role.
+  const STAFF_ROLES = ["admin", "sales", "sales_junior", "sales_senior", "sales_manager", "moderator", "support", "advertising"] as const;
+  const hasAccess = hasAnyRole(STAFF_ROLES);
 
   // 2FA is optional for @365motorsales.com employees and the super-admin.
-  // Other admins (external) must still enable TOTP.
+  // Only enforce for real admins (persona simulation doesn't grant admin privs).
   const emailLc = (user?.email ?? "").toLowerCase();
   const is365Staff =
     emailLc.endsWith("@365motorsales.com") || emailLc === "jordilwbailey@gmail.com";
   const [mfaState, setMfaState] = useState<"checking" | "ok" | "missing">("checking");
   useEffect(() => {
-    if (!user || !isAdmin || is365Staff) {
+    if (!user || !realIsAdmin || is365Staff) {
       setMfaState("ok");
       return;
     }
@@ -62,7 +67,7 @@ function AdminLayout() {
     return () => {
       cancelled = true;
     };
-  }, [user, isAdmin, is365Staff]);
+  }, [user, realIsAdmin, is365Staff]);
 
   const { data: pendingCounts } = useAdminPendingCounts(hasAccess);
 
@@ -71,10 +76,37 @@ function AdminLayout() {
     if (!user) {
       navigate({ to: "/login" });
     } else if (!hasAccess) {
-      toast.error("Admin access required.");
+      toast.error("Staff access required.");
       navigate({ to: "/dashboard" });
     }
   }, [user, hasAccess, loading, navigate]);
+
+  // Map effective roles → the coarse AdminNavRole buckets used by ADMIN_NAV.
+  const navRoles = new Set<string>();
+  effectiveRoles.forEach((r) => {
+    if (r === "admin") navRoles.add("admin");
+    else if (r === "moderator") navRoles.add("moderator");
+    else if (r === "support") navRoles.add("support");
+    else if (r === "advertising") navRoles.add("advertising");
+    else if (r === "sales" || r === "sales_junior" || r === "sales_senior" || r === "sales_manager") {
+      navRoles.add("sales");
+    }
+  });
+  const visibleNav = ADMIN_NAV.filter((n) => n.roles.some((r) => navRoles.has(r)));
+
+  // If the current subroute isn't in the visible nav for this persona, kick to /admin.
+  useEffect(() => {
+    if (loading || !hasAccess) return;
+    // Overview (/admin) is always allowed for any staff persona.
+    if (pathname === "/admin") return;
+    const matched = ADMIN_NAV.find((n) =>
+      n.exact ? pathname === n.to : pathname === n.to || pathname.startsWith(n.to + "/"),
+    );
+    if (matched && !matched.roles.some((r) => navRoles.has(r))) {
+      toast.error("This section isn't available for the selected persona.");
+      navigate({ to: "/admin" });
+    }
+  }, [pathname, loading, hasAccess, navRoles, navigate]);
 
   if (loading || !user || !hasAccess || mfaState === "checking") {
     return (
@@ -104,8 +136,8 @@ function AdminLayout() {
     );
   }
 
-  const visibleNav = ADMIN_NAV;
-  const label = "Admin";
+  const label = isAdmin ? "Admin" : "Staff";
+
 
   return (
     <SiteLayout>
