@@ -43,6 +43,10 @@ function DashboardClubsPage() {
           </Button>
         </div>
 
+        <div className="mt-4"><ClubDiscountNote /></div>
+
+
+
         {loading ? (
           <div className="mt-8 p-12 text-center text-muted-foreground">Loading…</div>
         ) : (
