@@ -75,12 +75,10 @@ export const getAdminOverviewTrends = createServerFn({ method: "GET" })
     return { days };
   })
   .handler(async ({ context, data }): Promise<AdminOverviewTrends> => {
-    // Cast: generated types haven't picked up the new RPC yet.
-    const rpc = context.supabase.rpc as unknown as (
-      fn: string,
-      args?: Record<string, unknown>,
-    ) => Promise<{ data: unknown; error: { message: string } | null }>;
-    const { data: res, error } = await rpc("admin_overview_trends", { days: data.days });
+    const { data: res, error } = await (context.supabase.rpc as any)(
+      "admin_overview_trends",
+      { days: data.days },
+    );
     if (error) throw new Error(error.message);
     return res as AdminOverviewTrends;
   });
