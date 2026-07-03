@@ -222,6 +222,48 @@ const SIM_KEY = "sandbox.roles";
 const SIM_SELLER_KEY = "sandbox.sellerType";
 const VALID_SELLER_TYPES: SellerType[] = ["private", "dealer", "repair_shop", "insurance"];
 
+// Persist authError briefly (60s) so a page refresh during a broken-session
+// state still shows the "Try again" toast instead of an indefinite spinner.
+const AUTH_ERROR_KEY = "auth.error";
+const AUTH_ERROR_TTL_MS = 60_000;
+const VALID_AUTH_ERRORS: AuthErrorKind[] = ["refresh_failed", "safety_timeout", "bootstrap_failed"];
+
+function loadPersistedAuthError(): AuthErrorKind | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(AUTH_ERROR_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { kind?: string; ts?: number };
+    if (!parsed?.kind || !parsed?.ts) return null;
+    if (Date.now() - parsed.ts > AUTH_ERROR_TTL_MS) {
+      window.sessionStorage.removeItem(AUTH_ERROR_KEY);
+      return null;
+    }
+    return VALID_AUTH_ERRORS.includes(parsed.kind as AuthErrorKind)
+      ? (parsed.kind as AuthErrorKind)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function persistAuthError(kind: AuthErrorKind | null) {
+  if (typeof window === "undefined") return;
+  try {
+    if (kind === null) {
+      window.sessionStorage.removeItem(AUTH_ERROR_KEY);
+    } else {
+      window.sessionStorage.setItem(
+        AUTH_ERROR_KEY,
+        JSON.stringify({ kind, ts: Date.now() }),
+      );
+    }
+  } catch {
+    /* ignore quota / disabled storage */
+  }
+}
+
+
 function loadSim(): AppRole[] | null {
   if (typeof window === "undefined") return null;
   try {
