@@ -169,6 +169,7 @@ import { Route as AdminDiscountAuditsRouteImport } from './routes/admin.discount
 import { Route as AdminDiagnosticsRouteImport } from './routes/admin.diagnostics'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
 import { Route as AdminClubsRouteImport } from './routes/admin.clubs'
+import { Route as AdminClubDiscountRouteImport } from './routes/admin.club-discount'
 import { Route as AdminClaimsRouteImport } from './routes/admin.claims'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
@@ -1066,6 +1067,11 @@ const AdminClubsRoute = AdminClubsRouteImport.update({
   path: '/clubs',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminClubDiscountRoute = AdminClubDiscountRouteImport.update({
+  id: '/club-discount',
+  path: '/club-discount',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminClaimsRoute = AdminClaimsRouteImport.update({
   id: '/claims',
   path: '/claims',
@@ -1639,6 +1645,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
+  '/admin/club-discount': typeof AdminClubDiscountRoute
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
@@ -1890,6 +1897,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
+  '/admin/club-discount': typeof AdminClubDiscountRoute
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
@@ -2145,6 +2153,7 @@ export interface FileRoutesById {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
+  '/admin/club-discount': typeof AdminClubDiscountRoute
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
@@ -2402,6 +2411,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/claims'
+    | '/admin/club-discount'
     | '/admin/clubs'
     | '/admin/currencies'
     | '/admin/diagnostics'
@@ -2653,6 +2663,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/claims'
+    | '/admin/club-discount'
     | '/admin/clubs'
     | '/admin/currencies'
     | '/admin/diagnostics'
@@ -2907,6 +2918,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/claims'
+    | '/admin/club-discount'
     | '/admin/clubs'
     | '/admin/currencies'
     | '/admin/diagnostics'
@@ -4365,6 +4377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminClubsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/club-discount': {
+      id: '/admin/club-discount'
+      path: '/club-discount'
+      fullPath: '/admin/club-discount'
+      preLoaderRoute: typeof AdminClubDiscountRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/claims': {
       id: '/admin/claims'
       path: '/claims'
@@ -5142,6 +5161,7 @@ interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminClaimsRoute: typeof AdminClaimsRoute
+  AdminClubDiscountRoute: typeof AdminClubDiscountRoute
   AdminClubsRoute: typeof AdminClubsRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
   AdminDiagnosticsRoute: typeof AdminDiagnosticsRoute
@@ -5188,6 +5208,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminClaimsRoute: AdminClaimsRoute,
+  AdminClubDiscountRoute: AdminClubDiscountRoute,
   AdminClubsRoute: AdminClubsRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
   AdminDiagnosticsRoute: AdminDiagnosticsRoute,

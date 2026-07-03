@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
-import { computeClubDiscountStatus, logClubDiscountGrant } from "@/lib/club-discount.server";
+import { computeClubDiscountStatus, logClubDiscountGrant, resolveClubCouponDuration } from "@/lib/club-discount.server";
 
 function validateEnv(env: StripeEnv): StripeEnv {
   if (env !== "sandbox" && env !== "live") throw new Error("Invalid environment");
@@ -114,7 +114,7 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
     let discountStripeArg: any = undefined;
     let appliedPercentOff = discount.percentOff;
     let appliedKind: "multi_business" | "club_member" | null = discount.percentOff > 0 ? "multi_business" : null;
-    let clubStatus = { eligible: false, pct: 0, clubId: null as string | null, clubName: null as string | null, clubSlug: null as string | null, enabled: false };
+    let clubStatus: import("@/lib/club-discount.server").ClubDiscountStatus = { eligible: false, pct: 0, clubId: null, clubName: null, clubSlug: null, enabled: false, couponDuration: "auto", requireVerified: true, includePendingClubs: false, includePendingMembers: false };
     if (discount.percentOff > 0) {
       const coupon = await stripe.coupons.create({
         percent_off: discount.percentOff,
@@ -133,7 +133,7 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
       if (clubStatus.eligible && clubStatus.pct > 0) {
         const coupon = await stripe.coupons.create({
           percent_off: clubStatus.pct,
-          duration: "forever",
+          duration: resolveClubCouponDuration(true, clubStatus),
           name: `Club member ${clubStatus.pct}% off`,
           metadata: { kind: "club_member", userId, clubId: clubStatus.clubId ?? "" },
         });
