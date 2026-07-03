@@ -539,6 +539,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           durationMs: Date.now() - bootStarted,
           error: errMsg(err),
         });
+        setAuthError("bootstrap_failed");
         try {
           await supabase.auth.signOut({ scope: "local" });
         } catch (e) {
