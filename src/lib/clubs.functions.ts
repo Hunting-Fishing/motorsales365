@@ -20,7 +20,7 @@ const DOC_KINDS = [
   "other",
 ] as const;
 
-const ApplyInput = z.object({
+const CreatePendingInput = z.object({
   name: z.string().trim().min(3).max(120),
   type: z.enum(CLUB_TYPES),
   description: z.string().trim().min(20).max(2000),
@@ -31,21 +31,11 @@ const ApplyInput = z.object({
   contact_email: z.string().trim().email().max(200),
   contact_phone: z.string().trim().max(40).optional().nullable(),
   website_url: z.string().trim().url().max(300).optional().nullable(),
-  documents: z
-    .array(
-      z.object({
-        kind: z.enum(DOC_KINDS),
-        storage_path: z.string().min(3).max(500),
-        original_filename: z.string().max(200).optional().nullable(),
-      }),
-    )
-    .min(1, "At least one accreditation document is required.")
-    .max(6),
 });
 
-export const applyForClub = createServerFn({ method: "POST" })
+export const createPendingClub = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: unknown) => ApplyInput.parse(i))
+  .inputValidator((i: unknown) => CreatePendingInput.parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const base = slugify(data.name) || "club";
@@ -80,18 +70,38 @@ export const applyForClub = createServerFn({ method: "POST" })
       .select("id,slug")
       .single();
     if (error) throw new Error(error.message);
+    return created as unknown as { id: string; slug: string };
+  });
 
-    const club = created as unknown as { id: string; slug: string };
+const AttachDocsInput = z.object({
+  club_id: z.string().uuid(),
+  documents: z
+    .array(
+      z.object({
+        kind: z.enum(DOC_KINDS),
+        storage_path: z.string().min(3).max(500),
+        original_filename: z.string().max(200).optional().nullable(),
+      }),
+    )
+    .min(1)
+    .max(6),
+});
+
+export const attachClubDocuments = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => AttachDocsInput.parse(i))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
     const docRows = data.documents.map((d) => ({
-      club_id: club.id,
+      club_id: data.club_id,
       kind: d.kind,
       storage_path: d.storage_path,
       original_filename: d.original_filename ?? null,
       uploaded_by: userId,
     }));
-    const { error: docErr } = await supabase.from("club_documents" as never).insert(docRows as never);
-    if (docErr) throw new Error(docErr.message);
-    return club;
+    const { error } = await supabase.from("club_documents" as never).insert(docRows as never);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 export const listMyClubs = createServerFn({ method: "GET" })
