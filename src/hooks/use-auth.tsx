@@ -267,10 +267,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadRoles = useCallback(async (uid: string) => {
     setRolesLoading(true);
+    const started = Date.now();
     try {
-      // Race the queries against a timeout so a wedged PostgREST call
-      // (e.g. supabase-js stuck on a failed token refresh) can't leave
-      // rolesLoading=true forever.
       const timeout = new Promise<"timeout">((resolve) =>
         setTimeout(() => resolve("timeout"), 8000),
       );
@@ -280,24 +278,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ]);
       const result = await Promise.race([query, timeout]);
       if (result === "timeout") {
-        console.warn("[auth] loadRoles timed out; continuing with empty roles");
+        authLog("warn", {
+          event: "loadRoles.timeout",
+          uid,
+          durationMs: Date.now() - started,
+        });
         setRoles([]);
         setRealSellerType("private");
         setProfileName(null);
         return;
       }
-      const [{ data: roleRows }, { data: profileRow }] = result;
-      setRoles((roleRows ?? []).map((r: any) => r.role));
+      const [{ data: roleRows, error: rolesErr }, { data: profileRow, error: profErr }] = result;
+      if (rolesErr || profErr) {
+        authLog("warn", {
+          event: "loadRoles.partial_error",
+          uid,
+          durationMs: Date.now() - started,
+          rolesError: rolesErr?.message,
+          profileError: profErr?.message,
+        });
+      }
+      const roleList = (roleRows ?? []).map((r: any) => r.role);
+      setRoles(roleList);
       const st = (profileRow as any)?.seller_type;
       setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
       setProfileName((profileRow as any)?.full_name ?? null);
+      authLog("info", {
+        event: "loadRoles.ok",
+        uid,
+        durationMs: Date.now() - started,
+        roleCount: roleList.length,
+      });
     } catch (err) {
-      console.warn("[auth] loadRoles failed", err);
+      authLog("error", {
+        event: "loadRoles.failed",
+        uid,
+        durationMs: Date.now() - started,
+        error: errMsg(err),
+      });
       setRoles([]);
     } finally {
       setRolesLoading(false);
     }
   }, []);
+
 
   const handleSession = useCallback(
     (newSession: Session | null) => {
