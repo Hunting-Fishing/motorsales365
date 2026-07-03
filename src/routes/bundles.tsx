@@ -34,7 +34,7 @@ function BundlesPage() {
   const [bundles, setBundles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [buying, setBuying] = useState<string | null>(null);
-  const { data: clubStatus } = useClubDiscountStatus();
+  const { data: clubStatus, refetch: refetchClub } = useClubDiscountStatus();
   const discountPct = clubStatus?.eligible ? clubStatus.pct : 0;
 
   useEffect(() => {
@@ -58,7 +58,9 @@ function BundlesPage() {
     if (!confirm("Confirm purchase? Credits will be added to your account.")) return;
     setBuying(bundleId);
     try {
-      const res: any = await purchaseBundle({ data: { bundleId } });
+      const res: any = await purchaseBundle({
+        data: { bundleId, expectClubDiscount: !!clubStatus?.eligible },
+      });
       if (res?.clubDiscountPhp > 0) {
         toast.success(
           `Bundle purchased — club member ${res.clubDiscountPct}% off (₱${Number(res.clubDiscountPhp).toLocaleString()} saved).`,
@@ -67,7 +69,11 @@ function BundlesPage() {
         toast.success("Bundle purchased — credits available now.");
       }
     } catch (e: any) {
-      toast.error(e.message ?? "Purchase failed");
+      const msg = e.message ?? "Purchase failed";
+      toast.error(msg);
+      if (msg.toLowerCase().includes("club-member discount")) {
+        void refetchClub();
+      }
     } finally {
       setBuying(null);
     }
