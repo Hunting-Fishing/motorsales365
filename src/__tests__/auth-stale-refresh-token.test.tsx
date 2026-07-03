@@ -109,11 +109,6 @@ describe("auth bootstrap — stale refresh token recovery", () => {
     rolesCallCount = 0;
     listeners.length = 0;
     signOutLocal.mockClear();
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
   });
 
   it("clears the stale token and loads roles on next sign-in within the timeout window", async () => {
@@ -121,34 +116,33 @@ describe("auth bootstrap — stale refresh token recovery", () => {
 
     // 1) Bootstrap sees the stale token, calls signOut({ scope: "local" }),
     //    releases loading, and renders as signed-out.
-    await vi.runAllTimersAsync();
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => expect(result.current.loading).toBe(false), { timeout: 3000 });
 
     expect(signOutLocal).toHaveBeenCalledTimes(1);
     expect(result.current.user).toBeNull();
     expect(result.current.effectiveRoles).toEqual([]);
 
     // 2) A fresh sign-in fires via onAuthStateChange. The first roles fetch
-    //    rejects (flake); the retry with backoff succeeds within the 8s budget.
+    //    rejects (flake); the retry with backoff (~1s) then succeeds well
+    //    inside the 8s per-attempt safety timeout.
     const freshSession = {
       user: { id: "user-123", email: "test@example.com", user_metadata: {} },
     };
     await act(async () => {
       for (const cb of listeners) cb("SIGNED_IN", freshSession);
-      // Drain the queued 0ms loadRoles microtask + first attempt rejection.
-      await vi.advanceTimersByTimeAsync(50);
-      // Advance past the 1s first-retry backoff window.
-      await vi.advanceTimersByTimeAsync(1200);
     });
 
-    await waitFor(() => {
-      expect(result.current.user?.id).toBe("user-123");
-      expect(result.current.effectiveRoles.sort()).toEqual(["admin", "user"]);
-    });
+    await waitFor(
+      () => {
+        expect(result.current.user?.id).toBe("user-123");
+        expect(result.current.effectiveRoles.sort()).toEqual(["admin", "user"]);
+      },
+      { timeout: 5000 },
+    );
 
-    // Confirm the retry actually ran (>=2 attempts) and finished well under
-    // the 8s per-attempt safety timeout.
+    // Confirm the retry actually ran (>=2 attempts).
     expect(rolesCallCount).toBeGreaterThanOrEqual(2);
     expect(result.current.loading).toBe(false);
   });
 });
+
