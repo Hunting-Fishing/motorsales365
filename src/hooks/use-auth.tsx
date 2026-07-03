@@ -225,14 +225,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadRoles = useCallback(async (uid: string) => {
     setRolesLoading(true);
     try {
-      const [{ data: roleRows }, { data: profileRow }] = await Promise.all([
+      // Race the queries against a timeout so a wedged PostgREST call
+      // (e.g. supabase-js stuck on a failed token refresh) can't leave
+      // rolesLoading=true forever.
+      const timeout = new Promise<"timeout">((resolve) =>
+        setTimeout(() => resolve("timeout"), 8000),
+      );
+      const query = Promise.all([
         supabase.from("user_roles").select("role").eq("user_id", uid),
         supabase.from("profiles").select("seller_type, full_name").eq("id", uid).maybeSingle(),
       ]);
+      const result = await Promise.race([query, timeout]);
+      if (result === "timeout") {
+        console.warn("[auth] loadRoles timed out; continuing with empty roles");
+        setRoles([]);
+        setRealSellerType("private");
+        setProfileName(null);
+        return;
+      }
+      const [{ data: roleRows }, { data: profileRow }] = result;
       setRoles((roleRows ?? []).map((r: any) => r.role));
       const st = (profileRow as any)?.seller_type;
       setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
       setProfileName((profileRow as any)?.full_name ?? null);
+    } catch (err) {
+      console.warn("[auth] loadRoles failed", err);
+      setRoles([]);
     } finally {
       setRolesLoading(false);
     }
@@ -268,7 +286,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [loadRoles],
   );
 
-  const loading = authLoading || (!!user && rolesLoading);
+  // The header "Signing you in…" pill is gated on authLoading only.
+  // Roles arriving late shouldn't keep the pill spinning; role-gated
+  // routes check rolesLoading separately.
+  const loading = authLoading;
+
 
   const refreshSession = useCallback(
     async (providedSession?: Session | null) => {
@@ -286,35 +308,74 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false;
 
+    // Safety timeout: if bootstrap never resolves (network stall, wedged
+    // supabase client), release the UI after 8s. Any real session will
+    // still populate via onAuthStateChange.
+    const safetyTimer = setTimeout(() => {
+      if (cancelled) return;
+      setAuthLoading((prev) => {
+        if (prev) console.warn("[auth] bootstrap safety timeout fired");
+        return false;
+      });
+    }, 8000);
+
     // Listener FIRST — also clears loading so we render as soon as
     // Supabase emits INITIAL_SESSION from the persisted storage token.
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (cancelled) return;
+      // Refresh failed / signed out / no session on init → hard reset.
+      if (event === "SIGNED_OUT" || !newSession) {
+        handleSession(null);
+        setAuthLoading(false);
+        setRolesLoading(false);
+        return;
+      }
       handleSession(newSession);
       setAuthLoading(false);
     });
 
     // Re-validate the persisted session with the Auth server (getUser) rather
-    // than trusting the localStorage token blindly. Falls back to getSession
-    // only to expose the access token shape that handleSession expects.
+    // than trusting the localStorage token blindly. If getUser errors (stale
+    // refresh token, revoked session), wipe the local session so the UI
+    // renders as signed-out instead of hanging on the bad token.
     (async () => {
-      const { data: userData, error } = await supabase.auth.getUser();
-      if (cancelled) return;
-      if (error || !userData.user) {
-        handleSession(null);
-      } else {
-        const { data: sessData } = await supabase.auth.getSession();
+      try {
+        const { data: userData, error } = await supabase.auth.getUser();
         if (cancelled) return;
-        handleSession(sessData.session ?? null);
+        if (error || !userData.user) {
+          // Clear the dead token from localStorage without a network round-trip.
+          try {
+            await supabase.auth.signOut({ scope: "local" });
+          } catch {
+            // ignore; handleSession(null) below still renders signed-out
+          }
+          handleSession(null);
+        } else {
+          const { data: sessData } = await supabase.auth.getSession();
+          if (cancelled) return;
+          handleSession(sessData.session ?? null);
+        }
+      } catch (err) {
+        if (cancelled) return;
+        console.warn("[auth] bootstrap failed", err);
+        try {
+          await supabase.auth.signOut({ scope: "local" });
+        } catch {
+          // ignore
+        }
+        handleSession(null);
+      } finally {
+        if (!cancelled) setAuthLoading(false);
       }
-      setAuthLoading(false);
     })();
 
     return () => {
       cancelled = true;
+      clearTimeout(safetyTimer);
       sub.subscription.unsubscribe();
     };
   }, [handleSession]);
+
 
   const signOut = async () => {
     await supabase.auth.signOut();

@@ -1,44 +1,52 @@
-## Goal
 
-The header "View as" dropdown currently only lets an admin preview seller types (Private seller, Dealer, Repair shop, Insurance). Admins need to also preview the app as an **Advertiser**, **Partner/Influencer (Partner Program)**, and other staff personas (Sales, Moderator, Support, regular user) from the same menu — one click, no need to open the separate Role simulator.
+## Problem
 
-## What changes
+Users (Jocelyn, and you) see the header pill "Signing you in…" stuck indefinitely on `/login` and other pages.
 
-Turn the "View as" button into a single unified **Persona switcher** for admins, grouping:
+The network log confirms the cause:
 
-1. **Seller personas** (drives `simulatedSellerType`)
-   - Private seller
-   - Dealer
-   - Repair shop
-   - Insurance
+```
+POST /auth/v1/token?grant_type=refresh_token
+→ 400 { "code": "refresh_token_not_found" }
+```
 
-2. **Role personas** (drives `simulatedRoles`)
-   - Advertiser
-   - Partner / Influencer (Partner Program partner)
-   - Sales (Junior / Senior / Manager)
-   - Moderator
-   - Support
-   - Regular user (no staff perms)
+The browser has a persisted Supabase session whose refresh token is no longer valid on the server (rotated/expired/revoked). Our current bootstrap in `src/hooks/use-auth.tsx` cannot recover from that:
 
-3. **Reset** — clears both simulated seller type and simulated roles back to the real admin account.
+1. `onAuthStateChange` fires `INITIAL_SESSION` with the stale session — we set `rolesLoading = true` and fire `loadRoles`.
+2. Those PostgREST calls use the expired access token. `supabase-js` tries to auto-refresh, the refresh 400s, and the pending queries end up waiting on the internal refresh lock — they never resolve.
+3. `loading = authLoading || (user && rolesLoading)` stays `true`. The pill spins forever.
 
-Selecting a persona sets the appropriate simulation flag(s) and closes the menu. The button label reflects the active persona (e.g. "View as: Advertiser").
+There is no timeout, no "refresh failed → sign out locally" recovery, and no safety net if `getUser()` / `getSession()` themselves stall.
 
-The existing separate "Role" dropdown can be removed to avoid duplication (all its options move into the unified menu).
+## Fix
 
-## Technical notes
+Only touch `src/hooks/use-auth.tsx`. No schema or UI changes.
 
-- File: `src/components/site-header.tsx`
-  - Replace the two admin dropdowns (seller View-as + Role simulator) with one grouped `DropdownMenu` using `DropdownMenuLabel` + `DropdownMenuSeparator`.
-  - Each item calls the correct setter:
-    - Seller personas → `setSimulatedSellerType(value)` and `setSimulatedRoles(null)`
-    - Role personas → `setSimulatedRoles([value])` and `setSimulatedSellerType(null)`
-    - Reset → both setters to `null`
-  - "Partner / Influencer" persona: since there is no dedicated `AppRole` for partner, simulate it by setting `simulatedRoles` to `["user"]` **and** flipping a new local `simulatedPersona: "partner" | null` that gates partner-only UI. Simplest first pass: use the existing `advertising` role plus a `data-persona="partner"` marker; if a real partner flag is needed later, we can add `simulatedIsPartner` to `useAuth`.
-- No DB or RLS changes. This is UI-only — the orange sandbox banner already reads "UI only — RLS unchanged."
-- No changes to `src/hooks/use-auth.tsx` unless we add `simulatedIsPartner` (optional; called out above).
+1. **Detect and clear a dead session on boot.**
+   In the bootstrap effect, when `getUser()` returns an auth error OR `getSession()` returns null while local storage still holds a token, call `supabase.auth.signOut({ scope: "local" })`. That wipes the bad token from `localStorage` without a network round-trip, then let `handleSession(null)` + `setAuthLoading(false)` render the signed-out UI.
+
+2. **Listen for refresh failures at runtime.**
+   Also treat the `SIGNED_OUT` event and any `INITIAL_SESSION` / `TOKEN_REFRESHED` event that arrives with `newSession === null` as a hard reset: `handleSession(null)`, `setAuthLoading(false)`, `setRolesLoading(false)`.
+
+3. **Safety timeouts (belt & suspenders).**
+   - `authLoading` — force `false` after 8s if the bootstrap has not resolved (network stall).
+   - `rolesLoading` — race `loadRoles`'s queries against an 8s timeout so a hung PostgREST call can't wedge the UI; on timeout we set roles to `[]` and log a warning. The real values will populate on the next successful fetch (query invalidation on next auth event).
+
+4. **Don't gate the "Signing you in…" pill on `rolesLoading` alone.**
+   Change the derived `loading` to `authLoading` only. Roles arriving late shouldn't keep showing "Signing you in…" — that message is misleading once the session is confirmed. Role-gated routes already check `rolesLoading` separately (`/admin` route redirect logic) so this doesn't loosen access control; it only fixes the header UX.
+
+## Files touched
+
+- `src/hooks/use-auth.tsx` — bootstrap effect, `handleSession`, `loading` derivation, add timeouts.
+
+## Verification
+
+- Reproduce: in DevTools, edit the persisted `sb-…-auth-token` refresh_token to gibberish, reload → header should settle into signed-out state within ~1s, not spin forever.
+- Normal signed-in refresh: reload while logged in → pill briefly shows, then resolves to the account chip.
+- Signed-out cold load: no pill flash beyond initial mount.
+- No regression on `/admin` (role gate still waits for roles before deciding).
 
 ## Out of scope
 
-- Server-side role impersonation (still UI-only).
-- Adding a real `partner`/`influencer` value to the `AppRole` enum.
+- Not changing any RLS, migrations, or the sign-in flow itself.
+- Not touching the persona switcher or protected routes.
