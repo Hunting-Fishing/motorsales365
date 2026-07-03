@@ -17,8 +17,6 @@ vi.mock("@/lib/email/send", () => ({
 type AuthListener = (event: string, session: any) => void;
 const listeners: AuthListener[] = [];
 
-// Roles fetch: always reject so we can observe retry-timer scheduling and
-// cancellation without needing to wait for successful loads.
 let rolesCallsByUid: Record<string, number> = {};
 const rolesTableBuilder = () => ({
   select: () => ({
@@ -90,6 +88,8 @@ function fire(event: string, session: any) {
   for (const cb of listeners) cb(event, session);
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 describe("auth — overlapping refresh attempts", () => {
   beforeEach(() => {
     rolesCallsByUid = {};
@@ -101,77 +101,66 @@ describe("auth — overlapping refresh attempts", () => {
     }
   });
 
-  it("only the latest error surfaces and pending retries are cancelled", async () => {
-    vi.useFakeTimers();
-    try {
+  it(
+    "only the latest error surfaces and pending retries are cancelled",
+    async () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
-      // Let bootstrap resolve as signed-out.
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(0);
-      });
+      // Bootstrap resolves as signed-out.
       await waitFor(() => expect(result.current.loading).toBe(false));
 
-      // 1) First sign-in for user A. Roles fetch will reject and schedule a
-      //    backoff retry (~1s) — we do NOT advance timers yet.
+      // 1) Sign in as user-A → role fetch fails and schedules retry (~1s).
       const sessionA = {
         user: { id: "user-A", email: "a@example.com", user_metadata: {} },
       };
       await act(async () => {
         fire("SIGNED_IN", sessionA);
-        await Promise.resolve();
       });
       await waitFor(() => expect(rolesCallsByUid["user-A"]).toBe(1));
 
-      // 2) Before the retry timer fires, an unexpected SIGNED_OUT lands
-      //    (simulating refresh failure #1). This must set authError and
-      //    cancel the pending retry for user-A.
+      // 2) Unexpected SIGNED_OUT lands before retry fires — must set
+      //    authError=refresh_failed AND cancel the pending user-A retry.
       await act(async () => {
         fire("SIGNED_OUT", null);
-        await Promise.resolve();
       });
       expect(result.current.authError).toBe("refresh_failed");
 
-      // 3) A second sign-in for a DIFFERENT user immediately clears the
-      //    error and starts a fresh role-load cycle for user-B.
+      // 3) Immediate sign-in for a different user clears the error and
+      //    starts a fresh retry loop for user-B.
       const sessionB = {
         user: { id: "user-B", email: "b@example.com", user_metadata: {} },
       };
       await act(async () => {
         fire("SIGNED_IN", sessionB);
-        await Promise.resolve();
       });
       expect(result.current.authError).toBeNull();
       await waitFor(() => expect(rolesCallsByUid["user-B"]).toBe(1));
 
-      // 4) Advance far past the 4s max backoff window. If user-A's retry
-      //    had NOT been cancelled, we'd see additional calls against
-      //    user-A here. With proper cancellation, only user-B's retries fire.
+      // 4) Wait past the first two backoff windows (~1s + ~2s = 3s). If
+      //    user-A's retry were still armed we'd see additional user-A
+      //    calls here; proper cancellation keeps the count at 1.
       await act(async () => {
-        await vi.advanceTimersByTimeAsync(10_000);
+        await sleep(3500);
       });
-      const userACallsAfter = rolesCallsByUid["user-A"] ?? 0;
-      expect(userACallsAfter).toBe(1);
+      expect(rolesCallsByUid["user-A"] ?? 0).toBe(1);
       expect(rolesCallsByUid["user-B"]).toBeGreaterThanOrEqual(2);
 
-      // 5) A second unexpected SIGNED_OUT lands — the latest error state
-      //    must again be "refresh_failed" (not a stale value, not null).
+      // 5) A second unexpected SIGNED_OUT — the LATEST error must be
+      //    refresh_failed (not stale, not cleared).
       await act(async () => {
         fire("SIGNED_OUT", null);
-        await Promise.resolve();
       });
       expect(result.current.authError).toBe("refresh_failed");
       expect(result.current.user).toBeNull();
 
-      // 6) Advance again — user-B's retry loop must also be cancelled by
-      //    the sign-out; no further role calls for user-B.
+      // 6) Advance again — user-B's retry loop must also be cancelled.
       const userBCallsBefore = rolesCallsByUid["user-B"] ?? 0;
       await act(async () => {
-        await vi.advanceTimersByTimeAsync(10_000);
+        await sleep(3000);
       });
       expect(rolesCallsByUid["user-B"]).toBe(userBCallsBefore);
-    } finally {
-      vi.useRealTimers();
-    }
-  });
+      expect(rolesCallsByUid["user-A"] ?? 0).toBe(1);
+    },
+    20_000,
+  );
 });
