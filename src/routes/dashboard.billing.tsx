@@ -52,7 +52,27 @@ import {
   detachPaymentMethod,
   getInvoiceDetails,
 } from "@/utils/payments.functions";
-import { ClubDiscountBadgeForPayment } from "@/components/clubs/applied-club-discount";
+import { BadgePercent, Sparkles } from "lucide-react";
+
+type ClubGrantRow = {
+  id: string;
+  payment_id: string | null;
+  scope: string;
+  discount_pct: number;
+  discount_amount_php: number;
+  original_amount_php: number;
+  applied_at: string;
+  club: { name: string | null; slug: string | null; verified: boolean | null } | null;
+};
+
+const CLUB_SCOPE_LABEL: Record<string, string> = {
+  ad_order: "ad order",
+  boost: "listing boost",
+  bundle: "listing bundle",
+  subscription: "subscription",
+  passport_premium: "Passport Premium",
+  promotion: "promotion",
+};
 
 export const Route = createFileRoute("/dashboard/billing")({
   component: BillingPage,
@@ -113,6 +133,7 @@ function BillingPage() {
   const [loadingInvoice, setLoadingInvoice] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
   const [defaultPmId, setDefaultPmId] = useState<string | null>(null);
+  const [grantsByPayment, setGrantsByPayment] = useState<Record<string, ClubGrantRow>>({});
 
   const env = getStripeEnvironment();
 
@@ -134,7 +155,27 @@ function BillingPage() {
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .then(({ data }) => setPayments(data ?? []));
+      .then(async ({ data }) => {
+        const rows = data ?? [];
+        setPayments(rows);
+        const ids = rows.map((p: any) => p.id).filter(Boolean);
+        if (ids.length === 0) {
+          setGrantsByPayment({});
+          return;
+        }
+        const { data: grants } = await supabase
+          .from("club_member_discount_grants")
+          .select(
+            "id,payment_id,scope,discount_pct,discount_amount_php,original_amount_php,applied_at,club:clubs(name,slug,verified)",
+          )
+          .in("payment_id", ids as string[])
+          .order("applied_at", { ascending: false });
+        const map: Record<string, ClubGrantRow> = {};
+        for (const g of (grants ?? []) as any[]) {
+          if (g.payment_id && !map[g.payment_id]) map[g.payment_id] = g as ClubGrantRow;
+        }
+        setGrantsByPayment(map);
+      });
     reloadSubs();
     listInvoices({ data: { environment: env, limit: 20 } })
       .then((res) => setInvoices(res.invoices ?? []))
@@ -1367,8 +1408,12 @@ function BillingPage() {
                 {payments.map((p) => {
                   const linked = p.listing_id ? listings.find((l) => l.id === p.listing_id) : null;
                   const docLabel = p.status === "paid" ? "Receipt" : "Invoice";
+                  const grant = grantsByPayment[p.id];
+                  const clubName = grant?.club?.name ?? null;
+                  const clubSlug = grant?.club?.slug ?? null;
+                  const scope = grant ? (CLUB_SCOPE_LABEL[grant.scope] ?? grant.scope) : null;
                   return (
-                    <tr key={p.id} className="border-t border-border">
+                    <tr key={p.id} className="border-t border-border align-top">
                       <td className="p-3">{formatDate(p.created_at)}</td>
                       <td className="p-3 capitalize">{p.kind}</td>
                       <td className="p-3">
@@ -1387,8 +1432,41 @@ function BillingPage() {
                         )}
                       </td>
                       <td className="p-3 font-medium">
-                        <div>{formatPHP(p.amount_php)}</div>
-                        <ClubDiscountBadgeForPayment paymentId={p.id} />
+                        {grant ? (
+                          <>
+                            <div className="text-muted-foreground line-through">
+                              {formatPHP(grant.original_amount_php)}
+                            </div>
+                            <div>{formatPHP(p.amount_php)}</div>
+                            <div className="mt-1 flex flex-col gap-1 text-xs font-normal">
+                              <span className="inline-flex w-fit items-center gap-1 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 font-medium text-emerald-700">
+                                <BadgePercent className="h-3 w-3" />
+                                Club {grant.discount_pct}% off · saved{" "}
+                                {formatPHP(grant.discount_amount_php)}
+                              </span>
+                              <span className="inline-flex items-start gap-1 text-muted-foreground">
+                                <Sparkles className="mt-0.5 h-3 w-3 text-emerald-600" />
+                                <span>
+                                  Eligible as verified member of{" "}
+                                  {clubSlug ? (
+                                    <Link
+                                      to="/clubs/$slug"
+                                      params={{ slug: clubSlug }}
+                                      className="underline hover:text-foreground"
+                                    >
+                                      {clubName ?? "your club"}
+                                    </Link>
+                                  ) : (
+                                    (clubName ?? "your club")
+                                  )}
+                                  {scope ? ` — applied to this ${scope}.` : "."}
+                                </span>
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <div>{formatPHP(p.amount_php)}</div>
+                        )}
                       </td>
                       <td className="p-3">
                         <Badge variant={p.status === "paid" ? "default" : "secondary"}>
