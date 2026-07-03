@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { getListingCheckoutStatus } from "@/lib/listing-payment.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
+import { RecentClubDiscountNote } from "@/components/clubs/applied-club-discount";
 
 export const Route = createFileRoute("/checkout/return")({
   validateSearch: (
