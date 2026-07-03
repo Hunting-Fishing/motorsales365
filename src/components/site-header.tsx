@@ -320,18 +320,28 @@ export function SiteHeader() {
               setSimulatedSellerType(null);
               setSimulatedRoles([v]);
             };
-            const resetAll = () => {
-              setSimulatedSellerType(null);
-              setSimulatedRoles(null);
-            };
             return (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2" title="Preview app as any persona (UI only)">
-                    <Eye className="h-4 w-4" />
-                    <span className="hidden md:inline">View as: {label}</span>
+              <div className="hidden md:inline-flex items-center gap-1">
+                {personaActive && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleResetPersona}
+                    className="gap-1.5"
+                    title="Clear persona and refetch all data as real admin"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                    Reset
                   </Button>
-                </DropdownMenuTrigger>
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2" title="Preview app as any persona (UI only)">
+                      <Eye className="h-4 w-4" />
+                      <span className="hidden md:inline">View as: {label}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+
                 <DropdownMenuContent align="end" className="w-64 max-h-[70vh] overflow-y-auto">
                   <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                     Seller personas
