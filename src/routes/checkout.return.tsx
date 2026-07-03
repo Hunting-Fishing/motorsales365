@@ -130,6 +130,9 @@ function CheckoutReturn() {
               ? "Your listing will activate within a few seconds."
               : "We couldn’t find a session reference, but if you completed the form your payment is on its way."}
         </p>
+        <div className="mx-auto mt-6 max-w-md text-left">
+          <RecentClubDiscountNote />
+        </div>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           {chainingToBoost ? (
             <Button asChild>
