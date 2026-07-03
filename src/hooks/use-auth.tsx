@@ -479,12 +479,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === "SIGNED_OUT" || !newSession) {
         if (event === "TOKEN_REFRESHED" && !newSession) {
           authLog("error", { event: "token_refresh.failed" });
+          setAuthError("refresh_failed");
         }
         handleSession(null);
         setAuthLoading(false);
         setRolesLoading(false);
         return;
       }
+      // Successful (re-)authentication clears any prior error.
+      setAuthError(null);
       handleSession(newSession);
       setAuthLoading(false);
     });
