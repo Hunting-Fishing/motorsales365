@@ -8,8 +8,11 @@ import {
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
+
+export type AuthErrorKind = "refresh_failed" | "bootstrap_failed" | "safety_timeout";
 
 /**
  * Structured auth logger. Emits a single-line JSON payload prefixed with
@@ -207,6 +210,10 @@ interface AuthContextValue {
   };
   refreshSession: (session?: Session | null) => Promise<Session | null>;
   signOut: () => Promise<void>;
+  /** Non-null when the last auth bootstrap/refresh failed and the user needs to re-auth. */
+  authError: AuthErrorKind | null;
+  /** Clears local session state and sends the user back to /auth to sign in again. */
+  retryAuth: () => Promise<void>;
 
 }
 
@@ -248,6 +255,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [rolesLoading, setRolesLoading] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
   const [profileName, setProfileName] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<AuthErrorKind | null>(null);
+  const authErrorToastRef = useRef<string | number | null>(null);
 
   const [realSellerType, setRealSellerType] = useState<SellerType>("private");
   // Initialize as null to match SSR output, then hydrate from localStorage
@@ -450,6 +459,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             event: "bootstrap.safety_timeout",
             durationMs: Date.now() - bootStarted,
           });
+          setAuthError("safety_timeout");
         }
         return false;
       });
@@ -470,12 +480,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === "SIGNED_OUT" || !newSession) {
         if (event === "TOKEN_REFRESHED" && !newSession) {
           authLog("error", { event: "token_refresh.failed" });
+          setAuthError("refresh_failed");
         }
         handleSession(null);
         setAuthLoading(false);
         setRolesLoading(false);
         return;
       }
+      // Successful (re-)authentication clears any prior error.
+      setAuthError(null);
       handleSession(newSession);
       setAuthLoading(false);
     });
@@ -495,6 +508,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             error: error ? errMsg(error) : "no_user",
             errorStatus: (error as any)?.status,
           });
+          // Only flag as an error worth surfacing if we actually had a
+          // persisted session token that failed to validate. First-time
+          // visitors with no token shouldn't see a re-auth toast.
+          const hadPersistedToken =
+            typeof window !== "undefined" &&
+            Object.keys(window.localStorage ?? {}).some((k) => k.startsWith("sb-"));
+          if (hadPersistedToken) setAuthError("refresh_failed");
           try {
             await supabase.auth.signOut({ scope: "local" });
           } catch (e) {
@@ -520,6 +540,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           durationMs: Date.now() - bootStarted,
           error: errMsg(err),
         });
+        setAuthError("bootstrap_failed");
         try {
           await supabase.auth.signOut({ scope: "local" });
         } catch (e) {
@@ -544,7 +565,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     handleSession(null);
     setAuthLoading(false);
+    setAuthError(null);
   };
+
+  const retryAuth = useCallback(async () => {
+    authLog("info", { event: "retryAuth.start" });
+    try {
+      await supabase.auth.signOut({ scope: "local" });
+    } catch (e) {
+      authLog("warn", { event: "retryAuth.local_signout_failed", error: errMsg(e) });
+    }
+    handleSession(null);
+    setAuthError(null);
+    setAuthLoading(false);
+    if (typeof window !== "undefined") {
+      const next = encodeURIComponent(window.location.pathname + window.location.search);
+      window.location.assign(`/auth?next=${next}`);
+    }
+  }, [handleSession]);
+
+  // Surface a persistent toast with a "Try again" action whenever we detect
+  // a broken session. Dedupes so we never stack multiple error toasts.
+  useEffect(() => {
+    if (!authError) {
+      if (authErrorToastRef.current !== null) {
+        toast.dismiss(authErrorToastRef.current);
+        authErrorToastRef.current = null;
+      }
+      return;
+    }
+    if (authErrorToastRef.current !== null) return;
+    const message =
+      authError === "refresh_failed"
+        ? "Your session expired"
+        : authError === "safety_timeout"
+        ? "Sign-in is taking too long"
+        : "We couldn't verify your session";
+    authErrorToastRef.current = toast.error(message, {
+      description: "Please sign in again to continue.",
+      duration: Infinity,
+      action: {
+        label: "Try again",
+        onClick: () => {
+          void retryAuth();
+        },
+      },
+    });
+  }, [authError, retryAuth]);
 
   const realRoles = roles as AppRole[];
   const realIsAdmin = realRoles.includes("admin");
@@ -655,6 +722,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         refreshSession,
         signOut,
+        authError,
+        retryAuth,
 
       }}
 
