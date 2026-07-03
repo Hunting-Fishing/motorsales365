@@ -259,6 +259,7 @@ import { Route as ApiPublicGoSlugRouteImport } from './routes/api/public/go.$slu
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 import { Route as ApiPublicFlashcardsContentRouteImport } from './routes/api/public/flashcards.content'
 import { Route as AdminAdvertisementsAnalyticsCodeRouteImport } from './routes/admin.advertisements.analytics.$code'
+import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
@@ -1565,6 +1566,12 @@ const AdminAdvertisementsAnalyticsCodeRoute =
     path: '/$code',
     getParentRoute: () => AdminAdvertisementsAnalyticsRoute,
   } as any)
+const AuthenticatedDashboardClubsIdRoute =
+  AuthenticatedDashboardClubsIdRouteImport.update({
+    id: '/dashboard/clubs_/$id',
+    path: '/dashboard/clubs/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicTrainingPartnersIdClickRoute =
   ApiPublicTrainingPartnersIdClickRouteImport.update({
     id: '/api/public/training-partners/$id/click',
@@ -1785,6 +1792,7 @@ export interface FileRoutesByFullPath {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
+  '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -2031,6 +2039,7 @@ export interface FileRoutesByTo {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
+  '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -2285,6 +2294,7 @@ export interface FileRoutesById {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
+  '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -2539,6 +2549,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/dashboard/team/'
+    | '/dashboard/clubs/$id'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
@@ -2785,6 +2796,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements'
     | '/dashboard/team'
+    | '/dashboard/clubs/$id'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
@@ -3038,6 +3050,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/dashboard/team/'
+    | '/_authenticated/dashboard/clubs_/$id'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
@@ -4958,6 +4971,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisementsAnalyticsCodeRouteImport
       parentRoute: typeof AdminAdvertisementsAnalyticsRoute
     }
+    '/_authenticated/dashboard/clubs_/$id': {
+      id: '/_authenticated/dashboard/clubs_/$id'
+      path: '/dashboard/clubs/$id'
+      fullPath: '/dashboard/clubs/$id'
+      preLoaderRoute: typeof AuthenticatedDashboardClubsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/training-partners/$id/click': {
       id: '/api/public/training-partners/$id/click'
       path: '/api/public/training-partners/$id/click'
@@ -4977,6 +4997,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
   AuthenticatedDashboardStaffRequestsRoute: typeof AuthenticatedDashboardStaffRequestsRoute
   AuthenticatedDisputeReportIdRoute: typeof AuthenticatedDisputeReportIdRoute
+  AuthenticatedDashboardClubsIdRoute: typeof AuthenticatedDashboardClubsIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -4991,6 +5012,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardStaffRequestsRoute:
     AuthenticatedDashboardStaffRequestsRoute,
   AuthenticatedDisputeReportIdRoute: AuthenticatedDisputeReportIdRoute,
+  AuthenticatedDashboardClubsIdRoute: AuthenticatedDashboardClubsIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

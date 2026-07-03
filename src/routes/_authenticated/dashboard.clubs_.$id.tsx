@@ -16,7 +16,7 @@ import {
   createClubEvent,
 } from "@/lib/clubs.functions";
 
-export const Route = createFileRoute("/_authenticated/dashboard/clubs/$id")({
+export const Route = createFileRoute("/_authenticated/dashboard/clubs_/$id")({
   head: () => ({ meta: [{ title: "Manage club — 365 MotorSales" }] }),
   component: ManageClubPage,
 });
