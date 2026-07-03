@@ -385,28 +385,53 @@ export function SiteHeader() {
           })()}
 
           {authError ? (
-            <div
-              className="flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-1.5 text-destructive"
-              role="alert"
-            >
-              <span className="hidden text-xs font-medium sm:inline">
-                {authError === "refresh_failed"
-                  ? "Session expired"
-                  : authError === "safety_timeout"
-                  ? "Sign-in stalled"
-                  : "Sign-in failed"}
-              </span>
-              <Button
-                variant="destructive"
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={() => {
-                  void retryAuth();
-                }}
-              >
-                Try again
-              </Button>
-            </div>
+            (() => {
+              const needsLogin = !user;
+              const label = needsLogin
+                ? "Please sign in again"
+                : authError === "refresh_failed"
+                ? "Session expired"
+                : authError === "safety_timeout"
+                ? "Sign-in stalled"
+                : "Sign-in failed";
+              return (
+                <div
+                  className="flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-1.5 text-destructive"
+                  role="alert"
+                  aria-live="assertive"
+                  data-auth-state={needsLogin ? "needs-login" : "error"}
+                >
+                  <span className="hidden text-xs font-medium sm:inline">{label}</span>
+                  {needsLogin ? (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="h-7 px-2 text-xs"
+                      onClick={() => {
+                        const next = encodeURIComponent(
+                          window.location.pathname + window.location.search,
+                        );
+                        navigate({ to: "/auth", search: { next } as any });
+                      }}
+                    >
+                      <LogIn className="mr-1 h-3 w-3" />
+                      Sign in
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="h-7 px-2 text-xs"
+                      onClick={() => {
+                        void retryAuth();
+                      }}
+                    >
+                      Try again
+                    </Button>
+                  )}
+                </div>
+              );
+            })()
           ) : loading ? (
             <div
               className="flex items-center gap-2 rounded-md border border-border bg-secondary/40 px-3 py-1.5"
