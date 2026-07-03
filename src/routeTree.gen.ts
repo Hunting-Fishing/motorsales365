@@ -124,6 +124,7 @@ import { Route as DashboardBoostsRouteImport } from './routes/dashboard.boosts'
 import { Route as DashboardBlockedRouteImport } from './routes/dashboard.blocked'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as DashboardAdsRouteImport } from './routes/dashboard.ads'
+import { Route as ClubsSlugRouteImport } from './routes/clubs.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CCodeRouteImport } from './routes/c.$code'
 import { Route as BusinessesSubmitRouteImport } from './routes/businesses.submit'
@@ -832,6 +833,11 @@ const DashboardAdsRoute = DashboardAdsRouteImport.update({
   id: '/ads',
   path: '/ads',
   getParentRoute: () => DashboardRoute,
+} as any)
+const ClubsSlugRoute = ClubsSlugRouteImport.update({
+  id: '/clubs/$slug',
+  path: '/clubs/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   id: '/checkout/return',
@@ -1642,6 +1648,7 @@ export interface FileRoutesByFullPath {
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/clubs/$slug': typeof ClubsSlugRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/blocked': typeof DashboardBlockedRoute
@@ -1887,6 +1894,7 @@ export interface FileRoutesByTo {
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/clubs/$slug': typeof ClubsSlugRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/blocked': typeof DashboardBlockedRoute
@@ -2136,6 +2144,7 @@ export interface FileRoutesById {
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/clubs/$slug': typeof ClubsSlugRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/blocked': typeof DashboardBlockedRoute
@@ -2387,6 +2396,7 @@ export interface FileRouteTypes {
     | '/businesses/submit'
     | '/c/$code'
     | '/checkout/return'
+    | '/clubs/$slug'
     | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/blocked'
@@ -2632,6 +2642,7 @@ export interface FileRouteTypes {
     | '/businesses/submit'
     | '/c/$code'
     | '/checkout/return'
+    | '/clubs/$slug'
     | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/blocked'
@@ -2880,6 +2891,7 @@ export interface FileRouteTypes {
     | '/businesses/submit'
     | '/c/$code'
     | '/checkout/return'
+    | '/clubs/$slug'
     | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/blocked'
@@ -3092,6 +3104,7 @@ export interface RootRouteChildren {
   BusinessesSubmitRoute: typeof BusinessesSubmitRoute
   CCodeRoute: typeof CCodeRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
+  ClubsSlugRoute: typeof ClubsSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GoProductIdRoute: typeof GoProductIdRoute
   HelpPayWithGcashRoute: typeof HelpPayWithGcashRoute
@@ -3973,6 +3986,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/ads'
       preLoaderRoute: typeof DashboardAdsRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/clubs/$slug': {
+      id: '/clubs/$slug'
+      path: '/clubs/$slug'
+      fullPath: '/clubs/$slug'
+      preLoaderRoute: typeof ClubsSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/checkout/return': {
       id: '/checkout/return'
@@ -5405,6 +5425,7 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessesSubmitRoute: BusinessesSubmitRoute,
   CCodeRoute: CCodeRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
+  ClubsSlugRoute: ClubsSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GoProductIdRoute: GoProductIdRoute,
   HelpPayWithGcashRoute: HelpPayWithGcashRoute,
