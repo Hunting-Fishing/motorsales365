@@ -1,8 +1,63 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { getClubDiscountConfig, type ClubDiscountConfig } from "@/lib/club-discount.server";
 
 const SCOPES = ["ad_order", "boost", "bundle", "subscription", "passport_premium", "promotion"] as const;
+
+async function assertAdmin(supabase: any, userId: string) {
+  const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+  if (!isAdmin) throw new Error("Forbidden");
+}
+
+/** Read the current club-discount config (admin only). */
+export const getClubDiscountAdminConfig = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ClubDiscountConfig> => {
+    const { supabase, userId } = context;
+    await assertAdmin(supabase, userId);
+    return getClubDiscountConfig(supabase);
+  });
+
+const UpdateConfigSchema = z.object({
+  enabled: z.boolean(),
+  pct: z.number().min(0).max(100),
+  couponDuration: z.enum(["auto", "once", "forever"]),
+  requireVerified: z.boolean(),
+  includePendingClubs: z.boolean(),
+  includePendingMembers: z.boolean(),
+});
+
+const COUPON_DURATION_VALUE: Record<"auto" | "once" | "forever", number> = {
+  auto: 0,
+  once: 1,
+  forever: 2,
+};
+
+/** Persist config knobs to pricing_settings (admin only). */
+export const updateClubDiscountAdminConfig = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => UpdateConfigSchema.parse(i))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertAdmin(supabase, userId);
+    const updates: Array<{ key: string; value: number }> = [
+      { key: "club_member_discount_enabled", value: data.enabled ? 1 : 0 },
+      { key: "club_member_discount_pct", value: Math.round(data.pct * 100) / 100 },
+      { key: "club_member_discount_coupon_duration", value: COUPON_DURATION_VALUE[data.couponDuration] },
+      { key: "club_member_discount_require_verified", value: data.requireVerified ? 1 : 0 },
+      { key: "club_member_discount_include_pending_clubs", value: data.includePendingClubs ? 1 : 0 },
+      { key: "club_member_discount_include_pending_members", value: data.includePendingMembers ? 1 : 0 },
+    ];
+    for (const u of updates) {
+      const { error } = await supabase
+        .from("pricing_settings")
+        .update({ value: u.value, updated_at: new Date().toISOString() })
+        .eq("key", u.key);
+      if (error) throw new Error(`Failed to update ${u.key}: ${error.message}`);
+    }
+    return getClubDiscountConfig(supabase);
+  });
 
 const FiltersSchema = z.object({
   userId: z.string().uuid().optional().nullable(),
