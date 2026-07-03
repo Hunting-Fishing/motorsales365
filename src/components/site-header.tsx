@@ -87,6 +87,8 @@ export function SiteHeader() {
     isSupport,
     isAdvertising,
     signOut,
+    authError,
+    retryAuth,
     realSellerType,
     effectiveSellerType,
     simulatedSellerType,
