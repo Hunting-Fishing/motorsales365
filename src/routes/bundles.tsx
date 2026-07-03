@@ -34,6 +34,8 @@ function BundlesPage() {
   const [bundles, setBundles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [buying, setBuying] = useState<string | null>(null);
+  const { data: clubStatus } = useClubDiscountStatus();
+  const discountPct = clubStatus?.eligible ? clubStatus.pct : 0;
 
   useEffect(() => {
     (async () => {
