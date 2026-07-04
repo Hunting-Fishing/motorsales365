@@ -222,6 +222,7 @@ import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './route
 import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
 import { Route as AuthenticatedDashboardClubsRouteImport } from './routes/_authenticated/dashboard.clubs'
 import { Route as AuthenticatedDashboardClaimBusinessRouteImport } from './routes/_authenticated/dashboard.claim-business'
+import { Route as AuthenticatedAdminClubDiscountPromotionsRouteImport } from './routes/_authenticated/admin.club-discount-promotions'
 import { Route as AuthenticatedAccountTrustScoreRouteImport } from './routes/_authenticated/account.trust-score'
 import { Route as AuthenticatedAccountRewardsRouteImport } from './routes/_authenticated/account.rewards'
 import { Route as AuthenticatedAccountDisputesRouteImport } from './routes/_authenticated/account.disputes'
@@ -1353,6 +1354,12 @@ const AuthenticatedDashboardClaimBusinessRoute =
     path: '/dashboard/claim-business',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminClubDiscountPromotionsRoute =
+  AuthenticatedAdminClubDiscountPromotionsRouteImport.update({
+    id: '/admin/club-discount-promotions',
+    path: '/admin/club-discount-promotions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAccountTrustScoreRoute =
   AuthenticatedAccountTrustScoreRouteImport.update({
     id: '/account/trust-score',
@@ -1768,6 +1775,7 @@ export interface FileRoutesByFullPath {
   '/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
+  '/admin/club-discount-promotions': typeof AuthenticatedAdminClubDiscountPromotionsRoute
   '/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
   '/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
@@ -2019,6 +2027,7 @@ export interface FileRoutesByTo {
   '/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
+  '/admin/club-discount-promotions': typeof AuthenticatedAdminClubDiscountPromotionsRoute
   '/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
   '/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
@@ -2276,6 +2285,7 @@ export interface FileRoutesById {
   '/_authenticated/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/_authenticated/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/_authenticated/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
+  '/_authenticated/admin/club-discount-promotions': typeof AuthenticatedAdminClubDiscountPromotionsRoute
   '/_authenticated/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
   '/_authenticated/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
@@ -2534,6 +2544,7 @@ export interface FileRouteTypes {
     | '/account/disputes'
     | '/account/rewards'
     | '/account/trust-score'
+    | '/admin/club-discount-promotions'
     | '/dashboard/claim-business'
     | '/dashboard/clubs'
     | '/dashboard/parts-wanted'
@@ -2785,6 +2796,7 @@ export interface FileRouteTypes {
     | '/account/disputes'
     | '/account/rewards'
     | '/account/trust-score'
+    | '/admin/club-discount-promotions'
     | '/dashboard/claim-business'
     | '/dashboard/clubs'
     | '/dashboard/parts-wanted'
@@ -3041,6 +3053,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account/disputes'
     | '/_authenticated/account/rewards'
     | '/_authenticated/account/trust-score'
+    | '/_authenticated/admin/club-discount-promotions'
     | '/_authenticated/dashboard/claim-business'
     | '/_authenticated/dashboard/clubs'
     | '/_authenticated/dashboard/parts-wanted'
@@ -4748,6 +4761,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardClaimBusinessRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/club-discount-promotions': {
+      id: '/_authenticated/admin/club-discount-promotions'
+      path: '/admin/club-discount-promotions'
+      fullPath: '/admin/club-discount-promotions'
+      preLoaderRoute: typeof AuthenticatedAdminClubDiscountPromotionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/account/trust-score': {
       id: '/_authenticated/account/trust-score'
       path: '/account/trust-score'
@@ -5049,6 +5069,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountDisputesRoute: typeof AuthenticatedAccountDisputesRoute
   AuthenticatedAccountRewardsRoute: typeof AuthenticatedAccountRewardsRoute
   AuthenticatedAccountTrustScoreRoute: typeof AuthenticatedAccountTrustScoreRoute
+  AuthenticatedAdminClubDiscountPromotionsRoute: typeof AuthenticatedAdminClubDiscountPromotionsRoute
   AuthenticatedDashboardClaimBusinessRoute: typeof AuthenticatedDashboardClaimBusinessRoute
   AuthenticatedDashboardClubsRoute: typeof AuthenticatedDashboardClubsRoute
   AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
@@ -5061,6 +5082,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountDisputesRoute: AuthenticatedAccountDisputesRoute,
   AuthenticatedAccountRewardsRoute: AuthenticatedAccountRewardsRoute,
   AuthenticatedAccountTrustScoreRoute: AuthenticatedAccountTrustScoreRoute,
+  AuthenticatedAdminClubDiscountPromotionsRoute:
+    AuthenticatedAdminClubDiscountPromotionsRoute,
   AuthenticatedDashboardClaimBusinessRoute:
     AuthenticatedDashboardClaimBusinessRoute,
   AuthenticatedDashboardClubsRoute: AuthenticatedDashboardClubsRoute,

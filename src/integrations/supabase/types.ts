@@ -3234,6 +3234,63 @@ export type Database = {
         }
         Relationships: []
       }
+      club_discount_promotions: {
+        Row: {
+          applies_to: string[]
+          audiences: string[]
+          created_at: string
+          description: string
+          eligibility_notes: string
+          excludes: string[]
+          footer_note: string
+          headline: string
+          how_it_applies: string
+          id: string
+          is_active: boolean
+          name: string
+          percent: number
+          sort_order: number
+          stacking_rules: string
+          updated_at: string
+        }
+        Insert: {
+          applies_to?: string[]
+          audiences?: string[]
+          created_at?: string
+          description: string
+          eligibility_notes?: string
+          excludes?: string[]
+          footer_note?: string
+          headline: string
+          how_it_applies?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          percent?: number
+          sort_order?: number
+          stacking_rules?: string
+          updated_at?: string
+        }
+        Update: {
+          applies_to?: string[]
+          audiences?: string[]
+          created_at?: string
+          description?: string
+          eligibility_notes?: string
+          excludes?: string[]
+          footer_note?: string
+          headline?: string
+          how_it_applies?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          percent?: number
+          sort_order?: number
+          stacking_rules?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       club_documents: {
         Row: {
           club_id: string
