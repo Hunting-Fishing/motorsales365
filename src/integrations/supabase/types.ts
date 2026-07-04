@@ -12230,7 +12230,7 @@ export type Database = {
         | "boat"
         | "other"
       sales_rep_source: "referral" | "manual" | "territory" | "customer_choice"
-      sales_rep_subject: "user" | "business"
+      sales_rep_subject: "user" | "business" | "supplier"
       seller_type: "private" | "business" | "staff"
       service_inquiry_status:
         | "new"
@@ -12621,7 +12621,7 @@ export const Constants = {
         "other",
       ],
       sales_rep_source: ["referral", "manual", "territory", "customer_choice"],
-      sales_rep_subject: ["user", "business"],
+      sales_rep_subject: ["user", "business", "supplier"],
       seller_type: ["private", "business", "staff"],
       service_inquiry_status: [
         "new",
