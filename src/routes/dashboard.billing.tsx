@@ -1493,8 +1493,15 @@ function BillingPage() {
                                   {scope ? ` — applied to this ${scope}.` : "."}
                                 </span>
                               </span>
+                              <span className="text-muted-foreground">
+                                {reasonLabel ?? "Verified club membership"}
+                                {grant.applied_at
+                                  ? ` · Applied ${formatDate(grant.applied_at)}`
+                                  : ""}
+                              </span>
                             </div>
                           </>
+
                         ) : (
                           <div>{formatPHP(p.amount_php)}</div>
                         )}
