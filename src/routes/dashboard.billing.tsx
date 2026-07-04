@@ -62,7 +62,12 @@ type ClubGrantRow = {
   discount_amount_php: number;
   original_amount_php: number;
   applied_at: string;
+  eligibility_reason: string | null;
   club: { name: string | null; slug: string | null; verified: boolean | null } | null;
+};
+
+const ELIGIBILITY_REASON_LABEL: Record<string, string> = {
+  verified_club_membership: "Verified club membership",
 };
 
 const CLUB_SCOPE_LABEL: Record<string, string> = {
@@ -174,6 +179,7 @@ function BillingPage() {
               discount_amount_php: snap.discount_amount_php,
               original_amount_php: snap.original_amount_php,
               applied_at: snap.applied_at,
+              eligibility_reason: snap.eligibility_reason ?? "verified_club_membership",
               club: snap.club_id
                 ? { name: snap.club_name, slug: snap.club_slug, verified: null }
                 : null,
@@ -192,7 +198,8 @@ function BillingPage() {
             .in("payment_id", missing)
             .order("applied_at", { ascending: false });
           for (const g of (grants ?? []) as any[]) {
-            if (g.payment_id && !map[g.payment_id]) map[g.payment_id] = g as ClubGrantRow;
+            if (g.payment_id && !map[g.payment_id])
+              map[g.payment_id] = { ...g, eligibility_reason: "verified_club_membership" } as ClubGrantRow;
           }
         }
         setGrantsByPayment(map);
@@ -1433,6 +1440,9 @@ function BillingPage() {
                   const clubName = grant?.club?.name ?? null;
                   const clubSlug = grant?.club?.slug ?? null;
                   const scope = grant ? (CLUB_SCOPE_LABEL[grant.scope] ?? grant.scope) : null;
+                  const reasonLabel = grant?.eligibility_reason
+                    ? (ELIGIBILITY_REASON_LABEL[grant.eligibility_reason] ?? grant.eligibility_reason)
+                    : null;
                   return (
                     <tr key={p.id} className="border-t border-border align-top">
                       <td className="p-3">{formatDate(p.created_at)}</td>
@@ -1483,8 +1493,15 @@ function BillingPage() {
                                   {scope ? ` — applied to this ${scope}.` : "."}
                                 </span>
                               </span>
+                              <span className="text-muted-foreground">
+                                {reasonLabel ?? "Verified club membership"}
+                                {grant.applied_at
+                                  ? ` · Applied ${formatDate(grant.applied_at)}`
+                                  : ""}
+                              </span>
                             </div>
                           </>
+
                         ) : (
                           <div>{formatPHP(p.amount_php)}</div>
                         )}
