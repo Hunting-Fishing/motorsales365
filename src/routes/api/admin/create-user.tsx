@@ -254,7 +254,49 @@ export const Route = createFileRoute("/api/admin/create-user")({
           }
 
 
-          await sb.from("profiles").update(profilePatch as any).eq("id", newUserId);
+          const patchedFields = Object.keys(profilePatch);
+          const fieldFlags = {
+            had_phone: "phone" in profilePatch,
+            had_personal_email: "personal_email" in profilePatch,
+            had_street_address: "street_address" in profilePatch,
+            had_business_address: "business_address" in profilePatch,
+          };
+
+          const { error: patchErr } = await sb
+            .from("profiles")
+            .update(profilePatch as any)
+            .eq("id", newUserId);
+
+          if (patchErr) {
+            await logRouteAccess({
+              actorId,
+              role: "admin",
+              label,
+              method: "POST",
+              outcome: "error",
+              errorMessage: `Profile patch failed: ${patchErr.message}`,
+              durationMs: Date.now() - start,
+              request,
+              targetSummary: {
+                email: input.email,
+                new_user_id: newUserId,
+                account_type: input.account_type,
+                roles: input.roles,
+                patched_fields: patchedFields,
+                patched_field_count: patchedFields.length,
+                ...fieldFlags,
+              },
+            });
+            return new Response(
+              JSON.stringify({
+                ok: true,
+                userId: newUserId,
+                email: input.email,
+                warning: `Profile fields not saved: ${patchErr.message}. Open the user's Edit dialog to re-enter them.`,
+              }),
+              { status: 207, headers: { "Content-Type": "application/json" } },
+            );
+          }
 
           await logRouteAccess({
             actorId,
@@ -269,6 +311,9 @@ export const Route = createFileRoute("/api/admin/create-user")({
               new_user_id: newUserId,
               account_type: input.account_type,
               roles: input.roles,
+              patched_fields: patchedFields,
+              patched_field_count: patchedFields.length,
+              ...fieldFlags,
             },
           });
 
