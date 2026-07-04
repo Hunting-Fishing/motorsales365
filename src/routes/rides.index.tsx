@@ -9,7 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RideCard, type RideCardData } from "@/components/rides/ride-card";
 import { ClubCard, type ClubCardData } from "@/components/clubs/club-card";
+import { ClubDiscountExplainer } from "@/components/clubs/club-discount-explainer";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Camera, Wrench, Share2, ShieldCheck } from "lucide-react";
+
 
 
 export const Route = createFileRoute("/rides/")({
