@@ -115,7 +115,7 @@ function Consent() {
               What {clientName} will be able to do
             </p>
             <ul className="mt-2 space-y-1 text-sm">
-              {scopes.map((s) => (
+              {scopes.map((s: string) => (
                 <li key={s}>• {scopeLabel(s)}</li>
               ))}
               <li>• Call this app's enabled tools (search listings, list your listings)</li>
