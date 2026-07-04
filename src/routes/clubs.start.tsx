@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import {
   ArrowLeft,
@@ -8,6 +8,7 @@ import {
   Car,
   CheckCircle2,
   FileCheck2,
+  MapPin,
   Mountain,
   Package,
   Rocket,
@@ -19,12 +20,27 @@ import {
 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 
+const CLUB_TYPE_VALUES = [
+  "motorcycle_riding",
+  "car_club",
+  "off_road",
+  "truck_club",
+  "brand_owners",
+  "general_motoring",
+  "other",
+] as const;
+
 const searchSchema = z.object({
-  step: z.enum(["role", "join", "type"]).optional(),
+  step: z.enum(["role", "join", "type", "details"]).optional(),
   role: z.enum(["member", "organizer"]).optional(),
+  type: z.enum(CLUB_TYPE_VALUES).optional(),
 });
+
 
 export const Route = createFileRoute("/clubs/start")({
   head: () => ({
@@ -122,23 +138,56 @@ function StartClubPage() {
           <JoinStep onBack={() => navigate({ search: { step: "role" } })} />
         )}
         {step === "type" && (
-          <TypeStep onBack={() => navigate({ search: { step: "role" } })} />
+          <TypeStep
+            initialType={search.type}
+            onBack={() => navigate({ search: { step: "role" } })}
+            onContinue={(type) =>
+              navigate({ search: { step: "details", role: "organizer", type } })
+            }
+          />
+        )}
+        {step === "details" && (
+          <DetailsStep
+            type={search.type}
+            onBack={() =>
+              navigate({ search: { step: "type", role: "organizer", type: search.type } })
+            }
+          />
         )}
       </div>
     </SiteLayout>
   );
 }
 
-function Stepper({ step, role }: { step: "role" | "join" | "type"; role?: "member" | "organizer" }) {
-  const items = [
-    { key: "role", label: "Your role" },
-    {
-      key: role === "member" ? "join" : "type",
-      label: role === "member" ? "Find a club" : role === "organizer" ? "Club type" : "Next step",
-    },
-    { key: "done", label: role === "member" ? "Join" : "Submit application" },
-  ];
-  const activeIdx = step === "role" ? 0 : 1;
+function Stepper({
+  step,
+  role,
+}: {
+  step: "role" | "join" | "type" | "details";
+  role?: "member" | "organizer";
+}) {
+  const items =
+    role === "organizer"
+      ? [
+          { key: "role", label: "Your role" },
+          { key: "type", label: "Club type" },
+          { key: "details", label: "Basic details" },
+          { key: "done", label: "Upload docs & submit" },
+        ]
+      : role === "member"
+        ? [
+            { key: "role", label: "Your role" },
+            { key: "join", label: "Find a club" },
+            { key: "done", label: "Join" },
+          ]
+        : [
+            { key: "role", label: "Your role" },
+            { key: "next", label: "Next step" },
+            { key: "done", label: "Submit" },
+          ];
+  const activeIdx =
+    step === "role" ? 0 : step === "type" || step === "join" ? 1 : step === "details" ? 2 : 3;
+
   return (
     <ol className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
       {items.map((it, i) => (
