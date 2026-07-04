@@ -13,6 +13,16 @@ import { Label } from "@/components/ui/label";
 import { createPendingClub, attachClubDocuments } from "@/lib/clubs.functions";
 import { uploadWithRetry } from "@/lib/storage-upload";
 
+const CLUB_TYPES = [
+  "motorcycle_riding",
+  "car_club",
+  "off_road",
+  "truck_club",
+  "brand_owners",
+  "general_motoring",
+  "other",
+] as const;
+
 export const Route = createFileRoute("/clubs/apply")({
   head: () => ({
     meta: [
@@ -27,6 +37,12 @@ export const Route = createFileRoute("/clubs/apply")({
     ],
     links: [{ rel: "canonical", href: "https://www.365motorsales.com/clubs/apply" }],
   }),
+  validateSearch: (s: Record<string, unknown>) => {
+    const t = typeof s.type === "string" && (CLUB_TYPES as readonly string[]).includes(s.type)
+      ? (s.type as (typeof CLUB_TYPES)[number])
+      : undefined;
+    return { type: t };
+  },
   component: ApplyClubPage,
 });
 
@@ -45,12 +61,13 @@ type StagedDoc = {
 function ApplyClubPage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { type: prefilledType } = Route.useSearch();
   const createFn = useServerFn(createPendingClub);
   const attachFn = useServerFn(attachClubDocuments);
 
   const [form, setForm] = useState({
     name: "",
-    type: "motorcycle_riding",
+    type: prefilledType ?? "motorcycle_riding",
     description: "",
     region: "",
     city: "",
