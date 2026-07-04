@@ -382,3 +382,183 @@ function ClubApplySuccessPage() {
     </SiteLayout>
   );
 }
+
+function ResubmitDocumentsPanel({
+  clubId,
+  onResubmitted,
+}: {
+  clubId: string;
+  onResubmitted: () => void;
+}) {
+  const resubmitFn = useServerFn(resubmitClubApplication);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [kind, setKind] = useState<DocKind>("lto_accreditation");
+  const [docs, setDocs] = useState<StagedDoc[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  function addFiles(files: FileList | null) {
+    if (!files || !files.length) return;
+    const arr = Array.from(files).map((file) => ({ file, kind }));
+    setDocs((prev) => [...prev, ...arr].slice(0, 6));
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  function removeDoc(idx: number) {
+    setDocs((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  async function submit() {
+    if (docs.length === 0) {
+      toast.error("Attach at least one document to resubmit");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const uploaded: Array<{
+        kind: DocKind;
+        storage_path: string;
+        original_filename: string;
+      }> = [];
+      for (const d of docs) {
+        const ext = d.file.name.split(".").pop() ?? "bin";
+        const path = `${clubId}/${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage
+          .from("club-docs")
+          .upload(path, d.file, { upsert: false, contentType: d.file.type });
+        if (error) throw new Error(`Upload failed: ${error.message}`);
+        uploaded.push({
+          kind: d.kind,
+          storage_path: path,
+          original_filename: d.file.name,
+        });
+      }
+      await resubmitFn({ data: { club_id: clubId, documents: uploaded } });
+      toast.success("Documents resubmitted — we'll review shortly.");
+      setDocs([]);
+      onResubmitted();
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to resubmit");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <section
+      aria-labelledby="resubmit-heading"
+      className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-5 sm:p-6"
+    >
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Upload className="h-4 w-4" aria-hidden="true" />
+        </span>
+        <div className="flex-1">
+          <h2 id="resubmit-heading" className="font-display text-lg font-semibold">
+            Submit updated documents
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Upload replacement or additional accreditation files below. Once you resubmit, your
+            application returns to the review queue.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+        <div>
+          <Label htmlFor="resubmit-kind" className="text-xs font-medium">
+            Document type
+          </Label>
+          <Select value={kind} onValueChange={(v) => setKind(v as DocKind)}>
+            <SelectTrigger id="resubmit-kind" className="mt-1">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DOC_KINDS.map((k) => (
+                <SelectItem key={k.value} value={k.value}>
+                  {k.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <input
+            ref={inputRef}
+            type="file"
+            accept="application/pdf,image/*"
+            multiple
+            hidden
+            onChange={(e) => addFiles(e.target.files)}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => inputRef.current?.click()}
+            disabled={submitting || docs.length >= 6}
+          >
+            <Paperclip className="h-4 w-4" aria-hidden="true" />
+            <span>Add file{docs.length ? "s" : ""}</span>
+          </Button>
+        </div>
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        PDF, JPG, or PNG. Up to 6 files per resubmission.
+      </p>
+
+      {docs.length > 0 && (
+        <ul className="mt-4 space-y-2">
+          {docs.map((d, i) => (
+            <li
+              key={i}
+              className="flex items-center gap-3 rounded-md border border-border bg-card p-2 text-sm"
+            >
+              <FileText className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-medium">{d.file.name}</div>
+                <div className="text-xs text-muted-foreground">
+                  {DOC_KINDS.find((k) => k.value === d.kind)?.label}
+                </div>
+              </div>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={() => removeDoc(i)}
+                disabled={submitting}
+                aria-label={`Remove ${d.file.name}`}
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <Button asChild variant="ghost" size="sm">
+          <Link
+            to="/dashboard/clubs_/$id"
+            params={{ id: clubId }}
+            aria-label="Open club in dashboard for a full edit"
+          >
+            <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
+            <span>Open in dashboard for a full edit</span>
+          </Link>
+        </Button>
+        <Button type="button" onClick={submit} disabled={submitting || docs.length === 0}>
+          {submitting ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              <span>Resubmitting…</span>
+            </>
+          ) : (
+            <>
+              <Upload className="h-4 w-4" aria-hidden="true" />
+              <span>Resubmit for review</span>
+            </>
+          )}
+        </Button>
+      </div>
+    </section>
+  );
+}
