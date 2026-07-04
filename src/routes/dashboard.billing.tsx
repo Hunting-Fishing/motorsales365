@@ -62,7 +62,12 @@ type ClubGrantRow = {
   discount_amount_php: number;
   original_amount_php: number;
   applied_at: string;
+  eligibility_reason: string | null;
   club: { name: string | null; slug: string | null; verified: boolean | null } | null;
+};
+
+const ELIGIBILITY_REASON_LABEL: Record<string, string> = {
+  verified_club_membership: "Verified club membership",
 };
 
 const CLUB_SCOPE_LABEL: Record<string, string> = {
