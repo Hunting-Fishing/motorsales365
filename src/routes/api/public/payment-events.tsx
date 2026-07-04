@@ -189,14 +189,6 @@ export const Route = createFileRoute("/api/public/payment-events")({
             queued_at: new Date().toISOString(),
           },
         });
-            from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
-            sender_domain: SENDER_DOMAIN,
-            subject: SUBJECT_BY_TYPE[body.type],
-            purpose: "transactional",
-            label: template,
-            queued_at: new Date().toISOString(),
-          },
-        });
 
         if (error) {
           await supabaseAdmin.from("email_send_log").insert({
