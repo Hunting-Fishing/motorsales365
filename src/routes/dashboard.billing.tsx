@@ -52,7 +52,9 @@ import {
   detachPaymentMethod,
   getInvoiceDetails,
 } from "@/utils/payments.functions";
+import { listMyBillingPayments } from "@/lib/billing.functions";
 import { BadgePercent, Sparkles } from "lucide-react";
+
 
 type ClubGrantRow = {
   id: string;
@@ -155,55 +157,38 @@ function BillingPage() {
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from("payments")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .then(async ({ data }) => {
-        const rows = data ?? [];
+    listMyBillingPayments()
+      .then((rows) => {
         setPayments(rows);
         const map: Record<string, ClubGrantRow> = {};
-        const missing: string[] = [];
-        // Prefer the immutable snapshot stored on the payment itself so the
-        // eligibility reason stays correct even if the buyer later leaves
-        // the club or the club is renamed/unverified.
-        for (const p of rows as any[]) {
-          const snap = p?.club_discount;
-          if (snap && snap.discount_pct) {
+        // The billing API response always includes `eligibility_reason` and
+        // `applied_at` at the top level (sourced from payments.club_discount),
+        // plus a normalized `club_discount` object for full attribution.
+        for (const p of rows) {
+          const cd = p.club_discount;
+          if (cd) {
             map[p.id] = {
-              id: snap.grant_id ?? p.id,
+              id: cd.grant_id ?? p.id,
               payment_id: p.id,
-              scope: snap.scope,
-              discount_pct: snap.discount_pct,
-              discount_amount_php: snap.discount_amount_php,
-              original_amount_php: snap.original_amount_php,
-              applied_at: snap.applied_at,
-              eligibility_reason: snap.eligibility_reason ?? "verified_club_membership",
-              club: snap.club_id
-                ? { name: snap.club_name, slug: snap.club_slug, verified: null }
+              scope: cd.scope,
+              discount_pct: cd.discount_pct,
+              discount_amount_php: cd.discount_amount_php,
+              original_amount_php: cd.original_amount_php,
+              applied_at: p.applied_at ?? cd.applied_at ?? "",
+              eligibility_reason: p.eligibility_reason ?? cd.eligibility_reason,
+              club: cd.club_id
+                ? { name: cd.club_name, slug: cd.club_slug, verified: null }
                 : null,
-            } as ClubGrantRow;
-          } else if (p.id) {
-            missing.push(p.id);
-          }
-        }
-        // Backfill from grants table for older payments that predate the snapshot column.
-        if (missing.length > 0) {
-          const { data: grants } = await supabase
-            .from("club_member_discount_grants")
-            .select(
-              "id,payment_id,scope,discount_pct,discount_amount_php,original_amount_php,applied_at,club:clubs(name,slug,verified)",
-            )
-            .in("payment_id", missing)
-            .order("applied_at", { ascending: false });
-          for (const g of (grants ?? []) as any[]) {
-            if (g.payment_id && !map[g.payment_id])
-              map[g.payment_id] = { ...g, eligibility_reason: "verified_club_membership" } as ClubGrantRow;
+            };
           }
         }
         setGrantsByPayment(map);
+      })
+      .catch(() => {
+        setPayments([]);
+        setGrantsByPayment({});
       });
+
     reloadSubs();
     listInvoices({ data: { environment: env, limit: 20 } })
       .then((res) => setInvoices(res.invoices ?? []))
