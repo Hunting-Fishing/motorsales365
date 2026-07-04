@@ -198,7 +198,8 @@ function BillingPage() {
             .in("payment_id", missing)
             .order("applied_at", { ascending: false });
           for (const g of (grants ?? []) as any[]) {
-            if (g.payment_id && !map[g.payment_id]) map[g.payment_id] = g as ClubGrantRow;
+            if (g.payment_id && !map[g.payment_id])
+              map[g.payment_id] = { ...g, eligibility_reason: "verified_club_membership" } as ClubGrantRow;
           }
         }
         setGrantsByPayment(map);
