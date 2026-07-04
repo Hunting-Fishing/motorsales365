@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { RideCard, type RideCardData } from "@/components/rides/ride-card";
 import { ClubCard, type ClubCardData } from "@/components/clubs/club-card";
 import { ClubDiscountExplainer } from "@/components/clubs/club-discount-explainer";
+import { listActiveClubDiscountPromotions } from "@/lib/club-discount-promotions.functions";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Camera, Wrench, Share2, ShieldCheck } from "lucide-react";
 
@@ -34,6 +35,9 @@ export const Route = createFileRoute("/rides/")({
       { property: "twitter:image", content: `https://www.365motorsales.com${ogRides}` },
     ],
     links: [{ rel: "canonical", href: "https://www.365motorsales.com/rides" }],
+  }),
+  loader: async () => ({
+    clubPromotions: await listActiveClubDiscountPromotions(),
   }),
   component: RidesHubPage,
 });
@@ -292,7 +296,7 @@ function ClubsTab() {
         </div>
       </section>
 
-      <ClubDiscountExplainer />
+      <ClubDiscountExplainer promotions={Route.useLoaderData().clubPromotions} />
 
 
       {loading ? (

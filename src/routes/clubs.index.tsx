@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ClubCard, type ClubCardData } from "@/components/clubs/club-card";
 import { ClubDiscountExplainer } from "@/components/clubs/club-discount-explainer";
+import { listActiveClubDiscountPromotions } from "@/lib/club-discount-promotions.functions";
 
 
 export const Route = createFileRoute("/clubs/")({
@@ -26,6 +27,9 @@ export const Route = createFileRoute("/clubs/")({
       { property: "og:url", content: "https://www.365motorsales.com/clubs" },
     ],
     links: [{ rel: "canonical", href: "https://www.365motorsales.com/clubs" }],
+  }),
+  loader: async () => ({
+    clubPromotions: await listActiveClubDiscountPromotions(),
   }),
   component: ClubsIndexPage,
 });
@@ -175,7 +179,7 @@ function ClubsIndexPage() {
           </div>
         </section>
 
-        <ClubDiscountExplainer />
+        <ClubDiscountExplainer promotions={Route.useLoaderData().clubPromotions} />
 
         <section
           aria-labelledby="start-club-heading"
