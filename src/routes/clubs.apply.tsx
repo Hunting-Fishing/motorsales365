@@ -200,7 +200,7 @@ function ApplyClubPage() {
           </div>
         </div>
 
-        {invalidType && !prefill.type && (
+        {invalidType && (
           <div
             role="alert"
             className="mt-4 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm"
