@@ -1440,6 +1440,9 @@ function BillingPage() {
                   const clubName = grant?.club?.name ?? null;
                   const clubSlug = grant?.club?.slug ?? null;
                   const scope = grant ? (CLUB_SCOPE_LABEL[grant.scope] ?? grant.scope) : null;
+                  const reasonLabel = grant?.eligibility_reason
+                    ? (ELIGIBILITY_REASON_LABEL[grant.eligibility_reason] ?? grant.eligibility_reason)
+                    : null;
                   return (
                     <tr key={p.id} className="border-t border-border align-top">
                       <td className="p-3">{formatDate(p.created_at)}</td>
