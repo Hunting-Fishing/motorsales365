@@ -122,14 +122,52 @@ function SignupPage() {
       list.push({ field: "email", label: "Email", message: "Enter your email address." });
     else if (!emailValid)
       list.push({ field: "email", label: "Email", message: "Enter a valid email address." });
-    if (phoneNational.trim() && !phoneValid)
+    if (!phoneNational.trim())
       list.push({
         field: "phone",
         label: "Mobile",
-        message: "Enter a valid mobile number or leave it blank.",
+        message: "Enter your mobile number.",
       });
+    else if (!phoneValid)
+      list.push({
+        field: "phone",
+        label: "Mobile",
+        message: "Enter a valid mobile number.",
+      });
+    if (!location.region)
+      list.push({ field: "city", label: "Region", message: "Choose your region." });
+    if (!location.province)
+      list.push({ field: "city", label: "Province", message: "Choose your province." });
     if (!location.city)
       list.push({ field: "city", label: "City / Town", message: "Choose your city or town." });
+    if (!isBusinessLike) {
+      if (!streetAddress.trim())
+        list.push({
+          field: "street-address",
+          label: "Street address",
+          message: "Enter your street address.",
+        });
+      if (!postalCode.trim())
+        list.push({
+          field: "postal-code",
+          label: "Postal code",
+          message: "Enter your postal / ZIP code.",
+        });
+    }
+    if (isBusinessLike) {
+      if (!businessAddress.trim())
+        list.push({
+          field: "business-address",
+          label: "Business street address",
+          message: "Enter your business street address.",
+        });
+      if (!businessPostalCode.trim())
+        list.push({
+          field: "business-postal",
+          label: "Business postal code",
+          message: "Enter your business postal / ZIP code.",
+        });
+    }
     if (isBusinessLike && !businessName.trim()) {
       list.push({
         field: "businessName",
@@ -180,6 +218,12 @@ function SignupPage() {
     phoneNational,
     phoneValid,
     location.city,
+    location.region,
+    location.province,
+    streetAddress,
+    postalCode,
+    businessAddress,
+    businessPostalCode,
     isBusinessLike,
     businessName,
     businessKind,
@@ -494,7 +538,7 @@ function SignupPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div id="field-phone">
-              <Label htmlFor="phone">Mobile (optional)</Label>
+              <Label htmlFor="phone">Mobile <span className="text-destructive">*</span></Label>
               <PhoneInput
                 id="phone"
                 iso={phoneIso}
@@ -561,26 +605,42 @@ function SignupPage() {
 
           {!isBusinessLike && (
             <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
-              <div>
-                <Label htmlFor="street-address">Street address (optional)</Label>
+              <div id="field-street-address">
+                <Label htmlFor="street-address">
+                  Street address <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="street-address"
                   value={streetAddress}
                   onChange={(e) => setStreetAddress(e.target.value)}
+                  onBlur={() => markTouched("street-address")}
                   placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
                   autoComplete="street-address"
+                  aria-invalid={!!errorFor("street-address")}
+                  className={invalidCls("street-address")}
                 />
+                {errorFor("street-address") && (
+                  <p className="mt-1 text-xs text-destructive">{errorFor("street-address")}</p>
+                )}
               </div>
-              <div>
-                <Label htmlFor="postal-code">Postal / ZIP code</Label>
+              <div id="field-postal-code">
+                <Label htmlFor="postal-code">
+                  Postal / ZIP code <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="postal-code"
                   value={postalCode}
                   onChange={(e) => setPostalCode(e.target.value)}
+                  onBlur={() => markTouched("postal-code")}
                   placeholder="e.g. 1000"
                   autoComplete="postal-code"
                   inputMode="text"
+                  aria-invalid={!!errorFor("postal-code")}
+                  className={invalidCls("postal-code")}
                 />
+                {errorFor("postal-code") && (
+                  <p className="mt-1 text-xs text-destructive">{errorFor("postal-code")}</p>
+                )}
               </div>
             </div>
           )}
@@ -648,30 +708,45 @@ function SignupPage() {
               </div>
 
               <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
-                <div>
-                  <Label htmlFor="business-address">Street address (optional)</Label>
+                <div id="field-business-address">
+                  <Label htmlFor="business-address">
+                    Street address <span className="text-destructive">*</span>
+                  </Label>
                   <Input
                     id="business-address"
                     value={businessAddress}
                     onChange={(e) => setBusinessAddress(e.target.value)}
+                    onBlur={() => markTouched("business-address")}
                     placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
                     autoComplete="street-address"
+                    aria-invalid={!!errorFor("business-address")}
+                    className={invalidCls("business-address")}
                   />
+                  {errorFor("business-address") && (
+                    <p className="mt-1 text-xs text-destructive">{errorFor("business-address")}</p>
+                  )}
                 </div>
-                <div>
-                  <Label htmlFor="business-postal">Postal / ZIP code</Label>
+                <div id="field-business-postal">
+                  <Label htmlFor="business-postal">
+                    Postal / ZIP code <span className="text-destructive">*</span>
+                  </Label>
                   <Input
                     id="business-postal"
                     value={businessPostalCode}
                     onChange={(e) => setBusinessPostalCode(e.target.value)}
+                    onBlur={() => markTouched("business-postal")}
                     placeholder="e.g. 1000"
                     autoComplete="postal-code"
+                    aria-invalid={!!errorFor("business-postal")}
+                    className={invalidCls("business-postal")}
                   />
+                  {errorFor("business-postal") && (
+                    <p className="mt-1 text-xs text-destructive">{errorFor("business-postal")}</p>
+                  )}
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                You can skip the street and postal for now, but your account won't go live or appear
-                in the directory until a full business address is saved.
+                A full business address is required to create your account and appear in the directory.
               </p>
             </div>
           )}
