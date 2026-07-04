@@ -281,12 +281,26 @@ function ClubsTab() {
               before it goes live, so you always know who you're riding with.
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link to="/clubs">Browse all clubs</Link>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <Link to="/clubs" aria-label="Browse all accredited clubs">
+                Browse all clubs
+              </Link>
             </Button>
-            <Button asChild size="sm">
-              <Link to="/clubs/start">Start a club</Link>
+            <Button
+              asChild
+              size="sm"
+              className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <Link to="/clubs/start" aria-label="Start a club: begin the guided signup flow">
+                <Rocket className="h-4 w-4" aria-hidden="true" />
+                <span>Start a club</span>
+              </Link>
             </Button>
           </div>
         </div>
