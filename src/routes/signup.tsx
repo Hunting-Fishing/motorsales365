@@ -708,30 +708,45 @@ function SignupPage() {
               </div>
 
               <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
-                <div>
-                  <Label htmlFor="business-address">Street address (optional)</Label>
+                <div id="field-business-address">
+                  <Label htmlFor="business-address">
+                    Street address <span className="text-destructive">*</span>
+                  </Label>
                   <Input
                     id="business-address"
                     value={businessAddress}
                     onChange={(e) => setBusinessAddress(e.target.value)}
+                    onBlur={() => markTouched("business-address")}
                     placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
                     autoComplete="street-address"
+                    aria-invalid={!!errorFor("business-address")}
+                    className={invalidCls("business-address")}
                   />
+                  {errorFor("business-address") && (
+                    <p className="mt-1 text-xs text-destructive">{errorFor("business-address")}</p>
+                  )}
                 </div>
-                <div>
-                  <Label htmlFor="business-postal">Postal / ZIP code</Label>
+                <div id="field-business-postal">
+                  <Label htmlFor="business-postal">
+                    Postal / ZIP code <span className="text-destructive">*</span>
+                  </Label>
                   <Input
                     id="business-postal"
                     value={businessPostalCode}
                     onChange={(e) => setBusinessPostalCode(e.target.value)}
+                    onBlur={() => markTouched("business-postal")}
                     placeholder="e.g. 1000"
                     autoComplete="postal-code"
+                    aria-invalid={!!errorFor("business-postal")}
+                    className={invalidCls("business-postal")}
                   />
+                  {errorFor("business-postal") && (
+                    <p className="mt-1 text-xs text-destructive">{errorFor("business-postal")}</p>
+                  )}
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                You can skip the street and postal for now, but your account won't go live or appear
-                in the directory until a full business address is saved.
+                A full business address is required to create your account and appear in the directory.
               </p>
             </div>
           )}
