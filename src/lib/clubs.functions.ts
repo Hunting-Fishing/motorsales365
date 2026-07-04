@@ -137,6 +137,38 @@ export const listMyClubs = createServerFn({ method: "GET" })
     };
   });
 
+export const getMyClubStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: club, error } = await supabase
+      .from("clubs" as never)
+      .select("id,name,slug,status,verified,review_notes,reviewed_at,owner_id,created_at,updated_at")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!club) return null;
+    const c = club as any;
+    if (c.owner_id !== userId) return null;
+    const { count: docCount } = await supabase
+      .from("club_documents" as never)
+      .select("id", { count: "exact", head: true })
+      .eq("club_id", data.id);
+    return {
+      id: c.id as string,
+      name: c.name as string,
+      slug: c.slug as string,
+      status: c.status as "pending" | "active" | "rejected" | "suspended",
+      verified: !!c.verified,
+      review_notes: (c.review_notes ?? null) as string | null,
+      reviewed_at: (c.reviewed_at ?? null) as string | null,
+      created_at: c.created_at as string,
+      updated_at: c.updated_at as string,
+      document_count: docCount ?? 0,
+    };
+  });
+
 export const getMyClubDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
