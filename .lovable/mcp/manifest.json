@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://jfjrnjyroxvlydajvndl.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "365motorsales-mcp",
+      "version": "0.1.0",
+      "title": "365 MotorSales"
+    },
+    "tools": [
+      {
+        "name": "echo",
+        "title": "Echo",
+        "description": "Echo the input text back. Use to verify the 365 MotorSales MCP server is reachable.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Text to echo back to the caller."
+            }
+          },
+          "required": [
+            "text"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "search_listings",
+        "title": "Search 365 MotorSales listings",
+        "description": "Search public 365 MotorSales Philippines marketplace listings by category, location and price. Returns active listings only.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "enum": [
+                "cars",
+                "motorcycles",
+                "trucks",
+                "heavy-equipment",
+                "boats",
+                "parts",
+                "agricultural",
+                "industrial"
+              ],
+              "description": "Marketplace category slug, e.g. 'cars', 'motorcycles', 'parts'."
+            },
+            "query": {
+              "description": "Optional keyword filter matched against the listing title.",
+              "type": "string",
+              "maxLength": 120
+            },
+            "region": {
+              "description": "Philippine region name, e.g. 'NCR'.",
+              "type": "string",
+              "maxLength": 60
+            },
+            "city": {
+              "description": "City or town name.",
+              "type": "string",
+              "maxLength": 60
+            },
+            "min_price_php": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "max_price_php": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "limit": {
+              "description": "Max results (default 10).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 25
+            }
+          },
+          "required": [
+            "category"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_listings",
+        "title": "List my listings",
+        "description": "List the signed-in user's own 365 MotorSales listings, most recent first. Requires the user to be authenticated.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Optional status filter.",
+              "type": "string",
+              "enum": [
+                "active",
+                "draft",
+                "pending_sale",
+                "sold",
+                "archived"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
