@@ -237,7 +237,7 @@ function ApplyClubPage() {
           </div>
         )}
 
-        {!prefill.type && !prefill.invalidType && (
+        {!prefill.type && !invalidType && (
           <div className="mt-4 flex items-start gap-2 rounded-lg border border-border bg-muted/40 p-3 text-sm">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             <div>
