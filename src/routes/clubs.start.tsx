@@ -510,14 +510,43 @@ function DetailsStep({
   type?: ClubTypeValue;
   onBack: () => void;
 }) {
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    region: "",
-    city: "",
+  const [form, setForm] = useState(() => {
+    if (typeof window === "undefined") {
+      return { name: "", description: "", region: "", city: "" };
+    }
+    try {
+      const raw = window.sessionStorage.getItem(DETAILS_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<{
+          name: string;
+          description: string;
+          region: string;
+          city: string;
+        }>;
+        return {
+          name: typeof parsed.name === "string" ? parsed.name : "",
+          description: typeof parsed.description === "string" ? parsed.description : "",
+          region: typeof parsed.region === "string" ? parsed.region : "",
+          city: typeof parsed.city === "string" ? parsed.city : "",
+        };
+      }
+    } catch {
+      /* ignore */
+    }
+    return { name: "", description: "", region: "", city: "" };
   });
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
   const navigate = useNavigate({ from: "/clubs/start" });
+
+  // Persist details as the user types so leaving and returning restores the draft.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.sessionStorage.setItem(DETAILS_STORAGE_KEY, JSON.stringify(form));
+    } catch {
+      /* ignore */
+    }
+  }, [form]);
 
   // If someone lands on details without picking a type, bounce back.
   useEffect(() => {
@@ -543,6 +572,8 @@ function DetailsStep({
     setErrors({});
     if (!type) return;
     const clean = parsed.data;
+    // Wizard completed — clear saved progress so a fresh visit starts clean.
+    clearWizardStorage();
     navigate({
       to: "/clubs/apply",
       search: {
