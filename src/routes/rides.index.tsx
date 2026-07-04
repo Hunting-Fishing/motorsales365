@@ -12,7 +12,7 @@ import { ClubCard, type ClubCardData } from "@/components/clubs/club-card";
 import { ClubDiscountExplainer } from "@/components/clubs/club-discount-explainer";
 import { listActiveClubDiscountPromotions } from "@/lib/club-discount-promotions.functions";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Camera, Wrench, Share2, ShieldCheck } from "lucide-react";
+import { Camera, Wrench, Share2, ShieldCheck, Rocket } from "lucide-react";
 
 
 
