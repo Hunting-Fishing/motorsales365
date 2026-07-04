@@ -195,6 +195,7 @@ import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
 import { Route as DashboardDispatchHistoryRouteImport } from './routes/dashboard.dispatch.history'
 import { Route as DashboardBusinessBusinessIdRouteImport } from './routes/dashboard.business.$businessId'
+import { Route as ClubsApplySuccessRouteImport } from './routes/clubs.apply.success'
 import { Route as BusinessesSlugBookRouteImport } from './routes/businesses.$slug.book'
 import { Route as ApiPublicReverseGeocodeRouteImport } from './routes/api/public/reverse-geocode'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
@@ -1203,6 +1204,11 @@ const DashboardBusinessBusinessIdRoute =
     path: '/business/$businessId',
     getParentRoute: () => DashboardRoute,
   } as any)
+const ClubsApplySuccessRoute = ClubsApplySuccessRouteImport.update({
+  id: '/success',
+  path: '/success',
+  getParentRoute: () => ClubsApplyRoute,
+} as any)
 const BusinessesSlugBookRoute = BusinessesSlugBookRouteImport.update({
   id: '/book',
   path: '/book',
@@ -1703,7 +1709,7 @@ export interface FileRoutesByFullPath {
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/clubs/$slug': typeof ClubsSlugRoute
-  '/clubs/apply': typeof ClubsApplyRoute
+  '/clubs/apply': typeof ClubsApplyRouteWithChildren
   '/clubs/start': typeof ClubsStartRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
@@ -1811,6 +1817,7 @@ export interface FileRoutesByFullPath {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
+  '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdRouteWithChildren
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
@@ -1957,7 +1964,7 @@ export interface FileRoutesByTo {
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/clubs/$slug': typeof ClubsSlugRoute
-  '/clubs/apply': typeof ClubsApplyRoute
+  '/clubs/apply': typeof ClubsApplyRouteWithChildren
   '/clubs/start': typeof ClubsStartRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
@@ -2064,6 +2071,7 @@ export interface FileRoutesByTo {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
+  '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
@@ -2215,7 +2223,7 @@ export interface FileRoutesById {
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/clubs/$slug': typeof ClubsSlugRoute
-  '/clubs/apply': typeof ClubsApplyRoute
+  '/clubs/apply': typeof ClubsApplyRouteWithChildren
   '/clubs/start': typeof ClubsStartRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
@@ -2323,6 +2331,7 @@ export interface FileRoutesById {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
+  '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdRouteWithChildren
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
@@ -2583,6 +2592,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
+    | '/clubs/apply/success'
     | '/dashboard/business/$businessId'
     | '/dashboard/dispatch/history'
     | '/dashboard/rides/new'
@@ -2836,6 +2846,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
+    | '/clubs/apply/success'
     | '/dashboard/dispatch/history'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
@@ -3094,6 +3105,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
+    | '/clubs/apply/success'
     | '/dashboard/business/$businessId'
     | '/dashboard/dispatch/history'
     | '/dashboard/rides_/new'
@@ -3204,7 +3216,7 @@ export interface RootRouteChildren {
   CCodeRoute: typeof CCodeRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   ClubsSlugRoute: typeof ClubsSlugRoute
-  ClubsApplyRoute: typeof ClubsApplyRoute
+  ClubsApplyRoute: typeof ClubsApplyRouteWithChildren
   ClubsStartRoute: typeof ClubsStartRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GoProductIdRoute: typeof GoProductIdRoute
@@ -4585,6 +4597,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBusinessBusinessIdRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/clubs/apply/success': {
+      id: '/clubs/apply/success'
+      path: '/success'
+      fullPath: '/clubs/apply/success'
+      preLoaderRoute: typeof ClubsApplySuccessRouteImport
+      parentRoute: typeof ClubsApplyRoute
+    }
     '/businesses/$slug/book': {
       id: '/businesses/$slug/book'
       path: '/book'
@@ -5510,6 +5529,18 @@ const BusinessesSlugRouteWithChildren = BusinessesSlugRoute._addFileChildren(
   BusinessesSlugRouteChildren,
 )
 
+interface ClubsApplyRouteChildren {
+  ClubsApplySuccessRoute: typeof ClubsApplySuccessRoute
+}
+
+const ClubsApplyRouteChildren: ClubsApplyRouteChildren = {
+  ClubsApplySuccessRoute: ClubsApplySuccessRoute,
+}
+
+const ClubsApplyRouteWithChildren = ClubsApplyRoute._addFileChildren(
+  ClubsApplyRouteChildren,
+)
+
 interface ListingIdRouteChildren {
   ListingIdEditRoute: typeof ListingIdEditRoute
 }
@@ -5596,7 +5627,7 @@ const rootRouteChildren: RootRouteChildren = {
   CCodeRoute: CCodeRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   ClubsSlugRoute: ClubsSlugRoute,
-  ClubsApplyRoute: ClubsApplyRoute,
+  ClubsApplyRoute: ClubsApplyRouteWithChildren,
   ClubsStartRoute: ClubsStartRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GoProductIdRoute: GoProductIdRoute,

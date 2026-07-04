@@ -151,7 +151,10 @@ function ApplyClubPage() {
       await attachFn({ data: { club_id: club.id, documents: uploaded } });
 
       toast.success("Application submitted — we'll review shortly.");
-      navigate({ to: "/dashboard/clubs" });
+      navigate({
+        to: "/clubs/apply/success",
+        search: { club: club.id, name: form.name.trim() },
+      });
     } catch (err: any) {
       toast.error(err?.message ?? "Failed to submit");
     } finally {
