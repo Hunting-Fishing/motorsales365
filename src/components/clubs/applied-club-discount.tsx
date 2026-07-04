@@ -49,6 +49,7 @@ export function ClubDiscountAppliedNote({ grant }: { grant: ClubGrant }) {
   const clubName = grant.club?.name ?? "your verified club";
   const scope = scopeLabel[grant.scope] ?? grant.scope.replace(/_/g, " ");
   const appliedAt = formatAppliedAt(grant.applied_at);
+  const finalAmount = Math.max(0, grant.original_amount_php - grant.discount_amount_php);
   return (
     <div className="flex items-start gap-2 rounded-md border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-sm">
       <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" />
@@ -84,6 +85,73 @@ export function ClubDiscountAppliedNote({ grant }: { grant: ClubGrant }) {
             <Clock className="h-3 w-3" />
             <span>Applied {appliedAt}</span>
           </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="mt-1 inline-flex items-center gap-1 rounded text-xs font-medium text-emerald-700 underline decoration-dotted underline-offset-2 hover:text-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                aria-label="See how this discount was calculated"
+              >
+                <Calculator className="h-3 w-3" />
+                See calculation
+              </button>
+            </PopoverTrigger>
+            <PopoverContent side="top" align="start" className="w-72 p-3 text-xs">
+              <div className="mb-2 flex items-center gap-1 font-semibold text-foreground">
+                <Calculator className="h-3.5 w-3.5 text-emerald-600" />
+                Discount breakdown
+              </div>
+              <div className="mb-2 text-muted-foreground">
+                Granted by{" "}
+                {grant.club?.slug ? (
+                  <Link
+                    to="/clubs/$slug"
+                    params={{ slug: grant.club.slug }}
+                    className="font-medium text-foreground underline"
+                  >
+                    {clubName}
+                  </Link>
+                ) : (
+                  <span className="font-medium text-foreground">{clubName}</span>
+                )}{" "}
+                (verified club membership).
+              </div>
+              <dl className="space-y-1">
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Original ({scope})</dt>
+                  <dd className="font-mono text-foreground">
+                    {formatPHP(grant.original_amount_php)}
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Discount rate</dt>
+                  <dd className="font-mono text-foreground">−{grant.discount_pct}%</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">
+                    Calculation
+                  </dt>
+                  <dd className="font-mono text-foreground">
+                    {formatPHP(grant.original_amount_php)} × {grant.discount_pct}%
+                  </dd>
+                </div>
+                <div className="flex justify-between text-emerald-700">
+                  <dt>You saved</dt>
+                  <dd className="font-mono font-semibold">
+                    −{formatPHP(grant.discount_amount_php)}
+                  </dd>
+                </div>
+                <div className="mt-1 flex justify-between border-t pt-1 font-semibold text-foreground">
+                  <dt>Final amount</dt>
+                  <dd className="font-mono">{formatPHP(finalAmount)}</dd>
+                </div>
+              </dl>
+              <div className="mt-2 flex items-center gap-1 text-[11px] text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                Applied {appliedAt}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </div>
