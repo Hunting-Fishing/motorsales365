@@ -127,6 +127,42 @@ export const Route = createFileRoute("/api/public/payment-events")({
           return Response.json({ ok: false, suppressed: true });
         }
 
+        // Hydrate the club discount snapshot from payments.club_discount when
+        // the caller didn't inline it — so Stripe-driven receipts still show
+        // the eligibility explanation and applied timestamp.
+        let templateData: Record<string, unknown> = { ...body };
+        if (body.type === "payment.succeeded") {
+          let clubDiscount = body.club_discount ?? null;
+          if (!clubDiscount && body.payment_id) {
+            const { data: pay } = await supabaseAdmin
+              .from("payments")
+              .select("club_discount")
+              .eq("id", body.payment_id)
+              .maybeSingle();
+            const snap = (pay as { club_discount?: Record<string, unknown> } | null)
+              ?.club_discount;
+            if (snap && typeof snap === "object") {
+              clubDiscount = {
+                clubName: (snap.club_name as string | null) ?? null,
+                clubSlug: (snap.club_slug as string | null) ?? null,
+                pct: (snap.discount_pct as number | null) ?? null,
+                scopeLabel:
+                  (snap.scope_label as string | null) ??
+                  (snap.scope as string | null) ??
+                  null,
+                originalAmountPhp: (snap.original_amount_php as number | null) ?? null,
+                discountAmountPhp: (snap.discount_amount_php as number | null) ?? null,
+                finalAmountPhp: (snap.final_amount_php as number | null) ?? null,
+                appliedAt: (snap.applied_at as string | null) ?? null,
+                eligibilityReason:
+                  (snap.eligibility_reason as string | null) ??
+                  "verified_club_membership",
+              };
+            }
+          }
+          templateData = { ...body, clubDiscount };
+        }
+
         const idempotencyKey = `${body.provider}-${body.event_id}`;
         const messageId = crypto.randomUUID();
 
@@ -143,8 +179,16 @@ export const Route = createFileRoute("/api/public/payment-events")({
             message_id: messageId,
             idempotency_key: idempotencyKey,
             template,
-            template_data: body,
+            template_data: templateData,
             to: body.email,
+            from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+            sender_domain: SENDER_DOMAIN,
+            subject: SUBJECT_BY_TYPE[body.type],
+            purpose: "transactional",
+            label: template,
+            queued_at: new Date().toISOString(),
+          },
+        });
             from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
             sender_domain: SENDER_DOMAIN,
             subject: SUBJECT_BY_TYPE[body.type],
