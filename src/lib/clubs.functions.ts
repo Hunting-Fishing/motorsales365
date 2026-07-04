@@ -169,7 +169,8 @@ export const getMyClubStatus = createServerFn({ method: "POST" })
     };
   });
 
-
+export const getMyClubDetail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
