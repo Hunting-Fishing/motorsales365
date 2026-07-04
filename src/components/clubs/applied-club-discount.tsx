@@ -163,18 +163,44 @@ export function ClubDiscountForPayment({ paymentId }: { paymentId: string }) {
   const [grant, setGrant] = useState<ClubGrant | null>(null);
   useEffect(() => {
     let cancelled = false;
-    supabase
-      .from("club_member_discount_grants")
-      .select(
-        "id,club_id,scope,discount_pct,discount_amount_php,original_amount_php,payment_id,applied_at,club:clubs(name,slug)",
-      )
-      .eq("payment_id", paymentId)
-      .order("applied_at", { ascending: false })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!cancelled) setGrant((data as ClubGrant | null) ?? null);
-      });
+    (async () => {
+      // Prefer the snapshot stored on the payment record — it survives
+      // club deletion, renames, and membership changes.
+      const { data: pay } = await supabase
+        .from("payments")
+        .select("id,club_discount")
+        .eq("id", paymentId)
+        .maybeSingle();
+      const snap = (pay as any)?.club_discount;
+      if (snap && snap.discount_pct) {
+        if (!cancelled) {
+          setGrant({
+            id: snap.grant_id ?? paymentId,
+            club_id: snap.club_id ?? null,
+            scope: snap.scope,
+            discount_pct: snap.discount_pct,
+            discount_amount_php: snap.discount_amount_php,
+            original_amount_php: snap.original_amount_php,
+            payment_id: paymentId,
+            applied_at: snap.applied_at,
+            club: snap.club_id
+              ? { name: snap.club_name, slug: snap.club_slug, verified: null }
+              : null,
+          });
+        }
+        return;
+      }
+      const { data } = await supabase
+        .from("club_member_discount_grants")
+        .select(
+          "id,club_id,scope,discount_pct,discount_amount_php,original_amount_php,payment_id,applied_at,club:clubs(name,slug)",
+        )
+        .eq("payment_id", paymentId)
+        .order("applied_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (!cancelled) setGrant((data as ClubGrant | null) ?? null);
+    })();
     return () => {
       cancelled = true;
     };
