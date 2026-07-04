@@ -202,7 +202,18 @@ function ClubsIndexPage() {
                 business days.
               </p>
             </div>
-            <Button onClick={() => navigate({ to: "/clubs/start" })}>Start a club</Button>
+            <Button
+              asChild
+              className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <Link
+                to="/clubs/start"
+                aria-label="Start a club: begin the guided signup flow"
+              >
+                <Rocket className="h-4 w-4" aria-hidden="true" />
+                <span>Start a club</span>
+              </Link>
+            </Button>
           </div>
         </section>
 
