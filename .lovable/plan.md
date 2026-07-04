@@ -1,33 +1,41 @@
-## Problem
+## Goal
 
-Jocelyn's DB row (`profiles` for `jocelyn.roldan@365motorsales.com`) has `phone`, `phone_e164`, `personal_email`, `street_address`, `postal_code`, `signup_intent` all `NULL`. The Edit User Profile dialog is correctly rendering what's stored — the data was never persisted at creation time.
+Make signup fail (with clear inline errors) when phone, email, or address fields are missing for the selected account type — so we don't create another Jocelyn-style profile with blanks.
 
-Root cause: `src/routes/api/admin/create-user.tsx` runs the post-create `profiles.update(profilePatch)` **without checking `error` and without logging which fields were sent**. If the update ever fails, or if an admin submits a tab with empty fields, we get a silent success. The audit log only records `{email, new_user_id, account_type, roles}` — we can't tell after the fact whether phone/personal_email/address were actually posted. The Edit dialog's save path (`admin-profile.functions.ts`) already persists these columns correctly, so the write layer works — only the create path is unobservable.
+## Scope
 
-## Fix — Code (harden Create User)
+Client-side validation only in `src/routes/signup.tsx`. No schema/API changes. (Admin create-user already has its own guard.)
 
-**File:** `src/routes/api/admin/create-user.tsx`
+## Required fields by intent
 
-1. Check the result of `sb.from("profiles").update(profilePatch)`:
-   - On error: audit-log `outcome:"error"` with `error_message: "Profile patch failed: <msg>"` and the list of attempted keys, and return HTTP 207 with `{ ok: true, userId, warning: "Profile fields not saved: <msg>" }` so the client can toast the warning (user is created, but admin knows to reopen and re-save).
-2. Extend the successful `target_summary` on the audit log to include `patched_fields: Object.keys(profilePatch)` and boolean flags `{ had_phone, had_personal_email, had_street_address, had_business_address }` — this way every future creation records exactly what was written, without logging PII values.
-3. Log a second `outcome: "allowed"` audit entry (or extend the existing one) that always includes `patched_field_count` so we can spot future silent-empty submissions.
+| Field | Buyer | Business | Service provider |
+|---|---|---|---|
+| First / last name, email, password, terms, city | required (already) | required (already) | required (already) |
+| **Phone (valid E.164)** | **required** | **required** | **required** |
+| **Street address** | **required** | required (business street) | required (business street) |
+| **Postal code** | **required** | required (business postal) | required (business postal) |
+| **Region + Province** | **required** | **required** | **required** |
+| Business name + kind | — | required (already) | required (already) |
+| Business city / region / province | — | **required** | **required** |
 
-**File:** `src/components/admin/add-user-dialog.tsx`
+Notes:
+- Personal-account users only have one address block (street, postal, city, region, province) — all required.
+- Business-like accounts must fill the **business** address block (street, city, province, region, postal); the personal address block stays optional for them since the business profile is what goes live in the directory.
+- Phone becomes required for everyone (was optional). Label changes from "Mobile (optional)" → "Mobile".
 
-4. On the response, if `data.warning` is present, `toast.error(data.warning)` instead of the silent success toast — surfaces any partial failure to the admin at creation time.
-5. Small UX guard: if all Address-tab fields and Phone are empty when the admin clicks Create, show a non-blocking confirm ("You didn't enter phone or address for this user. Create anyway?") — prevents accidental empty profiles going forward.
+## Changes in `src/routes/signup.tsx`
 
-No schema changes. No changes to the trigger, RLS, or Edit dialog.
-
-## Fix — Data (backfill Jocelyn)
-
-I'll ask again in one prompt for her actual values (phone, personal email, street address, city, province, region, postal code) and then run a single `UPDATE public.profiles SET ... WHERE id = '9bf7f511-1283-49bd-b8c9-1cd970723983'` via the insert tool. Phone will be normalized to E.164 the same way the create-user route does.
-
-If you'd rather fix her via the Edit dialog yourself, the "Edit User Profile" modal you showed already saves these fields correctly — just type them in and Save.
+1. Extend the `issues` memo:
+   - Push `phone` issue when `!phoneNational.trim()` ("Enter your mobile number.") in addition to the existing invalid-format check.
+   - Push `region` / `province` issues when missing.
+   - For personal accounts (`!isBusinessLike`): require `streetAddress`, `postalCode`.
+   - For business-like accounts: require `businessAddress`, `businessCity`, `businessProvince`, `businessRegion`, `businessPostalCode`.
+2. Add `errorFor(...)` + `invalidCls(...)` wiring and `id="field-<name>"` anchors to any field that doesn't already have them (region, province, street/postal for personal, business address block).
+3. Remove "(optional)" from the affected labels; update the helper line under the business address block ("You can skip the street and postal for now…") to say the address is required to create the account.
+4. Update the `useMemo` dependency array to include the new state (`streetAddress`, `postalCode`, `location.region`, `location.province`, `businessAddress`, `businessCity`, `businessProvince`, `businessRegion`, `businessPostalCode`).
 
 ## Verification
 
-- Re-query `profiles` for Jocelyn after the data patch to confirm all four fields are populated.
-- Create one throwaway test user through Add User with phone + personal email + address filled → confirm `route_audit_log.target_summary` now contains `patched_fields` and the flags.
-- Create one throwaway test user with those fields left blank → confirm the confirm-dialog appears; if forced through, confirm the audit row shows `patched_field_count` reflecting only the fields sent.
+- Attempt signup as **Buyer** with phone/address blank → submit button stays disabled and Issues panel lists Phone / Street / Postal / Region / Province.
+- Attempt signup as **Business** with business address blank → Issues panel lists business street / city / province / region / postal.
+- Fill everything → submit succeeds; new profile row has phone_e164, street_address, postal_code, region, province, city populated. Confirm via a quick DB read.
