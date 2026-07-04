@@ -259,7 +259,7 @@ function ApplyClubPage() {
                 id="type"
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={form.type}
-                onChange={(e) => setForm({ ...form, type: e.target.value })}
+                onChange={(e) => setForm({ ...form, type: e.target.value as (typeof CLUB_TYPES)[number] })}
               >
                 <option value="motorcycle_riding">Motorcycle riding</option>
                 <option value="car_club">Car club</option>
