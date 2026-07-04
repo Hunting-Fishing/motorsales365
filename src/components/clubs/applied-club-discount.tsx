@@ -348,6 +348,78 @@ export function ClubDiscountForPayment({ paymentId }: { paymentId: string }) {
   return <ClubDiscountAppliedNote grant={grant} />;
 }
 
+/**
+ * Full-width "Club eligibility" section for the dashboard receipt view.
+ * Mirrors the checkout confirmation breakdown (eligibility reason, verified
+ * club, applied scope, applied timestamp, and discount calculation) inside
+ * a titled section that fits the receipt layout. Renders nothing when the
+ * payment has no club discount applied.
+ */
+export function ClubEligibilitySection({ paymentId }: { paymentId: string }) {
+  const [grant, setGrant] = useState<ClubGrant | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data: pay } = await supabase
+        .from("payments")
+        .select("id,club_discount")
+        .eq("id", paymentId)
+        .maybeSingle();
+      const snap = (pay as any)?.club_discount;
+      if (snap && snap.discount_pct) {
+        if (!cancelled) {
+          setGrant({
+            id: snap.grant_id ?? paymentId,
+            club_id: snap.club_id ?? null,
+            scope: snap.scope,
+            discount_pct: snap.discount_pct,
+            discount_amount_php: snap.discount_amount_php,
+            original_amount_php: snap.original_amount_php,
+            payment_id: paymentId,
+            applied_at: snap.applied_at,
+            club: snap.club_id
+              ? { name: snap.club_name, slug: snap.club_slug, verified: null }
+              : null,
+          });
+        }
+        return;
+      }
+      const { data } = await supabase
+        .from("club_member_discount_grants")
+        .select(
+          "id,club_id,scope,discount_pct,discount_amount_php,original_amount_php,payment_id,applied_at,club:clubs(name,slug)",
+        )
+        .eq("payment_id", paymentId)
+        .order("applied_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (!cancelled) setGrant((data as ClubGrant | null) ?? null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [paymentId]);
+  if (!grant) return null;
+  return (
+    <section
+      aria-labelledby="club-eligibility-heading"
+      className="mt-6 border-t border-border pt-6"
+    >
+      <div className="mb-3 flex items-center gap-2">
+        <ShieldCheck className="h-4 w-4 text-emerald-600" />
+        <h2
+          id="club-eligibility-heading"
+          className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+        >
+          Club eligibility
+        </h2>
+      </div>
+      <ClubDiscountAppliedNote grant={grant} />
+    </section>
+  );
+}
+
+
 /** Compact badge for row-level display in tables. */
 export function ClubDiscountBadgeForPayment({ paymentId }: { paymentId: string }) {
   const [grant, setGrant] = useState<ClubGrant | null>(null);

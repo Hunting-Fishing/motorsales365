@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { formatPHP, formatDate } from "@/lib/format";
 import { Printer, ArrowLeft, ChevronDown, ChevronRight } from "lucide-react";
 import { buildReceiptLines, assertReceiptOrder } from "@/lib/receipt-lines";
-import { ClubDiscountForPayment } from "@/components/clubs/applied-club-discount";
+import { ClubEligibilitySection } from "@/components/clubs/applied-club-discount";
 
 export const Route = createFileRoute("/payments/$id/receipt")({
   component: ReceiptPage,
@@ -607,9 +607,8 @@ function ReceiptPage() {
                 );
               })()}
 
-          <div className="mt-6">
-            <ClubDiscountForPayment paymentId={payment.id} />
-          </div>
+          <ClubEligibilitySection paymentId={payment.id} />
+
 
 
           <footer className="mt-8 border-t border-border pt-4 text-xs text-muted-foreground">
