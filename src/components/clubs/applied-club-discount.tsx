@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { BadgePercent, Sparkles, ShieldCheck, Clock, Calculator } from "lucide-react";
+import { BadgePercent, Sparkles, ShieldCheck, Clock, Calculator, Info } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
