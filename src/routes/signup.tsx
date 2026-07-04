@@ -605,26 +605,42 @@ function SignupPage() {
 
           {!isBusinessLike && (
             <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
-              <div>
-                <Label htmlFor="street-address">Street address (optional)</Label>
+              <div id="field-street-address">
+                <Label htmlFor="street-address">
+                  Street address <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="street-address"
                   value={streetAddress}
                   onChange={(e) => setStreetAddress(e.target.value)}
+                  onBlur={() => markTouched("street-address")}
                   placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
                   autoComplete="street-address"
+                  aria-invalid={!!errorFor("street-address")}
+                  className={invalidCls("street-address")}
                 />
+                {errorFor("street-address") && (
+                  <p className="mt-1 text-xs text-destructive">{errorFor("street-address")}</p>
+                )}
               </div>
-              <div>
-                <Label htmlFor="postal-code">Postal / ZIP code</Label>
+              <div id="field-postal-code">
+                <Label htmlFor="postal-code">
+                  Postal / ZIP code <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="postal-code"
                   value={postalCode}
                   onChange={(e) => setPostalCode(e.target.value)}
+                  onBlur={() => markTouched("postal-code")}
                   placeholder="e.g. 1000"
                   autoComplete="postal-code"
                   inputMode="text"
+                  aria-invalid={!!errorFor("postal-code")}
+                  className={invalidCls("postal-code")}
                 />
+                {errorFor("postal-code") && (
+                  <p className="mt-1 text-xs text-destructive">{errorFor("postal-code")}</p>
+                )}
               </div>
             </div>
           )}
