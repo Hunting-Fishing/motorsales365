@@ -222,7 +222,7 @@ function ApplyClubPage() {
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
             <div>
               <div className="font-semibold text-destructive">
-                We didn't recognise that club type ("{prefill.invalidType}")
+                We didn't recognise that club type ("{invalidType}")
               </div>
               <p className="mt-1 text-muted-foreground">
                 Pick the closest match from the Type dropdown below, or start the guided flow to
