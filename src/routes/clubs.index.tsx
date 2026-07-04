@@ -1,11 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search, ShieldCheck, Sparkles } from "lucide-react";
+import { FileCheck2, Rocket, Search, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ClubCard, type ClubCardData } from "@/components/clubs/club-card";
+import { ClubDiscountExplainer } from "@/components/clubs/club-discount-explainer";
+
 
 export const Route = createFileRoute("/clubs/")({
   head: () => ({
