@@ -122,14 +122,52 @@ function SignupPage() {
       list.push({ field: "email", label: "Email", message: "Enter your email address." });
     else if (!emailValid)
       list.push({ field: "email", label: "Email", message: "Enter a valid email address." });
-    if (phoneNational.trim() && !phoneValid)
+    if (!phoneNational.trim())
       list.push({
         field: "phone",
         label: "Mobile",
-        message: "Enter a valid mobile number or leave it blank.",
+        message: "Enter your mobile number.",
       });
+    else if (!phoneValid)
+      list.push({
+        field: "phone",
+        label: "Mobile",
+        message: "Enter a valid mobile number.",
+      });
+    if (!location.region)
+      list.push({ field: "city", label: "Region", message: "Choose your region." });
+    if (!location.province)
+      list.push({ field: "city", label: "Province", message: "Choose your province." });
     if (!location.city)
       list.push({ field: "city", label: "City / Town", message: "Choose your city or town." });
+    if (!isBusinessLike) {
+      if (!streetAddress.trim())
+        list.push({
+          field: "street-address",
+          label: "Street address",
+          message: "Enter your street address.",
+        });
+      if (!postalCode.trim())
+        list.push({
+          field: "postal-code",
+          label: "Postal code",
+          message: "Enter your postal / ZIP code.",
+        });
+    }
+    if (isBusinessLike) {
+      if (!businessAddress.trim())
+        list.push({
+          field: "business-address",
+          label: "Business street address",
+          message: "Enter your business street address.",
+        });
+      if (!businessPostalCode.trim())
+        list.push({
+          field: "business-postal",
+          label: "Business postal code",
+          message: "Enter your business postal / ZIP code.",
+        });
+    }
     if (isBusinessLike && !businessName.trim()) {
       list.push({
         field: "businessName",
