@@ -258,21 +258,43 @@ function ClubsTab() {
   }, []);
 
   return (
-    <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <p className="max-w-xl text-sm text-muted-foreground">
-          Accredited motoring clubs — riding groups, car clubs and off-road crews. Every club is
-          verified with formal documentation.
-        </p>
-        <div className="flex gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link to="/clubs">Browse all clubs</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link to="/clubs/apply">Apply for a club</Link>
-          </Button>
+    <div className="space-y-6">
+      <section
+        aria-labelledby="about-clubs-heading"
+        className="rounded-2xl border border-border bg-card p-5 sm:p-6"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2
+              id="about-clubs-heading"
+              className="font-display text-xl font-bold text-foreground sm:text-2xl"
+            >
+              About Clubs on 365 MotorSales
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+              Accredited motoring clubs — riding groups, car clubs, off-road crews and brand-owner
+              communities. Every club is reviewed with formal documentation (LTO, SEC or DTI)
+              before it goes live, so you always know who you're riding with.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to="/clubs">Browse all clubs</Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link to="/clubs/apply">Apply for a club</Link>
+            </Button>
+          </div>
         </div>
-      </div>
+        <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700">
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Verified members save 5% on 365 ads, boosts &amp; plans
+        </div>
+      </section>
+
+      <ClubDiscountExplainer />
+
+
       {loading ? (
         <div className="p-12 text-center text-muted-foreground">Loading…</div>
       ) : clubs.length === 0 ? (
