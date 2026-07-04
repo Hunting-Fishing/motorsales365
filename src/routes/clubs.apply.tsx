@@ -73,9 +73,17 @@ function ApplyClubPage() {
   const createFn = useServerFn(createPendingClub);
   const attachFn = useServerFn(attachClubDocuments);
 
+  // Derive validity of the `type` search param. The validator keeps the raw
+  // string so we can render a helpful error when it doesn't match the enum.
+  const validPrefillType =
+    prefill.type && (CLUB_TYPES as readonly string[]).includes(prefill.type)
+      ? (prefill.type as (typeof CLUB_TYPES)[number])
+      : undefined;
+  const invalidType = prefill.type && !validPrefillType ? prefill.type : null;
+
   const [form, setForm] = useState({
     name: prefill.name ?? "",
-    type: prefill.type ?? "motorcycle_riding",
+    type: validPrefillType ?? "motorcycle_riding",
     description: prefill.description ?? "",
     region: prefill.region ?? "",
     city: prefill.city ?? "",
@@ -86,28 +94,7 @@ function ApplyClubPage() {
   const [docs, setDocs] = useState<StagedDoc[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
-  // Detect an invalid `?type=...` value from the raw URL. The route validator
-  // strips unknown types, so we read the original param straight from the
-  // browser (client-only) to surface a helpful error banner.
-  const [invalidType, setInvalidType] = useState<string | null>(null);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const read = () => {
-      const raw = new URLSearchParams(window.location.search).get("type");
-      if (
-        raw &&
-        raw.trim().length > 0 &&
-        !(CLUB_TYPES as readonly string[]).includes(raw)
-      ) {
-        setInvalidType(raw.slice(0, 60));
-      } else {
-        setInvalidType(null);
-      }
-    };
-    read();
-    window.addEventListener("popstate", read);
-    return () => window.removeEventListener("popstate", read);
-  }, []);
+
 
 
   function addFiles(files: FileList | null, kind: StagedDoc["kind"]) {
