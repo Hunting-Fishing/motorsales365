@@ -10,6 +10,7 @@ import {
   Loader2,
   Mail,
   Paperclip,
+  RefreshCw,
   ShieldCheck,
   ShieldX,
   Upload,
@@ -238,106 +239,12 @@ function ClubApplySuccessPage() {
           </section>
         )}
 
-        <section
-          aria-labelledby="next-steps-heading"
-          className="mt-6 rounded-2xl border border-border bg-card p-5 sm:p-6"
-        >
-          <h2 id="next-steps-heading" className="font-display text-lg font-semibold">
-            What to expect next
-          </h2>
-          {status === "active" ? (
-            <ol className="mt-4 space-y-4">
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600">
-                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">You're approved</div>
-                  <p className="text-sm text-muted-foreground">
-                    Your public club page is live. Verified members are eligible for the 5% Club
-                    Member Discount on internal 365 purchases.
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <FileText className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">Add logo, cover &amp; first post</div>
-                  <p className="text-sm text-muted-foreground">
-                    Open your club in the dashboard to add media, post a first ride or event, and
-                    invite members.
-                  </p>
-                </div>
-              </li>
-            </ol>
-          ) : status === "rejected" ? (
-            <ol className="mt-4 space-y-4">
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-                  <Mail className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">Check your email</div>
-                  <p className="text-sm text-muted-foreground">
-                    Reply to the review email with the requested changes or new documents.
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <FileText className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">Update &amp; resubmit</div>
-                  <p className="text-sm text-muted-foreground">
-                    Open your club in the dashboard to upload new documents. We'll re-review once
-                    you notify us.
-                  </p>
-                </div>
-              </li>
-            </ol>
-          ) : (
-            <ol className="mt-4 space-y-4">
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Clock className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">Admin review (1–3 business days)</div>
-                  <p className="text-sm text-muted-foreground">
-                    Our team verifies your accreditation documents (LTO, SEC, DTI, or equivalent).
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Mail className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">We'll email you the decision</div>
-                  <p className="text-sm text-muted-foreground">
-                    You'll get a notification at the contact email you provided. If we need more
-                    info, we'll reach out from there.
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <FileText className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">Publish and invite members</div>
-                  <p className="text-sm text-muted-foreground">
-                    Once approved, your club page goes live. You can then add a logo/cover, post
-                    rides &amp; events, and invite members.
-                  </p>
-                </div>
-              </li>
-            </ol>
-          )}
-        </section>
+        <ApprovalTimeline
+          clubId={club}
+          data={data ?? null}
+          isLoading={isLoading}
+          isError={isError}
+        />
 
         {club && status === "rejected" && (
           <ResubmitDocumentsPanel clubId={club} onResubmitted={() => refetch()} />
@@ -560,5 +467,269 @@ function ResubmitDocumentsPanel({
         </Button>
       </div>
     </section>
+  );
+}
+
+// ---------- Approval timeline ----------
+
+type StatusData = {
+  status: ClubStatus;
+  created_at: string;
+  updated_at: string;
+  reviewed_at: string | null;
+  review_notes: string | null;
+  document_count: number;
+};
+
+const dateFmt = new Intl.DateTimeFormat("en", { dateStyle: "medium" });
+const relFmt = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "—" : dateFmt.format(d);
+}
+
+function relativeFromNow(iso: string): string {
+  const d = new Date(iso).getTime();
+  if (!d) return "";
+  const diffMs = d - Date.now();
+  const diffDays = Math.round(diffMs / 86_400_000);
+  if (Math.abs(diffDays) >= 1) return relFmt.format(diffDays, "day");
+  const diffHours = Math.round(diffMs / 3_600_000);
+  if (Math.abs(diffHours) >= 1) return relFmt.format(diffHours, "hour");
+  const diffMin = Math.round(diffMs / 60_000);
+  return relFmt.format(diffMin, "minute");
+}
+
+type Tone = "positive" | "negative" | "current" | "upcoming" | "neutral";
+
+const TONE_CLASSES: Record<Tone, string> = {
+  positive: "bg-emerald-500/15 text-emerald-600 ring-emerald-500/30",
+  negative: "bg-destructive/10 text-destructive ring-destructive/30",
+  current: "bg-primary/10 text-primary ring-primary/30",
+  upcoming: "bg-muted text-muted-foreground ring-border",
+  neutral: "bg-muted text-foreground ring-border",
+};
+
+type TimelineRow = {
+  key: string;
+  title: string;
+  sub?: React.ReactNode;
+  dateISO?: string | null;
+  dateLabel?: string;
+  Icon: typeof Clock;
+  tone: Tone;
+  dashed?: boolean;
+};
+
+function ApprovalTimeline({
+  clubId,
+  data,
+  isLoading,
+  isError,
+}: {
+  clubId?: string;
+  data: StatusData | null;
+  isLoading: boolean;
+  isError: boolean;
+}) {
+  return (
+    <section
+      aria-labelledby="timeline-heading"
+      aria-live="polite"
+      className="mt-6 rounded-2xl border border-border bg-card p-5 sm:p-6"
+    >
+      <h2 id="timeline-heading" className="font-display text-lg font-semibold">
+        Approval timeline
+      </h2>
+
+      {isLoading ? (
+        <div className="mt-4 space-y-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex gap-3">
+              <div className="h-8 w-8 shrink-0 animate-pulse rounded-full bg-muted" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-32 animate-pulse rounded bg-muted" />
+                <div className="h-3 w-56 animate-pulse rounded bg-muted" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : isError || !data ? (
+        <p className="mt-3 text-sm text-muted-foreground">
+          We couldn't load your timeline right now. Refresh the status above to try again.
+        </p>
+      ) : (
+        <TimelineRows data={data} clubId={clubId} />
+      )}
+    </section>
+  );
+}
+
+function TimelineRows({ data, clubId }: { data: StatusData; clubId?: string }) {
+  const rows: TimelineRow[] = [];
+
+  // 1. Submitted
+  rows.push({
+    key: "submitted",
+    title: "Submitted",
+    sub: `${data.document_count} document${data.document_count === 1 ? "" : "s"} attached`,
+    dateISO: data.created_at,
+    Icon: FileText,
+    tone: "positive",
+  });
+
+  // 2. Under review
+  const reviewCompleted =
+    data.status === "active" || data.status === "rejected" || data.status === "suspended";
+  rows.push({
+    key: "review",
+    title: reviewCompleted ? "Reviewed" : "Under review",
+    sub: reviewCompleted ? undefined : "Typically 1–3 business days",
+    dateISO: reviewCompleted ? (data.reviewed_at ?? null) : null,
+    dateLabel: reviewCompleted ? undefined : "In progress",
+    Icon: reviewCompleted ? ShieldCheck : Clock,
+    tone: reviewCompleted ? "positive" : "current",
+  });
+
+  // 3. Decision (only when reviewed)
+  if (reviewCompleted && data.reviewed_at) {
+    if (data.status === "active") {
+      rows.push({
+        key: "decision",
+        title: "Approved & live",
+        sub: "Your club page is live. Verified members get the 5% Club Member Discount on internal 365 purchases.",
+        dateISO: data.reviewed_at,
+        Icon: ShieldCheck,
+        tone: "positive",
+      });
+    } else if (data.status === "rejected") {
+      rows.push({
+        key: "decision",
+        title: "Needs changes",
+        sub:
+          data.review_notes ??
+          "Check the reviewer notes and resubmit updated documents below.",
+        dateISO: data.reviewed_at,
+        Icon: XCircle,
+        tone: "negative",
+      });
+    } else {
+      rows.push({
+        key: "decision",
+        title: "Suspended",
+        sub: "Contact support for next steps.",
+        dateISO: data.reviewed_at,
+        Icon: ShieldX,
+        tone: "negative",
+      });
+    }
+  }
+
+  // 4. Last updated (only meaningful when distinct from created/reviewed)
+  const distinctUpdate =
+    data.updated_at !== data.created_at && data.updated_at !== data.reviewed_at;
+  if (distinctUpdate) {
+    const awaitingRereview = data.status === "pending" && !!data.reviewed_at;
+    rows.push({
+      key: "updated",
+      title: "Last updated",
+      sub: awaitingRereview ? "Awaiting re-review" : "Details updated",
+      dateISO: data.updated_at,
+      Icon: RefreshCw,
+      tone: awaitingRereview ? "current" : "neutral",
+    });
+  }
+
+  // 5. Next step
+  if (data.status === "pending") {
+    rows.push({
+      key: "next",
+      title: "We'll email you the decision",
+      sub: "You'll get a notification at the contact email you provided.",
+      Icon: Mail,
+      tone: "upcoming",
+      dashed: true,
+    });
+  } else if (data.status === "active") {
+    rows.push({
+      key: "next",
+      title: "Add logo, cover & first post",
+      sub: clubId ? (
+        <Link
+          to="/dashboard/clubs_/$id"
+          params={{ id: clubId }}
+          className="text-primary underline-offset-4 hover:underline"
+        >
+          Open your club in the dashboard →
+        </Link>
+      ) : (
+        "Open your club in the dashboard."
+      ),
+      Icon: LayoutDashboard,
+      tone: "upcoming",
+      dashed: true,
+    });
+  } else if (data.status === "rejected") {
+    rows.push({
+      key: "next",
+      title: "Resubmit updated documents",
+      sub: "Use the panel below to upload replacements — we'll re-review shortly.",
+      Icon: Upload,
+      tone: "upcoming",
+      dashed: true,
+    });
+  } else {
+    rows.push({
+      key: "next",
+      title: "Contact support",
+      sub: "Reach out and we'll help you get unblocked.",
+      Icon: Mail,
+      tone: "upcoming",
+      dashed: true,
+    });
+  }
+
+  return (
+    <ol className="mt-4 space-y-0">
+      {rows.map((row, idx) => {
+        const isLast = idx === rows.length - 1;
+        const toneClass = TONE_CLASSES[row.tone];
+        return (
+          <li key={row.key} className="relative flex gap-4 pb-6 last:pb-0">
+            {!isLast && (
+              <span
+                aria-hidden="true"
+                className="absolute left-4 top-9 bottom-0 -ml-px w-px bg-border"
+              />
+            )}
+            <span
+              className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-1 ${toneClass} ${
+                row.dashed ? "border border-dashed border-current bg-transparent" : ""
+              }`}
+            >
+              <row.Icon className="h-4 w-4" aria-hidden="true" />
+            </span>
+            <div className="min-w-0 flex-1 pt-1">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+                <div className="font-medium text-foreground">{row.title}</div>
+                {row.dateISO ? (
+                  <div className="text-xs text-muted-foreground">
+                    <time dateTime={row.dateISO}>{formatDate(row.dateISO)}</time>
+                    <span className="mx-1">·</span>
+                    <span>{relativeFromNow(row.dateISO)}</span>
+                  </div>
+                ) : row.dateLabel ? (
+                  <div className="text-xs font-medium text-primary">{row.dateLabel}</div>
+                ) : null}
+              </div>
+              {row.sub && (
+                <div className="mt-1 text-sm text-muted-foreground">{row.sub}</div>
+              )}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
