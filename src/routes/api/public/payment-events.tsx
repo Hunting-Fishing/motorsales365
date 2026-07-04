@@ -16,6 +16,18 @@ import { verifyInternalHmac } from "@/integrations/supabase/internal-secrets.ser
  * src/lib/payment-events.server.ts when running inside the app.
  */
 
+type ClubDiscountPayload = {
+  clubName?: string | null;
+  clubSlug?: string | null;
+  pct?: number | null;
+  scopeLabel?: string | null;
+  originalAmountPhp?: number | null;
+  discountAmountPhp?: number | null;
+  finalAmountPhp?: number | null;
+  appliedAt?: string | null;
+  eligibilityReason?: string | null;
+};
+
 type PaymentEvent =
   | {
       type: "payment.succeeded";
@@ -25,6 +37,9 @@ type PaymentEvent =
       amount_php: number;
       description?: string;
       invoice_id?: string;
+      /** Internal payments.id — used to hydrate club_discount snapshot when the snapshot isn't inlined. */
+      payment_id?: string;
+      club_discount?: ClubDiscountPayload | null;
     }
   | {
       type: "payment.failed";
