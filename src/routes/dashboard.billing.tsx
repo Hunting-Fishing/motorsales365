@@ -179,6 +179,7 @@ function BillingPage() {
               discount_amount_php: snap.discount_amount_php,
               original_amount_php: snap.original_amount_php,
               applied_at: snap.applied_at,
+              eligibility_reason: snap.eligibility_reason ?? "verified_club_membership",
               club: snap.club_id
                 ? { name: snap.club_name, slug: snap.club_slug, verified: null }
                 : null,
