@@ -11923,6 +11923,10 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      is_sales_assigned_supplier: {
+        Args: { _rep: string; _supplier_id: string }
+        Returns: boolean
+      }
       is_sales_assigned_user: {
         Args: { _rep: string; _target_user: string }
         Returns: boolean
