@@ -183,21 +183,63 @@ export async function logClubDiscountGrant(
     metadata?: Record<string, unknown>;
   },
 ): Promise<void> {
+  const appliedAt = new Date().toISOString();
+  const finalAmountPhp = Math.max(0, args.originalAmountPhp - args.discountAmountPhp);
+  const clubName = args.clubId ? await lookupClubName(admin, args.clubId) : null;
+  const clubSlug = args.clubId ? await lookupClubSlug(admin, args.clubId) : null;
+
+  let grantId: string | null = null;
   try {
-    await admin.from("club_member_discount_grants").insert({
-      user_id: args.userId,
-      club_id: args.clubId,
-      scope: args.scope,
-      payment_id: args.paymentId ?? null,
-      line_item_id: args.lineItemId ?? null,
-      original_amount_php: args.originalAmountPhp,
-      discount_amount_php: args.discountAmountPhp,
-      discount_pct: args.discountPct,
-      metadata: args.metadata ?? {},
-    });
+    const { data: grantRow } = await admin
+      .from("club_member_discount_grants")
+      .insert({
+        user_id: args.userId,
+        club_id: args.clubId,
+        scope: args.scope,
+        payment_id: args.paymentId ?? null,
+        line_item_id: args.lineItemId ?? null,
+        original_amount_php: args.originalAmountPhp,
+        discount_amount_php: args.discountAmountPhp,
+        discount_pct: args.discountPct,
+        metadata: args.metadata ?? {},
+      })
+      .select("id")
+      .maybeSingle();
+    grantId = (grantRow as { id?: string } | null)?.id ?? null;
   } catch {
     // best-effort audit log
   }
+
+  // Snapshot the discount metadata onto the payment record itself so the
+  // receipt keeps rendering the correct eligibility reason and club
+  // attribution even if the buyer later leaves the club, the club is
+  // unverified, or its name/slug changes.
+  if (args.paymentId) {
+    try {
+      const snapshot = {
+        club_id: args.clubId,
+        club_name: clubName,
+        club_slug: clubSlug,
+        scope: args.scope,
+        scope_label: SCOPE_LABEL[args.scope] ?? args.scope,
+        product_label: args.productLabel ?? null,
+        discount_pct: args.discountPct,
+        discount_amount_php: args.discountAmountPhp,
+        original_amount_php: args.originalAmountPhp,
+        final_amount_php: finalAmountPhp,
+        applied_at: appliedAt,
+        eligibility_reason: "verified_club_membership",
+        grant_id: grantId,
+      };
+      await admin
+        .from("payments")
+        .update({ club_discount: snapshot })
+        .eq("id", args.paymentId);
+    } catch {
+      // best-effort snapshot
+    }
+  }
+
   // Best-effort user notification. Never let email failures bubble up.
   try {
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/server-enqueue.server");
