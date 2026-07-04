@@ -325,8 +325,18 @@ function JoinStep({ onBack }: { onBack: () => void }) {
   );
 }
 
-function TypeStep({ onBack }: { onBack: () => void }) {
-  const [type, setType] = useState<string | null>(null);
+type ClubTypeValue = (typeof CLUB_TYPE_VALUES)[number];
+
+function TypeStep({
+  initialType,
+  onBack,
+  onContinue,
+}: {
+  initialType?: ClubTypeValue;
+  onBack: () => void;
+  onContinue: (type: ClubTypeValue) => void;
+}) {
+  const [type, setType] = useState<ClubTypeValue | null>(initialType ?? null);
   return (
     <section aria-labelledby="type-heading" className="space-y-5">
       <button
@@ -387,15 +397,199 @@ function TypeStep({ onBack }: { onBack: () => void }) {
         ) : (
           <span className="text-xs text-muted-foreground">Pick a type to continue</span>
         )}
-        <Button asChild disabled={!type}>
-          <Link
-            to="/clubs/apply"
-            search={type ? ({ type } as any) : undefined}
-          >
-            Continue to application <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
+        <Button
+          type="button"
+          disabled={!type}
+          onClick={() => type && onContinue(type)}
+        >
+          Continue <ArrowRight className="ml-1 h-4 w-4" />
         </Button>
       </div>
     </section>
   );
 }
+
+const detailsSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, "Club name must be at least 3 characters")
+    .max(120, "Club name must be less than 120 characters"),
+  description: z
+    .string()
+    .trim()
+    .min(20, "Description must be at least 20 characters")
+    .max(500, "Keep it under 500 characters here — you can expand on the next step"),
+  region: z.string().trim().max(120, "Region must be less than 120 characters").optional().or(z.literal("")),
+  city: z.string().trim().max(120, "City must be less than 120 characters").optional().or(z.literal("")),
+});
+
+function DetailsStep({
+  type,
+  onBack,
+}: {
+  type?: ClubTypeValue;
+  onBack: () => void;
+}) {
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    region: "",
+    city: "",
+  });
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
+  const navigate = useNavigate({ from: "/clubs/start" });
+
+  // If someone lands on details without picking a type, bounce back.
+  useEffect(() => {
+    if (!type) {
+      navigate({ search: { step: "type", role: "organizer" } });
+    }
+  }, [type, navigate]);
+
+  const typeLabel = CLUB_TYPES.find((t) => t.value === type)?.label;
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const parsed = detailsSchema.safeParse(form);
+    if (!parsed.success) {
+      const next: Partial<Record<keyof typeof form, string>> = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0] as keyof typeof form | undefined;
+        if (key && !next[key]) next[key] = issue.message;
+      }
+      setErrors(next);
+      return;
+    }
+    setErrors({});
+    if (!type) return;
+    const clean = parsed.data;
+    navigate({
+      to: "/clubs/apply",
+      search: {
+        type,
+        name: clean.name,
+        description: clean.description,
+        region: clean.region || undefined,
+        city: clean.city || undefined,
+      } as any,
+    });
+  }
+
+  return (
+    <section aria-labelledby="details-heading" className="space-y-5">
+      <button
+        type="button"
+        onClick={onBack}
+        className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" /> Back
+      </button>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="details-heading" className="font-display text-xl font-semibold">
+          Tell us about your club
+        </h2>
+        {typeLabel && <Badge variant="secondary">{typeLabel}</Badge>}
+      </div>
+      <p className="text-sm text-muted-foreground">
+        The basics — you'll upload accreditation documents on the next step.
+      </p>
+
+      <form onSubmit={submit} className="space-y-5">
+        <div>
+          <Label htmlFor="name">Club name</Label>
+          <Input
+            id="name"
+            required
+            minLength={3}
+            maxLength={120}
+            autoComplete="off"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? "name-err" : undefined}
+          />
+          {errors.name && (
+            <p id="name-err" className="mt-1 text-xs text-destructive">
+              {errors.name}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <Label htmlFor="description">Short description</Label>
+          <Textarea
+            id="description"
+            required
+            minLength={20}
+            maxLength={500}
+            rows={4}
+            placeholder="Mission, activities, who it's for…"
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            aria-invalid={!!errors.description}
+            aria-describedby={errors.description ? "description-err" : "description-hint"}
+          />
+          <div className="mt-1 flex items-center justify-between text-xs">
+            {errors.description ? (
+              <p id="description-err" className="text-destructive">
+                {errors.description}
+              </p>
+            ) : (
+              <p id="description-hint" className="text-muted-foreground">
+                20–500 characters. You can expand later.
+              </p>
+            )}
+            <span className="text-muted-foreground/70">{form.description.length}/500</span>
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="region" className="flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5 text-muted-foreground" /> Region (optional)
+            </Label>
+            <Input
+              id="region"
+              maxLength={120}
+              placeholder="e.g. NCR, Region IV-A"
+              value={form.region}
+              onChange={(e) => setForm({ ...form, region: e.target.value })}
+              aria-invalid={!!errors.region}
+              aria-describedby={errors.region ? "region-err" : undefined}
+            />
+            {errors.region && (
+              <p id="region-err" className="mt-1 text-xs text-destructive">
+                {errors.region}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="city">City / municipality (optional)</Label>
+            <Input
+              id="city"
+              maxLength={120}
+              placeholder="e.g. Quezon City"
+              value={form.city}
+              onChange={(e) => setForm({ ...form, city: e.target.value })}
+              aria-invalid={!!errors.city}
+              aria-describedby={errors.city ? "city-err" : undefined}
+            />
+            {errors.city && (
+              <p id="city-err" className="mt-1 text-xs text-destructive">
+                {errors.city}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <Button type="submit">
+            Continue to documents <ArrowRight className="ml-1 h-4 w-4" />
+          </Button>
+        </div>
+      </form>
+    </section>
+  );
+}
+
