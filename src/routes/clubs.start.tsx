@@ -99,11 +99,75 @@ const CLUB_TYPES = [
   { value: "other", label: "Other", hint: "Something else — tell us in the description", icon: Sparkles },
 ] as const;
 
+const WIZARD_STORAGE_KEY = "clubs-start-wizard-v1";
+const DETAILS_STORAGE_KEY = "clubs-start-details-v1";
+
+type SavedWizard = {
+  step?: "role" | "join" | "type" | "details";
+  role?: "member" | "organizer";
+  type?: ClubTypeValue;
+};
+
+function readSavedWizard(): SavedWizard | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(WIZARD_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = searchSchema.safeParse(JSON.parse(raw));
+    return parsed.success ? (parsed.data as SavedWizard) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveWizard(state: SavedWizard) {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    /* ignore */
+  }
+}
+
+function clearWizardStorage() {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.removeItem(WIZARD_STORAGE_KEY);
+    window.sessionStorage.removeItem(DETAILS_STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 function StartClubPage() {
   const navigate = useNavigate({ from: "/clubs/start" });
   const search = Route.useSearch();
   const step = search.step ?? "role";
   const role = search.role;
+  const [hydrated, setHydrated] = useState(false);
+  const hasSearch = !!(search.step || search.role || search.type);
+
+  // On mount: if URL is bare, restore any saved wizard state from this tab's session.
+  useEffect(() => {
+    if (hydrated) return;
+    setHydrated(true);
+    if (hasSearch) return;
+    const saved = readSavedWizard();
+    if (saved && (saved.step || saved.role || saved.type)) {
+      navigate({ search: saved, replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist current wizard position whenever the URL changes.
+  useEffect(() => {
+    if (!hydrated) return;
+    if (hasSearch) {
+      saveWizard({ step: search.step, role: search.role, type: search.type });
+    }
+  }, [hydrated, hasSearch, search.step, search.role, search.type]);
+
+  const canResetProgress = hasSearch && step !== "role";
 
   return (
     <SiteLayout>
@@ -115,9 +179,24 @@ function StartClubPage() {
           <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">Clubs on 365</h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">
             Every club on 365 MotorSales is formally accredited. This short flow points you to the
-            right place — whether you want to join a club or register one.
+            right place — whether you want to join a club or register one. Your progress is saved
+            in this tab, so you can leave and come back.
           </p>
           <Stepper step={step} role={role} />
+          {canResetProgress && (
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={() => {
+                  clearWizardStorage();
+                  navigate({ search: {}, replace: true });
+                }}
+                className="text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                Start over
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
