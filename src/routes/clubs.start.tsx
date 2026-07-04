@@ -110,28 +110,19 @@ function StartClubPage() {
           <RoleStep
             onPick={(picked) =>
               navigate({
-                search: (prev) => ({
-                  ...prev,
+                search: {
                   role: picked,
                   step: picked === "member" ? "join" : "type",
-                }),
+                },
               })
             }
           />
         )}
         {step === "join" && (
-          <JoinStep
-            onBack={() =>
-              navigate({ search: () => ({ step: "role" as const }) })
-            }
-          />
+          <JoinStep onBack={() => navigate({ search: { step: "role" } })} />
         )}
         {step === "type" && (
-          <TypeStep
-            onBack={() =>
-              navigate({ search: () => ({ step: "role" as const }) })
-            }
-          />
+          <TypeStep onBack={() => navigate({ search: { step: "role" } })} />
         )}
       </div>
     </SiteLayout>
