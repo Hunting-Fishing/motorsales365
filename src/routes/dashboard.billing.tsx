@@ -158,21 +158,42 @@ function BillingPage() {
       .then(async ({ data }) => {
         const rows = data ?? [];
         setPayments(rows);
-        const ids = rows.map((p: any) => p.id).filter(Boolean);
-        if (ids.length === 0) {
-          setGrantsByPayment({});
-          return;
-        }
-        const { data: grants } = await supabase
-          .from("club_member_discount_grants")
-          .select(
-            "id,payment_id,scope,discount_pct,discount_amount_php,original_amount_php,applied_at,club:clubs(name,slug,verified)",
-          )
-          .in("payment_id", ids as string[])
-          .order("applied_at", { ascending: false });
         const map: Record<string, ClubGrantRow> = {};
-        for (const g of (grants ?? []) as any[]) {
-          if (g.payment_id && !map[g.payment_id]) map[g.payment_id] = g as ClubGrantRow;
+        const missing: string[] = [];
+        // Prefer the immutable snapshot stored on the payment itself so the
+        // eligibility reason stays correct even if the buyer later leaves
+        // the club or the club is renamed/unverified.
+        for (const p of rows as any[]) {
+          const snap = p?.club_discount;
+          if (snap && snap.discount_pct) {
+            map[p.id] = {
+              id: snap.grant_id ?? p.id,
+              payment_id: p.id,
+              scope: snap.scope,
+              discount_pct: snap.discount_pct,
+              discount_amount_php: snap.discount_amount_php,
+              original_amount_php: snap.original_amount_php,
+              applied_at: snap.applied_at,
+              club: snap.club_id
+                ? { name: snap.club_name, slug: snap.club_slug, verified: null }
+                : null,
+            } as ClubGrantRow;
+          } else if (p.id) {
+            missing.push(p.id);
+          }
+        }
+        // Backfill from grants table for older payments that predate the snapshot column.
+        if (missing.length > 0) {
+          const { data: grants } = await supabase
+            .from("club_member_discount_grants")
+            .select(
+              "id,payment_id,scope,discount_pct,discount_amount_php,original_amount_php,applied_at,club:clubs(name,slug,verified)",
+            )
+            .in("payment_id", missing)
+            .order("applied_at", { ascending: false });
+          for (const g of (grants ?? []) as any[]) {
+            if (g.payment_id && !map[g.payment_id]) map[g.payment_id] = g as ClubGrantRow;
+          }
         }
         setGrantsByPayment(map);
       });

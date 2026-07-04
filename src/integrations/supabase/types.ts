@@ -7491,6 +7491,7 @@ export type Database = {
           amount_php: number
           approved_at: string | null
           boost_amount_php: number | null
+          club_discount: Json | null
           created_at: string
           credit_calculated_at: string | null
           gross_amount_php: number | null
@@ -7528,6 +7529,7 @@ export type Database = {
           amount_php: number
           approved_at?: string | null
           boost_amount_php?: number | null
+          club_discount?: Json | null
           created_at?: string
           credit_calculated_at?: string | null
           gross_amount_php?: number | null
@@ -7565,6 +7567,7 @@ export type Database = {
           amount_php?: number
           approved_at?: string | null
           boost_amount_php?: number | null
+          club_discount?: Json | null
           created_at?: string
           credit_calculated_at?: string | null
           gross_amount_php?: number | null
