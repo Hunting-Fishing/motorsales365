@@ -122,8 +122,14 @@ function LoginPage() {
     inFlightRef.current = true;
     setGoogleSubmitting(true);
     try {
+      // Preserve `redirect` (e.g. the MCP consent URL) through the Google
+      // round-trip: route Google back to /login?redirect=..., where the
+      // signed-in effect below forwards the user to the intended destination.
+      const returnTo = redirectTo
+        ? `${siteOrigin()}/login?redirect=${encodeURIComponent(redirectTo)}`
+        : siteOrigin();
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: siteOrigin(),
+        redirect_uri: returnTo,
       });
       if (result.error) {
         toast.error("Could not sign in with Google");

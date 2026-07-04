@@ -389,8 +389,11 @@ function SignupPage() {
       return;
     }
     stashPendingProfile();
+    const returnTo = search.redirect
+      ? `${siteOrigin()}/login?redirect=${encodeURIComponent(search.redirect)}`
+      : siteOrigin();
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: siteOrigin(),
+      redirect_uri: returnTo,
     });
     if (result.error) {
       toast.error("Could not sign up with Google");
