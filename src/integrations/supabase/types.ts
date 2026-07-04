@@ -11923,6 +11923,10 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      is_sales_assigned_supplier: {
+        Args: { _rep: string; _supplier_id: string }
+        Returns: boolean
+      }
       is_sales_assigned_user: {
         Args: { _rep: string; _target_user: string }
         Returns: boolean
@@ -12230,7 +12234,7 @@ export type Database = {
         | "boat"
         | "other"
       sales_rep_source: "referral" | "manual" | "territory" | "customer_choice"
-      sales_rep_subject: "user" | "business"
+      sales_rep_subject: "user" | "business" | "supplier"
       seller_type: "private" | "business" | "staff"
       service_inquiry_status:
         | "new"
@@ -12621,7 +12625,7 @@ export const Constants = {
         "other",
       ],
       sales_rep_source: ["referral", "manual", "territory", "customer_choice"],
-      sales_rep_subject: ["user", "business"],
+      sales_rep_subject: ["user", "business", "supplier"],
       seller_type: ["private", "business", "staff"],
       service_inquiry_status: [
         "new",
