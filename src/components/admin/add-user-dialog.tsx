@@ -202,6 +202,27 @@ export function AddUserDialog({
       setTab("identity");
       return;
     }
+
+    // Guard against accidentally creating an empty profile: if the admin left
+    // phone AND the entire personal address blank (and — for business — the
+    // business address too), confirm before creating so we don't end up with
+    // a user we then have to backfill by hand.
+    const personalAddressEmpty = Object.values(address).every(
+      (v) => (v as string).trim() === "",
+    );
+    const businessAddressEmpty =
+      accountType !== "business" ||
+      Object.values(bizAddress).every((v) => (v as string).trim() === "");
+    if (!phone.trim() && personalAddressEmpty && businessAddressEmpty) {
+      const ok = window.confirm(
+        "You haven't entered a phone number or address for this user. Create the account anyway?",
+      );
+      if (!ok) {
+        setTab("identity");
+        return;
+      }
+    }
+
     setSubmitting(true);
     try {
       const { data: sess } = await supabase.auth.getSession();
@@ -246,7 +267,11 @@ export function AddUserDialog({
         toast.error(data?.error ?? `Failed (${res.status})`);
         return;
       }
-      toast.success(`User created. Temp password: ${password}`, { duration: 12000 });
+      if (data?.warning) {
+        toast.warning(data.warning, { duration: 14000 });
+      } else {
+        toast.success(`User created. Temp password: ${password}`, { duration: 12000 });
+      }
       if (enforceDomain) {
         toast.message(
           "Don't forget to add a Cloudflare Email Routing rule for this address so they can receive mail.",
