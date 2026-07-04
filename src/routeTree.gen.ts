@@ -232,6 +232,7 @@ import { Route as AuthenticatedAccountTrustScoreRouteImport } from './routes/_au
 import { Route as AuthenticatedAccountRewardsRouteImport } from './routes/_authenticated/account.rewards'
 import { Route as AuthenticatedAccountDisputesRouteImport } from './routes/_authenticated/account.disputes'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as DashboardBusinessBusinessIdIndexRouteImport } from './routes/dashboard.business.$businessId.index'
 import { Route as PartsPNetworkSkuRouteImport } from './routes/parts.p.$network.$sku'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -1417,6 +1418,11 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardBusinessBusinessIdIndexRoute =
   DashboardBusinessBusinessIdIndexRouteImport.update({
     id: '/',
@@ -1815,6 +1821,7 @@ export interface FileRoutesByFullPath {
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
@@ -2073,6 +2080,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopIndexRoute
   '/wanted-parts': typeof WantedPartsIndexRoute
   '/wanted': typeof WantedIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
@@ -2337,6 +2345,7 @@ export interface FileRoutesById {
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/_authenticated/account/rewards': typeof AuthenticatedAccountRewardsRoute
@@ -2602,6 +2611,7 @@ export interface FileRouteTypes {
     | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/account/disputes'
     | '/account/rewards'
@@ -2860,6 +2870,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/wanted-parts'
     | '/wanted'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/account/disputes'
     | '/account/rewards'
@@ -3123,6 +3134,7 @@ export interface FileRouteTypes {
     | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/account/disputes'
     | '/_authenticated/account/rewards'
@@ -3311,6 +3323,7 @@ export interface RootRouteChildren {
   ShopIndexRoute: typeof ShopIndexRoute
   WantedPartsIndexRoute: typeof WantedPartsIndexRoute
   WantedIndexRoute: typeof WantedIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
   ApiPublicGeoSearchRoute: typeof ApiPublicGeoSearchRoute
@@ -4911,6 +4924,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/business/$businessId/': {
       id: '/dashboard/business/$businessId/'
       path: '/'
@@ -5755,6 +5775,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopIndexRoute: ShopIndexRoute,
   WantedPartsIndexRoute: WantedPartsIndexRoute,
   WantedIndexRoute: WantedIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
   ApiPublicGeoSearchRoute: ApiPublicGeoSearchRoute,
