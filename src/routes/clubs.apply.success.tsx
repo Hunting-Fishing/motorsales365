@@ -339,6 +339,10 @@ function ClubApplySuccessPage() {
           )}
         </section>
 
+        {club && status === "rejected" && (
+          <ResubmitDocumentsPanel clubId={club} onResubmitted={() => refetch()} />
+        )}
+
         <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button asChild variant="outline">
             <Link to="/clubs">Browse clubs</Link>
