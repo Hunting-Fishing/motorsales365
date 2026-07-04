@@ -179,7 +179,7 @@ export const Route = createFileRoute("/api/public/payment-events")({
             message_id: messageId,
             idempotency_key: idempotencyKey,
             template,
-            template_data: templateData,
+            template_data: templateData as any,
             to: body.email,
             from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
             sender_domain: SENDER_DOMAIN,
