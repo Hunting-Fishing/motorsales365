@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { FileText, ShieldCheck, Upload, X } from "lucide-react";
+import { AlertTriangle, FileText, Info, ShieldCheck, Upload, X } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -40,16 +40,40 @@ export const Route = createFileRoute("/clubs/apply")({
   validateSearch: (s: Record<string, unknown>) => {
     const str = (v: unknown, max: number) =>
       typeof v === "string" && v.trim().length > 0 ? v.slice(0, max) : undefined;
+    const looksInvalid = (v: unknown) =>
+      typeof v === "string" &&
+      v.trim().length > 0 &&
+      !(CLUB_TYPES as readonly string[]).includes(v);
     const t =
       typeof s.type === "string" && (CLUB_TYPES as readonly string[]).includes(s.type)
         ? (s.type as (typeof CLUB_TYPES)[number])
         : undefined;
+    // Preserve the offending value across TanStack Router's URL canonicalisation
+    // (invalid `type=...` gets stripped, so we re-emit it under `invalidType=...`
+    // and read it back on the redirected request so the banner survives).
+    const initialInvalid = looksInvalid(s.type) ? String(s.type).slice(0, 60) : undefined;
+    const passthroughInvalid = looksInvalid(s.invalidType)
+      ? String(s.invalidType).slice(0, 60)
+      : undefined;
+    const invalidType = initialInvalid ?? passthroughInvalid;
+    const name = str(s.name, 120);
+    const description = str(s.description, 2000);
+    const region = str(s.region, 120);
+    const city = str(s.city, 120);
     return {
-      type: t,
-      name: str(s.name, 120),
-      description: str(s.description, 2000),
-      region: str(s.region, 120),
-      city: str(s.city, 120),
+      ...(t ? { type: t } : {}),
+      ...(invalidType ? { invalidType } : {}),
+      ...(name ? { name } : {}),
+      ...(description ? { description } : {}),
+      ...(region ? { region } : {}),
+      ...(city ? { city } : {}),
+    } as {
+      type?: (typeof CLUB_TYPES)[number];
+      invalidType?: string;
+      name?: string;
+      description?: string;
+      region?: string;
+      city?: string;
     };
   },
   component: ApplyClubPage,
@@ -189,6 +213,46 @@ function ApplyClubPage() {
             </ul>
           </div>
         </div>
+
+        {prefill.invalidType && !prefill.type && (
+          <div
+            role="alert"
+            className="mt-4 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm"
+          >
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+            <div>
+              <div className="font-semibold text-destructive">
+                We didn't recognise that club type ("{prefill.invalidType}")
+              </div>
+              <p className="mt-1 text-muted-foreground">
+                Pick the closest match from the Type dropdown below, or start the guided flow to
+                choose one.
+              </p>
+              <div className="mt-2">
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/clubs/start">Use the guided flow</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!prefill.type && !prefill.invalidType && (
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-border bg-muted/40 p-3 text-sm">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+            <div>
+              <div className="font-semibold">Not sure which type to pick?</div>
+              <p className="mt-1 text-muted-foreground">
+                The guided flow walks you through role, club type and basic details before you
+                land here.{" "}
+                <Link to="/clubs/start" className="font-medium text-primary hover:underline">
+                  Start the guided flow
+                </Link>
+                .
+              </p>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={submit} className="mt-6 space-y-6">
           <div className="grid gap-4 sm:grid-cols-2">
