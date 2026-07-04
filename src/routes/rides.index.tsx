@@ -9,7 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RideCard, type RideCardData } from "@/components/rides/ride-card";
 import { ClubCard, type ClubCardData } from "@/components/clubs/club-card";
+import { ClubDiscountExplainer } from "@/components/clubs/club-discount-explainer";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Camera, Wrench, Share2, ShieldCheck } from "lucide-react";
+
 
 
 export const Route = createFileRoute("/rides/")({
@@ -152,7 +155,54 @@ function RidesHubPage() {
 
       <div className="container mx-auto px-4 py-8">
         <AdCarousel placement="rides_top" className="mb-6" />
+
+        <section
+          aria-labelledby="about-rides-heading"
+          className="mb-8 rounded-2xl border border-border bg-card p-5 sm:p-6"
+        >
+          <h2
+            id="about-rides-heading"
+            className="font-display text-xl font-bold text-foreground sm:text-2xl"
+          >
+            About Rides on 365 MotorSales
+          </h2>
+          <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+            "Rides" are public vehicle profiles owned by community members — a permanent home for
+            every car, bike, truck, boat or project build. Free to post, free to browse.
+          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-border bg-background/60 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <Camera className="h-4 w-4 text-primary" /> What is a Ride?
+              </div>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                A profile page for one specific vehicle — photos, specs, modifications and full
+                service history all in one place.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-background/60 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <Wrench className="h-4 w-4 text-primary" /> Why post yours?
+              </div>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                Show off the build, keep a permanent maintenance log, collect likes, and flip it
+                into a marketplace listing when you're ready to sell.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-background/60 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <Share2 className="h-4 w-4 text-primary" /> How it works
+              </div>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                Add your ride → upload photos → log mods and service → share the link. Free for
+                all members.
+              </p>
+            </div>
+          </div>
+        </section>
+
         <Tabs defaultValue="rides">
+
           <TabsList>
             <TabsTrigger value="rides">
               <Sparkles className="mr-2 h-4 w-4" /> Rides
@@ -208,21 +258,43 @@ function ClubsTab() {
   }, []);
 
   return (
-    <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <p className="max-w-xl text-sm text-muted-foreground">
-          Accredited motoring clubs — riding groups, car clubs and off-road crews. Every club is
-          verified with formal documentation.
-        </p>
-        <div className="flex gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link to="/clubs">Browse all clubs</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link to="/clubs/apply">Apply for a club</Link>
-          </Button>
+    <div className="space-y-6">
+      <section
+        aria-labelledby="about-clubs-heading"
+        className="rounded-2xl border border-border bg-card p-5 sm:p-6"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2
+              id="about-clubs-heading"
+              className="font-display text-xl font-bold text-foreground sm:text-2xl"
+            >
+              About Clubs on 365 MotorSales
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+              Accredited motoring clubs — riding groups, car clubs, off-road crews and brand-owner
+              communities. Every club is reviewed with formal documentation (LTO, SEC or DTI)
+              before it goes live, so you always know who you're riding with.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to="/clubs">Browse all clubs</Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link to="/clubs/apply">Apply for a club</Link>
+            </Button>
+          </div>
         </div>
-      </div>
+        <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700">
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Verified members save 5% on 365 ads, boosts &amp; plans
+        </div>
+      </section>
+
+      <ClubDiscountExplainer />
+
+
       {loading ? (
         <div className="p-12 text-center text-muted-foreground">Loading…</div>
       ) : clubs.length === 0 ? (

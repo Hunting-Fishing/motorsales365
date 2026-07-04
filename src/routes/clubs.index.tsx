@@ -1,11 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search, ShieldCheck, Sparkles } from "lucide-react";
+import { FileCheck2, Rocket, Search, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ClubCard, type ClubCardData } from "@/components/clubs/club-card";
+import { ClubDiscountExplainer } from "@/components/clubs/club-discount-explainer";
+
 
 export const Route = createFileRoute("/clubs/")({
   head: () => ({
@@ -87,12 +89,10 @@ function ClubsIndexPage() {
           <div className="mt-4 flex flex-wrap gap-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700">
               <ShieldCheck className="h-3.5 w-3.5" />
-              Verified members save 5% on 365 ads, boosts & plans
-            </div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
-              More perks coming soon — insurance rates, parts discounts, event access.
+              Verified members save 5% on 365 ads, boosts &amp; plans
             </div>
           </div>
+
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
@@ -128,7 +128,81 @@ function ClubsIndexPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto space-y-8 px-4 py-8">
+        <section
+          aria-labelledby="about-clubs-heading"
+          className="rounded-2xl border border-border bg-card p-5 sm:p-6"
+        >
+          <h2
+            id="about-clubs-heading"
+            className="font-display text-xl font-bold text-foreground sm:text-2xl"
+          >
+            About Clubs on 365 MotorSales
+          </h2>
+          <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+            365 Clubs are formally accredited motoring groups — not open Facebook groups. Each one
+            is reviewed by our team before it's published so members and the wider community can
+            trust who they're riding with.
+          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-border bg-background/60 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <FileCheck2 className="h-4 w-4 text-primary" /> Accredited only
+              </div>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                Every club submits formal documentation — LTO accreditation, SEC or DTI
+                registration, or equivalent — and is approved by an admin before going live.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-background/60 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <Users className="h-4 w-4 text-primary" /> Community + safety
+              </div>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                Riding clubs, car clubs, off-road crews and brand-owner communities. See member
+                counts, region, upcoming events and RSVPs before you join.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-background/60 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <Sparkles className="h-4 w-4 text-primary" /> Verified member perks
+              </div>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                Members of a verified club unlock the 5% Club Member Discount on internal 365
+                purchases. More perks are on the roadmap.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <ClubDiscountExplainer />
+
+        <section
+          aria-labelledby="start-club-heading"
+          className="rounded-2xl border border-border bg-card p-5 sm:p-6"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary">
+                <Rocket className="h-4 w-4" /> Start a club
+              </div>
+              <h2
+                id="start-club-heading"
+                className="mt-1 font-display text-xl font-bold text-foreground sm:text-2xl"
+              >
+                Get your club listed
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                Three steps: submit your accreditation docs, wait for admin review, then publish
+                your page and invite members. Applications are usually reviewed within a few
+                business days.
+              </p>
+            </div>
+            <Button onClick={() => navigate({ to: "/clubs/apply" })}>Apply for a club</Button>
+          </div>
+        </section>
+
+
         {loading ? (
           <div className="p-12 text-center text-muted-foreground">Loading…</div>
         ) : filtered.length === 0 ? (
