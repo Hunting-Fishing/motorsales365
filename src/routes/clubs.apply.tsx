@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { FileText, ShieldCheck, Upload, X } from "lucide-react";
+import { AlertTriangle, FileText, Info, ShieldCheck, Upload, X } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -40,12 +40,11 @@ export const Route = createFileRoute("/clubs/apply")({
   validateSearch: (s: Record<string, unknown>) => {
     const str = (v: unknown, max: number) =>
       typeof v === "string" && v.trim().length > 0 ? v.slice(0, max) : undefined;
-    const t =
-      typeof s.type === "string" && (CLUB_TYPES as readonly string[]).includes(s.type)
-        ? (s.type as (typeof CLUB_TYPES)[number])
-        : undefined;
+    // Return the raw `type` string (even if not in the enum) so TanStack Router
+    // doesn't 307-strip it from the URL. Validity is derived in the component.
+    const rawType = str(s.type, 60);
     return {
-      type: t,
+      type: rawType,
       name: str(s.name, 120),
       description: str(s.description, 2000),
       region: str(s.region, 120),
@@ -74,9 +73,17 @@ function ApplyClubPage() {
   const createFn = useServerFn(createPendingClub);
   const attachFn = useServerFn(attachClubDocuments);
 
+  // Derive validity of the `type` search param. The validator keeps the raw
+  // string so we can render a helpful error when it doesn't match the enum.
+  const validPrefillType =
+    prefill.type && (CLUB_TYPES as readonly string[]).includes(prefill.type)
+      ? (prefill.type as (typeof CLUB_TYPES)[number])
+      : undefined;
+  const invalidType = prefill.type && !validPrefillType ? prefill.type : null;
+
   const [form, setForm] = useState({
     name: prefill.name ?? "",
-    type: prefill.type ?? "motorcycle_riding",
+    type: validPrefillType ?? "motorcycle_riding",
     description: prefill.description ?? "",
     region: prefill.region ?? "",
     city: prefill.city ?? "",
@@ -86,6 +93,9 @@ function ApplyClubPage() {
   });
   const [docs, setDocs] = useState<StagedDoc[]>([]);
   const [submitting, setSubmitting] = useState(false);
+
+
+
 
   function addFiles(files: FileList | null, kind: StagedDoc["kind"]) {
     if (!files || !files.length) return;
@@ -190,6 +200,46 @@ function ApplyClubPage() {
           </div>
         </div>
 
+        {invalidType && (
+          <div
+            role="alert"
+            className="mt-4 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm"
+          >
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+            <div>
+              <div className="font-semibold text-destructive">
+                We didn't recognise that club type ("{invalidType}")
+              </div>
+              <p className="mt-1 text-muted-foreground">
+                Pick the closest match from the Type dropdown below, or start the guided flow to
+                choose one.
+              </p>
+              <div className="mt-2">
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/clubs/start">Use the guided flow</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!validPrefillType && !invalidType && (
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-border bg-muted/40 p-3 text-sm">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+            <div>
+              <div className="font-semibold">Not sure which type to pick?</div>
+              <p className="mt-1 text-muted-foreground">
+                The guided flow walks you through role, club type and basic details before you
+                land here.{" "}
+                <Link to="/clubs/start" className="font-medium text-primary hover:underline">
+                  Start the guided flow
+                </Link>
+                .
+              </p>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={submit} className="mt-6 space-y-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
@@ -209,7 +259,7 @@ function ApplyClubPage() {
                 id="type"
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={form.type}
-                onChange={(e) => setForm({ ...form, type: e.target.value })}
+                onChange={(e) => setForm({ ...form, type: e.target.value as (typeof CLUB_TYPES)[number] })}
               >
                 <option value="motorcycle_riding">Motorcycle riding</option>
                 <option value="car_club">Car club</option>
