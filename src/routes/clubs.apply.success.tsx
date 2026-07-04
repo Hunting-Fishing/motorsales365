@@ -107,7 +107,7 @@ function ClubApplySuccessPage() {
               className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <Link
-                to="/dashboard/clubs/$id"
+                to="/dashboard/clubs_/$id"
                 params={{ id: club }}
                 aria-label="Open your club in the dashboard"
               >
