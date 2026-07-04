@@ -1,90 +1,54 @@
-# Club Member Discount (5% off internal purchases)
 
-Give verified-club members 5% off **365-controlled** purchases only: ad packages, listing boosts, subscription tiers, passport premium, featured placements. Excludes affiliate/partner/third-party items.
+## Goal
 
-## Eligibility rule
+Turn the Rides hub, the Clubs directory, and the Clubs tab on `/rides` into pages that actually explain what Rides and Clubs are on 365 MotorSales, and clearly document the **5% Club Member Discount** — eligibility, scope, and how it applies at checkout.
 
-A user qualifies at checkout if **all** are true:
-- Signed in
-- Has at least one `club_members` row with `status = 'active'`
-- That club has `status = 'active'` AND `verified = true`
+Right now these pages only show a one-line subtitle and a grid, so new visitors don't understand what a "Ride" is, what makes a Club "accredited", or why they'd bother applying.
 
-Rejected clubs, pending applications, suspended clubs, and pending join requests do NOT qualify. This keeps the incentive tied to real accreditation.
+## What gets added
 
-## Scope: what the 5% applies to
+### 1. `/rides` — Rides hub (`src/routes/rides.index.tsx`)
 
-In-scope (internal, 365-controlled):
-- Ad packages / ad orders (`ad_orders`, `ad_packages`)
-- Listing boosts (`listing_boosts`, `boost_products`)
-- Listing bundles (`bundle_purchases`, `listing_bundles`)
-- Subscription plans (`subscription_plans`, `business_plans`)
-- Passport premium (`passport_premium_products`)
-- Featured/promoted listings (`listing_promotions`)
+Under the existing hero, before the Rides/Clubs tabs, add a compact **"About Rides"** explainer strip (3 short cards):
 
-Out-of-scope (never discounted):
-- Affiliate links, partner products, parts marketplace sales, shop products, inspection orders paid to third-party providers, tow bids, part quotes, anything routed through outside sellers.
+- **What is a Ride?** — A public profile page for a specific vehicle (car, bike, truck, boat, project build) owned by a community member. Photos, specs, mods, and full service history in one place.
+- **Why post yours?** — Show off the build, keep a permanent service log, get likes/comments, and (optionally) mark it "for sale" to flip it straight into a marketplace listing.
+- **How it works** — Add your ride → upload photos → log mods and service → share the link. Free for all members.
 
-One discount at a time — does not stack with `customer_discounts` promo codes or staff promotions; system takes the larger of the two.
+Inside the **Rides tab content**, above the grid, keep a short line linking to "Add your ride" (already there — no duplication).
 
-## Data model (one small migration)
+Inside the **Clubs tab content** (currently just a subtitle + button), add the same "About Clubs" summary used on `/clubs` (see §2) so users landing on the tab get the full picture without navigating away.
 
-New table `club_member_discount_grants` (audit/log per applied discount):
-- `user_id`, `club_id`, `payment_id` (nullable link), `line_item_id`, `original_amount`, `discount_amount`, `applied_at`
-- RLS: user reads own; service_role all.
+### 2. `/clubs` — Clubs directory (`src/routes/clubs.index.tsx`)
 
-New helper SQL function `public.user_has_verified_club(_user_id uuid) returns boolean` (SECURITY DEFINER) — single source of truth used by server functions and RLS.
+Replace the current 2 pill-badges with a proper **"About Clubs on 365"** section between the hero and the search bar. Three cards:
 
-Config row in `pricing_settings`:
-- `club_member_discount_pct = 5` (so we can tune without redeploy)
-- `club_member_discount_enabled = true`
+- **Accredited only** — Every club is reviewed with formal documentation (LTO accreditation, SEC / DTI registration, or equivalent) before it's published. No fly-by-night groups.
+- **Community + safety** — Find riding groups, car clubs, off-road crews and brand-owner communities near you. See member counts, region, and upcoming events.
+- **Verified member perks** — Members of a verified club unlock a **5% Club Member Discount** on internal 365 purchases (see §3).
 
-## Server-side application
+Also add a compact **"Start a club"** CTA card explaining the application flow in 3 steps: Submit accreditation docs → Admin review → Publish and invite members.
 
-Discount is applied **server-side only** at checkout/order-creation server functions — never trusted from the client:
-- `createAdOrder`, `createBoostPurchase`, `createBundlePurchase`, `createSubscription`, `createPassportPremiumPurchase`
+### 3. New **Club Member Discount** explainer
 
-Each of these:
-1. Calls `user_has_verified_club(auth.uid())`.
-2. If true and item is in-scope, computes `discount = round(subtotal * pct / 100)`.
-3. Compares with any promo/staff discount; keeps the larger.
-4. Writes to `payment_line_items` as a discount line, inserts `club_member_discount_grants` row.
+A new shared component `src/components/clubs/club-discount-explainer.tsx` rendered on both `/clubs` (below the About cards) and inside the Clubs tab on `/rides`. Content — sourced from the existing project rule so it stays accurate:
 
-## UI surfaces
+- **What you get:** 5% off internal 365 MotorSales purchases.
+- **What it applies to:** ads, listing boosts, listing bundles, subscription plans, and Passport Premium.
+- **What it doesn't apply to:** third-party items (insurance quotes, partner parts, tow provider fees, external shops) — those aren't 365-controlled.
+- **Who's eligible:** signed-in members of a **verified** club whose membership is active. Membership status is re-checked at checkout; if you leave the club or the club loses verified status, the discount stops applying to future purchases.
+- **How it applies:** automatically at checkout on eligible purchases — no coupon code needed. You'll see a "Club member 5% off applied" note and the eligibility reason is recorded on the receipt.
+- **Stacking:** does not stack with other percentage discounts or promo coupons on the same purchase — the larger discount wins.
+- **Future perks:** insurance rates, parts discounts, and event access are on the roadmap but not live yet — the 5% off is the only live perk today.
 
-- **Checkout / pricing widgets** for ads, boosts, bundles, plans, passport: show "Club member 5% off" line when eligible; show "Join a verified club to save 5%" CTA linking to `/clubs` when not.
-- **`/clubs` and `/clubs/$slug`**: add perk badge "5% off 365 ads, boosts & plans" (replacing/joining the "Perks coming soon" placeholder for this specific real perk; insurance/parts discounts stay aspirational).
-- **`/dashboard/clubs`**: show "Your club discount is active" chip if user qualifies.
-- **`/pricing` and ad/boost landing pages**: small note "Verified club members save 5%".
+### 4. `/rides/$slug` and `/clubs/$slug`
 
-## Anti-abuse
+Out of scope for this pass. This plan only touches the two hub pages and the Clubs tab.
 
-- Discount tied to `verified = true` clubs only → requires accreditation doc review, which we already gate.
-- Leaving/being removed from a club revokes eligibility immediately (checked at purchase time, not cached).
-- Admin can toggle `club_member_discount_enabled` off globally, or set a club's `verified = false` to revoke.
-- Log every applied discount in `club_member_discount_grants` for audit and abuse review.
-- No self-approval: club owner still needs admin-approved verification to unlock the perk for members.
+## Technical notes
 
-## Policy updates (required by memory rules)
-
-- `/terms`: add a "Club member discount" clause — 5% off internal 365 purchases only, requires active membership in a verified club, may be changed or withdrawn, does not stack, no cash value.
-- `/refund-policy`: refunds computed on discounted amount.
-- Bump "Last updated" on both.
-- `mem://features/clubs.md`: add note that 5% internal-purchase discount is the first real perk; insurance/parts stay aspirational.
-
-## Out of scope (v1)
-
-- Per-club custom discount rates
-- Discounts on affiliate / third-party / marketplace items
-- Stacking with promo codes
-- Retroactive discounts on past purchases
-
-## Rollout order
-
-1. Migration (`club_member_discount_grants`, `user_has_verified_club`, `pricing_settings` rows)
-2. Wire discount into each in-scope server function + line-item writer
-3. UI: eligibility hook + checkout line + club/pricing CTAs
-4. Terms + refund policy + memory updates
-
-## Fairness note
-
-Yes — this pattern is common (alumni assocs, riding clubs, chambers of commerce negotiating vendor discounts for members). Because the discount is on **your own** products, there's no third party to renege, and the 5% is a real incentive without eroding margin the way affiliate rev-share would.
+- All new content is **presentation-only** — no schema changes, no server functions, no new queries. Reuses the existing hero + grid layout.
+- New file: `src/components/clubs/club-discount-explainer.tsx` (pure presentational, no props required beyond an optional `className`).
+- Edits: `src/routes/rides.index.tsx` (add "About Rides" strip; expand Clubs tab with "About Clubs" summary + `<ClubDiscountExplainer />`), `src/routes/clubs.index.tsx` (replace pill badges with "About Clubs" cards + `<ClubDiscountExplainer />` + "Start a club" CTA).
+- Meta descriptions on both routes stay as-is; content is what changes.
+- No terms/privacy changes needed — the discount rules described here already match the live policy captured in project memory. If the % or scope ever changes, this copy plus `/terms` must both be updated.
