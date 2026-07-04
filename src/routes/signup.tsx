@@ -538,7 +538,7 @@ function SignupPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div id="field-phone">
-              <Label htmlFor="phone">Mobile (optional)</Label>
+              <Label htmlFor="phone">Mobile <span className="text-destructive">*</span></Label>
               <PhoneInput
                 id="phone"
                 iso={phoneIso}
