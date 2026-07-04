@@ -1,66 +1,33 @@
+## Problem
 
-## Goal
+Jocelyn's DB row (`profiles` for `jocelyn.roldan@365motorsales.com`) has `phone`, `phone_e164`, `personal_email`, `street_address`, `postal_code`, `signup_intent` all `NULL`. The Edit User Profile dialog is correctly rendering what's stored — the data was never persisted at creation time.
 
-Replace the static "What to expect next" list on `/clubs/apply/success` with a real approval timeline anchored to the milestone dates already returned by `getMyClubStatus` (`created_at`, `updated_at`, `reviewed_at`), plus a status-aware "what happens next" step at the end.
+Root cause: `src/routes/api/admin/create-user.tsx` runs the post-create `profiles.update(profilePatch)` **without checking `error` and without logging which fields were sent**. If the update ever fails, or if an admin submits a tab with empty fields, we get a silent success. The audit log only records `{email, new_user_id, account_type, roles}` — we can't tell after the fact whether phone/personal_email/address were actually posted. The Edit dialog's save path (`admin-profile.functions.ts`) already persists these columns correctly, so the write layer works — only the create path is unobservable.
 
-## Data (already available, no server changes)
+## Fix — Code (harden Create User)
 
-From `getMyClubStatus`:
-- `created_at` → **Submitted**
-- `reviewed_at` (when set) → **Reviewed** (admin decision timestamp)
-- `updated_at` → **Last updated** (any change: resubmission, admin edit, etc.)
-- `status` → drives the final "next" step + review-notes rendering
-- `document_count` → shown on the Submitted row as sub-detail
+**File:** `src/routes/api/admin/create-user.tsx`
 
-## UX — new `<ApprovalTimeline />` in `src/routes/clubs.apply.success.tsx`
+1. Check the result of `sb.from("profiles").update(profilePatch)`:
+   - On error: audit-log `outcome:"error"` with `error_message: "Profile patch failed: <msg>"` and the list of attempted keys, and return HTTP 207 with `{ ok: true, userId, warning: "Profile fields not saved: <msg>" }` so the client can toast the warning (user is created, but admin knows to reopen and re-save).
+2. Extend the successful `target_summary` on the audit log to include `patched_fields: Object.keys(profilePatch)` and boolean flags `{ had_phone, had_personal_email, had_street_address, had_business_address }` — this way every future creation records exactly what was written, without logging PII values.
+3. Log a second `outcome: "allowed"` audit entry (or extend the existing one) that always includes `patched_field_count` so we can spot future silent-empty submissions.
 
-Vertical timeline rendered inside a new card that replaces the current "What to expect next" section. Each milestone is a row with an icon-in-circle marker, a connecting line to the next row, a title, an absolute date + relative "x days ago", and a short sub-line.
+**File:** `src/components/admin/add-user-dialog.tsx`
 
-Milestone rows (in order):
+4. On the response, if `data.warning` is present, `toast.error(data.warning)` instead of the silent success toast — surfaces any partial failure to the admin at creation time.
+5. Small UX guard: if all Address-tab fields and Phone are empty when the admin clicks Create, show a non-blocking confirm ("You didn't enter phone or address for this user. Create anyway?") — prevents accidental empty profiles going forward.
 
-1. **Submitted** — always shown, `completed`.
-   - Date: `created_at`.
-   - Sub: `"{document_count} document{s} attached"`.
-   - Icon: `FileText`.
+No schema changes. No changes to the trigger, RLS, or Edit dialog.
 
-2. **Under review** — always shown.
-   - `completed` when `status === "active" | "rejected" | "suspended"`; `current` when `status === "pending"`.
-   - Date: `reviewed_at` when completed; "In progress" text when current.
-   - Sub (pending): `"Typically 1–3 business days"`.
-   - Icon: `Clock` (current) / `ShieldCheck` (completed).
+## Fix — Data (backfill Jocelyn)
 
-3. **Decision** — shown once `reviewed_at` is set OR status is terminal.
-   - `active` → title "Approved & live", green, `ShieldCheck`, sub: "Your club page is live. Verified members get the 5% Club Member Discount."
-   - `rejected` → title "Needs changes", destructive, `XCircle`, sub: reviewer notes (fallback: "Check the reviewer notes above and resubmit updated documents below.").
-   - `suspended` → title "Suspended", destructive, `ShieldX`, sub: "Contact support for next steps."
+I'll ask again in one prompt for her actual values (phone, personal email, street address, city, province, region, postal code) and then run a single `UPDATE public.profiles SET ... WHERE id = '9bf7f511-1283-49bd-b8c9-1cd970723983'` via the insert tool. Phone will be normalized to E.164 the same way the create-user route does.
 
-4. **Last updated** — shown only when `updated_at` differs from both `created_at` and `reviewed_at` (i.e. there's been a meaningful change after review, e.g. after resubmission).
-   - Sub: `"Awaiting re-review"` when status is back to `pending` post-review; otherwise `"Details updated"`.
-   - Icon: `RefreshCw`.
+If you'd rather fix her via the Edit dialog yourself, the "Edit User Profile" modal you showed already saves these fields correctly — just type them in and Save.
 
-5. **Next step** — always the final row, `upcoming` styling (dashed marker), tailored to status:
-   - `pending` → "We'll email you the decision" (`Mail`).
-   - `active` → "Add logo, cover & first post" with a link to `/dashboard/clubs_/$id` (`LayoutDashboard`).
-   - `rejected` → "Resubmit updated documents" pointing to the existing resubmit panel below (`Upload`).
-   - `suspended` → "Contact support" (`Mail`).
+## Verification
 
-## Formatting
-
-- Add a small helper `formatDate(iso)` → `Intl.DateTimeFormat("en", { dateStyle: "medium" })` (e.g. "Jul 4, 2026").
-- Add `relativeFromNow(iso)` → `Intl.RelativeTimeFormat("en", { numeric: "auto" })` producing "2 days ago" / "today".
-- Both helpers live at module scope in the same file — no new deps.
-
-## Visuals
-
-- Card matches existing rounded-2xl / border / bg-card style.
-- Marker circles: 8×8, colored per state (`muted` for upcoming, `primary/10` for current, `emerald/15` for completed-positive, `destructive/10` for negative).
-- Vertical connector: 2px line via `border-l` on a padded column, hidden on the last row.
-- `aria-live="polite"` on the timeline so refetches (after resubmission) announce updates.
-- Skeleton state while `isLoading` (three greyed rows).
-- Error state: fallback to the current concise "What to expect next" copy so the page still helps if the fetch fails.
-
-## Out of scope
-
-- No new server fn, no schema/migration, no changes to the resubmit panel or CTAs at the bottom.
-- No history table — timeline uses only the three timestamps we already have.
-- No changes to `/dashboard/clubs_/$id` or admin flows.
+- Re-query `profiles` for Jocelyn after the data patch to confirm all four fields are populated.
+- Create one throwaway test user through Add User with phone + personal email + address filled → confirm `route_audit_log.target_summary` now contains `patched_fields` and the flags.
+- Create one throwaway test user with those fields left blank → confirm the confirm-dialog appears; if forced through, confirm the audit row shows `patched_field_count` reflecting only the fields sent.
