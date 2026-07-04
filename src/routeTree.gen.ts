@@ -31,6 +31,7 @@ import { Route as PartsRouteImport } from './routes/parts'
 import { Route as PartnerTrainingRouteImport } from './routes/partner-training'
 import { Route as PartnerProgramRouteImport } from './routes/partner-program'
 import { Route as MyQrRouteImport } from './routes/my-qr'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
@@ -178,6 +179,8 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as AdminAdvertisementsRouteImport } from './routes/admin.advertisements'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
 import { Route as AdminAdvertisementsIndexRouteImport } from './routes/admin.advertisements.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
@@ -228,6 +231,7 @@ import { Route as AuthenticatedAdminClubDiscountPromotionsRouteImport } from './
 import { Route as AuthenticatedAccountTrustScoreRouteImport } from './routes/_authenticated/account.trust-score'
 import { Route as AuthenticatedAccountRewardsRouteImport } from './routes/_authenticated/account.rewards'
 import { Route as AuthenticatedAccountDisputesRouteImport } from './routes/_authenticated/account.disputes'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DashboardBusinessBusinessIdIndexRouteImport } from './routes/dashboard.business.$businessId.index'
 import { Route as PartsPNetworkSkuRouteImport } from './routes/parts.p.$network.$sku'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -376,6 +380,11 @@ const PartnerProgramRoute = PartnerProgramRouteImport.update({
 const MyQrRoute = MyQrRouteImport.update({
   id: '/my-qr',
   path: '/my-qr',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MapRoute = MapRouteImport.update({
@@ -1115,6 +1124,18 @@ const AdminAccountsRoute = AdminAccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => AdminRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardTeamIndexRoute = DashboardTeamIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -1390,6 +1411,12 @@ const AuthenticatedAccountDisputesRoute =
     path: '/account/disputes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardBusinessBusinessIdIndexRoute =
   DashboardBusinessBusinessIdIndexRouteImport.update({
     id: '/',
@@ -1635,6 +1662,7 @@ export interface FileRoutesByFullPath {
   '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
+  '/mcp': typeof McpRoute
   '/my-qr': typeof MyQrRoute
   '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
@@ -1657,6 +1685,8 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
@@ -1785,6 +1815,7 @@ export interface FileRoutesByFullPath {
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
@@ -1891,6 +1922,7 @@ export interface FileRoutesByTo {
   '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
+  '/mcp': typeof McpRoute
   '/my-qr': typeof MyQrRoute
   '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
@@ -1913,6 +1945,8 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -2039,6 +2073,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopIndexRoute
   '/wanted-parts': typeof WantedPartsIndexRoute
   '/wanted': typeof WantedIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
@@ -2149,6 +2184,7 @@ export interface FileRoutesById {
   '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
+  '/mcp': typeof McpRoute
   '/my-qr': typeof MyQrRoute
   '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
@@ -2171,6 +2207,8 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
@@ -2299,6 +2337,7 @@ export interface FileRoutesById {
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/_authenticated/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/_authenticated/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
@@ -2410,6 +2449,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/login'
     | '/map'
+    | '/mcp'
     | '/my-qr'
     | '/partner-program'
     | '/partner-training'
@@ -2432,6 +2472,8 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/verified'
     | '/verify-email'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/accounts'
     | '/admin/advertisements'
     | '/admin/alerts'
@@ -2560,6 +2602,7 @@ export interface FileRouteTypes {
     | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
+    | '/.mcp/invoke-tool/$tool'
     | '/account/disputes'
     | '/account/rewards'
     | '/account/trust-score'
@@ -2666,6 +2709,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/login'
     | '/map'
+    | '/mcp'
     | '/my-qr'
     | '/partner-program'
     | '/partner-training'
@@ -2688,6 +2732,8 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/verified'
     | '/verify-email'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/accounts'
     | '/admin/alerts'
     | '/admin/analytics'
@@ -2814,6 +2860,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/wanted-parts'
     | '/wanted'
+    | '/.mcp/invoke-tool/$tool'
     | '/account/disputes'
     | '/account/rewards'
     | '/account/trust-score'
@@ -2923,6 +2970,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/login'
     | '/map'
+    | '/mcp'
     | '/my-qr'
     | '/partner-program'
     | '/partner-training'
@@ -2945,6 +2993,8 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/verified'
     | '/verify-email'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/accounts'
     | '/admin/advertisements'
     | '/admin/alerts'
@@ -3073,6 +3123,7 @@ export interface FileRouteTypes {
     | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
+    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/account/disputes'
     | '/_authenticated/account/rewards'
     | '/_authenticated/account/trust-score'
@@ -3184,6 +3235,7 @@ export interface RootRouteChildren {
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
+  McpRoute: typeof McpRoute
   MyQrRoute: typeof MyQrRoute
   PartnerProgramRoute: typeof PartnerProgramRouteWithChildren
   PartnerTrainingRoute: typeof PartnerTrainingRoute
@@ -3206,6 +3258,8 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   VerifiedRoute: typeof VerifiedRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiRobotsDottxtRoute: typeof ApiRobotsDottxtRoute
   BSlugRoute: typeof BSlugRoute
   BoostCheckoutRoute: typeof BoostCheckoutRoute
@@ -3257,6 +3311,7 @@ export interface RootRouteChildren {
   ShopIndexRoute: typeof ShopIndexRoute
   WantedPartsIndexRoute: typeof WantedPartsIndexRoute
   WantedIndexRoute: typeof WantedIndexRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
   ApiPublicGeoSearchRoute: typeof ApiPublicGeoSearchRoute
   ApiPublicGeocodeRoute: typeof ApiPublicGeocodeRoute
@@ -3447,6 +3502,13 @@ declare module '@tanstack/react-router' {
       path: '/my-qr'
       fullPath: '/my-qr'
       preLoaderRoute: typeof MyQrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/map': {
@@ -4478,6 +4540,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAccountsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/team/': {
       id: '/dashboard/team/'
       path: '/'
@@ -4827,6 +4903,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/disputes'
       preLoaderRoute: typeof AuthenticatedAccountDisputesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/dashboard/business/$businessId/': {
       id: '/dashboard/business/$businessId/'
@@ -5595,6 +5678,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsDottxtRoute: LlmsDottxtRoute,
   LoginRoute: LoginRoute,
   MapRoute: MapRoute,
+  McpRoute: McpRoute,
   MyQrRoute: MyQrRoute,
   PartnerProgramRoute: PartnerProgramRouteWithChildren,
   PartnerTrainingRoute: PartnerTrainingRoute,
@@ -5617,6 +5701,9 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   VerifiedRoute: VerifiedRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
   BSlugRoute: BSlugRoute,
   BoostCheckoutRoute: BoostCheckoutRoute,
@@ -5668,6 +5755,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopIndexRoute: ShopIndexRoute,
   WantedPartsIndexRoute: WantedPartsIndexRoute,
   WantedIndexRoute: WantedIndexRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
   ApiPublicGeoSearchRoute: ApiPublicGeoSearchRoute,
   ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,
