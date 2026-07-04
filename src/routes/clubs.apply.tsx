@@ -87,6 +87,30 @@ function ApplyClubPage() {
   const [docs, setDocs] = useState<StagedDoc[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
+  // Detect an invalid `?type=...` value from the raw URL. The route validator
+  // strips unknown types, so we read the original param straight from the
+  // browser (client-only) to surface a helpful error banner.
+  const [invalidType, setInvalidType] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const read = () => {
+      const raw = new URLSearchParams(window.location.search).get("type");
+      if (
+        raw &&
+        raw.trim().length > 0 &&
+        !(CLUB_TYPES as readonly string[]).includes(raw)
+      ) {
+        setInvalidType(raw.slice(0, 60));
+      } else {
+        setInvalidType(null);
+      }
+    };
+    read();
+    window.addEventListener("popstate", read);
+    return () => window.removeEventListener("popstate", read);
+  }, []);
+
+
   function addFiles(files: FileList | null, kind: StagedDoc["kind"]) {
     if (!files || !files.length) return;
     const arr = Array.from(files).map((f) => ({ file: f, kind }));
