@@ -40,12 +40,11 @@ export const Route = createFileRoute("/clubs/apply")({
   validateSearch: (s: Record<string, unknown>) => {
     const str = (v: unknown, max: number) =>
       typeof v === "string" && v.trim().length > 0 ? v.slice(0, max) : undefined;
-    const t =
-      typeof s.type === "string" && (CLUB_TYPES as readonly string[]).includes(s.type)
-        ? (s.type as (typeof CLUB_TYPES)[number])
-        : undefined;
+    // Return the raw `type` string (even if not in the enum) so TanStack Router
+    // doesn't 307-strip it from the URL. Validity is derived in the component.
+    const rawType = str(s.type, 60);
     return {
-      type: t,
+      type: rawType,
       name: str(s.name, 120),
       description: str(s.description, 2000),
       region: str(s.region, 120),
