@@ -104,6 +104,65 @@ export const attachClubDocuments = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const ResubmitInput = z.object({
+  club_id: z.string().uuid(),
+  documents: z
+    .array(
+      z.object({
+        kind: z.enum(DOC_KINDS),
+        storage_path: z.string().min(3).max(500),
+        original_filename: z.string().max(200).optional().nullable(),
+      }),
+    )
+    .min(1)
+    .max(6),
+});
+
+export const resubmitClubApplication = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => ResubmitInput.parse(i))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: club, error: loadErr } = await supabase
+      .from("clubs" as never)
+      .select("id,owner_id,status")
+      .eq("id", data.club_id)
+      .maybeSingle();
+    if (loadErr) throw new Error(loadErr.message);
+    if (!club) throw new Error("Club not found");
+    const c = club as any;
+    if (c.owner_id !== userId) throw new Error("Not authorized");
+    if (c.status !== "rejected") {
+      throw new Error("This club is not awaiting resubmission");
+    }
+
+    const docRows = data.documents.map((d) => ({
+      club_id: data.club_id,
+      kind: d.kind,
+      storage_path: d.storage_path,
+      original_filename: d.original_filename ?? null,
+      uploaded_by: userId,
+    }));
+    const { error: insertErr } = await supabase
+      .from("club_documents" as never)
+      .insert(docRows as never);
+    if (insertErr) throw new Error(insertErr.message);
+
+    const { error: updErr } = await supabase
+      .from("clubs" as never)
+      .update({
+        status: "pending",
+        review_notes: null,
+        reviewed_at: null,
+        reviewed_by: null,
+        updated_at: new Date().toISOString(),
+      } as never)
+      .eq("id", data.club_id);
+    if (updErr) throw new Error(updErr.message);
+
+    return { ok: true };
+  });
+
 export const listMyClubs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
