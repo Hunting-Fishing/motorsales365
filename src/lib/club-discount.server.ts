@@ -314,6 +314,22 @@ async function lookupClubName(
   }
 }
 
+async function lookupClubSlug(
+  admin: SupabaseClient<any, any, any>,
+  clubId: string,
+): Promise<string | null> {
+  try {
+    const { data } = await admin
+      .from("clubs" as never)
+      .select("slug")
+      .eq("id", clubId)
+      .maybeSingle();
+    return (data as any)?.slug ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Notify a single user that they've become eligible for the club discount.
  * Best-effort. Skipped when the user isn't currently eligible per config,
