@@ -38,10 +38,19 @@ export const Route = createFileRoute("/clubs/apply")({
     links: [{ rel: "canonical", href: "https://www.365motorsales.com/clubs/apply" }],
   }),
   validateSearch: (s: Record<string, unknown>) => {
-    const t = typeof s.type === "string" && (CLUB_TYPES as readonly string[]).includes(s.type)
-      ? (s.type as (typeof CLUB_TYPES)[number])
-      : undefined;
-    return { type: t };
+    const str = (v: unknown, max: number) =>
+      typeof v === "string" && v.trim().length > 0 ? v.slice(0, max) : undefined;
+    const t =
+      typeof s.type === "string" && (CLUB_TYPES as readonly string[]).includes(s.type)
+        ? (s.type as (typeof CLUB_TYPES)[number])
+        : undefined;
+    return {
+      type: t,
+      name: str(s.name, 120),
+      description: str(s.description, 2000),
+      region: str(s.region, 120),
+      city: str(s.city, 120),
+    };
   },
   component: ApplyClubPage,
 });
@@ -61,16 +70,16 @@ type StagedDoc = {
 function ApplyClubPage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const { type: prefilledType } = Route.useSearch();
+  const prefill = Route.useSearch();
   const createFn = useServerFn(createPendingClub);
   const attachFn = useServerFn(attachClubDocuments);
 
   const [form, setForm] = useState({
-    name: "",
-    type: prefilledType ?? "motorcycle_riding",
-    description: "",
-    region: "",
-    city: "",
+    name: prefill.name ?? "",
+    type: prefill.type ?? "motorcycle_riding",
+    description: prefill.description ?? "",
+    region: prefill.region ?? "",
+    city: prefill.city ?? "",
     contact_email: "",
     contact_phone: "",
     website_url: "",
