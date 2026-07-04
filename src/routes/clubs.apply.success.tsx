@@ -239,106 +239,12 @@ function ClubApplySuccessPage() {
           </section>
         )}
 
-        <section
-          aria-labelledby="next-steps-heading"
-          className="mt-6 rounded-2xl border border-border bg-card p-5 sm:p-6"
-        >
-          <h2 id="next-steps-heading" className="font-display text-lg font-semibold">
-            What to expect next
-          </h2>
-          {status === "active" ? (
-            <ol className="mt-4 space-y-4">
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600">
-                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">You're approved</div>
-                  <p className="text-sm text-muted-foreground">
-                    Your public club page is live. Verified members are eligible for the 5% Club
-                    Member Discount on internal 365 purchases.
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <FileText className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">Add logo, cover &amp; first post</div>
-                  <p className="text-sm text-muted-foreground">
-                    Open your club in the dashboard to add media, post a first ride or event, and
-                    invite members.
-                  </p>
-                </div>
-              </li>
-            </ol>
-          ) : status === "rejected" ? (
-            <ol className="mt-4 space-y-4">
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-                  <Mail className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">Check your email</div>
-                  <p className="text-sm text-muted-foreground">
-                    Reply to the review email with the requested changes or new documents.
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <FileText className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">Update &amp; resubmit</div>
-                  <p className="text-sm text-muted-foreground">
-                    Open your club in the dashboard to upload new documents. We'll re-review once
-                    you notify us.
-                  </p>
-                </div>
-              </li>
-            </ol>
-          ) : (
-            <ol className="mt-4 space-y-4">
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Clock className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">Admin review (1–3 business days)</div>
-                  <p className="text-sm text-muted-foreground">
-                    Our team verifies your accreditation documents (LTO, SEC, DTI, or equivalent).
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Mail className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">We'll email you the decision</div>
-                  <p className="text-sm text-muted-foreground">
-                    You'll get a notification at the contact email you provided. If we need more
-                    info, we'll reach out from there.
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <FileText className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <div className="font-medium">Publish and invite members</div>
-                  <p className="text-sm text-muted-foreground">
-                    Once approved, your club page goes live. You can then add a logo/cover, post
-                    rides &amp; events, and invite members.
-                  </p>
-                </div>
-              </li>
-            </ol>
-          )}
-        </section>
+        <ApprovalTimeline
+          clubId={club}
+          data={data ?? null}
+          isLoading={isLoading}
+          isError={isError}
+        />
 
         {club && status === "rejected" && (
           <ResubmitDocumentsPanel clubId={club} onResubmitted={() => refetch()} />
