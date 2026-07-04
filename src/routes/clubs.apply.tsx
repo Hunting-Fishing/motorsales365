@@ -40,40 +40,16 @@ export const Route = createFileRoute("/clubs/apply")({
   validateSearch: (s: Record<string, unknown>) => {
     const str = (v: unknown, max: number) =>
       typeof v === "string" && v.trim().length > 0 ? v.slice(0, max) : undefined;
-    const looksInvalid = (v: unknown) =>
-      typeof v === "string" &&
-      v.trim().length > 0 &&
-      !(CLUB_TYPES as readonly string[]).includes(v);
     const t =
       typeof s.type === "string" && (CLUB_TYPES as readonly string[]).includes(s.type)
         ? (s.type as (typeof CLUB_TYPES)[number])
         : undefined;
-    // Preserve the offending value across TanStack Router's URL canonicalisation
-    // (invalid `type=...` gets stripped, so we re-emit it under `invalidType=...`
-    // and read it back on the redirected request so the banner survives).
-    const initialInvalid = looksInvalid(s.type) ? String(s.type).slice(0, 60) : undefined;
-    const passthroughInvalid = looksInvalid(s.invalidType)
-      ? String(s.invalidType).slice(0, 60)
-      : undefined;
-    const invalidType = initialInvalid ?? passthroughInvalid;
-    const name = str(s.name, 120);
-    const description = str(s.description, 2000);
-    const region = str(s.region, 120);
-    const city = str(s.city, 120);
     return {
-      ...(t ? { type: t } : {}),
-      ...(invalidType ? { invalidType } : {}),
-      ...(name ? { name } : {}),
-      ...(description ? { description } : {}),
-      ...(region ? { region } : {}),
-      ...(city ? { city } : {}),
-    } as {
-      type?: (typeof CLUB_TYPES)[number];
-      invalidType?: string;
-      name?: string;
-      description?: string;
-      region?: string;
-      city?: string;
+      type: t,
+      name: str(s.name, 120),
+      description: str(s.description, 2000),
+      region: str(s.region, 120),
+      city: str(s.city, 120),
     };
   },
   component: ApplyClubPage,
