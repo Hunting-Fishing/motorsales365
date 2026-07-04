@@ -202,7 +202,7 @@ function ClubsIndexPage() {
                 business days.
               </p>
             </div>
-            <Button onClick={() => navigate({ to: "/clubs/apply" })}>Apply for a club</Button>
+            <Button onClick={() => navigate({ to: "/clubs/start" })}>Start a club</Button>
           </div>
         </section>
 
