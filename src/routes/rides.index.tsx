@@ -286,7 +286,7 @@ function ClubsTab() {
               <Link to="/clubs">Browse all clubs</Link>
             </Button>
             <Button asChild size="sm">
-              <Link to="/clubs/apply">Apply for a club</Link>
+              <Link to="/clubs/start">Start a club</Link>
             </Button>
           </div>
         </div>

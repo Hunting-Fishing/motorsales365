@@ -124,6 +124,7 @@ import { Route as DashboardBoostsRouteImport } from './routes/dashboard.boosts'
 import { Route as DashboardBlockedRouteImport } from './routes/dashboard.blocked'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as DashboardAdsRouteImport } from './routes/dashboard.ads'
+import { Route as ClubsStartRouteImport } from './routes/clubs.start'
 import { Route as ClubsApplyRouteImport } from './routes/clubs.apply'
 import { Route as ClubsSlugRouteImport } from './routes/clubs.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -840,6 +841,11 @@ const DashboardAdsRoute = DashboardAdsRouteImport.update({
   id: '/ads',
   path: '/ads',
   getParentRoute: () => DashboardRoute,
+} as any)
+const ClubsStartRoute = ClubsStartRouteImport.update({
+  id: '/clubs/start',
+  path: '/clubs/start',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ClubsApplyRoute = ClubsApplyRouteImport.update({
   id: '/clubs/apply',
@@ -1698,6 +1704,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/clubs/$slug': typeof ClubsSlugRoute
   '/clubs/apply': typeof ClubsApplyRoute
+  '/clubs/start': typeof ClubsStartRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/blocked': typeof DashboardBlockedRoute
@@ -1951,6 +1958,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/clubs/$slug': typeof ClubsSlugRoute
   '/clubs/apply': typeof ClubsApplyRoute
+  '/clubs/start': typeof ClubsStartRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/blocked': typeof DashboardBlockedRoute
@@ -2208,6 +2216,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/clubs/$slug': typeof ClubsSlugRoute
   '/clubs/apply': typeof ClubsApplyRoute
+  '/clubs/start': typeof ClubsStartRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/blocked': typeof DashboardBlockedRoute
@@ -2467,6 +2476,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/clubs/$slug'
     | '/clubs/apply'
+    | '/clubs/start'
     | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/blocked'
@@ -2720,6 +2730,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/clubs/$slug'
     | '/clubs/apply'
+    | '/clubs/start'
     | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/blocked'
@@ -2976,6 +2987,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/clubs/$slug'
     | '/clubs/apply'
+    | '/clubs/start'
     | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/blocked'
@@ -3193,6 +3205,7 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   ClubsSlugRoute: typeof ClubsSlugRoute
   ClubsApplyRoute: typeof ClubsApplyRoute
+  ClubsStartRoute: typeof ClubsStartRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GoProductIdRoute: typeof GoProductIdRoute
   HelpPayWithGcashRoute: typeof HelpPayWithGcashRoute
@@ -4074,6 +4087,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/ads'
       preLoaderRoute: typeof DashboardAdsRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/clubs/start': {
+      id: '/clubs/start'
+      path: '/clubs/start'
+      fullPath: '/clubs/start'
+      preLoaderRoute: typeof ClubsStartRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/clubs/apply': {
       id: '/clubs/apply'
@@ -5577,6 +5597,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   ClubsSlugRoute: ClubsSlugRoute,
   ClubsApplyRoute: ClubsApplyRoute,
+  ClubsStartRoute: ClubsStartRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GoProductIdRoute: GoProductIdRoute,
   HelpPayWithGcashRoute: HelpPayWithGcashRoute,
