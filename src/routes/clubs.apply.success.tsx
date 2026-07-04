@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -8,13 +9,36 @@ import {
   LayoutDashboard,
   Loader2,
   Mail,
+  Paperclip,
   ShieldCheck,
   ShieldX,
+  Upload,
+  X,
   XCircle,
 } from "lucide-react";
+import { toast } from "sonner";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
-import { getMyClubStatus } from "@/lib/clubs.functions";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { getMyClubStatus, resubmitClubApplication } from "@/lib/clubs.functions";
+
+const DOC_KINDS = [
+  { value: "lto_accreditation", label: "LTO Accreditation" },
+  { value: "sec_incorporation", label: "SEC Certificate of Incorporation" },
+  { value: "dti_business_permit", label: "DTI / Business Permit" },
+  { value: "other", label: "Other formal document" },
+] as const;
+
+type DocKind = (typeof DOC_KINDS)[number]["value"];
+type StagedDoc = { file: File; kind: DocKind };
 
 export const Route = createFileRoute("/clubs/apply/success")({
   head: () => ({
