@@ -163,7 +163,9 @@ export function ListingQr({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {compact ? (
+        {trigger ? (
+          trigger
+        ) : compact ? (
           <Button
             variant={triggerVariant}
             size="sm"
@@ -179,6 +181,7 @@ export function ListingQr({
           </Button>
         )}
       </DialogTrigger>
+
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
