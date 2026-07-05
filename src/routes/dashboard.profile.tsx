@@ -258,7 +258,7 @@ function ProfilePage() {
           )}
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <div>
+          <div id="field-first_name">
             <Label htmlFor="first-name">First name</Label>
             <Input
               id="first-name"
@@ -267,7 +267,7 @@ function ProfilePage() {
               onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
             />
           </div>
-          <div>
+          <div id="field-last_name">
             <Label htmlFor="last-name">Last name</Label>
             <Input
               id="last-name"
@@ -277,7 +277,7 @@ function ProfilePage() {
             />
           </div>
         </div>
-        <div>
+        <div id="field-phone">
           <Label>Phone</Label>
           <PhoneInput
             iso={profilePhone.iso}
