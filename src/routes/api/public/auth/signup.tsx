@@ -111,6 +111,7 @@ export const Route = createFileRoute("/api/public/auth/signup")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const sbAdmin = admin();
         try {
           const json = await request.json().catch(() => null);
           const parsed = Body.safeParse(json);
@@ -119,12 +120,26 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               field: String(i.path[0] ?? ""),
               message: i.message,
             }));
+            await logSignupFailure(sbAdmin, request, {
+              reason: "schema_invalid",
+              missing_fields: Array.from(new Set(errors.map((e) => e.field).filter(Boolean))),
+              status_code: 422,
+              intent: (json as any)?.intent ?? null,
+              phone_iso: (json as any)?.phone_iso ?? null,
+            });
             return Response.json({ ok: false, errors }, { status: 422 });
           }
           const input = parsed.data;
           const errors: ErrorList = [];
 
           if (isStaffEmail(input.email)) {
+            await logSignupFailure(sbAdmin, request, {
+              reason: "staff_domain_blocked",
+              missing_fields: [],
+              status_code: 403,
+              intent: input.intent,
+              phone_iso: input.phone_iso,
+            });
             return Response.json(
               {
                 ok: false,
@@ -166,11 +181,17 @@ export const Route = createFileRoute("/api/public/auth/signup")({
           }
 
           if (errors.length > 0) {
+            await logSignupFailure(sbAdmin, request, {
+              reason: "field_validation_failed",
+              missing_fields: Array.from(new Set(errors.map((e) => e.field).filter(Boolean))),
+              status_code: 422,
+              intent: input.intent,
+              phone_iso: input.phone_iso,
+            });
             return Response.json({ ok: false, errors }, { status: 422 });
           }
 
           const emailLower = input.email.toLowerCase();
-          const sbAdmin = admin();
 
           // Check for existing account up front so the response is deterministic.
           const { data: existing } = await (sbAdmin as any)
@@ -180,6 +201,13 @@ export const Route = createFileRoute("/api/public/auth/signup")({
             .eq("email", emailLower)
             .maybeSingle();
           if (existing) {
+            await logSignupFailure(sbAdmin, request, {
+              reason: "email_already_registered",
+              missing_fields: ["email"],
+              status_code: 409,
+              intent: input.intent,
+              phone_iso: input.phone_iso,
+            });
             return Response.json(
               { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
               { status: 409 },
@@ -214,6 +242,13 @@ export const Route = createFileRoute("/api/public/auth/signup")({
             }
           })();
           if (!originUrl) {
+            await logSignupFailure(sbAdmin, request, {
+              reason: "invalid_origin",
+              missing_fields: ["origin"],
+              status_code: 400,
+              intent: input.intent,
+              phone_iso: input.phone_iso,
+            });
             return Response.json(
               { ok: false, errors: [{ field: "origin", message: "Invalid origin." }] },
               { status: 400 },
@@ -224,9 +259,6 @@ export const Route = createFileRoute("/api/public/auth/signup")({
             : "";
           const emailRedirectTo = `${originUrl}/verify-email?intent=${input.intent}${redirectQuery}`;
 
-          // Use the publishable-key client so Supabase sends the standard
-          // confirmation email using the configured template. Admin
-          // createUser + generateLink would skip that flow.
           const sbPub = pub();
           const { data, error } = await sbPub.auth.signUp({
             email: emailLower,
@@ -236,25 +268,42 @@ export const Route = createFileRoute("/api/public/auth/signup")({
           if (error) {
             const msg = error.message || "";
             if (/already|registered|exists|in use/i.test(msg)) {
+              await logSignupFailure(sbAdmin, request, {
+                reason: "email_already_registered",
+                missing_fields: ["email"],
+                status_code: 409,
+                intent: input.intent,
+                phone_iso: input.phone_iso,
+              });
               return Response.json(
                 { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
                 { status: 409 },
               );
             }
+            await logSignupFailure(sbAdmin, request, {
+              reason: "auth_signup_error",
+              missing_fields: [],
+              status_code: 400,
+              intent: input.intent,
+              phone_iso: input.phone_iso,
+            });
             return Response.json({ ok: false, errors: [{ field: "email", message: msg }] }, { status: 400 });
           }
-          // Supabase returns identities=[] when the email exists.
           const identities = (data.user as { identities?: unknown[] } | null)?.identities;
           if (data.user && Array.isArray(identities) && identities.length === 0) {
+            await logSignupFailure(sbAdmin, request, {
+              reason: "email_already_registered",
+              missing_fields: ["email"],
+              status_code: 409,
+              intent: input.intent,
+              phone_iso: input.phone_iso,
+            });
             return Response.json(
               { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
               { status: 409 },
             );
           }
 
-          // Belt-and-suspenders: upsert validated fields onto the freshly
-          // created profile row. `handle_new_user` reads user_metadata, but
-          // we don't want silent gaps if the trigger definition drifts.
           if (data.user?.id) {
             const profilePatch: Record<string, unknown> = {
               first_name: input.first_name,
@@ -285,6 +334,11 @@ export const Route = createFileRoute("/api/public/auth/signup")({
             user_id: data.user?.id ?? null,
           });
         } catch (e: any) {
+          await logSignupFailure(sbAdmin, request, {
+            reason: "unhandled_exception",
+            missing_fields: [],
+            status_code: 500,
+          });
           return Response.json(
             { ok: false, errors: [{ field: "", message: e?.message ?? "Unhandled" }] },
             { status: 500 },
