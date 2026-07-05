@@ -86,6 +86,107 @@ export function buildE164(iso: string, national: string): string | null {
   return `${c.dial}${digits}`;
 }
 
+// Per-country expected NATIONAL number length (digits after dial code, trunk
+// prefix stripped). Ranges are inclusive. `mobilePrefix` (optional) is a list
+// of acceptable first-digit(s) after trunk-strip — used to reject landlines
+// or clearly wrong numbers. Countries not listed fall back to a generic
+// E.164-wide range of 6–14 national digits.
+type PhoneRule = { min: number; max: number; mobilePrefix?: string[] };
+const PHONE_RULES: Record<string, PhoneRule> = {
+  PH: { min: 10, max: 10, mobilePrefix: ["9"] },
+  US: { min: 10, max: 10 },
+  CA: { min: 10, max: 10 },
+  GB: { min: 10, max: 10, mobilePrefix: ["7"] },
+  AU: { min: 9, max: 9, mobilePrefix: ["4"] },
+  NZ: { min: 8, max: 10 },
+  SG: { min: 8, max: 8, mobilePrefix: ["8", "9"] },
+  MY: { min: 9, max: 10, mobilePrefix: ["1"] },
+  ID: { min: 9, max: 12, mobilePrefix: ["8"] },
+  TH: { min: 9, max: 9, mobilePrefix: ["6", "8", "9"] },
+  VN: { min: 9, max: 10 },
+  JP: { min: 10, max: 10 },
+  KR: { min: 9, max: 10, mobilePrefix: ["1"] },
+  CN: { min: 11, max: 11, mobilePrefix: ["1"] },
+  HK: { min: 8, max: 8 },
+  TW: { min: 9, max: 9, mobilePrefix: ["9"] },
+  IN: { min: 10, max: 10, mobilePrefix: ["6", "7", "8", "9"] },
+  PK: { min: 10, max: 10, mobilePrefix: ["3"] },
+  BD: { min: 10, max: 10 },
+  AE: { min: 9, max: 9, mobilePrefix: ["5"] },
+  SA: { min: 9, max: 9, mobilePrefix: ["5"] },
+  QA: { min: 8, max: 8 },
+  KW: { min: 8, max: 8 },
+  BH: { min: 8, max: 8 },
+  OM: { min: 8, max: 8 },
+  IL: { min: 9, max: 9 },
+  TR: { min: 10, max: 10, mobilePrefix: ["5"] },
+  ZA: { min: 9, max: 9 },
+  NG: { min: 10, max: 10 },
+  KE: { min: 9, max: 9, mobilePrefix: ["7", "1"] },
+  EG: { min: 10, max: 10, mobilePrefix: ["1"] },
+  DE: { min: 10, max: 11 },
+  FR: { min: 9, max: 9, mobilePrefix: ["6", "7"] },
+  ES: { min: 9, max: 9, mobilePrefix: ["6", "7"] },
+  IT: { min: 9, max: 11 },
+  NL: { min: 9, max: 9, mobilePrefix: ["6"] },
+  BE: { min: 8, max: 9 },
+  CH: { min: 9, max: 9, mobilePrefix: ["7"] },
+  AT: { min: 10, max: 11 },
+  SE: { min: 7, max: 10 },
+  NO: { min: 8, max: 8 },
+  DK: { min: 8, max: 8 },
+  FI: { min: 8, max: 10 },
+  IE: { min: 9, max: 9, mobilePrefix: ["8"] },
+  PT: { min: 9, max: 9, mobilePrefix: ["9"] },
+  GR: { min: 10, max: 10, mobilePrefix: ["6"] },
+  PL: { min: 9, max: 9 },
+  CZ: { min: 9, max: 9 },
+  RO: { min: 9, max: 9, mobilePrefix: ["7"] },
+  RU: { min: 10, max: 10, mobilePrefix: ["9"] },
+  UA: { min: 9, max: 9 },
+  MX: { min: 10, max: 10 },
+  BR: { min: 10, max: 11 },
+  AR: { min: 10, max: 11 },
+  CL: { min: 9, max: 9, mobilePrefix: ["9"] },
+  CO: { min: 10, max: 10, mobilePrefix: ["3"] },
+  PE: { min: 9, max: 9, mobilePrefix: ["9"] },
+};
+
+export type PhoneValidation = { valid: boolean; message?: string; e164?: string };
+
+/**
+ * Strictly validate a national phone number against the per-country rule.
+ * Returns the normalized E.164 string when valid. Trunk-strip is applied
+ * before length checks (e.g. PH `09694343430` → `9694343430`).
+ */
+export function validatePhone(iso: string, national: string): PhoneValidation {
+  const c = COUNTRY_CODES.find((x) => x.iso === iso);
+  if (!c) return { valid: false, message: "Pick a country." };
+  const raw = national.trim();
+  if (!raw) return { valid: false, message: "Enter your mobile number." };
+  let digits = raw.replace(/\D/g, "");
+  if (!digits) return { valid: false, message: "Enter digits only for the number." };
+  if (digits.startsWith("0")) digits = digits.replace(/^0+/, "");
+  const rule = PHONE_RULES[iso] ?? { min: 6, max: 14 };
+  if (digits.length < rule.min || digits.length > rule.max) {
+    const range = rule.min === rule.max ? `${rule.min}` : `${rule.min}–${rule.max}`;
+    return {
+      valid: false,
+      message: `${c.name} numbers need ${range} digits after ${c.dial}.`,
+    };
+  }
+  if (rule.mobilePrefix && !rule.mobilePrefix.some((p) => digits.startsWith(p))) {
+    return {
+      valid: false,
+      message: `${c.name} mobile numbers start with ${rule.mobilePrefix
+        .map((p) => `${p}`)
+        .join(" or ")} after ${c.dial}.`,
+    };
+  }
+  return { valid: true, e164: `${c.dial}${digits}` };
+}
+
+
 // Country-aware formatter: groups national digits with dashes so PH
 // `9694343430` displays as `969-434-3430`. Falls back to 3-3-rest for unknown
 // ISO codes. Pass only national digits (no dial code).

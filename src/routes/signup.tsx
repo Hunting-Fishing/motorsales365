@@ -23,7 +23,7 @@ import { AccountTypeGrid } from "@/components/signup/account-type-grid";
 import { SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid.types";
 import { LocationPicker, type LocationValue } from "@/components/location-picker";
 import { PhoneInput } from "@/components/phone-input";
-import { buildE164 } from "@/data/country-codes";
+import { buildE164, validatePhone } from "@/data/country-codes";
 import { siteOrigin } from "@/lib/site-config";
 import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
 
@@ -102,8 +102,12 @@ function SignupPage() {
   const kindOptions = useMemo(() => BUSINESS_KIND_OPTIONS, []);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const phoneE164 = phoneNational.trim() ? buildE164(phoneIso, phoneNational) : "";
-  const phoneValid = phoneE164 !== null;
+  const phoneCheck = validatePhone(phoneIso, phoneNational);
+  const phoneE164 = phoneCheck.valid ? phoneCheck.e164 ?? "" : phoneNational.trim() ? buildE164(phoneIso, phoneNational) ?? "" : "";
+  const phoneValid = phoneCheck.valid;
+  const phoneMessage = phoneCheck.message;
+  const postalOk = (s: string) => /^[A-Za-z0-9][A-Za-z0-9 \-]{2,10}$/.test(s.trim());
+  const addressOk = (s: string) => s.trim().length >= 5 && /[A-Za-z]/.test(s) && /\d/.test(s);
 
   type Issue = { field: string; label: string; message: string };
   const issues = useMemo<Issue[]>(() => {
@@ -132,8 +136,14 @@ function SignupPage() {
       list.push({
         field: "phone",
         label: "Mobile",
-        message: "Enter a valid mobile number.",
+        message: phoneMessage ?? "Enter a valid mobile number for the selected country.",
       });
+    if (!location.region)
+      list.push({ field: "city", label: "Region", message: "Choose your region." });
+    if (!location.province)
+      list.push({ field: "city", label: "Province", message: "Choose your province." });
+    if (!location.city)
+      list.push({ field: "city", label: "City / Town", message: "Choose your city or town." });
     if (!location.region)
       list.push({ field: "city", label: "Region", message: "Choose your region." });
     if (!location.province)
@@ -147,11 +157,23 @@ function SignupPage() {
           label: "Street address",
           message: "Enter your street address.",
         });
+      else if (!addressOk(streetAddress))
+        list.push({
+          field: "street-address",
+          label: "Street address",
+          message: "Include both a house/unit number and street name (e.g. 123 Rizal St).",
+        });
       if (!postalCode.trim())
         list.push({
           field: "postal-code",
           label: "Postal code",
           message: "Enter your postal / ZIP code.",
+        });
+      else if (!postalOk(postalCode))
+        list.push({
+          field: "postal-code",
+          label: "Postal code",
+          message: "Enter a valid postal / ZIP code (3–11 letters, digits, or dashes).",
         });
     }
     if (isBusinessLike) {
@@ -161,13 +183,26 @@ function SignupPage() {
           label: "Business street address",
           message: "Enter your business street address.",
         });
+      else if (!addressOk(businessAddress))
+        list.push({
+          field: "business-address",
+          label: "Business street address",
+          message: "Include both a building/unit number and street name.",
+        });
       if (!businessPostalCode.trim())
         list.push({
           field: "business-postal",
           label: "Business postal code",
           message: "Enter your business postal / ZIP code.",
         });
+      else if (!postalOk(businessPostalCode))
+        list.push({
+          field: "business-postal",
+          label: "Business postal code",
+          message: "Enter a valid postal / ZIP code (3–11 letters, digits, or dashes).",
+        });
     }
+
     if (isBusinessLike && !businessName.trim()) {
       list.push({
         field: "businessName",
@@ -217,6 +252,7 @@ function SignupPage() {
     emailValid,
     phoneNational,
     phoneValid,
+    phoneMessage,
     location.city,
     location.region,
     location.province,
