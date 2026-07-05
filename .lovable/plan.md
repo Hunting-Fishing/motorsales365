@@ -1,41 +1,48 @@
 ## Goal
 
-Make signup fail (with clear inline errors) when phone, email, or address fields are missing for the selected account type — so we don't create another Jocelyn-style profile with blanks.
+Show a "Complete your profile" banner at the top of the dashboard listing the exact NULL/empty profile fields for the signed-in user, with a single button that jumps to `/dashboard/profile` focused on the first missing field.
 
-## Scope
+## Where
 
-Client-side validation only in `src/routes/signup.tsx`. No schema/API changes. (Admin create-user already has its own guard.)
+- New component: `src/components/profile-completeness-banner.tsx`.
+- Mount at the top of `MyListings` in `src/routes/dashboard.index.tsx` (the `/dashboard` landing view). Nothing else on that page changes.
 
-## Required fields by intent
+## What counts as "missing"
 
-| Field | Buyer | Business | Service provider |
-|---|---|---|---|
-| First / last name, email, password, terms, city | required (already) | required (already) | required (already) |
-| **Phone (valid E.164)** | **required** | **required** | **required** |
-| **Street address** | **required** | required (business street) | required (business street) |
-| **Postal code** | **required** | required (business postal) | required (business postal) |
-| **Region + Province** | **required** | **required** | **required** |
-| Business name + kind | — | required (already) | required (already) |
-| Business city / region / province | — | **required** | **required** |
+Empty string, `null`, or whitespace-only. Requirements depend on `profiles.signup_intent` (fallback to `seller_type`):
 
-Notes:
-- Personal-account users only have one address block (street, postal, city, region, province) — all required.
-- Business-like accounts must fill the **business** address block (street, city, province, region, postal); the personal address block stays optional for them since the business profile is what goes live in the directory.
-- Phone becomes required for everyone (was optional). Label changes from "Mobile (optional)" → "Mobile".
+**All account types**
+- `first_name`, `last_name`
+- `phone_e164` (falls back to `phone`)
+- `personal_email`
+- `signup_region`, `signup_province`, `signup_city`
 
-## Changes in `src/routes/signup.tsx`
+**Buyer (`buyer` / private)**
+- `street_address`, `postal_code`
 
-1. Extend the `issues` memo:
-   - Push `phone` issue when `!phoneNational.trim()` ("Enter your mobile number.") in addition to the existing invalid-format check.
-   - Push `region` / `province` issues when missing.
-   - For personal accounts (`!isBusinessLike`): require `streetAddress`, `postalCode`.
-   - For business-like accounts: require `businessAddress`, `businessCity`, `businessProvince`, `businessRegion`, `businessPostalCode`.
-2. Add `errorFor(...)` + `invalidCls(...)` wiring and `id="field-<name>"` anchors to any field that doesn't already have them (region, province, street/postal for personal, business address block).
-3. Remove "(optional)" from the affected labels; update the helper line under the business address block ("You can skip the street and postal for now…") to say the address is required to create the account.
-4. Update the `useMemo` dependency array to include the new state (`streetAddress`, `postalCode`, `location.region`, `location.province`, `businessAddress`, `businessCity`, `businessProvince`, `businessRegion`, `businessPostalCode`).
+**Business / Service provider (`business` / `service_provider`, or `seller_type` in `dealer`/`repair_shop`/`insurance`)**
+- `business_name`, `business_kind`
+- `business_address`, `business_postal_code`
+- `business_region`, `business_province`, `business_city`
+
+Staff accounts (`is_staff_account = true` or `@365motorsales.com` email) skip the banner entirely.
+
+## Banner UX
+
+- Fetches the profile once via `supabase.from("profiles").select(...).eq("id", user.id).maybeSingle()` inside the component (dashboard already uses direct client reads).
+- Hidden while loading and hidden if no fields are missing.
+- Card style: amber/warning surface, `AlertCircle` icon, heading "Complete your profile", one-line explainer ("These fields are still empty — add them so buyers and sellers can reach you.").
+- Missing fields render as a compact 2-column bullet list using friendly labels (e.g. `phone_e164` → "Mobile number", `business_kind` → "Business category").
+- Primary button "Edit profile" → `<Link to="/dashboard/profile" hash="field-<first-missing>">`. Secondary text link "Not now" collapses the list for the session via `sessionStorage` (banner still visible next login).
+- Live count in the heading: "Complete your profile — 4 missing".
+
+## Small profile-page assist
+
+- In `src/routes/dashboard.profile.tsx`, add matching `id="field-<key>"` wrappers around the inputs for the fields above (phone, personal_email, street_address, postal_code, business_name, business_kind, business_address, business_postal_code, business/signup region/province/city) so the hash from the banner scrolls to the right row. No logic change to the form.
 
 ## Verification
 
-- Attempt signup as **Buyer** with phone/address blank → submit button stays disabled and Issues panel lists Phone / Street / Postal / Region / Province.
-- Attempt signup as **Business** with business address blank → Issues panel lists business street / city / province / region / postal.
-- Fill everything → submit succeeds; new profile row has phone_e164, street_address, postal_code, region, province, city populated. Confirm via a quick DB read.
+- Log in as Jocelyn (known blanks): banner shows Mobile, Personal email, Street address, City, Region, Province; "Edit profile" scrolls to Mobile.
+- Fill and save one field → banner recomputes on next dashboard visit and drops it from the list.
+- Log in as a fully populated user → banner does not render.
+- Log in as a staff account → banner does not render.
