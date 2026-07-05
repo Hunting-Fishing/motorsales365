@@ -38,6 +38,7 @@ import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
 import { BoostDialog } from "@/components/boost-dialog";
+import { ProfileCompletenessBanner } from "@/components/profile-completeness-banner";
 
 export const Route = createFileRoute("/dashboard/")({
   component: MyListings,
@@ -247,6 +248,8 @@ function MyListings() {
           </Link>
         </Button>
       </div>
+
+      <ProfileCompletenessBanner userId={user?.id} />
 
       <BusinessWorkspaceBanner userId={user?.id} />
 
