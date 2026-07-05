@@ -2,6 +2,8 @@ import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-r
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
+
 
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
@@ -549,9 +551,8 @@ function SignupPage() {
 
           <div className="relative">
             <Link to="/" className="inline-flex items-center gap-2 group">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-navy-500 text-white shadow-lg shadow-navy-500/30">
-                <span className="text-[11px] font-black tracking-tight" style={{ fontFamily: "var(--font-sora)" }}>365</span>
-              </span>
+              <BrandLogo size={36} className="rounded-lg shadow-lg shadow-navy-500/30" />
+
               <span
                 className="text-lg font-bold tracking-tight group-hover:text-navy-50"
                 style={{ fontFamily: "var(--font-sora)" }}
@@ -604,7 +605,7 @@ function SignupPage() {
           <div className="mx-auto max-w-md">
             <header className="mb-6">
               <div className="md:hidden mb-4 flex items-center gap-2">
-                <span className="grid h-8 w-8 place-items-center rounded-md bg-navy-900 text-white text-[10px] font-black" style={{ fontFamily: "var(--font-sora)" }}>365</span>
+                <BrandLogo size={32} className="rounded-md" />
                 <span className="font-bold text-navy-900 tracking-tight" style={{ fontFamily: "var(--font-sora)" }}>MotorSales</span>
               </div>
               <h1
