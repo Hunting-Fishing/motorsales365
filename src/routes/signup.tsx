@@ -108,7 +108,15 @@ function SignupPage() {
   const phoneValid = phoneCheck.valid;
   const phoneMessage = phoneCheck.message;
   const postalOk = (s: string) => /^[A-Za-z0-9][A-Za-z0-9 \-]{2,10}$/.test(s.trim());
-  const addressOk = (s: string) => s.trim().length >= 5 && /[A-Za-z]/.test(s) && /\d/.test(s);
+  // Real-time granular checks used by the AddressChecklist UI.
+  const addrHasNumber = (s: string) => /\d/.test(s);
+  const addrHasStreetName = (s: string) => {
+    // At least one word made of letters (2+ chars). Numbers alone don't count.
+    return /[A-Za-z]{2,}/.test(s);
+  };
+  const addrLongEnough = (s: string) => s.trim().length >= 5;
+  const addressOk = (s: string) =>
+    addrLongEnough(s) && addrHasStreetName(s) && addrHasNumber(s);
 
   type Issue = { field: string; label: string; message: string };
   const issues = useMemo<Issue[]>(() => {
