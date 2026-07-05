@@ -94,10 +94,10 @@ export function PhoneInput({
             role="combobox"
             aria-label={`Country: ${country.name} (${country.dial})`}
             disabled={disabled}
-            className="w-[96px] shrink-0 justify-between gap-1 px-2 font-normal sm:w-[108px]"
+            className="w-[80px] shrink-0 justify-between gap-1 px-2 font-normal sm:w-[108px]"
           >
             <span className="flex min-w-0 items-center gap-1">
-              <span className="text-base leading-none" aria-hidden>
+              <span className="hidden text-base leading-none sm:inline" aria-hidden>
                 {country.flag}
               </span>
               <span className="truncate text-sm tabular-nums">
