@@ -143,12 +143,25 @@ function SignupPage() {
   const intentMeta = useMemo(() => SIGNUP_TYPES.find((s) => s.id === intent), [intent]);
   const kindOptions = useMemo(() => BUSINESS_KIND_OPTIONS, []);
 
+  // country-codes module — loaded async so it doesn't block hydration.
+  const [phoneApi, setPhoneApi] = useState<PhoneApi | null>(null);
+
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const phoneCheck = validatePhone(phoneIso, phoneNational);
-  const phoneE164 = phoneCheck.valid ? phoneCheck.e164 ?? "" : phoneNational.trim() ? buildE164(phoneIso, phoneNational) ?? "" : "";
+  const phoneCheck = phoneApi
+    ? phoneApi.validatePhone(phoneIso, phoneNational)
+    : { valid: phoneNational.trim().length > 0, e164: undefined as string | undefined, message: undefined as string | undefined };
+  const phoneE164 = phoneApi
+    ? phoneCheck.valid
+      ? phoneCheck.e164 ?? ""
+      : phoneNational.trim()
+        ? phoneApi.buildE164(phoneIso, phoneNational) ?? ""
+        : ""
+    : "";
   const phoneValid = phoneCheck.valid;
   const phoneMessage = phoneCheck.message;
-  const phoneHint = getPhoneHint(phoneIso, phoneNational);
+  const phoneHint = phoneApi
+    ? phoneApi.getPhoneHint(phoneIso, phoneNational)
+    : ({ status: "idle", expected: "", example: "" } as ReturnType<PhoneApi["getPhoneHint"]>);
 
   const postalOk = (s: string) => /^[A-Za-z0-9][A-Za-z0-9 \-]{2,10}$/.test(s.trim());
   // Real-time granular checks used by the AddressChecklist UI.
