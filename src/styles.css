@@ -44,6 +44,14 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
+  --font-sora: "Sora", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-manrope: "Manrope", "Inter", system-ui, sans-serif;
+
+  /* Navy Trust palette — used by dedicated auth surfaces (/signup, /login) */
+  --color-navy-50: #e8edf3;
+  --color-navy-500: #3b6fa0;
+  --color-navy-700: #1e3a5f;
+  --color-navy-900: #0f1b3d;
 
   /* Seller-tier "rarity" border colors (game-inspired) */
   --color-tier-unverified: oklch(0.72 0.01 250);
