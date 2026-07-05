@@ -205,6 +205,7 @@ import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/
 import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocode'
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
+import { Route as ApiAdminBackfillProfilesRouteImport } from './routes/api/admin/backfill-profiles'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
 import { Route as AdminPartsOutreachRouteImport } from './routes/admin.parts.outreach'
 import { Route as AdminPartsFeedsRouteImport } from './routes/admin.parts.feeds'
@@ -222,6 +223,7 @@ import { Route as AdminAdvertisementsHistoryRouteImport } from './routes/admin.a
 import { Route as AdminAdvertisementsCampaignsRouteImport } from './routes/admin.advertisements.campaigns'
 import { Route as AdminAdvertisementsApprovalsRouteImport } from './routes/admin.advertisements.approvals'
 import { Route as AdminAdvertisementsAnalyticsRouteImport } from './routes/admin.advertisements.analytics'
+import { Route as AdminAccountsBackfillRouteImport } from './routes/admin.accounts.backfill'
 import { Route as AuthenticatedDisputeReportIdRouteImport } from './routes/_authenticated/dispute.$reportId'
 import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './routes/_authenticated/dashboard.staff-requests'
 import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
@@ -1261,6 +1263,12 @@ const ApiAdminCreateUserRoute = ApiAdminCreateUserRouteImport.update({
   path: '/api/admin/create-user',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminBackfillProfilesRoute =
+  ApiAdminBackfillProfilesRouteImport.update({
+    id: '/api/admin/backfill-profiles',
+    path: '/api/admin/backfill-profiles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   id: '/redemptions_/$staffId',
   path: '/redemptions/$staffId',
@@ -1358,6 +1366,11 @@ const AdminAdvertisementsAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => AdminAdvertisementsRoute,
   } as any)
+const AdminAccountsBackfillRoute = AdminAccountsBackfillRouteImport.update({
+  id: '/backfill',
+  path: '/backfill',
+  getParentRoute: () => AdminAccountsRoute,
+} as any)
 const AuthenticatedDisputeReportIdRoute =
   AuthenticatedDisputeReportIdRouteImport.update({
     id: '/dispute/$reportId',
@@ -1693,7 +1706,7 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -1832,6 +1845,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
@@ -1849,6 +1863,7 @@ export interface FileRoutesByFullPath {
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
@@ -1954,7 +1969,7 @@ export interface FileRoutesByTo {
   '/verify-email': typeof VerifyEmailRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -2091,6 +2106,7 @@ export interface FileRoutesByTo {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
@@ -2108,6 +2124,7 @@ export interface FileRoutesByTo {
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
@@ -2217,7 +2234,7 @@ export interface FileRoutesById {
   '/verify-email': typeof VerifyEmailRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -2356,6 +2373,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/_authenticated/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/_authenticated/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
@@ -2373,6 +2391,7 @@ export interface FileRoutesById {
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
@@ -2622,6 +2641,7 @@ export interface FileRouteTypes {
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
+    | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
     | '/admin/advertisements/approvals'
     | '/admin/advertisements/campaigns'
@@ -2639,6 +2659,7 @@ export interface FileRouteTypes {
     | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
+    | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
     | '/api/public/geocode'
@@ -2881,6 +2902,7 @@ export interface FileRouteTypes {
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
+    | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
     | '/admin/advertisements/approvals'
     | '/admin/advertisements/campaigns'
@@ -2898,6 +2920,7 @@ export interface FileRouteTypes {
     | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
+    | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
     | '/api/public/geocode'
@@ -3145,6 +3168,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/parts-wanted'
     | '/_authenticated/dashboard/staff-requests'
     | '/_authenticated/dispute/$reportId'
+    | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
     | '/admin/advertisements/approvals'
     | '/admin/advertisements/campaigns'
@@ -3162,6 +3186,7 @@ export interface FileRouteTypes {
     | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions_/$staffId'
+    | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
     | '/api/public/geocode'
@@ -3325,6 +3350,7 @@ export interface RootRouteChildren {
   WantedIndexRoute: typeof WantedIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiAdminBackfillProfilesRoute: typeof ApiAdminBackfillProfilesRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
   ApiPublicGeoSearchRoute: typeof ApiPublicGeoSearchRoute
   ApiPublicGeocodeRoute: typeof ApiPublicGeocodeRoute
@@ -4735,6 +4761,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminCreateUserRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/backfill-profiles': {
+      id: '/api/admin/backfill-profiles'
+      path: '/api/admin/backfill-profiles'
+      fullPath: '/api/admin/backfill-profiles'
+      preLoaderRoute: typeof ApiAdminBackfillProfilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/redemptions_/$staffId': {
       id: '/admin/redemptions_/$staffId'
       path: '/redemptions/$staffId'
@@ -4853,6 +4886,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/advertisements/analytics'
       preLoaderRoute: typeof AdminAdvertisementsAnalyticsRouteImport
       parentRoute: typeof AdminAdvertisementsRoute
+    }
+    '/admin/accounts/backfill': {
+      id: '/admin/accounts/backfill'
+      path: '/backfill'
+      fullPath: '/admin/accounts/backfill'
+      preLoaderRoute: typeof AdminAccountsBackfillRouteImport
+      parentRoute: typeof AdminAccountsRoute
     }
     '/_authenticated/dispute/$reportId': {
       id: '/_authenticated/dispute/$reportId'
@@ -5240,6 +5280,18 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AdminAccountsRouteChildren {
+  AdminAccountsBackfillRoute: typeof AdminAccountsBackfillRoute
+}
+
+const AdminAccountsRouteChildren: AdminAccountsRouteChildren = {
+  AdminAccountsBackfillRoute: AdminAccountsBackfillRoute,
+}
+
+const AdminAccountsRouteWithChildren = AdminAccountsRoute._addFileChildren(
+  AdminAccountsRouteChildren,
+)
+
 interface AdminAdvertisementsAnalyticsRouteChildren {
   AdminAdvertisementsAnalyticsCodeRoute: typeof AdminAdvertisementsAnalyticsCodeRoute
 }
@@ -5319,7 +5371,7 @@ const AdminPartsRouteWithChildren = AdminPartsRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
-  AdminAccountsRoute: typeof AdminAccountsRoute
+  AdminAccountsRoute: typeof AdminAccountsRouteWithChildren
   AdminAdvertisementsRoute: typeof AdminAdvertisementsRouteWithChildren
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
@@ -5366,7 +5418,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminAccountsRoute: AdminAccountsRoute,
+  AdminAccountsRoute: AdminAccountsRouteWithChildren,
   AdminAdvertisementsRoute: AdminAdvertisementsRouteWithChildren,
   AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
@@ -5777,6 +5829,7 @@ const rootRouteChildren: RootRouteChildren = {
   WantedIndexRoute: WantedIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiAdminBackfillProfilesRoute: ApiAdminBackfillProfilesRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
   ApiPublicGeoSearchRoute: ApiPublicGeoSearchRoute,
   ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,

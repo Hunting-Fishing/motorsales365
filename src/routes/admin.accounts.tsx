@@ -255,11 +255,15 @@ function AccountsConsole() {
         </div>
         <div className="flex items-center gap-2">
           <AddUserDialog onCreated={load} />
+          <Button asChild variant="outline" size="sm">
+            <a href="/admin/accounts/backfill">Bulk backfill</a>
+          </Button>
           <Button variant="outline" size="sm" onClick={exportCsv}>
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
         </div>
+
       </div>
 
       <div className="mb-4 flex items-start gap-2 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
