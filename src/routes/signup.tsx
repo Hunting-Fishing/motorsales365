@@ -5,9 +5,6 @@ import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -17,9 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { SiteLayout } from "@/components/site-layout";
 import { getCreditedCode } from "@/lib/referral";
-import { AccountTypeGrid } from "@/components/signup/account-type-grid";
 import { SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid.types";
 import { LocationPicker, type LocationValue } from "@/components/location-picker";
 import { PhoneInput } from "@/components/phone-input";
