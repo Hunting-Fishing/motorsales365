@@ -82,7 +82,7 @@ const SAFETY_TOOLS = [
     icon: FileCheck2,
     title: "Request an OR/CR check",
     body: "Ask the seller to submit OR/CR documents to 365 for verification. Once approved, the listing gets the Documents Checked badge.",
-    to: "/passport.$slug" as const,
+    to: "/passport-premium" as const,
   },
   {
     icon: MapPin,

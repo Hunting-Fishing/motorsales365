@@ -43,7 +43,7 @@ function PrivacyPage() {
 
         <p className="mt-3 text-muted-foreground">
           <strong>Club accreditation documents.</strong> When you apply to list a Club at{" "}
-          <Link className="text-primary underline" to="/clubs/apply">/clubs/apply</Link>, we collect
+          <Link className="text-primary underline" to="/clubs/apply" search={{}}>/clubs/apply</Link>, we collect
           the formal documents you upload (e.g., LTO Accreditation, SEC Certificate of
           Incorporation, DTI / Business Permit) along with the contact details you supply. These
           documents are stored in a private Lovable Cloud storage bucket and are visible only to
