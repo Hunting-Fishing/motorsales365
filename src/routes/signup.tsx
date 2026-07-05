@@ -537,10 +537,11 @@ function SignupPage() {
 
   return (
     <div
-      className="min-h-dvh flex items-center justify-center bg-navy-50 px-4 py-6 md:py-10"
+      className="min-h-dvh flex items-center justify-center bg-navy-50 px-3 py-3 md:px-4 md:py-10"
       style={{ fontFamily: "var(--font-manrope)" }}
     >
-      <div className="w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl shadow-navy-900/10 flex flex-col md:flex-row md:min-h-[720px] border border-slate-200/60">
+      <div className="w-full max-w-5xl overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-xl md:shadow-2xl shadow-navy-900/10 flex flex-col md:flex-row md:min-h-[720px] border border-slate-200/60">
+
         {/* Left: brand / value panel */}
         <aside
           className="hidden md:flex md:w-[38%] bg-navy-900 text-white p-10 flex-col justify-between relative overflow-hidden"
@@ -601,20 +602,20 @@ function SignupPage() {
         </aside>
 
         {/* Right: compact form */}
-        <div className="flex-1 bg-white p-6 md:p-10">
+        <div className="flex-1 bg-white p-4 sm:p-6 md:p-10">
           <div className="mx-auto max-w-md">
-            <header className="mb-6">
-              <div className="md:hidden mb-4 flex items-center gap-2">
-                <BrandLogo size={32} className="rounded-md" />
-                <span className="font-bold text-navy-900 tracking-tight" style={{ fontFamily: "var(--font-sora)" }}>MotorSales</span>
+            <header className="mb-3 md:mb-6">
+              <div className="md:hidden mb-2 flex items-center gap-2">
+                <BrandLogo size={28} className="rounded-md" />
+                <span className="text-sm font-bold text-navy-900 tracking-tight" style={{ fontFamily: "var(--font-sora)" }}>MotorSales</span>
               </div>
               <h1
-                className="text-2xl font-bold text-navy-900"
+                className="text-xl md:text-2xl font-bold text-navy-900"
                 style={{ fontFamily: "var(--font-sora)" }}
               >
                 Create your account
               </h1>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-slate-500">
                 Already have an account?{" "}
                 <Link to="/login" className="font-semibold text-navy-700 hover:text-navy-900 hover:underline">
                   Sign in
@@ -622,7 +623,8 @@ function SignupPage() {
               </p>
             </header>
 
-            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4" noValidate>
+
               {/* Account type — segmented control */}
               <div id="field-intent">
                 <label className={sectionLabelCls + " mb-2"}>Account type</label>
@@ -664,11 +666,12 @@ function SignupPage() {
 
               <div
                 className={cn(
-                  "space-y-4 transition-opacity",
+                  "space-y-3 md:space-y-4 transition-opacity",
                   !intent && "pointer-events-none opacity-50",
                 )}
                 aria-disabled={!intent}
               >
+
                 {/* Name pair */}
                 <div className="grid grid-cols-2 gap-3">
                   <div id="field-firstName">
@@ -770,10 +773,11 @@ function SignupPage() {
                 </div>
 
                 {/* Location cascade — City / Region / Province / City */}
-                <div className="pt-2 border-t border-slate-100">
-                  <div className="mb-2 flex items-center justify-between">
+                <div className="pt-1 md:pt-2 border-t border-slate-100">
+                  <div className="mb-1.5 md:mb-2 flex items-center justify-between">
                     <label className={sectionLabelCls}>Location</label>
                   </div>
+
                   <div id="field-city">
                     <LocationPicker
                       value={location}
@@ -965,7 +969,7 @@ function SignupPage() {
                 )}
 
                 {/* Password pair */}
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+                <div className="grid grid-cols-2 gap-3 pt-1 md:pt-2 border-t border-slate-100">
                   <div id="field-password">
                     <label htmlFor="password" className={fieldLabelCls}>
                       Password <span className="text-destructive">*</span>
@@ -1079,7 +1083,7 @@ function SignupPage() {
                 </button>
 
                 {/* Divider */}
-                <div className="relative py-1">
+                <div className="relative py-0">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-slate-200" />
                   </div>
