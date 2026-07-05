@@ -136,8 +136,14 @@ function SignupPage() {
       list.push({
         field: "phone",
         label: "Mobile",
-        message: "Enter a valid mobile number.",
+        message: phoneMessage ?? "Enter a valid mobile number for the selected country.",
       });
+    if (!location.region)
+      list.push({ field: "city", label: "Region", message: "Choose your region." });
+    if (!location.province)
+      list.push({ field: "city", label: "Province", message: "Choose your province." });
+    if (!location.city)
+      list.push({ field: "city", label: "City / Town", message: "Choose your city or town." });
     if (!location.region)
       list.push({ field: "city", label: "Region", message: "Choose your region." });
     if (!location.province)
