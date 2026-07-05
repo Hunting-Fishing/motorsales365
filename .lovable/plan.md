@@ -1,42 +1,51 @@
-## Goal
+## Root cause
 
-On `/signup`, the three account-type tabs are visible but unresponsive for several seconds. Make them hydrate and respond immediately, without changing any signup logic or visual design.
+The 400s on `/` come from this embed in `src/routes/index.tsx` (also used by `dashboard.likes.tsx`, `dashboard.favorites.tsx`, and `src/lib/rewards.functions.ts`):
 
-## Diagnosis
+```
+profiles:user_id(verification_status, phone_verified_at)
+```
 
-`src/routes/signup.tsx` (1153 lines) is one big component. It statically imports a lot of heavy code that has nothing to do with picking an account type:
+PostgREST needs a foreign key to resolve an embed. Current FKs on `listings`:
 
-- `LocationPicker` → pulls in `src/lib/psgc.ts` → **`src/data/psgc.json` (~47 KB)** plus Command/Popover UI
-- `PhoneInput` → pulls in `src/data/country-codes.ts` (~350 lines of country/dial data)
-- `BUSINESS_KIND_OPTIONS` from `src/data/business-kinds.ts`
-- Full form state, validation, and submit logic
+- `listings.user_id → auth.users(id)`
+- `listings.vehicle_id → vehicles(id)` ✓ (that embed works)
 
-All of that ships in the same route chunk, so React can't hydrate the segmented control until the entire bundle is parsed and executed. That's the "buttons visible but unresponsive" gap the user is seeing.
+There is no FK from `listings` to `public.profiles`, so PostgREST can't resolve `profiles:user_id(...)` and returns `400`. Both other embeds in the same select (`listing_media`, `vehicles`) have proper FKs, so they're fine — the whole request just fails because of the profiles one. The identical embed in `dashboard.likes.tsx`, `dashboard.favorites.tsx`, and `rewards.functions.ts` is broken for the same reason.
 
-TanStack Router already code-splits the component per route, so the fix is inside `signup.tsx`: split the heavy sub-tree out of the initial chunk.
+I confirmed:
+- All existing `listings.user_id` values already have a matching row in `public.profiles` (0 orphans).
+- `profiles.id` is already `PRIMARY KEY` and 1:1 with `auth.users(id)`.
 
-## Plan
+## Fix
 
-Edit only `src/routes/signup.tsx` (frontend/presentation only, no logic change):
+One backend-only migration — no application code changes.
 
-1. **Extract the form body into a separate component file** `src/components/signup/signup-form-body.tsx` containing everything that renders *below* the account-type segmented control: name pair, phone/email, password, location picker, business fields, terms checkbox, submit button, and their state/validation. It receives `intent` as a prop.
-2. **Lazy-load it** in `signup.tsx` with `React.lazy(() => import("@/components/signup/signup-form-body"))` and render inside `<Suspense fallback={<FormSkeleton />}>`. The account-type radio group, header, and side panel stay in the critical route chunk so they hydrate immediately.
-3. **Warm the chunk on idle** — after mount, call `requestIdleCallback(() => import("@/components/signup/signup-form-body"))` (with `setTimeout` fallback) so the lazy chunk is usually ready by the time the user picks a tab. Also warm on first `pointerdown`/`focus` of any account-type button as a belt-and-braces preload.
-4. **Skeleton fallback** — a lightweight placeholder that matches the form's vertical rhythm so there's no layout jump when the real form swaps in.
-5. **Keep the existing "disabled until intent chosen" behavior** — the wrapper that sets `opacity-50 pointer-events-none` when `!intent` moves into the lazy body unchanged.
+Add a second foreign key on `listings.user_id` targeting `public.profiles(id)`. That gives PostgREST the relationship it needs to resolve `profiles:user_id(...)` everywhere the embed is used.
 
-No changes to:
-- Auth flow, submit endpoint, or validation rules
-- Copy, colors, spacing, or the segmented control markup
-- `useAuth`, currency fetches, or any other global provider
+```sql
+ALTER TABLE public.listings
+  ADD CONSTRAINT listings_user_id_profiles_fkey
+  FOREIGN KEY (user_id)
+  REFERENCES public.profiles(id)
+  ON DELETE CASCADE;
+
+NOTIFY pgrst, 'reload schema';
+```
+
+Notes:
+- Safe to add — every existing row satisfies it.
+- Keeps the existing `listings_user_id_fkey → auth.users(id)` in place; both cascade on delete, so behavior is consistent.
+- `NOTIFY pgrst, 'reload schema'` refreshes the Data API's relationship cache so the embed starts working immediately.
 
 ## Verification
 
-- Confirm the account-type tabs respond to clicks within the first paint (Playwright: navigate to `/signup`, immediately click "Buyer", assert `aria-checked="true"` within <500 ms of `domcontentloaded`).
-- Check the built chunk graph: the initial `/signup` chunk should no longer contain `psgc.json` or `country-codes` — those should be in the lazy chunk.
-- Visual diff: form looks identical after the skeleton swap.
+After the migration:
+1. Reload `/` and confirm the two failing requests (`boost_until=gt...` and `published_at.desc.nullslast`) return `200` with `profiles` populated.
+2. Spot-check `/dashboard/likes` and `/dashboard/favorites` — same embed, same fix.
+3. Nothing to change in `src/routes/index.tsx` or the other files.
 
 ## Out of scope
 
-- The repeated `currencies` fetches in the network log (separate issue; not blocking signup interactivity).
-- Any redesign of the account-type control or form layout.
+- No changes to RLS, grants, or column shape.
+- No changes to the failing routes' queries.
