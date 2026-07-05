@@ -284,10 +284,9 @@ function SignupPage() {
   // Restore previously entered form data when the user comes back from verify-email
   // (e.g. wrong email). Stashed values take precedence over URL defaults.
   useEffect(() => {
+    const p = readPending();
+    if (!p) return;
     try {
-      const raw = window.localStorage.getItem("signup.pending");
-      if (!raw) return;
-      const p = JSON.parse(raw);
       if (p.intent) setIntent(p.intent);
       if (p.first_name !== undefined) setFirstName(p.first_name);
       if (p.last_name !== undefined) setLastName(p.last_name);
@@ -310,8 +309,10 @@ function SignupPage() {
       }
       if (typeof p.agreed === "boolean") setAgreed(p.agreed);
       if (p.ref_code !== undefined) setRefCode(p.ref_code);
-      window.localStorage.removeItem("signup.pending");
-      // Focus and select email so the user can immediately change it
+      // Keep the stash: the post-auth applier will clear it once the
+      // profile row is patched. If the user returns to this form (e.g.
+      // "Wrong email? Start over"), we still want their inputs available.
+      // Focus and select email so the user can immediately change it.
       setTimeout(() => {
         const el = document.getElementById("email") as HTMLInputElement | null;
         if (el) {
