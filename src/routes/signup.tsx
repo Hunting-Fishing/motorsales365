@@ -63,6 +63,36 @@ import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 // Phone is now captured as { iso, national } via PhoneInput and normalized to
 // E.164 via buildE164 on submit.
 
+type ChecklistItem = { label: string; ok: boolean };
+
+// Real-time, per-field completeness indicator rendered under an address or
+// postal input. Turns green as each requirement is satisfied so users see
+// progress while typing — no wait for blur / submit.
+function AddressChecklist({ items, active }: { items: ChecklistItem[]; active: boolean }) {
+  if (!active) return null;
+  return (
+    <ul className="mt-2 space-y-1 text-xs" role="status" aria-live="polite">
+      {items.map((it) => (
+        <li
+          key={it.label}
+          className={cn(
+            "flex items-center gap-1.5",
+            it.ok ? "text-emerald-600" : "text-muted-foreground",
+          )}
+        >
+          {it.ok ? (
+            <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+          ) : (
+            <AlertCircle className="h-3.5 w-3.5" aria-hidden />
+          )}
+          <span>{it.label}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+
 function SignupPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -108,7 +138,15 @@ function SignupPage() {
   const phoneValid = phoneCheck.valid;
   const phoneMessage = phoneCheck.message;
   const postalOk = (s: string) => /^[A-Za-z0-9][A-Za-z0-9 \-]{2,10}$/.test(s.trim());
-  const addressOk = (s: string) => s.trim().length >= 5 && /[A-Za-z]/.test(s) && /\d/.test(s);
+  // Real-time granular checks used by the AddressChecklist UI.
+  const addrHasNumber = (s: string) => /\d/.test(s);
+  const addrHasStreetName = (s: string) => {
+    // At least one word made of letters (2+ chars). Numbers alone don't count.
+    return /[A-Za-z]{2,}/.test(s);
+  };
+  const addrLongEnough = (s: string) => s.trim().length >= 5;
+  const addressOk = (s: string) =>
+    addrLongEnough(s) && addrHasStreetName(s) && addrHasNumber(s);
 
   type Issue = { field: string; label: string; message: string };
   const issues = useMemo<Issue[]>(() => {
@@ -657,7 +695,10 @@ function SignupPage() {
                 <Input
                   id="street-address"
                   value={streetAddress}
-                  onChange={(e) => setStreetAddress(e.target.value)}
+                  onChange={(e) => {
+                    setStreetAddress(e.target.value);
+                    if (e.target.value.length > 0) markTouched("street-address");
+                  }}
                   onBlur={() => markTouched("street-address")}
                   placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
                   autoComplete="street-address"
@@ -667,6 +708,14 @@ function SignupPage() {
                 {errorFor("street-address") && (
                   <p className="mt-1 text-xs text-destructive">{errorFor("street-address")}</p>
                 )}
+                <AddressChecklist
+                  active={touched["street-address"] || streetAddress.length > 0}
+                  items={[
+                    { label: "House / unit number", ok: addrHasNumber(streetAddress) },
+                    { label: "Street name", ok: addrHasStreetName(streetAddress) },
+                    { label: "At least 5 characters", ok: addrLongEnough(streetAddress) },
+                  ]}
+                />
               </div>
               <div id="field-postal-code">
                 <Label htmlFor="postal-code">
@@ -675,7 +724,10 @@ function SignupPage() {
                 <Input
                   id="postal-code"
                   value={postalCode}
-                  onChange={(e) => setPostalCode(e.target.value)}
+                  onChange={(e) => {
+                    setPostalCode(e.target.value);
+                    if (e.target.value.length > 0) markTouched("postal-code");
+                  }}
                   onBlur={() => markTouched("postal-code")}
                   placeholder="e.g. 1000"
                   autoComplete="postal-code"
@@ -686,9 +738,14 @@ function SignupPage() {
                 {errorFor("postal-code") && (
                   <p className="mt-1 text-xs text-destructive">{errorFor("postal-code")}</p>
                 )}
+                <AddressChecklist
+                  active={touched["postal-code"] || postalCode.length > 0}
+                  items={[{ label: "Valid postal / ZIP format", ok: postalOk(postalCode) }]}
+                />
               </div>
             </div>
           )}
+
 
           {isBusinessLike && (
             <div className="space-y-4 rounded-xl border border-dashed border-border bg-muted/30 p-4">
@@ -760,7 +817,10 @@ function SignupPage() {
                   <Input
                     id="business-address"
                     value={businessAddress}
-                    onChange={(e) => setBusinessAddress(e.target.value)}
+                    onChange={(e) => {
+                      setBusinessAddress(e.target.value);
+                      if (e.target.value.length > 0) markTouched("business-address");
+                    }}
                     onBlur={() => markTouched("business-address")}
                     placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
                     autoComplete="street-address"
@@ -770,6 +830,14 @@ function SignupPage() {
                   {errorFor("business-address") && (
                     <p className="mt-1 text-xs text-destructive">{errorFor("business-address")}</p>
                   )}
+                  <AddressChecklist
+                    active={touched["business-address"] || businessAddress.length > 0}
+                    items={[
+                      { label: "Building / unit number", ok: addrHasNumber(businessAddress) },
+                      { label: "Street name", ok: addrHasStreetName(businessAddress) },
+                      { label: "At least 5 characters", ok: addrLongEnough(businessAddress) },
+                    ]}
+                  />
                 </div>
                 <div id="field-business-postal">
                   <Label htmlFor="business-postal">
@@ -778,7 +846,10 @@ function SignupPage() {
                   <Input
                     id="business-postal"
                     value={businessPostalCode}
-                    onChange={(e) => setBusinessPostalCode(e.target.value)}
+                    onChange={(e) => {
+                      setBusinessPostalCode(e.target.value);
+                      if (e.target.value.length > 0) markTouched("business-postal");
+                    }}
                     onBlur={() => markTouched("business-postal")}
                     placeholder="e.g. 1000"
                     autoComplete="postal-code"
@@ -788,8 +859,13 @@ function SignupPage() {
                   {errorFor("business-postal") && (
                     <p className="mt-1 text-xs text-destructive">{errorFor("business-postal")}</p>
                   )}
+                  <AddressChecklist
+                    active={touched["business-postal"] || businessPostalCode.length > 0}
+                    items={[{ label: "Valid postal / ZIP format", ok: postalOk(businessPostalCode) }]}
+                  />
                 </div>
               </div>
+
               <p className="text-xs text-muted-foreground">
                 A full business address is required to create your account and appear in the directory.
               </p>
