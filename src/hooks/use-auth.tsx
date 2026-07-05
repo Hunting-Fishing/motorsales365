@@ -11,6 +11,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { applyPendingIfAny } from "@/lib/signup-pending";
 
 export type AuthErrorKind = "refresh_failed" | "bootstrap_failed" | "safety_timeout";
 
