@@ -549,9 +549,8 @@ function SignupPage() {
 
           <div className="relative">
             <Link to="/" className="inline-flex items-center gap-2 group">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-navy-500 text-white shadow-lg shadow-navy-500/30">
-                <span className="text-[11px] font-black tracking-tight" style={{ fontFamily: "var(--font-sora)" }}>365</span>
-              </span>
+              <BrandLogo size={36} className="rounded-lg shadow-lg shadow-navy-500/30" />
+
               <span
                 className="text-lg font-bold tracking-tight group-hover:text-navy-50"
                 style={{ fontFamily: "var(--font-sora)" }}
