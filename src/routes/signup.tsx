@@ -530,524 +530,591 @@ function SignupPage() {
   };
 
 
+  const inputCls =
+    "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-navy-500 focus:ring-2 focus:ring-navy-500/25";
+  const invalidInputCls = (field: string) =>
+    cn(inputCls, errorFor(field) && "border-destructive focus:border-destructive focus:ring-destructive/25");
+  const sectionLabelCls =
+    "block text-[11px] font-bold uppercase tracking-wider text-slate-500";
+  const fieldLabelCls = "block text-xs font-semibold text-slate-700 mb-1";
+
   return (
-    <SiteLayout>
-      <div className="container mx-auto max-w-3xl px-4 py-12">
-        <header className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold sm:text-4xl">
-            Create your 365 MotorSales account
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Pick what brings you here — we'll tailor your dashboard around it.
-          </p>
-        </header>
-
-        <section aria-labelledby="account-type-heading" className="mb-8">
-          <div className="mb-3 flex items-baseline justify-between">
-            <h2
-              id="account-type-heading"
-              className="text-sm font-semibold uppercase tracking-wide text-muted-foreground"
-            >
-              1. Account type
-            </h2>
-            {intent && (
-              <span className="text-xs text-muted-foreground">Selected: {intentMeta?.label}</span>
-            )}
-          </div>
-          <AccountTypeGrid value={intent} onChange={setIntent} />
-          {intent && intentMeta?.note && (
-            <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
-              <p className="font-semibold text-primary">Heads up</p>
-              <p className="mt-1 text-muted-foreground">{intentMeta.note}</p>
-            </div>
-          )}
-        </section>
-
-        <form
-          onSubmit={handleSubmit}
-          className={cn(
-            "space-y-5 rounded-2xl border border-border bg-card p-6 shadow-sm transition-opacity",
-            !intent && "pointer-events-none opacity-50",
-          )}
-          aria-disabled={!intent}
+    <div
+      className="min-h-dvh flex items-center justify-center bg-navy-50 px-4 py-6 md:py-10"
+      style={{ fontFamily: "var(--font-manrope)" }}
+    >
+      <div className="w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl shadow-navy-900/10 flex flex-col md:flex-row md:min-h-[720px] border border-slate-200/60">
+        {/* Left: brand / value panel */}
+        <aside
+          className="hidden md:flex md:w-[38%] bg-navy-900 text-white p-10 flex-col justify-between relative overflow-hidden"
+          style={{ fontFamily: "var(--font-manrope)" }}
         >
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              2. Your details
+          <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-navy-500/15 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-32 -left-20 h-64 w-64 rounded-full bg-navy-500/10 blur-3xl" />
+
+          <div className="relative">
+            <Link to="/" className="inline-flex items-center gap-2 group">
+              <span className="grid h-9 w-9 place-items-center rounded-lg bg-navy-500 text-white shadow-lg shadow-navy-500/30">
+                <span className="text-[11px] font-black tracking-tight" style={{ fontFamily: "var(--font-sora)" }}>365</span>
+              </span>
+              <span
+                className="text-lg font-bold tracking-tight group-hover:text-navy-50"
+                style={{ fontFamily: "var(--font-sora)" }}
+              >
+                MotorSales
+              </span>
+            </Link>
+
+            <h2
+              className="mt-12 text-3xl font-bold leading-tight"
+              style={{ fontFamily: "var(--font-sora)" }}
+            >
+              Join the Philippines' trusted motor marketplace.
             </h2>
-            <span className="text-xs text-muted-foreground">
-              <span className="text-destructive">*</span> required
-            </span>
+            <p className="mt-3 text-sm text-slate-300/90 leading-relaxed">
+              Buy, sell, and list vehicles, equipment, and services on one platform built for dealers, businesses, and private owners.
+            </p>
+
+            <ul className="mt-8 space-y-5">
+              {[
+                { t: "Verified inventory", d: "Authenticated listings from vetted dealers and private sellers." },
+                { t: "Secure transactions", d: "Encrypted messaging and platform tools that protect both sides." },
+                { t: "Nationwide reach", d: "Buyers and sellers across every region in the Philippines." },
+              ].map((f) => (
+                <li key={f.t} className="flex gap-3">
+                  <span className="mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-navy-500/25">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-navy-50" aria-hidden />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-white">{f.t}</p>
+                    <p className="text-xs text-slate-400 leading-relaxed">{f.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div id="field-firstName">
-              <Label htmlFor="first-name">
-                First name <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="first-name"
-                required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                onBlur={() => markTouched("firstName")}
-                autoComplete="given-name"
-                aria-invalid={!!errorFor("firstName")}
-                className={invalidCls("firstName")}
-              />
-              {errorFor("firstName") && (
-                <p className="mt-1 text-xs text-destructive">{errorFor("firstName")}</p>
-              )}
-            </div>
-            <div id="field-lastName">
-              <Label htmlFor="last-name">
-                Last name <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="last-name"
-                required
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                onBlur={() => markTouched("lastName")}
-                autoComplete="family-name"
-                aria-invalid={!!errorFor("lastName")}
-                className={invalidCls("lastName")}
-              />
-              {errorFor("lastName") && (
-                <p className="mt-1 text-xs text-destructive">{errorFor("lastName")}</p>
-              )}
-            </div>
+          <div className="relative mt-8 pt-6 border-t border-white/10">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+              Trusted marketplace
+            </p>
+            <p className="mt-2 text-xs text-slate-400 leading-relaxed">
+              Motorcycles · Cars · Trucks · Heavy equipment · Boats · Planes · Parts
+            </p>
           </div>
+        </aside>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div id="field-phone">
-              <Label htmlFor="phone">Mobile <span className="text-destructive">*</span></Label>
-              <PhoneInput
-                id="phone"
-                iso={phoneIso}
-                national={phoneNational}
-                onChange={({ iso, national }) => {
-                  setPhoneIso(iso);
-                  setPhoneNational(national);
-                }}
-              />
-              {errorFor("phone") ? (
-                <p className="mt-1 text-xs text-destructive">{errorFor("phone")}</p>
-              ) : (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Pick your country, then enter your number.
-                  {phoneNational.trim() && (
-                    phoneValid ? (
-                      <span className="ml-1 text-emerald-600">✓ {phoneE164}</span>
-                    ) : phoneE164 ? (
-                      <span className="ml-1 text-muted-foreground">
-                        Preview: <span className="font-mono">{phoneE164}</span>
-                        {phoneMessage ? ` — ${phoneMessage}` : ""}
-                      </span>
-                    ) : null
-                  )}
-                </p>
-              )}
-            </div>
-            <div id="field-email">
-              <Label htmlFor="email">
-                Email <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onBlur={() => markTouched("email")}
-                autoComplete="email"
-                aria-invalid={!!errorFor("email")}
-                className={invalidCls("email")}
-              />
-              {errorFor("email") && (
-                <p className="mt-1 text-xs text-destructive">{errorFor("email")}</p>
-              )}
-              {isStaffEmail(email) && (
-                <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
-                  {STAFF_EMAIL_DOMAIN} is reserved for 365 employees. Ask a 365 admin to create your account.
-                </p>
-              )}
-
-            </div>
-          </div>
-
-          <div id="field-city">
-            <Label className="mb-2 block">
-              City / Town <span className="text-destructive">*</span>
-            </Label>
-            <LocationPicker
-              value={location}
-              onChange={(v) => {
-                setLocation(v);
-                markTouched("city");
-              }}
-              showBarangay={false}
-            />
-            {errorFor("city") && (
-              <p className="mt-1 text-xs text-destructive">{errorFor("city")}</p>
-            )}
-          </div>
-
-          {!isBusinessLike && (
-            <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
-              <div id="field-street-address">
-                <Label htmlFor="street-address">
-                  Street address <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="street-address"
-                  value={streetAddress}
-                  onChange={(e) => {
-                    setStreetAddress(e.target.value);
-                    if (e.target.value.length > 0) markTouched("street-address");
-                  }}
-                  onBlur={() => markTouched("street-address")}
-                  placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
-                  autoComplete="street-address"
-                  aria-invalid={!!errorFor("street-address")}
-                  className={invalidCls("street-address")}
-                />
-                {errorFor("street-address") && (
-                  <p className="mt-1 text-xs text-destructive">{errorFor("street-address")}</p>
-                )}
-                <AddressChecklist
-                  active={touched["street-address"] || streetAddress.length > 0}
-                  items={[
-                    { label: "House / unit number", ok: addrHasNumber(streetAddress) },
-                    { label: "Street name", ok: addrHasStreetName(streetAddress) },
-                    { label: "At least 5 characters", ok: addrLongEnough(streetAddress) },
-                  ]}
-                />
+        {/* Right: compact form */}
+        <div className="flex-1 bg-white p-6 md:p-10">
+          <div className="mx-auto max-w-md">
+            <header className="mb-6">
+              <div className="md:hidden mb-4 flex items-center gap-2">
+                <span className="grid h-8 w-8 place-items-center rounded-md bg-navy-900 text-white text-[10px] font-black" style={{ fontFamily: "var(--font-sora)" }}>365</span>
+                <span className="font-bold text-navy-900 tracking-tight" style={{ fontFamily: "var(--font-sora)" }}>MotorSales</span>
               </div>
-              <div id="field-postal-code">
-                <Label htmlFor="postal-code">
-                  Postal / ZIP code <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="postal-code"
-                  value={postalCode}
-                  onChange={(e) => {
-                    setPostalCode(e.target.value);
-                    if (e.target.value.length > 0) markTouched("postal-code");
-                  }}
-                  onBlur={() => markTouched("postal-code")}
-                  placeholder="e.g. 1000"
-                  autoComplete="postal-code"
-                  inputMode="text"
-                  aria-invalid={!!errorFor("postal-code")}
-                  className={invalidCls("postal-code")}
-                />
-                {errorFor("postal-code") && (
-                  <p className="mt-1 text-xs text-destructive">{errorFor("postal-code")}</p>
-                )}
-                <AddressChecklist
-                  active={touched["postal-code"] || postalCode.length > 0}
-                  items={[{ label: "Valid postal / ZIP format", ok: postalOk(postalCode) }]}
-                />
-              </div>
-            </div>
-          )}
-
-
-          {isBusinessLike && (
-            <div className="space-y-4 rounded-xl border border-dashed border-border bg-muted/30 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Business details
-              </p>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div id="field-businessName">
-                  <Label htmlFor="business-name">
-                    {intent === "service_provider" ? "Service name" : "Business / dealer name"}{" "}
-                    <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="business-name"
-                    required
-                    value={businessName}
-                    onChange={(e) => setBusinessName(e.target.value)}
-                    onBlur={() => markTouched("businessName")}
-                    placeholder={
-                      intent === "service_provider"
-                        ? "e.g. Reyes Towing Services"
-                        : "e.g. Manila Auto Hub"
-                    }
-                    aria-invalid={!!errorFor("businessName")}
-                    className={invalidCls("businessName")}
-                  />
-                  {errorFor("businessName") && (
-                    <p className="mt-1 text-xs text-destructive">{errorFor("businessName")}</p>
-                  )}
-                </div>
-                <div id="field-businessKind">
-                  <Label htmlFor="business-kind">
-                    Category <span className="text-destructive">*</span>
-                  </Label>
-                  <Select
-                    value={businessKind}
-                    onValueChange={(v) => {
-                      setBusinessKind(v);
-                      markTouched("businessKind");
-                    }}
-                  >
-                    <SelectTrigger
-                      id="business-kind"
-                      aria-invalid={!!errorFor("businessKind")}
-                      className={invalidCls("businessKind")}
-                    >
-                      <SelectValue placeholder="Choose a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {kindOptions.map((o) => (
-                        <SelectItem key={o.value} value={o.value}>
-                          {o.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errorFor("businessKind") && (
-                    <p className="mt-1 text-xs text-destructive">{errorFor("businessKind")}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
-                <div id="field-business-address">
-                  <Label htmlFor="business-address">
-                    Street address <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="business-address"
-                    value={businessAddress}
-                    onChange={(e) => {
-                      setBusinessAddress(e.target.value);
-                      if (e.target.value.length > 0) markTouched("business-address");
-                    }}
-                    onBlur={() => markTouched("business-address")}
-                    placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
-                    autoComplete="street-address"
-                    aria-invalid={!!errorFor("business-address")}
-                    className={invalidCls("business-address")}
-                  />
-                  {errorFor("business-address") && (
-                    <p className="mt-1 text-xs text-destructive">{errorFor("business-address")}</p>
-                  )}
-                  <AddressChecklist
-                    active={touched["business-address"] || businessAddress.length > 0}
-                    items={[
-                      { label: "Building / unit number", ok: addrHasNumber(businessAddress) },
-                      { label: "Street name", ok: addrHasStreetName(businessAddress) },
-                      { label: "At least 5 characters", ok: addrLongEnough(businessAddress) },
-                    ]}
-                  />
-                </div>
-                <div id="field-business-postal">
-                  <Label htmlFor="business-postal">
-                    Postal / ZIP code <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="business-postal"
-                    value={businessPostalCode}
-                    onChange={(e) => {
-                      setBusinessPostalCode(e.target.value);
-                      if (e.target.value.length > 0) markTouched("business-postal");
-                    }}
-                    onBlur={() => markTouched("business-postal")}
-                    placeholder="e.g. 1000"
-                    autoComplete="postal-code"
-                    aria-invalid={!!errorFor("business-postal")}
-                    className={invalidCls("business-postal")}
-                  />
-                  {errorFor("business-postal") && (
-                    <p className="mt-1 text-xs text-destructive">{errorFor("business-postal")}</p>
-                  )}
-                  <AddressChecklist
-                    active={touched["business-postal"] || businessPostalCode.length > 0}
-                    items={[{ label: "Valid postal / ZIP format", ok: postalOk(businessPostalCode) }]}
-                  />
-                </div>
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                A full business address is required to create your account and appear in the directory.
-              </p>
-            </div>
-          )}
-
-          <div id="field-password">
-            <Label htmlFor="password">
-              Password <span className="text-destructive">*</span>
-            </Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                required
-                minLength={8}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onBlur={() => markTouched("password")}
-                autoComplete="new-password"
-                aria-invalid={!!errorFor("password")}
-                className={cn("pr-10", invalidCls("password"))}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={showPassword ? "Hide password" : "Show password"}
+              <h1
+                className="text-2xl font-bold text-navy-900"
+                style={{ fontFamily: "var(--font-sora)" }}
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-            {errorFor("password") ? (
-              <p className="mt-1 text-xs text-destructive">{errorFor("password")}</p>
-            ) : (
-              <p className="mt-1 text-xs text-muted-foreground">
-                At least 8 characters. Use a mix of letters and numbers.
-              </p>
-            )}
-          </div>
-
-          <div id="field-confirm-password">
-            <Label htmlFor="confirm-password">
-              Confirm password <span className="text-destructive">*</span>
-            </Label>
-            <div className="relative">
-              <Input
-                id="confirm-password"
-                type={showPassword ? "text" : "password"}
-                required
-                minLength={8}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                onBlur={() => markTouched("confirm-password")}
-                autoComplete="new-password"
-                aria-invalid={!!errorFor("confirm-password")}
-                className={cn("pr-10", invalidCls("confirm-password"))}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-            {errorFor("confirm-password") ? (
-              <p className="mt-1 text-xs text-destructive">{errorFor("confirm-password")}</p>
-            ) : (
-              <p className="mt-1 text-xs text-muted-foreground">
-                Re-enter your password to confirm.
-              </p>
-            )}
-          </div>
-
-          <div
-            id="field-terms"
-            className={cn(
-              "flex items-start gap-3 rounded-lg border bg-muted/30 p-3",
-              errorFor("terms") ? "border-destructive" : "border-border",
-            )}
-          >
-            <Checkbox
-              id="terms"
-              checked={agreed}
-              onCheckedChange={(v) => {
-                setAgreed(v === true);
-                markTouched("terms");
-              }}
-              className="mt-0.5"
-            />
-            <div className="flex-1">
-              <Label
-                htmlFor="terms"
-                className="text-sm font-normal leading-relaxed text-muted-foreground"
-              >
-                I agree to the{" "}
-                <Link to="/terms" className="font-medium text-primary underline">
-                  Terms
-                </Link>{" "}
-                and{" "}
-                <Link to="/privacy" className="font-medium text-primary underline">
-                  Privacy Policy
+                Create your account
+              </h1>
+              <p className="mt-1 text-sm text-slate-500">
+                Already have an account?{" "}
+                <Link to="/login" className="font-semibold text-navy-700 hover:text-navy-900 hover:underline">
+                  Sign in
                 </Link>
-                .
-              </Label>
-              {errorFor("terms") && (
-                <p className="mt-1 text-xs text-destructive">{errorFor("terms")}</p>
-              )}
-            </div>
-          </div>
+              </p>
+            </header>
 
-          {intent &&
-            (issues.length > 0 ? (
-              <div
-                className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm"
-                role="alert"
-                aria-live="polite"
-              >
-                <div className="flex items-center gap-2 font-semibold text-destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  Before you can create your {intentMeta?.label.toLowerCase()} account
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+              {/* Account type — segmented control */}
+              <div id="field-intent">
+                <label className={sectionLabelCls + " mb-2"}>Account type</label>
+                <div
+                  role="radiogroup"
+                  aria-label="Account type"
+                  className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1"
+                >
+                  {SIGNUP_TYPES.map((t) => {
+                    const active = intent === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        onClick={() => setIntent(t.id)}
+                        className={cn(
+                          "rounded-md px-2 py-2 text-[11px] sm:text-xs font-semibold transition",
+                          active
+                            ? "bg-white text-navy-900 shadow-sm border border-slate-200"
+                            : "text-slate-500 hover:text-navy-700 hover:bg-white/60",
+                        )}
+                      >
+                        {t.label}
+                      </button>
+                    );
+                  })}
                 </div>
-                <ul className="mt-2 space-y-1 text-foreground">
-                  {issues.map((i) => (
-                    <li key={i.field} className="flex gap-2">
-                      <span className="text-destructive">•</span>
-                      <span>
-                        <span className="font-medium">{i.label}:</span>{" "}
-                        <span className="text-muted-foreground">{i.message}</span>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                {intent && intentMeta?.note && (
+                  <p className="mt-2 text-[11px] text-slate-500 leading-snug">
+                    {intentMeta.note}
+                  </p>
+                )}
+                {errorFor("intent") && (
+                  <p className="mt-1 text-xs text-destructive">{errorFor("intent")}</p>
+                )}
               </div>
-            ) : (
-              <div className="flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-3 text-sm text-emerald-700 dark:text-emerald-400">
-                <CheckCircle2 className="h-4 w-4" />
-                All set — you're ready to create your account.
+
+              <div
+                className={cn(
+                  "space-y-4 transition-opacity",
+                  !intent && "pointer-events-none opacity-50",
+                )}
+                aria-disabled={!intent}
+              >
+                {/* Name pair */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div id="field-firstName">
+                    <label htmlFor="first-name" className={fieldLabelCls}>
+                      First name <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      id="first-name"
+                      required
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      onBlur={() => markTouched("firstName")}
+                      autoComplete="given-name"
+                      placeholder="Juan"
+                      aria-invalid={!!errorFor("firstName")}
+                      className={invalidInputCls("firstName")}
+                    />
+                    {errorFor("firstName") && (
+                      <p className="mt-1 text-[11px] text-destructive">{errorFor("firstName")}</p>
+                    )}
+                  </div>
+                  <div id="field-lastName">
+                    <label htmlFor="last-name" className={fieldLabelCls}>
+                      Last name <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      id="last-name"
+                      required
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      onBlur={() => markTouched("lastName")}
+                      autoComplete="family-name"
+                      placeholder="Dela Cruz"
+                      aria-invalid={!!errorFor("lastName")}
+                      className={invalidInputCls("lastName")}
+                    />
+                    {errorFor("lastName") && (
+                      <p className="mt-1 text-[11px] text-destructive">{errorFor("lastName")}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Mobile + Email */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div id="field-phone">
+                    <label htmlFor="phone" className={fieldLabelCls}>
+                      Mobile <span className="text-destructive">*</span>
+                    </label>
+                    <PhoneInput
+                      id="phone"
+                      iso={phoneIso}
+                      national={phoneNational}
+                      onChange={({ iso, national }) => {
+                        setPhoneIso(iso);
+                        setPhoneNational(national);
+                      }}
+                    />
+                    {errorFor("phone") ? (
+                      <p className="mt-1 text-[11px] text-destructive">{errorFor("phone")}</p>
+                    ) : phoneNational.trim() ? (
+                      <p className="mt-1 text-[10px] text-slate-400 font-mono">
+                        {phoneValid ? (
+                          <span className="text-emerald-600">✓ {phoneE164}</span>
+                        ) : phoneE164 ? (
+                          <span>Preview: {phoneE164}{phoneMessage ? ` — ${phoneMessage}` : ""}</span>
+                        ) : null}
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-[10px] text-slate-400">
+                        Pick country, then enter your number.
+                      </p>
+                    )}
+                  </div>
+                  <div id="field-email">
+                    <label htmlFor="email" className={fieldLabelCls}>
+                      Email <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onBlur={() => markTouched("email")}
+                      autoComplete="email"
+                      placeholder="you@example.com"
+                      aria-invalid={!!errorFor("email")}
+                      className={invalidInputCls("email")}
+                    />
+                    {errorFor("email") && (
+                      <p className="mt-1 text-[11px] text-destructive">{errorFor("email")}</p>
+                    )}
+                    {isStaffEmail(email) && (
+                      <p className="mt-1 text-[11px] text-amber-700">
+                        {STAFF_EMAIL_DOMAIN} is reserved for 365 employees.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Location cascade — City / Region / Province / City */}
+                <div className="pt-2 border-t border-slate-100">
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className={sectionLabelCls}>Location</label>
+                  </div>
+                  <div id="field-city">
+                    <LocationPicker
+                      value={location}
+                      onChange={(v) => {
+                        setLocation(v);
+                        markTouched("city");
+                      }}
+                      showBarangay={false}
+                    />
+                    {errorFor("city") && (
+                      <p className="mt-1 text-[11px] text-destructive">{errorFor("city")}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Personal address (only when not business-like) */}
+                {!isBusinessLike && (
+                  <div className="grid grid-cols-3 gap-3">
+                    <div id="field-street-address" className="col-span-2">
+                      <label htmlFor="street-address" className={fieldLabelCls}>
+                        Street address <span className="text-destructive">*</span>
+                      </label>
+                      <input
+                        id="street-address"
+                        value={streetAddress}
+                        onChange={(e) => {
+                          setStreetAddress(e.target.value);
+                          if (e.target.value.length > 0) markTouched("street-address");
+                        }}
+                        onBlur={() => markTouched("street-address")}
+                        placeholder="123 Rizal Ave, Brgy. San Jose"
+                        autoComplete="street-address"
+                        aria-invalid={!!errorFor("street-address")}
+                        className={invalidInputCls("street-address")}
+                      />
+                      {errorFor("street-address") && (
+                        <p className="mt-1 text-[11px] text-destructive">{errorFor("street-address")}</p>
+                      )}
+                      <AddressChecklist
+                        active={touched["street-address"] || streetAddress.length > 0}
+                        items={[
+                          { label: "House / unit number", ok: addrHasNumber(streetAddress) },
+                          { label: "Street name", ok: addrHasStreetName(streetAddress) },
+                          { label: "At least 5 characters", ok: addrLongEnough(streetAddress) },
+                        ]}
+                      />
+                    </div>
+                    <div id="field-postal-code">
+                      <label htmlFor="postal-code" className={fieldLabelCls}>
+                        Postal <span className="text-destructive">*</span>
+                      </label>
+                      <input
+                        id="postal-code"
+                        value={postalCode}
+                        onChange={(e) => {
+                          setPostalCode(e.target.value);
+                          if (e.target.value.length > 0) markTouched("postal-code");
+                        }}
+                        onBlur={() => markTouched("postal-code")}
+                        placeholder="1000"
+                        autoComplete="postal-code"
+                        aria-invalid={!!errorFor("postal-code")}
+                        className={invalidInputCls("postal-code")}
+                      />
+                      {errorFor("postal-code") && (
+                        <p className="mt-1 text-[11px] text-destructive">{errorFor("postal-code")}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Business section */}
+                {isBusinessLike && (
+                  <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50/60 p-3">
+                    <p className={sectionLabelCls}>
+                      {intent === "service_provider" ? "Service details" : "Business details"}
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div id="field-businessName">
+                        <label htmlFor="business-name" className={fieldLabelCls}>
+                          {intent === "service_provider" ? "Service name" : "Business name"}{" "}
+                          <span className="text-destructive">*</span>
+                        </label>
+                        <input
+                          id="business-name"
+                          required
+                          value={businessName}
+                          onChange={(e) => setBusinessName(e.target.value)}
+                          onBlur={() => markTouched("businessName")}
+                          placeholder={
+                            intent === "service_provider"
+                              ? "Reyes Towing Services"
+                              : "Manila Auto Hub"
+                          }
+                          aria-invalid={!!errorFor("businessName")}
+                          className={invalidInputCls("businessName")}
+                        />
+                        {errorFor("businessName") && (
+                          <p className="mt-1 text-[11px] text-destructive">{errorFor("businessName")}</p>
+                        )}
+                      </div>
+                      <div id="field-businessKind">
+                        <label htmlFor="business-kind" className={fieldLabelCls}>
+                          Category <span className="text-destructive">*</span>
+                        </label>
+                        <Select
+                          value={businessKind}
+                          onValueChange={(v) => {
+                            setBusinessKind(v);
+                            markTouched("businessKind");
+                          }}
+                        >
+                          <SelectTrigger
+                            id="business-kind"
+                            aria-invalid={!!errorFor("businessKind")}
+                            className={cn(
+                              "w-full rounded-lg border-slate-200 bg-white text-sm h-auto py-2",
+                              errorFor("businessKind") && "border-destructive",
+                            )}
+                          >
+                            <SelectValue placeholder="Choose a category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {kindOptions.map((o) => (
+                              <SelectItem key={o.value} value={o.value}>
+                                {o.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {errorFor("businessKind") && (
+                          <p className="mt-1 text-[11px] text-destructive">{errorFor("businessKind")}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div id="field-business-address" className="col-span-2">
+                        <label htmlFor="business-address" className={fieldLabelCls}>
+                          Street address <span className="text-destructive">*</span>
+                        </label>
+                        <input
+                          id="business-address"
+                          value={businessAddress}
+                          onChange={(e) => {
+                            setBusinessAddress(e.target.value);
+                            if (e.target.value.length > 0) markTouched("business-address");
+                          }}
+                          onBlur={() => markTouched("business-address")}
+                          placeholder="123 Rizal Ave, Brgy. San Jose"
+                          autoComplete="street-address"
+                          aria-invalid={!!errorFor("business-address")}
+                          className={invalidInputCls("business-address")}
+                        />
+                        {errorFor("business-address") && (
+                          <p className="mt-1 text-[11px] text-destructive">{errorFor("business-address")}</p>
+                        )}
+                        <AddressChecklist
+                          active={touched["business-address"] || businessAddress.length > 0}
+                          items={[
+                            { label: "Building / unit number", ok: addrHasNumber(businessAddress) },
+                            { label: "Street name", ok: addrHasStreetName(businessAddress) },
+                            { label: "At least 5 characters", ok: addrLongEnough(businessAddress) },
+                          ]}
+                        />
+                      </div>
+                      <div id="field-business-postal">
+                        <label htmlFor="business-postal" className={fieldLabelCls}>
+                          Postal <span className="text-destructive">*</span>
+                        </label>
+                        <input
+                          id="business-postal"
+                          value={businessPostalCode}
+                          onChange={(e) => {
+                            setBusinessPostalCode(e.target.value);
+                            if (e.target.value.length > 0) markTouched("business-postal");
+                          }}
+                          onBlur={() => markTouched("business-postal")}
+                          placeholder="1000"
+                          autoComplete="postal-code"
+                          aria-invalid={!!errorFor("business-postal")}
+                          className={invalidInputCls("business-postal")}
+                        />
+                        {errorFor("business-postal") && (
+                          <p className="mt-1 text-[11px] text-destructive">{errorFor("business-postal")}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Password pair */}
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+                  <div id="field-password">
+                    <label htmlFor="password" className={fieldLabelCls}>
+                      Password <span className="text-destructive">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        required
+                        minLength={8}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onBlur={() => markTouched("password")}
+                        autoComplete="new-password"
+                        placeholder="••••••••"
+                        aria-invalid={!!errorFor("password")}
+                        className={cn(invalidInputCls("password"), "pr-9")}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-navy-700"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                      </button>
+                    </div>
+                    {errorFor("password") ? (
+                      <p className="mt-1 text-[11px] text-destructive">{errorFor("password")}</p>
+                    ) : (
+                      <p className="mt-1 text-[10px] text-slate-400">Min 8 characters.</p>
+                    )}
+                  </div>
+                  <div id="field-confirm-password">
+                    <label htmlFor="confirm-password" className={fieldLabelCls}>
+                      Confirm <span className="text-destructive">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="confirm-password"
+                        type={showPassword ? "text" : "password"}
+                        required
+                        minLength={8}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        onBlur={() => markTouched("confirm-password")}
+                        autoComplete="new-password"
+                        placeholder="••••••••"
+                        aria-invalid={!!errorFor("confirm-password")}
+                        className={cn(invalidInputCls("confirm-password"), "pr-9")}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-navy-700"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                      </button>
+                    </div>
+                    {errorFor("confirm-password") && (
+                      <p className="mt-1 text-[11px] text-destructive">{errorFor("confirm-password")}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Terms */}
+                <div id="field-terms" className="flex items-start gap-2 pt-1">
+                  <Checkbox
+                    id="terms"
+                    checked={agreed}
+                    onCheckedChange={(v) => {
+                      setAgreed(v === true);
+                      markTouched("terms");
+                    }}
+                    className="mt-0.5"
+                  />
+                  <label
+                    htmlFor="terms"
+                    className="text-[11px] leading-snug text-slate-500"
+                  >
+                    I agree to the{" "}
+                    <Link to="/terms" className="font-semibold text-navy-700 hover:underline">
+                      Terms
+                    </Link>{" "}
+                    and{" "}
+                    <Link to="/privacy" className="font-semibold text-navy-700 hover:underline">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </label>
+                </div>
+                {errorFor("terms") && (
+                  <p className="text-[11px] text-destructive -mt-2">{errorFor("terms")}</p>
+                )}
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  disabled={submitting || !intent}
+                  className={cn(
+                    "w-full rounded-lg bg-navy-900 py-2.5 text-sm font-bold text-white shadow-lg shadow-navy-900/20 transition hover:bg-navy-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60",
+                  )}
+                  style={{ fontFamily: "var(--font-sora)" }}
+                >
+                  {submitting
+                    ? "Creating account…"
+                    : intent
+                      ? `Create ${intentMeta?.label.toLowerCase()} account`
+                      : "Choose an account type"}
+                </button>
+
+                {/* Divider */}
+                <div className="relative py-1">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-200" />
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="bg-white px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                      Or register with
+                    </span>
+                  </div>
+                </div>
+
+                {/* Google */}
+                <button
+                  type="button"
+                  onClick={handleGoogle}
+                  disabled={!intent}
+                  className="w-full flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden>
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                  Continue with Google
+                </button>
               </div>
-            ))}
-
-          <Button type="submit" disabled={submitting || !intent} className="w-full" size="lg">
-            {submitting
-              ? "Creating account…"
-              : intent
-                ? `Create ${intentMeta?.label.toLowerCase()} account`
-                : "Choose an account type to continue"}
-          </Button>
-
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs uppercase text-muted-foreground">or</span>
-            <div className="h-px flex-1 bg-border" />
+            </form>
           </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleGoogle}
-            disabled={!intent}
-            className="w-full"
-          >
-            Continue with Google
-          </Button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
-          <Link to="/login" className="font-semibold text-primary hover:underline">
-            Sign in
-          </Link>
-        </p>
+        </div>
       </div>
-    </SiteLayout>
+    </div>
   );
 }
+
