@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/site-layout";
 import { siteOrigin } from "@/lib/site-config";
+import type { SignupIntent } from "@/components/signup/account-type-grid.types";
 
 type Search = { email?: string; intent?: string; redirect?: string };
 
