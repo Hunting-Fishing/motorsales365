@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/site-layout";
 import { siteOrigin } from "@/lib/site-config";
+import type { SignupIntent } from "@/components/signup/account-type-grid.types";
 
 type Search = { email?: string; intent?: string; redirect?: string };
 
@@ -121,13 +122,10 @@ function VerifyEmailPage() {
           <div className="flex items-center justify-between text-sm text-muted-foreground">
           <Link
             to="/signup"
-            search={
-              intent
-                ? { type: intent, ...(redirect ? { redirect } : {}) }
-                : redirect
-                  ? { redirect }
-                  : {}
-            }
+            search={{
+              ...(intent ? { type: intent as SignupIntent } : {}),
+              ...(redirect ? { redirect } : {}),
+            }}
             className="hover:underline"
           >
             Wrong email? Start over
