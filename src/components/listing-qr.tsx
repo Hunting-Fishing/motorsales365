@@ -29,7 +29,7 @@ interface ListingQrProps {
   className?: string;
   compact?: boolean;
   /** Optional custom trigger. When provided, replaces the default button entirely. */
-  trigger?: React.ReactNode;
+  trigger?: ReactNode;
 }
 
 
