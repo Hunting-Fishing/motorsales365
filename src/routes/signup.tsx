@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
@@ -18,12 +18,26 @@ import {
 import { cn } from "@/lib/utils";
 import { getCreditedCode } from "@/lib/referral";
 import { SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid.types";
-import { LocationPicker, type LocationValue } from "@/components/location-picker";
-import { PhoneInput } from "@/components/phone-input";
-import { buildE164, getPhoneHint, validatePhone } from "@/data/country-codes";
+import type { LocationValue } from "@/components/location-picker";
 import { siteOrigin } from "@/lib/site-config";
 import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
 import { readPending, writePending, clearPending } from "@/lib/signup-pending";
+
+// Heavy sub-widgets are lazy-loaded so the account-type segmented control
+// hydrates immediately. Without this the ~47 KB PSGC dataset (LocationPicker)
+// and the full country-codes list (PhoneInput) block the main /signup chunk.
+const LocationPicker = lazy(() =>
+  import("@/components/location-picker").then((m) => ({ default: m.LocationPicker })),
+);
+const PhoneInput = lazy(() =>
+  import("@/components/phone-input").then((m) => ({ default: m.PhoneInput })),
+);
+
+// Country-codes validation is loaded on demand for the same reason. Until it
+// resolves, phone validation is optimistic (non-empty = "ok") so the form
+// isn't blocked; real validation kicks in as soon as the module lands
+// (usually within a tick of mount thanks to the idle preloader below).
+type PhoneApi = typeof import("@/data/country-codes");
 
 
 type SignupSearch = { type?: SignupIntent; redirect?: string };
