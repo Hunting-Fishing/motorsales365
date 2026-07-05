@@ -249,6 +249,8 @@ function MyListings() {
         </Button>
       </div>
 
+      <ProfileCompletenessBanner userId={user?.id} />
+
       <BusinessWorkspaceBanner userId={user?.id} />
 
 
