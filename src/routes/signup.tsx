@@ -636,8 +636,15 @@ function SignupPage() {
               ) : (
                 <p className="mt-1 text-xs text-muted-foreground">
                   Pick your country, then enter your number.
-                  {phoneNational.trim() && phoneValid && (
-                    <span className="ml-1 text-emerald-600">✓ {phoneE164}</span>
+                  {phoneNational.trim() && (
+                    phoneValid ? (
+                      <span className="ml-1 text-emerald-600">✓ {phoneE164}</span>
+                    ) : phoneE164 ? (
+                      <span className="ml-1 text-muted-foreground">
+                        Preview: <span className="font-mono">{phoneE164}</span>
+                        {phoneMessage ? ` — ${phoneMessage}` : ""}
+                      </span>
+                    ) : null
                   )}
                 </p>
               )}
