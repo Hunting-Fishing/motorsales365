@@ -969,7 +969,7 @@ function SignupPage() {
                 )}
 
                 {/* Password pair */}
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+                <div className="grid grid-cols-2 gap-3 pt-1 md:pt-2 border-t border-slate-100">
                   <div id="field-password">
                     <label htmlFor="password" className={fieldLabelCls}>
                       Password <span className="text-destructive">*</span>
