@@ -2,6 +2,8 @@ import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-r
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
+
 
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
