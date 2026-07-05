@@ -644,7 +644,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // is a no-op when the stash is missing / already applied, matches the
       // stash to this user by email, and retries with backoff on failure.
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "USER_UPDATED") {
-        void applyPendingIfAny(newSession).then((result) => {
+        void applyPendingIfAny(newSession).then(async (result) => {
           if (result.ok) {
             authLog("info", {
               event: "signup_pending.applied",
@@ -659,8 +659,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               error: result.error,
             });
           }
+          // Block OAuth signups from proceeding with an incomplete profile.
+          // Only trigger on SIGNED_IN (fresh sign-in this tab) so existing
+          // users aren't yanked mid-session on hard refresh.
+          if (event !== "SIGNED_IN" || typeof window === "undefined") return;
+          const path = window.location.pathname;
+          // Never bounce from routes that are already part of the auth /
+          // completion flow, or from the completion page itself.
+          const bypass = [
+            "/complete-profile",
+            "/auth",
+            "/login",
+            "/signup",
+            "/verify-email",
+            "/logout",
+          ];
+          if (bypass.some((p) => path === p || path.startsWith(p + "/"))) return;
+          try {
+            const { checkProfileCompletion } = await import(
+              "@/lib/profile-completion.functions"
+            );
+            const check = await checkProfileCompletion({});
+            if (!check.complete) {
+              authLog("info", {
+                event: "profile.incomplete_redirect",
+                uid: newSession.user?.id,
+                missing: check.missing.map((m) => m.field),
+              });
+              const redirect = encodeURIComponent(
+                window.location.pathname + window.location.search,
+              );
+              window.location.assign(`/complete-profile?redirect=${redirect}`);
+            }
+          } catch (err) {
+            authLog("warn", {
+              event: "profile.completion_check_failed",
+              uid: newSession.user?.id,
+              error: errMsg(err),
+            });
+          }
         });
       }
+
     });
 
     // Re-validate the persisted session with the Auth server (getUser) rather
