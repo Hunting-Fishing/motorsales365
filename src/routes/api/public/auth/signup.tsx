@@ -1,10 +1,54 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
+import { createHash } from "crypto";
 import { validatePhone } from "@/data/country-codes";
 import { BUSINESS_KIND_VALUES } from "@/data/business-kinds";
 import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
+
+// Non-sensitive audit for failed signups. We record ONLY:
+//   - reason category
+//   - missing / invalid field names (no values)
+//   - chosen intent + phone country iso (not the phone number)
+//   - HTTP status
+//   - salted SHA-256 hash of the caller IP for abuse-pattern grouping
+//   - truncated user agent
+// No emails, passwords, phone numbers, names, or addresses are stored.
+async function logSignupFailure(
+  sb: SupabaseClient<Database>,
+  request: Request,
+  args: {
+    reason: string;
+    missing_fields: string[];
+    status_code: number;
+    intent?: string | null;
+    phone_iso?: string | null;
+  },
+) {
+  try {
+    const ip =
+      request.headers.get("cf-connecting-ip") ??
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      null;
+    const salt = process.env.SIGNUP_AUDIT_SALT ?? process.env.SUPABASE_URL ?? "";
+    const ip_hash = ip ? createHash("sha256").update(`${salt}:${ip}`).digest("hex") : null;
+    const ua = (request.headers.get("user-agent") ?? "").slice(0, 200);
+    await (sb.from("signup_failure_events") as any).insert({
+      reason: args.reason,
+      missing_fields: args.missing_fields,
+      status_code: args.status_code,
+      intent: args.intent ?? null,
+      phone_iso: args.phone_iso ?? null,
+      ip_hash,
+      user_agent: ua || null,
+    });
+  } catch {
+    // never let audit failures block the response
+  }
+}
+
+
 
 // Server-side signup validator + creator. The old client path called
 // `supabase.auth.signUp` directly, so anyone bypassing the UI could create an
