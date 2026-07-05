@@ -10015,6 +10015,42 @@ export type Database = {
           },
         ]
       }
+      signup_failure_events: {
+        Row: {
+          created_at: string
+          id: string
+          intent: string | null
+          ip_hash: string | null
+          missing_fields: string[]
+          phone_iso: string | null
+          reason: string
+          status_code: number
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          intent?: string | null
+          ip_hash?: string | null
+          missing_fields?: string[]
+          phone_iso?: string | null
+          reason: string
+          status_code: number
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          intent?: string | null
+          ip_hash?: string | null
+          missing_fields?: string[]
+          phone_iso?: string | null
+          reason?: string
+          status_code?: number
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           description: string | null
