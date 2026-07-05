@@ -872,14 +872,24 @@ function SignupPage() {
                   </div>
 
                   <div id="field-city">
-                    <LocationPicker
-                      value={location}
-                      onChange={(v) => {
-                        setLocation(v);
-                        markTouched("city");
-                      }}
-                      showBarangay={false}
-                    />
+                    <Suspense
+                      fallback={
+                        <div className="space-y-2" aria-hidden>
+                          <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+                          <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+                          <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+                        </div>
+                      }
+                    >
+                      <LocationPicker
+                        value={location}
+                        onChange={(v) => {
+                          setLocation(v);
+                          markTouched("city");
+                        }}
+                        showBarangay={false}
+                      />
+                    </Suspense>
                     {errorFor("city") && (
                       <p className="mt-1 text-[11px] text-destructive">{errorFor("city")}</p>
                     )}
