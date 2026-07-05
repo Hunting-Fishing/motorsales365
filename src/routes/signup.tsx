@@ -537,10 +537,11 @@ function SignupPage() {
 
   return (
     <div
-      className="min-h-dvh flex items-center justify-center bg-navy-50 px-4 py-6 md:py-10"
+      className="min-h-dvh flex items-center justify-center bg-navy-50 px-3 py-3 md:px-4 md:py-10"
       style={{ fontFamily: "var(--font-manrope)" }}
     >
-      <div className="w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl shadow-navy-900/10 flex flex-col md:flex-row md:min-h-[720px] border border-slate-200/60">
+      <div className="w-full max-w-5xl overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-xl md:shadow-2xl shadow-navy-900/10 flex flex-col md:flex-row md:min-h-[720px] border border-slate-200/60">
+
         {/* Left: brand / value panel */}
         <aside
           className="hidden md:flex md:w-[38%] bg-navy-900 text-white p-10 flex-col justify-between relative overflow-hidden"
