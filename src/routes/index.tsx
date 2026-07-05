@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
 import {
   Search,
   Car,
@@ -69,34 +71,56 @@ function Index() {
   const navigate = useNavigate();
   const [category, setCategory] = useState<string>("car");
   const [keyword, setKeyword] = useState("");
-  const [featured, setFeatured] = useState<ListingCardData[]>([]);
-  const [recent, setRecent] = useState<ListingCardData[]>([]);
   const { ids: blockedIds } = useBlockedUserIds();
-  const visibleFeatured = featured.filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id));
-  const visibleRecent = recent.filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id));
 
-  useEffect(() => {
-    const load = async () => {
-      const { data: boostedRows } = await supabase
-        .from("listings")
-        .select(
-          "id,title,price_php,monthly_php,down_payment_php,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))",
-        )
-        .in("status", ["active", "pending_sale"])
-        .gt("boost_until", new Date().toISOString())
-        .order("boost_until", { ascending: false })
-        .limit(8);
+  const { data: homeData } = useQuery({
+    queryKey: ["home", "listings"],
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    queryFn: async () => {
+      const [boostedRes, recentRes] = await Promise.all([
+        supabase
+          .from("listings")
+          .select(
+            "id,title,price_php,monthly_php,down_payment_php,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))",
+          )
+          .in("status", ["active", "pending_sale"])
+          .gt("boost_until", new Date().toISOString())
+          .order("boost_until", { ascending: false })
+          .limit(8),
+        supabase
+          .from("listings")
+          .select(
+            "id,title,price_php,monthly_php,down_payment_php,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))",
+          )
+          .in("status", ["active", "pending_sale"])
+          .order("published_at", { ascending: false, nullsFirst: false })
+          .limit(12),
+      ]);
+      const boostedRows = boostedRes.data;
+      const recentRows = recentRes.data;
 
-      const { data: recentRows } = await supabase
-        .from("listings")
-        .select(
-          "id,title,price_php,monthly_php,down_payment_php,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))",
-        )
-        .in("status", ["active", "pending_sale"])
-        .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(12);
+      const userIds = Array.from(
+        new Set(
+          [...(boostedRows ?? []), ...(recentRows ?? [])]
+            .map((r: any) => r.user_id)
+            .filter(Boolean),
+        ),
+      );
+      let dealers: Record<
+        string,
+        { planName: string; currentPeriodEnd: string | null; cancelAtPeriodEnd: boolean; status: string }
+      > = {};
+      if (userIds.length > 0) {
+        try {
+          const res = await getActiveDealerStatus({ data: { userIds } });
+          dealers = res.dealers;
+        } catch {
+          /* ignore */
+        }
+      }
 
-      const map = (rows: any[] | null, dealers: Record<string, { planName: string; currentPeriodEnd: string | null; cancelAtPeriodEnd: boolean; status: string }>): ListingCardData[] =>
+      const map = (rows: any[] | null): ListingCardData[] =>
         (rows ?? []).map((r) => {
           const photos = (r.listing_media ?? []).filter((m: any) => m.type === "photo");
           const videos = (r.listing_media ?? []).filter((m: any) => m.type === "video");
@@ -127,23 +151,16 @@ function Index() {
             attributes: r.attributes,
           };
         });
-      const userIds = Array.from(
-        new Set([...(boostedRows ?? []), ...(recentRows ?? [])].map((r: any) => r.user_id).filter(Boolean)),
-      );
-      let dealers: Record<string, { planName: string; currentPeriodEnd: string | null; cancelAtPeriodEnd: boolean; status: string }> = {};
-      if (userIds.length > 0) {
-        try {
-          const res = await getActiveDealerStatus({ data: { userIds } });
-          dealers = res.dealers;
-        } catch {
-          /* ignore */
-        }
-      }
-      setFeatured(map(boostedRows, dealers));
-      setRecent(map(recentRows, dealers));
-    };
-    load();
-  }, []);
+
+      return { featured: map(boostedRows), recent: map(recentRows) };
+    },
+  });
+
+  const featured = homeData?.featured ?? [];
+  const recent = homeData?.recent ?? [];
+  const visibleFeatured = featured.filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id));
+  const visibleRecent = recent.filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id));
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

@@ -432,7 +432,7 @@ export function SiteHeader() {
                 </div>
               );
             })()
-          ) : loading ? (
+          ) : loading && user ? (
             <div
               className="flex items-center gap-2 rounded-md border border-border bg-secondary/40 px-3 py-1.5"
               aria-live="polite"
