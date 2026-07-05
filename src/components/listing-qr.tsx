@@ -51,7 +51,9 @@ export function ListingQr({
   triggerLabel = "QR & Poster",
   className,
   compact = false,
+  trigger,
 }: ListingQrProps) {
+
   const [open, setOpen] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const url = getListingUrl(listingId, baseUrl);
