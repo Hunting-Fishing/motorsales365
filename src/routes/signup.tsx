@@ -346,7 +346,7 @@ function SignupPage() {
 
   const stashPendingProfile = () => {
     writePending({
-      intent,
+      intent: intent ?? undefined,
       full_name: fullName || undefined,
       first_name: firstName.trim() || undefined,
       last_name: lastName.trim() || undefined,
