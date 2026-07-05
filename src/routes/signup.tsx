@@ -345,35 +345,30 @@ function SignupPage() {
   // are valid across business and service_provider, so no reset is needed.
 
   const stashPendingProfile = () => {
-    try {
-      const payload = {
-        intent,
-        full_name: fullName || undefined,
-        first_name: firstName.trim() || undefined,
-        last_name: lastName.trim() || undefined,
-        email: email.trim() || undefined,
-        personal_email: email.trim() || undefined,
-        phone: phoneE164 || undefined,
-        phone_iso: phoneIso || undefined,
-        phone_national: phoneNational.trim() || undefined,
-        business_name: isBusinessLike ? businessName.trim() || undefined : undefined,
-        business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
-        business_kind: isBusinessLike ? businessKind || undefined : undefined,
-        street_address: streetAddress.trim() || undefined,
-        postal_code: postalCode.trim() || undefined,
-        business_postal_code: isBusinessLike ? businessPostalCode.trim() || undefined : undefined,
-        region: location.region ?? undefined,
-        province: location.province ?? undefined,
-        city: location.city ?? undefined,
-        is_business: isBusinessLike,
-        agreed,
-        ref_code: refCode.trim() || undefined,
-        saved_at: Date.now(),
-      };
-      window.localStorage.setItem("signup.pending", JSON.stringify(payload));
-    } catch {
-      // localStorage may be unavailable; pending payload is best-effort only.
-    }
+    writePending({
+      intent,
+      full_name: fullName || undefined,
+      first_name: firstName.trim() || undefined,
+      last_name: lastName.trim() || undefined,
+      email: email.trim() || undefined,
+      personal_email: email.trim() || undefined,
+      phone: phoneE164 || undefined,
+      phone_iso: phoneIso || undefined,
+      phone_national: phoneNational.trim() || undefined,
+      business_name: isBusinessLike ? businessName.trim() || undefined : undefined,
+      business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
+      business_kind: isBusinessLike ? businessKind || undefined : undefined,
+      street_address: streetAddress.trim() || undefined,
+      postal_code: postalCode.trim() || undefined,
+      business_postal_code: isBusinessLike ? businessPostalCode.trim() || undefined : undefined,
+      region: location.region ?? undefined,
+      province: location.province ?? undefined,
+      city: location.city ?? undefined,
+      is_business: isBusinessLike,
+      agreed,
+      ref_code: refCode.trim() || undefined,
+      saved_at: Date.now(),
+    });
   };
 
 
