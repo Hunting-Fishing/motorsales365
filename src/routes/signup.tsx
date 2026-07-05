@@ -695,7 +695,10 @@ function SignupPage() {
                 <Input
                   id="street-address"
                   value={streetAddress}
-                  onChange={(e) => setStreetAddress(e.target.value)}
+                  onChange={(e) => {
+                    setStreetAddress(e.target.value);
+                    if (e.target.value.length > 0) markTouched("street-address");
+                  }}
                   onBlur={() => markTouched("street-address")}
                   placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
                   autoComplete="street-address"
@@ -705,6 +708,14 @@ function SignupPage() {
                 {errorFor("street-address") && (
                   <p className="mt-1 text-xs text-destructive">{errorFor("street-address")}</p>
                 )}
+                <AddressChecklist
+                  active={touched["street-address"] || streetAddress.length > 0}
+                  items={[
+                    { label: "House / unit number", ok: addrHasNumber(streetAddress) },
+                    { label: "Street name", ok: addrHasStreetName(streetAddress) },
+                    { label: "At least 5 characters", ok: addrLongEnough(streetAddress) },
+                  ]}
+                />
               </div>
               <div id="field-postal-code">
                 <Label htmlFor="postal-code">
@@ -713,7 +724,10 @@ function SignupPage() {
                 <Input
                   id="postal-code"
                   value={postalCode}
-                  onChange={(e) => setPostalCode(e.target.value)}
+                  onChange={(e) => {
+                    setPostalCode(e.target.value);
+                    if (e.target.value.length > 0) markTouched("postal-code");
+                  }}
                   onBlur={() => markTouched("postal-code")}
                   placeholder="e.g. 1000"
                   autoComplete="postal-code"
@@ -724,9 +738,14 @@ function SignupPage() {
                 {errorFor("postal-code") && (
                   <p className="mt-1 text-xs text-destructive">{errorFor("postal-code")}</p>
                 )}
+                <AddressChecklist
+                  active={touched["postal-code"] || postalCode.length > 0}
+                  items={[{ label: "Valid postal / ZIP format", ok: postalOk(postalCode) }]}
+                />
               </div>
             </div>
           )}
+
 
           {isBusinessLike && (
             <div className="space-y-4 rounded-xl border border-dashed border-border bg-muted/30 p-4">
