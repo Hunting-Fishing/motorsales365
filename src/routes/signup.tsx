@@ -666,11 +666,12 @@ function SignupPage() {
 
               <div
                 className={cn(
-                  "space-y-4 transition-opacity",
+                  "space-y-3 md:space-y-4 transition-opacity",
                   !intent && "pointer-events-none opacity-50",
                 )}
                 aria-disabled={!intent}
               >
+
                 {/* Name pair */}
                 <div className="grid grid-cols-2 gap-3">
                   <div id="field-firstName">
