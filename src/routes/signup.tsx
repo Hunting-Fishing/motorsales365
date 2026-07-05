@@ -427,14 +427,24 @@ function SignupPage() {
   };
 
   const handleGoogle = async () => {
-    if (!intent) {
-      toast.error("Please choose what kind of account you'd like first.");
+    setSubmitAttempted(true);
+    // Same identity-step validation as email/password signup, minus the
+    // password fields (Google supplies credentials). We still require phone,
+    // personal email, address, and (for business) business_* so the applier
+    // can persist them into `profiles` after the OAuth round-trip.
+    const oauthIssues = issues.filter(
+      (i) => i.field !== "password" && i.field !== "confirm-password",
+    );
+    if (oauthIssues.length > 0) {
+      toast.error(
+        `Please fix ${oauthIssues.length} ${oauthIssues.length === 1 ? "field" : "fields"} before continuing with Google.`,
+      );
+      const first = oauthIssues[0].field;
+      const el = document.getElementById(`field-${first}`) ?? document.getElementById(first);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    if (!agreed) {
-      toast.error("Please agree to the Terms and Privacy Policy first.");
-      return;
-    }
+    if (!intent) return;
     stashPendingProfile();
     const returnTo = search.redirect
       ? `${siteOrigin()}/login?redirect=${encodeURIComponent(search.redirect)}`
@@ -449,6 +459,7 @@ function SignupPage() {
     if (result.redirected) return;
     goAfterSignup(POST_SIGNUP_ROUTE[intent]);
   };
+
 
   return (
     <SiteLayout>
