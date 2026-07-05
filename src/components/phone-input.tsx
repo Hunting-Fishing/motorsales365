@@ -84,7 +84,7 @@ export function PhoneInput({ iso, national, onChange, placeholder, id, disabled 
         inputMode="tel"
         autoComplete="tel-national"
         placeholder={placeholder ?? "917 123 4567"}
-        value={formatNational(national)}
+        value={formatNational(national, iso)}
         disabled={disabled}
         onChange={(e) => onChange({ iso, national: e.target.value.replace(/\D/g, "") })}
         className="flex-1"
