@@ -369,8 +369,14 @@ function MyListings() {
                     title={l.title}
                     pricePhp={l.price_php}
                     coverUrl={photo?.url ?? null}
-                  triggerLabel="QR / Share"
+                    trigger={
+                      <Button variant="ghost" size="sm" className={actionBtnCls} title="QR code & printable poster">
+                        <QrCode className="h-4 w-4" />
+                        <span>QR / Share</span>
+                      </Button>
+                    }
                   />
+
                   <BoostDialog listingId={l.id} listingTitle={l.title}>
                     <Button
                       variant="ghost"
