@@ -776,15 +776,21 @@ function SignupPage() {
                     <label htmlFor="phone" className={fieldLabelCls}>
                       Mobile <span className="text-destructive">*</span>
                     </label>
-                    <PhoneInput
-                      id="phone"
-                      iso={phoneIso}
-                      national={phoneNational}
-                      onChange={({ iso, national }) => {
-                        setPhoneIso(iso);
-                        setPhoneNational(national);
-                      }}
-                    />
+                    <Suspense
+                      fallback={
+                        <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" aria-hidden />
+                      }
+                    >
+                      <PhoneInput
+                        id="phone"
+                        iso={phoneIso}
+                        national={phoneNational}
+                        onChange={({ iso, national }) => {
+                          setPhoneIso(iso);
+                          setPhoneNational(national);
+                        }}
+                      />
+                    </Suspense>
                     {(() => {
                       // Submit-time / touched errors take priority.
                       const submitError = errorFor("phone");
