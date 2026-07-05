@@ -82,48 +82,133 @@ async function maybeApplyPendingSignup(user: User) {
       full_name?: string;
       first_name?: string;
       last_name?: string;
+      email?: string;
+      personal_email?: string;
       phone?: string;
       business_name?: string;
       business_address?: string;
       business_kind?: string;
+      street_address?: string;
+      postal_code?: string;
+      business_postal_code?: string;
       region?: string;
       province?: string;
       city?: string;
       is_business?: boolean;
     };
+
+    // Pull the current row so we don't clobber values the user already
+    // corrected on their profile (e.g. a different personal_email).
+    const { data: current } = await supabase
+      .from("profiles")
+      .select(
+        "personal_email, phone_e164, street_address, postal_code, business_address, business_postal_code, business_name, business_kind, business_region, business_province, business_city, signup_region, signup_province, signup_city, first_name, last_name, full_name",
+      )
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const setIfMissing = (
+      update: Record<string, unknown>,
+      key: string,
+      value: string | undefined,
+      currentValue: string | null | undefined,
+    ) => {
+      if (!value) return;
+      if (currentValue && String(currentValue).trim()) return;
+      update[key] = value;
+    };
+
     const update: Record<string, unknown> = {};
     if (pending.intent) update.signup_intent = pending.intent;
     if (pending.city) update.signup_city = pending.city;
     if (pending.region) update.signup_region = pending.region;
     if (pending.province) update.signup_province = pending.province;
-    if (pending.full_name) update.full_name = pending.full_name;
-    if (pending.first_name) update.first_name = pending.first_name;
-    if (pending.last_name) update.last_name = pending.last_name;
+    setIfMissing(update, "full_name", pending.full_name, current?.full_name);
+    setIfMissing(update, "first_name", pending.first_name, current?.first_name);
+    setIfMissing(update, "last_name", pending.last_name, current?.last_name);
+    setIfMissing(
+      update,
+      "personal_email",
+      pending.personal_email ?? pending.email,
+      current?.personal_email,
+    );
     if (pending.phone) {
-      update.phone = pending.phone;
-      const e164 = normalizePhPhone(pending.phone);
-      if (e164) update.phone_e164 = e164;
+      const e164 = normalizePhPhone(pending.phone) ?? pending.phone;
+      if (!current?.phone_e164 || !String(current.phone_e164).trim()) {
+        update.phone = pending.phone;
+        update.phone_e164 = e164;
+      }
     }
     if (pending.is_business) {
       update.seller_type = "dealer";
-      if (pending.business_name) update.business_name = pending.business_name;
-      if (pending.business_address) update.business_address = pending.business_address;
-      if (pending.business_kind) update.business_kind = pending.business_kind;
+      setIfMissing(update, "business_name", pending.business_name, current?.business_name);
+      setIfMissing(update, "business_address", pending.business_address, current?.business_address);
+      setIfMissing(update, "business_kind", pending.business_kind, current?.business_kind);
+      setIfMissing(
+        update,
+        "business_postal_code",
+        pending.business_postal_code ?? pending.postal_code,
+        current?.business_postal_code,
+      );
       if (pending.region) update.business_region = pending.region;
       if (pending.province) update.business_province = pending.province;
       if (pending.city) update.business_city = pending.city;
+    } else {
+      setIfMissing(update, "street_address", pending.street_address, current?.street_address);
+      setIfMissing(update, "postal_code", pending.postal_code, current?.postal_code);
     }
+
+    let updateOk = true;
     if (Object.keys(update).length > 0) {
-      await supabase
+      const { error } = await supabase
         .from("profiles")
         .update(update as never)
         .eq("id", user.id);
+      if (error) {
+        updateOk = false;
+        console.warn("[signup.pending] update failed", error);
+      }
+    }
+
+    // Verify the required identity fields for this intent actually landed
+    // before clearing the pending payload. If anything is still null, keep
+    // it around so the next onAuthStateChange invocation retries.
+    if (!updateOk) return;
+    const { data: verified } = await supabase
+      .from("profiles")
+      .select(
+        "phone_e164, personal_email, street_address, postal_code, business_address, business_postal_code",
+      )
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const needsPhone = !!pending.phone;
+    const needsEmail = !!(pending.personal_email ?? pending.email);
+    const needsBuyerAddr = !pending.is_business && !!pending.street_address;
+    const needsBuyerPostal = !pending.is_business && !!pending.postal_code;
+    const needsBizAddr = !!pending.is_business && !!pending.business_address;
+    const needsBizPostal =
+      !!pending.is_business && !!(pending.business_postal_code ?? pending.postal_code);
+
+    const ok = (val: string | null | undefined) => !!val && String(val).trim().length > 0;
+    const stillMissing =
+      (needsPhone && !ok(verified?.phone_e164)) ||
+      (needsEmail && !ok(verified?.personal_email)) ||
+      (needsBuyerAddr && !ok(verified?.street_address)) ||
+      (needsBuyerPostal && !ok(verified?.postal_code)) ||
+      (needsBizAddr && !ok(verified?.business_address)) ||
+      (needsBizPostal && !ok(verified?.business_postal_code));
+
+    if (stillMissing) {
+      console.warn("[signup.pending] required fields still missing; will retry");
+      return;
     }
     window.localStorage.removeItem("signup.pending");
   } catch (err) {
     console.warn("[signup.pending] failed", err);
   }
 }
+
 
 async function maybeSendWelcomeEmail(user: User) {
   if (!user.email || !user.email_confirmed_at) return;
