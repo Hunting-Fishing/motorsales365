@@ -94,17 +94,17 @@ export function PhoneInput({
             role="combobox"
             aria-label={`Country: ${country.name} (${country.dial})`}
             disabled={disabled}
-            className="w-[76px] shrink-0 justify-between gap-1 px-2 font-normal"
+            className="h-10 w-[68px] shrink-0 justify-between gap-1 px-2 font-normal"
           >
-            <span className="flex min-w-0 items-center gap-1">
-              <span className="hidden text-base leading-none md:inline" aria-hidden>
+            <span className="flex min-w-0 flex-col items-center leading-none">
+              <span className="text-[11px]" aria-hidden>
                 {country.flag}
               </span>
-              <span className="truncate text-sm tabular-nums">
+              <span className="mt-0.5 text-[13px] font-medium tabular-nums">
                 {country.dial}
               </span>
             </span>
-            <ChevronDown className="size-4 shrink-0 opacity-50" />
+            <ChevronDown className="size-3.5 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
 
