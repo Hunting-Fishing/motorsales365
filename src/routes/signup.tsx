@@ -605,7 +605,7 @@ function SignupPage() {
           <div className="mx-auto max-w-md">
             <header className="mb-6">
               <div className="md:hidden mb-4 flex items-center gap-2">
-                <span className="grid h-8 w-8 place-items-center rounded-md bg-navy-900 text-white text-[10px] font-black" style={{ fontFamily: "var(--font-sora)" }}>365</span>
+                <BrandLogo size={32} className="rounded-md" />
                 <span className="font-bold text-navy-900 tracking-tight" style={{ fontFamily: "var(--font-sora)" }}>MotorSales</span>
               </div>
               <h1
