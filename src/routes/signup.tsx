@@ -102,8 +102,12 @@ function SignupPage() {
   const kindOptions = useMemo(() => BUSINESS_KIND_OPTIONS, []);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const phoneE164 = phoneNational.trim() ? buildE164(phoneIso, phoneNational) : "";
-  const phoneValid = phoneE164 !== null;
+  const phoneCheck = validatePhone(phoneIso, phoneNational);
+  const phoneE164 = phoneCheck.valid ? phoneCheck.e164 ?? "" : phoneNational.trim() ? buildE164(phoneIso, phoneNational) ?? "" : "";
+  const phoneValid = phoneCheck.valid;
+  const phoneMessage = phoneCheck.message;
+  const postalOk = (s: string) => /^[A-Za-z0-9][A-Za-z0-9 \-]{2,10}$/.test(s.trim());
+  const addressOk = (s: string) => s.trim().length >= 5 && /[A-Za-z]/.test(s) && /\d/.test(s);
 
   type Issue = { field: string; label: string; message: string };
   const issues = useMemo<Issue[]>(() => {
