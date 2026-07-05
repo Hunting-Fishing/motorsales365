@@ -817,7 +817,10 @@ function SignupPage() {
                   <Input
                     id="business-address"
                     value={businessAddress}
-                    onChange={(e) => setBusinessAddress(e.target.value)}
+                    onChange={(e) => {
+                      setBusinessAddress(e.target.value);
+                      if (e.target.value.length > 0) markTouched("business-address");
+                    }}
                     onBlur={() => markTouched("business-address")}
                     placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
                     autoComplete="street-address"
@@ -827,6 +830,14 @@ function SignupPage() {
                   {errorFor("business-address") && (
                     <p className="mt-1 text-xs text-destructive">{errorFor("business-address")}</p>
                   )}
+                  <AddressChecklist
+                    active={touched["business-address"] || businessAddress.length > 0}
+                    items={[
+                      { label: "Building / unit number", ok: addrHasNumber(businessAddress) },
+                      { label: "Street name", ok: addrHasStreetName(businessAddress) },
+                      { label: "At least 5 characters", ok: addrLongEnough(businessAddress) },
+                    ]}
+                  />
                 </div>
                 <div id="field-business-postal">
                   <Label htmlFor="business-postal">
@@ -835,7 +846,10 @@ function SignupPage() {
                   <Input
                     id="business-postal"
                     value={businessPostalCode}
-                    onChange={(e) => setBusinessPostalCode(e.target.value)}
+                    onChange={(e) => {
+                      setBusinessPostalCode(e.target.value);
+                      if (e.target.value.length > 0) markTouched("business-postal");
+                    }}
                     onBlur={() => markTouched("business-postal")}
                     placeholder="e.g. 1000"
                     autoComplete="postal-code"
@@ -845,8 +859,13 @@ function SignupPage() {
                   {errorFor("business-postal") && (
                     <p className="mt-1 text-xs text-destructive">{errorFor("business-postal")}</p>
                   )}
+                  <AddressChecklist
+                    active={touched["business-postal"] || businessPostalCode.length > 0}
+                    items={[{ label: "Valid postal / ZIP format", ok: postalOk(businessPostalCode) }]}
+                  />
                 </div>
               </div>
+
               <p className="text-xs text-muted-foreground">
                 A full business address is required to create your account and appear in the directory.
               </p>
