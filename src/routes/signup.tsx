@@ -1083,7 +1083,7 @@ function SignupPage() {
                 </button>
 
                 {/* Divider */}
-                <div className="relative py-1">
+                <div className="relative py-0">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-slate-200" />
                   </div>
