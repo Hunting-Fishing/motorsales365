@@ -102,7 +102,7 @@ export const applyPendingSignupProfile = createServerFn({ method: "POST" })
       return { ok: true as const, updated: 0, skipped: "empty_patch" as const };
     }
 
-    const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
+    const { error } = await (supabase.from("profiles") as any).update(patch).eq("id", userId);
     if (error) throw new Error(error.message);
     return { ok: true as const, updated: Object.keys(patch).length };
   });
