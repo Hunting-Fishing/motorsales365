@@ -157,11 +157,23 @@ function SignupPage() {
           label: "Street address",
           message: "Enter your street address.",
         });
+      else if (!addressOk(streetAddress))
+        list.push({
+          field: "street-address",
+          label: "Street address",
+          message: "Include both a house/unit number and street name (e.g. 123 Rizal St).",
+        });
       if (!postalCode.trim())
         list.push({
           field: "postal-code",
           label: "Postal code",
           message: "Enter your postal / ZIP code.",
+        });
+      else if (!postalOk(postalCode))
+        list.push({
+          field: "postal-code",
+          label: "Postal code",
+          message: "Enter a valid postal / ZIP code (3–11 letters, digits, or dashes).",
         });
     }
     if (isBusinessLike) {
@@ -171,13 +183,26 @@ function SignupPage() {
           label: "Business street address",
           message: "Enter your business street address.",
         });
+      else if (!addressOk(businessAddress))
+        list.push({
+          field: "business-address",
+          label: "Business street address",
+          message: "Include both a building/unit number and street name.",
+        });
       if (!businessPostalCode.trim())
         list.push({
           field: "business-postal",
           label: "Business postal code",
           message: "Enter your business postal / ZIP code.",
         });
+      else if (!postalOk(businessPostalCode))
+        list.push({
+          field: "business-postal",
+          label: "Business postal code",
+          message: "Enter a valid postal / ZIP code (3–11 letters, digits, or dashes).",
+        });
     }
+
     if (isBusinessLike && !businessName.trim()) {
       list.push({
         field: "businessName",
