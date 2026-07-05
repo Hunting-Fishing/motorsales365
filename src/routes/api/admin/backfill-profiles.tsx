@@ -224,7 +224,7 @@ export const Route = createFileRoute("/api/admin/backfill-profiles")({
             if (!res.user_id || res.errors.length > 0 || res.would_apply.length === 0) continue;
             const patch: Record<string, any> = {};
             for (const k of res.would_apply) patch[k] = res.incoming[k];
-            const { error: updErr } = await sb.from("profiles").update(patch).eq("id", res.user_id);
+            const { error: updErr } = await (sb.from("profiles") as any).update(patch).eq("id", res.user_id);
             if (updErr) {
               res.errors.push(`update failed: ${updErr.message}`);
               continue;
