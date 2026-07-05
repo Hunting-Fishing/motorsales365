@@ -26,6 +26,7 @@ import { PhoneInput } from "@/components/phone-input";
 import { buildE164, validatePhone } from "@/data/country-codes";
 import { siteOrigin } from "@/lib/site-config";
 import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
+import { readPending, writePending, clearPending } from "@/lib/signup-pending";
 
 
 type SignupSearch = { type?: SignupIntent; redirect?: string };
