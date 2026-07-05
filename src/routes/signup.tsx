@@ -252,6 +252,7 @@ function SignupPage() {
     emailValid,
     phoneNational,
     phoneValid,
+    phoneMessage,
     location.city,
     location.region,
     location.province,
