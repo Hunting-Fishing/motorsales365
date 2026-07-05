@@ -23,7 +23,7 @@ import { AccountTypeGrid } from "@/components/signup/account-type-grid";
 import { SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid.types";
 import { LocationPicker, type LocationValue } from "@/components/location-picker";
 import { PhoneInput } from "@/components/phone-input";
-import { buildE164 } from "@/data/country-codes";
+import { buildE164, validatePhone } from "@/data/country-codes";
 import { siteOrigin } from "@/lib/site-config";
 import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
 
