@@ -773,10 +773,11 @@ function SignupPage() {
                 </div>
 
                 {/* Location cascade — City / Region / Province / City */}
-                <div className="pt-2 border-t border-slate-100">
-                  <div className="mb-2 flex items-center justify-between">
+                <div className="pt-1 md:pt-2 border-t border-slate-100">
+                  <div className="mb-1.5 md:mb-2 flex items-center justify-between">
                     <label className={sectionLabelCls}>Location</label>
                   </div>
+
                   <div id="field-city">
                     <LocationPicker
                       value={location}
