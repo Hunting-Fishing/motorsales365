@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import QRCode from "qrcode";
 import { QrCode, Download, Printer, Copy, Share2 } from "lucide-react";
 import { toast } from "sonner";
