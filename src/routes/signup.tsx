@@ -20,7 +20,7 @@ import { getCreditedCode } from "@/lib/referral";
 import { SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid.types";
 import { LocationPicker, type LocationValue } from "@/components/location-picker";
 import { PhoneInput } from "@/components/phone-input";
-import { buildE164, validatePhone } from "@/data/country-codes";
+import { buildE164, getPhoneHint, validatePhone } from "@/data/country-codes";
 import { siteOrigin } from "@/lib/site-config";
 import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
 import { readPending, writePending, clearPending } from "@/lib/signup-pending";
@@ -134,6 +134,8 @@ function SignupPage() {
   const phoneE164 = phoneCheck.valid ? phoneCheck.e164 ?? "" : phoneNational.trim() ? buildE164(phoneIso, phoneNational) ?? "" : "";
   const phoneValid = phoneCheck.valid;
   const phoneMessage = phoneCheck.message;
+  const phoneHint = getPhoneHint(phoneIso, phoneNational);
+
   const postalOk = (s: string) => /^[A-Za-z0-9][A-Za-z0-9 \-]{2,10}$/.test(s.trim());
   // Real-time granular checks used by the AddressChecklist UI.
   const addrHasNumber = (s: string) => /\d/.test(s);
@@ -729,21 +731,52 @@ function SignupPage() {
                         setPhoneNational(national);
                       }}
                     />
-                    {errorFor("phone") ? (
-                      <p className="mt-1 text-[11px] text-destructive">{errorFor("phone")}</p>
-                    ) : phoneNational.trim() ? (
-                      <p className="mt-1 text-[10px] text-slate-400 font-mono">
-                        {phoneValid ? (
-                          <span className="text-emerald-600">✓ {phoneE164}</span>
-                        ) : phoneE164 ? (
-                          <span>Preview: {phoneE164}{phoneMessage ? ` — ${phoneMessage}` : ""}</span>
-                        ) : null}
-                      </p>
-                    ) : (
-                      <p className="mt-1 text-[10px] text-slate-400">
-                        Pick country, then enter your number.
-                      </p>
-                    )}
+                    {(() => {
+                      // Submit-time / touched errors take priority.
+                      const submitError = errorFor("phone");
+                      if (submitError) {
+                        return (
+                          <p className="mt-1 flex items-start gap-1 text-[11px] text-destructive">
+                            <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
+                            <span>{submitError}</span>
+                          </p>
+                        );
+                      }
+                      if (phoneHint.status === "valid") {
+                        return (
+                          <p className="mt-1 flex items-center gap-1 text-[11px] text-emerald-600">
+                            <CheckCircle2 className="h-3 w-3 shrink-0" aria-hidden />
+                            <span className="font-mono">{phoneHint.e164}</span>
+                          </p>
+                        );
+                      }
+                      if (phoneHint.status === "incomplete") {
+                        return (
+                          <p className="mt-1 text-[11px] text-amber-600">
+                            {phoneHint.message}{" "}
+                            <span className="text-slate-400">e.g. {phoneHint.example}</span>
+                          </p>
+                        );
+                      }
+                      if (phoneHint.status === "invalid") {
+                        return (
+                          <p className="mt-1 flex items-start gap-1 text-[11px] text-destructive">
+                            <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
+                            <span>
+                              {phoneHint.message}{" "}
+                              <span className="text-slate-400">e.g. {phoneHint.example}</span>
+                            </span>
+                          </p>
+                        );
+                      }
+                      // idle
+                      return (
+                        <p className="mt-1 text-[10px] text-slate-400">
+                          {phoneHint.expected} · e.g. {phoneHint.example}
+                        </p>
+                      );
+                    })()}
+
                   </div>
                   <div id="field-email">
                     <label htmlFor="email" className={fieldLabelCls}>

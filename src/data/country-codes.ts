@@ -186,6 +186,115 @@ export function validatePhone(iso: string, national: string): PhoneValidation {
   return { valid: true, e164: `${c.dial}${digits}` };
 }
 
+// --- Inline hint helper -----------------------------------------------------
+// Produces a UI-friendly status for a phone-in-progress. Distinguishes
+// "incomplete" (user is still typing) from "invalid" (wrong prefix / too many
+// digits / landline) so we can color amber vs red and show a helpful hint.
+export type PhoneHintStatus = "idle" | "incomplete" | "invalid" | "valid";
+export type PhoneHint = {
+  status: PhoneHintStatus;
+  message: string;
+  example: string;
+  expected: string; // e.g. "10 digits" or "9–11 digits"
+  current: number;
+  e164?: string;
+};
+
+const EXAMPLES: Record<string, string> = {
+  PH: "917 123 4567",
+  US: "415 555 0132",
+  CA: "416 555 0199",
+  GB: "7400 123456",
+  AU: "412 345 678",
+  SG: "8123 4567",
+  MY: "12 345 6789",
+  ID: "812 3456 7890",
+  TH: "81 234 5678",
+  VN: "912 345 678",
+  JP: "90 1234 5678",
+  KR: "10 1234 5678",
+  CN: "131 2345 6789",
+  HK: "5123 4567",
+  TW: "912 345 678",
+  IN: "98765 43210",
+  AE: "50 123 4567",
+  SA: "51 234 5678",
+  DE: "1512 3456789",
+  FR: "6 12 34 56 78",
+  ES: "612 345 678",
+  IT: "312 345 6789",
+  NL: "6 12345678",
+  BR: "11 91234 5678",
+  MX: "55 1234 5678",
+};
+
+export function getPhoneHint(iso: string, national: string): PhoneHint {
+  const c = COUNTRY_CODES.find((x) => x.iso === iso) ?? COUNTRY_CODES[0];
+  const rule = PHONE_RULES[iso] ?? { min: 6, max: 14 };
+  const expected =
+    rule.min === rule.max ? `${rule.min} digits` : `${rule.min}–${rule.max} digits`;
+  const example = `${c.dial} ${EXAMPLES[iso] ?? "123 456 7890"}`;
+
+  const raw = national.trim();
+  if (!raw) {
+    return {
+      status: "idle",
+      message: `Enter your ${c.name} mobile number.`,
+      example,
+      expected,
+      current: 0,
+    };
+  }
+
+  let digits = raw.replace(/\D/g, "");
+  if (digits.startsWith("0")) digits = digits.replace(/^0+/, "");
+
+  // Still typing — under the minimum length
+  if (digits.length < rule.min) {
+    const remaining = rule.min - digits.length;
+    return {
+      status: "incomplete",
+      message: `${digits.length} of ${rule.min} digits — ${remaining} more to go.`,
+      example,
+      expected,
+      current: digits.length,
+    };
+  }
+
+  // Over the maximum
+  if (digits.length > rule.max) {
+    return {
+      status: "invalid",
+      message: `Too many digits. ${c.name} numbers use ${expected} after ${c.dial}.`,
+      example,
+      expected,
+      current: digits.length,
+    };
+  }
+
+  // Wrong mobile prefix (landline or malformed)
+  if (rule.mobilePrefix && !rule.mobilePrefix.some((p) => digits.startsWith(p))) {
+    const prefixes = rule.mobilePrefix.join(" or ");
+    return {
+      status: "invalid",
+      message: `${c.name} mobile numbers start with ${prefixes} after ${c.dial}.`,
+      example,
+      expected,
+      current: digits.length,
+    };
+  }
+
+  return {
+    status: "valid",
+    message: "Looks good.",
+    example,
+    expected,
+    current: digits.length,
+    e164: `${c.dial}${digits}`,
+  };
+}
+
+
 
 // Country-aware formatter: groups national digits with dashes so PH
 // `9694343430` displays as `969-434-3430`. Falls back to 3-3-rest for unknown
