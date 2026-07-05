@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
@@ -18,12 +18,26 @@ import {
 import { cn } from "@/lib/utils";
 import { getCreditedCode } from "@/lib/referral";
 import { SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid.types";
-import { LocationPicker, type LocationValue } from "@/components/location-picker";
-import { PhoneInput } from "@/components/phone-input";
-import { buildE164, getPhoneHint, validatePhone } from "@/data/country-codes";
+import type { LocationValue } from "@/components/location-picker";
 import { siteOrigin } from "@/lib/site-config";
 import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
 import { readPending, writePending, clearPending } from "@/lib/signup-pending";
+
+// Heavy sub-widgets are lazy-loaded so the account-type segmented control
+// hydrates immediately. Without this the ~47 KB PSGC dataset (LocationPicker)
+// and the full country-codes list (PhoneInput) block the main /signup chunk.
+const LocationPicker = lazy(() =>
+  import("@/components/location-picker").then((m) => ({ default: m.LocationPicker })),
+);
+const PhoneInput = lazy(() =>
+  import("@/components/phone-input").then((m) => ({ default: m.PhoneInput })),
+);
+
+// Country-codes validation is loaded on demand for the same reason. Until it
+// resolves, phone validation is optimistic (non-empty = "ok") so the form
+// isn't blocked; real validation kicks in as soon as the module lands
+// (usually within a tick of mount thanks to the idle preloader below).
+type PhoneApi = typeof import("@/data/country-codes");
 
 
 type SignupSearch = { type?: SignupIntent; redirect?: string };
@@ -129,12 +143,25 @@ function SignupPage() {
   const intentMeta = useMemo(() => SIGNUP_TYPES.find((s) => s.id === intent), [intent]);
   const kindOptions = useMemo(() => BUSINESS_KIND_OPTIONS, []);
 
+  // country-codes module — loaded async so it doesn't block hydration.
+  const [phoneApi, setPhoneApi] = useState<PhoneApi | null>(null);
+
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const phoneCheck = validatePhone(phoneIso, phoneNational);
-  const phoneE164 = phoneCheck.valid ? phoneCheck.e164 ?? "" : phoneNational.trim() ? buildE164(phoneIso, phoneNational) ?? "" : "";
+  const phoneCheck = phoneApi
+    ? phoneApi.validatePhone(phoneIso, phoneNational)
+    : { valid: phoneNational.trim().length > 0, e164: undefined as string | undefined, message: undefined as string | undefined };
+  const phoneE164 = phoneApi
+    ? phoneCheck.valid
+      ? phoneCheck.e164 ?? ""
+      : phoneNational.trim()
+        ? phoneApi.buildE164(phoneIso, phoneNational) ?? ""
+        : ""
+    : "";
   const phoneValid = phoneCheck.valid;
   const phoneMessage = phoneCheck.message;
-  const phoneHint = getPhoneHint(phoneIso, phoneNational);
+  const phoneHint = phoneApi
+    ? phoneApi.getPhoneHint(phoneIso, phoneNational)
+    : ({ status: "idle", expected: "", example: "" } as ReturnType<PhoneApi["getPhoneHint"]>);
 
   const postalOk = (s: string) => /^[A-Za-z0-9][A-Za-z0-9 \-]{2,10}$/.test(s.trim());
   // Real-time granular checks used by the AddressChecklist UI.
@@ -316,6 +343,33 @@ function SignupPage() {
   useEffect(() => {
     const c = getCreditedCode();
     if (c) setRefCode(c);
+  }, []);
+
+  // Preload heavy sub-modules after mount so they're ready by the time the
+  // user picks an account type. Uses requestIdleCallback where available so
+  // it doesn't compete with hydration of the account-type tabs.
+  useEffect(() => {
+    let cancelled = false;
+    const load = () => {
+      if (cancelled) return;
+      import("@/data/country-codes").then((m) => {
+        if (!cancelled) setPhoneApi(m);
+      });
+      // Warm the lazy chunks so <Suspense> doesn't flash a skeleton later.
+      void import("@/components/location-picker");
+      void import("@/components/phone-input");
+    };
+    const w = window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    if (typeof w.requestIdleCallback === "function") {
+      w.requestIdleCallback(load, { timeout: 800 });
+    } else {
+      setTimeout(load, 50);
+    }
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Restore previously entered form data when the user comes back from verify-email
@@ -722,15 +776,21 @@ function SignupPage() {
                     <label htmlFor="phone" className={fieldLabelCls}>
                       Mobile <span className="text-destructive">*</span>
                     </label>
-                    <PhoneInput
-                      id="phone"
-                      iso={phoneIso}
-                      national={phoneNational}
-                      onChange={({ iso, national }) => {
-                        setPhoneIso(iso);
-                        setPhoneNational(national);
-                      }}
-                    />
+                    <Suspense
+                      fallback={
+                        <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" aria-hidden />
+                      }
+                    >
+                      <PhoneInput
+                        id="phone"
+                        iso={phoneIso}
+                        national={phoneNational}
+                        onChange={({ iso, national }) => {
+                          setPhoneIso(iso);
+                          setPhoneNational(national);
+                        }}
+                      />
+                    </Suspense>
                     {(() => {
                       // Submit-time / touched errors take priority.
                       const submitError = errorFor("phone");
@@ -812,14 +872,24 @@ function SignupPage() {
                   </div>
 
                   <div id="field-city">
-                    <LocationPicker
-                      value={location}
-                      onChange={(v) => {
-                        setLocation(v);
-                        markTouched("city");
-                      }}
-                      showBarangay={false}
-                    />
+                    <Suspense
+                      fallback={
+                        <div className="space-y-2" aria-hidden>
+                          <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+                          <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+                          <div className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+                        </div>
+                      }
+                    >
+                      <LocationPicker
+                        value={location}
+                        onChange={(v) => {
+                          setLocation(v);
+                          markTouched("city");
+                        }}
+                        showBarangay={false}
+                      />
+                    </Suspense>
                     {errorFor("city") && (
                       <p className="mt-1 text-[11px] text-destructive">{errorFor("city")}</p>
                     )}
