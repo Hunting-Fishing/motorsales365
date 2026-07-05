@@ -703,76 +703,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     });
 
-    // Re-validate the persisted session with the Auth server (getUser) rather
-    // than trusting the localStorage token blindly. If getUser errors (stale
-    // refresh token, revoked session), wipe the local session so the UI
-    // renders as signed-out instead of hanging on the bad token.
-    (async () => {
-      try {
-        // Cheap local check first — avoids a 400 "Auth session missing!"
-        // network call for signed-out visitors (which is expected but
-        // pollutes the console and network tab).
-        const { data: sessPre } = await supabase.auth.getSession();
-        if (cancelled) return;
-        if (!sessPre.session) {
-          authLog("info", {
-            event: "bootstrap.no_session",
-            durationMs: Date.now() - bootStarted,
-          });
-          handleSession(null);
-          return;
-        }
+    // Note: we intentionally do NOT call getSession()/getUser() here.
+    // The listener above fires INITIAL_SESSION synchronously from the
+    // persisted localStorage token, which flips authLoading=false in
+    // <50ms. supabase-js auto-refreshes tokens in the background and
+    // emits TOKEN_REFRESHED / SIGNED_OUT for expired/revoked refresh
+    // tokens — both are handled above.
 
-        const { data: userData, error } = await supabase.auth.getUser();
-        if (cancelled) return;
-        if (error || !userData.user) {
-          authLog("warn", {
-            event: "bootstrap.getUser_failed",
-            durationMs: Date.now() - bootStarted,
-            error: error ? errMsg(error) : "no_user",
-            errorStatus: (error as any)?.status,
-          });
-          // We had a persisted session that failed to validate → surface
-          // re-auth toast and clear the bad token.
-          setAuthError("refresh_failed");
-          try {
-            await supabase.auth.signOut({ scope: "local" });
-          } catch (e) {
-            authLog("warn", { event: "bootstrap.local_signout_failed", error: errMsg(e) });
-          }
-          handleSession(null);
-        } else {
-          const { data: sessData } = await supabase.auth.getSession();
-          if (cancelled) return;
-          authLog("info", {
-            event: "bootstrap.ok",
-            uid: userData.user.id,
-            email: userData.user.email,
-            durationMs: Date.now() - bootStarted,
-            hasSession: !!sessData.session,
-          });
-          handleSession(sessData.session ?? null);
-        }
-
-      } catch (err) {
-        if (cancelled) return;
-        authLog("error", {
-          event: "bootstrap.exception",
-          durationMs: Date.now() - bootStarted,
-          error: errMsg(err),
-        });
-        setAuthError("bootstrap_failed");
-        try {
-          await supabase.auth.signOut({ scope: "local" });
-        } catch (e) {
-          authLog("warn", { event: "bootstrap.local_signout_failed", error: errMsg(e) });
-        }
-        handleSession(null);
-
-      } finally {
-        if (!cancelled) setAuthLoading(false);
-      }
-    })();
 
     return () => {
       cancelled = true;
