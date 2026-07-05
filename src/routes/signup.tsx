@@ -602,20 +602,20 @@ function SignupPage() {
         </aside>
 
         {/* Right: compact form */}
-        <div className="flex-1 bg-white p-6 md:p-10">
+        <div className="flex-1 bg-white p-4 sm:p-6 md:p-10">
           <div className="mx-auto max-w-md">
-            <header className="mb-6">
-              <div className="md:hidden mb-4 flex items-center gap-2">
-                <BrandLogo size={32} className="rounded-md" />
-                <span className="font-bold text-navy-900 tracking-tight" style={{ fontFamily: "var(--font-sora)" }}>MotorSales</span>
+            <header className="mb-3 md:mb-6">
+              <div className="md:hidden mb-2 flex items-center gap-2">
+                <BrandLogo size={28} className="rounded-md" />
+                <span className="text-sm font-bold text-navy-900 tracking-tight" style={{ fontFamily: "var(--font-sora)" }}>MotorSales</span>
               </div>
               <h1
-                className="text-2xl font-bold text-navy-900"
+                className="text-xl md:text-2xl font-bold text-navy-900"
                 style={{ fontFamily: "var(--font-sora)" }}
               >
                 Create your account
               </h1>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-slate-500">
                 Already have an account?{" "}
                 <Link to="/login" className="font-semibold text-navy-700 hover:text-navy-900 hover:underline">
                   Sign in
@@ -623,7 +623,8 @@ function SignupPage() {
               </p>
             </header>
 
-            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4" noValidate>
+
               {/* Account type — segmented control */}
               <div id="field-intent">
                 <label className={sectionLabelCls + " mb-2"}>Account type</label>
