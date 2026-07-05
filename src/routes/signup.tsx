@@ -345,6 +345,33 @@ function SignupPage() {
     if (c) setRefCode(c);
   }, []);
 
+  // Preload heavy sub-modules after mount so they're ready by the time the
+  // user picks an account type. Uses requestIdleCallback where available so
+  // it doesn't compete with hydration of the account-type tabs.
+  useEffect(() => {
+    let cancelled = false;
+    const load = () => {
+      if (cancelled) return;
+      import("@/data/country-codes").then((m) => {
+        if (!cancelled) setPhoneApi(m);
+      });
+      // Warm the lazy chunks so <Suspense> doesn't flash a skeleton later.
+      void import("@/components/location-picker");
+      void import("@/components/phone-input");
+    };
+    const w = window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    if (typeof w.requestIdleCallback === "function") {
+      w.requestIdleCallback(load, { timeout: 800 });
+    } else {
+      setTimeout(load, 50);
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Restore previously entered form data when the user comes back from verify-email
   // (e.g. wrong email). Stashed values take precedence over URL defaults.
   useEffect(() => {
