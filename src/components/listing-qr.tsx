@@ -28,7 +28,10 @@ interface ListingQrProps {
   triggerLabel?: string;
   className?: string;
   compact?: boolean;
+  /** Optional custom trigger. When provided, replaces the default button entirely. */
+  trigger?: React.ReactNode;
 }
+
 
 function getListingUrl(id: string, baseUrl?: string) {
   const origin =
