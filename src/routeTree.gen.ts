@@ -271,6 +271,7 @@ import { Route as ApiPublicHooksAnnualBonusesRouteImport } from './routes/api/pu
 import { Route as ApiPublicGoSlugRouteImport } from './routes/api/public/go.$slug'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 import { Route as ApiPublicFlashcardsContentRouteImport } from './routes/api/public/flashcards.content'
+import { Route as ApiPublicAuthSignupRouteImport } from './routes/api/public/auth/signup'
 import { Route as AdminAdvertisementsAnalyticsCodeRouteImport } from './routes/admin.advertisements.analytics.$code'
 import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
@@ -1643,6 +1644,11 @@ const ApiPublicFlashcardsContentRoute =
     path: '/api/public/flashcards/content',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAuthSignupRoute = ApiPublicAuthSignupRouteImport.update({
+  id: '/api/public/auth/signup',
+  path: '/api/public/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminAdvertisementsAnalyticsCodeRoute =
   AdminAdvertisementsAnalyticsCodeRouteImport.update({
     id: '/$code',
@@ -1890,6 +1896,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
+  '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
@@ -2150,6 +2157,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
+  '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
@@ -2418,6 +2426,7 @@ export interface FileRoutesById {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
+  '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
@@ -2686,6 +2695,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/dashboard/clubs/$id'
     | '/admin/advertisements/analytics/$code'
+    | '/api/public/auth/signup'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/go/$slug'
@@ -2946,6 +2956,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/clubs/$id'
     | '/admin/advertisements/analytics/$code'
+    | '/api/public/auth/signup'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/go/$slug'
@@ -3213,6 +3224,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/_authenticated/dashboard/clubs_/$id'
     | '/admin/advertisements/analytics/$code'
+    | '/api/public/auth/signup'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/go/$slug'
@@ -3360,6 +3372,7 @@ export interface RootRouteChildren {
   ShopBrandSlugRoute: typeof ShopBrandSlugRoute
   ShopDepartmentSlugRoute: typeof ShopDepartmentSlugRoute
   ShopPSlugRoute: typeof ShopPSlugRoute
+  ApiPublicAuthSignupRoute: typeof ApiPublicAuthSignupRoute
   ApiPublicFlashcardsContentRoute: typeof ApiPublicFlashcardsContentRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   ApiPublicGoSlugRoute: typeof ApiPublicGoSlugRoute
@@ -5223,6 +5236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFlashcardsContentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/auth/signup': {
+      id: '/api/public/auth/signup'
+      path: '/api/public/auth/signup'
+      fullPath: '/api/public/auth/signup'
+      preLoaderRoute: typeof ApiPublicAuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/advertisements/analytics/$code': {
       id: '/admin/advertisements/analytics/$code'
       path: '/$code'
@@ -5839,6 +5859,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopBrandSlugRoute: ShopBrandSlugRoute,
   ShopDepartmentSlugRoute: ShopDepartmentSlugRoute,
   ShopPSlugRoute: ShopPSlugRoute,
+  ApiPublicAuthSignupRoute: ApiPublicAuthSignupRoute,
   ApiPublicFlashcardsContentRoute: ApiPublicFlashcardsContentRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   ApiPublicGoSlugRoute: ApiPublicGoSlugRoute,

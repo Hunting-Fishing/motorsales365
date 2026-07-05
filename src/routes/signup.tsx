@@ -402,62 +402,60 @@ function SignupPage() {
     setSubmitting(true);
     stashPendingProfile();
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          first_name: firstName.trim(),
-          last_name: lastName.trim(),
-          phone: phoneE164 || undefined,
-          business_name: isBusinessLike ? businessName.trim() : undefined,
-          business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
-          business_kind: isBusinessLike ? businessKind || undefined : undefined,
-          street_address: streetAddress.trim() || undefined,
-          postal_code: isBusinessLike
-            ? businessPostalCode.trim() || undefined
-            : postalCode.trim() || undefined,
-          signup_city: location.city ?? undefined,
-          signup_region: location.region ?? undefined,
-          signup_province: location.province ?? undefined,
-          referral_code: refCode || undefined,
-          signup_intent: intent,
-        },
-        emailRedirectTo: `${siteOrigin()}/verify-email?intent=${intent}${search.redirect ? `&redirect=${encodeURIComponent(search.redirect)}` : ""}`,
-      },
+    const res = await fetch("/api/public/auth/signup", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        intent,
+        email: email.trim(),
+        password,
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        phone_iso: phoneIso,
+        phone_national: phoneNational.trim(),
+        signup_region: location.region,
+        signup_province: location.province,
+        signup_city: location.city,
+        street_address: streetAddress.trim(),
+        postal_code: postalCode.trim(),
+        business_name: businessName.trim(),
+        business_kind: businessKind || undefined,
+        business_address: businessAddress.trim(),
+        business_postal_code: businessPostalCode.trim(),
+        referral_code: refCode || "",
+        redirect: search.redirect ?? "",
+        origin: siteOrigin(),
+        agreed: true,
+      }),
     });
     setSubmitting(false);
-    if (error) {
-      const msg = error.message || "";
-      if (/already|registered|exists|in use/i.test(msg)) {
+    let body: any = null;
+    try {
+      body = await res.json();
+    } catch {
+      /* ignore */
+    }
+    if (!res.ok || !body?.ok) {
+      const errs: { field: string; message: string }[] = body?.errors ?? [];
+      const first = errs[0];
+      if (res.status === 409) {
         toast.error("That email is already registered. Try signing in instead.");
-      } else {
-        toast.error(msg);
+        navigate({ to: "/login", search: { redirect: search.redirect } as any });
+        return;
+      }
+      toast.error(first?.message ?? `Signup failed (${res.status}).`);
+      if (first?.field) {
+        const el =
+          document.getElementById(`field-${first.field}`) ?? document.getElementById(first.field);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
       }
       return;
     }
-    // Supabase returns a user with empty identities[] when the email is already
-    // registered (to avoid leaking account existence). Treat as "already in use".
-    const identities = (data.user as { identities?: unknown[] } | null)?.identities;
-    if (data.user && Array.isArray(identities) && identities.length === 0) {
-      toast.error("That email is already registered. Please sign in instead.");
-      navigate({
-        to: "/login",
-        search: { redirect: search.redirect } as any,
-      });
-      return;
-    }
-    // If email confirmation is required, no session is returned — send to pending screen.
-    if (!data.session) {
+    if (body.needs_verify) {
       toast.success("Account created — check your email to verify.");
-      navigate({
-        to: "/verify-email",
-        search: { email, intent },
-      });
+      navigate({ to: "/verify-email", search: { email, intent } });
       return;
     }
-    // Edge case: confirmations disabled, session is live immediately.
     toast.success("Account created!");
     goAfterSignup(POST_SIGNUP_ROUTE[intent]);
   };
