@@ -26,6 +26,7 @@ import { PhoneInput } from "@/components/phone-input";
 import { buildE164, validatePhone } from "@/data/country-codes";
 import { siteOrigin } from "@/lib/site-config";
 import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
+import { readPending, writePending, clearPending } from "@/lib/signup-pending";
 
 
 type SignupSearch = { type?: SignupIntent; redirect?: string };
@@ -283,10 +284,9 @@ function SignupPage() {
   // Restore previously entered form data when the user comes back from verify-email
   // (e.g. wrong email). Stashed values take precedence over URL defaults.
   useEffect(() => {
+    const p = readPending();
+    if (!p) return;
     try {
-      const raw = window.localStorage.getItem("signup.pending");
-      if (!raw) return;
-      const p = JSON.parse(raw);
       if (p.intent) setIntent(p.intent);
       if (p.first_name !== undefined) setFirstName(p.first_name);
       if (p.last_name !== undefined) setLastName(p.last_name);
@@ -309,8 +309,10 @@ function SignupPage() {
       }
       if (typeof p.agreed === "boolean") setAgreed(p.agreed);
       if (p.ref_code !== undefined) setRefCode(p.ref_code);
-      window.localStorage.removeItem("signup.pending");
-      // Focus and select email so the user can immediately change it
+      // Keep the stash: the post-auth applier will clear it once the
+      // profile row is patched. If the user returns to this form (e.g.
+      // "Wrong email? Start over"), we still want their inputs available.
+      // Focus and select email so the user can immediately change it.
       setTimeout(() => {
         const el = document.getElementById("email") as HTMLInputElement | null;
         if (el) {
@@ -343,35 +345,30 @@ function SignupPage() {
   // are valid across business and service_provider, so no reset is needed.
 
   const stashPendingProfile = () => {
-    try {
-      const payload = {
-        intent,
-        full_name: fullName || undefined,
-        first_name: firstName.trim() || undefined,
-        last_name: lastName.trim() || undefined,
-        email: email.trim() || undefined,
-        personal_email: email.trim() || undefined,
-        phone: phoneE164 || undefined,
-        phone_iso: phoneIso || undefined,
-        phone_national: phoneNational.trim() || undefined,
-        business_name: isBusinessLike ? businessName.trim() || undefined : undefined,
-        business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
-        business_kind: isBusinessLike ? businessKind || undefined : undefined,
-        street_address: streetAddress.trim() || undefined,
-        postal_code: postalCode.trim() || undefined,
-        business_postal_code: isBusinessLike ? businessPostalCode.trim() || undefined : undefined,
-        region: location.region ?? undefined,
-        province: location.province ?? undefined,
-        city: location.city ?? undefined,
-        is_business: isBusinessLike,
-        agreed,
-        ref_code: refCode.trim() || undefined,
-        saved_at: Date.now(),
-      };
-      window.localStorage.setItem("signup.pending", JSON.stringify(payload));
-    } catch {
-      // localStorage may be unavailable; pending payload is best-effort only.
-    }
+    writePending({
+      intent: intent ?? undefined,
+      full_name: fullName || undefined,
+      first_name: firstName.trim() || undefined,
+      last_name: lastName.trim() || undefined,
+      email: email.trim() || undefined,
+      personal_email: email.trim() || undefined,
+      phone: phoneE164 || undefined,
+      phone_iso: phoneIso || undefined,
+      phone_national: phoneNational.trim() || undefined,
+      business_name: isBusinessLike ? businessName.trim() || undefined : undefined,
+      business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
+      business_kind: isBusinessLike ? businessKind || undefined : undefined,
+      street_address: streetAddress.trim() || undefined,
+      postal_code: postalCode.trim() || undefined,
+      business_postal_code: isBusinessLike ? businessPostalCode.trim() || undefined : undefined,
+      region: location.region ?? undefined,
+      province: location.province ?? undefined,
+      city: location.city ?? undefined,
+      is_business: isBusinessLike,
+      agreed,
+      ref_code: refCode.trim() || undefined,
+      saved_at: Date.now(),
+    });
   };
 
 
