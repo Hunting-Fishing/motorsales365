@@ -39,15 +39,16 @@ export function PhoneInput({ iso, national, onChange, placeholder, id, disabled 
             variant="outline"
             role="combobox"
             disabled={disabled}
-            className="w-[130px] shrink-0 justify-between font-normal"
+            className="w-[104px] shrink-0 justify-between gap-1 px-2 font-normal"
           >
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1">
               <span className="text-base leading-none">{country.flag}</span>
               <span className="text-sm tabular-nums">{country.dial}</span>
             </span>
-            <ChevronDown className="size-4 opacity-50" />
+            <ChevronDown className="size-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
+
         <PopoverContent className="w-[280px] p-0" align="start">
           <Command>
             <CommandInput placeholder="Search country…" />
