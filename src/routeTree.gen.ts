@@ -45,6 +45,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CompanyRouteImport } from './routes/company'
 import { Route as BundlesRouteImport } from './routes/bundles'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disclosure'
 import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -455,6 +456,11 @@ const CompanyRoute = CompanyRouteImport.update({
 const BundlesRoute = BundlesRouteImport.update({
   id: '/bundles',
   path: '/bundles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AffiliateDisclosureRoute = AffiliateDisclosureRouteImport.update({
@@ -1681,6 +1687,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/advertise': typeof AdvertiseRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
+  '/auth': typeof AuthRoute
   '/bundles': typeof BundlesRoute
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
@@ -1948,6 +1955,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/advertise': typeof AdvertiseRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
+  '/auth': typeof AuthRoute
   '/bundles': typeof BundlesRoute
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
@@ -2213,6 +2221,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/advertise': typeof AdvertiseRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
+  '/auth': typeof AuthRoute
   '/bundles': typeof BundlesRoute
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
@@ -2483,6 +2492,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/advertise'
     | '/affiliate-disclosure'
+    | '/auth'
     | '/bundles'
     | '/company'
     | '/contact'
@@ -2750,6 +2760,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/advertise'
     | '/affiliate-disclosure'
+    | '/auth'
     | '/bundles'
     | '/company'
     | '/contact'
@@ -3014,6 +3025,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/advertise'
     | '/affiliate-disclosure'
+    | '/auth'
     | '/bundles'
     | '/company'
     | '/contact'
@@ -3284,6 +3296,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AdvertiseRoute: typeof AdvertiseRoute
   AffiliateDisclosureRoute: typeof AffiliateDisclosureRoute
+  AuthRoute: typeof AuthRoute
   BundlesRoute: typeof BundlesRoute
   CompanyRoute: typeof CompanyRoute
   ContactRoute: typeof ContactRoute
@@ -3665,6 +3678,13 @@ declare module '@tanstack/react-router' {
       path: '/bundles'
       fullPath: '/bundles'
       preLoaderRoute: typeof BundlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/affiliate-disclosure': {
@@ -5779,6 +5799,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AdvertiseRoute: AdvertiseRoute,
   AffiliateDisclosureRoute: AffiliateDisclosureRoute,
+  AuthRoute: AuthRoute,
   BundlesRoute: BundlesRoute,
   CompanyRoute: CompanyRoute,
   ContactRoute: ContactRoute,
