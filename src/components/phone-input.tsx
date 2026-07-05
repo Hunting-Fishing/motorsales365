@@ -88,7 +88,7 @@ export function PhoneInput({ iso, national, onChange, placeholder, id, disabled 
         value={formatNational(national, iso)}
         disabled={disabled}
         onChange={(e) => onChange({ iso, national: e.target.value.replace(/\D/g, "") })}
-        className="flex-1"
+        className="min-w-0 flex-1"
       />
     </div>
   );
