@@ -63,6 +63,36 @@ import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 // Phone is now captured as { iso, national } via PhoneInput and normalized to
 // E.164 via buildE164 on submit.
 
+type ChecklistItem = { label: string; ok: boolean };
+
+// Real-time, per-field completeness indicator rendered under an address or
+// postal input. Turns green as each requirement is satisfied so users see
+// progress while typing — no wait for blur / submit.
+function AddressChecklist({ items, active }: { items: ChecklistItem[]; active: boolean }) {
+  if (!active) return null;
+  return (
+    <ul className="mt-2 space-y-1 text-xs" role="status" aria-live="polite">
+      {items.map((it) => (
+        <li
+          key={it.label}
+          className={cn(
+            "flex items-center gap-1.5",
+            it.ok ? "text-emerald-600" : "text-muted-foreground",
+          )}
+        >
+          {it.ok ? (
+            <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+          ) : (
+            <AlertCircle className="h-3.5 w-3.5" aria-hidden />
+          )}
+          <span>{it.label}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+
 function SignupPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
