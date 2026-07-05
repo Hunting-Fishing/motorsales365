@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import QRCode from "qrcode";
 import { QrCode, Download, Printer, Copy, Share2 } from "lucide-react";
 import { toast } from "sonner";
@@ -28,7 +28,10 @@ interface ListingQrProps {
   triggerLabel?: string;
   className?: string;
   compact?: boolean;
+  /** Optional custom trigger. When provided, replaces the default button entirely. */
+  trigger?: ReactNode;
 }
+
 
 function getListingUrl(id: string, baseUrl?: string) {
   const origin =
@@ -48,7 +51,9 @@ export function ListingQr({
   triggerLabel = "QR & Poster",
   className,
   compact = false,
+  trigger,
 }: ListingQrProps) {
+
   const [open, setOpen] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const url = getListingUrl(listingId, baseUrl);
@@ -158,7 +163,9 @@ export function ListingQr({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {compact ? (
+        {trigger ? (
+          trigger
+        ) : compact ? (
           <Button
             variant={triggerVariant}
             size="sm"
@@ -174,6 +181,7 @@ export function ListingQr({
           </Button>
         )}
       </DialogTrigger>
+
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

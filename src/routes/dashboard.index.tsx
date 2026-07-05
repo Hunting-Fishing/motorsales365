@@ -17,7 +17,9 @@ import {
   MessageSquare,
   TrendingUp,
   TrendingDown,
+  QrCode,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -307,56 +309,61 @@ function MyListings() {
             const expiring =
               l.expires_at &&
               new Date(l.expires_at).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000;
+            const actionBtnCls =
+              "flex h-auto flex-col items-center gap-1 rounded-md px-2 py-1.5 text-[10px] font-medium leading-tight";
             return (
               <div
                 key={l.id}
-                className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:flex-row"
+                className="rounded-xl border border-border bg-card"
               >
-                <div className="h-24 w-32 shrink-0 overflow-hidden rounded-md bg-secondary">
-                  <ImageWithSkeleton src={photo?.url || placeholderCar} alt={l.title ? `${l.title} cover photo` : "Listing cover photo"} />
-                </div>
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge className={statusColor[l.status] ?? ""}>
-                      {l.status.replace("_", " ")}
-                    </Badge>
-                    {boosted && (
-                      <Badge className="bg-accent text-accent-foreground">
-                        <Star className="mr-1 h-3 w-3" />
-                        Featured
+                <div className="flex flex-col gap-4 p-4 sm:flex-row">
+                  <div className="h-24 w-32 shrink-0 overflow-hidden rounded-md bg-secondary">
+                    <ImageWithSkeleton src={photo?.url || placeholderCar} alt={l.title ? `${l.title} cover photo` : "Listing cover photo"} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className={statusColor[l.status] ?? ""}>
+                        {l.status.replace("_", " ")}
                       </Badge>
-                    )}
-                    {l.plan === "upgraded" && <Badge variant="secondary">Upgraded</Badge>}
-                    {expiring && l.status === "active" && (
-                      <Badge variant="outline" className="border-warning text-warning">
-                        Expiring soon
-                      </Badge>
-                    )}
+                      {boosted && (
+                        <Badge className="bg-accent text-accent-foreground">
+                          <Star className="mr-1 h-3 w-3" />
+                          Featured
+                        </Badge>
+                      )}
+                      {l.plan === "upgraded" && <Badge variant="secondary">Upgraded</Badge>}
+                      {expiring && l.status === "active" && (
+                        <Badge variant="outline" className="border-warning text-warning">
+                          Expiring soon
+                        </Badge>
+                      )}
+                    </div>
+                    <Link
+                      to="/listing/$id"
+                      params={{ id: l.id }}
+                      className="mt-1 block font-semibold hover:text-primary"
+                    >
+                      {l.title}
+                    </Link>
+                    <div className="mt-1 text-lg font-bold text-primary">
+                      {formatPHP(l.price_php)}
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Eye className="h-3 w-3" />
+                        {l.view_count} views
+                      </span>
+                      <span>Created {formatDate(l.created_at)}</span>
+                      {l.expires_at && <span>Expires {formatDate(l.expires_at)}</span>}
+                    </div>
+                    <ListingStats stats={stats[l.id]} />
                   </div>
-                  <Link
-                    to="/listing/$id"
-                    params={{ id: l.id }}
-                    className="mt-1 block font-semibold hover:text-primary"
-                  >
-                    {l.title}
-                  </Link>
-                  <div className="mt-1 text-lg font-bold text-primary">
-                    {formatPHP(l.price_php)}
-                  </div>
-                  <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Eye className="h-3 w-3" />
-                      {l.view_count} views
-                    </span>
-                    <span>Created {formatDate(l.created_at)}</span>
-                    {l.expires_at && <span>Expires {formatDate(l.expires_at)}</span>}
-                  </div>
-                  <ListingStats stats={stats[l.id]} />
                 </div>
-                <div className="flex shrink-0 flex-wrap gap-2 sm:flex-col">
-                  <Button asChild variant="outline" size="sm">
-                    <Link to="/listing/$id/edit" params={{ id: l.id }}>
+                <div className="flex flex-wrap items-stretch gap-1 border-t border-border px-2 py-2">
+                  <Button asChild variant="ghost" size="sm" className={actionBtnCls}>
+                    <Link to="/listing/$id/edit" params={{ id: l.id }} aria-label="Edit listing">
                       <Edit className="h-4 w-4" />
+                      <span>Edit</span>
                     </Link>
                   </Button>
                   <ListingQr
@@ -364,12 +371,19 @@ function MyListings() {
                     title={l.title}
                     pricePhp={l.price_php}
                     coverUrl={photo?.url ?? null}
-                    compact
+                    trigger={
+                      <Button variant="ghost" size="sm" className={actionBtnCls} title="QR code & printable poster">
+                        <QrCode className="h-4 w-4" />
+                        <span>QR / Share</span>
+                      </Button>
+                    }
                   />
+
                   <BoostDialog listingId={l.id} listingTitle={l.title}>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
+                      className={actionBtnCls}
                       disabled={
                         boosted ||
                         !(
@@ -388,49 +402,64 @@ function MyListings() {
                       }
                     >
                       <Rocket className="h-4 w-4" />
+                      <span>Boost</span>
                     </Button>
                   </BoostDialog>
-
-                  <Button variant="outline" size="sm" onClick={() => renew(l.id)} title="Renew">
+                  <Button variant="ghost" size="sm" className={actionBtnCls} onClick={() => renew(l.id)} title="Renew">
                     <RefreshCcw className="h-4 w-4" />
+                    <span>Renew</span>
                   </Button>
                   {l.status !== "sold" && (
                     <Button
-                      variant={l.status === "pending_sale" ? "default" : "outline"}
+                      variant={l.status === "pending_sale" ? "default" : "ghost"}
                       size="sm"
+                      className={actionBtnCls}
                       onClick={() => togglePendingSale(l)}
                       title={
                         l.status === "pending_sale" ? "Cancel pending sale" : "Mark as pending sale"
                       }
                     >
                       <Clock className="h-4 w-4" />
+                      <span>{l.status === "pending_sale" ? "Cancel pending" : "Pending"}</span>
                     </Button>
                   )}
                   {l.status !== "sold" ? (
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
+                      className={actionBtnCls}
                       onClick={() => setSoldTarget({ id: l.id, title: l.title })}
                       title="Mark sold"
                     >
                       <CheckCircle2 className="h-4 w-4" />
+                      <span>Sold</span>
                     </Button>
                   ) : (
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
+                      className={actionBtnCls}
                       onClick={() => undoSold(l.id)}
                       title="Undo sold — restore to active"
                     >
                       <Undo2 className="h-4 w-4" />
+                      <span>Undo sold</span>
                     </Button>
                   )}
-                  <Button variant="outline" size="sm" onClick={() => remove(l.id)} title="Delete">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`${actionBtnCls} text-destructive hover:text-destructive`}
+                    onClick={() => remove(l.id)}
+                    title="Delete"
+                  >
                     <Trash2 className="h-4 w-4" />
+                    <span>Delete</span>
                   </Button>
                 </div>
               </div>
             );
+
           })}
         </div>
       )}
