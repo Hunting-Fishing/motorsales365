@@ -134,6 +134,8 @@ function SignupPage() {
   const phoneE164 = phoneCheck.valid ? phoneCheck.e164 ?? "" : phoneNational.trim() ? buildE164(phoneIso, phoneNational) ?? "" : "";
   const phoneValid = phoneCheck.valid;
   const phoneMessage = phoneCheck.message;
+  const phoneHint = getPhoneHint(phoneIso, phoneNational);
+
   const postalOk = (s: string) => /^[A-Za-z0-9][A-Za-z0-9 \-]{2,10}$/.test(s.trim());
   // Real-time granular checks used by the AddressChecklist UI.
   const addrHasNumber = (s: string) => /\d/.test(s);
