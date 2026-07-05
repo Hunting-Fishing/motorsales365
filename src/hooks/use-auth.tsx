@@ -639,6 +639,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthError(null);
       handleSession(newSession);
       setAuthLoading(false);
+      // Persist any signup fields the user stashed before this session was
+      // created (email-verify link, Google OAuth handoff, etc). The applier
+      // is a no-op when the stash is missing / already applied, matches the
+      // stash to this user by email, and retries with backoff on failure.
+      if (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "USER_UPDATED") {
+        void applyPendingIfAny(newSession).then((result) => {
+          if (result.ok) {
+            authLog("info", {
+              event: "signup_pending.applied",
+              uid: newSession.user?.id,
+              updated: result.updated,
+            });
+          } else if (result.reason === "failed") {
+            authLog("warn", {
+              event: "signup_pending.apply_failed",
+              uid: newSession.user?.id,
+              attempts: result.attempts,
+              error: result.error,
+            });
+          }
+        });
+      }
     });
 
     // Re-validate the persisted session with the Auth server (getUser) rather
