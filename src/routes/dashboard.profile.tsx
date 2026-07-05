@@ -323,21 +323,21 @@ function ProfilePage() {
         </div>
         {profile.seller_type === "business" && (
           <>
-            <div>
+            <div id="field-business_name">
               <Label>Business name</Label>
               <Input
                 value={profile.business_name ?? ""}
                 onChange={(e) => setProfile({ ...profile, business_name: e.target.value })}
               />
             </div>
-            <div>
+            <div id="field-business_address">
               <Label>Business address</Label>
               <Input
                 value={profile.business_address ?? ""}
                 onChange={(e) => setProfile({ ...profile, business_address: e.target.value })}
               />
             </div>
-            <div className="space-y-2">
+            <div id="field-business_location" className="space-y-2">
               <Label className="block">Business location</Label>
               <p className="text-xs text-muted-foreground">
                 Based on the official PSA Philippine Standard Geographic Code.
