@@ -233,6 +233,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
             business_kind: isBusinessLike ? input.business_kind : undefined,
             business_address: isBusinessLike ? input.business_address : undefined,
             referral_code: input.referral_code || undefined,
+            signup_source:
+              input.signup_source ?? (input.referral_code ? "link" : "direct"),
           };
 
           const originUrl = (() => {
