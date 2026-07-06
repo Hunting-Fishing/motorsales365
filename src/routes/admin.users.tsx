@@ -866,9 +866,9 @@ function AdminUsers() {
             <DialogTitle>Re-evaluate signup intents</DialogTitle>
             <DialogDescription>
               {intentPreview?.rows.length === 1
-                ? `Preview of derived intent for ${intentPreview.rows[0].full_name ?? "this user"}.`
-                : `Preview of derived intent for the ${intentPreview?.rows.length ?? 0} users on this page.`}
-              {" "}Only rows marked <strong>Change</strong> will be written; unchanged rows are skipped.
+                ? <>Preview of derived intent for {intentPreview.rows[0].full_name ?? "this user"}.{" "}</>
+                : <>Preview of derived intent for the {intentPreview?.rows.length ?? 0} users on this page.{" "}</>}
+              Only rows marked <strong>Change</strong> will be written; unchanged rows are skipped.
             </DialogDescription>
           </DialogHeader>
 
