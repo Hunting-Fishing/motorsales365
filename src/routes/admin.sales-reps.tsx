@@ -1187,7 +1187,7 @@ function ConnectionsPanel({
                 </div>
                 {b.slug ? (
                   <Link
-                    to="/business/$slug"
+                    to="/businesses/$slug"
                     params={{ slug: b.slug } as any}
                     className="inline-flex items-center text-xs text-primary hover:underline"
                   >
