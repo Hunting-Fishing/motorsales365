@@ -255,15 +255,21 @@ function AdminUsers() {
   }, [pageSize]);
 
   const hasFilters =
-    search || roleFilter !== "all" || sellerFilter !== "all" || verFilter !== "all";
+    search ||
+    roleFilter !== "all" ||
+    sellerFilter !== "all" ||
+    verFilter !== "all" ||
+    intentFilter !== "all";
   const clearFilters = () => {
     setSearchInput("");
     setSearch("");
     setRoleFilter("all");
     setSellerFilter("all");
     setVerFilter("all");
+    setIntentFilter("all");
     setPage(0);
   };
+
 
   const toggleRole = async (userId: string, role: StaffRole, has: boolean) => {
     if (has) {
