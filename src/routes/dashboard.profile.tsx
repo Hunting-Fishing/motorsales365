@@ -484,8 +484,24 @@ function ProfilePage() {
         </div>
       </div>
 
-      {/* Security: TOTP two-factor authentication (free, no SMS) */}
-      <TotpSetupCard />
+      {/* Security: two-factor authentication — coming soon */}
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="font-display text-lg font-bold">Security — Two-factor authentication</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Add an extra layer of security to your account with an authenticator app.
+            </p>
+          </div>
+          <span className="shrink-0 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Coming soon
+          </span>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Two-factor authentication isn't required yet — we'll notify you here when setup is available.
+        </p>
+      </section>
+
     </div>
   );
 }
