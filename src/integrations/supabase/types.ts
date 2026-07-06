@@ -7779,6 +7779,7 @@ export type Database = {
           signup_intent: string | null
           signup_province: string | null
           signup_region: string | null
+          signup_source: string | null
           street_address: string | null
           tier_id: string | null
           tier_recomputed_at: string | null
@@ -7833,6 +7834,7 @@ export type Database = {
           signup_intent?: string | null
           signup_province?: string | null
           signup_region?: string | null
+          signup_source?: string | null
           street_address?: string | null
           tier_id?: string | null
           tier_recomputed_at?: string | null
@@ -7887,6 +7889,7 @@ export type Database = {
           signup_intent?: string | null
           signup_province?: string | null
           signup_region?: string | null
+          signup_source?: string | null
           street_address?: string | null
           tier_id?: string | null
           tier_recomputed_at?: string | null
