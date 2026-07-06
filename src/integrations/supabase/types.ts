@@ -9080,6 +9080,7 @@ export type Database = {
           accepting_new_clients: boolean
           active: boolean
           bio: string | null
+          commission_rate_override: number | null
           created_at: string
           photo_url: string | null
           public_email: string | null
@@ -9092,6 +9093,7 @@ export type Database = {
           accepting_new_clients?: boolean
           active?: boolean
           bio?: string | null
+          commission_rate_override?: number | null
           created_at?: string
           photo_url?: string | null
           public_email?: string | null
@@ -9104,6 +9106,7 @@ export type Database = {
           accepting_new_clients?: boolean
           active?: boolean
           bio?: string | null
+          commission_rate_override?: number | null
           created_at?: string
           photo_url?: string | null
           public_email?: string | null
