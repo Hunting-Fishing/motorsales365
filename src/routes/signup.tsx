@@ -341,6 +341,18 @@ function SignupPage() {
     errorFor(field) ? "border-destructive focus-visible:ring-destructive" : "";
 
   useEffect(() => {
+    // Prefer an explicit ?ref=/?r=/?code= on /signup so direct QR/link
+    // targets attribute even when cookies were blocked on the /r/ hop.
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlCode = (params.get("ref") || params.get("r") || params.get("code") || "").trim();
+      const src = (params.get("src") || params.get("s") || "").toLowerCase();
+      if (urlCode) {
+        recordTouch(urlCode, src === "qr" ? "qr" : "link");
+        setRefCode(urlCode);
+        return;
+      }
+    }
     const c = getCreditedCode();
     if (c) setRefCode(c);
   }, []);
