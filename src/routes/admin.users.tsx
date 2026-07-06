@@ -228,6 +228,7 @@ function AdminUsers() {
   const [referralMap, setReferralMap] = useState<
     Map<string, { code: string; staffName: string | null; staffId: string | null }>
   >(new Map());
+  const [evaluatorNames, setEvaluatorNames] = useState<Map<string, string | null>>(new Map());
 
   // Debounce search input
   useEffect(() => {
