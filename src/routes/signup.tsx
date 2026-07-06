@@ -511,7 +511,7 @@ function SignupPage() {
         business_address: businessAddress.trim(),
         business_postal_code: businessPostalCode.trim(),
         referral_code: refCode || "",
-        signup_source: (await import("@/lib/referral")).getCreditedSource(),
+        signup_source: getCreditedSource(),
         redirect: search.redirect ?? "",
         origin: siteOrigin(),
         agreed: true,
