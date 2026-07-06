@@ -664,7 +664,7 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
   const [form, setForm] = useState<any>({});
   const [lastId, setLastId] = useState<string | null>(null);
   const [refSearch, setRefSearch] = useState("");
-  const [refFilter, setRefFilter] = useState<"all" | "spend" | "nospend">("all");
+  const [refFilter, setRefFilter] = useState<"all" | "spend" | "nospend" | "signup_only" | "qr" | "link">("all");
   const [refSort, setRefSort] = useState<
     "commission_desc" | "commission_asc" | "spent_desc" | "spent_asc" | "recent" | "oldest" | "name"
   >("commission_desc");
