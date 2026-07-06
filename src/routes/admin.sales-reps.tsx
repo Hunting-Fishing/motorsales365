@@ -871,9 +871,34 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
               {/* -------- Territories -------- */}
               <TabsContent value="territories" className="mt-4 space-y-3">
                 {rep.territories.length === 0 ? (
-                  <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                    No territories yet. Add one below to route leads and auto-assignments to this
-                    rep.
+                  <div className="rounded-md border border-dashed p-4 text-sm">
+                    <div className="text-muted-foreground">
+                      No territories yet. Auto-populate from this rep's signup area, or add one
+                      manually below.
+                    </div>
+                    <div className="mt-2 flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => autoSetup.mutate()}
+                        disabled={autoSetup.isPending}
+                      >
+                        <Zap className="mr-1 h-3 w-3" />
+                        Auto-populate from signup area
+                      </Button>
+                      {detail?.account?.profile ? (
+                        <span className="text-xs text-muted-foreground">
+                          Signup area:{" "}
+                          {[
+                            detail.account.profile.signup_region ??
+                              detail.account.profile.business_region,
+                            detail.account.profile.signup_city ??
+                              detail.account.profile.business_city,
+                          ]
+                            .filter(Boolean)
+                            .join(" › ") || "not set"}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                 ) : null}
                 <TerritoryEditor
