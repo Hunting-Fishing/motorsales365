@@ -224,6 +224,9 @@ function AdminUsers() {
   const [intentFilter, setIntentFilter] = useState<
     "all" | "buyer" | "business" | "service_provider" | "unset"
   >("all");
+  const [evalSourceFilter, setEvalSourceFilter] = useState<"all" | "auto" | "manual" | "never">(
+    "all",
+  );
   const [referralMap, setReferralMap] = useState<
     Map<string, { code: string; staffName: string | null; staffId: string | null }>
   >(new Map());
@@ -241,7 +244,7 @@ function AdminUsers() {
   // Reset to first page when filters change
   useEffect(() => {
     setPage(0);
-  }, [roleFilter, sellerFilter, verFilter, intentFilter]);
+  }, [roleFilter, sellerFilter, verFilter, intentFilter, evalSourceFilter]);
 
 
   const load = async () => {
@@ -296,7 +299,14 @@ function AdminUsers() {
           q = q.is("signup_intent", null);
         } else {
           q = q.eq("signup_intent", intentFilter);
-        }
+      }
+      if (evalSourceFilter === "auto") {
+        q = q.is("intent_evaluated_by", null).not("intent_evaluated_at", "is", null);
+      } else if (evalSourceFilter === "manual") {
+        q = q.not("intent_evaluated_by", "is", null);
+      } else if (evalSourceFilter === "never") {
+        q = q.is("intent_evaluated_at", null);
+      }
       }
       if (verFilter !== "all") {
         if (verFilter === "unverified") {
@@ -397,7 +407,7 @@ function AdminUsers() {
     load();
     // reason: `load` is recreated each render; depend only on its inputs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, search, roleFilter, sellerFilter, verFilter, intentFilter, staffIds]);
+  }, [page, pageSize, search, roleFilter, sellerFilter, verFilter, intentFilter, evalSourceFilter, staffIds]);
 
   useEffect(() => {
     setPage(0);
@@ -408,7 +418,8 @@ function AdminUsers() {
     roleFilter !== "all" ||
     sellerFilter !== "all" ||
     verFilter !== "all" ||
-    intentFilter !== "all";
+    intentFilter !== "all" ||
+    evalSourceFilter !== "all";
   const clearFilters = () => {
     setSearchInput("");
     setSearch("");
@@ -416,6 +427,7 @@ function AdminUsers() {
     setSellerFilter("all");
     setVerFilter("all");
     setIntentFilter("all");
+    setEvalSourceFilter("all");
     setPage(0);
   };
 
@@ -611,6 +623,17 @@ function AdminUsers() {
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="verified">Verified</SelectItem>
             <SelectItem value="rejected">Rejected</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={evalSourceFilter} onValueChange={(v) => setEvalSourceFilter(v as any)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Intent evaluated by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All intent sources</SelectItem>
+            <SelectItem value="auto">Auto (system trigger)</SelectItem>
+            <SelectItem value="manual">Manual (admin)</SelectItem>
+            <SelectItem value="never">Never evaluated</SelectItem>
           </SelectContent>
         </Select>
       </div>
