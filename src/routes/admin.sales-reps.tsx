@@ -1151,6 +1151,7 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                         <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                           <tr>
                             <th className="px-3 py-2">User</th>
+                            <th className="px-3 py-2">Source</th>
                             <th className="px-3 py-2">Signed up</th>
                             <th className="px-3 py-2 text-right">Redemptions</th>
                             <th className="px-3 py-2 text-right">Spent</th>
