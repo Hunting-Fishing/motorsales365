@@ -491,7 +491,7 @@ function AdminUsers() {
             title="Recompute signup intent badges for all users on this page from profile + business data"
           >
             <RefreshCw className={`mr-1 h-4 w-4 ${bulkIntentBusy ? "animate-spin" : ""}`} />
-            {bulkIntentBusy ? "Re-evaluating…" : "Re-evaluate intents"}
+            {bulkIntentBusy ? "Previewing…" : "Re-evaluate intents"}
           </Button>
           <AddUserDialog onCreated={load} />
           {isSuperAdmin && (
