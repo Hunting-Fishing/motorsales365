@@ -63,14 +63,6 @@ function AdminPayments() {
         </p>
       </div>
       <Tabs defaultValue={initialTab}>
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold">Payments Control</h1>
-        <p className="text-sm text-muted-foreground">
-          Configure methods, review manual payments, and audit transactions.
-        </p>
-      </div>
-      <Tabs defaultValue="queue">
         <TabsList>
           <TabsTrigger value="queue">Review Queue</TabsTrigger>
           <TabsTrigger value="methods">Methods</TabsTrigger>
