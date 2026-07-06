@@ -228,6 +228,7 @@ function AdminUsers() {
   const [referralMap, setReferralMap] = useState<
     Map<string, { code: string; staffName: string | null; staffId: string | null }>
   >(new Map());
+  const [evaluatorNames, setEvaluatorNames] = useState<Map<string, string | null>>(new Map());
 
   // Debounce search input
   useEffect(() => {
@@ -368,6 +369,26 @@ function AdminUsers() {
       setUsers((profs ?? []).map((p) => ({ ...p, roles: roleMap.get(p.id) ?? [] })));
       setReferralMap(refMap);
       setTotal(count ?? 0);
+
+      // Look up display names for whoever last evaluated the intent badge.
+      const evaluatorIds = Array.from(
+        new Set(
+          (profs ?? [])
+            .map((p: any) => p.intent_evaluated_by)
+            .filter((v: any): v is string => !!v),
+        ),
+      );
+      if (evaluatorIds.length > 0) {
+        const { data: evalProfs } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", evaluatorIds);
+        const map = new Map<string, string | null>();
+        (evalProfs ?? []).forEach((r: any) => map.set(r.id, r.full_name ?? null));
+        setEvaluatorNames(map);
+      } else {
+        setEvaluatorNames(new Map());
+      }
     } finally {
       setLoading(false);
     }
@@ -643,6 +664,21 @@ function AdminUsers() {
                     </span>
                   </div>
                 )}
+                {(u as any).intent_evaluated_at && (
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    Intent evaluated {formatDate((u as any).intent_evaluated_at)}
+                    {(u as any).intent_evaluated_by && (
+                      <>
+                        {" by "}
+                        <span className="font-medium text-foreground">
+                          {evaluatorNames.get((u as any).intent_evaluated_by) ??
+                            `${String((u as any).intent_evaluated_by).slice(0, 8)}…`}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
+
 
                 <div className="mt-2 flex flex-wrap gap-1">
                   {STAFF_ROLES.map((role) => {

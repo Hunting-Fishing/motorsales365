@@ -104,7 +104,11 @@ export const recomputeUserIntents = createServerFn({ method: "POST" })
       if (changed && !data.dryRun) {
         const { error: uErr } = await supabaseAdmin
           .from("profiles")
-          .update({ signup_intent: next })
+          .update({
+            signup_intent: next,
+            intent_evaluated_at: new Date().toISOString(),
+            intent_evaluated_by: context.userId,
+          } as any)
           .eq("id", (p as any).id);
         if (uErr) throw new Error(uErr.message);
         try {
