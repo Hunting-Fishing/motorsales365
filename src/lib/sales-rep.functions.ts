@@ -980,7 +980,7 @@ export const adminGetRepDetail = createServerFn({ method: "POST" })
     if (refCodes.length) {
       const { data: reds } = await supabaseAdmin
         .from("referral_redemptions")
-        .select("user_id, final_amount_php, created_at")
+        .select("user_id, final_amount_php, discount_amount_php, created_at")
         .in("referral_code", refCodes)
         .order("created_at", { ascending: true });
       redemptionsRows = reds ?? [];
