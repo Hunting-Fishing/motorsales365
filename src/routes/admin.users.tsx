@@ -139,6 +139,39 @@ function AdminUsers() {
     }
   };
 
+  const handleRecomputeOne = async (userId: string) => {
+    setIntentBusyId(userId);
+    try {
+      const res = await recomputeIntents({ data: { userIds: [userId] } });
+      const r = res.results[0];
+      if (r?.changed) {
+        toast.success(`Intent updated: ${r.previous ?? "unset"} → ${r.next}`);
+        load();
+      } else {
+        toast.message(`Intent unchanged (${r?.next ?? "buyer"})`);
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to recompute intent");
+    } finally {
+      setIntentBusyId(null);
+    }
+  };
+
+  const handleRecomputeVisible = async () => {
+    const ids = users.map((u) => u.id);
+    if (ids.length === 0) return;
+    setBulkIntentBusy(true);
+    try {
+      const res = await recomputeIntents({ data: { userIds: ids } });
+      toast.success(`Re-evaluated ${ids.length} users · ${res.updated} updated, ${res.unchanged} unchanged`);
+      if (res.updated > 0) load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to recompute intents");
+    } finally {
+      setBulkIntentBusy(false);
+    }
+  };
+
   const [users, setUsers] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
