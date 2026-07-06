@@ -45,8 +45,8 @@ describe("IntentEvaluatedFooter — Auto vs Manual label derivation", () => {
     expect(badge).toHaveTextContent("Auto");
     expect(badge).toHaveAttribute("data-source", "auto");
     expect(screen.getByText(/by system trigger/i)).toBeInTheDocument();
-    // Should NOT render evaluator name UI
-    expect(screen.queryByText(/^by /i)).not.toBeInTheDocument();
+    // Should NOT render an evaluator-name node like "by <Name>"
+    expect(screen.queryByText(/^by [A-Z]/)).not.toBeInTheDocument();
   });
 
   it("renders Manual badge when evaluatedBy is a uuid (admin action)", () => {
