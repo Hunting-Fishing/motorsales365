@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, Copy, Eye, Info, RefreshCw, Search, X } from "lucide-react";
@@ -691,7 +691,15 @@ function AdminUsers() {
                     <span>Intent evaluated {formatDate((u as any).intent_evaluated_at)}</span>
                     {(u as any).intent_evaluated_by ? (
                       <>
-                        <Badge variant="outline" className="h-4 px-1 text-[10px]">Manual</Badge>
+                        <Link
+                          to="/admin/audit"
+                          search={{ action: "intent_recomputed_manual", q: u.id }}
+                          title="View manual intent recompute entries for this user"
+                        >
+                          <Badge variant="outline" className="h-4 px-1 text-[10px] hover:bg-accent">
+                            Manual
+                          </Badge>
+                        </Link>
                         <span>
                           by{" "}
                           <span className="font-medium text-foreground">
@@ -702,7 +710,15 @@ function AdminUsers() {
                       </>
                     ) : (
                       <>
-                        <Badge variant="secondary" className="h-4 px-1 text-[10px]">Auto</Badge>
+                        <Link
+                          to="/admin/audit"
+                          search={{ action: "intent_recomputed_auto", q: u.id }}
+                          title="View automatic intent recompute entries for this user"
+                        >
+                          <Badge variant="secondary" className="h-4 px-1 text-[10px] hover:bg-accent">
+                            Auto
+                          </Badge>
+                        </Link>
                         <span>by system trigger</span>
                       </>
                     )}

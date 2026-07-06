@@ -18,7 +18,13 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { listRouteAuditLog, type RouteAuditRow } from "@/lib/route-audit.functions";
 
+type AuditSearch = { action?: string; q?: string };
+
 export const Route = createFileRoute("/admin/audit")({
+  validateSearch: (s: Record<string, unknown>): AuditSearch => ({
+    action: typeof s.action === "string" ? s.action : undefined,
+    q: typeof s.q === "string" ? s.q : undefined,
+  }),
   component: AdminAudit,
 });
 
@@ -121,13 +127,14 @@ function AdminAudit() {
 }
 
 function UserActionsTab() {
+  const initial = Route.useSearch();
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [actionFilter, setActionFilter] = useState("all");
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
+  const [actionFilter, setActionFilter] = useState(initial.action ?? "all");
+  const [searchInput, setSearchInput] = useState(initial.q ?? "");
+  const [search, setSearch] = useState(initial.q ?? "");
   const [names, setNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
