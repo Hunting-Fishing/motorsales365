@@ -33,7 +33,9 @@ import {
   adminSaveRepProfile,
   adminListAuditLog,
   adminGetRepDetail,
+  adminGetReferredUserDetail,
   adminAutoSetupTerritory,
+
 } from "@/lib/sales-rep.functions";
 import { PSGC, regionLabel, provincesOf, citiesOf } from "@/lib/psgc";
 import { Button } from "@/components/ui/button";
