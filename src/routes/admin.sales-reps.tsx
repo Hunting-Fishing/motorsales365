@@ -1138,7 +1138,7 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                 ) : (detail?.referredUsers?.length ?? 0) === 0 ? (
                   <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
                     <UsersIcon className="mx-auto mb-2 h-5 w-5 opacity-60" />
-                    No referred users with tracked spend yet.
+                    No referred users yet.
                   </div>
                 ) : filteredReferred.length === 0 ? (
                   <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
