@@ -65,7 +65,7 @@ describe("IntentEvaluatedFooter — Auto vs Manual label derivation", () => {
     expect(screen.queryByText(/system trigger/i)).not.toBeInTheDocument();
   });
 
-  it("falls back to a truncated uuid when the evaluator name is not resolved", () => {
+  it('falls back to "an admin" when the evaluator name is missing (null)', () => {
     render(
       <IntentEvaluatedFooter
         userId={USER}
@@ -75,8 +75,35 @@ describe("IntentEvaluatedFooter — Auto vs Manual label derivation", () => {
       />,
     );
     expect(screen.getByTestId("intent-source-badge")).toHaveAttribute("data-source", "manual");
-    // First 8 chars of ADMIN followed by an ellipsis
-    expect(screen.getByText(`${ADMIN.slice(0, 8)}…`)).toBeInTheDocument();
+    expect(screen.getByText("an admin")).toBeInTheDocument();
+    // No raw uuid fragment leaks into the label.
+    expect(screen.queryByText(new RegExp(ADMIN.slice(0, 8)))).not.toBeInTheDocument();
+  });
+
+  it('falls back to "an admin" when the evaluator name is a blank string', () => {
+    render(
+      <IntentEvaluatedFooter
+        userId={USER}
+        evaluatedAt={AT}
+        evaluatedBy={ADMIN}
+        evaluatorName="   "
+      />,
+    );
+    expect(screen.getByText("an admin")).toBeInTheDocument();
+  });
+
+  it("still shows the Auto label clearly when no name/evaluator is available", () => {
+    render(
+      <IntentEvaluatedFooter
+        userId={USER}
+        evaluatedAt={AT}
+        evaluatedBy={null}
+        evaluatorName={null}
+      />,
+    );
+    const badge = screen.getByTestId("intent-source-badge");
+    expect(badge).toHaveTextContent("Auto");
+    expect(screen.getByText(/by system trigger/i)).toBeInTheDocument();
   });
 
   it("Auto badge links to the auto-filtered audit view for this user", () => {
