@@ -150,14 +150,18 @@ function AdminReferrals() {
     Record<string, { scans: number; signups: number; visitors: number; listings: number }>
   >({});
   const [loading, setLoading] = useState(true);
-  const [range, setRange] = useState<RangeKey>("30");
+  const initialSearch = Route.useSearch();
+  const validRanges: RangeKey[] = ["7", "30", "90", "all"];
+  const [range, setRange] = useState<RangeKey>(
+    (validRanges.includes(initialSearch.range as RangeKey) ? initialSearch.range : "30") as RangeKey,
+  );
   const [newOpen, setNewOpen] = useState(false);
   const [editing, setEditing] = useState<StaffRow | null>(null);
   const [promosFor, setPromosFor] = useState<StaffRow | null>(null);
   const [verifyCode, setVerifyCode] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch.search ?? "");
   const [sortKey, setSortKey] = useState<
     "name" | "email" | "code" | "status" | "scans" | "visitors" | "signups" | "listings"
   >("name");
