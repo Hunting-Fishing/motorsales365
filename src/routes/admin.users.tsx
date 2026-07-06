@@ -446,6 +446,16 @@ function AdminUsers() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold">Users</h1>
         <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={bulkIntentBusy || loading || users.length === 0}
+            onClick={handleRecomputeVisible}
+            title="Recompute signup intent badges for all users on this page from profile + business data"
+          >
+            <RefreshCw className={`mr-1 h-4 w-4 ${bulkIntentBusy ? "animate-spin" : ""}`} />
+            {bulkIntentBusy ? "Re-evaluating…" : "Re-evaluate intents"}
+          </Button>
           <AddUserDialog onCreated={load} />
           {isSuperAdmin && (
             <AddUserDialog
