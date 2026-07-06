@@ -860,6 +860,7 @@ function AdminReferrals() {
                 sortDir={sortDir}
                 onSort={toggleSort}
               />
+              <th className="px-4 py-2">Approval</th>
               <th className="px-4 py-2 text-right">Actions</th>
             </tr>
           </thead>
