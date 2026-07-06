@@ -244,7 +244,7 @@ function AdminUsers() {
   // Reset to first page when filters change
   useEffect(() => {
     setPage(0);
-  }, [roleFilter, sellerFilter, verFilter, intentFilter]);
+  }, [roleFilter, sellerFilter, verFilter, intentFilter, evalSourceFilter]);
 
 
   const load = async () => {
