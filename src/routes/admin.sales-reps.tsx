@@ -1,9 +1,27 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, MapPin, Plus, Trash2, UserCog, X, Zap, History } from "lucide-react";
+import {
+  Loader2,
+  MapPin,
+  Plus,
+  Trash2,
+  UserCog,
+  X,
+  Zap,
+  History,
+  Download,
+  ExternalLink,
+  Mail,
+  Phone,
+  CalendarClock,
+  Users as UsersIcon,
+  Building2,
+  Store,
+  LifeBuoy,
+} from "lucide-react";
 import {
   adminListReps,
   adminListAssignments,
@@ -14,6 +32,7 @@ import {
   adminRemoveTerritory,
   adminSaveRepProfile,
   adminListAuditLog,
+  adminGetRepDetail,
 } from "@/lib/sales-rep.functions";
 import { PSGC, regionLabel, provincesOf, citiesOf } from "@/lib/psgc";
 import { Button } from "@/components/ui/button";
@@ -609,10 +628,17 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
   const { data, refetch } = useReps();
   const rep: Rep | undefined = data?.reps?.find((r: Rep) => r.user_id === repUserId);
   const saveFn = useServerFn(adminSaveRepProfile);
+  const detailFn = useServerFn(adminGetRepDetail);
+  const [days, setDays] = useState<number>(30);
+
+  const detailQ = useQuery({
+    queryKey: ["admin-rep-detail", repUserId, days],
+    queryFn: () => detailFn({ data: { rep_user_id: repUserId!, days } }),
+    enabled: !!repUserId,
+  });
+  const detail = detailQ.data;
 
   const [form, setForm] = useState<any>({});
-
-  // Sync form when rep loads
   const [lastId, setLastId] = useState<string | null>(null);
   if (rep && lastId !== rep.user_id) {
     setLastId(rep.user_id);
@@ -624,12 +650,26 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
       photo_url: rep.rep_profile?.photo_url ?? "",
       accepting_new_clients: rep.rep_profile?.accepting_new_clients ?? true,
       active: rep.rep_profile?.active ?? true,
+      commission_rate_override_pct:
+        rep.rep_profile?.commission_rate_override != null
+          ? String(Number(rep.rep_profile.commission_rate_override) * 100)
+          : "",
     });
   }
 
   const save = useMutation({
-    mutationFn: () =>
-      saveFn({
+    mutationFn: () => {
+      const pct = String(form.commission_rate_override_pct ?? "").trim();
+      let override: number | null | undefined = undefined;
+      if (pct === "") override = null;
+      else {
+        const n = Number(pct);
+        if (!Number.isFinite(n) || n < 0 || n > 100) {
+          throw new Error("Commission rate must be between 0 and 100");
+        }
+        override = n / 100;
+      }
+      return saveFn({
         data: {
           rep_user_id: rep!.user_id,
           title: form.title || null,
@@ -639,110 +679,360 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
           photo_url: form.photo_url || null,
           accepting_new_clients: !!form.accepting_new_clients,
           active: !!form.active,
+          commission_rate_override: override,
         },
-      }),
-    onSuccess: () => { toast.success("Saved"); refetch(); },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Saved");
+      refetch();
+      detailQ.refetch();
+    },
     onError: (e: any) => toast.error(e?.message ?? "Failed"),
   });
 
+  const exportReferredCsv = () => {
+    const rows = detail?.referredUsers ?? [];
+    const header = [
+      "user_id",
+      "name",
+      "email",
+      "signed_up_at",
+      "first_redemption_at",
+      "last_redemption_at",
+      "redemptions",
+      "spent_php",
+      "commission_rate",
+      "commission_php",
+    ];
+    const csv = [
+      header.join(","),
+      ...rows.map((r: any) =>
+        header
+          .map((k) => {
+            const v = (r as any)[k];
+            if (v == null) return "";
+            const s = String(v).replace(/"/g, '""');
+            return /[,"\n]/.test(s) ? `"${s}"` : s;
+          })
+          .join(","),
+      ),
+    ].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `referred-users-${rep?.user_id ?? "rep"}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <Sheet open={!!repUserId} onOpenChange={(o) => !o && (setLastId(null), onClose())}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
+      <SheetContent className="w-full overflow-y-auto sm:max-w-3xl">
         {rep ? (
           <>
             <SheetHeader>
               <SheetTitle>{repName(rep)}</SheetTitle>
-              <p className="text-xs text-muted-foreground">{rep.email}</p>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <span>{rep.email}</span>
+                {(detail?.account?.roles ?? []).map((r: string) => (
+                  <Badge key={r} variant="outline" className="text-[10px]">
+                    {r}
+                  </Badge>
+                ))}
+              </div>
             </SheetHeader>
 
-            <div className="mt-4 space-y-6">
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold">Profile</h3>
-                <div className="grid gap-3">
-                  <div className="grid gap-1">
-                    <Label className="text-xs">Title</Label>
-                    <Input
-                      value={form.title ?? ""}
-                      onChange={(e) => setForm({ ...form, title: e.target.value })}
-                      placeholder="e.g. Senior Sales Rep"
-                    />
-                  </div>
-                  <div className="grid gap-1">
-                    <Label className="text-xs">Bio</Label>
-                    <Textarea
-                      value={form.bio ?? ""}
-                      onChange={(e) => setForm({ ...form, bio: e.target.value })}
-                      rows={3}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="grid gap-1">
-                      <Label className="text-xs">Public email</Label>
-                      <Input
-                        type="email"
-                        value={form.public_email ?? ""}
-                        onChange={(e) => setForm({ ...form, public_email: e.target.value })}
-                      />
-                    </div>
-                    <div className="grid gap-1">
-                      <Label className="text-xs">Public phone</Label>
-                      <Input
-                        value={form.public_phone ?? ""}
-                        onChange={(e) => setForm({ ...form, public_phone: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                  <div className="grid gap-1">
-                    <Label className="text-xs">Photo URL override</Label>
-                    <Input
-                      value={form.photo_url ?? ""}
-                      onChange={(e) => setForm({ ...form, photo_url: e.target.value })}
-                      placeholder="Leave blank to use profile avatar"
-                    />
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={!!form.accepting_new_clients}
-                        onCheckedChange={(v) => setForm({ ...form, accepting_new_clients: v })}
-                        id="accepting"
-                      />
-                      <Label htmlFor="accepting" className="text-xs">Accepting new clients</Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={!!form.active}
-                        onCheckedChange={(v) => setForm({ ...form, active: v })}
-                        id="active"
-                      />
-                      <Label htmlFor="active" className="text-xs">Active</Label>
-                    </div>
-                  </div>
-                  <div>
-                    <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
-                      Save profile
-                    </Button>
-                  </div>
-                </div>
-              </section>
+            <Tabs defaultValue="overview" className="mt-4">
+              <TabsList className="flex flex-wrap">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="territories">Territories</TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                <TabsTrigger value="referred">Referred users</TabsTrigger>
+                <TabsTrigger value="connections">Connections</TabsTrigger>
+              </TabsList>
 
-              <section className="space-y-2">
-                <h3 className="text-sm font-semibold">Territories</h3>
+              {/* -------- Overview -------- */}
+              <TabsContent value="overview" className="mt-4 space-y-6">
+                <AccountCard detail={detail} loading={detailQ.isLoading} rep={rep} />
+
+                <section className="space-y-3">
+                  <h3 className="text-sm font-semibold">Profile</h3>
+                  <div className="grid gap-3">
+                    <div className="grid gap-1">
+                      <Label className="text-xs">Title</Label>
+                      <Input
+                        value={form.title ?? ""}
+                        onChange={(e) => setForm({ ...form, title: e.target.value })}
+                        placeholder="e.g. Senior Sales Rep"
+                      />
+                    </div>
+                    <div className="grid gap-1">
+                      <Label className="text-xs">Bio</Label>
+                      <Textarea
+                        value={form.bio ?? ""}
+                        onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                        rows={3}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="grid gap-1">
+                        <Label className="text-xs">Public email</Label>
+                        <Input
+                          type="email"
+                          value={form.public_email ?? ""}
+                          onChange={(e) => setForm({ ...form, public_email: e.target.value })}
+                        />
+                      </div>
+                      <div className="grid gap-1">
+                        <Label className="text-xs">Public phone</Label>
+                        <Input
+                          value={form.public_phone ?? ""}
+                          onChange={(e) => setForm({ ...form, public_phone: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid gap-1">
+                      <Label className="text-xs">Photo URL override</Label>
+                      <Input
+                        value={form.photo_url ?? ""}
+                        onChange={(e) => setForm({ ...form, photo_url: e.target.value })}
+                        placeholder="Leave blank to use profile avatar"
+                      />
+                    </div>
+                    <div className="grid gap-1">
+                      <Label className="text-xs">
+                        Commission rate override (%)
+                      </Label>
+                      <Input
+                        inputMode="decimal"
+                        value={form.commission_rate_override_pct ?? ""}
+                        onChange={(e) =>
+                          setForm({ ...form, commission_rate_override_pct: e.target.value })
+                        }
+                        placeholder={`Leave blank to use site default (${(
+                          (detail?.stats?.commissionRate ?? 0.1) * 100
+                        ).toFixed(1)}%)`}
+                      />
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={!!form.accepting_new_clients}
+                          onCheckedChange={(v) => setForm({ ...form, accepting_new_clients: v })}
+                          id="accepting"
+                        />
+                        <Label htmlFor="accepting" className="text-xs">
+                          Accepting new clients
+                        </Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={!!form.active}
+                          onCheckedChange={(v) => setForm({ ...form, active: v })}
+                          id="active"
+                        />
+                        <Label htmlFor="active" className="text-xs">
+                          Active
+                        </Label>
+                      </div>
+                    </div>
+                    <div>
+                      <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
+                        Save profile
+                      </Button>
+                    </div>
+                  </div>
+                </section>
+              </TabsContent>
+
+              {/* -------- Territories -------- */}
+              <TabsContent value="territories" className="mt-4 space-y-3">
+                {rep.territories.length === 0 ? (
+                  <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                    No territories yet. Add one below to route leads and auto-assignments to this
+                    rep.
+                  </div>
+                ) : null}
                 <TerritoryEditor
                   repUserId={rep.user_id}
                   territories={rep.territories}
-                  onChange={refetch}
+                  onChange={() => {
+                    refetch();
+                    detailQ.refetch();
+                  }}
                 />
-              </section>
+              </TabsContent>
 
-              <section className="space-y-2">
-                <h3 className="text-sm font-semibold">Quick stats</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <KpiCard label="Active accounts" value={rep.active_accounts} />
-                  <KpiCard label="Territories" value={rep.territories.length} />
+              {/* -------- Analytics -------- */}
+              <TabsContent value="analytics" className="mt-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold">Quick stats</h3>
+                  <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>
+                    <SelectTrigger className="h-8 w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="7">Last 7 days</SelectItem>
+                      <SelectItem value="30">Last 30 days</SelectItem>
+                      <SelectItem value="90">Last 90 days</SelectItem>
+                      <SelectItem value="365">Last 365 days</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </section>
-            </div>
+
+                {detailQ.isLoading ? (
+                  <div className="flex h-24 items-center justify-center">
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      <KpiCard label="Active accounts" value={detail?.stats?.activeAccounts ?? 0} />
+                      <KpiCard label="Territories" value={detail?.stats?.territoriesCount ?? 0} />
+                      <KpiCard label="Open follow-ups" value={detail?.stats?.openFollowups ?? 0} />
+                      <KpiCard label="Signups (window)" value={detail?.stats?.signupsInWindow ?? 0} />
+                      <KpiCard label="QR scans (window)" value={detail?.stats?.qrScans ?? 0} />
+                      <KpiCard label="Redemptions (window)" value={detail?.stats?.redemptions ?? 0} />
+                      <KpiCard
+                        label="Revenue (window)"
+                        value={`₱${formatMoney(detail?.stats?.revenuePhp ?? 0)}`}
+                      />
+                      <KpiCard
+                        label="Est. commission (window)"
+                        value={`₱${formatMoney(detail?.stats?.commissionPhpEstimated ?? 0)}`}
+                        hint={`@ ${((detail?.stats?.commissionRate ?? 0.1) * 100).toFixed(1)}%`}
+                      />
+                      <KpiCard
+                        label="Est. payout owed (lifetime)"
+                        value={`₱${formatMoney(detail?.stats?.payoutOwedPhpEstimated ?? 0)}`}
+                        hint="Est. — no payment tracking yet"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="mb-2 text-xs font-medium text-muted-foreground">
+                        Signups per week (window)
+                      </div>
+                      {(detail?.stats?.signupsByWeek ?? []).length === 0 ? (
+                        <div className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
+                          No signups in this window.
+                        </div>
+                      ) : (
+                        <WeeklyBars data={detail!.stats.signupsByWeek} />
+                      )}
+                    </div>
+                  </>
+                )}
+              </TabsContent>
+
+              {/* -------- Referred users -------- */}
+              <TabsContent value="referred" className="mt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-muted-foreground">
+                    Lifetime spend & commission per user attributed to this rep via their referral
+                    code.
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={exportReferredCsv}
+                    disabled={!(detail?.referredUsers?.length ?? 0)}
+                  >
+                    <Download className="mr-1 h-3 w-3" /> Export CSV
+                  </Button>
+                </div>
+                {detailQ.isLoading ? (
+                  <div className="flex h-24 items-center justify-center">
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (detail?.referredUsers?.length ?? 0) === 0 ? (
+                  <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+                    <UsersIcon className="mx-auto mb-2 h-5 w-5 opacity-60" />
+                    No referred users with tracked spend yet.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto rounded-md border">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                        <tr>
+                          <th className="px-3 py-2">User</th>
+                          <th className="px-3 py-2">Signed up</th>
+                          <th className="px-3 py-2 text-right">Redemptions</th>
+                          <th className="px-3 py-2 text-right">Spent</th>
+                          <th className="px-3 py-2 text-right">Rate</th>
+                          <th className="px-3 py-2 text-right">Commission</th>
+                          <th className="px-3 py-2"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {detail!.referredUsers.map((r: any) => (
+                          <tr key={r.user_id} className="border-t align-top">
+                            <td className="px-3 py-2">
+                              <div className="font-medium">{r.name ?? "—"}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {r.email ?? r.user_id.slice(0, 8)}
+                              </div>
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-2 text-xs text-muted-foreground">
+                              {r.signed_up_at
+                                ? new Date(r.signed_up_at).toLocaleDateString()
+                                : "—"}
+                            </td>
+                            <td className="px-3 py-2 text-right">{r.redemptions}</td>
+                            <td className="px-3 py-2 text-right">₱{formatMoney(r.spent_php)}</td>
+                            <td className="px-3 py-2 text-right text-xs text-muted-foreground">
+                              {(r.commission_rate * 100).toFixed(1)}%
+                            </td>
+                            <td className="px-3 py-2 text-right font-medium">
+                              ₱{formatMoney(r.commission_php)}
+                            </td>
+                            <td className="px-3 py-2">
+                              <Link
+                                to="/admin/users"
+                                search={{ q: r.email ?? r.user_id } as any}
+                                className="inline-flex items-center text-xs text-primary hover:underline"
+                              >
+                                View <ExternalLink className="ml-1 h-3 w-3" />
+                              </Link>
+                            </td>
+                          </tr>
+                        ))}
+                        <tr className="border-t bg-muted/30 font-medium">
+                          <td className="px-3 py-2" colSpan={3}>
+                            Totals
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            ₱{formatMoney(detail?.stats?.lifetimeSpentPhp ?? 0)}
+                          </td>
+                          <td></td>
+                          <td className="px-3 py-2 text-right">
+                            ₱{formatMoney(detail?.stats?.lifetimeCommissionPhpEstimated ?? 0)}
+                          </td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                <p className="text-[11px] text-muted-foreground">
+                  Commission and payout figures are estimates computed from the rep's rate override
+                  (or the site-wide default). No paid/unpaid state is tracked yet.
+                </p>
+              </TabsContent>
+
+              {/* -------- Connections -------- */}
+              <TabsContent value="connections" className="mt-4 space-y-4">
+                {detailQ.isLoading ? (
+                  <div className="flex h-24 items-center justify-center">
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <ConnectionsPanel connections={detail!.connections} repUserId={rep.user_id} />
+                )}
+              </TabsContent>
+            </Tabs>
           </>
         ) : (
           <div className="flex h-40 items-center justify-center text-muted-foreground">
@@ -754,14 +1044,242 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
   );
 }
 
-function KpiCard({ label, value }: { label: string; value: number | string }) {
+function formatMoney(n: number): string {
+  return Number(n ?? 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function KpiCard({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: number | string;
+  hint?: string;
+}) {
   return (
     <div className="rounded-md border p-3">
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="text-xl font-semibold">{value}</div>
+      {hint ? <div className="mt-0.5 text-[10px] text-muted-foreground">{hint}</div> : null}
     </div>
   );
 }
+
+function AccountCard({
+  detail,
+  loading,
+  rep,
+}: {
+  detail: any;
+  loading: boolean;
+  rep: Rep;
+}) {
+  const acct = detail?.account;
+  const p = acct?.profile ?? rep.profile ?? {};
+  const city = p.signup_city ?? p.business_city ?? null;
+  const region = p.signup_region ?? p.business_region ?? null;
+  return (
+    <div className="rounded-md border bg-muted/30 p-3">
+      <div className="text-xs font-medium text-muted-foreground">Account</div>
+      {loading && !acct ? (
+        <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+          <Loader2 className="h-3 w-3 animate-spin" /> Loading…
+        </div>
+      ) : (
+        <div className="mt-2 grid gap-1 text-sm sm:grid-cols-2">
+          <div className="flex items-center gap-2">
+            <Mail className="h-3.5 w-3.5 text-muted-foreground" />
+            {acct?.email || rep.email || "—"}
+          </div>
+          <div className="flex items-center gap-2">
+            <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+            {acct?.phone || p.phone_e164 || p.phone || "—"}
+          </div>
+          <div className="flex items-center gap-2">
+            <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+            {[city, region].filter(Boolean).join(", ") || "—"}
+          </div>
+          <div className="flex items-center gap-2">
+            <CalendarClock className="h-3.5 w-3.5 text-muted-foreground" />
+            Joined:{" "}
+            {acct?.created_at ? new Date(acct.created_at).toLocaleDateString() : "—"}
+          </div>
+          <div className="flex items-center gap-2">
+            <CalendarClock className="h-3.5 w-3.5 text-muted-foreground" />
+            Last sign-in:{" "}
+            {acct?.last_sign_in_at
+              ? new Date(acct.last_sign_in_at).toLocaleString()
+              : "—"}
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/admin/users"
+              search={{ q: acct?.email ?? rep.email } as any}
+              className="inline-flex items-center text-xs text-primary hover:underline"
+            >
+              Open in admin/users <ExternalLink className="ml-1 h-3 w-3" />
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WeeklyBars({ data }: { data: { weekStart: string; count: number }[] }) {
+  const max = Math.max(1, ...data.map((d) => d.count));
+  return (
+    <div className="space-y-1">
+      {data.map((d) => (
+        <div key={d.weekStart} className="flex items-center gap-2 text-xs">
+          <div className="w-20 text-muted-foreground">{d.weekStart}</div>
+          <div className="h-2 flex-1 rounded bg-muted">
+            <div
+              className="h-2 rounded bg-primary"
+              style={{ width: `${(d.count / max) * 100}%` }}
+            />
+          </div>
+          <div className="w-6 text-right tabular-nums">{d.count}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ConnectionsPanel({
+  connections,
+  repUserId,
+}: {
+  connections: any;
+  repUserId: string;
+}) {
+  const bizList = connections.businesses_owned ?? [];
+  const clubList = connections.clubs_owned ?? [];
+  const audit = connections.recent_admin_audit ?? [];
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <KpiCard label="Businesses owned" value={bizList.length} />
+        <KpiCard label="Listings" value={connections.listings_count ?? 0} />
+        <KpiCard label="Clubs owned" value={clubList.length} />
+        <KpiCard label="Open tickets" value={connections.open_support_tickets ?? 0} />
+      </div>
+
+      <section>
+        <div className="mb-2 flex items-center gap-2 text-sm font-medium">
+          <Building2 className="h-4 w-4" /> Businesses
+        </div>
+        {bizList.length === 0 ? (
+          <div className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
+            None.
+          </div>
+        ) : (
+          <ul className="divide-y rounded-md border text-sm">
+            {bizList.map((b: any) => (
+              <li key={b.id} className="flex items-center justify-between px-3 py-2">
+                <div>
+                  <div className="font-medium">{b.name}</div>
+                  <div className="text-xs text-muted-foreground">{b.status}</div>
+                </div>
+                {b.slug ? (
+                  <Link
+                    to="/businesses/$slug"
+                    params={{ slug: b.slug } as any}
+                    className="inline-flex items-center text-xs text-primary hover:underline"
+                  >
+                    Open <ExternalLink className="ml-1 h-3 w-3" />
+                  </Link>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section>
+        <div className="mb-2 flex items-center gap-2 text-sm font-medium">
+          <Store className="h-4 w-4" /> Clubs
+        </div>
+        {clubList.length === 0 ? (
+          <div className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
+            None.
+          </div>
+        ) : (
+          <ul className="divide-y rounded-md border text-sm">
+            {clubList.map((c: any) => (
+              <li key={c.id} className="flex items-center justify-between px-3 py-2">
+                <div>
+                  <div className="font-medium">{c.name}</div>
+                  <div className="text-xs text-muted-foreground">{c.status}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section>
+        <div className="mb-2 flex items-center gap-2 text-sm font-medium">
+          <LifeBuoy className="h-4 w-4" /> Partner program
+        </div>
+        {connections.partner_program ? (
+          <div className="rounded-md border p-3 text-sm">
+            <div>Status: {connections.partner_program.status ?? "—"}</div>
+            <div className="text-xs text-muted-foreground">
+              Joined:{" "}
+              {connections.partner_program.created_at
+                ? new Date(connections.partner_program.created_at).toLocaleDateString()
+                : "—"}
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
+            Not a partner-program partner.
+          </div>
+        )}
+      </section>
+
+      <section>
+        <div className="mb-2 flex items-center gap-2 text-sm font-medium">
+          <History className="h-4 w-4" /> Recent admin audit
+        </div>
+        {audit.length === 0 ? (
+          <div className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
+            None.
+          </div>
+        ) : (
+          <ul className="divide-y rounded-md border text-sm">
+            {audit.map((a: any) => (
+              <li key={a.id} className="px-3 py-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{a.action}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(a.created_at).toLocaleString()}
+                  </span>
+                </div>
+                {a.note ? <div className="text-xs text-muted-foreground">{a.note}</div> : null}
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="mt-2">
+          <Link
+            to="/admin/audit"
+            search={{ q: repUserId } as any}
+            className="inline-flex items-center text-xs text-primary hover:underline"
+          >
+            View full audit <ExternalLink className="ml-1 h-3 w-3" />
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 
 /* -------------------- Audit Log Tab -------------------- */
 

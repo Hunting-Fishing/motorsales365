@@ -1,51 +1,63 @@
 ## Goal
+Expand the "Manage" panel on `/admin/sales-reps` into a full admin dossier for the selected rep: their user info, editable territories, richer analytics, and a per-referred-user breakdown of spend and commission split.
 
-Every `@365motorsales.com` staff member who has a `staff_referrals` code (e.g. Jocelyn's `jocelynrolda655`) should also be an **accredited Partner Program partner**, so their QR/link signups flow through the same commission pipeline external partners use. Backfill everyone now; auto-accredit new staff going forward.
+## Layout change (RepDetailSheet)
+Widen the Sheet to `sm:max-w-3xl` and replace the flat sections with tabs:
 
-## What "accredited staff partner" means
+1. **Overview** — profile fields (title, bio, public email/phone, photo, accepting/active toggles) — same form as today. Adds a read-only "Account" card at top: rep's full name, email, phone, city/region, joined date, roles, last sign-in, verification badges. Sourced from the existing `adminGetUserDossier` server fn (already used by `user-dossier-dialog`).
+2. **Territories** — current `TerritoryEditor`. If none exist, show a clear empty state with the same add form inline (already supported; just surface the CTA when list is empty).
+3. **Analytics** — expanded Quick Stats grid (window selector: 7/30/90/365d, default 30d):
+   - Active accounts, Territories count, Open follow-ups
+   - Signups in window, QR scans, Redemptions
+   - Attributed revenue (₱), Estimated commission (₱), Estimated payout owed (unpaid)
+   - Small sparkline-free "trend" list: signups per week for the window (bar list, no new chart lib)
+4. **Referred users** — table of every user attributed to this rep (via `staff_referrals` → `referral_redemptions` and `sales_rep_assignments` where `source='referral'`), columns:
+   - User (name + email, links to `/admin/users?q=…`)
+   - Signed up on
+   - Redemptions count
+   - Total spent (sum `final_amount_php`)
+   - Commission rate (%)
+   - Commission earned (₱)
+   - Status (paid / unpaid — derived, see Technical)
+   Sortable by spent/earned; CSV export button.
+5. **Connections** — read-only list of the rep's other app links: businesses they own/manage, listings count, clubs, partner-program partner row (if any), open support tickets count, recent audit entries touching this user. Each item links to the relevant admin page.
 
-For each staff user with a `staff_referrals` row:
+## Technical details
 
-1. `staff_referrals.active = true` (internal staff flag stays authoritative).
-2. `partner_program_applications` row: auto-created, `status = 'approved'`, `channel_type = 'internal_staff'`, `agreed_terms = true`, `reviewer_id = system`, notes = "Auto-accredited: 365 Motorsales internal staff".
-3. `partner_program_partners` row: `active = true`, `referral_code = <same code as staff_referrals.referral_code>`, `display_name = profile.full_name`, linked to the application above.
-4. Same code powers both `/r/<code>` staff attribution and Partner Program commission events — no dual codes.
+### New server function
+`adminGetRepDetail({ rep_user_id, days })` in `src/lib/sales-rep.functions.ts`:
+- Reuses `requireAdmin`, `supabaseAdmin`.
+- Returns:
+  - `account`: profile row + auth email/phone/last_sign_in_at/created_at + roles array
+  - `stats`: same shape as `getMyRepStats` but scoped to `rep_user_id`, plus `signupsByWeek: {weekStart, count}[]`
+  - `referredUsers`: for each `staff_referrals` row belonging to this rep, join `referral_redemptions` grouped by `user_id`; enrich with `profiles`. Fields: user_id, name, email, signed_up_at, redemptions, spent_php, commission_rate, commission_php.
+  - `connections`: counts + small samples of businesses owned/managed, listings, clubs, partner_program_partners row, open support_tickets, last 10 admin_audit_log entries where subject = this user.
 
-## Migration (backfill + trigger)
+### Commission model (no schema change)
+Sales reps don't have a dedicated commission table today. Use a single site-wide default rate from `site_settings` (key `sales_rep_commission_rate`, default `0.10`) applied to `final_amount_php`. Per-user override optional via `sales_rep_profiles.commission_rate_override` (nullable numeric) — added in a small migration; if null, fall back to site default. "Estimated commission" and "payout owed" are computed on read; nothing is auto-persisted. A clear "Estimated" label appears on all commission figures. Actual payout tracking (marking as paid) is out of scope for this task and called out in the UI.
 
-New migration `accredit_365_staff_partners.sql`:
+### Migration
+- `ALTER TABLE sales_rep_profiles ADD COLUMN commission_rate_override numeric NULL CHECK (commission_rate_override >= 0 AND commission_rate_override <= 1);`
+- Upsert `site_settings` row for `sales_rep_commission_rate` = `0.10` if missing.
 
-- **Backfill**: for every `auth.users` row where email ends with `@365motorsales.com` AND a `staff_referrals` row exists, insert the application + partner rows if not already present (idempotent via `ON CONFLICT (referral_code) DO NOTHING` on partners, and a lookup guard on applications).
-- **Trigger function** `public.auto_accredit_staff_partner()` (SECURITY DEFINER):
-  - Fires `AFTER INSERT OR UPDATE OF staff_user_id, referral_code, active ON public.staff_referrals`.
-  - If the linked auth user's email ends with `@365motorsales.com` and `active = true`, upsert the application + partner rows using the same shape as backfill.
-- **Also** trigger on `auth.users` email confirmation for staff domain — if a `staff_referrals` row already exists for that user, run the same upsert. (Covers the "staff signs up after their referral row was pre-created" case.)
-- No changes to `affiliate_commission_rules`; existing rules apply because the partner code is now registered in `partner_program_partners`.
+### Client wiring
+- Add `commission_rate_override` to the `adminSaveRepProfile` input + Overview form (small numeric input, "leave blank to use site default").
+- New `useQuery(["admin-rep-detail", repUserId, days])` inside `RepDetailSheet`, disabled until `repUserId` is set.
+- CSV export builds client-side from `referredUsers`.
+- Empty states everywhere ("No referrals yet", "No connections", "No territories — add one below").
 
-## Attribution wiring check
+### Non-goals
+- No new charts library.
+- No commission-payment tracking table (called out as future work).
+- No changes to `/admin/users`, `/admin/audit`, or the rep-facing pages.
 
-Confirm during implementation that the signup-attribution path (whatever writes `user_referrals` / commission events on `/r/<code>` visits) already looks up `partner_program_partners.referral_code`. If it only checks `staff_referrals`, add a parallel lookup so a staff code produces both:
-
-- a `user_referrals` row with `referred_by_staff_id` (existing behavior), and
-- a `partner_program_commission_events` row against the matching `partner_program_partners.id` (new behavior).
-
-Details will be finalized after reading the current referral-resolve function during build.
-
-## Admin UI
-
-Small addition to `/admin/users` and `/admin/staff` (or wherever staff are listed):
-
-- Show a "Partner ✓" badge next to any staff row that has a matching `partner_program_partners` entry.
-- On the referral column already added in `/admin/users`, append `(accredited partner)` when true.
-
-## Out of scope
-
-- No changes to payout rules, commission math, or Partner Program public flow.
-- No changes to external (non-staff) partner applications.
-- No new UI for staff to "apply" — accreditation is automatic and admin-controlled.
-
-## Files touched
-
-- New migration under `supabase/migrations/` (backfill + triggers).
-- `src/routes/admin.users.tsx` — add "Partner ✓" badge in referral column.
-- Possibly one small edit to the referral-resolution server function (confirmed during build).
+```text
+Sheet (sm:max-w-3xl)
+├── Header: name + email + role chips
+└── Tabs
+    ├── Overview     → Account card + Profile form (+ commission override)
+    ├── Territories  → TerritoryEditor (with empty-state add form)
+    ├── Analytics    → KPI grid + weekly signups bar list + window selector
+    ├── Referred     → table + CSV export
+    └── Connections  → businesses / listings / clubs / partner / tickets / audit
+```
