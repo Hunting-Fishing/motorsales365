@@ -349,7 +349,13 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               setStaffName(data.first_name || data.staff_name || null);
               setActive(Boolean(data.active));
               setCounted(data.active ? Boolean(data.counted) : null);
-              if (data.active) recordTouch(code);
+              if (data.active) {
+                // Distinguish QR scans from plain link clicks so we can attribute
+                // signup source. QR posters/deep links pass ?src=qr (or ?s=qr).
+                const params = new URLSearchParams(window.location.search);
+                const srcParam = (params.get("src") || params.get("s") || "").toLowerCase();
+                recordTouch(code, srcParam === "qr" ? "qr" : "link");
+              }
             } else {
               setActive(true);
             }
