@@ -642,6 +642,16 @@ function AdminUsers() {
                 )}
                 <EditProfileDialog user={u} onSaved={load} is365Staff={staffIds.has(u.id)} canEditRoles={canEditRoles} />
                 {isSuperAdmin && <ResetPasswordDialog user={u} />}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={intentBusyId === u.id}
+                  onClick={() => handleRecomputeOne(u.id)}
+                  title="Recompute this user's signup intent from seller type + business ownership"
+                >
+                  <RefreshCw className={`mr-1 h-4 w-4 ${intentBusyId === u.id ? "animate-spin" : ""}`} />
+                  {intentBusyId === u.id ? "…" : "Re-evaluate intent"}
+                </Button>
                 {isVerified ? (
                   <Button
                     size="sm"
