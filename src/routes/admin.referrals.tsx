@@ -168,6 +168,13 @@ function AdminReferrals() {
   const [confirmReason, setConfirmReason] = useState("");
   const [confirmBusy, setConfirmBusy] = useState(false);
   const [qrPreview, setQrPreview] = useState<StaffRow | null>(null);
+  // Partner Program accreditation state (drives approval badge + action).
+  const [accred, setAccred] = useState<
+    Record<string, { approved: boolean; active: boolean }>
+  >({});
+  const [accredBusy, setAccredBusy] = useState<string | null>(null);
+  const fetchAccred = useServerFn(listReferralAccreditation);
+  const toggleAccred = useServerFn(setReferralAccreditation);
 
   const load = async (rangeKey: RangeKey = range) => {
     setLoading(true);
