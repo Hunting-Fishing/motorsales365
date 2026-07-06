@@ -74,7 +74,7 @@ function downloadCsv(filename: string, rows: Row[], nameOf: (id: string) => stri
     lines.push(
       [
         fmt(r.created_at),
-        ACTION_LABEL[r.action] ?? r.action,
+        intentSourceLabel(r),
         r.entity_type ? `${r.entity_type}:${r.entity_id ?? ""}` : "",
         nameOf(r.target_user_id),
         r.field,
