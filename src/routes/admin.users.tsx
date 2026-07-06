@@ -540,6 +540,7 @@ function AdminUsers() {
                   {isVerified && <VerifiedBadge size="sm" />}
                   {staffIds.has(u.id) && <Staff365Badge size="xs" className="ml-1" />}
                   <IntentBadge intent={u.signup_intent} />
+                  <SourceBadge source={(u as any).signup_source} />
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {u.seller_type} · joined {formatDate(u.created_at)}
