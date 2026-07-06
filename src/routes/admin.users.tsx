@@ -43,6 +43,34 @@ const STAFF_ROLES = ["admin", "moderator", "support", "sales", "advertising"] as
 type StaffRole = (typeof STAFF_ROLES)[number];
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
 
+function IntentBadge({ intent }: { intent: string | null | undefined }) {
+  if (!intent) return null;
+  const map: Record<string, { label: string; cls: string }> = {
+    buyer: {
+      label: "Buyer / Private",
+      cls: "border-blue-500/40 bg-blue-500/10 text-blue-700 dark:text-blue-300",
+    },
+    business: {
+      label: "Business",
+      cls: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+    },
+    service_provider: {
+      label: "Service",
+      cls: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+    },
+  };
+  const m = map[intent];
+  if (!m) return null;
+  return (
+    <span
+      className={`ml-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${m.cls}`}
+    >
+      {m.label}
+    </span>
+  );
+}
+
+
 function AdminUsers() {
   const { user, isAdmin } = useAuth();
   const isSuperAdmin = (user?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
