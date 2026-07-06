@@ -686,44 +686,12 @@ function AdminUsers() {
                     </span>
                   </div>
                 )}
-                {(u as any).intent_evaluated_at && (
-                  <div className="mt-1 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-                    <span>Intent evaluated {formatDate((u as any).intent_evaluated_at)}</span>
-                    {(u as any).intent_evaluated_by ? (
-                      <>
-                        <Link
-                          to="/admin/audit"
-                          search={{ action: "intent_recomputed_manual", q: u.id }}
-                          title="View manual intent recompute entries for this user"
-                        >
-                          <Badge variant="outline" className="h-4 px-1 text-[10px] hover:bg-accent">
-                            Manual
-                          </Badge>
-                        </Link>
-                        <span>
-                          by{" "}
-                          <span className="font-medium text-foreground">
-                            {evaluatorNames.get((u as any).intent_evaluated_by) ??
-                              `${String((u as any).intent_evaluated_by).slice(0, 8)}…`}
-                          </span>
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <Link
-                          to="/admin/audit"
-                          search={{ action: "intent_recomputed_auto", q: u.id }}
-                          title="View automatic intent recompute entries for this user"
-                        >
-                          <Badge variant="secondary" className="h-4 px-1 text-[10px] hover:bg-accent">
-                            Auto
-                          </Badge>
-                        </Link>
-                        <span>by system trigger</span>
-                      </>
-                    )}
-                  </div>
-                )}
+                <IntentEvaluatedFooter
+                  userId={u.id}
+                  evaluatedAt={(u as any).intent_evaluated_at}
+                  evaluatedBy={(u as any).intent_evaluated_by}
+                  evaluatorName={evaluatorNames.get((u as any).intent_evaluated_by) ?? null}
+                />
 
 
                 <div className="mt-2 flex flex-wrap gap-1">
