@@ -105,7 +105,10 @@ function sellerName(p: any): string {
 }
 
 function AdminListings() {
-  const [tab, setTab] = useState<string>("active");
+  const initialStatus = Route.useSearch().status;
+  const [tab, setTab] = useState<string>(
+    initialStatus && STATUS_TABS.some((s) => s.value === initialStatus) ? initialStatus : "active",
+  );
   const [category, setCategory] = useState<string>("all");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
