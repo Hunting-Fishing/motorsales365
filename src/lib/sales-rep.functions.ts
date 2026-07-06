@@ -653,6 +653,7 @@ export const adminSaveRepProfile = createServerFn({ method: "POST" })
         photo_url: z.string().url().max(500).nullable().optional(),
         accepting_new_clients: z.boolean().optional(),
         active: z.boolean().optional(),
+        commission_rate_override: z.number().min(0).max(1).nullable().optional(),
       })
       .parse(input),
   )
