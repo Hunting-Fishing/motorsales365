@@ -29,18 +29,19 @@ export function PhLocationPicker({
   compact?: boolean;
 }) {
   const regionOptions = useMemo(
-    () => PSGC.map((r) => regionLabel(r)).sort((a, b) => a.localeCompare(b)),
+    () => [ALL_PH_REGION, ...PSGC.map((r) => regionLabel(r)).sort((a, b) => a.localeCompare(b))],
     [],
   );
 
   const cityOptions = useMemo(() => {
-    if (!region) return [];
+    if (!region || region === ALL_PH_REGION) return [];
     const r = PSGC.find((x) => regionLabel(x) === region);
     if (!r) return [];
     const all = new Set<string>(r.cities);
     for (const p of r.provinces) for (const c of p.cities) all.add(c);
     return Array.from(all).sort((a, b) => a.localeCompare(b));
   }, [region]);
+
 
   return (
     <>
