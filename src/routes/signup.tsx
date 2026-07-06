@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { getCreditedCode } from "@/lib/referral";
+import { getCreditedCode, getCreditedSource } from "@/lib/referral";
 import { SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid.types";
 import type { LocationValue } from "@/components/location-picker";
 import { siteOrigin } from "@/lib/site-config";
@@ -511,6 +511,7 @@ function SignupPage() {
         business_address: businessAddress.trim(),
         business_postal_code: businessPostalCode.trim(),
         referral_code: refCode || "",
+        signup_source: getCreditedSource(),
         redirect: search.redirect ?? "",
         origin: siteOrigin(),
         agreed: true,

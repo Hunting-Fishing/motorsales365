@@ -81,6 +81,7 @@ const Body = z
     business_address: z.string().trim().max(300).optional().default(""),
     business_postal_code: z.string().trim().max(20).optional().default(""),
     referral_code: z.string().trim().max(80).optional().default(""),
+    signup_source: z.enum(["qr", "link", "direct"]).optional(),
     redirect: z.string().trim().max(500).optional().default(""),
     origin: z.string().trim().url().max(500),
     agreed: z.literal(true),
@@ -232,6 +233,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
             business_kind: isBusinessLike ? input.business_kind : undefined,
             business_address: isBusinessLike ? input.business_address : undefined,
             referral_code: input.referral_code || undefined,
+            signup_source:
+              input.signup_source ?? (input.referral_code ? "link" : "direct"),
           };
 
           const originUrl = (() => {
