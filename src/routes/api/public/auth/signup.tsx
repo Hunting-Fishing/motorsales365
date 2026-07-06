@@ -70,8 +70,10 @@ const Body = z
     phone_iso: z.string().trim().min(2).max(2),
     phone_national: z.string().trim().min(1).max(30),
     signup_region: z.string().trim().min(1).max(120),
-    signup_province: z.string().trim().min(1).max(120),
-    signup_city: z.string().trim().min(1).max(120),
+    // Province/city optional when signup_region === "All Philippines" (nationwide).
+    signup_province: z.string().trim().max(120).optional().default(""),
+    signup_city: z.string().trim().max(120).optional().default(""),
+
     // Personal address (required unless business-like)
     street_address: z.string().trim().max(200).optional().default(""),
     postal_code: z.string().trim().max(20).optional().default(""),
