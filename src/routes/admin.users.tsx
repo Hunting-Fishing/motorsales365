@@ -142,16 +142,14 @@ function AdminUsers() {
   const handleRecomputeOne = async (userId: string) => {
     setIntentBusyId(userId);
     try {
-      const res = await recomputeIntents({ data: { userIds: [userId] } });
-      const r = res.results[0];
-      if (r?.changed) {
-        toast.success(`Intent updated: ${r.previous ?? "unset"} → ${r.next}`);
-        load();
-      } else {
-        toast.message(`Intent unchanged (${r?.next ?? "buyer"})`);
-      }
+      const res = await recomputeIntents({ data: { userIds: [userId], dryRun: true } });
+      setIntentPreview({
+        rows: res.results as IntentPreviewRow[],
+        wouldChange: res.wouldChange,
+        unchanged: res.unchanged,
+      });
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to recompute intent");
+      toast.error(e?.message ?? "Failed to preview intent");
     } finally {
       setIntentBusyId(null);
     }
