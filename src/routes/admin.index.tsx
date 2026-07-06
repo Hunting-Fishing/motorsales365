@@ -225,7 +225,7 @@ function AdminOverview() {
             icon={Rocket}
             label="Boosts sold"
             window={d.productivity.boostsSold}
-            toFor={() => "/admin/payments"}
+            toFor={() => "/admin/payments?tab=all"}
           />
           <WindowCard icon={MessagesSquare} label="Messages sent" window={d.productivity.messagesSent} />
         </div>
@@ -245,13 +245,13 @@ function AdminOverview() {
           <RevenueCard
             label="Revenue (paid)"
             window={d.productivity.revenue}
-            toFor={() => "/admin/payments"}
+            toFor={() => "/admin/payments?tab=all"}
           />
           <SnapshotCard
             icon={Wallet}
             label="Revenue — all time"
             value={formatPHP(Number(d.productivity.revenueTotal) || 0)}
-            to="/admin/payments"
+            to="/admin/payments?tab=all"
           />
         </div>
       </Section>

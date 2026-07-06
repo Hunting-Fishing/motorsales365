@@ -24,7 +24,16 @@ import { PaymentReviewDrawer } from "@/components/admin/payment-review-drawer";
 import { StripeGCashAdminPanel } from "@/components/admin/stripe-gcash-admin-panel";
 import { Download, Smartphone } from "lucide-react";
 
+const PAYMENTS_TABS = ["queue", "methods", "rails", "all"] as const;
+type PaymentsTab = (typeof PAYMENTS_TABS)[number];
+
 export const Route = createFileRoute("/admin/payments")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab:
+      typeof search.tab === "string" && (PAYMENTS_TABS as readonly string[]).includes(search.tab)
+        ? (search.tab as PaymentsTab)
+        : undefined,
+  }),
   component: AdminPayments,
 });
 
@@ -44,6 +53,7 @@ const STATE_VARIANT: Record<string, "default" | "outline" | "secondary" | "destr
 };
 
 function AdminPayments() {
+  const initialTab = Route.useSearch().tab ?? "queue";
   return (
     <div className="space-y-6">
       <div>
@@ -52,7 +62,7 @@ function AdminPayments() {
           Configure methods, review manual payments, and audit transactions.
         </p>
       </div>
-      <Tabs defaultValue="queue">
+      <Tabs defaultValue={initialTab}>
         <TabsList>
           <TabsTrigger value="queue">Review Queue</TabsTrigger>
           <TabsTrigger value="methods">Methods</TabsTrigger>
