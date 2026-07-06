@@ -139,24 +139,6 @@ function AdminUsers() {
     }
   };
 
-  const handleRecomputeOne = async (userId: string) => {
-    setIntentBusyId(userId);
-    try {
-      const res = await recomputeIntents({ data: { userIds: [userId] } });
-      const r = res.results[0];
-      if (r?.changed) {
-        toast.success(`Intent updated: ${r.previous ?? "unset"} → ${r.next}`);
-        load();
-      } else {
-        toast.message(`Intent unchanged (${r?.next ?? "buyer"})`);
-      }
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to recompute intent");
-    } finally {
-      setIntentBusyId(null);
-    }
-  };
-
   type IntentPreviewRow = {
     user_id: string;
     full_name: string | null;
@@ -170,6 +152,22 @@ function AdminUsers() {
     unchanged: number;
   } | null>(null);
   const [confirmBusy, setConfirmBusy] = useState(false);
+
+  const handleRecomputeOne = async (userId: string) => {
+    setIntentBusyId(userId);
+    try {
+      const res = await recomputeIntents({ data: { userIds: [userId], dryRun: true } });
+      setIntentPreview({
+        rows: res.results as IntentPreviewRow[],
+        wouldChange: res.wouldChange,
+        unchanged: res.unchanged,
+      });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to preview intent");
+    } finally {
+      setIntentBusyId(null);
+    }
+  };
 
   const handleRecomputeVisible = async () => {
     const ids = users.map((u) => u.id);
@@ -867,7 +865,9 @@ function AdminUsers() {
           <DialogHeader>
             <DialogTitle>Re-evaluate signup intents</DialogTitle>
             <DialogDescription>
-              Preview of derived intent for the {intentPreview?.rows.length ?? 0} users on this page.
+              {intentPreview?.rows.length === 1
+                ? <>Preview of derived intent for {intentPreview.rows[0].full_name ?? "this user"}.{" "}</>
+                : <>Preview of derived intent for the {intentPreview?.rows.length ?? 0} users on this page.{" "}</>}
               Only rows marked <strong>Change</strong> will be written; unchanged rows are skipped.
             </DialogDescription>
           </DialogHeader>
