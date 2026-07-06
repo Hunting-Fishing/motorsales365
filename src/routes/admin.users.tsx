@@ -224,6 +224,9 @@ function AdminUsers() {
   const [intentFilter, setIntentFilter] = useState<
     "all" | "buyer" | "business" | "service_provider" | "unset"
   >("all");
+  const [evalSourceFilter, setEvalSourceFilter] = useState<"all" | "auto" | "manual" | "never">(
+    "all",
+  );
   const [referralMap, setReferralMap] = useState<
     Map<string, { code: string; staffName: string | null; staffId: string | null }>
   >(new Map());
