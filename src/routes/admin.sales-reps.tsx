@@ -1093,6 +1093,9 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                       <SelectItem value="all">All users</SelectItem>
                       <SelectItem value="spend">With spend</SelectItem>
                       <SelectItem value="nospend">No spend</SelectItem>
+                      <SelectItem value="signup_only">Signup only</SelectItem>
+                      <SelectItem value="qr">Source: QR</SelectItem>
+                      <SelectItem value="link">Source: Link</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={refSort} onValueChange={(v) => setRefSort(v as any)}>
