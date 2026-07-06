@@ -724,8 +724,57 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
     onError: (e: any) => toast.error(e?.message ?? "Failed"),
   });
 
+  const filteredReferred = useMemo(() => {
+    const rows: any[] = detail?.referredUsers ?? [];
+    const q = refSearch.trim().toLowerCase();
+    let out = rows.filter((r) => {
+      if (refFilter === "spend" && !(Number(r.spent_php) > 0)) return false;
+      if (refFilter === "nospend" && Number(r.spent_php) > 0) return false;
+      if (!q) return true;
+      return (
+        (r.name ?? "").toLowerCase().includes(q) ||
+        (r.email ?? "").toLowerCase().includes(q) ||
+        (r.user_id ?? "").toLowerCase().includes(q)
+      );
+    });
+    const cmp: Record<string, (a: any, b: any) => number> = {
+      commission_desc: (a, b) => Number(b.commission_php) - Number(a.commission_php),
+      commission_asc: (a, b) => Number(a.commission_php) - Number(b.commission_php),
+      spent_desc: (a, b) => Number(b.spent_php) - Number(a.spent_php),
+      spent_asc: (a, b) => Number(a.spent_php) - Number(b.spent_php),
+      recent: (a, b) =>
+        new Date(b.signed_up_at ?? 0).getTime() - new Date(a.signed_up_at ?? 0).getTime(),
+      oldest: (a, b) =>
+        new Date(a.signed_up_at ?? 0).getTime() - new Date(b.signed_up_at ?? 0).getTime(),
+      name: (a, b) => (a.name ?? a.email ?? "").localeCompare(b.name ?? b.email ?? ""),
+    };
+    out = [...out].sort(cmp[refSort]);
+    return out;
+  }, [detail?.referredUsers, refSearch, refFilter, refSort]);
+
+  const refTotalPages = Math.max(1, Math.ceil(filteredReferred.length / refPageSize));
+  const refCurrentPage = Math.min(refPage, refTotalPages);
+  const pagedReferred = useMemo(
+    () =>
+      filteredReferred.slice((refCurrentPage - 1) * refPageSize, refCurrentPage * refPageSize),
+    [filteredReferred, refCurrentPage, refPageSize],
+  );
+  const filteredTotals = useMemo(
+    () =>
+      filteredReferred.reduce(
+        (acc, r) => {
+          acc.spent += Number(r.spent_php) || 0;
+          acc.commission += Number(r.commission_php) || 0;
+          return acc;
+        },
+        { spent: 0, commission: 0 },
+      ),
+    [filteredReferred],
+  );
+
   const exportReferredCsv = () => {
-    const rows = detail?.referredUsers ?? [];
+    const rows = filteredReferred;
+
     const header = [
       "user_id",
       "name",
