@@ -1,63 +1,61 @@
 ## Goal
-Expand the "Manage" panel on `/admin/sales-reps` into a full admin dossier for the selected rep: their user info, editable territories, richer analytics, and a per-referred-user breakdown of spend and commission split.
 
-## Layout change (RepDetailSheet)
-Widen the Sheet to `sm:max-w-3xl` and replace the flat sections with tabs:
+Every QR scan and referral-driven signup must be captured, attributed, and visible everywhere (admin overview, partner/staff drilldowns, rep manage view, referred users list). Today several code paths silently drop or mis-count them.
 
-1. **Overview** — profile fields (title, bio, public email/phone, photo, accepting/active toggles) — same form as today. Adds a read-only "Account" card at top: rep's full name, email, phone, city/region, joined date, roles, last sign-in, verification badges. Sourced from the existing `adminGetUserDossier` server fn (already used by `user-dossier-dialog`).
-2. **Territories** — current `TerritoryEditor`. If none exist, show a clear empty state with the same add form inline (already supported; just surface the CTA when list is empty).
-3. **Analytics** — expanded Quick Stats grid (window selector: 7/30/90/365d, default 30d):
-   - Active accounts, Territories count, Open follow-ups
-   - Signups in window, QR scans, Redemptions
-   - Attributed revenue (₱), Estimated commission (₱), Estimated payout owed (unpaid)
-   - Small sparkline-free "trend" list: signups per week for the window (bar list, no new chart lib)
-4. **Referred users** — table of every user attributed to this rep (via `staff_referrals` → `referral_redemptions` and `sales_rep_assignments` where `source='referral'`), columns:
-   - User (name + email, links to `/admin/users?q=…`)
-   - Signed up on
-   - Redemptions count
-   - Total spent (sum `final_amount_php`)
-   - Commission rate (%)
-   - Commission earned (₱)
-   - Status (paid / unpaid — derived, see Technical)
-   Sortable by spent/earned; CSV export button.
-5. **Connections** — read-only list of the rep's other app links: businesses they own/manage, listings count, clubs, partner-program partner row (if any), open support tickets count, recent audit entries touching this user. Each item links to the relevant admin page.
+## Bugs found
 
-## Technical details
+1. **Sales-rep QR scan count always 0.** `src/lib/sales-rep.functions.ts` (lines ~232 and ~988) queries `qr_scans` by `staff_referral_id` and `created_at`, but the columns are `referral_code` and `scanned_at`. The query never matches, so every rep dashboard reports 0 scans.
+2. **Referred users list misses signup-only users.** The drilldown is built only from `referral_redemptions` — a user who signed up via a QR code but never redeemed a discount never appears. `user_referrals` (which the DB trigger populates on every signup) is ignored.
+3. **Admin Overview "Top staff / Top partners" signups column is wrong.** `admin_overview()` counts `referral_redemptions WHERE kind='signup'` for the signups column — that only counts users who *both* signed up *and* consumed a signup-bonus promotion. The screenshot's "10 SCANS / 0 SIGNUPS" is this bug. Should count from `user_referrals`.
+4. **`partnerSignups7d` snapshot has the same bug** (also reads `referral_redemptions`). Should use `user_referrals`.
+5. **QR posters don't tag scans as "qr".** All `/r/{code}` share URLs (poster page, admin qr-ads, referrals table, staff QR auth) are emitted without `?src=qr`, so `qr-landing-content.tsx` records every scan as `signup_source=link`. Verification tooling and reports that expect `signup_source='qr'` for poster/QR-origin signups will always show 0.
+6. **Signup form doesn't force the code from `/r/{code}` deep links.** `useEffect` reads only the credited-code cookie; the poster/QR flow works fine when the user visits `/r/CODE` first (that page calls `recordTouch`), but a direct `?ref=CODE` on `/signup` isn't parsed as a fallback. Low priority but included for completeness.
 
-### New server function
-`adminGetRepDetail({ rep_user_id, days })` in `src/lib/sales-rep.functions.ts`:
-- Reuses `requireAdmin`, `supabaseAdmin`.
-- Returns:
-  - `account`: profile row + auth email/phone/last_sign_in_at/created_at + roles array
-  - `stats`: same shape as `getMyRepStats` but scoped to `rep_user_id`, plus `signupsByWeek: {weekStart, count}[]`
-  - `referredUsers`: for each `staff_referrals` row belonging to this rep, join `referral_redemptions` grouped by `user_id`; enrich with `profiles`. Fields: user_id, name, email, signed_up_at, redemptions, spent_php, commission_rate, commission_php.
-  - `connections`: counts + small samples of businesses owned/managed, listings, clubs, partner_program_partners row, open support_tickets, last 10 admin_audit_log entries where subject = this user.
+## Fix plan
 
-### Commission model (no schema change)
-Sales reps don't have a dedicated commission table today. Use a single site-wide default rate from `site_settings` (key `sales_rep_commission_rate`, default `0.10`) applied to `final_amount_php`. Per-user override optional via `sales_rep_profiles.commission_rate_override` (nullable numeric) — added in a small migration; if null, fall back to site default. "Estimated commission" and "payout owed" are computed on read; nothing is auto-persisted. A clear "Estimated" label appears on all commission figures. Actual payout tracking (marking as paid) is out of scope for this task and called out in the UI.
+### A. Data-integrity fixes (server / SQL)
 
-### Migration
-- `ALTER TABLE sales_rep_profiles ADD COLUMN commission_rate_override numeric NULL CHECK (commission_rate_override >= 0 AND commission_rate_override <= 1);`
-- Upsert `site_settings` row for `sales_rep_commission_rate` = `0.10` if missing.
+1. Replace `qr_scans` query in `getRepStats` and `adminGetSalesRepDetail` (`src/lib/sales-rep.functions.ts`) with the correct shape:
+   `from("qr_scans").select("id", { count: "exact", head: true }).in("referral_code", refCodes).gte("scanned_at", since)`.
+2. New migration `fix_qr_signup_attribution.sql` that rewrites `admin_overview()`:
+   - `partnerSignups7d` → `SELECT count(*) FROM user_referrals WHERE created_at >= d7 AND referred_by_staff_id IS NOT NULL` (falls back to first_referral_code if staff link missing).
+   - `topStaff.signups` and `topPartners.signups` → `count(*) FROM user_referrals ur WHERE (ur.credited_referral_code = s.referral_code OR ur.first_referral_code = s.referral_code) AND ur.created_at >= d30`. This surfaces every referred signup, credited or not.
+3. In the same migration, expose a per-rep helper the drilldown can join on: keep queries in the app but make sure `user_referrals` has the indexes we already have on `first_referral_code`/`credited_referral_code` (already present per existing migrations — verify only, no schema change if present).
 
-### Client wiring
-- Add `commission_rate_override` to the `adminSaveRepProfile` input + Overview form (small numeric input, "leave blank to use site default").
-- New `useQuery(["admin-rep-detail", repUserId, days])` inside `RepDetailSheet`, disabled until `repUserId` is set.
-- CSV export builds client-side from `referredUsers`.
-- Empty states everywhere ("No referrals yet", "No connections", "No territories — add one below").
+### B. Complete "Referred users" tab (rep drilldown)
 
-### Non-goals
-- No new charts library.
-- No commission-payment tracking table (called out as future work).
-- No changes to `/admin/users`, `/admin/audit`, or the rep-facing pages.
+In `adminGetSalesRepDetail` (`src/lib/sales-rep.functions.ts`):
+- After building the `byUser` map from `referral_redemptions`, also fetch `user_referrals` rows for `refCodes` (`credited_referral_code IN (...) OR first_referral_code IN (...)`).
+- Merge each referred user into `byUser` with `redemptions=0`, `spent_php=0`, `signup_only=true` when absent; keep spend fields when present.
+- Enrich profile rows for the new user IDs (name/email/phone/city).
+- Extend the table in `src/routes/admin.sales-reps.tsx` "Referred users" tab:
+  - Add a "Source" column ("QR"/"Link"/"Direct") from `profiles.signup_source`.
+  - Add a filter option "Signup only" alongside "With spend" / "No spend".
+  - Update the totals row to include the total signup count (already-present spend/commission totals remain).
+  - CSV export already reads the memoised list, so it picks up the new rows automatically.
+- The existing drilldown drawer (`ReferredUserDrilldown`) already tolerates zero redemptions; verify the empty-state copy reads "No transactions yet — signup only".
 
-```text
-Sheet (sm:max-w-3xl)
-├── Header: name + email + role chips
-└── Tabs
-    ├── Overview     → Account card + Profile form (+ commission override)
-    ├── Territories  → TerritoryEditor (with empty-state add form)
-    ├── Analytics    → KPI grid + weekly signups bar list + window selector
-    ├── Referred     → table + CSV export
-    └── Connections  → businesses / listings / clubs / partner / tickets / audit
-```
+### C. Overview payout breakdown correctness
+
+`adminGetSalesRepOverview` uses the same referral-redemption source. Update the Overview tab's "per-user split" list to iterate the merged list so signup-only users appear with 0 commission and are counted in "referred users total" (they don't affect payout math but should be visible).
+
+### D. QR-vs-link source tagging
+
+Append `?src=qr` to every URL used for a printable/QR context so `qr-landing-content.tsx` records `signup_source=qr`:
+- `src/routes/admin.advertisements.qr-ads.tsx` (line ~160 and poster preview)
+- `src/routes/admin.referrals.tsx` (share/poster/CSV builders, lines ~289, ~626, ~886–887, ~1308, ~1355, ~1469)
+- `src/lib/staff-qr-auth.functions.ts` (line 79)
+- `src/components/share-qr.tsx` sample link
+- Anywhere the QR image encodes the URL (share-qr and template preview)
+Plain web share links (copy-link buttons that are not QR-encoded) stay as-is so `signup_source` stays "link".
+
+### E. Signup form fallback
+
+In `src/routes/signup.tsx`, extend the `useEffect` that loads `refCode` to also check `URLSearchParams` for `ref` / `r` / `code` and to persist via `recordTouch(code, srcParam === "qr" ? "qr" : "link")` before falling back to `getCreditedCode()`. This guarantees a direct `/signup?ref=CODE&src=qr` link is attributed even if cookies were blocked.
+
+## Technical notes
+
+- `user_referrals` is already populated by the `attach_signup_referral` trigger on `auth.users` insert, gated by Partner Program accreditation for the `credited_referral_code` column. Reporting on `first_referral_code OR credited_referral_code` captures *all* referred signups; commission-relevant reads keep using `credited_referral_code` only.
+- No schema changes to `qr_scans`, `user_referrals`, `referral_redemptions`, or `profiles` — only a function rewrite + client-side query fixes + URL tagging.
+- Migration file will follow the standard `CREATE OR REPLACE FUNCTION public.admin_overview()` shape and re-grant is unnecessary (function already exists).
+- After migration, verify with a `supabase--read_query` sample: top partners for Dieter/Jocelyn should show non-zero signups if `user_referrals` rows exist.

@@ -76,7 +76,7 @@ async function authorizeAndResolve(
     process.env.VITE_PUBLIC_SITE_ORIGIN ??
     "https://365motorsales.com";
   return {
-    link: `${origin.replace(/\/$/, "")}/r/${row.referral_code}`,
+    link: `${origin.replace(/\/$/, "")}/r/${row.referral_code}?src=qr`,
     staffUserId: row.staff_user_id as string,
     code: row.referral_code as string,
   };

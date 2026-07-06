@@ -229,12 +229,12 @@ export const getMyRepStats = createServerFn({ method: "POST" })
         0,
       );
     }
-    if (refIds.length) {
+    if (refCodes.length) {
       const { count } = await supabase
         .from("qr_scans")
         .select("id", { count: "exact", head: true })
-        .in("staff_referral_id", refIds)
-        .gte("created_at", since);
+        .in("referral_code", refCodes)
+        .gte("scanned_at", since);
       qrScans = count ?? 0;
     }
 
@@ -985,13 +985,35 @@ export const adminGetRepDetail = createServerFn({ method: "POST" })
         .order("created_at", { ascending: true });
       redemptionsRows = reds ?? [];
     }
-    if (refIds.length) {
+    if (refCodes.length) {
       const { count } = await supabaseAdmin
         .from("qr_scans")
         .select("id", { count: "exact", head: true })
-        .in("staff_referral_id", refIds)
-        .gte("created_at", since);
+        .in("referral_code", refCodes)
+        .gte("scanned_at", since);
       qrScansInWindow = count ?? 0;
+    }
+
+    // Also pull every referred signup (credited or first-touch) so users who
+    // signed up via a QR/referral link but haven't spent yet still show up.
+    let signupRows: any[] = [];
+    if (refCodes.length) {
+      const [creditedRes, firstRes] = await Promise.all([
+        supabaseAdmin
+          .from("user_referrals")
+          .select("user_id, signup_date, credited_referral_code, first_referral_code")
+          .in("credited_referral_code", refCodes),
+        supabaseAdmin
+          .from("user_referrals")
+          .select("user_id, signup_date, credited_referral_code, first_referral_code")
+          .in("first_referral_code", refCodes),
+      ]);
+      const seen = new Set<string>();
+      for (const row of [...(creditedRes.data ?? []), ...(firstRes.data ?? [])]) {
+        if (!row?.user_id || seen.has(row.user_id)) continue;
+        seen.add(row.user_id);
+        signupRows.push(row);
+      }
     }
 
     // Group redemptions by user
@@ -1017,13 +1039,35 @@ export const adminGetRepDetail = createServerFn({ method: "POST" })
       if (r.created_at > cur.last_at) cur.last_at = r.created_at;
       byUser.set(uid, cur);
     }
+    // Merge in signup-only referred users (no redemptions yet).
+    const signupInfoByUser = new Map<
+      string,
+      { signup_date: string | null; credited: boolean }
+    >();
+    for (const s of signupRows) {
+      const uid = s.user_id as string;
+      signupInfoByUser.set(uid, {
+        signup_date: s.signup_date ?? null,
+        credited: !!s.credited_referral_code,
+      });
+      if (!byUser.has(uid)) {
+        const at = s.signup_date ?? new Date(0).toISOString();
+        byUser.set(uid, {
+          user_id: uid,
+          redemptions: 0,
+          spent_php: 0,
+          first_at: at,
+          last_at: at,
+        });
+      }
+    }
     const referredUserIds = Array.from(byUser.keys());
     let profilesById = new Map<string, any>();
     let emailsById = new Map<string, string>();
     if (referredUserIds.length) {
       const { data: profs } = await supabaseAdmin
         .from("profiles")
-        .select("id, full_name, first_name, last_name, avatar_url, created_at")
+        .select("id, full_name, first_name, last_name, avatar_url, created_at, signup_source, signup_city, signup_region")
         .in("id", referredUserIds);
       profilesById = new Map((profs ?? []).map((p: any) => [p.id, p]));
       // Auth emails — pull page 1 (existing pattern in adminListReps)
@@ -1042,20 +1086,25 @@ export const adminGetRepDetail = createServerFn({ method: "POST" })
     const referredUsers = Array.from(byUser.values())
       .map((r) => {
         const commission_php = Math.round(r.spent_php * commissionRate * 100) / 100;
+        const prof = profilesById.get(r.user_id);
+        const signupInfo = signupInfoByUser.get(r.user_id);
         return {
           user_id: r.user_id,
-          name: nameOf(profilesById.get(r.user_id)),
+          name: nameOf(prof),
           email: emailsById.get(r.user_id) ?? null,
-          signed_up_at: profilesById.get(r.user_id)?.created_at ?? r.first_at,
-          first_redemption_at: r.first_at,
-          last_redemption_at: r.last_at,
+          signed_up_at: prof?.created_at ?? signupInfo?.signup_date ?? r.first_at,
+          first_redemption_at: r.redemptions > 0 ? r.first_at : null,
+          last_redemption_at: r.redemptions > 0 ? r.last_at : null,
           redemptions: r.redemptions,
           spent_php: Math.round(r.spent_php * 100) / 100,
           commission_rate: commissionRate,
           commission_php,
+          signup_source: (prof?.signup_source ?? null) as string | null,
+          signup_only: r.redemptions === 0,
+          credited: signupInfo?.credited ?? (r.redemptions > 0),
         };
       })
-      .sort((a, b) => b.spent_php - a.spent_php);
+      .sort((a, b) => b.spent_php - a.spent_php || (a.signed_up_at < b.signed_up_at ? 1 : -1));
 
     const totalSpent = referredUsers.reduce((s, r) => s + r.spent_php, 0);
     const totalCommission = referredUsers.reduce((s, r) => s + r.commission_php, 0);

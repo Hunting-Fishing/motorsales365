@@ -286,7 +286,7 @@ function AdminReferrals() {
   }, [range]);
 
   const generateQrFor = async (row: StaffRow, oldCode?: string) => {
-    const url = `${PUBLIC_BASE}/r/${row.referral_code}`;
+    const url = `${PUBLIC_BASE}/r/${row.referral_code}?src=qr`;
     const dataUrl = await QRCode.toDataURL(url, { width: 600, margin: 2 });
     const blob = await (await fetch(dataUrl)).blob();
     // Key storage path by staff id so referral_code renames don't orphan PNGs.

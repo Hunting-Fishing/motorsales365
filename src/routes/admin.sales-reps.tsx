@@ -664,7 +664,7 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
   const [form, setForm] = useState<any>({});
   const [lastId, setLastId] = useState<string | null>(null);
   const [refSearch, setRefSearch] = useState("");
-  const [refFilter, setRefFilter] = useState<"all" | "spend" | "nospend">("all");
+  const [refFilter, setRefFilter] = useState<"all" | "spend" | "nospend" | "signup_only" | "qr" | "link">("all");
   const [refSort, setRefSort] = useState<
     "commission_desc" | "commission_asc" | "spent_desc" | "spent_asc" | "recent" | "oldest" | "name"
   >("commission_desc");
@@ -736,6 +736,9 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
     let out = rows.filter((r) => {
       if (refFilter === "spend" && !(Number(r.spent_php) > 0)) return false;
       if (refFilter === "nospend" && Number(r.spent_php) > 0) return false;
+      if (refFilter === "signup_only" && !r.signup_only) return false;
+      if (refFilter === "qr" && (r.signup_source ?? "") !== "qr") return false;
+      if (refFilter === "link" && (r.signup_source ?? "") !== "link") return false;
       if (!q) return true;
       return (
         (r.name ?? "").toLowerCase().includes(q) ||
@@ -785,6 +788,9 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
       "user_id",
       "name",
       "email",
+      "signup_source",
+      "signup_only",
+      "credited",
       "signed_up_at",
       "first_redemption_at",
       "last_redemption_at",
@@ -1087,6 +1093,9 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                       <SelectItem value="all">All users</SelectItem>
                       <SelectItem value="spend">With spend</SelectItem>
                       <SelectItem value="nospend">No spend</SelectItem>
+                      <SelectItem value="signup_only">Signup only</SelectItem>
+                      <SelectItem value="qr">Source: QR</SelectItem>
+                      <SelectItem value="link">Source: Link</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={refSort} onValueChange={(v) => setRefSort(v as any)}>
@@ -1129,7 +1138,7 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                 ) : (detail?.referredUsers?.length ?? 0) === 0 ? (
                   <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
                     <UsersIcon className="mx-auto mb-2 h-5 w-5 opacity-60" />
-                    No referred users with tracked spend yet.
+                    No referred users yet.
                   </div>
                 ) : filteredReferred.length === 0 ? (
                   <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
@@ -1142,6 +1151,7 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                         <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                           <tr>
                             <th className="px-3 py-2">User</th>
+                            <th className="px-3 py-2">Source</th>
                             <th className="px-3 py-2">Signed up</th>
                             <th className="px-3 py-2 text-right">Redemptions</th>
                             <th className="px-3 py-2 text-right">Spent</th>
@@ -1158,6 +1168,31 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                                 <div className="text-xs text-muted-foreground">
                                   {r.email ?? r.user_id.slice(0, 8)}
                                 </div>
+                              </td>
+                              <td className="whitespace-nowrap px-3 py-2 text-xs">
+                                <span className={
+                                  r.signup_source === "qr"
+                                    ? "rounded bg-primary/10 px-1.5 py-0.5 font-medium text-primary"
+                                    : r.signup_source === "link"
+                                      ? "rounded bg-muted px-1.5 py-0.5 text-muted-foreground"
+                                      : "text-muted-foreground"
+                                }>
+                                  {r.signup_source === "qr"
+                                    ? "QR"
+                                    : r.signup_source === "link"
+                                      ? "Link"
+                                      : "Direct"}
+                                </span>
+                                {r.signup_only ? (
+                                  <span className="ml-1 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400">
+                                    signup only
+                                  </span>
+                                ) : null}
+                                {r.credited === false ? (
+                                  <span className="ml-1 rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground" title="Referrer not Partner Program accredited">
+                                    not credited
+                                  </span>
+                                ) : null}
                               </td>
                               <td className="whitespace-nowrap px-3 py-2 text-xs text-muted-foreground">
                                 {r.signed_up_at
@@ -1194,7 +1229,7 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                             </tr>
                           ))}
                           <tr className="border-t bg-muted/30 font-medium">
-                            <td className="px-3 py-2" colSpan={3}>
+                            <td className="px-3 py-2" colSpan={4}>
                               Filtered totals ({filteredReferred.length} of{" "}
                               {detail?.referredUsers?.length ?? 0})
                             </td>
