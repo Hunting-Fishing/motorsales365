@@ -950,6 +950,48 @@ function AdminReferrals() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
+                      {(() => {
+                        const a = accred[r.referral_code];
+                        const isApproved = !!a?.approved && !!a?.active;
+                        const isRevoked = !!a?.approved && !a?.active;
+                        return (
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-xs ${
+                                isApproved
+                                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                                  : isRevoked
+                                    ? "bg-destructive/10 text-destructive"
+                                    : "bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                              }`}
+                              title={
+                                isApproved
+                                  ? "Signups from this code credit the referrer."
+                                  : isRevoked
+                                    ? "Approval revoked — signups no longer credit."
+                                    : "Not accredited — signups do not credit until approved."
+                              }
+                            >
+                              {isApproved ? "Approved" : isRevoked ? "Revoked" : "Pending"}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              disabled={accredBusy === r.referral_code}
+                              title={isApproved ? "Revoke approval" : "Approve referrer"}
+                              onClick={() => handleAccredToggle(r, !isApproved)}
+                            >
+                              {isApproved ? (
+                                <ShieldOff className="h-4 w-4 text-destructive" />
+                              ) : (
+                                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                              )}
+                            </Button>
+                          </div>
+                        );
+                      })()}
+                    </td>
+                    <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
                         <Button
                           size="sm"
