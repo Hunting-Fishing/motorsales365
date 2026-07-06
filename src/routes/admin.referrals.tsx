@@ -246,6 +246,36 @@ function AdminReferrals() {
     });
     setStats(s);
     setLoading(false);
+
+    // Load Partner Program accreditation status for every code.
+    try {
+      const codes = staffRows.map((r) => r.referral_code).filter(Boolean);
+      if (codes.length > 0) {
+        const res = await (fetchAccred as any)({ data: { codes } });
+        const map: Record<string, { approved: boolean; active: boolean }> = {};
+        for (const row of res?.rows ?? []) {
+          map[row.referral_code] = { approved: row.approved, active: row.active };
+        }
+        setAccred(map);
+      } else {
+        setAccred({});
+      }
+    } catch (e: any) {
+      console.warn("[admin.referrals] accreditation load failed", e?.message ?? e);
+    }
+  };
+
+  const handleAccredToggle = async (row: StaffRow, approve: boolean) => {
+    setAccredBusy(row.referral_code);
+    try {
+      await (toggleAccred as any)({ data: { referralCode: row.referral_code, approved: approve } });
+      setAccred((m) => ({ ...m, [row.referral_code]: { approved: approve, active: approve } }));
+      toast.success(approve ? "Referral code approved" : "Referral code revoked");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not update approval");
+    } finally {
+      setAccredBusy(null);
+    }
   };
 
   useEffect(() => {
