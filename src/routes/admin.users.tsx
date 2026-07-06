@@ -157,18 +157,55 @@ function AdminUsers() {
     }
   };
 
+  type IntentPreviewRow = {
+    user_id: string;
+    full_name: string | null;
+    previous: string | null;
+    next: string;
+    changed: boolean;
+  };
+  const [intentPreview, setIntentPreview] = useState<{
+    rows: IntentPreviewRow[];
+    wouldChange: number;
+    unchanged: number;
+  } | null>(null);
+  const [confirmBusy, setConfirmBusy] = useState(false);
+
   const handleRecomputeVisible = async () => {
     const ids = users.map((u) => u.id);
     if (ids.length === 0) return;
     setBulkIntentBusy(true);
     try {
-      const res = await recomputeIntents({ data: { userIds: ids } });
-      toast.success(`Re-evaluated ${ids.length} users · ${res.updated} updated, ${res.unchanged} unchanged`);
-      if (res.updated > 0) load();
+      const res = await recomputeIntents({ data: { userIds: ids, dryRun: true } });
+      setIntentPreview({
+        rows: res.results as IntentPreviewRow[],
+        wouldChange: res.wouldChange,
+        unchanged: res.unchanged,
+      });
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to recompute intents");
+      toast.error(e?.message ?? "Failed to preview intents");
     } finally {
       setBulkIntentBusy(false);
+    }
+  };
+
+  const handleConfirmRecompute = async () => {
+    if (!intentPreview) return;
+    const ids = intentPreview.rows.filter((r) => r.changed).map((r) => r.user_id);
+    if (ids.length === 0) {
+      setIntentPreview(null);
+      return;
+    }
+    setConfirmBusy(true);
+    try {
+      const res = await recomputeIntents({ data: { userIds: ids } });
+      toast.success(`Updated ${res.updated} user${res.updated === 1 ? "" : "s"}`);
+      setIntentPreview(null);
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to apply changes");
+    } finally {
+      setConfirmBusy(false);
     }
   };
 
