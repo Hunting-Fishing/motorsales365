@@ -71,10 +71,18 @@ export function PhLocationPicker({
         <Select
           value={city || ANY}
           onValueChange={(v) => onChange({ region, city: v === ANY ? "" : v })}
-          disabled={!region}
+          disabled={!region || region === ALL_PH_REGION}
         >
           <SelectTrigger>
-            <SelectValue placeholder={region ? "Any city" : "Pick a region first"} />
+            <SelectValue
+              placeholder={
+                region === ALL_PH_REGION
+                  ? "Nationwide — no city"
+                  : region
+                    ? "Any city"
+                    : "Pick a region first"
+              }
+            />
           </SelectTrigger>
           <SelectContent className="max-h-72">
             <SelectItem value={ANY}>Any city</SelectItem>
@@ -86,6 +94,7 @@ export function PhLocationPicker({
           </SelectContent>
         </Select>
       </div>
+
     </>
   );
 }
