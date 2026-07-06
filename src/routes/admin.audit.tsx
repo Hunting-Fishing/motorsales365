@@ -149,7 +149,13 @@ function UserActionsTab() {
         .select("*", { count: "exact" })
         .order("created_at", { ascending: false });
 
-      if (actionFilter !== "all") q = q.eq("action", actionFilter);
+      if (actionFilter === "intent_recomputed_manual") {
+        q = q.eq("action", "intent_recomputed").eq("metadata->>source", "manual");
+      } else if (actionFilter === "intent_recomputed_auto") {
+        q = q.eq("action", "intent_recomputed").eq("metadata->>source", "auto");
+      } else if (actionFilter !== "all") {
+        q = q.eq("action", actionFilter);
+      }
 
       if (search) {
         if (/^[0-9a-f-]{8,}$/i.test(search)) {
