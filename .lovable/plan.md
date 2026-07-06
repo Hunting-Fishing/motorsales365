@@ -1,44 +1,51 @@
-## Why sign-in feels slow
+## Goal
 
-The auth bootstrap does more work than it needs to on every page load, and the header's "Signing you in…" pill is shown for the entire duration:
+Every `@365motorsales.com` staff member who has a `staff_referrals` code (e.g. Jocelyn's `jocelynrolda655`) should also be an **accredited Partner Program partner**, so their QR/link signups flow through the same commission pipeline external partners use. Backfill everyone now; auto-accredit new staff going forward.
 
-1. **Blocking `getUser()` network revalidation.** After the Supabase client already emits `INITIAL_SESSION` from localStorage (fast, local), we still call `supabase.auth.getUser()` — a full round‑trip to the Auth server — before we set `authLoading = false`. For signed‑in users on a slow network that's 300–1500 ms of a spinner where the UI could already be rendered as signed‑in.
-2. **Redundant `getSession()` before the listener resolves.** The listener already delivers the session on subscribe; the extra pre‑fetch in the IIFE just adds latency and log noise.
-3. **`authLoading` starts `true`.** Anyone visiting anonymously sees the "Signing you in…" pill flash even though there's no token to check.
-4. **Home listings use `useEffect` + `useState`.** No cache — every visit refetches the two 12‑row queries (with the heavy `profiles/vehicles/listing_media` embeds) from scratch, so back‑nav and re‑visits feel just as slow as a cold load.
+## What "accredited staff partner" means
 
-## What to change
+For each staff user with a `staff_referrals` row:
 
-### 1. Trust `INITIAL_SESSION`; drop the blocking `getUser()`
-In `src/hooks/use-auth.tsx`, replace the whole bootstrap IIFE with a listener‑only bootstrap:
+1. `staff_referrals.active = true` (internal staff flag stays authoritative).
+2. `partner_program_applications` row: auto-created, `status = 'approved'`, `channel_type = 'internal_staff'`, `agreed_terms = true`, `reviewer_id = system`, notes = "Auto-accredited: 365 Motorsales internal staff".
+3. `partner_program_partners` row: `active = true`, `referral_code = <same code as staff_referrals.referral_code>`, `display_name = profile.full_name`, linked to the application above.
+4. Same code powers both `/r/<code>` staff attribution and Partner Program commission events — no dual codes.
 
-- Remove the `getSession()` → `getUser()` chain.
-- The `onAuthStateChange` handler already runs on subscribe with `INITIAL_SESSION`. Use that single event to set the session and flip `authLoading = false`.
-- If the persisted refresh token is bad, supabase‑js auto‑refreshes in the background and fires `TOKEN_REFRESHED` (no session) or `SIGNED_OUT` — we already handle both to surface the "Session expired" toast. No functional loss, ~300–1500 ms saved.
-- Keep the 8s safety timer, but the common path now resolves in <50 ms.
+## Migration (backfill + trigger)
 
-### 2. Anonymous visitors: no spinner at all
-Because `authLoading` will flip to `false` inside the first `INITIAL_SESSION` tick, the "Signing you in…" pill for signed‑out users effectively disappears. Additionally in `src/components/site-header.tsx`, if `!user && loading`, render the plain "Sign in" button instead of the spinner — a stale button is harmless, and it removes the perceived hang.
+New migration `accredit_365_staff_partners.sql`:
 
-### 3. Cache the home‑page listings via TanStack Query
-In `src/routes/index.tsx`, replace the `useEffect` + `useState` loader with two `useQuery` calls keyed on `["home","featured"]` and `["home","recent"]`, `staleTime: 60_000`. Result: instant paint on back‑nav / re‑visit, and the queries run in parallel with auth bootstrap (they already don't depend on auth).
+- **Backfill**: for every `auth.users` row where email ends with `@365motorsales.com` AND a `staff_referrals` row exists, insert the application + partner rows if not already present (idempotent via `ON CONFLICT (referral_code) DO NOTHING` on partners, and a lookup guard on applications).
+- **Trigger function** `public.auto_accredit_staff_partner()` (SECURITY DEFINER):
+  - Fires `AFTER INSERT OR UPDATE OF staff_user_id, referral_code, active ON public.staff_referrals`.
+  - If the linked auth user's email ends with `@365motorsales.com` and `active = true`, upsert the application + partner rows using the same shape as backfill.
+- **Also** trigger on `auth.users` email confirmation for staff domain — if a `staff_referrals` row already exists for that user, run the same upsert. (Covers the "staff signs up after their referral row was pre-created" case.)
+- No changes to `affiliate_commission_rules`; existing rules apply because the partner code is now registered in `partner_program_partners`.
 
-### 4. Keep `loadRoles` off the critical path (already true, verify)
-`loadRoles` runs inside `setTimeout(…, 0)` and only affects `rolesLoading`. The header pill is gated on `authLoading` only, so this is fine — no change needed. Just confirm nothing on `/` reads `isAdmin`/`salesTier` in a way that blocks rendering.
+## Attribution wiring check
+
+Confirm during implementation that the signup-attribution path (whatever writes `user_referrals` / commission events on `/r/<code>` visits) already looks up `partner_program_partners.referral_code`. If it only checks `staff_referrals`, add a parallel lookup so a staff code produces both:
+
+- a `user_referrals` row with `referred_by_staff_id` (existing behavior), and
+- a `partner_program_commission_events` row against the matching `partner_program_partners.id` (new behavior).
+
+Details will be finalized after reading the current referral-resolve function during build.
+
+## Admin UI
+
+Small addition to `/admin/users` and `/admin/staff` (or wherever staff are listed):
+
+- Show a "Partner ✓" badge next to any staff row that has a matching `partner_program_partners` entry.
+- On the referral column already added in `/admin/users`, append `(accredited partner)` when true.
+
+## Out of scope
+
+- No changes to payout rules, commission math, or Partner Program public flow.
+- No changes to external (non-staff) partner applications.
+- No new UI for staff to "apply" — accreditation is automatic and admin-controlled.
 
 ## Files touched
 
-- `src/hooks/use-auth.tsx` — remove the `getSession()`+`getUser()` bootstrap block; release `authLoading` from the `INITIAL_SESSION` branch of the listener.
-- `src/components/site-header.tsx` — for anon + loading, render the "Sign in" button rather than the spinner pill (spinner stays for the transient signed‑in→role‑ready case only if we want; otherwise drop it entirely).
-- `src/routes/index.tsx` — swap the `useEffect` loader for two `useQuery` calls with a 60 s `staleTime`.
-
-## Trade‑offs / risks
-
-- We stop actively revalidating the persisted token on boot. A revoked/expired refresh token still gets caught (auto‑refresh fires `SIGNED_OUT`/`TOKEN_REFRESHED`), but the UI may briefly show the previous user's name before the toast appears. Acceptable and matches how most SPAs behave.
-- Home listings become cached for 60 s; new listings won't show up instantly on repeat visits within that window (existing behavior was "refetch every mount", which nobody asked for).
-
-## Expected result
-
-- Signed‑out visitors: no auth spinner at all; header shows "Sign in" immediately, Latest/Featured listings load in parallel with (and independently of) auth.
-- Signed‑in visitors: header switches to the account menu within one tick of `INITIAL_SESSION` (typically <50 ms), instead of after a full `getUser()` round‑trip.
-- Repeat visits to `/`: listings render from cache instantly.
+- New migration under `supabase/migrations/` (backfill + triggers).
+- `src/routes/admin.users.tsx` — add "Partner ✓" badge in referral column.
+- Possibly one small edit to the referral-resolution server function (confirmed during build).

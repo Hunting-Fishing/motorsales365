@@ -11796,6 +11796,10 @@ export type Database = {
     }
     Functions: {
       accept_org_invite: { Args: { _token: string }; Returns: Json }
+      accredit_staff_partner: {
+        Args: { _staff_user_id: string }
+        Returns: undefined
+      }
       admin_overview: { Args: never; Returns: Json }
       admin_overview_trends: { Args: { days?: number }; Returns: Json }
       admin_pending_counts: { Args: never; Returns: Json }
