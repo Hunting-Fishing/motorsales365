@@ -1084,6 +1084,11 @@ export const adminGetRepDetail = createServerFn({ method: "POST" })
       .map(([weekStart, count]) => ({ weekStart, count }))
       .sort((a, b) => (a.weekStart < b.weekStart ? -1 : 1));
 
+    const lifetimeDiscount = redemptionsRows.reduce(
+      (s, r) => s + Number(r.discount_amount_php ?? 0),
+      0,
+    );
+
     const stats = {
       days: data.days,
       activeAccounts: (activeAssignRes as any).count ?? 0,
@@ -1094,13 +1099,21 @@ export const adminGetRepDetail = createServerFn({ method: "POST" })
       redemptions: redemptionsInWindow,
       revenuePhp: Math.round(revenueInWindow * 100) / 100,
       commissionRate,
+      commissionRateOverrideActive:
+        repProfileRes.data?.commission_rate_override != null,
+      commissionRateSiteDefault: defaultRate,
       commissionPhpEstimated: Math.round(revenueInWindow * commissionRate * 100) / 100,
       // Lifetime, since we have no paid-out state today
       lifetimeSpentPhp: Math.round(totalSpent * 100) / 100,
+      lifetimeDiscountPhp: Math.round(lifetimeDiscount * 100) / 100,
+      lifetimeRedemptions: redemptionsRows.length,
+      lifetimeReferredUsers: referredUsers.length,
       lifetimeCommissionPhpEstimated: Math.round(totalCommission * 100) / 100,
+      payoutPaidPhp: 0,
       payoutOwedPhpEstimated: Math.round(totalCommission * 100) / 100,
       signupsByWeek,
     };
+
 
     const connections = {
       businesses_owned: businessesOwnedRes.data ?? [],
