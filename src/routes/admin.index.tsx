@@ -151,18 +151,25 @@ function AdminOverview() {
       <Section title="User activity" subtitle="Registrations, verified sellers and account state.">
 
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-          <SnapshotCard icon={Users} label="Total users" value={fmt(d.users.total)} />
-          <WindowCard icon={UserPlus} label="New signups" window={d.users.signups} />
+          <SnapshotCard icon={Users} label="Total users" value={fmt(d.users.total)} to="/admin/accounts" />
+          <WindowCard
+            icon={UserPlus}
+            label="New signups"
+            window={d.users.signups}
+            toFor={() => "/admin/accounts"}
+          />
           <SnapshotCard
             icon={BadgeCheck}
             label="Verified sellers"
             value={fmt(d.users.verifiedSellers)}
+            to="/admin/verifications"
           />
           <SnapshotCard
             icon={Users}
             label="Active accounts"
             value={fmt(d.users.activeAccounts)}
             hint={`${fmt(d.users.foundingMembers)} founding members`}
+            to="/admin/accounts"
           />
         </div>
       </Section>
@@ -173,11 +180,17 @@ function AdminOverview() {
         subtitle="QR scans across staff cards and partner/influencer referral links."
       >
         <div className="grid gap-3 md:grid-cols-2">
-          <WindowCard icon={QrCode} label="QR scans" window={d.scans.total} />
+          <WindowCard
+            icon={QrCode}
+            label="QR scans"
+            window={d.scans.total}
+            toFor={(w) => `/admin/referrals?range=${w === "today" ? "7" : w === "d7" ? "7" : "30"}`}
+          />
           <SnapshotCard
             icon={Radio}
             label="Signups via referral (7d)"
             value={fmt(d.scans.partnerSignups7d)}
+            to="/admin/referrals?range=7"
           />
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
@@ -202,8 +215,18 @@ function AdminOverview() {
         subtitle="What's actually being created, boosted and paid for."
       >
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          <WindowCard icon={ListChecks} label="Listings created" window={d.productivity.listingsCreated} />
-          <WindowCard icon={Rocket} label="Boosts sold" window={d.productivity.boostsSold} />
+          <WindowCard
+            icon={ListChecks}
+            label="Listings created"
+            window={d.productivity.listingsCreated}
+            toFor={() => "/admin/listings?status=all"}
+          />
+          <WindowCard
+            icon={Rocket}
+            label="Boosts sold"
+            window={d.productivity.boostsSold}
+            toFor={() => "/admin/payments"}
+          />
           <WindowCard icon={MessagesSquare} label="Messages sent" window={d.productivity.messagesSent} />
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
@@ -211,17 +234,24 @@ function AdminOverview() {
             icon={ListChecks}
             label="Active listings"
             value={fmt(d.productivity.activeListings)}
+            to="/admin/listings?status=active"
           />
           <SnapshotCard
             icon={Wallet}
             label="Listings awaiting payment"
             value={fmt(d.productivity.pendingPayment)}
+            to="/admin/listings?status=pending_payment"
           />
-          <RevenueCard label="Revenue (paid)" window={d.productivity.revenue} />
+          <RevenueCard
+            label="Revenue (paid)"
+            window={d.productivity.revenue}
+            toFor={() => "/admin/payments"}
+          />
           <SnapshotCard
             icon={Wallet}
             label="Revenue — all time"
             value={formatPHP(Number(d.productivity.revenueTotal) || 0)}
+            to="/admin/payments"
           />
         </div>
       </Section>
