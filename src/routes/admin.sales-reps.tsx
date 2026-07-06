@@ -630,6 +630,26 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
   const rep: Rep | undefined = data?.reps?.find((r: Rep) => r.user_id === repUserId);
   const saveFn = useServerFn(adminSaveRepProfile);
   const detailFn = useServerFn(adminGetRepDetail);
+  const autoSetupFn = useServerFn(adminAutoSetupTerritory);
+  const autoSetup = useMutation({
+    mutationFn: () => autoSetupFn({ data: { rep_user_id: repUserId! } }),
+    onSuccess: (res: any) => {
+      if (res?.added) {
+        toast.success(
+          `Added ${[res.region, res.city].filter(Boolean).join(" › ") || "signup area"} as primary territory`,
+        );
+        refetch();
+        detailQ.refetch();
+      } else if (res?.reason === "already_has_territories") {
+        toast.info("Rep already has territories");
+      } else if (res?.reason === "no_signup_area") {
+        toast.error("No signup region on this rep's profile — add one manually");
+      } else {
+        toast.info("Nothing to auto-populate");
+      }
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+  });
   const [days, setDays] = useState<number>(30);
 
   const detailQ = useQuery({
