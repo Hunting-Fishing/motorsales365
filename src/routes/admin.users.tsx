@@ -418,7 +418,8 @@ function AdminUsers() {
     roleFilter !== "all" ||
     sellerFilter !== "all" ||
     verFilter !== "all" ||
-    intentFilter !== "all";
+    intentFilter !== "all" ||
+    evalSourceFilter !== "all";
   const clearFilters = () => {
     setSearchInput("");
     setSearch("");
@@ -426,6 +427,7 @@ function AdminUsers() {
     setSellerFilter("all");
     setVerFilter("all");
     setIntentFilter("all");
+    setEvalSourceFilter("all");
     setPage(0);
   };
 
