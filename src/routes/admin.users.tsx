@@ -480,10 +480,11 @@ function AdminUsers() {
               className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4"
             >
               <div>
-                <div className="flex items-center gap-1.5 font-medium">
+                <div className="flex flex-wrap items-center gap-1.5 font-medium">
                   {u.full_name ?? "(no name)"}
                   {isVerified && <VerifiedBadge size="sm" />}
                   {staffIds.has(u.id) && <Staff365Badge size="xs" className="ml-1" />}
+                  <IntentBadge intent={u.signup_intent} />
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {u.seller_type} · joined {formatDate(u.created_at)}
@@ -491,6 +492,18 @@ function AdminUsers() {
                     u.verification_status !== "unverified" &&
                     ` · ${u.verification_status}`}
                 </div>
+                {referralMap.get(u.id) && (
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    Referred by{" "}
+                    <span className="font-medium text-foreground">
+                      {referralMap.get(u.id)!.staffName ?? "Unknown"}
+                    </span>{" "}
+                    <span className="opacity-70">
+                      (code {referralMap.get(u.id)!.code})
+                    </span>
+                  </div>
+                )}
+
                 <div className="mt-2 flex flex-wrap gap-1">
                   {STAFF_ROLES.map((role) => {
                     const has = u.roles.includes(role);
