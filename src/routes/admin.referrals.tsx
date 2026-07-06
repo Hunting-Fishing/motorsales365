@@ -68,6 +68,10 @@ import { ShieldCheck, ShieldOff, Stethoscope } from "lucide-react";
 import { VerifyReferralDialog } from "@/components/admin/verify-referral-dialog";
 
 export const Route = createFileRoute("/admin/referrals")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    search: typeof search.search === "string" ? (search.search as string) : undefined,
+    range: typeof search.range === "string" ? (search.range as string) : undefined,
+  }),
   component: AdminReferrals,
 });
 
