@@ -44,6 +44,9 @@ const ACTION_LABEL: Record<string, string> = {
   verification_changed: "Verification changed",
   seller_type_changed: "Seller type changed",
   permission_changed: "Permission changed",
+  intent_recomputed: "Intent recomputed",
+  referral_approved: "Referral approved",
+  referral_revoked: "Referral revoked",
 };
 
 function fmt(ts: string) {
@@ -210,6 +213,9 @@ function UserActionsTab() {
             <SelectItem value="verification_changed">Verification changed</SelectItem>
             <SelectItem value="seller_type_changed">Seller type changed</SelectItem>
             <SelectItem value="permission_changed">Permission changed</SelectItem>
+            <SelectItem value="intent_recomputed">Intent recomputed</SelectItem>
+            <SelectItem value="referral_approved">Referral approved</SelectItem>
+            <SelectItem value="referral_revoked">Referral revoked</SelectItem>
           </SelectContent>
         </Select>
       </div>
