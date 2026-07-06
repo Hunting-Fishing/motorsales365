@@ -1225,11 +1225,7 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                 </p>
               </TabsContent>
 
-                <p className="text-[11px] text-muted-foreground">
-                  Commission and payout figures are estimates computed from the rep's rate override
-                  (or the site-wide default). No paid/unpaid state is tracked yet.
-                </p>
-              </TabsContent>
+
 
               {/* -------- Connections -------- */}
               <TabsContent value="connections" className="mt-4 space-y-4">
