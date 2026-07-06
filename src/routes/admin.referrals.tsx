@@ -1021,6 +1021,14 @@ function AdminReferrals() {
                         <Button
                           size="sm"
                           variant="ghost"
+                          title="Verify QR + signup wiring"
+                          onClick={() => setVerifyCode(r.referral_code)}
+                        >
+                          <Stethoscope className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
                           title="Promotions"
                           onClick={() => setPromosFor(r)}
                         >
