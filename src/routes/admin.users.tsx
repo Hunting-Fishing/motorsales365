@@ -162,6 +162,13 @@ function AdminUsers() {
       } else if (sellerFilter !== "all") {
         q = q.eq("seller_type", sellerFilter as any);
       }
+      if (intentFilter !== "all") {
+        if (intentFilter === "unset") {
+          q = q.is("signup_intent", null);
+        } else {
+          q = q.eq("signup_intent", intentFilter);
+        }
+      }
       if (verFilter !== "all") {
         if (verFilter === "unverified") {
           q = q.or("verification_status.is.null,verification_status.eq.unverified");
@@ -169,6 +176,7 @@ function AdminUsers() {
           q = q.eq("verification_status", verFilter as any);
         }
       }
+
       if (search.trim()) {
         const s = search.trim().replace(/[%,()]/g, "");
         q = q.or(
