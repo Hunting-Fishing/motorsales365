@@ -11842,6 +11842,16 @@ export type Database = {
         Args: { _auto: boolean; _claim_id: string }
         Returns: undefined
       }
+      auto_setup_sales_rep_territory: {
+        Args: { _rep_user_id: string }
+        Returns: {
+          added: boolean
+          city: string
+          province: string
+          reason: string
+          region: string
+        }[]
+      }
       backfill_parts_wanted: { Args: { p_wanted_id: string }; Returns: number }
       can_manage_ads: { Args: { _user_id: string }; Returns: boolean }
       can_manage_org: {
