@@ -450,28 +450,31 @@ function TopReferrerList({
       ) : (
         <ul className="space-y-1.5">
           {rows.map((r, i) => (
-            <li
-              key={`${r.code}-${i}`}
-              className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-muted/30 px-3 py-2 text-sm"
-            >
-              <div className="min-w-0">
-                <div className="truncate font-medium">{r.name || r.code}</div>
-                <div className="truncate text-[11px] text-muted-foreground">
-                  Code {r.code}
+            <li key={`${r.code}-${i}`}>
+              <Link
+                to="/admin/referrals"
+                search={{ search: r.code } as any}
+                className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-muted/30 px-3 py-2 text-sm transition-colors hover:bg-muted"
+              >
+                <div className="min-w-0">
+                  <div className="truncate font-medium">{r.name || r.code}</div>
+                  <div className="truncate text-[11px] text-muted-foreground">
+                    Code {r.code}
+                  </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="font-display text-sm font-semibold">{fmt(r.scans)}</div>
-                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  scans
+                <div className="text-right">
+                  <div className="font-display text-sm font-semibold">{fmt(r.scans)}</div>
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    scans
+                  </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="font-display text-sm font-semibold">{fmt(r.signups)}</div>
-                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  signups
+                <div className="text-right">
+                  <div className="font-display text-sm font-semibold">{fmt(r.signups)}</div>
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    signups
+                  </div>
                 </div>
-              </div>
+              </Link>
             </li>
           ))}
         </ul>
