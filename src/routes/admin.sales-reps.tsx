@@ -33,6 +33,7 @@ import {
   adminSaveRepProfile,
   adminListAuditLog,
   adminGetRepDetail,
+  adminAutoSetupTerritory,
 } from "@/lib/sales-rep.functions";
 import { PSGC, regionLabel, provincesOf, citiesOf } from "@/lib/psgc";
 import { Button } from "@/components/ui/button";
@@ -629,6 +630,26 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
   const rep: Rep | undefined = data?.reps?.find((r: Rep) => r.user_id === repUserId);
   const saveFn = useServerFn(adminSaveRepProfile);
   const detailFn = useServerFn(adminGetRepDetail);
+  const autoSetupFn = useServerFn(adminAutoSetupTerritory);
+  const autoSetup = useMutation({
+    mutationFn: () => autoSetupFn({ data: { rep_user_id: repUserId! } }),
+    onSuccess: (res: any) => {
+      if (res?.added) {
+        toast.success(
+          `Added ${[res.region, res.city].filter(Boolean).join(" › ") || "signup area"} as primary territory`,
+        );
+        refetch();
+        detailQ.refetch();
+      } else if (res?.reason === "already_has_territories") {
+        toast.info("Rep already has territories");
+      } else if (res?.reason === "no_signup_area") {
+        toast.error("No signup region on this rep's profile — add one manually");
+      } else {
+        toast.info("Nothing to auto-populate");
+      }
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+  });
   const [days, setDays] = useState<number>(30);
 
   const detailQ = useQuery({
@@ -850,9 +871,34 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
               {/* -------- Territories -------- */}
               <TabsContent value="territories" className="mt-4 space-y-3">
                 {rep.territories.length === 0 ? (
-                  <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                    No territories yet. Add one below to route leads and auto-assignments to this
-                    rep.
+                  <div className="rounded-md border border-dashed p-4 text-sm">
+                    <div className="text-muted-foreground">
+                      No territories yet. Auto-populate from this rep's signup area, or add one
+                      manually below.
+                    </div>
+                    <div className="mt-2 flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => autoSetup.mutate()}
+                        disabled={autoSetup.isPending}
+                      >
+                        <Zap className="mr-1 h-3 w-3" />
+                        Auto-populate from signup area
+                      </Button>
+                      {detail?.account?.profile ? (
+                        <span className="text-xs text-muted-foreground">
+                          Signup area:{" "}
+                          {[
+                            detail.account.profile.signup_region ??
+                              detail.account.profile.business_region,
+                            detail.account.profile.signup_city ??
+                              detail.account.profile.business_city,
+                          ]
+                            .filter(Boolean)
+                            .join(" › ") || "not set"}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                 ) : null}
                 <TerritoryEditor

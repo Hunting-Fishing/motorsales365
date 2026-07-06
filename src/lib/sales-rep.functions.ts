@@ -1113,3 +1113,46 @@ export const adminGetRepDetail = createServerFn({ method: "POST" })
 
     return { account, stats, referredUsers, connections, rep_profile: repProfileRes.data ?? null };
   });
+
+/** Admin: auto-populate a rep's territory from their profile signup area, if empty. */
+export const adminAutoSetupTerritory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ rep_user_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await requireAdmin(supabase, userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: rows, error } = await supabaseAdmin.rpc(
+      "auto_setup_sales_rep_territory" as any,
+      { _rep_user_id: data.rep_user_id },
+    );
+    if (error) throw new Error(error.message);
+    const row: any = Array.isArray(rows) ? rows[0] : rows;
+    const added = !!row?.added;
+    const reason = row?.reason ?? null;
+
+    if (added) {
+      await supabaseAdmin.from("sales_rep_audit_log").insert({
+        actor_id: userId,
+        action: "territory_add",
+        rep_user_id: data.rep_user_id,
+        details: {
+          region: row.region,
+          province: row.province,
+          city: row.city,
+          is_primary: true,
+          source: "auto_from_signup_area",
+        },
+      });
+    }
+    return {
+      added,
+      reason,
+      region: row?.region ?? null,
+      province: row?.province ?? null,
+      city: row?.city ?? null,
+    };
+  });
