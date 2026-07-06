@@ -64,7 +64,8 @@ import {
   listReferralAccreditation,
   setReferralAccreditation,
 } from "@/lib/admin-referral-accreditation.functions";
-import { ShieldCheck, ShieldOff } from "lucide-react";
+import { ShieldCheck, ShieldOff, Stethoscope } from "lucide-react";
+import { VerifyReferralDialog } from "@/components/admin/verify-referral-dialog";
 
 export const Route = createFileRoute("/admin/referrals")({
   component: AdminReferrals,
