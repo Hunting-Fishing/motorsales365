@@ -1376,6 +1376,7 @@ function AdminReferrals() {
         />
       )}
       {promosFor && <PromoDialog staff={promosFor} onClose={() => setPromosFor(null)} />}
+      <VerifyReferralDialog referralCode={verifyCode} onClose={() => setVerifyCode(null)} />
     </div>
   );
 }
