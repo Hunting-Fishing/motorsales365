@@ -867,13 +867,13 @@ function AdminReferrals() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={9} className="p-6 text-center text-muted-foreground">
+                <td colSpan={10} className="p-6 text-center text-muted-foreground">
                   Loading…
                 </td>
               </tr>
             ) : pagedRows.length === 0 ? (
               <tr>
-                <td colSpan={9} className="p-6 text-center text-muted-foreground">
+                <td colSpan={10} className="p-6 text-center text-muted-foreground">
                   No staff referrals match your filters.
                 </td>
               </tr>
