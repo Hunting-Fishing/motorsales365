@@ -158,10 +158,8 @@ function ProfilePage() {
         const seed = data?.phone_e164 || data?.phone || "";
         setProfilePhone(parseE164(seed));
       });
-    supabase.auth.mfa.listFactors().then(({ data }) => {
-      const verified = (data?.totp ?? []).some((f: any) => f.status === "verified");
-      setTotpEnabled(verified);
-    });
+    // Two-factor auth is "coming soon" — no MFA factor check.
+
   }, [user]);
 
   const removePhone = async () => {
