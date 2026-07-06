@@ -116,6 +116,17 @@ function Staff365Page() {
         </p>
       </div>
 
+      <a
+        href="/staff/academy"
+        className="mb-4 flex items-center justify-between rounded-lg border bg-muted/30 p-3 text-sm hover:border-primary"
+      >
+        <span>
+          <strong>📚 Staff Academy</strong> — playbooks, feature guides, scripts, and roadmap for new hires.
+        </span>
+        <span className="text-xs text-muted-foreground">Open →</span>
+      </a>
+
+
       <Tabs defaultValue={initialTab}>
         <TabsList>
           <TabsTrigger value="staff">Staff</TabsTrigger>
