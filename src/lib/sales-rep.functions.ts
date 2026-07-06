@@ -1151,7 +1151,7 @@ export const adminGetReferredUserDetail = createServerFn({ method: "POST" })
         .eq("staff_user_id", data.rep_user_id),
       supabaseAdmin
         .from("profiles")
-        .select("id, full_name, first_name, last_name, avatar_url, created_at, phone, city, region")
+        .select("id, full_name, first_name, last_name, avatar_url, created_at, phone, signup_city, signup_region")
         .eq("id", data.user_id)
         .maybeSingle(),
       supabaseAdmin.auth.admin.getUserById(data.user_id),
