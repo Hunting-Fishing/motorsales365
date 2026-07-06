@@ -849,3 +849,267 @@ export const adminListAuditLog = createServerFn({ method: "POST" })
 
     return { entries: enriched };
   });
+
+/* ============= Admin rep detail dossier ============= */
+
+export const adminGetRepDetail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        rep_user_id: z.string().uuid(),
+        days: z.number().int().min(1).max(365).default(30),
+      })
+      .parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await requireAdmin(supabase, userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const repId = data.rep_user_id;
+    const since = new Date(Date.now() - data.days * 86400000).toISOString();
+
+    // Site-default commission rate
+    const { data: settingRow } = await supabaseAdmin
+      .from("site_settings")
+      .select("value")
+      .eq("key", "sales_rep_commission_rate")
+      .maybeSingle();
+    const siteRate = Number(settingRow?.value ?? "0.10");
+    const defaultRate = Number.isFinite(siteRate) ? siteRate : 0.1;
+
+    const [
+      profileRes,
+      repProfileRes,
+      rolesRes,
+      authUserRes,
+      territoriesRes,
+      activeAssignRes,
+      signupsInWindowRes,
+      openFollowupsRes,
+      staffReferralsRes,
+      businessesOwnedRes,
+      listingsCountRes,
+      clubsRes,
+      partnerRes,
+      openTicketsRes,
+      recentAuditRes,
+    ] = await Promise.all([
+      supabaseAdmin
+        .from("profiles")
+        .select(
+          "id, full_name, first_name, last_name, avatar_url, phone, phone_e164, phone_verified_at, signup_city, signup_region, business_city, business_region, created_at",
+        )
+        .eq("id", repId)
+        .maybeSingle(),
+      supabaseAdmin.from("sales_rep_profiles").select("*").eq("user_id", repId).maybeSingle(),
+      supabaseAdmin.from("user_roles").select("role").eq("user_id", repId),
+      supabaseAdmin.auth.admin.getUserById(repId),
+      supabaseAdmin.from("sales_rep_territories").select("*").eq("rep_user_id", repId),
+      supabaseAdmin
+        .from("sales_rep_assignments")
+        .select("id", { count: "exact", head: true })
+        .eq("rep_user_id", repId)
+        .eq("active", true),
+      supabaseAdmin
+        .from("sales_rep_assignments")
+        .select("id", { count: "exact", head: true })
+        .eq("rep_user_id", repId)
+        .eq("source", "referral")
+        .gte("assigned_at", since),
+      supabaseAdmin
+        .from("sales_rep_followups")
+        .select("id", { count: "exact", head: true })
+        .eq("rep_user_id", repId)
+        .eq("status", "open"),
+      supabaseAdmin
+        .from("staff_referrals")
+        .select("id, referral_code")
+        .eq("staff_user_id", repId),
+      supabaseAdmin
+        .from("businesses")
+        .select("id, name, slug, status")
+        .eq("owner_id", repId)
+        .limit(20),
+      supabaseAdmin
+        .from("listings")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", repId),
+      supabaseAdmin.from("clubs").select("id, name, slug, status").eq("owner_id", repId).limit(20),
+      supabaseAdmin
+        .from("partner_program_partners" as any)
+        .select("*")
+        .eq("user_id", repId)
+        .maybeSingle(),
+      supabaseAdmin
+        .from("support_tickets")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", repId)
+        .in("status", ["open", "in_progress"]),
+      supabaseAdmin
+        .from("admin_audit_log")
+        .select("id, action, created_at, actor_id, target_type, target_id, notes")
+        .eq("target_id", repId)
+        .order("created_at", { ascending: false })
+        .limit(10),
+    ]);
+
+    const authUser: any = (authUserRes as any)?.data?.user ?? null;
+    const account = {
+      id: repId,
+      email: (authUser?.email ?? "").toLowerCase(),
+      phone: authUser?.phone ?? profileRes.data?.phone ?? null,
+      last_sign_in_at: authUser?.last_sign_in_at ?? null,
+      created_at: authUser?.created_at ?? profileRes.data?.created_at ?? null,
+      profile: profileRes.data ?? null,
+      roles: (rolesRes.data ?? []).map((r: any) => r.role),
+    };
+
+    const commissionRate =
+      repProfileRes.data?.commission_rate_override != null
+        ? Number(repProfileRes.data.commission_rate_override)
+        : defaultRate;
+
+    // Referral redemptions -> per-user aggregation
+    const refCodes = (staffReferralsRes.data ?? []).map((r: any) => r.referral_code);
+    const refIds = (staffReferralsRes.data ?? []).map((r: any) => r.id);
+
+    let redemptionsRows: any[] = [];
+    let qrScansInWindow = 0;
+    if (refCodes.length) {
+      const { data: reds } = await supabaseAdmin
+        .from("referral_redemptions")
+        .select("user_id, final_amount_php, created_at")
+        .in("referral_code", refCodes)
+        .order("created_at", { ascending: true });
+      redemptionsRows = reds ?? [];
+    }
+    if (refIds.length) {
+      const { count } = await supabaseAdmin
+        .from("qr_scans")
+        .select("id", { count: "exact", head: true })
+        .in("staff_referral_id", refIds)
+        .gte("created_at", since);
+      qrScansInWindow = count ?? 0;
+    }
+
+    // Group redemptions by user
+    const byUser = new Map<
+      string,
+      { user_id: string; redemptions: number; spent_php: number; first_at: string; last_at: string }
+    >();
+    for (const r of redemptionsRows) {
+      const uid = r.user_id as string;
+      const amt = Number(r.final_amount_php ?? 0);
+      const cur =
+        byUser.get(uid) ??
+        {
+          user_id: uid,
+          redemptions: 0,
+          spent_php: 0,
+          first_at: r.created_at,
+          last_at: r.created_at,
+        };
+      cur.redemptions += 1;
+      cur.spent_php += amt;
+      if (r.created_at < cur.first_at) cur.first_at = r.created_at;
+      if (r.created_at > cur.last_at) cur.last_at = r.created_at;
+      byUser.set(uid, cur);
+    }
+    const referredUserIds = Array.from(byUser.keys());
+    let profilesById = new Map<string, any>();
+    let emailsById = new Map<string, string>();
+    if (referredUserIds.length) {
+      const { data: profs } = await supabaseAdmin
+        .from("profiles")
+        .select("id, full_name, first_name, last_name, avatar_url, created_at")
+        .in("id", referredUserIds);
+      profilesById = new Map((profs ?? []).map((p: any) => [p.id, p]));
+      // Auth emails — pull page 1 (existing pattern in adminListReps)
+      const { data: authList } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+      emailsById = new Map(
+        (authList?.users ?? [])
+          .filter((u: any) => referredUserIds.includes(u.id))
+          .map((u: any) => [u.id, (u.email ?? "").toLowerCase()]),
+      );
+    }
+    const nameOf = (p: any) =>
+      p?.full_name ||
+      [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim() ||
+      null;
+
+    const referredUsers = Array.from(byUser.values())
+      .map((r) => {
+        const commission_php = Math.round(r.spent_php * commissionRate * 100) / 100;
+        return {
+          user_id: r.user_id,
+          name: nameOf(profilesById.get(r.user_id)),
+          email: emailsById.get(r.user_id) ?? null,
+          signed_up_at: profilesById.get(r.user_id)?.created_at ?? r.first_at,
+          first_redemption_at: r.first_at,
+          last_redemption_at: r.last_at,
+          redemptions: r.redemptions,
+          spent_php: Math.round(r.spent_php * 100) / 100,
+          commission_rate: commissionRate,
+          commission_php,
+        };
+      })
+      .sort((a, b) => b.spent_php - a.spent_php);
+
+    const totalSpent = referredUsers.reduce((s, r) => s + r.spent_php, 0);
+    const totalCommission = referredUsers.reduce((s, r) => s + r.commission_php, 0);
+
+    // Revenue in window
+    const revenueInWindow = redemptionsRows
+      .filter((r) => r.created_at >= since)
+      .reduce((s, r) => s + Number(r.final_amount_php ?? 0), 0);
+    const redemptionsInWindow = redemptionsRows.filter((r) => r.created_at >= since).length;
+
+    // Signups per ISO week within window
+    const weekMap = new Map<string, number>();
+    const cutoff = new Date(since).getTime();
+    for (const r of redemptionsRows) {
+      const t = new Date(r.created_at).getTime();
+      if (t < cutoff) continue;
+      const d = new Date(r.created_at);
+      // Start of week (Mon)
+      const day = d.getUTCDay();
+      const diff = (day + 6) % 7;
+      const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - diff));
+      const key = monday.toISOString().slice(0, 10);
+      weekMap.set(key, (weekMap.get(key) ?? 0) + 1);
+    }
+    const signupsByWeek = Array.from(weekMap.entries())
+      .map(([weekStart, count]) => ({ weekStart, count }))
+      .sort((a, b) => (a.weekStart < b.weekStart ? -1 : 1));
+
+    const stats = {
+      days: data.days,
+      activeAccounts: (activeAssignRes as any).count ?? 0,
+      territoriesCount: (territoriesRes.data ?? []).length,
+      openFollowups: (openFollowupsRes as any).count ?? 0,
+      signupsInWindow: (signupsInWindowRes as any).count ?? 0,
+      qrScans: qrScansInWindow,
+      redemptions: redemptionsInWindow,
+      revenuePhp: Math.round(revenueInWindow * 100) / 100,
+      commissionRate,
+      commissionPhpEstimated: Math.round(revenueInWindow * commissionRate * 100) / 100,
+      // Lifetime, since we have no paid-out state today
+      lifetimeSpentPhp: Math.round(totalSpent * 100) / 100,
+      lifetimeCommissionPhpEstimated: Math.round(totalCommission * 100) / 100,
+      payoutOwedPhpEstimated: Math.round(totalCommission * 100) / 100,
+      signupsByWeek,
+    };
+
+    const connections = {
+      businesses_owned: businessesOwnedRes.data ?? [],
+      listings_count: (listingsCountRes as any).count ?? 0,
+      clubs_owned: clubsRes.data ?? [],
+      partner_program: (partnerRes as any).data ?? null,
+      open_support_tickets: (openTicketsRes as any).count ?? 0,
+      recent_admin_audit: recentAuditRes.data ?? [],
+    };
+
+    return { account, stats, referredUsers, connections, rep_profile: repProfileRes.data ?? null };
+  });
