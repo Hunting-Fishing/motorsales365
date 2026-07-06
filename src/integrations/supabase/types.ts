@@ -11859,6 +11859,7 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      derive_signup_intent: { Args: { _user_id: string }; Returns: string }
       dispatch_expand_stale: { Args: never; Returns: number }
       dispatch_match_providers: {
         Args: { _request_id: string; _take?: number }
@@ -12122,6 +12123,10 @@ export type Database = {
         }[]
       }
       recompute_seller_rating: { Args: { _seller: string }; Returns: undefined }
+      recompute_signup_intent: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       record_qr_scan: {
         Args: {
           _browser?: string
