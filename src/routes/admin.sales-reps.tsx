@@ -1036,7 +1036,7 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
 
               {/* -------- Referred users -------- */}
               <TabsContent value="referred" className="mt-4 space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="text-xs text-muted-foreground">
                     Lifetime spend & commission per user attributed to this rep via their referral
                     code.
@@ -1045,11 +1045,71 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                     size="sm"
                     variant="outline"
                     onClick={exportReferredCsv}
-                    disabled={!(detail?.referredUsers?.length ?? 0)}
+                    disabled={filteredReferred.length === 0}
                   >
                     <Download className="mr-1 h-3 w-3" /> Export CSV
                   </Button>
                 </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <Input
+                    placeholder="Search name, email, or ID…"
+                    value={refSearch}
+                    onChange={(e) => {
+                      setRefSearch(e.target.value);
+                      setRefPage(1);
+                    }}
+                    className="h-9 w-full sm:max-w-xs"
+                  />
+                  <Select
+                    value={refFilter}
+                    onValueChange={(v) => {
+                      setRefFilter(v as any);
+                      setRefPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="h-9 w-[150px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All users</SelectItem>
+                      <SelectItem value="spend">With spend</SelectItem>
+                      <SelectItem value="nospend">No spend</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={refSort} onValueChange={(v) => setRefSort(v as any)}>
+                    <SelectTrigger className="h-9 w-[190px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="commission_desc">Commission (high → low)</SelectItem>
+                      <SelectItem value="commission_asc">Commission (low → high)</SelectItem>
+                      <SelectItem value="spent_desc">Spent (high → low)</SelectItem>
+                      <SelectItem value="spent_asc">Spent (low → high)</SelectItem>
+                      <SelectItem value="recent">Newest signup</SelectItem>
+                      <SelectItem value="oldest">Oldest signup</SelectItem>
+                      <SelectItem value="name">Name (A → Z)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={String(refPageSize)}
+                    onValueChange={(v) => {
+                      setRefPageSize(Number(v));
+                      setRefPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="h-9 w-[110px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10 / page</SelectItem>
+                      <SelectItem value="25">25 / page</SelectItem>
+                      <SelectItem value="50">50 / page</SelectItem>
+                      <SelectItem value="100">100 / page</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {detailQ.isLoading ? (
                   <div className="flex h-24 items-center justify-center">
                     <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -1059,70 +1119,112 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                     <UsersIcon className="mx-auto mb-2 h-5 w-5 opacity-60" />
                     No referred users with tracked spend yet.
                   </div>
-                ) : (
-                  <div className="overflow-x-auto rounded-md border">
-                    <table className="w-full text-sm">
-                      <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
-                        <tr>
-                          <th className="px-3 py-2">User</th>
-                          <th className="px-3 py-2">Signed up</th>
-                          <th className="px-3 py-2 text-right">Redemptions</th>
-                          <th className="px-3 py-2 text-right">Spent</th>
-                          <th className="px-3 py-2 text-right">Rate</th>
-                          <th className="px-3 py-2 text-right">Commission</th>
-                          <th className="px-3 py-2"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {detail!.referredUsers.map((r: any) => (
-                          <tr key={r.user_id} className="border-t align-top">
-                            <td className="px-3 py-2">
-                              <div className="font-medium">{r.name ?? "—"}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {r.email ?? r.user_id.slice(0, 8)}
-                              </div>
-                            </td>
-                            <td className="whitespace-nowrap px-3 py-2 text-xs text-muted-foreground">
-                              {r.signed_up_at
-                                ? new Date(r.signed_up_at).toLocaleDateString()
-                                : "—"}
-                            </td>
-                            <td className="px-3 py-2 text-right">{r.redemptions}</td>
-                            <td className="px-3 py-2 text-right">₱{formatMoney(r.spent_php)}</td>
-                            <td className="px-3 py-2 text-right text-xs text-muted-foreground">
-                              {(r.commission_rate * 100).toFixed(1)}%
-                            </td>
-                            <td className="px-3 py-2 text-right font-medium">
-                              ₱{formatMoney(r.commission_php)}
-                            </td>
-                            <td className="px-3 py-2">
-                              <Link
-                                to="/admin/users"
-                                search={{ q: r.email ?? r.user_id } as any}
-                                className="inline-flex items-center text-xs text-primary hover:underline"
-                              >
-                                View <ExternalLink className="ml-1 h-3 w-3" />
-                              </Link>
-                            </td>
-                          </tr>
-                        ))}
-                        <tr className="border-t bg-muted/30 font-medium">
-                          <td className="px-3 py-2" colSpan={3}>
-                            Totals
-                          </td>
-                          <td className="px-3 py-2 text-right">
-                            ₱{formatMoney(detail?.stats?.lifetimeSpentPhp ?? 0)}
-                          </td>
-                          <td></td>
-                          <td className="px-3 py-2 text-right">
-                            ₱{formatMoney(detail?.stats?.lifetimeCommissionPhpEstimated ?? 0)}
-                          </td>
-                          <td></td>
-                        </tr>
-                      </tbody>
-                    </table>
+                ) : filteredReferred.length === 0 ? (
+                  <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+                    No users match the current search or filter.
                   </div>
+                ) : (
+                  <>
+                    <div className="overflow-x-auto rounded-md border">
+                      <table className="w-full text-sm">
+                        <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                          <tr>
+                            <th className="px-3 py-2">User</th>
+                            <th className="px-3 py-2">Signed up</th>
+                            <th className="px-3 py-2 text-right">Redemptions</th>
+                            <th className="px-3 py-2 text-right">Spent</th>
+                            <th className="px-3 py-2 text-right">Rate</th>
+                            <th className="px-3 py-2 text-right">Commission</th>
+                            <th className="px-3 py-2"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pagedReferred.map((r: any) => (
+                            <tr key={r.user_id} className="border-t align-top">
+                              <td className="px-3 py-2">
+                                <div className="font-medium">{r.name ?? "—"}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {r.email ?? r.user_id.slice(0, 8)}
+                                </div>
+                              </td>
+                              <td className="whitespace-nowrap px-3 py-2 text-xs text-muted-foreground">
+                                {r.signed_up_at
+                                  ? new Date(r.signed_up_at).toLocaleDateString()
+                                  : "—"}
+                              </td>
+                              <td className="px-3 py-2 text-right">{r.redemptions}</td>
+                              <td className="px-3 py-2 text-right">₱{formatMoney(r.spent_php)}</td>
+                              <td className="px-3 py-2 text-right text-xs text-muted-foreground">
+                                {(r.commission_rate * 100).toFixed(1)}%
+                              </td>
+                              <td className="px-3 py-2 text-right font-medium">
+                                ₱{formatMoney(r.commission_php)}
+                              </td>
+                              <td className="px-3 py-2">
+                                <Link
+                                  to="/admin/users"
+                                  search={{ q: r.email ?? r.user_id } as any}
+                                  className="inline-flex items-center text-xs text-primary hover:underline"
+                                >
+                                  View <ExternalLink className="ml-1 h-3 w-3" />
+                                </Link>
+                              </td>
+                            </tr>
+                          ))}
+                          <tr className="border-t bg-muted/30 font-medium">
+                            <td className="px-3 py-2" colSpan={3}>
+                              Filtered totals ({filteredReferred.length} of{" "}
+                              {detail?.referredUsers?.length ?? 0})
+                            </td>
+                            <td className="px-3 py-2 text-right">
+                              ₱{formatMoney(filteredTotals.spent)}
+                            </td>
+                            <td></td>
+                            <td className="px-3 py-2 text-right">
+                              ₱{formatMoney(filteredTotals.commission)}
+                            </td>
+                            <td></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+                      <div>
+                        Showing {(refCurrentPage - 1) * refPageSize + 1}–
+                        {Math.min(refCurrentPage * refPageSize, filteredReferred.length)} of{" "}
+                        {filteredReferred.length}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={refCurrentPage <= 1}
+                          onClick={() => setRefPage((p) => Math.max(1, p - 1))}
+                        >
+                          Previous
+                        </Button>
+                        <span>
+                          Page {refCurrentPage} / {refTotalPages}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={refCurrentPage >= refTotalPages}
+                          onClick={() => setRefPage((p) => Math.min(refTotalPages, p + 1))}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
+                  </>
                 )}
+                <p className="text-[11px] text-muted-foreground">
+                  Commission and payout figures are estimates computed from the rep's rate override
+                  (or the site-wide default). No paid/unpaid state is tracked yet.
+                </p>
+              </TabsContent>
+
                 <p className="text-[11px] text-muted-foreground">
                   Commission and payout figures are estimates computed from the rep's rate override
                   (or the site-wide default). No paid/unpaid state is tracked yet.
