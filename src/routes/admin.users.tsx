@@ -825,6 +825,80 @@ function AdminUsers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!intentPreview} onOpenChange={(o) => !o && !confirmBusy && setIntentPreview(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Re-evaluate signup intents</DialogTitle>
+            <DialogDescription>
+              Preview of derived intent for the {intentPreview?.rows.length ?? 0} users on this page.
+              Only rows marked <strong>Change</strong> will be written; unchanged rows are skipped.
+            </DialogDescription>
+          </DialogHeader>
+
+          {intentPreview && (
+            <>
+              <div className="rounded-md border border-border bg-muted/40 p-2 text-sm">
+                <strong>{intentPreview.wouldChange}</strong> to change ·{" "}
+                <span className="text-muted-foreground">{intentPreview.unchanged} unchanged</span>
+              </div>
+
+              {intentPreview.wouldChange === 0 ? (
+                <div className="rounded-md border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
+                  Nothing to update — all users already match their derived intent.
+                </div>
+              ) : (
+                <div className="rounded-md border border-border overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead className="bg-muted/40 text-left text-muted-foreground">
+                      <tr>
+                        <th className="px-2 py-1.5 font-medium">User</th>
+                        <th className="px-2 py-1.5 font-medium">Current</th>
+                        <th className="px-2 py-1.5 font-medium">Will become</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {intentPreview.rows
+                        .filter((r) => r.changed)
+                        .map((r) => (
+                          <tr key={r.user_id} className="border-t border-border">
+                            <td className="px-2 py-1.5">{r.full_name ?? "(no name)"}</td>
+                            <td className="px-2 py-1.5 text-muted-foreground">
+                              {r.previous ?? "unset"}
+                            </td>
+                            <td className="px-2 py-1.5">
+                              <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 font-medium">
+                                {r.next}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              disabled={confirmBusy}
+              onClick={() => setIntentPreview(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={confirmBusy || (intentPreview?.wouldChange ?? 0) === 0}
+              onClick={handleConfirmRecompute}
+            >
+              {confirmBusy
+                ? "Applying…"
+                : `Apply ${intentPreview?.wouldChange ?? 0} change${(intentPreview?.wouldChange ?? 0) === 1 ? "" : "s"}`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
