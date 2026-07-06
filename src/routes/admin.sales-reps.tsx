@@ -1229,7 +1229,7 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                             </tr>
                           ))}
                           <tr className="border-t bg-muted/30 font-medium">
-                            <td className="px-3 py-2" colSpan={3}>
+                            <td className="px-3 py-2" colSpan={4}>
                               Filtered totals ({filteredReferred.length} of{" "}
                               {detail?.referredUsers?.length ?? 0})
                             </td>
