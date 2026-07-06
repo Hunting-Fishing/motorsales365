@@ -37,12 +37,9 @@ function buildChecklist(profile: any, totpEnabled: boolean): ChecklistItem[] {
       required: true,
     },
     { label: "Profile photo", done: has(profile?.avatar_url), required: false },
-    { label: "Two-factor authentication (authenticator app)", done: totpEnabled, required: !isStaff },
+    { label: "Two-factor authentication — coming soon", done: false, required: false },
   ];
-  if (isStaff) {
-    // Staff don't need business fields; require 2FA instead.
-    items[items.length - 1].required = true;
-  }
+
   if (isBusiness) {
     items.push(
       { label: "Business name", done: has(profile?.business_name), required: true },
