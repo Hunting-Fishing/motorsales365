@@ -105,9 +105,12 @@ function AdminUsers() {
   const canEditRoles = isAdmin || isSuperAdmin;
   const genMagicLink = useServerFn(generateStaffMagicLink);
   const fetchStaffIds = useServerFn(listStaffUserIds);
+  const recomputeIntents = useServerFn(recomputeUserIntents);
   const [staffIds, setStaffIds] = useState<Set<string>>(new Set());
   const [magicLink, setMagicLink] = useState<{ email: string; link: string } | null>(null);
   const [magicLoadingId, setMagicLoadingId] = useState<string | null>(null);
+  const [intentBusyId, setIntentBusyId] = useState<string | null>(null);
+  const [bulkIntentBusy, setBulkIntentBusy] = useState(false);
 
   // Load 365motorsales.com staff user IDs once for filtering + eye button gating.
   useEffect(() => {
