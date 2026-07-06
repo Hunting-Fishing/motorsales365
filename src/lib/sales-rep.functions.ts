@@ -985,13 +985,35 @@ export const adminGetRepDetail = createServerFn({ method: "POST" })
         .order("created_at", { ascending: true });
       redemptionsRows = reds ?? [];
     }
-    if (refIds.length) {
+    if (refCodes.length) {
       const { count } = await supabaseAdmin
         .from("qr_scans")
         .select("id", { count: "exact", head: true })
-        .in("staff_referral_id", refIds)
-        .gte("created_at", since);
+        .in("referral_code", refCodes)
+        .gte("scanned_at", since);
       qrScansInWindow = count ?? 0;
+    }
+
+    // Also pull every referred signup (credited or first-touch) so users who
+    // signed up via a QR/referral link but haven't spent yet still show up.
+    let signupRows: any[] = [];
+    if (refCodes.length) {
+      const [creditedRes, firstRes] = await Promise.all([
+        supabaseAdmin
+          .from("user_referrals")
+          .select("user_id, signup_date, credited_referral_code, first_referral_code")
+          .in("credited_referral_code", refCodes),
+        supabaseAdmin
+          .from("user_referrals")
+          .select("user_id, signup_date, credited_referral_code, first_referral_code")
+          .in("first_referral_code", refCodes),
+      ]);
+      const seen = new Set<string>();
+      for (const row of [...(creditedRes.data ?? []), ...(firstRes.data ?? [])]) {
+        if (!row?.user_id || seen.has(row.user_id)) continue;
+        seen.add(row.user_id);
+        signupRows.push(row);
+      }
     }
 
     // Group redemptions by user
