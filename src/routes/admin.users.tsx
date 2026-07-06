@@ -70,6 +70,33 @@ function IntentBadge({ intent }: { intent: string | null | undefined }) {
   );
 }
 
+function SourceBadge({ source }: { source: string | null | undefined }) {
+  const s = (source ?? "direct").toLowerCase();
+  const map: Record<string, { label: string; cls: string }> = {
+    qr: {
+      label: "QR",
+      cls: "border-fuchsia-500/40 bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-300",
+    },
+    link: {
+      label: "Link",
+      cls: "border-cyan-500/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300",
+    },
+    direct: {
+      label: "Direct",
+      cls: "border-muted bg-muted/40 text-muted-foreground",
+    },
+  };
+  const m = map[s] ?? map.direct;
+  return (
+    <span
+      title={`Signup source: ${m.label}`}
+      className={`ml-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${m.cls}`}
+    >
+      {m.label}
+    </span>
+  );
+}
+
 
 function AdminUsers() {
   const { user, isAdmin } = useAuth();
