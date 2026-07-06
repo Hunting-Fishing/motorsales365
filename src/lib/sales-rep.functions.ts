@@ -1114,6 +1114,176 @@ export const adminGetRepDetail = createServerFn({ method: "POST" })
     return { account, stats, referredUsers, connections, rep_profile: repProfileRes.data ?? null };
   });
 
+/** Admin: full redemption drilldown for a specific referred user attributed to a rep. */
+export const adminGetReferredUserDetail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        rep_user_id: z.string().uuid(),
+        user_id: z.string().uuid(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await requireAdmin(supabase, userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Site-default commission rate
+    const { data: settingRow } = await supabaseAdmin
+      .from("site_settings")
+      .select("value")
+      .eq("key", "sales_rep_commission_rate")
+      .maybeSingle();
+    const siteRate = Number(settingRow?.value ?? "0.10");
+    const defaultRate = Number.isFinite(siteRate) ? siteRate : 0.1;
+
+    const [repProfileRes, staffRefsRes, profileRes, authUserRes] = await Promise.all([
+      supabaseAdmin
+        .from("sales_rep_profiles")
+        .select("commission_rate_override")
+        .eq("user_id", data.rep_user_id)
+        .maybeSingle(),
+      supabaseAdmin
+        .from("staff_referrals")
+        .select("id, referral_code")
+        .eq("staff_user_id", data.rep_user_id),
+      supabaseAdmin
+        .from("profiles")
+        .select("id, full_name, first_name, last_name, avatar_url, created_at, phone, signup_city, signup_region")
+        .eq("id", data.user_id)
+        .maybeSingle(),
+      supabaseAdmin.auth.admin.getUserById(data.user_id),
+    ]);
+
+    const commissionRate =
+      repProfileRes.data?.commission_rate_override != null
+        ? Number(repProfileRes.data.commission_rate_override)
+        : defaultRate;
+    const overrideActive = repProfileRes.data?.commission_rate_override != null;
+
+    const refCodes = (staffRefsRes.data ?? []).map((r: any) => r.referral_code);
+
+    let redemptions: any[] = [];
+    if (refCodes.length) {
+      const { data: reds } = await supabaseAdmin
+        .from("referral_redemptions")
+        .select(
+          "id, referral_code, kind, applies_to, base_amount_php, discount_amount_php, final_amount_php, percent_off, flat_amount_php, promotion_id, subscription_id, payment_id, listing_id, metadata, created_at",
+        )
+        .eq("user_id", data.user_id)
+        .in("referral_code", refCodes)
+        .order("created_at", { ascending: false });
+      redemptions = reds ?? [];
+    }
+
+    // Fetch related promotions (for code/name) in one shot
+    const promoIds = Array.from(
+      new Set(redemptions.map((r) => r.promotion_id).filter(Boolean)),
+    );
+    let promoById = new Map<string, any>();
+    if (promoIds.length) {
+      const { data: promos } = await supabaseAdmin
+        .from("promotions")
+        .select("id, code, percent_off, applies_to")
+        .in("id", promoIds);
+      promoById = new Map((promos ?? []).map((p: any) => [p.id, p]));
+    }
+
+    // Enrich rows + compute commission per row
+    const rows = redemptions.map((r) => {
+      const final = Number(r.final_amount_php ?? 0);
+      const commission = Math.round(final * commissionRate * 100) / 100;
+      const promo = r.promotion_id ? promoById.get(r.promotion_id) : null;
+      return {
+        id: r.id,
+        created_at: r.created_at,
+        referral_code: r.referral_code,
+        kind: r.kind as string,
+        applies_to: r.applies_to as string,
+        base_amount_php: Number(r.base_amount_php ?? 0),
+        discount_amount_php: Number(r.discount_amount_php ?? 0),
+        final_amount_php: final,
+        percent_off: r.percent_off != null ? Number(r.percent_off) : null,
+        flat_amount_php: r.flat_amount_php != null ? Number(r.flat_amount_php) : null,
+        commission_php: commission,
+        promotion: promo
+          ? { id: promo.id, code: promo.code, percent_off: Number(promo.percent_off) }
+          : null,
+        subscription_id: r.subscription_id ?? null,
+        payment_id: r.payment_id ?? null,
+        listing_id: r.listing_id ?? null,
+      };
+    });
+
+    // Category (kind) breakdown
+    const byKind = new Map<
+      string,
+      { kind: string; count: number; spent_php: number; commission_php: number }
+    >();
+    for (const r of rows) {
+      const cur = byKind.get(r.kind) ?? {
+        kind: r.kind,
+        count: 0,
+        spent_php: 0,
+        commission_php: 0,
+      };
+      cur.count += 1;
+      cur.spent_php += r.final_amount_php;
+      cur.commission_php += r.commission_php;
+      byKind.set(r.kind, cur);
+    }
+    const categories = Array.from(byKind.values())
+      .map((c) => ({
+        ...c,
+        spent_php: Math.round(c.spent_php * 100) / 100,
+        commission_php: Math.round(c.commission_php * 100) / 100,
+      }))
+      .sort((a, b) => b.spent_php - a.spent_php);
+
+    const totalSpent = Math.round(rows.reduce((s, r) => s + r.final_amount_php, 0) * 100) / 100;
+    const totalDiscount =
+      Math.round(rows.reduce((s, r) => s + r.discount_amount_php, 0) * 100) / 100;
+    const totalCommission =
+      Math.round(rows.reduce((s, r) => s + r.commission_php, 0) * 100) / 100;
+
+    const p = profileRes.data;
+    const name =
+      p?.full_name ||
+      [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim() ||
+      null;
+
+    return {
+      user: {
+        id: data.user_id,
+        name,
+        email: (authUserRes.data?.user?.email ?? "").toLowerCase() || null,
+        phone: p?.phone ?? authUserRes.data?.user?.phone ?? null,
+        city: p?.signup_city ?? null,
+        region: p?.signup_region ?? null,
+
+        avatar_url: p?.avatar_url ?? null,
+        signed_up_at: p?.created_at ?? authUserRes.data?.user?.created_at ?? null,
+        last_sign_in_at: authUserRes.data?.user?.last_sign_in_at ?? null,
+      },
+      commission: {
+        rate: commissionRate,
+        override_active: overrideActive,
+        site_default_rate: defaultRate,
+      },
+      totals: {
+        transactions: rows.length,
+        spent_php: totalSpent,
+        discount_php: totalDiscount,
+        commission_php: totalCommission,
+      },
+      categories,
+      transactions: rows,
+    };
+  });
+
+
 /** Admin: auto-populate a rep's territory from their profile signup area, if empty. */
 export const adminAutoSetupTerritory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

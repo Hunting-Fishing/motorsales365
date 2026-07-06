@@ -33,7 +33,9 @@ import {
   adminSaveRepProfile,
   adminListAuditLog,
   adminGetRepDetail,
+  adminGetReferredUserDetail,
   adminAutoSetupTerritory,
+
 } from "@/lib/sales-rep.functions";
 import { PSGC, regionLabel, provincesOf, citiesOf } from "@/lib/psgc";
 import { Button } from "@/components/ui/button";
@@ -668,12 +670,16 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
   >("commission_desc");
   const [refPage, setRefPage] = useState(1);
   const [refPageSize, setRefPageSize] = useState<number>(25);
+  const [drilldownUserId, setDrilldownUserId] = useState<string | null>(null);
+
   if (rep && lastId !== rep.user_id) {
     setLastId(rep.user_id);
     setRefSearch("");
     setRefFilter("all");
     setRefSort("commission_desc");
     setRefPage(1);
+    setDrilldownUserId(null);
+
     setForm({
       title: rep.rep_profile?.title ?? "",
       bio: rep.rep_profile?.bio ?? "",
@@ -810,7 +816,9 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
   };
 
   return (
+    <>
     <Sheet open={!!repUserId} onOpenChange={(o) => !o && (setLastId(null), onClose())}>
+
       <SheetContent className="w-full overflow-y-auto sm:max-w-3xl">
         {rep ? (
           <>
@@ -1160,15 +1168,25 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                               <td className="px-3 py-2 text-right font-medium">
                                 ₱{formatMoney(r.commission_php)}
                               </td>
-                              <td className="px-3 py-2">
-                                <Link
-                                  to="/admin/users"
-                                  search={{ q: r.email ?? r.user_id } as any}
-                                  className="inline-flex items-center text-xs text-primary hover:underline"
-                                >
-                                  View <ExternalLink className="ml-1 h-3 w-3" />
-                                </Link>
+                              <td className="whitespace-nowrap px-3 py-2">
+                                <div className="flex items-center justify-end gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => setDrilldownUserId(r.user_id)}
+                                    className="text-xs text-primary hover:underline"
+                                  >
+                                    Details
+                                  </button>
+                                  <Link
+                                    to="/admin/users"
+                                    search={{ q: r.email ?? r.user_id } as any}
+                                    className="inline-flex items-center text-xs text-muted-foreground hover:underline"
+                                  >
+                                    Profile <ExternalLink className="ml-1 h-3 w-3" />
+                                  </Link>
+                                </div>
                               </td>
+
                             </tr>
                           ))}
                           <tr className="border-t bg-muted/30 font-medium">
@@ -1246,8 +1264,310 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
         )}
       </SheetContent>
     </Sheet>
+    <ReferredUserDrilldown
+      repUserId={rep?.user_id ?? null}
+      userId={drilldownUserId}
+      onClose={() => setDrilldownUserId(null)}
+    />
+    </>
   );
 }
+
+function ReferredUserDrilldown({
+  repUserId,
+  userId,
+  onClose,
+}: {
+  repUserId: string | null;
+  userId: string | null;
+  onClose: () => void;
+}) {
+  const detailFn = useServerFn(adminGetReferredUserDetail);
+  const q = useQuery({
+    queryKey: ["admin-referred-user-detail", repUserId, userId],
+    queryFn: () =>
+      detailFn({ data: { rep_user_id: repUserId!, user_id: userId! } }),
+    enabled: !!repUserId && !!userId,
+  });
+  const d = q.data;
+
+  const exportCsv = () => {
+    const rows = d?.transactions ?? [];
+    if (!rows.length) return;
+    const header = [
+      "created_at",
+      "kind",
+      "applies_to",
+      "referral_code",
+      "promotion_code",
+      "base_amount_php",
+      "discount_amount_php",
+      "final_amount_php",
+      "commission_rate",
+      "commission_php",
+    ];
+    const csv = [
+      header.join(","),
+      ...rows.map((r) =>
+        [
+          r.created_at,
+          r.kind,
+          r.applies_to,
+          r.referral_code,
+          r.promotion?.code ?? "",
+          r.base_amount_php,
+          r.discount_amount_php,
+          r.final_amount_php,
+          d?.commission.rate ?? "",
+          r.commission_php,
+        ]
+          .map((v) => {
+            if (v == null) return "";
+            const s = String(v).replace(/"/g, '""');
+            return /[,"\n]/.test(s) ? `"${s}"` : s;
+          })
+          .join(","),
+      ),
+    ].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `referred-user-${userId ?? "user"}-transactions.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <Sheet open={!!userId} onOpenChange={(o) => !o && onClose()}>
+      <SheetContent className="w-full overflow-y-auto sm:max-w-2xl">
+        {!userId ? null : q.isLoading || !d ? (
+          <div className="flex h-40 items-center justify-center text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
+        ) : (
+          <>
+            <SheetHeader>
+              <SheetTitle>{d.user.name ?? d.user.email ?? "Referred user"}</SheetTitle>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                {d.user.email && (
+                  <span className="inline-flex items-center gap-1">
+                    <Mail className="h-3 w-3" /> {d.user.email}
+                  </span>
+                )}
+                {d.user.phone && (
+                  <span className="inline-flex items-center gap-1">
+                    <Phone className="h-3 w-3" /> {d.user.phone}
+                  </span>
+                )}
+                {(d.user.city || d.user.region) && (
+                  <span className="inline-flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {[d.user.city, d.user.region].filter(Boolean).join(", ")}
+                  </span>
+                )}
+                {d.user.signed_up_at && (
+                  <span className="inline-flex items-center gap-1">
+                    <CalendarClock className="h-3 w-3" />
+                    Joined {new Date(d.user.signed_up_at).toLocaleDateString()}
+                  </span>
+                )}
+              </div>
+            </SheetHeader>
+
+            <div className="mt-4 space-y-4">
+              {/* Commission split card */}
+              <div className="rounded-md border p-3">
+                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Commission split
+                </div>
+                <div className="flex flex-wrap items-baseline gap-4 text-sm">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Applied rate</div>
+                    <div className="text-lg font-semibold">
+                      {(d.commission.rate * 100).toFixed(2)}%
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Source</div>
+                    <div className="text-sm">
+                      {d.commission.override_active ? (
+                        <Badge variant="secondary">Rep override</Badge>
+                      ) : (
+                        <Badge variant="outline">Site default</Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Site default</div>
+                    <div className="text-sm">
+                      {(d.commission.site_default_rate * 100).toFixed(2)}%
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Commission per transaction = final amount × applied rate. Estimates only; no
+                  paid/unpaid state is tracked yet.
+                </p>
+              </div>
+
+              {/* Totals */}
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <KpiCard label="Transactions" value={d.totals.transactions} />
+                <KpiCard label="Total spent" value={`₱${formatMoney(d.totals.spent_php)}`} />
+                <KpiCard
+                  label="Total discount"
+                  value={`₱${formatMoney(d.totals.discount_php)}`}
+                />
+                <KpiCard
+                  label="Commission"
+                  value={`₱${formatMoney(d.totals.commission_php)}`}
+                />
+              </div>
+
+              {/* Category breakdown */}
+              <div>
+                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Spend categories
+                </div>
+                {d.categories.length === 0 ? (
+                  <div className="rounded-md border border-dashed p-4 text-center text-xs text-muted-foreground">
+                    No categories yet.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto rounded-md border">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                        <tr>
+                          <th className="px-3 py-2">Category</th>
+                          <th className="px-3 py-2 text-right">Count</th>
+                          <th className="px-3 py-2 text-right">Spent</th>
+                          <th className="px-3 py-2 text-right">Commission</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {d.categories.map((c) => (
+                          <tr key={c.kind} className="border-t">
+                            <td className="px-3 py-2 capitalize">{c.kind.replace(/_/g, " ")}</td>
+                            <td className="px-3 py-2 text-right">{c.count}</td>
+                            <td className="px-3 py-2 text-right">₱{formatMoney(c.spent_php)}</td>
+                            <td className="px-3 py-2 text-right font-medium">
+                              ₱{formatMoney(c.commission_php)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Transactions */}
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Transactions ({d.transactions.length})
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={exportCsv}
+                    disabled={d.transactions.length === 0}
+                  >
+                    <Download className="mr-1 h-3 w-3" /> Export CSV
+                  </Button>
+                </div>
+                {d.transactions.length === 0 ? (
+                  <div className="rounded-md border border-dashed p-6 text-center text-xs text-muted-foreground">
+                    No transactions on this rep's referral codes yet.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto rounded-md border">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                        <tr>
+                          <th className="px-3 py-2">Date</th>
+                          <th className="px-3 py-2">Type</th>
+                          <th className="px-3 py-2">Code</th>
+                          <th className="px-3 py-2 text-right">Base</th>
+                          <th className="px-3 py-2 text-right">Discount</th>
+                          <th className="px-3 py-2 text-right">Final</th>
+                          <th className="px-3 py-2 text-right">Commission</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {d.transactions.map((t) => (
+                          <tr key={t.id} className="border-t align-top">
+                            <td className="whitespace-nowrap px-3 py-2 text-xs text-muted-foreground">
+                              {new Date(t.created_at).toLocaleString()}
+                            </td>
+                            <td className="px-3 py-2">
+                              <div className="capitalize">{t.kind.replace(/_/g, " ")}</div>
+                              <div className="text-xs text-muted-foreground capitalize">
+                                {t.applies_to.replace(/_/g, " ")}
+                              </div>
+                            </td>
+                            <td className="px-3 py-2">
+                              <div className="font-mono text-xs">{t.referral_code}</div>
+                              {t.promotion?.code && (
+                                <div className="text-[11px] text-muted-foreground">
+                                  promo {t.promotion.code} (
+                                  {t.promotion.percent_off.toFixed(0)}%)
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-3 py-2 text-right">
+                              ₱{formatMoney(t.base_amount_php)}
+                            </td>
+                            <td className="px-3 py-2 text-right text-xs text-muted-foreground">
+                              −₱{formatMoney(t.discount_amount_php)}
+                            </td>
+                            <td className="px-3 py-2 text-right">
+                              ₱{formatMoney(t.final_amount_php)}
+                            </td>
+                            <td className="px-3 py-2 text-right font-medium">
+                              ₱{formatMoney(t.commission_php)}
+                            </td>
+                          </tr>
+                        ))}
+                        <tr className="border-t bg-muted/30 font-medium">
+                          <td className="px-3 py-2" colSpan={3}>
+                            Totals
+                          </td>
+                          <td></td>
+                          <td className="px-3 py-2 text-right text-xs">
+                            −₱{formatMoney(d.totals.discount_php)}
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            ₱{formatMoney(d.totals.spent_php)}
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            ₱{formatMoney(d.totals.commission_php)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <Link
+                  to="/admin/users"
+                  search={{ q: d.user.email ?? d.user.id } as any}
+                  className="inline-flex items-center text-xs text-primary hover:underline"
+                >
+                  Open full user profile <ExternalLink className="ml-1 h-3 w-3" />
+                </Link>
+              </div>
+            </div>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
 
 function formatMoney(n: number): string {
   return Number(n ?? 0).toLocaleString(undefined, {
