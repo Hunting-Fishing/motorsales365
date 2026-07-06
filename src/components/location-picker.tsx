@@ -14,7 +14,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { PSGC, regionLabel, provincesOf, citiesOf, resolvePsgc } from "@/lib/psgc";
+import { PSGC, regionLabel, provincesOf, citiesOf, resolvePsgc, ALL_PH_REGION } from "@/lib/psgc";
 
 export type LocationValue = {
   region?: string | null;
