@@ -554,8 +554,9 @@ function CurrencyPreferenceCard() {
   );
 }
 
-function ProfileCompletion({ profile, totpEnabled }: { profile: any; totpEnabled: boolean }) {
-  const items = buildChecklist(profile, totpEnabled);
+function ProfileCompletion({ profile }: { profile: any }) {
+  const items = buildChecklist(profile);
+
   const required = items.filter((i) => i.required);
   const requiredDone = required.filter((i) => i.done).length;
   const totalDone = items.filter((i) => i.done).length;
