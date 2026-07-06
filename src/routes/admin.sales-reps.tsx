@@ -1264,8 +1264,15 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
         )}
       </SheetContent>
     </Sheet>
+    <ReferredUserDrilldown
+      repUserId={rep?.user_id ?? null}
+      userId={drilldownUserId}
+      onClose={() => setDrilldownUserId(null)}
+    />
+    </>
   );
 }
+
 
 function formatMoney(n: number): string {
   return Number(n ?? 0).toLocaleString(undefined, {
