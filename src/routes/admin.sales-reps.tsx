@@ -847,6 +847,10 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
               <TabsContent value="overview" className="mt-4 space-y-6">
                 <AccountCard detail={detail} loading={detailQ.isLoading} rep={rep} />
 
+                <PayoutBreakdown detail={detail} loading={detailQ.isLoading} />
+
+
+
                 <section className="space-y-3">
                   <h3 className="text-sm font-semibold">Profile</h3>
                   <div className="grid gap-3">
