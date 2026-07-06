@@ -43,6 +43,34 @@ const STAFF_ROLES = ["admin", "moderator", "support", "sales", "advertising"] as
 type StaffRole = (typeof STAFF_ROLES)[number];
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
 
+function IntentBadge({ intent }: { intent: string | null | undefined }) {
+  if (!intent) return null;
+  const map: Record<string, { label: string; cls: string }> = {
+    buyer: {
+      label: "Buyer / Private",
+      cls: "border-blue-500/40 bg-blue-500/10 text-blue-700 dark:text-blue-300",
+    },
+    business: {
+      label: "Business",
+      cls: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+    },
+    service_provider: {
+      label: "Service",
+      cls: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+    },
+  };
+  const m = map[intent];
+  if (!m) return null;
+  return (
+    <span
+      className={`ml-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${m.cls}`}
+    >
+      {m.label}
+    </span>
+  );
+}
+
+
 function AdminUsers() {
   const { user, isAdmin } = useAuth();
   const isSuperAdmin = (user?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
@@ -93,6 +121,12 @@ function AdminUsers() {
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [sellerFilter, setSellerFilter] = useState<string>("all");
   const [verFilter, setVerFilter] = useState<string>("all");
+  const [intentFilter, setIntentFilter] = useState<
+    "all" | "buyer" | "business" | "service_provider" | "unset"
+  >("all");
+  const [referralMap, setReferralMap] = useState<
+    Map<string, { code: string; staffName: string | null; staffId: string | null }>
+  >(new Map());
 
   // Debounce search input
   useEffect(() => {
@@ -106,7 +140,8 @@ function AdminUsers() {
   // Reset to first page when filters change
   useEffect(() => {
     setPage(0);
-  }, [roleFilter, sellerFilter, verFilter]);
+  }, [roleFilter, sellerFilter, verFilter, intentFilter]);
+
 
   const load = async () => {
     setLoading(true);
@@ -155,6 +190,13 @@ function AdminUsers() {
       } else if (sellerFilter !== "all") {
         q = q.eq("seller_type", sellerFilter as any);
       }
+      if (intentFilter !== "all") {
+        if (intentFilter === "unset") {
+          q = q.is("signup_intent", null);
+        } else {
+          q = q.eq("signup_intent", intentFilter);
+        }
+      }
       if (verFilter !== "all") {
         if (verFilter === "unverified") {
           q = q.or("verification_status.is.null,verification_status.eq.unverified");
@@ -162,6 +204,7 @@ function AdminUsers() {
           q = q.eq("verification_status", verFilter as any);
         }
       }
+
       if (search.trim()) {
         const s = search.trim().replace(/[%,()]/g, "");
         q = q.or(
@@ -180,18 +223,49 @@ function AdminUsers() {
 
       const ids = (profs ?? []).map((p) => p.id);
       const roleMap = new Map<string, string[]>();
+      const refMap = new Map<
+        string,
+        { code: string; staffName: string | null; staffId: string | null }
+      >();
       if (ids.length > 0) {
-        const { data: roles } = await supabase
-          .from("user_roles")
-          .select("user_id,role")
-          .in("user_id", ids);
+        const [{ data: roles }, { data: refs }] = await Promise.all([
+          supabase.from("user_roles").select("user_id,role").in("user_id", ids),
+          supabase
+            .from("user_referrals")
+            .select("user_id,credited_referral_code,first_referral_code,referred_by_staff_id")
+            .in("user_id", ids),
+        ]);
         (roles ?? []).forEach((r: any) => {
           const arr = roleMap.get(r.user_id) ?? [];
           arr.push(r.role);
           roleMap.set(r.user_id, arr);
         });
+        const refRows = refs ?? [];
+        const staffIdsToLookup = Array.from(
+          new Set(refRows.map((r: any) => r.referred_by_staff_id).filter(Boolean)),
+        );
+        const staffNameMap = new Map<string, string | null>();
+        if (staffIdsToLookup.length > 0) {
+          const { data: staffProfs } = await supabase
+            .from("profiles")
+            .select("id,full_name")
+            .in("id", staffIdsToLookup);
+          (staffProfs ?? []).forEach((s: any) => staffNameMap.set(s.id, s.full_name ?? null));
+        }
+        refRows.forEach((r: any) => {
+          const code = r.credited_referral_code ?? r.first_referral_code;
+          if (!code) return;
+          refMap.set(r.user_id, {
+            code,
+            staffId: r.referred_by_staff_id ?? null,
+            staffName: r.referred_by_staff_id
+              ? staffNameMap.get(r.referred_by_staff_id) ?? null
+              : null,
+          });
+        });
       }
       setUsers((profs ?? []).map((p) => ({ ...p, roles: roleMap.get(p.id) ?? [] })));
+      setReferralMap(refMap);
       setTotal(count ?? 0);
     } finally {
       setLoading(false);
@@ -202,21 +276,28 @@ function AdminUsers() {
     load();
     // reason: `load` is recreated each render; depend only on its inputs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, search, roleFilter, sellerFilter, verFilter, staffIds]);
+  }, [page, pageSize, search, roleFilter, sellerFilter, verFilter, intentFilter, staffIds]);
+
   useEffect(() => {
     setPage(0);
   }, [pageSize]);
 
   const hasFilters =
-    search || roleFilter !== "all" || sellerFilter !== "all" || verFilter !== "all";
+    search ||
+    roleFilter !== "all" ||
+    sellerFilter !== "all" ||
+    verFilter !== "all" ||
+    intentFilter !== "all";
   const clearFilters = () => {
     setSearchInput("");
     setSearch("");
     setRoleFilter("all");
     setSellerFilter("all");
     setVerFilter("all");
+    setIntentFilter("all");
     setPage(0);
   };
+
 
   const toggleRole = async (userId: string, role: StaffRole, has: boolean) => {
     if (has) {
@@ -322,6 +403,36 @@ function AdminUsers() {
         </div>
       </div>
 
+      {/* Signup-intent tabs */}
+      <div className="mb-3 flex flex-wrap gap-1 rounded-lg border border-border bg-card p-1">
+        {(
+          [
+            { id: "all", label: "All" },
+            { id: "buyer", label: "Buyer / Private seller" },
+            { id: "business", label: "Business / Dealer" },
+            { id: "service_provider", label: "Service provider" },
+            { id: "unset", label: "No intent set" },
+          ] as const
+        ).map((t) => {
+          const active = intentFilter === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setIntentFilter(t.id)}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                active
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted"
+              }`}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+
+
       <div className="mb-4 grid gap-2 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="relative lg:col-span-2">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -397,10 +508,11 @@ function AdminUsers() {
               className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4"
             >
               <div>
-                <div className="flex items-center gap-1.5 font-medium">
+                <div className="flex flex-wrap items-center gap-1.5 font-medium">
                   {u.full_name ?? "(no name)"}
                   {isVerified && <VerifiedBadge size="sm" />}
                   {staffIds.has(u.id) && <Staff365Badge size="xs" className="ml-1" />}
+                  <IntentBadge intent={u.signup_intent} />
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {u.seller_type} · joined {formatDate(u.created_at)}
@@ -408,6 +520,18 @@ function AdminUsers() {
                     u.verification_status !== "unverified" &&
                     ` · ${u.verification_status}`}
                 </div>
+                {referralMap.get(u.id) && (
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    Referred by{" "}
+                    <span className="font-medium text-foreground">
+                      {referralMap.get(u.id)!.staffName ?? "Unknown"}
+                    </span>{" "}
+                    <span className="opacity-70">
+                      (code {referralMap.get(u.id)!.code})
+                    </span>
+                  </div>
+                )}
+
                 <div className="mt-2 flex flex-wrap gap-1">
                   {STAFF_ROLES.map((role) => {
                     const has = u.roles.includes(role);
