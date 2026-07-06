@@ -1162,15 +1162,25 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                               <td className="px-3 py-2 text-right font-medium">
                                 ₱{formatMoney(r.commission_php)}
                               </td>
-                              <td className="px-3 py-2">
-                                <Link
-                                  to="/admin/users"
-                                  search={{ q: r.email ?? r.user_id } as any}
-                                  className="inline-flex items-center text-xs text-primary hover:underline"
-                                >
-                                  View <ExternalLink className="ml-1 h-3 w-3" />
-                                </Link>
+                              <td className="whitespace-nowrap px-3 py-2">
+                                <div className="flex items-center justify-end gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => setDrilldownUserId(r.user_id)}
+                                    className="text-xs text-primary hover:underline"
+                                  >
+                                    Details
+                                  </button>
+                                  <Link
+                                    to="/admin/users"
+                                    search={{ q: r.email ?? r.user_id } as any}
+                                    className="inline-flex items-center text-xs text-muted-foreground hover:underline"
+                                  >
+                                    Profile <ExternalLink className="ml-1 h-3 w-3" />
+                                  </Link>
+                                </div>
                               </td>
+
                             </tr>
                           ))}
                           <tr className="border-t bg-muted/30 font-medium">
