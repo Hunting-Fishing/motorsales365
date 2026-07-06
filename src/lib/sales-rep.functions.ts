@@ -1260,8 +1260,9 @@ export const adminGetReferredUserDetail = createServerFn({ method: "POST" })
         name,
         email: (authUserRes.data?.user?.email ?? "").toLowerCase() || null,
         phone: p?.phone ?? authUserRes.data?.user?.phone ?? null,
-        city: p?.city ?? null,
-        region: p?.region ?? null,
+        city: p?.signup_city ?? null,
+        region: p?.signup_region ?? null,
+
         avatar_url: p?.avatar_url ?? null,
         signed_up_at: p?.created_at ?? authUserRes.data?.user?.created_at ?? null,
         last_sign_in_at: authUserRes.data?.user?.last_sign_in_at ?? null,
