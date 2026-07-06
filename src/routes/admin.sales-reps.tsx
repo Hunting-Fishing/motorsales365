@@ -670,6 +670,8 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
   >("commission_desc");
   const [refPage, setRefPage] = useState(1);
   const [refPageSize, setRefPageSize] = useState<number>(25);
+  const [drilldownUserId, setDrilldownUserId] = useState<string | null>(null);
+
   if (rep && lastId !== rep.user_id) {
     setLastId(rep.user_id);
     setRefSearch("");
