@@ -228,7 +228,9 @@ function UserActionsTab() {
             <SelectItem value="verification_changed">Verification changed</SelectItem>
             <SelectItem value="seller_type_changed">Seller type changed</SelectItem>
             <SelectItem value="permission_changed">Permission changed</SelectItem>
-            <SelectItem value="intent_recomputed">Intent recomputed</SelectItem>
+            <SelectItem value="intent_recomputed">Intent recomputed (all)</SelectItem>
+            <SelectItem value="intent_recomputed_manual">Intent recomputed (manual)</SelectItem>
+            <SelectItem value="intent_recomputed_auto">Intent recomputed (auto)</SelectItem>
             <SelectItem value="referral_approved">Referral approved</SelectItem>
             <SelectItem value="referral_revoked">Referral revoked</SelectItem>
           </SelectContent>
