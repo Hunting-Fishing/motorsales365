@@ -277,7 +277,7 @@ function UserActionsTab() {
                   {fmt(r.created_at)}
                 </td>
                 <td className="px-3 py-2">
-                  <Badge variant="secondary">{ACTION_LABEL[r.action] ?? r.action}</Badge>
+                  <Badge variant="secondary">{intentSourceLabel(r)}</Badge>
                 </td>
                 <td className="px-3 py-2 text-xs">
                   {r.entity_type ? (
