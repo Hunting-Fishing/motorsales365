@@ -151,18 +151,25 @@ function AdminOverview() {
       <Section title="User activity" subtitle="Registrations, verified sellers and account state.">
 
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-          <SnapshotCard icon={Users} label="Total users" value={fmt(d.users.total)} />
-          <WindowCard icon={UserPlus} label="New signups" window={d.users.signups} />
+          <SnapshotCard icon={Users} label="Total users" value={fmt(d.users.total)} to="/admin/accounts" />
+          <WindowCard
+            icon={UserPlus}
+            label="New signups"
+            window={d.users.signups}
+            toFor={() => "/admin/accounts"}
+          />
           <SnapshotCard
             icon={BadgeCheck}
             label="Verified sellers"
             value={fmt(d.users.verifiedSellers)}
+            to="/admin/verifications"
           />
           <SnapshotCard
             icon={Users}
             label="Active accounts"
             value={fmt(d.users.activeAccounts)}
             hint={`${fmt(d.users.foundingMembers)} founding members`}
+            to="/admin/accounts"
           />
         </div>
       </Section>
@@ -173,11 +180,17 @@ function AdminOverview() {
         subtitle="QR scans across staff cards and partner/influencer referral links."
       >
         <div className="grid gap-3 md:grid-cols-2">
-          <WindowCard icon={QrCode} label="QR scans" window={d.scans.total} />
+          <WindowCard
+            icon={QrCode}
+            label="QR scans"
+            window={d.scans.total}
+            toFor={(w) => `/admin/referrals?range=${w === "today" ? "7" : w === "d7" ? "7" : "30"}`}
+          />
           <SnapshotCard
             icon={Radio}
             label="Signups via referral (7d)"
             value={fmt(d.scans.partnerSignups7d)}
+            to="/admin/referrals?range=7"
           />
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
@@ -202,8 +215,18 @@ function AdminOverview() {
         subtitle="What's actually being created, boosted and paid for."
       >
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          <WindowCard icon={ListChecks} label="Listings created" window={d.productivity.listingsCreated} />
-          <WindowCard icon={Rocket} label="Boosts sold" window={d.productivity.boostsSold} />
+          <WindowCard
+            icon={ListChecks}
+            label="Listings created"
+            window={d.productivity.listingsCreated}
+            toFor={() => "/admin/listings?status=all"}
+          />
+          <WindowCard
+            icon={Rocket}
+            label="Boosts sold"
+            window={d.productivity.boostsSold}
+            toFor={() => "/admin/payments"}
+          />
           <WindowCard icon={MessagesSquare} label="Messages sent" window={d.productivity.messagesSent} />
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
@@ -211,17 +234,24 @@ function AdminOverview() {
             icon={ListChecks}
             label="Active listings"
             value={fmt(d.productivity.activeListings)}
+            to="/admin/listings?status=active"
           />
           <SnapshotCard
             icon={Wallet}
             label="Listings awaiting payment"
             value={fmt(d.productivity.pendingPayment)}
+            to="/admin/listings?status=pending_payment"
           />
-          <RevenueCard label="Revenue (paid)" window={d.productivity.revenue} />
+          <RevenueCard
+            label="Revenue (paid)"
+            window={d.productivity.revenue}
+            toFor={() => "/admin/payments"}
+          />
           <SnapshotCard
             icon={Wallet}
             label="Revenue — all time"
             value={formatPHP(Number(d.productivity.revenueTotal) || 0)}
+            to="/admin/payments"
           />
         </div>
       </Section>
@@ -258,32 +288,49 @@ function SnapshotCard({
   label,
   value,
   hint,
+  to,
 }: {
   icon: IconType;
   label: string;
   value: string;
   hint?: string;
+  to?: string;
 }) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-4">
+  const body = (
+    <>
       <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
         <Icon className="h-3.5 w-3.5" />
         {label}
       </div>
       <div className="mt-2 font-display text-2xl font-bold">{value}</div>
       {hint ? <div className="mt-0.5 text-[11px] text-muted-foreground">{hint}</div> : null}
-    </div>
+    </>
   );
+  if (to) {
+    return (
+      <Link
+        to={to}
+        className="block rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/40"
+      >
+        {body}
+      </Link>
+    );
+  }
+  return <div className="rounded-xl border border-border bg-card p-4">{body}</div>;
 }
+
+type WindowKey = "today" | "d7" | "d30";
 
 function WindowCard({
   icon: Icon,
   label,
   window,
+  toFor,
 }: {
   icon: IconType;
   label: string;
   window: OverviewWindow;
+  toFor?: (w: WindowKey) => string;
 }) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
@@ -292,15 +339,23 @@ function WindowCard({
         {label}
       </div>
       <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-        <TripletCell label="Today" value={fmt(window.today)} />
-        <TripletCell label="7d" value={fmt(window.d7)} />
-        <TripletCell label="30d" value={fmt(window.d30)} />
+        <TripletCell label="Today" value={fmt(window.today)} to={toFor?.("today")} />
+        <TripletCell label="7d" value={fmt(window.d7)} to={toFor?.("d7")} />
+        <TripletCell label="30d" value={fmt(window.d30)} to={toFor?.("d30")} />
       </div>
     </div>
   );
 }
 
-function RevenueCard({ label, window }: { label: string; window: OverviewRevenue }) {
+function RevenueCard({
+  label,
+  window,
+  toFor,
+}: {
+  label: string;
+  window: OverviewRevenue;
+  toFor?: (w: WindowKey) => string;
+}) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -308,23 +363,31 @@ function RevenueCard({ label, window }: { label: string; window: OverviewRevenue
         {label}
       </div>
       <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-        <TripletCell label="Today" value={formatPHP(Number(window.today) || 0)} />
-        <TripletCell label="7d" value={formatPHP(Number(window.d7) || 0)} />
-        <TripletCell label="30d" value={formatPHP(Number(window.d30) || 0)} />
+        <TripletCell label="Today" value={formatPHP(Number(window.today) || 0)} to={toFor?.("today")} />
+        <TripletCell label="7d" value={formatPHP(Number(window.d7) || 0)} to={toFor?.("d7")} />
+        <TripletCell label="30d" value={formatPHP(Number(window.d30) || 0)} to={toFor?.("d30")} />
       </div>
     </div>
   );
 }
 
-function TripletCell({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg bg-muted/40 py-1.5">
+function TripletCell({ label, value, to }: { label: string; value: string; to?: string }) {
+  const body = (
+    <>
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className="mt-0.5 truncate font-display text-sm font-semibold" title={value}>
         {value}
       </div>
-    </div>
+    </>
   );
+  if (to) {
+    return (
+      <Link to={to} className="block rounded-lg bg-muted/40 py-1.5 transition-colors hover:bg-muted">
+        {body}
+      </Link>
+    );
+  }
+  return <div className="rounded-lg bg-muted/40 py-1.5">{body}</div>;
 }
 
 function HealthCard({
@@ -387,28 +450,31 @@ function TopReferrerList({
       ) : (
         <ul className="space-y-1.5">
           {rows.map((r, i) => (
-            <li
-              key={`${r.code}-${i}`}
-              className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-muted/30 px-3 py-2 text-sm"
-            >
-              <div className="min-w-0">
-                <div className="truncate font-medium">{r.name || r.code}</div>
-                <div className="truncate text-[11px] text-muted-foreground">
-                  Code {r.code}
+            <li key={`${r.code}-${i}`}>
+              <Link
+                to="/admin/referrals"
+                search={{ search: r.code } as any}
+                className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-muted/30 px-3 py-2 text-sm transition-colors hover:bg-muted"
+              >
+                <div className="min-w-0">
+                  <div className="truncate font-medium">{r.name || r.code}</div>
+                  <div className="truncate text-[11px] text-muted-foreground">
+                    Code {r.code}
+                  </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="font-display text-sm font-semibold">{fmt(r.scans)}</div>
-                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  scans
+                <div className="text-right">
+                  <div className="font-display text-sm font-semibold">{fmt(r.scans)}</div>
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    scans
+                  </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="font-display text-sm font-semibold">{fmt(r.signups)}</div>
-                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  signups
+                <div className="text-right">
+                  <div className="font-display text-sm font-semibold">{fmt(r.signups)}</div>
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    signups
+                  </div>
                 </div>
-              </div>
+              </Link>
             </li>
           ))}
         </ul>

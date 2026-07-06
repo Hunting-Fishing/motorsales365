@@ -45,6 +45,9 @@ import {
 } from "@/lib/admin-listings.functions";
 
 export const Route = createFileRoute("/admin/listings")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    status: typeof search.status === "string" ? (search.status as string) : undefined,
+  }),
   component: AdminListings,
 });
 
@@ -102,7 +105,10 @@ function sellerName(p: any): string {
 }
 
 function AdminListings() {
-  const [tab, setTab] = useState<string>("active");
+  const initialStatus = Route.useSearch().status;
+  const [tab, setTab] = useState<string>(
+    initialStatus && STATUS_TABS.some((s) => s.value === initialStatus) ? initialStatus : "active",
+  );
   const [category, setCategory] = useState<string>("all");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");

@@ -1,61 +1,44 @@
 ## Goal
 
-Every QR scan and referral-driven signup must be captured, attributed, and visible everywhere (admin overview, partner/staff drilldowns, rep manage view, referred users list). Today several code paths silently drop or mis-count them.
+Turn the Admin Overview cards into deep links so admins can drill from any KPI into the underlying rows, pre-filtered to the window (today / 7d / 30d) they clicked.
 
-## Bugs found
+## Changes
 
-1. **Sales-rep QR scan count always 0.** `src/lib/sales-rep.functions.ts` (lines ~232 and ~988) queries `qr_scans` by `staff_referral_id` and `created_at`, but the columns are `referral_code` and `scanned_at`. The query never matches, so every rep dashboard reports 0 scans.
-2. **Referred users list misses signup-only users.** The drilldown is built only from `referral_redemptions` — a user who signed up via a QR code but never redeemed a discount never appears. `user_referrals` (which the DB trigger populates on every signup) is ignored.
-3. **Admin Overview "Top staff / Top partners" signups column is wrong.** `admin_overview()` counts `referral_redemptions WHERE kind='signup'` for the signups column — that only counts users who *both* signed up *and* consumed a signup-bonus promotion. The screenshot's "10 SCANS / 0 SIGNUPS" is this bug. Should count from `user_referrals`.
-4. **`partnerSignups7d` snapshot has the same bug** (also reads `referral_redemptions`). Should use `user_referrals`.
-5. **QR posters don't tag scans as "qr".** All `/r/{code}` share URLs (poster page, admin qr-ads, referrals table, staff QR auth) are emitted without `?src=qr`, so `qr-landing-content.tsx` records every scan as `signup_source=link`. Verification tooling and reports that expect `signup_source='qr'` for poster/QR-origin signups will always show 0.
-6. **Signup form doesn't force the code from `/r/{code}` deep links.** `useEffect` reads only the credited-code cookie; the poster/QR flow works fine when the user visits `/r/CODE` first (that page calls `recordTouch`), but a direct `?ref=CODE` on `/signup` isn't parsed as a fallback. Low priority but included for completeness.
+### 1. `src/routes/admin.index.tsx` — make cards linkable
 
-## Fix plan
+- Convert `SnapshotCard`, `WindowCard`, `RevenueCard`, and `TopReferrerList` rows from plain `<div>`s into `<Link>`s (keep current visuals; add hover state consistent with `HealthCard`).
+- `WindowCard` / `RevenueCard` render one link per triplet cell (Today / 7d / 30d) so each window is its own destination.
+- Wire destinations:
+  - **Top 365 staff / Top partners rows** → `/admin/sales-reps?rep=<code>` (jumps to that rep's detail).
+  - **New signups (window)** → `/admin/accounts?range=today|7d|30d&sort=signup_desc`.
+  - **Total users / Verified sellers / Active accounts / Founding members** → `/admin/accounts` with the matching filter (`verified=1`, `active=1`, `founding=1`).
+  - **QR scans (window)** → `/admin/referrals?range=…`.
+  - **Signups via referral (7d)** → `/admin/referrals?range=7d&signups=1`.
+  - **Listings created (window)** → `/admin/listings?range=today|7d|30d`.
+  - **Active listings** → `/admin/listings?status=active`.
+  - **Listings awaiting payment** → `/admin/listings?status=pending_payment`.
+  - **Boosts sold (window)** → `/admin/payments?kind=boost&range=…`.
+  - **Revenue (paid) window cells** → `/admin/payments?status=paid&range=today|7d|30d`.
+  - **Revenue — all time** → `/admin/payments?status=paid`.
+  - **Messages sent** → no admin messages route today; keep non-clickable (call this out).
 
-### A. Data-integrity fixes (server / SQL)
+### 2. Destination routes — accept the search params and apply filters
 
-1. Replace `qr_scans` query in `getRepStats` and `adminGetSalesRepDetail` (`src/lib/sales-rep.functions.ts`) with the correct shape:
-   `from("qr_scans").select("id", { count: "exact", head: true }).in("referral_code", refCodes).gte("scanned_at", since)`.
-2. New migration `fix_qr_signup_attribution.sql` that rewrites `admin_overview()`:
-   - `partnerSignups7d` → `SELECT count(*) FROM user_referrals WHERE created_at >= d7 AND referred_by_staff_id IS NOT NULL` (falls back to first_referral_code if staff link missing).
-   - `topStaff.signups` and `topPartners.signups` → `count(*) FROM user_referrals ur WHERE (ur.credited_referral_code = s.referral_code OR ur.first_referral_code = s.referral_code) AND ur.created_at >= d30`. This surfaces every referred signup, credited or not.
-3. In the same migration, expose a per-rep helper the drilldown can join on: keep queries in the app but make sure `user_referrals` has the indexes we already have on `first_referral_code`/`credited_referral_code` (already present per existing migrations — verify only, no schema change if present).
+For each destination, add `validateSearch` (zod) that parses the new params and wires them into the existing query/filter state so the page opens already filtered. Keep current UI; only pre-seed filters + add a small "Filtered from Overview: <label> — clear" chip that clears the search params.
 
-### B. Complete "Referred users" tab (rep drilldown)
+- **`src/routes/admin.sales-reps.tsx`** — extend existing `validateSearch` (already reads `q`) to also read `rep` and, when present, open the rep detail drawer/tab for that referral code on mount.
+- **`src/routes/admin.accounts.tsx`** — add `validateSearch` for `range`, `verified`, `active`, `founding`, `sort`; apply to the existing list query.
+- **`src/routes/admin.listings.tsx`** — add `validateSearch` for `range` and `status`; apply to the listings query.
+- **`src/routes/admin.payments.tsx`** — add `validateSearch` for `range`, `status`, `kind`; apply to the payments query.
+- **`src/routes/admin.referrals.tsx`** — add `validateSearch` for `range` and `signups`; apply to the scans/signups query.
 
-In `adminGetSalesRepDetail` (`src/lib/sales-rep.functions.ts`):
-- After building the `byUser` map from `referral_redemptions`, also fetch `user_referrals` rows for `refCodes` (`credited_referral_code IN (...) OR first_referral_code IN (...)`).
-- Merge each referred user into `byUser` with `redemptions=0`, `spent_php=0`, `signup_only=true` when absent; keep spend fields when present.
-- Enrich profile rows for the new user IDs (name/email/phone/city).
-- Extend the table in `src/routes/admin.sales-reps.tsx` "Referred users" tab:
-  - Add a "Source" column ("QR"/"Link"/"Direct") from `profiles.signup_source`.
-  - Add a filter option "Signup only" alongside "With spend" / "No spend".
-  - Update the totals row to include the total signup count (already-present spend/commission totals remain).
-  - CSV export already reads the memoised list, so it picks up the new rows automatically.
-- The existing drilldown drawer (`ReferredUserDrilldown`) already tolerates zero redemptions; verify the empty-state copy reads "No transactions yet — signup only".
+`range` helper (shared in `src/lib/date-range.ts`) returns `{ from, to }` for `today | 7d | 30d` in the app's timezone; destinations use it uniformly.
 
-### C. Overview payout breakdown correctness
+### 3. No backend changes
 
-`adminGetSalesRepOverview` uses the same referral-redemption source. Update the Overview tab's "per-user split" list to iterate the merged list so signup-only users appear with 0 commission and are counted in "referred users total" (they don't affect payout math but should be visible).
+All numbers on Overview already come from `admin_overview()`; the destination pages already query the same underlying tables. This work is purely routing + client-side filter wiring — no migrations, no RPC changes.
 
-### D. QR-vs-link source tagging
+## Out of scope
 
-Append `?src=qr` to every URL used for a printable/QR context so `qr-landing-content.tsx` records `signup_source=qr`:
-- `src/routes/admin.advertisements.qr-ads.tsx` (line ~160 and poster preview)
-- `src/routes/admin.referrals.tsx` (share/poster/CSV builders, lines ~289, ~626, ~886–887, ~1308, ~1355, ~1469)
-- `src/lib/staff-qr-auth.functions.ts` (line 79)
-- `src/components/share-qr.tsx` sample link
-- Anywhere the QR image encodes the URL (share-qr and template preview)
-Plain web share links (copy-link buttons that are not QR-encoded) stay as-is so `signup_source` stays "link".
-
-### E. Signup form fallback
-
-In `src/routes/signup.tsx`, extend the `useEffect` that loads `refCode` to also check `URLSearchParams` for `ref` / `r` / `code` and to persist via `recordTouch(code, srcParam === "qr" ? "qr" : "link")` before falling back to `getCreditedCode()`. This guarantees a direct `/signup?ref=CODE&src=qr` link is attributed even if cookies were blocked.
-
-## Technical notes
-
-- `user_referrals` is already populated by the `attach_signup_referral` trigger on `auth.users` insert, gated by Partner Program accreditation for the `credited_referral_code` column. Reporting on `first_referral_code OR credited_referral_code` captures *all* referred signups; commission-relevant reads keep using `credited_referral_code` only.
-- No schema changes to `qr_scans`, `user_referrals`, `referral_redemptions`, or `profiles` — only a function rewrite + client-side query fixes + URL tagging.
-- Migration file will follow the standard `CREATE OR REPLACE FUNCTION public.admin_overview()` shape and re-grant is unnecessary (function already exists).
-- After migration, verify with a `supabase--read_query` sample: top partners for Dieter/Jocelyn should show non-zero signups if `user_referrals` rows exist.
+- Building a new "admin messages" route (Messages sent card stays non-clickable).
+- Redesigning the destination pages; only their filter inputs get pre-seeded.
