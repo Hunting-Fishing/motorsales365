@@ -299,7 +299,14 @@ function AdminUsers() {
           q = q.is("signup_intent", null);
         } else {
           q = q.eq("signup_intent", intentFilter);
-        }
+      }
+      if (evalSourceFilter === "auto") {
+        q = q.is("intent_evaluated_by", null).not("intent_evaluated_at", "is", null);
+      } else if (evalSourceFilter === "manual") {
+        q = q.not("intent_evaluated_by", "is", null);
+      } else if (evalSourceFilter === "never") {
+        q = q.is("intent_evaluated_at", null);
+      }
       }
       if (verFilter !== "all") {
         if (verFilter === "unverified") {
