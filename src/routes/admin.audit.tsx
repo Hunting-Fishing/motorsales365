@@ -49,6 +49,15 @@ const ACTION_LABEL: Record<string, string> = {
   referral_revoked: "Referral revoked",
 };
 
+// Row-level label for intent_recomputed rows, distinguishing manual vs auto.
+function intentSourceLabel(r: Row): string {
+  if (r.action !== "intent_recomputed") return ACTION_LABEL[r.action] ?? r.action;
+  const src = (r.metadata as any)?.source;
+  if (src === "auto") return "Intent recomputed (auto)";
+  if (src === "manual") return "Intent recomputed (manual)";
+  return "Intent recomputed";
+}
+
 function fmt(ts: string) {
   const d = new Date(ts);
   return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
