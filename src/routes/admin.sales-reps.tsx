@@ -1169,6 +1169,31 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
                                   {r.email ?? r.user_id.slice(0, 8)}
                                 </div>
                               </td>
+                              <td className="whitespace-nowrap px-3 py-2 text-xs">
+                                <span className={
+                                  r.signup_source === "qr"
+                                    ? "rounded bg-primary/10 px-1.5 py-0.5 font-medium text-primary"
+                                    : r.signup_source === "link"
+                                      ? "rounded bg-muted px-1.5 py-0.5 text-muted-foreground"
+                                      : "text-muted-foreground"
+                                }>
+                                  {r.signup_source === "qr"
+                                    ? "QR"
+                                    : r.signup_source === "link"
+                                      ? "Link"
+                                      : "Direct"}
+                                </span>
+                                {r.signup_only ? (
+                                  <span className="ml-1 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400">
+                                    signup only
+                                  </span>
+                                ) : null}
+                                {r.credited === false ? (
+                                  <span className="ml-1 rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground" title="Referrer not Partner Program accredited">
+                                    not credited
+                                  </span>
+                                ) : null}
+                              </td>
                               <td className="whitespace-nowrap px-3 py-2 text-xs text-muted-foreground">
                                 {r.signed_up_at
                                   ? new Date(r.signed_up_at).toLocaleDateString()
