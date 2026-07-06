@@ -23,6 +23,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { generateStaffMagicLink } from "@/lib/admin-magic-link.functions";
 import { listStaffUserIds } from "@/lib/admin-staff.functions";
+import { recomputeUserIntents } from "@/lib/admin-recompute-intent.functions";
 import {
   Dialog,
   DialogContent,
