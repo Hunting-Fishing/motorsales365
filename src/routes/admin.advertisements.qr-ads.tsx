@@ -157,7 +157,7 @@ function AdminQrAdsPage() {
       name: staff.full_name,
       firstName: staff.full_name.split(" ")[0] || staff.full_name,
       code: staff.referral_code,
-      link: `${origin}/r/${staff.referral_code}`,
+      link: `${origin}/r/${staff.referral_code}?src=qr`,
     };
   }, [staff]);
 
