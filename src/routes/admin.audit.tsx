@@ -44,6 +44,9 @@ const ACTION_LABEL: Record<string, string> = {
   verification_changed: "Verification changed",
   seller_type_changed: "Seller type changed",
   permission_changed: "Permission changed",
+  intent_recomputed: "Intent recomputed",
+  referral_approved: "Referral approved",
+  referral_revoked: "Referral revoked",
 };
 
 function fmt(ts: string) {
