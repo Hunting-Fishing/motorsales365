@@ -288,32 +288,49 @@ function SnapshotCard({
   label,
   value,
   hint,
+  to,
 }: {
   icon: IconType;
   label: string;
   value: string;
   hint?: string;
+  to?: string;
 }) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-4">
+  const body = (
+    <>
       <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
         <Icon className="h-3.5 w-3.5" />
         {label}
       </div>
       <div className="mt-2 font-display text-2xl font-bold">{value}</div>
       {hint ? <div className="mt-0.5 text-[11px] text-muted-foreground">{hint}</div> : null}
-    </div>
+    </>
   );
+  if (to) {
+    return (
+      <Link
+        to={to}
+        className="block rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/40"
+      >
+        {body}
+      </Link>
+    );
+  }
+  return <div className="rounded-xl border border-border bg-card p-4">{body}</div>;
 }
+
+type WindowKey = "today" | "d7" | "d30";
 
 function WindowCard({
   icon: Icon,
   label,
   window,
+  toFor,
 }: {
   icon: IconType;
   label: string;
   window: OverviewWindow;
+  toFor?: (w: WindowKey) => string;
 }) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
@@ -322,15 +339,23 @@ function WindowCard({
         {label}
       </div>
       <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-        <TripletCell label="Today" value={fmt(window.today)} />
-        <TripletCell label="7d" value={fmt(window.d7)} />
-        <TripletCell label="30d" value={fmt(window.d30)} />
+        <TripletCell label="Today" value={fmt(window.today)} to={toFor?.("today")} />
+        <TripletCell label="7d" value={fmt(window.d7)} to={toFor?.("d7")} />
+        <TripletCell label="30d" value={fmt(window.d30)} to={toFor?.("d30")} />
       </div>
     </div>
   );
 }
 
-function RevenueCard({ label, window }: { label: string; window: OverviewRevenue }) {
+function RevenueCard({
+  label,
+  window,
+  toFor,
+}: {
+  label: string;
+  window: OverviewRevenue;
+  toFor?: (w: WindowKey) => string;
+}) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -338,23 +363,31 @@ function RevenueCard({ label, window }: { label: string; window: OverviewRevenue
         {label}
       </div>
       <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-        <TripletCell label="Today" value={formatPHP(Number(window.today) || 0)} />
-        <TripletCell label="7d" value={formatPHP(Number(window.d7) || 0)} />
-        <TripletCell label="30d" value={formatPHP(Number(window.d30) || 0)} />
+        <TripletCell label="Today" value={formatPHP(Number(window.today) || 0)} to={toFor?.("today")} />
+        <TripletCell label="7d" value={formatPHP(Number(window.d7) || 0)} to={toFor?.("d7")} />
+        <TripletCell label="30d" value={formatPHP(Number(window.d30) || 0)} to={toFor?.("d30")} />
       </div>
     </div>
   );
 }
 
-function TripletCell({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg bg-muted/40 py-1.5">
+function TripletCell({ label, value, to }: { label: string; value: string; to?: string }) {
+  const body = (
+    <>
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className="mt-0.5 truncate font-display text-sm font-semibold" title={value}>
         {value}
       </div>
-    </div>
+    </>
   );
+  if (to) {
+    return (
+      <Link to={to} className="block rounded-lg bg-muted/40 py-1.5 transition-colors hover:bg-muted">
+        {body}
+      </Link>
+    );
+  }
+  return <div className="rounded-lg bg-muted/40 py-1.5">{body}</div>;
 }
 
 function HealthCard({
