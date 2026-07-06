@@ -21,7 +21,7 @@ import { siteOrigin } from "@/lib/site-config";
 
 type ChecklistItem = { label: string; done: boolean; required: boolean };
 
-function buildChecklist(profile: any, totpEnabled: boolean): ChecklistItem[] {
+function buildChecklist(profile: any): ChecklistItem[] {
   const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
   const isStaff = profile?.seller_type === "staff";
   const has = (v: any) => (typeof v === "string" ? v.trim().length > 0 : !!v);
