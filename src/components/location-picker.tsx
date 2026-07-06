@@ -147,7 +147,7 @@ export function LocationPicker({
   className,
   stacked = false,
 }: Props) {
-  const regionOpts = useMemo(() => PSGC.map((r) => regionLabel(r)), []);
+  const regionOpts = useMemo(() => [ALL_PH_REGION, ...PSGC.map((r) => regionLabel(r))], []);
   const provinces = useMemo(() => provincesOf(value.region), [value.region]);
   const cities = useMemo(
     () => citiesOf(value.region, value.province),
