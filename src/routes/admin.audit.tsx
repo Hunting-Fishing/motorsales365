@@ -49,6 +49,15 @@ const ACTION_LABEL: Record<string, string> = {
   referral_revoked: "Referral revoked",
 };
 
+// Row-level label for intent_recomputed rows, distinguishing manual vs auto.
+function intentSourceLabel(r: Row): string {
+  if (r.action !== "intent_recomputed") return ACTION_LABEL[r.action] ?? r.action;
+  const src = (r.metadata as any)?.source;
+  if (src === "auto") return "Intent recomputed (auto)";
+  if (src === "manual") return "Intent recomputed (manual)";
+  return "Intent recomputed";
+}
+
 function fmt(ts: string) {
   const d = new Date(ts);
   return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
@@ -65,7 +74,7 @@ function downloadCsv(filename: string, rows: Row[], nameOf: (id: string) => stri
     lines.push(
       [
         fmt(r.created_at),
-        ACTION_LABEL[r.action] ?? r.action,
+        intentSourceLabel(r),
         r.entity_type ? `${r.entity_type}:${r.entity_id ?? ""}` : "",
         nameOf(r.target_user_id),
         r.field,
@@ -140,7 +149,13 @@ function UserActionsTab() {
         .select("*", { count: "exact" })
         .order("created_at", { ascending: false });
 
-      if (actionFilter !== "all") q = q.eq("action", actionFilter);
+      if (actionFilter === "intent_recomputed_manual") {
+        q = q.eq("action", "intent_recomputed").eq("metadata->>source", "manual");
+      } else if (actionFilter === "intent_recomputed_auto") {
+        q = q.eq("action", "intent_recomputed").eq("metadata->>source", "auto");
+      } else if (actionFilter !== "all") {
+        q = q.eq("action", actionFilter);
+      }
 
       if (search) {
         if (/^[0-9a-f-]{8,}$/i.test(search)) {
@@ -213,7 +228,9 @@ function UserActionsTab() {
             <SelectItem value="verification_changed">Verification changed</SelectItem>
             <SelectItem value="seller_type_changed">Seller type changed</SelectItem>
             <SelectItem value="permission_changed">Permission changed</SelectItem>
-            <SelectItem value="intent_recomputed">Intent recomputed</SelectItem>
+            <SelectItem value="intent_recomputed">Intent recomputed (all)</SelectItem>
+            <SelectItem value="intent_recomputed_manual">Intent recomputed (manual)</SelectItem>
+            <SelectItem value="intent_recomputed_auto">Intent recomputed (auto)</SelectItem>
             <SelectItem value="referral_approved">Referral approved</SelectItem>
             <SelectItem value="referral_revoked">Referral revoked</SelectItem>
           </SelectContent>
@@ -260,7 +277,7 @@ function UserActionsTab() {
                   {fmt(r.created_at)}
                 </td>
                 <td className="px-3 py-2">
-                  <Badge variant="secondary">{ACTION_LABEL[r.action] ?? r.action}</Badge>
+                  <Badge variant="secondary">{intentSourceLabel(r)}</Badge>
                 </td>
                 <td className="px-3 py-2 text-xs">
                   {r.entity_type ? (

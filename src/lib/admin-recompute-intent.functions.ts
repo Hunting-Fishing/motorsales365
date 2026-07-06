@@ -120,6 +120,7 @@ export const recomputeUserIntents = createServerFn({ method: "POST" })
             old_value: prev ?? null,
             new_value: next,
             note: "Recomputed via /admin/users",
+            metadata: { source: "manual" },
           } as any);
         } catch {
           // audit failure is non-fatal
