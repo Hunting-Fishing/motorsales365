@@ -139,6 +139,20 @@ function AdminUsers() {
     }
   };
 
+  type IntentPreviewRow = {
+    user_id: string;
+    full_name: string | null;
+    previous: string | null;
+    next: string;
+    changed: boolean;
+  };
+  const [intentPreview, setIntentPreview] = useState<{
+    rows: IntentPreviewRow[];
+    wouldChange: number;
+    unchanged: number;
+  } | null>(null);
+  const [confirmBusy, setConfirmBusy] = useState(false);
+
   const handleRecomputeOne = async (userId: string) => {
     setIntentBusyId(userId);
     try {
@@ -154,20 +168,6 @@ function AdminUsers() {
       setIntentBusyId(null);
     }
   };
-
-  type IntentPreviewRow = {
-    user_id: string;
-    full_name: string | null;
-    previous: string | null;
-    next: string;
-    changed: boolean;
-  };
-  const [intentPreview, setIntentPreview] = useState<{
-    rows: IntentPreviewRow[];
-    wouldChange: number;
-    unchanged: number;
-  } | null>(null);
-  const [confirmBusy, setConfirmBusy] = useState(false);
 
   const handleRecomputeVisible = async () => {
     const ids = users.map((u) => u.id);
