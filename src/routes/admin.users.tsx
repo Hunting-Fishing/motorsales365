@@ -195,18 +195,49 @@ function AdminUsers() {
 
       const ids = (profs ?? []).map((p) => p.id);
       const roleMap = new Map<string, string[]>();
+      const refMap = new Map<
+        string,
+        { code: string; staffName: string | null; staffId: string | null }
+      >();
       if (ids.length > 0) {
-        const { data: roles } = await supabase
-          .from("user_roles")
-          .select("user_id,role")
-          .in("user_id", ids);
+        const [{ data: roles }, { data: refs }] = await Promise.all([
+          supabase.from("user_roles").select("user_id,role").in("user_id", ids),
+          supabase
+            .from("user_referrals")
+            .select("user_id,credited_referral_code,first_referral_code,referred_by_staff_id")
+            .in("user_id", ids),
+        ]);
         (roles ?? []).forEach((r: any) => {
           const arr = roleMap.get(r.user_id) ?? [];
           arr.push(r.role);
           roleMap.set(r.user_id, arr);
         });
+        const refRows = refs ?? [];
+        const staffIdsToLookup = Array.from(
+          new Set(refRows.map((r: any) => r.referred_by_staff_id).filter(Boolean)),
+        );
+        const staffNameMap = new Map<string, string | null>();
+        if (staffIdsToLookup.length > 0) {
+          const { data: staffProfs } = await supabase
+            .from("profiles")
+            .select("id,full_name")
+            .in("id", staffIdsToLookup);
+          (staffProfs ?? []).forEach((s: any) => staffNameMap.set(s.id, s.full_name ?? null));
+        }
+        refRows.forEach((r: any) => {
+          const code = r.credited_referral_code ?? r.first_referral_code;
+          if (!code) return;
+          refMap.set(r.user_id, {
+            code,
+            staffId: r.referred_by_staff_id ?? null,
+            staffName: r.referred_by_staff_id
+              ? staffNameMap.get(r.referred_by_staff_id) ?? null
+              : null,
+          });
+        });
       }
       setUsers((profs ?? []).map((p) => ({ ...p, roles: roleMap.get(p.id) ?? [] })));
+      setReferralMap(refMap);
       setTotal(count ?? 0);
     } finally {
       setLoading(false);
@@ -217,7 +248,8 @@ function AdminUsers() {
     load();
     // reason: `load` is recreated each render; depend only on its inputs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, search, roleFilter, sellerFilter, verFilter, staffIds]);
+  }, [page, pageSize, search, roleFilter, sellerFilter, verFilter, intentFilter, staffIds]);
+
   useEffect(() => {
     setPage(0);
   }, [pageSize]);
