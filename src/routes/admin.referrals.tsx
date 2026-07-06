@@ -59,6 +59,12 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { siteOrigin } from "@/lib/site-config";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  listReferralAccreditation,
+  setReferralAccreditation,
+} from "@/lib/admin-referral-accreditation.functions";
+import { ShieldCheck, ShieldOff } from "lucide-react";
 
 export const Route = createFileRoute("/admin/referrals")({
   component: AdminReferrals,
