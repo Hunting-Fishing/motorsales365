@@ -291,10 +291,27 @@ function UserActionsTab() {
                 </td>
                 <td className="px-3 py-2">{nameOf(r.target_user_id)}</td>
                 <td className="px-3 py-2 text-xs">
-                  <span className="text-muted-foreground">{r.field}:</span>{" "}
-                  <span className="line-through text-muted-foreground">{r.old_value ?? "—"}</span>
-                  {" → "}
-                  <span className="font-medium">{r.new_value ?? "—"}</span>
+                  <div>
+                    <span className="text-muted-foreground">{r.field}:</span>{" "}
+                    <span className="line-through text-muted-foreground">{r.old_value ?? "—"}</span>
+                    {" → "}
+                    <span className="font-medium">{r.new_value ?? "—"}</span>
+                  </div>
+                  {(() => {
+                    const m = (r.metadata as any) ?? {};
+                    if (!m.changed_field) return null;
+                    return (
+                      <div className="mt-0.5 text-[11px] text-muted-foreground">
+                        triggered by <span className="font-mono">{m.changed_field}</span>:{" "}
+                        <span className="line-through">{m.changed_old ?? "—"}</span>
+                        {" → "}
+                        <span className="font-medium text-foreground">{m.changed_new ?? "—"}</span>
+                        {m.trigger ? (
+                          <span className="ml-1 opacity-70">({m.trigger})</span>
+                        ) : null}
+                      </div>
+                    );
+                  })()}
                 </td>
                 <td className="px-3 py-2 text-xs">{nameOf(r.actor_id)}</td>
               </tr>
