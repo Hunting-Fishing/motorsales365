@@ -14,6 +14,17 @@ export type PSGCRegion = {
 
 export const PSGC: PSGCRegion[] = psgcData as PSGCRegion[];
 
+/**
+ * Sentinel value stored in the `region` text column when a user / business
+ * operates nationwide (no province or city lock). Recognised app-wide by
+ * every region picker, filter, and validation path.
+ */
+export const ALL_PH_REGION = "All Philippines";
+
+export function isAllPhilippines(region: string | null | undefined): boolean {
+  return !!region && region.trim() === ALL_PH_REGION;
+}
+
 export function regionLabel(r: PSGCRegion): string {
   // e.g. "NCR — National Capital Region"
   if (r.regionName === r.name) return r.name;
@@ -22,10 +33,20 @@ export function regionLabel(r: PSGCRegion): string {
 
 export function findRegionByLabel(label: string | null | undefined): PSGCRegion | undefined {
   if (!label) return undefined;
+  if (isAllPhilippines(label)) {
+    return {
+      code: "PH",
+      name: ALL_PH_REGION,
+      regionName: ALL_PH_REGION,
+      provinces: [],
+      cities: [],
+    };
+  }
   return PSGC.find((r) => regionLabel(r) === label || r.name === label || r.regionName === label);
 }
 
 export function provincesOf(regionLabel: string | null | undefined): string[] {
+  if (isAllPhilippines(regionLabel)) return [];
   const r = findRegionByLabel(regionLabel);
   return r?.provinces.map((p) => p.name) ?? [];
 }
@@ -34,6 +55,7 @@ export function citiesOf(
   regionLabel: string | null | undefined,
   provinceName: string | null | undefined,
 ): string[] {
+  if (isAllPhilippines(regionLabel)) return [];
   const r = findRegionByLabel(regionLabel);
   if (!r) return [];
   if (provinceName) {
@@ -44,7 +66,11 @@ export function citiesOf(
   return r.cities;
 }
 
-export const REGION_OPTIONS = PSGC.map((r) => ({ value: regionLabel(r), label: regionLabel(r) }));
+export const REGION_OPTIONS = [
+  { value: ALL_PH_REGION, label: `${ALL_PH_REGION} (nationwide)` },
+  ...PSGC.map((r) => ({ value: regionLabel(r), label: regionLabel(r) })),
+];
+
 
 // --- Fuzzy resolution from free-text (e.g. reverse-geocoded place names) ---
 

@@ -14,7 +14,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { PSGC, regionLabel, provincesOf, citiesOf, resolvePsgc } from "@/lib/psgc";
+import { PSGC, regionLabel, provincesOf, citiesOf, resolvePsgc, ALL_PH_REGION } from "@/lib/psgc";
 
 export type LocationValue = {
   region?: string | null;
@@ -147,7 +147,7 @@ export function LocationPicker({
   className,
   stacked = false,
 }: Props) {
-  const regionOpts = useMemo(() => PSGC.map((r) => regionLabel(r)), []);
+  const regionOpts = useMemo(() => [ALL_PH_REGION, ...PSGC.map((r) => regionLabel(r))], []);
   const provinces = useMemo(() => provincesOf(value.region), [value.region]);
   const cities = useMemo(
     () => citiesOf(value.region, value.province),
@@ -256,11 +256,13 @@ export function LocationPicker({
           placeholder={
             !value.region
               ? "Pick a region first"
-              : provinces.length === 0
-                ? "No provinces (HUC/NCR)"
-                : asFilter
-                  ? "All provinces"
-                  : "Select province"
+              : value.region === ALL_PH_REGION
+                ? "Nationwide — no province"
+                : provinces.length === 0
+                  ? "No provinces (HUC/NCR)"
+                  : asFilter
+                    ? "All provinces"
+                    : "Select province"
           }
           searchPlaceholder="Search province…"
           emptyText="No province found."
@@ -277,17 +279,20 @@ export function LocationPicker({
           placeholder={
             !value.region
               ? "Pick a region first"
-              : cities.length === 0
-                ? "Pick a province first"
-                : asFilter
-                  ? "All cities"
-                  : "Select city"
+              : value.region === ALL_PH_REGION
+                ? "Nationwide — no city"
+                : cities.length === 0
+                  ? "Pick a province first"
+                  : asFilter
+                    ? "All cities"
+                    : "Select city"
           }
           searchPlaceholder="Search city or municipality…"
           emptyText="No city or municipality found."
           value={value.city}
           options={cities}
           disabled={!value.region || cities.length === 0}
+
           asFilter={asFilter}
           clearLabel="All cities"
           onChange={(v) => onChange({ ...value, city: v })}

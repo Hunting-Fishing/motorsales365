@@ -70,8 +70,10 @@ const Body = z
     phone_iso: z.string().trim().min(2).max(2),
     phone_national: z.string().trim().min(1).max(30),
     signup_region: z.string().trim().min(1).max(120),
-    signup_province: z.string().trim().min(1).max(120),
-    signup_city: z.string().trim().min(1).max(120),
+    // Province/city optional when signup_region === "All Philippines" (nationwide).
+    signup_province: z.string().trim().max(120).optional().default(""),
+    signup_city: z.string().trim().max(120).optional().default(""),
+
     // Personal address (required unless business-like)
     street_address: z.string().trim().max(200).optional().default(""),
     postal_code: z.string().trim().max(20).optional().default(""),
@@ -86,7 +88,26 @@ const Body = z
     origin: z.string().trim().url().max(500),
     agreed: z.literal(true),
   })
-  .strict();
+  .strict()
+  .superRefine((val, ctx) => {
+    if (val.signup_region.trim() !== "All Philippines") {
+      if (!val.signup_province || val.signup_province.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["signup_province"],
+          message: "Province is required unless region is All Philippines",
+        });
+      }
+      if (!val.signup_city || val.signup_city.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["signup_city"],
+          message: "City is required unless region is All Philippines",
+        });
+      }
+    }
+  });
+
 
 const POSTAL_RE = /^[A-Za-z0-9][A-Za-z0-9 \-]{2,10}$/;
 const ADDRESS_MIN = 5;

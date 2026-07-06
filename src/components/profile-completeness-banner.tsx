@@ -58,6 +58,7 @@ const isEmpty = (v: unknown) =>
 
 export function ProfileCompletenessBanner({ userId }: { userId: string | undefined }) {
   const [profile, setProfile] = useState<any>(null);
+  const [biz, setBiz] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [dismissed, setDismissed] = useState(false);
 
@@ -72,15 +73,24 @@ export function ProfileCompletenessBanner({ userId }: { userId: string | undefin
       return;
     }
     (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select(
-          "seller_type,signup_intent,is_staff_account,first_name,last_name,phone,phone_e164,personal_email,signup_region,signup_province,signup_city,street_address,postal_code,business_name,business_kind,business_address,business_postal_code,business_region,business_province,business_city",
-        )
-        .eq("id", userId)
-        .maybeSingle();
+      const [{ data: profileRow }, { data: bizRow }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select(
+            "seller_type,signup_intent,is_staff_account,first_name,last_name,phone,phone_e164,personal_email,signup_region,signup_province,signup_city,street_address,postal_code,business_name,business_kind,business_address,business_postal_code,business_region,business_province,business_city",
+          )
+          .eq("id", userId)
+          .maybeSingle(),
+        supabase
+          .from("businesses")
+          .select("name,type_slug,region,province,city,barangay")
+          .eq("owner_id", userId)
+          .limit(1)
+          .maybeSingle(),
+      ]);
       if (!cancelled) {
-        setProfile(data);
+        setProfile(profileRow);
+        setBiz(bizRow ?? null);
         setLoading(false);
       }
     })();
@@ -100,35 +110,48 @@ export function ProfileCompletenessBanner({ userId }: { userId: string | undefin
       seller === "business" ||
       seller === "dealer";
 
-    const required: FieldKey[] = [
-      "first_name",
-      "last_name",
-      "personal_email",
-      "signup_region",
-      "signup_province",
-      "signup_city",
-    ];
+    // Fall back to the user's owned business row for business_* fields —
+    // that's the source of truth for the business identity; profiles.business_*
+    // are legacy duplicate columns that many flows don't write.
+    const bizName = profile.business_name ?? biz?.name ?? null;
+    const bizKind = profile.business_kind ?? biz?.type_slug ?? null;
+    const bizRegion = profile.business_region ?? biz?.region ?? null;
+    const bizProvince = profile.business_province ?? biz?.province ?? null;
+    const bizCity = profile.business_city ?? biz?.city ?? null;
+
+    // Region set to "All Philippines" means nationwide — province/city not required.
+    const personalNationwide = String(profile.signup_region ?? "").trim() === "All Philippines";
+    const bizNationwide = String(bizRegion ?? "").trim() === "All Philippines";
+
+    const required: FieldKey[] = ["first_name", "last_name", "personal_email", "signup_region"];
+    if (!personalNationwide) required.push("signup_province", "signup_city");
     // phone: either phone_e164 or phone is fine
     const phoneMissing = isEmpty(profile.phone_e164) && isEmpty(profile.phone);
 
+    const check: Record<string, unknown> = { ...profile };
     if (isBusiness) {
+      check.business_name = bizName;
+      check.business_kind = bizKind;
+      check.business_region = bizRegion;
+      check.business_province = bizProvince;
+      check.business_city = bizCity;
       required.push(
         "business_name",
         "business_kind",
         "business_address",
         "business_postal_code",
         "business_region",
-        "business_province",
-        "business_city",
       );
+      if (!bizNationwide) required.push("business_province", "business_city");
     } else {
       required.push("street_address", "postal_code");
     }
 
-    const out = required.filter((k) => isEmpty(profile[k]));
+    const out = required.filter((k) => isEmpty(check[k]));
     if (phoneMissing) out.splice(2, 0, "phone_e164");
     return out;
-  }, [profile]);
+  }, [profile, biz]);
+
 
   if (loading || dismissed || !profile || missing.length === 0) return null;
 

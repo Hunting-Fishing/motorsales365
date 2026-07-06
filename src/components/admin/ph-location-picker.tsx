@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { PSGC, regionLabel, citiesOf } from "@/lib/psgc";
+import { PSGC, regionLabel, citiesOf, ALL_PH_REGION } from "@/lib/psgc";
 
 const ANY = "__any__";
 
@@ -29,18 +29,19 @@ export function PhLocationPicker({
   compact?: boolean;
 }) {
   const regionOptions = useMemo(
-    () => PSGC.map((r) => regionLabel(r)).sort((a, b) => a.localeCompare(b)),
+    () => [ALL_PH_REGION, ...PSGC.map((r) => regionLabel(r)).sort((a, b) => a.localeCompare(b))],
     [],
   );
 
   const cityOptions = useMemo(() => {
-    if (!region) return [];
+    if (!region || region === ALL_PH_REGION) return [];
     const r = PSGC.find((x) => regionLabel(x) === region);
     if (!r) return [];
     const all = new Set<string>(r.cities);
     for (const p of r.provinces) for (const c of p.cities) all.add(c);
     return Array.from(all).sort((a, b) => a.localeCompare(b));
   }, [region]);
+
 
   return (
     <>
@@ -70,10 +71,18 @@ export function PhLocationPicker({
         <Select
           value={city || ANY}
           onValueChange={(v) => onChange({ region, city: v === ANY ? "" : v })}
-          disabled={!region}
+          disabled={!region || region === ALL_PH_REGION}
         >
           <SelectTrigger>
-            <SelectValue placeholder={region ? "Any city" : "Pick a region first"} />
+            <SelectValue
+              placeholder={
+                region === ALL_PH_REGION
+                  ? "Nationwide — no city"
+                  : region
+                    ? "Any city"
+                    : "Pick a region first"
+              }
+            />
           </SelectTrigger>
           <SelectContent className="max-h-72">
             <SelectItem value={ANY}>Any city</SelectItem>
@@ -85,6 +94,7 @@ export function PhLocationPicker({
           </SelectContent>
         </Select>
       </div>
+
     </>
   );
 }
