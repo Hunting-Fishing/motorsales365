@@ -664,6 +664,21 @@ function AdminUsers() {
                     </span>
                   </div>
                 )}
+                {(u as any).intent_evaluated_at && (
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    Intent evaluated {formatDate((u as any).intent_evaluated_at)}
+                    {(u as any).intent_evaluated_by && (
+                      <>
+                        {" by "}
+                        <span className="font-medium text-foreground">
+                          {evaluatorNames.get((u as any).intent_evaluated_by) ??
+                            `${String((u as any).intent_evaluated_by).slice(0, 8)}…`}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
+
 
                 <div className="mt-2 flex flex-wrap gap-1">
                   {STAFF_ROLES.map((role) => {
