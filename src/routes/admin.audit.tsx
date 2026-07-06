@@ -127,13 +127,14 @@ function AdminAudit() {
 }
 
 function UserActionsTab() {
+  const initial = Route.useSearch();
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [actionFilter, setActionFilter] = useState("all");
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
+  const [actionFilter, setActionFilter] = useState(initial.action ?? "all");
+  const [searchInput, setSearchInput] = useState(initial.q ?? "");
+  const [search, setSearch] = useState(initial.q ?? "");
   const [names, setNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
