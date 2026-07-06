@@ -27,8 +27,11 @@ export function IntentEvaluatedFooter({
   if (!evaluatedAt) return null;
 
   const isManual = !!evaluatedBy;
-  const displayName =
-    evaluatorName ?? (evaluatedBy ? `${String(evaluatedBy).slice(0, 8)}…` : null);
+  // When the evaluator's profile name can't be resolved, fall back to a
+  // clear human label ("an admin") rather than a raw uuid fragment so the
+  // footer never renders "by 8chars…" or an empty "by ".
+  const trimmedName = evaluatorName?.trim() ? evaluatorName.trim() : null;
+  const displayName = trimmedName ?? (isManual ? "an admin" : null);
 
   return (
     <div
