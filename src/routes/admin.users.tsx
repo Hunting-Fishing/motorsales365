@@ -663,15 +663,23 @@ function AdminUsers() {
                   </div>
                 )}
                 {(u as any).intent_evaluated_at && (
-                  <div className="mt-1 text-xs text-muted-foreground">
-                    Intent evaluated {formatDate((u as any).intent_evaluated_at)}
-                    {(u as any).intent_evaluated_by && (
+                  <div className="mt-1 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+                    <span>Intent evaluated {formatDate((u as any).intent_evaluated_at)}</span>
+                    {(u as any).intent_evaluated_by ? (
                       <>
-                        {" by "}
-                        <span className="font-medium text-foreground">
-                          {evaluatorNames.get((u as any).intent_evaluated_by) ??
-                            `${String((u as any).intent_evaluated_by).slice(0, 8)}…`}
+                        <Badge variant="outline" className="h-4 px-1 text-[10px]">Manual</Badge>
+                        <span>
+                          by{" "}
+                          <span className="font-medium text-foreground">
+                            {evaluatorNames.get((u as any).intent_evaluated_by) ??
+                              `${String((u as any).intent_evaluated_by).slice(0, 8)}…`}
+                          </span>
                         </span>
+                      </>
+                    ) : (
+                      <>
+                        <Badge variant="secondary" className="h-4 px-1 text-[10px]">Auto</Badge>
+                        <span>by system trigger</span>
                       </>
                     )}
                   </div>
