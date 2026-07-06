@@ -13,7 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
 import { PhoneInput } from "@/components/phone-input";
 import { AvatarUploader } from "@/components/avatar-uploader";
-import { TotpSetupCard } from "@/components/totp-setup-card";
+// TotpSetupCard removed — two-factor auth is "coming soon".
 import { buildE164, parseE164 } from "@/data/country-codes";
 import { useCurrency } from "@/lib/currency";
 import { saveProfile } from "@/lib/profile.functions";
@@ -21,7 +21,7 @@ import { siteOrigin } from "@/lib/site-config";
 
 type ChecklistItem = { label: string; done: boolean; required: boolean };
 
-function buildChecklist(profile: any, totpEnabled: boolean): ChecklistItem[] {
+function buildChecklist(profile: any): ChecklistItem[] {
   const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
   const isStaff = profile?.seller_type === "staff";
   const has = (v: any) => (typeof v === "string" ? v.trim().length > 0 : !!v);
@@ -37,12 +37,9 @@ function buildChecklist(profile: any, totpEnabled: boolean): ChecklistItem[] {
       required: true,
     },
     { label: "Profile photo", done: has(profile?.avatar_url), required: false },
-    { label: "Two-factor authentication (authenticator app)", done: totpEnabled, required: !isStaff },
+    { label: "Two-factor authentication — coming soon", done: false, required: false },
   ];
-  if (isStaff) {
-    // Staff don't need business fields; require 2FA instead.
-    items[items.length - 1].required = true;
-  }
+
   if (isBusiness) {
     items.push(
       { label: "Business name", done: has(profile?.business_name), required: true },
@@ -67,7 +64,7 @@ export const Route = createFileRoute("/dashboard/profile")({
 function ProfilePage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
-  const [totpEnabled, setTotpEnabled] = useState(false);
+  
   const [saving, setSaving] = useState(false);
   const isStaffEmail = (user?.email ?? "").toLowerCase().endsWith("@365motorsales.com");
 
@@ -161,10 +158,8 @@ function ProfilePage() {
         const seed = data?.phone_e164 || data?.phone || "";
         setProfilePhone(parseE164(seed));
       });
-    supabase.auth.mfa.listFactors().then(({ data }) => {
-      const verified = (data?.totp ?? []).some((f: any) => f.status === "verified");
-      setTotpEnabled(verified);
-    });
+    // Two-factor auth is "coming soon" — no MFA factor check.
+
   }, [user]);
 
   const removePhone = async () => {
@@ -231,7 +226,7 @@ function ProfilePage() {
   return (
     <div className="max-w-2xl">
       <h1 className="mb-6 font-display text-2xl font-bold">Profile</h1>
-      <ProfileCompletion profile={profile} totpEnabled={totpEnabled} />
+      <ProfileCompletion profile={profile} />
       {profile.is_founding_member && (
         <div className="mb-4 flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
           <span className="text-2xl">✨</span>
@@ -487,8 +482,24 @@ function ProfilePage() {
         </div>
       </div>
 
-      {/* Security: TOTP two-factor authentication (free, no SMS) */}
-      <TotpSetupCard />
+      {/* Security: two-factor authentication — coming soon */}
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="font-display text-lg font-bold">Security — Two-factor authentication</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Add an extra layer of security to your account with an authenticator app.
+            </p>
+          </div>
+          <span className="shrink-0 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Coming soon
+          </span>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Two-factor authentication isn't required yet — we'll notify you here when setup is available.
+        </p>
+      </section>
+
     </div>
   );
 }
@@ -543,8 +554,9 @@ function CurrencyPreferenceCard() {
   );
 }
 
-function ProfileCompletion({ profile, totpEnabled }: { profile: any; totpEnabled: boolean }) {
-  const items = buildChecklist(profile, totpEnabled);
+function ProfileCompletion({ profile }: { profile: any }) {
+  const items = buildChecklist(profile);
+
   const required = items.filter((i) => i.required);
   const requiredDone = required.filter((i) => i.done).length;
   const totalDone = items.filter((i) => i.done).length;
