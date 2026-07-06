@@ -18,7 +18,13 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { listRouteAuditLog, type RouteAuditRow } from "@/lib/route-audit.functions";
 
+type AuditSearch = { action?: string; q?: string };
+
 export const Route = createFileRoute("/admin/audit")({
+  validateSearch: (s: Record<string, unknown>): AuditSearch => ({
+    action: typeof s.action === "string" ? s.action : undefined,
+    q: typeof s.q === "string" ? s.q : undefined,
+  }),
   component: AdminAudit,
 });
 
