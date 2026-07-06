@@ -47,7 +47,12 @@ function deriveIntent(args: {
 export const recomputeUserIntents = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
-    z.object({ userIds: z.array(z.string().uuid()).min(1).max(500) }).parse(d),
+    z
+      .object({
+        userIds: z.array(z.string().uuid()).min(1).max(500),
+        dryRun: z.boolean().optional().default(false),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
@@ -71,8 +76,19 @@ export const recomputeUserIntents = createServerFn({ method: "POST" })
       (businesses ?? []).map((r: any) => r.owner_id).filter(Boolean),
     );
 
+    // Fetch names for preview when running dry-run.
+    const nameMap = new Map<string, string | null>();
+    if (data.dryRun) {
+      const { data: named } = await supabaseAdmin
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", data.userIds);
+      (named ?? []).forEach((r: any) => nameMap.set(r.id, r.full_name ?? null));
+    }
+
     const results: Array<{
       user_id: string;
+      full_name: string | null;
       previous: string | null;
       next: Intent;
       changed: boolean;
@@ -85,7 +101,7 @@ export const recomputeUserIntents = createServerFn({ method: "POST" })
         ownsBusiness: ownerSet.has((p as any).id),
       });
       const changed = prev !== next;
-      if (changed) {
+      if (changed && !data.dryRun) {
         const { error: uErr } = await supabaseAdmin
           .from("profiles")
           .update({ signup_intent: next })
@@ -105,11 +121,19 @@ export const recomputeUserIntents = createServerFn({ method: "POST" })
           // audit failure is non-fatal
         }
       }
-      results.push({ user_id: (p as any).id, previous: prev, next, changed });
+      results.push({
+        user_id: (p as any).id,
+        full_name: nameMap.get((p as any).id) ?? null,
+        previous: prev,
+        next,
+        changed,
+      });
     }
 
     return {
-      updated: results.filter((r) => r.changed).length,
+      dryRun: !!data.dryRun,
+      updated: data.dryRun ? 0 : results.filter((r) => r.changed).length,
+      wouldChange: results.filter((r) => r.changed).length,
       unchanged: results.filter((r) => !r.changed).length,
       results,
     };

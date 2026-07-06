@@ -157,18 +157,55 @@ function AdminUsers() {
     }
   };
 
+  type IntentPreviewRow = {
+    user_id: string;
+    full_name: string | null;
+    previous: string | null;
+    next: string;
+    changed: boolean;
+  };
+  const [intentPreview, setIntentPreview] = useState<{
+    rows: IntentPreviewRow[];
+    wouldChange: number;
+    unchanged: number;
+  } | null>(null);
+  const [confirmBusy, setConfirmBusy] = useState(false);
+
   const handleRecomputeVisible = async () => {
     const ids = users.map((u) => u.id);
     if (ids.length === 0) return;
     setBulkIntentBusy(true);
     try {
-      const res = await recomputeIntents({ data: { userIds: ids } });
-      toast.success(`Re-evaluated ${ids.length} users · ${res.updated} updated, ${res.unchanged} unchanged`);
-      if (res.updated > 0) load();
+      const res = await recomputeIntents({ data: { userIds: ids, dryRun: true } });
+      setIntentPreview({
+        rows: res.results as IntentPreviewRow[],
+        wouldChange: res.wouldChange,
+        unchanged: res.unchanged,
+      });
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to recompute intents");
+      toast.error(e?.message ?? "Failed to preview intents");
     } finally {
       setBulkIntentBusy(false);
+    }
+  };
+
+  const handleConfirmRecompute = async () => {
+    if (!intentPreview) return;
+    const ids = intentPreview.rows.filter((r) => r.changed).map((r) => r.user_id);
+    if (ids.length === 0) {
+      setIntentPreview(null);
+      return;
+    }
+    setConfirmBusy(true);
+    try {
+      const res = await recomputeIntents({ data: { userIds: ids } });
+      toast.success(`Updated ${res.updated} user${res.updated === 1 ? "" : "s"}`);
+      setIntentPreview(null);
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to apply changes");
+    } finally {
+      setConfirmBusy(false);
     }
   };
 
@@ -454,7 +491,7 @@ function AdminUsers() {
             title="Recompute signup intent badges for all users on this page from profile + business data"
           >
             <RefreshCw className={`mr-1 h-4 w-4 ${bulkIntentBusy ? "animate-spin" : ""}`} />
-            {bulkIntentBusy ? "Re-evaluating…" : "Re-evaluate intents"}
+            {bulkIntentBusy ? "Previewing…" : "Re-evaluate intents"}
           </Button>
           <AddUserDialog onCreated={load} />
           {isSuperAdmin && (
@@ -785,6 +822,80 @@ function AdminUsers() {
               Copy link
             </Button>
             <Button onClick={() => setMagicLink(null)}>Done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!intentPreview} onOpenChange={(o) => !o && !confirmBusy && setIntentPreview(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Re-evaluate signup intents</DialogTitle>
+            <DialogDescription>
+              Preview of derived intent for the {intentPreview?.rows.length ?? 0} users on this page.
+              Only rows marked <strong>Change</strong> will be written; unchanged rows are skipped.
+            </DialogDescription>
+          </DialogHeader>
+
+          {intentPreview && (
+            <>
+              <div className="rounded-md border border-border bg-muted/40 p-2 text-sm">
+                <strong>{intentPreview.wouldChange}</strong> to change ·{" "}
+                <span className="text-muted-foreground">{intentPreview.unchanged} unchanged</span>
+              </div>
+
+              {intentPreview.wouldChange === 0 ? (
+                <div className="rounded-md border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
+                  Nothing to update — all users already match their derived intent.
+                </div>
+              ) : (
+                <div className="rounded-md border border-border overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead className="bg-muted/40 text-left text-muted-foreground">
+                      <tr>
+                        <th className="px-2 py-1.5 font-medium">User</th>
+                        <th className="px-2 py-1.5 font-medium">Current</th>
+                        <th className="px-2 py-1.5 font-medium">Will become</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {intentPreview.rows
+                        .filter((r) => r.changed)
+                        .map((r) => (
+                          <tr key={r.user_id} className="border-t border-border">
+                            <td className="px-2 py-1.5">{r.full_name ?? "(no name)"}</td>
+                            <td className="px-2 py-1.5 text-muted-foreground">
+                              {r.previous ?? "unset"}
+                            </td>
+                            <td className="px-2 py-1.5">
+                              <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 font-medium">
+                                {r.next}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              disabled={confirmBusy}
+              onClick={() => setIntentPreview(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={confirmBusy || (intentPreview?.wouldChange ?? 0) === 0}
+              onClick={handleConfirmRecompute}
+            >
+              {confirmBusy
+                ? "Applying…"
+                : `Apply ${intentPreview?.wouldChange ?? 0} change${(intentPreview?.wouldChange ?? 0) === 1 ? "" : "s"}`}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
