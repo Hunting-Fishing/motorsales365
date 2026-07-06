@@ -47,7 +47,12 @@ function deriveIntent(args: {
 export const recomputeUserIntents = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
-    z.object({ userIds: z.array(z.string().uuid()).min(1).max(500) }).parse(d),
+    z
+      .object({
+        userIds: z.array(z.string().uuid()).min(1).max(500),
+        dryRun: z.boolean().optional().default(false),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
