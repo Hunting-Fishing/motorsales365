@@ -625,6 +625,17 @@ function AdminUsers() {
             <SelectItem value="rejected">Rejected</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={evalSourceFilter} onValueChange={(v) => setEvalSourceFilter(v as any)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Intent evaluated by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All intent sources</SelectItem>
+            <SelectItem value="auto">Auto (system trigger)</SelectItem>
+            <SelectItem value="manual">Manual (admin)</SelectItem>
+            <SelectItem value="never">Never evaluated</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
