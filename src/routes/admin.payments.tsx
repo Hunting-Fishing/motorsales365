@@ -24,7 +24,16 @@ import { PaymentReviewDrawer } from "@/components/admin/payment-review-drawer";
 import { StripeGCashAdminPanel } from "@/components/admin/stripe-gcash-admin-panel";
 import { Download, Smartphone } from "lucide-react";
 
+const PAYMENTS_TABS = ["queue", "methods", "rails", "all"] as const;
+type PaymentsTab = (typeof PAYMENTS_TABS)[number];
+
 export const Route = createFileRoute("/admin/payments")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab:
+      typeof search.tab === "string" && (PAYMENTS_TABS as readonly string[]).includes(search.tab)
+        ? (search.tab as PaymentsTab)
+        : undefined,
+  }),
   component: AdminPayments,
 });
 
