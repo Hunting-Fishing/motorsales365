@@ -949,8 +949,8 @@ export const adminGetRepDetail = createServerFn({ method: "POST" })
         .in("status", ["open", "in_progress"]),
       supabaseAdmin
         .from("admin_audit_log")
-        .select("id, action, created_at, actor_id, target_type, target_id, notes")
-        .eq("target_id", repId)
+        .select("id, action, created_at, actor_id, entity_type, entity_id, note, field")
+        .eq("target_user_id", repId)
         .order("created_at", { ascending: false })
         .limit(10),
     ]);
