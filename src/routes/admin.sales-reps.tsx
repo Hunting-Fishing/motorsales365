@@ -1659,6 +1659,148 @@ function AccountCard({
   );
 }
 
+function PayoutBreakdown({ detail, loading }: { detail: any; loading: boolean }) {
+  const s = detail?.stats;
+  if (loading && !s) {
+    return (
+      <div className="rounded-md border p-3 text-xs text-muted-foreground">
+        <Loader2 className="mr-2 inline h-3 w-3 animate-spin" /> Loading payout breakdown…
+      </div>
+    );
+  }
+  if (!s) return null;
+
+  const rate: number = Number(s.commissionRate ?? 0.1);
+  const overrideActive = !!s.commissionRateOverrideActive;
+  const siteDefault: number = Number(s.commissionRateSiteDefault ?? 0.1);
+  const paid = Number(s.payoutPaidPhp ?? 0);
+  const owed = Number(s.payoutOwedPhpEstimated ?? 0);
+  const commissionTotal = Number(s.lifetimeCommissionPhpEstimated ?? 0);
+  const users: any[] = detail?.referredUsers ?? [];
+  const topUsers = [...users]
+    .sort((a, b) => Number(b.commission_php) - Number(a.commission_php))
+    .slice(0, 10);
+
+  return (
+    <section className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold">Payout breakdown</h3>
+        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+          <span>Rate</span>
+          <Badge variant={overrideActive ? "secondary" : "outline"}>
+            {(rate * 100).toFixed(2)}% {overrideActive ? "(override)" : "(site default)"}
+          </Badge>
+          {overrideActive && (
+            <span>site default {(siteDefault * 100).toFixed(2)}%</span>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <KpiCard
+          label="Lifetime referred revenue"
+          value={`₱${formatMoney(s.lifetimeSpentPhp ?? 0)}`}
+          hint={`${s.lifetimeRedemptions ?? 0} redemptions · ${s.lifetimeReferredUsers ?? 0} users`}
+        />
+        <KpiCard
+          label="Discounts given"
+          value={`₱${formatMoney(s.lifetimeDiscountPhp ?? 0)}`}
+          hint="Total off through this rep's codes"
+        />
+        <KpiCard
+          label="Commission earned"
+          value={`₱${formatMoney(commissionTotal)}`}
+          hint={`Revenue × ${(rate * 100).toFixed(2)}%`}
+        />
+        <KpiCard label="Amount paid" value={`₱${formatMoney(paid)}`} hint="Recorded payouts" />
+        <KpiCard
+          label="Outstanding balance"
+          value={`₱${formatMoney(owed)}`}
+          hint="Owed to rep"
+        />
+        <KpiCard
+          label="This window revenue"
+          value={`₱${formatMoney(s.revenuePhp ?? 0)}`}
+          hint={`Last ${s.days ?? 30}d · commission ₱${formatMoney(
+            s.commissionPhpEstimated ?? 0,
+          )}`}
+        />
+      </div>
+
+      <div className="overflow-x-auto rounded-md border">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th className="px-3 py-2">User</th>
+              <th className="px-3 py-2 text-right">Redemptions</th>
+              <th className="px-3 py-2 text-right">Spent</th>
+              <th className="px-3 py-2 text-right">Rate</th>
+              <th className="px-3 py-2 text-right">Commission</th>
+              <th className="px-3 py-2 text-right">Share</th>
+            </tr>
+          </thead>
+          <tbody>
+            {topUsers.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-3 py-4 text-center text-xs text-muted-foreground">
+                  No referred users with tracked spend yet.
+                </td>
+              </tr>
+            ) : (
+              topUsers.map((u) => {
+                const share =
+                  commissionTotal > 0 ? (Number(u.commission_php) / commissionTotal) * 100 : 0;
+                return (
+                  <tr key={u.user_id} className="border-t align-top">
+                    <td className="px-3 py-2">
+                      <div className="font-medium">{u.name ?? "—"}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {u.email ?? u.user_id.slice(0, 8)}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 text-right">{u.redemptions}</td>
+                    <td className="px-3 py-2 text-right">₱{formatMoney(u.spent_php)}</td>
+                    <td className="px-3 py-2 text-right text-xs text-muted-foreground">
+                      {(Number(u.commission_rate) * 100).toFixed(2)}%
+                    </td>
+                    <td className="px-3 py-2 text-right font-medium">
+                      ₱{formatMoney(u.commission_php)}
+                    </td>
+                    <td className="px-3 py-2 text-right text-xs text-muted-foreground">
+                      {share.toFixed(1)}%
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+            <tr className="border-t bg-muted/30 font-medium">
+              <td className="px-3 py-2">
+                Totals {users.length > topUsers.length ? `(top ${topUsers.length} of ${users.length})` : ""}
+              </td>
+              <td></td>
+              <td className="px-3 py-2 text-right">
+                ₱{formatMoney(s.lifetimeSpentPhp ?? 0)}
+              </td>
+              <td></td>
+              <td className="px-3 py-2 text-right">₱{formatMoney(commissionTotal)}</td>
+              <td className="px-3 py-2 text-right text-xs text-muted-foreground">100%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-[11px] text-muted-foreground">
+        Commission ={" "}
+        <span className="font-mono">final_amount × {(rate * 100).toFixed(2)}%</span>. Amount paid
+        is 0 until a payouts table is introduced; outstanding balance equals total commission
+        earned. Figures are estimates.
+      </p>
+    </section>
+  );
+}
+
+
+
 function WeeklyBars({ data }: { data: { weekStart: string; count: number }[] }) {
   const max = Math.max(1, ...data.map((d) => d.count));
   return (
