@@ -369,6 +369,26 @@ function AdminUsers() {
       setUsers((profs ?? []).map((p) => ({ ...p, roles: roleMap.get(p.id) ?? [] })));
       setReferralMap(refMap);
       setTotal(count ?? 0);
+
+      // Look up display names for whoever last evaluated the intent badge.
+      const evaluatorIds = Array.from(
+        new Set(
+          (profs ?? [])
+            .map((p: any) => p.intent_evaluated_by)
+            .filter((v: any): v is string => !!v),
+        ),
+      );
+      if (evaluatorIds.length > 0) {
+        const { data: evalProfs } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", evaluatorIds);
+        const map = new Map<string, string | null>();
+        (evalProfs ?? []).forEach((r: any) => map.set(r.id, r.full_name ?? null));
+        setEvaluatorNames(map);
+      } else {
+        setEvaluatorNames(new Map());
+      }
     } finally {
       setLoading(false);
     }
