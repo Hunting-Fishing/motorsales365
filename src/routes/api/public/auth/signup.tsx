@@ -88,7 +88,26 @@ const Body = z
     origin: z.string().trim().url().max(500),
     agreed: z.literal(true),
   })
-  .strict();
+  .strict()
+  .superRefine((val, ctx) => {
+    if (val.signup_region.trim() !== "All Philippines") {
+      if (!val.signup_province || val.signup_province.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["signup_province"],
+          message: "Province is required unless region is All Philippines",
+        });
+      }
+      if (!val.signup_city || val.signup_city.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["signup_city"],
+          message: "City is required unless region is All Philippines",
+        });
+      }
+    }
+  });
+
 
 const POSTAL_RE = /^[A-Za-z0-9][A-Za-z0-9 \-]{2,10}$/;
 const ADDRESS_MIN = 5;
