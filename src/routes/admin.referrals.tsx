@@ -150,6 +150,7 @@ function AdminReferrals() {
   const [newOpen, setNewOpen] = useState(false);
   const [editing, setEditing] = useState<StaffRow | null>(null);
   const [promosFor, setPromosFor] = useState<StaffRow | null>(null);
+  const [verifyCode, setVerifyCode] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [search, setSearch] = useState("");
