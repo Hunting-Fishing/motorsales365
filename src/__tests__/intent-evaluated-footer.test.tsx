@@ -137,4 +137,50 @@ describe("IntentEvaluatedFooter — Auto vs Manual label derivation", () => {
       `/admin/audit?action=intent_recomputed_manual&q=${USER}`,
     );
   });
+
+  it("Auto link exposes a descriptive aria-label including the user id", () => {
+    render(
+      <IntentEvaluatedFooter
+        userId={USER}
+        evaluatedAt={AT}
+        evaluatedBy={null}
+        evaluatorName={null}
+      />,
+    );
+    const link = screen.getByRole("link", {
+      name: new RegExp(`automatic.*intent recompute.*${USER}`, "i"),
+    });
+    expect(link).toBeInTheDocument();
+  });
+
+  it("Manual link aria-label names the evaluator when available", () => {
+    render(
+      <IntentEvaluatedFooter
+        userId={USER}
+        evaluatedAt={AT}
+        evaluatedBy={ADMIN}
+        evaluatorName="Jane Admin"
+      />,
+    );
+    const link = screen.getByRole("link", {
+      name: /manual intent recompute.*Jane Admin/i,
+    });
+    expect(link).toBeInTheDocument();
+  });
+
+  it("Manual link aria-label falls back to the user id when evaluator name is missing", () => {
+    render(
+      <IntentEvaluatedFooter
+        userId={USER}
+        evaluatedAt={AT}
+        evaluatedBy={ADMIN}
+        evaluatorName={null}
+      />,
+    );
+    // Falls back to displayName "an admin" (from the missing-name fallback).
+    const link = screen.getByRole("link", {
+      name: /manual intent recompute.*an admin/i,
+    });
+    expect(link).toBeInTheDocument();
+  });
 });
