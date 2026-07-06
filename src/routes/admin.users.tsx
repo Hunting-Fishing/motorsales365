@@ -93,6 +93,12 @@ function AdminUsers() {
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [sellerFilter, setSellerFilter] = useState<string>("all");
   const [verFilter, setVerFilter] = useState<string>("all");
+  const [intentFilter, setIntentFilter] = useState<
+    "all" | "buyer" | "business" | "service_provider" | "unset"
+  >("all");
+  const [referralMap, setReferralMap] = useState<
+    Map<string, { code: string; staffName: string | null; staffId: string | null }>
+  >(new Map());
 
   // Debounce search input
   useEffect(() => {
@@ -106,7 +112,8 @@ function AdminUsers() {
   // Reset to first page when filters change
   useEffect(() => {
     setPage(0);
-  }, [roleFilter, sellerFilter, verFilter]);
+  }, [roleFilter, sellerFilter, verFilter, intentFilter]);
+
 
   const load = async () => {
     setLoading(true);
