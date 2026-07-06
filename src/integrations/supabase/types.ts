@@ -7760,6 +7760,8 @@ export type Database = {
           founding_member_number: number | null
           full_name: string | null
           id: string
+          intent_evaluated_at: string | null
+          intent_evaluated_by: string | null
           is_founding_member: boolean
           is_staff_account: boolean
           last_name: string | null
@@ -7815,6 +7817,8 @@ export type Database = {
           founding_member_number?: number | null
           full_name?: string | null
           id: string
+          intent_evaluated_at?: string | null
+          intent_evaluated_by?: string | null
           is_founding_member?: boolean
           is_staff_account?: boolean
           last_name?: string | null
@@ -7870,6 +7874,8 @@ export type Database = {
           founding_member_number?: number | null
           full_name?: string | null
           id?: string
+          intent_evaluated_at?: string | null
+          intent_evaluated_by?: string | null
           is_founding_member?: boolean
           is_staff_account?: boolean
           last_name?: string | null
