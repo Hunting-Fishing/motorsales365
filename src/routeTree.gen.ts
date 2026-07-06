@@ -226,6 +226,7 @@ import { Route as AdminAdvertisementsCampaignsRouteImport } from './routes/admin
 import { Route as AdminAdvertisementsApprovalsRouteImport } from './routes/admin.advertisements.approvals'
 import { Route as AdminAdvertisementsAnalyticsRouteImport } from './routes/admin.advertisements.analytics'
 import { Route as AdminAccountsBackfillRouteImport } from './routes/admin.accounts.backfill'
+import { Route as AuthenticatedStaffAcademyRouteImport } from './routes/_authenticated/staff.academy'
 import { Route as AuthenticatedDisputeReportIdRouteImport } from './routes/_authenticated/dispute.$reportId'
 import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './routes/_authenticated/dashboard.staff-requests'
 import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
@@ -275,6 +276,7 @@ import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/r
 import { Route as ApiPublicFlashcardsContentRouteImport } from './routes/api/public/flashcards.content'
 import { Route as ApiPublicAuthSignupRouteImport } from './routes/api/public/auth/signup'
 import { Route as AdminAdvertisementsAnalyticsCodeRouteImport } from './routes/admin.advertisements.analytics.$code'
+import { Route as AuthenticatedStaffAcademySlugRouteImport } from './routes/_authenticated/staff.academy.$slug'
 import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
@@ -1385,6 +1387,12 @@ const AdminAccountsBackfillRoute = AdminAccountsBackfillRouteImport.update({
   path: '/backfill',
   getParentRoute: () => AdminAccountsRoute,
 } as any)
+const AuthenticatedStaffAcademyRoute =
+  AuthenticatedStaffAcademyRouteImport.update({
+    id: '/staff/academy',
+    path: '/staff/academy',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDisputeReportIdRoute =
   AuthenticatedDisputeReportIdRouteImport.update({
     id: '/dispute/$reportId',
@@ -1668,6 +1676,12 @@ const AdminAdvertisementsAnalyticsCodeRoute =
     path: '/$code',
     getParentRoute: () => AdminAdvertisementsAnalyticsRoute,
   } as any)
+const AuthenticatedStaffAcademySlugRoute =
+  AuthenticatedStaffAcademySlugRouteImport.update({
+    id: '/$slug',
+    path: '/$slug',
+    getParentRoute: () => AuthenticatedStaffAcademyRoute,
+  } as any)
 const AuthenticatedDashboardClubsIdRoute =
   AuthenticatedDashboardClubsIdRouteImport.update({
     id: '/dashboard/clubs_/$id',
@@ -1866,6 +1880,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
@@ -1910,6 +1925,7 @@ export interface FileRoutesByFullPath {
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
@@ -2130,6 +2146,7 @@ export interface FileRoutesByTo {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
@@ -2173,6 +2190,7 @@ export interface FileRoutesByTo {
   '/admin/advertisements': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
@@ -2400,6 +2418,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/_authenticated/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/_authenticated/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/_authenticated/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
@@ -2444,6 +2463,7 @@ export interface FileRoutesById {
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/_authenticated/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
@@ -2671,6 +2691,7 @@ export interface FileRouteTypes {
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
+    | '/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
     | '/admin/advertisements/approvals'
@@ -2715,6 +2736,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/'
     | '/dashboard/team/'
     | '/dashboard/clubs/$id'
+    | '/staff/academy/$slug'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
     | '/api/public/flashcards/content'
@@ -2935,6 +2957,7 @@ export interface FileRouteTypes {
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
+    | '/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
     | '/admin/advertisements/approvals'
@@ -2978,6 +3001,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements'
     | '/dashboard/team'
     | '/dashboard/clubs/$id'
+    | '/staff/academy/$slug'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
     | '/api/public/flashcards/content'
@@ -3204,6 +3228,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/parts-wanted'
     | '/_authenticated/dashboard/staff-requests'
     | '/_authenticated/dispute/$reportId'
+    | '/_authenticated/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
     | '/admin/advertisements/approvals'
@@ -3248,6 +3273,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/'
     | '/dashboard/team/'
     | '/_authenticated/dashboard/clubs_/$id'
+    | '/_authenticated/staff/academy/$slug'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
     | '/api/public/flashcards/content'
@@ -4947,6 +4973,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAccountsBackfillRouteImport
       parentRoute: typeof AdminAccountsRoute
     }
+    '/_authenticated/staff/academy': {
+      id: '/_authenticated/staff/academy'
+      path: '/staff/academy'
+      fullPath: '/staff/academy'
+      preLoaderRoute: typeof AuthenticatedStaffAcademyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dispute/$reportId': {
       id: '/_authenticated/dispute/$reportId'
       path: '/dispute/$reportId'
@@ -5290,6 +5323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisementsAnalyticsCodeRouteImport
       parentRoute: typeof AdminAdvertisementsAnalyticsRoute
     }
+    '/_authenticated/staff/academy/$slug': {
+      id: '/_authenticated/staff/academy/$slug'
+      path: '/$slug'
+      fullPath: '/staff/academy/$slug'
+      preLoaderRoute: typeof AuthenticatedStaffAcademySlugRouteImport
+      parentRoute: typeof AuthenticatedStaffAcademyRoute
+    }
     '/_authenticated/dashboard/clubs_/$id': {
       id: '/_authenticated/dashboard/clubs_/$id'
       path: '/dashboard/clubs/$id'
@@ -5307,6 +5347,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedStaffAcademyRouteChildren {
+  AuthenticatedStaffAcademySlugRoute: typeof AuthenticatedStaffAcademySlugRoute
+}
+
+const AuthenticatedStaffAcademyRouteChildren: AuthenticatedStaffAcademyRouteChildren =
+  {
+    AuthenticatedStaffAcademySlugRoute: AuthenticatedStaffAcademySlugRoute,
+  }
+
+const AuthenticatedStaffAcademyRouteWithChildren =
+  AuthenticatedStaffAcademyRoute._addFileChildren(
+    AuthenticatedStaffAcademyRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCompleteProfileRoute: typeof AuthenticatedCompleteProfileRoute
   AuthenticatedAccountDisputesRoute: typeof AuthenticatedAccountDisputesRoute
@@ -5318,6 +5372,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
   AuthenticatedDashboardStaffRequestsRoute: typeof AuthenticatedDashboardStaffRequestsRoute
   AuthenticatedDisputeReportIdRoute: typeof AuthenticatedDisputeReportIdRoute
+  AuthenticatedStaffAcademyRoute: typeof AuthenticatedStaffAcademyRouteWithChildren
   AuthenticatedDashboardClubsIdRoute: typeof AuthenticatedDashboardClubsIdRoute
 }
 
@@ -5336,6 +5391,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardStaffRequestsRoute:
     AuthenticatedDashboardStaffRequestsRoute,
   AuthenticatedDisputeReportIdRoute: AuthenticatedDisputeReportIdRoute,
+  AuthenticatedStaffAcademyRoute: AuthenticatedStaffAcademyRouteWithChildren,
   AuthenticatedDashboardClubsIdRoute: AuthenticatedDashboardClubsIdRoute,
 }
 

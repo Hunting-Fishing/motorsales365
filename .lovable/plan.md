@@ -1,59 +1,68 @@
-## What's actually going on (verified in DB)
+## What's already there vs. what's missing
 
-The user in the screenshot is `jordilwbailey@gmail.com` (id `a3999f39…`, owner of business "Test Tow Company"). I pulled their real records:
+- `/learn` + `/dashboard/learning` — public automotive courses (parts, mechanics). Not staff training.
+- `/partner-training` — external partner schools directory. Not staff training.
+- `/help/*`, `/guidelines`, `/start-selling`, `/support` — public help pages for buyers/sellers.
+- `/admin/staff-365` — admin roster of staff accounts.
+- `/dashboard/staff` — seller's own staff (business seat management), NOT internal 365 training.
 
-**`profiles` row — what IS populated:**
-`first_name=365`, `last_name=MotorSales`, `full_name=365 MotorSales`, `phone_e164=+639696063830`, `signup_intent=business`, `business_address=#18 Estancia`, `business_postal_code=2912`, `avatar_url`, `verification_status=verified`, `is_founding_member=true`.
+**No dedicated internal staff training / knowledge hub exists.** That's what we need for Jocelyn, Marwin, Joan, etc.
 
-**`profiles` row — what is NULL** (this is exactly the 9 fields the banner lists):
-`personal_email`, `signup_region`, `signup_province`, `signup_city`, `business_name`, `business_kind`, `business_region`, `business_province`, `business_city`.
+## Build: `/staff/academy` — 365 Staff Academy
 
-**`businesses` row for the same user (the "completed form"):**
-`name="Test Tow Company"`, `type_slug=towing`, `region="Ilocos Region (I)"`, `province="Metro Manila"`, `city="Piddig"`, `phone`, `email`.
+An internal training / enablement hub gated to `@365motorsales.com` accounts (uses existing `isStaffEmail` helper in `src/lib/staff-domain.ts`).
 
-**Root cause:** the profile form for business users saves the business identity into the `businesses` table (correct — that's the source of truth). The `profiles.business_name / business_kind / business_region / business_province / business_city` columns are legacy duplicates that never get written by that flow. The completeness banner reads only `profiles.*`, so it reports those columns as missing even though the equivalent info exists on `businesses`. The personal fields (`signup_region/province/city`, `personal_email`) are genuinely still empty on this account.
+### Route structure (all under `_authenticated/`, `noindex,nofollow`)
 
-## Fix — Profile completeness banner
+```
+src/routes/_authenticated/staff.academy.tsx           → hub landing (categories + search + featured)
+src/routes/_authenticated/staff.academy.$slug.tsx     → article/guide reader
+```
 
-`src/components/profile-completeness-banner.tsx`
+Route gate: on mount check `isStaffEmail(user.email)`; if not staff → render a friendly "Staff-only" card with a link to `/support`. No SSR (already true for `_authenticated`).
 
-1. **Also load the user's `businesses` row** (`select("name,type_slug,region,province,city,barangay").eq("owner_id", userId).limit(1)`).
-2. When `signup_intent` is business/service_provider, treat each `business_*` field as satisfied if EITHER the profile column OR the corresponding column on the owned business row is populated:
-   - `business_name` ← `profile.business_name || biz.name`
-   - `business_kind` ← `profile.business_kind || biz.type_slug`
-   - `business_region` ← `profile.business_region || biz.region`
-   - `business_province` ← `profile.business_province || biz.province`
-   - `business_city` ← `profile.business_city || biz.city`
-3. Leave the personal fields (`signup_region/province/city`, `personal_email`, phone) untouched — those are legitimately missing on this account and the banner should still surface them.
-4. Keep the existing `is_staff_account` short-circuit as-is (per user's request, do NOT add an admin exemption).
-5. Update the `HASH_FOR` map so that when only `business_*` fields remain, "Edit profile" targets the business location section on `/dashboard/profile` (already `field-business_location`).
+### Landing page sections
 
-**Behavior after fix, for this specific user:** banner drops from 9 → 4 missing (personal email, signup region, signup province, signup city). Once they fill those, banner disappears.
+1. **Welcome / your name / staff badge** — pulls first name from `profiles`, shows current role (from `user_roles`) as a chip.
+2. **Search bar** — filters the article list client-side by title/tag/body excerpt.
+3. **Category tiles** (icon + short blurb + count):
+   - Selling Playbook — how to pitch 365 to sellers, walk them through posting a listing, boost, business claim
+   - Feature Guides — one card per major app area (Listings, Boosts, Businesses, Parts, Tow, QR referrals, Passport, Ads)
+   - Coming Soon — roadmap items with expected windows (Insurance compare, Live auctions, Vehicle history badges, Trade-in offers, Driver education hub, Loan/financing match — reuse existing `/roadmap-*` art)
+   - Infographics & Shareables — downloadable PNG/PDF one-pagers (already have `src/assets/qr-landing-uploaded/*` and `src/assets/referral/*`)
+   - Scripts & Objections — copy-paste sales scripts, objection-handling talking points
+   - Compliance & Policy — links to `/terms`, `/privacy`, `/refund-policy`, Partner Program disclosure, Clubs accreditation rules
+4. **Featured / recently updated** — latest 3 articles.
+5. **Ask for help** — link to internal Slack/email + `/support` fallback.
 
-## Fix — "All Regions / Full Philippines" option in every region picker
+### Content model
 
-Sentinel: store the literal string `"All Philippines"` in the region column (existing schema is text; no migration needed).
+Two flavors — pick per article — kept simple to avoid a heavy CMS:
 
-**Shared (`src/lib/psgc.ts`):**
-- Export `ALL_PH_REGION = "All Philippines"`.
-- Prepend it to `REGION_OPTIONS` so it's the first choice in every dropdown/combobox.
-- `provincesOf("All Philippines")` and `citiesOf("All Philippines", …)` return `[]` (province/city selects auto-disable with helper text "Nationwide — no province needed").
-- `findRegionByLabel("All Philippines")` returns a synthetic region so nothing crashes.
+- **Static MDX-style TSX articles** for polished playbooks. File-based under `src/content/staff-academy/*.tsx`. Each exports `{ meta, Body }` with `meta = { slug, title, description, category, tags, updatedAt, status: "active"|"coming-soon"|"draft", heroImage? }`. A small `staff-academy-index.ts` aggregates them. This is fastest to iterate on and version-controlled.
+- **Optional DB-backed articles** — only if the user wants non-devs to publish. Skipped in this first pass unless requested; add later as a `staff_academy_articles` table with RLS restricted to staff role.
 
-**Pickers that get the new option automatically via `REGION_OPTIONS` / `PSGC`:**
-- `src/components/location-picker.tsx` (main combobox picker used across dashboard/profile, signup, business edit, verification, sell, dispatch, admin dialogs)
-- `src/components/businesses/location-drilldown.tsx`
-- `src/components/admin/ph-location-picker.tsx`
-- `src/components/businesses/suggest-location-dialog.tsx`
+Initial content seed (10-12 articles) covering the categories above, each ~200-400 words + a hero image + 3-5 bullet key takeaways + "next steps" CTA. Use existing `src/assets/qr-landing-uploaded/*` and `src/assets/referral/*` covers where they fit; no new image generation in the first pass.
 
-When Region = All Philippines: force `province/city/barangay = null`, disable those inputs, show "Serves the entire Philippines."
+### Reader page (`staff.academy.$slug.tsx`)
 
-**Left as-is:** `src/components/businesses/map-filter-bar.tsx` — that's a radius/distance filter, "All Philippines" doesn't apply.
+- Hero image, title, category chip, "Last updated" date, status pill (Active / Coming Soon / Draft).
+- Body renders the TSX `<Body />` component (typographic prose using existing tokens).
+- Sticky sidebar (desktop): table of contents + "Related articles" (same category).
+- Footer: "Was this helpful?" thumbs up/down (writes to `form_feedback` table which already exists) + a "Suggest an edit" mailto to team@.
 
-**Filter/search behaviour** (list views must show nationwide businesses under every region filter): update the WHERE to `region.eq.<selected> OR region.eq."All Philippines"` in `src/routes/businesses.index.tsx`, `src/routes/browse.$category.tsx`, and the admin list routes.
+### Navigation entry points
 
-**Signup & validation:** in `src/routes/signup.tsx`, `src/routes/api/public/auth/signup.tsx`, and `src/__tests__/signup-validation.test.ts`, skip province/city required-checks when region = All Philippines and add a passing case.
+- Add "Academy" to the dashboard sidebar for staff users only (existing sidebar already conditionally hides sections based on role — piggyback the same check).
+- Add a Staff Academy card on `/admin/staff-365` linking to `/staff/academy` so admins can send new hires straight there.
 
-**Forms that must accept nationwide submit** (province/city no longer required when region = All Philippines): `dashboard.profile.tsx`, `businesses.submit.tsx`, `dashboard.businesses_.$id.edit.tsx`, `admin` add/edit user dialogs, `sell.tsx`, `dashboard.dispatch.tsx`, `dashboard.verification.tsx`.
+### Head / SEO
 
-**Not touched:** reverse-geocode ("Use my location") still resolves to a specific region; never auto-picks All Philippines. No DB migration. No backend function changes.
+`noindex,nofollow` on both routes (internal only). Route-specific `head()` titles like "Staff Academy — 365 Motor Sales" and per-article `head()`.
+
+### Out of scope for this pass
+
+- No DB table (all content in-repo).
+- No video hosting beyond linking to YouTube/Loom URLs already provided.
+- No progress tracking / certificates — that lives on `/learn` for public courses. Can be added later.
+- No new image generation — reuse existing uploaded assets. New hero art can be added incrementally.
