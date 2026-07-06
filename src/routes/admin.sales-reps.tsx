@@ -816,7 +816,9 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
   };
 
   return (
+    <>
     <Sheet open={!!repUserId} onOpenChange={(o) => !o && (setLastId(null), onClose())}>
+
       <SheetContent className="w-full overflow-y-auto sm:max-w-3xl">
         {rep ? (
           <>
