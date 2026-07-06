@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Copy, Eye, Info, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, Eye, Info, RefreshCw, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { generateStaffMagicLink } from "@/lib/admin-magic-link.functions";
 import { listStaffUserIds } from "@/lib/admin-staff.functions";
+import { recomputeUserIntents } from "@/lib/admin-recompute-intent.functions";
 import {
   Dialog,
   DialogContent,
@@ -104,9 +105,12 @@ function AdminUsers() {
   const canEditRoles = isAdmin || isSuperAdmin;
   const genMagicLink = useServerFn(generateStaffMagicLink);
   const fetchStaffIds = useServerFn(listStaffUserIds);
+  const recomputeIntents = useServerFn(recomputeUserIntents);
   const [staffIds, setStaffIds] = useState<Set<string>>(new Set());
   const [magicLink, setMagicLink] = useState<{ email: string; link: string } | null>(null);
   const [magicLoadingId, setMagicLoadingId] = useState<string | null>(null);
+  const [intentBusyId, setIntentBusyId] = useState<string | null>(null);
+  const [bulkIntentBusy, setBulkIntentBusy] = useState(false);
 
   // Load 365motorsales.com staff user IDs once for filtering + eye button gating.
   useEffect(() => {
@@ -132,6 +136,39 @@ function AdminUsers() {
       toast.error(e?.message ?? "Failed to generate sign-in link");
     } finally {
       setMagicLoadingId(null);
+    }
+  };
+
+  const handleRecomputeOne = async (userId: string) => {
+    setIntentBusyId(userId);
+    try {
+      const res = await recomputeIntents({ data: { userIds: [userId] } });
+      const r = res.results[0];
+      if (r?.changed) {
+        toast.success(`Intent updated: ${r.previous ?? "unset"} → ${r.next}`);
+        load();
+      } else {
+        toast.message(`Intent unchanged (${r?.next ?? "buyer"})`);
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to recompute intent");
+    } finally {
+      setIntentBusyId(null);
+    }
+  };
+
+  const handleRecomputeVisible = async () => {
+    const ids = users.map((u) => u.id);
+    if (ids.length === 0) return;
+    setBulkIntentBusy(true);
+    try {
+      const res = await recomputeIntents({ data: { userIds: ids } });
+      toast.success(`Re-evaluated ${ids.length} users · ${res.updated} updated, ${res.unchanged} unchanged`);
+      if (res.updated > 0) load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to recompute intents");
+    } finally {
+      setBulkIntentBusy(false);
     }
   };
 
@@ -409,6 +446,16 @@ function AdminUsers() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold">Users</h1>
         <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={bulkIntentBusy || loading || users.length === 0}
+            onClick={handleRecomputeVisible}
+            title="Recompute signup intent badges for all users on this page from profile + business data"
+          >
+            <RefreshCw className={`mr-1 h-4 w-4 ${bulkIntentBusy ? "animate-spin" : ""}`} />
+            {bulkIntentBusy ? "Re-evaluating…" : "Re-evaluate intents"}
+          </Button>
           <AddUserDialog onCreated={load} />
           {isSuperAdmin && (
             <AddUserDialog
@@ -595,6 +642,16 @@ function AdminUsers() {
                 )}
                 <EditProfileDialog user={u} onSaved={load} is365Staff={staffIds.has(u.id)} canEditRoles={canEditRoles} />
                 {isSuperAdmin && <ResetPasswordDialog user={u} />}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={intentBusyId === u.id}
+                  onClick={() => handleRecomputeOne(u.id)}
+                  title="Recompute this user's signup intent from seller type + business ownership"
+                >
+                  <RefreshCw className={`mr-1 h-4 w-4 ${intentBusyId === u.id ? "animate-spin" : ""}`} />
+                  {intentBusyId === u.id ? "…" : "Re-evaluate intent"}
+                </Button>
                 {isVerified ? (
                   <Button
                     size="sm"
