@@ -375,6 +375,36 @@ function AdminUsers() {
         </div>
       </div>
 
+      {/* Signup-intent tabs */}
+      <div className="mb-3 flex flex-wrap gap-1 rounded-lg border border-border bg-card p-1">
+        {(
+          [
+            { id: "all", label: "All" },
+            { id: "buyer", label: "Buyer / Private seller" },
+            { id: "business", label: "Business / Dealer" },
+            { id: "service_provider", label: "Service provider" },
+            { id: "unset", label: "No intent set" },
+          ] as const
+        ).map((t) => {
+          const active = intentFilter === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setIntentFilter(t.id)}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                active
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted"
+              }`}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+
+
       <div className="mb-4 grid gap-2 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="relative lg:col-span-2">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
