@@ -678,6 +678,8 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
     setRefFilter("all");
     setRefSort("commission_desc");
     setRefPage(1);
+    setDrilldownUserId(null);
+
     setForm({
       title: rep.rep_profile?.title ?? "",
       bio: rep.rep_profile?.bio ?? "",
