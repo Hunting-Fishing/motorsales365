@@ -736,6 +736,9 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
     let out = rows.filter((r) => {
       if (refFilter === "spend" && !(Number(r.spent_php) > 0)) return false;
       if (refFilter === "nospend" && Number(r.spent_php) > 0) return false;
+      if (refFilter === "signup_only" && !r.signup_only) return false;
+      if (refFilter === "qr" && (r.signup_source ?? "") !== "qr") return false;
+      if (refFilter === "link" && (r.signup_source ?? "") !== "link") return false;
       if (!q) return true;
       return (
         (r.name ?? "").toLowerCase().includes(q) ||
