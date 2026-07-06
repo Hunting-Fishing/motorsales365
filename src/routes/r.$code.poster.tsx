@@ -29,7 +29,7 @@ function ReferralPoster() {
         setName((data as any).full_name);
         setActive(Boolean((data as any).active));
       }
-      const url = `${siteOrigin()}/r/${code}`;
+      const url = `${siteOrigin()}/r/${code}?src=qr`;
       const png = await QRCode.toDataURL(url, { width: 900, margin: 1, errorCorrectionLevel: "H" });
       setQrDataUrl(png);
     })();
