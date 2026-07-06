@@ -26,14 +26,18 @@ export function getVisitorId(): string {
   return id;
 }
 
-export function recordTouch(code: string) {
+export type ReferralSource = "qr" | "link";
+
+export function recordTouch(code: string, source: ReferralSource = "link") {
   if (typeof window === "undefined") return;
   const first = getCookie("mref_first") || localStorage.getItem("mref_first");
   if (!first) {
     setCookie("mref_first", code);
     setCookie("mref_credit", code);
+    setCookie("mref_source", source);
     localStorage.setItem("mref_first", code);
     localStorage.setItem("mref_credit", code);
+    localStorage.setItem("mref_source", source);
   }
   setCookie("mref_last", code);
   localStorage.setItem("mref_last", code);
@@ -44,4 +48,12 @@ export function getCreditedCode(): string | null {
     getCookie("mref_credit") ||
     (typeof window !== "undefined" ? localStorage.getItem("mref_credit") : null)
   );
+}
+
+export function getCreditedSource(): "qr" | "link" | "direct" {
+  const src =
+    getCookie("mref_source") ||
+    (typeof window !== "undefined" ? localStorage.getItem("mref_source") : null);
+  if (src === "qr" || src === "link") return src;
+  return getCreditedCode() ? "link" : "direct";
 }
