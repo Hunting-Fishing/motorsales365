@@ -12123,10 +12123,20 @@ export type Database = {
         }[]
       }
       recompute_seller_rating: { Args: { _seller: string }; Returns: undefined }
-      recompute_signup_intent: {
-        Args: { _user_id: string }
-        Returns: undefined
-      }
+      recompute_signup_intent:
+        | { Args: { _user_id: string }; Returns: undefined }
+        | {
+            Args: {
+              _trigger_entity_id?: string
+              _trigger_entity_type?: string
+              _trigger_field?: string
+              _trigger_new?: string
+              _trigger_old?: string
+              _trigger_source?: string
+              _user_id: string
+            }
+            Returns: undefined
+          }
       record_qr_scan: {
         Args: {
           _browser?: string
