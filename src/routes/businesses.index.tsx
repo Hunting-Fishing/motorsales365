@@ -127,9 +127,19 @@ function BusinessesIndex() {
         .limit(200);
 
       if (typeSlug) query = query.eq("type_slug", typeSlug);
-      if (loc.region) query = query.eq("region", loc.region);
-      if (loc.province) query = query.eq("province", loc.province);
-      if (loc.city) query = query.eq("city", loc.city);
+      if (loc.region) {
+        if (loc.region === "All Philippines") {
+          query = query.eq("region", "All Philippines");
+        } else {
+          // Include nationwide businesses under every specific-region filter.
+          query = query.or(
+            `region.eq.${loc.region},region.eq.All Philippines`,
+          );
+        }
+      }
+      if (loc.province && loc.region !== "All Philippines") query = query.eq("province", loc.province);
+      if (loc.city && loc.region !== "All Philippines") query = query.eq("city", loc.city);
+
       if (loc.barangay) query = query.ilike("barangay", `%${loc.barangay}%`);
       if (q.trim()) {
         const term = q.trim().replace(/[,()]/g, " ");
