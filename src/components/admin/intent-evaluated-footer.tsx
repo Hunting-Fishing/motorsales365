@@ -45,6 +45,7 @@ export function IntentEvaluatedFooter({
             to="/admin/audit"
             search={{ action: "intent_recomputed_manual", q: userId }}
             title="View manual intent recompute entries for this user"
+            aria-label={`View manual intent recompute audit entries for user ${displayName ?? userId}`}
           >
             <Badge
               variant="outline"
@@ -65,6 +66,7 @@ export function IntentEvaluatedFooter({
             to="/admin/audit"
             search={{ action: "intent_recomputed_auto", q: userId }}
             title="View automatic intent recompute entries for this user"
+            aria-label={`View automatic (system trigger) intent recompute audit entries for user ${userId}`}
           >
             <Badge
               variant="secondary"
