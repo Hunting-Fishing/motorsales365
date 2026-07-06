@@ -661,8 +661,19 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
 
   const [form, setForm] = useState<any>({});
   const [lastId, setLastId] = useState<string | null>(null);
+  const [refSearch, setRefSearch] = useState("");
+  const [refFilter, setRefFilter] = useState<"all" | "spend" | "nospend">("all");
+  const [refSort, setRefSort] = useState<
+    "commission_desc" | "commission_asc" | "spent_desc" | "spent_asc" | "recent" | "oldest" | "name"
+  >("commission_desc");
+  const [refPage, setRefPage] = useState(1);
+  const [refPageSize, setRefPageSize] = useState<number>(25);
   if (rep && lastId !== rep.user_id) {
     setLastId(rep.user_id);
+    setRefSearch("");
+    setRefFilter("all");
+    setRefSort("commission_desc");
+    setRefPage(1);
     setForm({
       title: rep.rep_profile?.title ?? "",
       bio: rep.rep_profile?.bio ?? "",
@@ -677,6 +688,7 @@ function RepDetailSheet({ repUserId, onClose }: { repUserId: string | null; onCl
           : "",
     });
   }
+
 
   const save = useMutation({
     mutationFn: () => {
