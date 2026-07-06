@@ -229,12 +229,12 @@ export const getMyRepStats = createServerFn({ method: "POST" })
         0,
       );
     }
-    if (refIds.length) {
+    if (refCodes.length) {
       const { count } = await supabase
         .from("qr_scans")
         .select("id", { count: "exact", head: true })
-        .in("staff_referral_id", refIds)
-        .gte("created_at", since);
+        .in("referral_code", refCodes)
+        .gte("scanned_at", since);
       qrScans = count ?? 0;
     }
 
