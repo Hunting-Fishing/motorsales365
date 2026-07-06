@@ -13,7 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
 import { PhoneInput } from "@/components/phone-input";
 import { AvatarUploader } from "@/components/avatar-uploader";
-import { TotpSetupCard } from "@/components/totp-setup-card";
+// TotpSetupCard removed — two-factor auth is "coming soon".
 import { buildE164, parseE164 } from "@/data/country-codes";
 import { useCurrency } from "@/lib/currency";
 import { saveProfile } from "@/lib/profile.functions";
