@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { getCreditedCode, getCreditedSource } from "@/lib/referral";
+import { getCreditedCode, getCreditedSource, recordTouch } from "@/lib/referral";
 import { SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid.types";
 import type { LocationValue } from "@/components/location-picker";
 import { siteOrigin } from "@/lib/site-config";
