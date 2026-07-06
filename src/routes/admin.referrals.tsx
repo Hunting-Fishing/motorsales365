@@ -64,7 +64,8 @@ import {
   listReferralAccreditation,
   setReferralAccreditation,
 } from "@/lib/admin-referral-accreditation.functions";
-import { ShieldCheck, ShieldOff } from "lucide-react";
+import { ShieldCheck, ShieldOff, Stethoscope } from "lucide-react";
+import { VerifyReferralDialog } from "@/components/admin/verify-referral-dialog";
 
 export const Route = createFileRoute("/admin/referrals")({
   component: AdminReferrals,
@@ -149,6 +150,7 @@ function AdminReferrals() {
   const [newOpen, setNewOpen] = useState(false);
   const [editing, setEditing] = useState<StaffRow | null>(null);
   const [promosFor, setPromosFor] = useState<StaffRow | null>(null);
+  const [verifyCode, setVerifyCode] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [search, setSearch] = useState("");
@@ -1019,6 +1021,14 @@ function AdminReferrals() {
                         <Button
                           size="sm"
                           variant="ghost"
+                          title="Verify QR + signup wiring"
+                          onClick={() => setVerifyCode(r.referral_code)}
+                        >
+                          <Stethoscope className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
                           title="Promotions"
                           onClick={() => setPromosFor(r)}
                         >
@@ -1366,6 +1376,7 @@ function AdminReferrals() {
         />
       )}
       {promosFor && <PromoDialog staff={promosFor} onClose={() => setPromosFor(null)} />}
+      <VerifyReferralDialog referralCode={verifyCode} onClose={() => setVerifyCode(null)} />
     </div>
   );
 }
