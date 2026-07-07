@@ -14,7 +14,7 @@ import { Minus, Plus, RotateCcw } from "lucide-react";
  */
 type Point = { x: number; y: number };
 
-const MIN_SCALE = 1;
+const MIN_SCALE = 0.5;
 const MAX_SCALE = 4;
 const DOUBLE_TAP_MS = 300;
 const DOUBLE_TAP_ZOOM = 2.5;
