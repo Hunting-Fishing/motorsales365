@@ -266,6 +266,65 @@ function QrScanTest() {
       </section>
 
       <section className="rounded-xl border border-border bg-card p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold">QR settings</h2>
+            <p className="text-xs text-muted-foreground">
+              Higher error correction survives cropping and glare; auto quiet-zone widens the white
+              border at small sizes so scanners still lock on.
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label className="text-xs">Error correction level</Label>
+            <Select value={level} onValueChange={(v) => setLevel(v as QrLevel)}>
+              <SelectTrigger className="h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="L">L — Low (~7% recoverable)</SelectItem>
+                <SelectItem value="M">M — Medium (~15%)</SelectItem>
+                <SelectItem value="Q">Q — Quartile (~25%)</SelectItem>
+                <SelectItem value="H">H — High (~30%, recommended)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs">Quiet zone</Label>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-muted-foreground">Auto</span>
+                <Switch checked={autoQuiet} onCheckedChange={setAutoQuiet} />
+              </div>
+            </div>
+            {autoQuiet ? (
+              <p className="text-[11px] text-muted-foreground">
+                Tuned per size: {SIZES.map((s) =>
+                  `${s.label.charAt(0)}=${computeQuietZoneModules(s.px, level)}`,
+                ).join(" · ")} modules
+              </p>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Slider
+                  min={2}
+                  max={10}
+                  step={1}
+                  value={[manualMargin]}
+                  onValueChange={(v) => setManualMargin(v[0] ?? 4)}
+                  className="flex-1"
+                />
+                <span className="w-16 text-right text-xs tabular-nums text-muted-foreground">
+                  {manualMargin} mod
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+
+      <section className="rounded-xl border border-border bg-card p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold">Camera</h2>
