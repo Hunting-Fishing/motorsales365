@@ -510,15 +510,21 @@ function ReferralQrCard({
         <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <Button variant="outline" size="sm" className="w-full" onClick={handleDownload}>
-          <Download className="mr-1 h-4 w-4" /> PNG
-        </Button>
+        <ResolutionDownload
+          onSelect={handleDownload}
+          options={DOWNLOAD_RESOLUTIONS}
+          triggerLabel="PNG"
+          size="sm"
+          variant="outline"
+          className="w-full"
+        />
         <a href={posterUrl} target="_blank" rel="noreferrer">
           <Button variant="outline" size="sm" className="w-full">
             <Printer className="mr-1 h-4 w-4" /> Poster
           </Button>
         </a>
       </div>
+
       {storedQrUrl ? (
         <a
           href={storedQrUrl}
