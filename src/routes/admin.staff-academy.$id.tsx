@@ -149,6 +149,14 @@ function StaffAcademyEditor() {
     enabled: !!isAdmin && !isNew,
   });
 
+  const loadStats = useServerFn(getStaffAcademyArticleStats);
+  const statsQ = useQuery({
+    queryKey: ["admin-staff-academy-stats", id],
+    queryFn: () => loadStats({ data: { article_id: id } }),
+    enabled: !!isAdmin && !isNew,
+    staleTime: 30_000,
+  });
+
   // Refresh history when a save happens
   useEffect(() => {
     if (save.isSuccess && !isNew) {
