@@ -404,22 +404,25 @@ function ReferralQrCard({
 }) {
   const hiddenHiResRef = useRef<HTMLDivElement>(null);
 
-  const handleDownload = () => {
-    // Prefer the hi-res offscreen canvas rendered inside the dialog. Fall back
-    // to the visible thumbnail so download works even before the dialog opens.
-    const canvas =
-      hiddenHiResRef.current?.querySelector("canvas") ||
-      document.querySelector<HTMLCanvasElement>(`canvas[data-qr="${referralCode}"]`);
-    if (!canvas) {
-      toast.error("QR not ready yet — open the QR preview and try again.");
-      return;
+  const handleDownload = async (px: number) => {
+    try {
+      const margin = computeQuietZoneModules(px, "H" as QrLevel);
+      const dataUrl = await QRCode.toDataURL(link, {
+        errorCorrectionLevel: "H",
+        margin,
+        width: px,
+        color: { dark: "#000000", light: "#ffffff" },
+      });
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `${referralCode}-qr-${px}.png`;
+      a.click();
+      toast.success(`Downloaded ${px}×${px} PNG`);
+    } catch {
+      toast.error("Could not generate QR — please try again.");
     }
-    const url = canvas.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${referralCode}-qr.png`;
-    a.click();
   };
+
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
