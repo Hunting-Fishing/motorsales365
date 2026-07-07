@@ -143,14 +143,16 @@ export const updateStaffManager = createServerFn({ method: "POST" })
       let cursor: string | null = data.managerUserId;
       for (let i = 0; i < 50 && cursor; i++) {
         if (cursor === data.userId) throw new Error("Would create a cycle");
-        const { data: row } = await supabaseAdmin
-          .from("profiles")
-          .select("manager_user_id")
-          .eq("id", cursor)
-          .maybeSingle();
-        cursor = (row?.manager_user_id as string | null) ?? null;
+        const res: { data: { manager_user_id: string | null } | null } =
+          await supabaseAdmin
+            .from("profiles")
+            .select("manager_user_id")
+            .eq("id", cursor)
+            .maybeSingle();
+        cursor = res.data?.manager_user_id ?? null;
       }
     }
+
 
     const { error } = await supabaseAdmin
       .from("profiles")
