@@ -18,6 +18,11 @@ import { Badge } from "@/components/ui/badge";
 import { Mail, Copy, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
+import { useAuth } from "@/hooks/use-auth";
+import { useStaffScope } from "@/hooks/use-staff-scope";
+import { InternalStaffView } from "@/components/internal-staff/InternalStaffView";
+import { StaffInfoPopover } from "@/components/internal-staff/StaffInfoPopover";
+
 
 const searchSchema = z.object({ orgId: z.string().uuid() });
 
@@ -29,6 +34,29 @@ export const Route = createFileRoute("/dashboard/team/members")({
 const ROLES = ["owner", "admin", "manager", "member", "viewer"] as const;
 
 function MembersPage() {
+  const { user } = useAuth();
+  const { scope } = useStaffScope();
+
+  if (scope?.is365Staff && user) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <h2 className="font-semibold">Internal team</h2>
+          <StaffInfoPopover />
+        </div>
+        <InternalStaffView
+          currentUserId={user.id}
+          isAdmin={!!scope.isAdmin}
+          variant="tree"
+        />
+      </div>
+    );
+  }
+
+  return <SellerMembersPage />;
+}
+
+function SellerMembersPage() {
   const { orgId } = Route.useSearch();
   const qc = useQueryClient();
   const fetchMembers = useServerFn(listOrgMembers);
@@ -41,10 +69,13 @@ function MembersPage() {
     queryKey: ["org-members", orgId],
     queryFn: () => fetchMembers({ data: { orgId } }),
   });
+
   const { data: invites } = useQuery({
     queryKey: ["org-invites", orgId],
     queryFn: () => fetchInvites({ data: { orgId } }),
   });
+
+
 
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"admin" | "manager" | "member" | "viewer">("member");

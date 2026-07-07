@@ -5,12 +5,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Users, Plus, KeyRound, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useStaffScope } from "@/hooks/use-staff-scope";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyOwnedOrg, listStaff, getSeatUsage } from "@/lib/seller-staff.functions";
+import { InternalStaffView } from "@/components/internal-staff/InternalStaffView";
+import { StaffInfoPopover } from "@/components/internal-staff/StaffInfoPopover";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -35,9 +39,13 @@ export const Route = createFileRoute("/dashboard/staff")({
 function StaffPage() {
   const { user, loading } = useAuth();
   const qc = useQueryClient();
+  const { scope } = useStaffScope();
+  const is365 = !!scope?.is365Staff;
+  const isAdmin = !!scope?.isAdmin;
   const fetchOrg = useServerFn(getMyOwnedOrg);
   const fetchStaff = useServerFn(listStaff);
   const fetchSeats = useServerFn(getSeatUsage);
+
 
   const { data: org } = useQuery({
     queryKey: ["my-owned-org", user?.id],
@@ -62,12 +70,34 @@ function StaffPage() {
   const [addOpen, setAddOpen] = useState(false);
 
   if (loading) return <div className="p-6 text-muted-foreground">Loading…</div>;
+
+  // Internal 365 staff see the unified internal-team view.
+  if (is365 && user) {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="font-display text-2xl font-bold flex items-center gap-2">
+              <Users className="h-6 w-6 text-primary" /> Staff & Access
+              <StaffInfoPopover />
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Internal 365 MotorSales team — everyone on <code className="rounded bg-muted px-1">@365motorsales.com</code>.
+            </p>
+          </div>
+        </div>
+        <InternalStaffView currentUserId={user.id} isAdmin={isAdmin} variant="list" />
+      </div>
+    );
+  }
+
   if (!org)
     return (
       <Card className="p-6 text-sm text-muted-foreground">
         You don't own a seller account yet. <Link to="/dashboard/profile" className="text-primary underline">Set up your profile</Link> first.
       </Card>
     );
+
 
   const used = seats?.used ?? 0;
   const max = seats?.max;

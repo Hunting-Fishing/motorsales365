@@ -7792,6 +7792,7 @@ export type Database = {
           is_staff_account: boolean
           last_name: string | null
           login_username: string | null
+          manager_user_id: string | null
           member_number: number | null
           parent_org_id: string | null
           personal_email: string | null
@@ -7849,6 +7850,7 @@ export type Database = {
           is_staff_account?: boolean
           last_name?: string | null
           login_username?: string | null
+          manager_user_id?: string | null
           member_number?: number | null
           parent_org_id?: string | null
           personal_email?: string | null
@@ -7906,6 +7908,7 @@ export type Database = {
           is_staff_account?: boolean
           last_name?: string | null
           login_username?: string | null
+          manager_user_id?: string | null
           member_number?: number | null
           parent_org_id?: string | null
           personal_email?: string | null
@@ -12075,6 +12078,7 @@ export type Database = {
         Returns: boolean
       }
       can_support: { Args: { _user_id: string }; Returns: boolean }
+      canonical_365_admin_id: { Args: never; Returns: string }
       canonical_365_org_id: { Args: never; Returns: string }
       cleanup_unverified_users: { Args: never; Returns: number }
       compute_user_tier: { Args: { _user_id: string }; Returns: string }
