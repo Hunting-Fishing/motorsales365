@@ -7,11 +7,20 @@ import { useAuth } from "@/hooks/use-auth";
 
 
 import { QRCodeCanvas } from "qrcode.react";
+import QRCode from "qrcode";
 import { computeQuietZoneModules, type QrLevel } from "@/lib/qr-quiet-zone";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2, ScanLine } from "lucide-react";
+import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2, ScanLine, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
 
@@ -393,24 +402,32 @@ function ReferralQrCard({
   storedQrUrl: string | null;
   posterUrl: string;
 }) {
-  const hiddenHiResRef = useRef<HTMLDivElement>(null);
+  const DOWNLOAD_RESOLUTIONS: Array<{ px: number; label: string; hint: string; recommended?: boolean }> = [
+    { px: 512, label: "512 px", hint: "Best for chat / social DMs — small file, quick to share" },
+    { px: 1024, label: "1024 px", hint: "Recommended — social posts, web, screen sharing", recommended: true },
+    { px: 2048, label: "2048 px", hint: "Print-ready — posters, flyers, business cards" },
+  ];
 
-  const handleDownload = () => {
-    // Prefer the hi-res offscreen canvas rendered inside the dialog. Fall back
-    // to the visible thumbnail so download works even before the dialog opens.
-    const canvas =
-      hiddenHiResRef.current?.querySelector("canvas") ||
-      document.querySelector<HTMLCanvasElement>(`canvas[data-qr="${referralCode}"]`);
-    if (!canvas) {
-      toast.error("QR not ready yet — open the QR preview and try again.");
-      return;
+
+  const handleDownload = async (px: number) => {
+    try {
+      const margin = computeQuietZoneModules(px, "H" as QrLevel);
+      const dataUrl = await QRCode.toDataURL(link, {
+        errorCorrectionLevel: "H",
+        margin,
+        width: px,
+        color: { dark: "#000000", light: "#ffffff" },
+      });
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `${referralCode}-qr-${px}.png`;
+      a.click();
+      toast.success(`Downloaded ${px}×${px} PNG`);
+    } catch {
+      toast.error("Could not generate QR — please try again.");
     }
-    const url = canvas.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${referralCode}-qr.png`;
-    a.click();
   };
+
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
@@ -477,44 +494,37 @@ function ReferralQrCard({
               Ask the scanner to fit the whole white square in their camera — the
               extra white border helps the scan work even at odd angles.
             </p>
-            <Button onClick={handleDownload} className="w-full sm:w-auto">
-              <Download className="mr-2 h-4 w-4" /> Download PNG
-            </Button>
-          </div>
-
-          {/* Hidden hi-res canvas used as the download source */}
-          <div
-            ref={hiddenHiResRef}
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              left: "-99999px",
-              top: 0,
-              width: 1024,
-              height: 1024,
-              pointerEvents: "none",
-              opacity: 0,
-            }}
-          >
-            <QRCodeCanvas value={link} size={1024} level="H" marginSize={computeQuietZoneModules(1024, "H" as QrLevel)} />
+            <ResolutionDownload
+              onSelect={handleDownload}
+              options={DOWNLOAD_RESOLUTIONS}
+              triggerLabel="Download PNG"
+              className="w-full sm:w-auto"
+            />
           </div>
         </DialogContent>
       </Dialog>
+
 
       <div className="mt-3 text-center">
         <div className="font-display text-lg font-bold">{fullName}</div>
         <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <Button variant="outline" size="sm" className="w-full" onClick={handleDownload}>
-          <Download className="mr-1 h-4 w-4" /> PNG
-        </Button>
+        <ResolutionDownload
+          onSelect={handleDownload}
+          options={DOWNLOAD_RESOLUTIONS}
+          triggerLabel="PNG"
+          size="sm"
+          variant="outline"
+          className="w-full"
+        />
         <a href={posterUrl} target="_blank" rel="noreferrer">
           <Button variant="outline" size="sm" className="w-full">
             <Printer className="mr-1 h-4 w-4" /> Poster
           </Button>
         </a>
       </div>
+
       {storedQrUrl ? (
         <a
           href={storedQrUrl}
@@ -525,5 +535,61 @@ function ReferralQrCard({
         </a>
       ) : null}
     </div>
+  );
+}
+
+type ResolutionOption = { px: number; label: string; hint: string; recommended?: boolean };
+
+function ResolutionDownload({
+  onSelect,
+  options,
+  triggerLabel,
+  size = "default",
+  variant = "default",
+  className,
+}: {
+  onSelect: (px: number) => void | Promise<void>;
+  options: ResolutionOption[];
+  triggerLabel: string;
+  size?: "default" | "sm";
+  variant?: "default" | "outline";
+  className?: string;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size={size} variant={variant} className={className}>
+          <Download className="mr-1 h-4 w-4" />
+          {triggerLabel}
+          <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-70" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-72">
+        <DropdownMenuLabel className="text-xs">Choose resolution</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {options.map((o) => (
+          <DropdownMenuItem
+            key={o.px}
+            onSelect={(e) => {
+              e.preventDefault();
+              void onSelect(o.px);
+            }}
+            className="flex flex-col items-start gap-0.5 py-2"
+          >
+            <div className="flex w-full items-center justify-between">
+              <span className="text-sm font-medium">
+                {o.label}
+                {o.recommended ? (
+                  <span className="ml-1.5 rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                    Recommended
+                  </span>
+                ) : null}
+              </span>
+            </div>
+            <span className="text-[11px] leading-tight text-muted-foreground">{o.hint}</span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
