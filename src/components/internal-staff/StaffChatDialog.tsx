@@ -73,7 +73,20 @@ export function StaffChatDialog({
           const inThread =
             (m.sender_id === user.id && m.recipient_id === otherUserId) ||
             (m.sender_id === otherUserId && m.recipient_id === user.id);
-          if (inThread) setMessages((prev) => [...prev, m]);
+          if (inThread)
+            setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "staff_dms" },
+        (payload) => {
+          const m = payload.new as Msg;
+          const inThread =
+            (m.sender_id === user.id && m.recipient_id === otherUserId) ||
+            (m.sender_id === otherUserId && m.recipient_id === user.id);
+          if (!inThread) return;
+          setMessages((prev) => prev.map((x) => (x.id === m.id ? { ...x, read_at: m.read_at } : x)));
         },
       )
       .subscribe();
