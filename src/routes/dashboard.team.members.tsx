@@ -18,6 +18,11 @@ import { Badge } from "@/components/ui/badge";
 import { Mail, Copy, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
+import { useAuth } from "@/hooks/use-auth";
+import { useStaffScope } from "@/hooks/use-staff-scope";
+import { InternalStaffView } from "@/components/internal-staff/InternalStaffView";
+import { StaffInfoPopover } from "@/components/internal-staff/StaffInfoPopover";
+
 
 const searchSchema = z.object({ orgId: z.string().uuid() });
 
