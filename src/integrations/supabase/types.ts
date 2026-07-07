@@ -10101,6 +10101,53 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_academy_article_history: {
+        Row: {
+          action: string
+          article_id: string
+          changed_by: string | null
+          created_at: string
+          from_status: string | null
+          id: string
+          slug: string | null
+          snapshot: Json | null
+          title: string | null
+          to_status: string | null
+        }
+        Insert: {
+          action: string
+          article_id: string
+          changed_by?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          slug?: string | null
+          snapshot?: Json | null
+          title?: string | null
+          to_status?: string | null
+        }
+        Update: {
+          action?: string
+          article_id?: string
+          changed_by?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          slug?: string | null
+          snapshot?: Json | null
+          title?: string | null
+          to_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_academy_article_history_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "staff_academy_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_academy_articles: {
         Row: {
           category: string

@@ -191,3 +191,55 @@ export const reorderStaffAcademyArticles = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+export type ArticleHistoryRow = {
+  id: string;
+  article_id: string;
+  action: "created" | "published" | "unpublished" | "status_changed" | "updated";
+  from_status: string | null;
+  to_status: string | null;
+  title: string | null;
+  slug: string | null;
+  changed_by: string | null;
+  changed_by_email: string | null;
+  snapshot: any;
+  created_at: string;
+};
+
+export const listStaffAcademyArticleHistory = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ article_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }): Promise<ArticleHistoryRow[]> => {
+    if (!(await isAdmin(context))) throw new Error("Forbidden");
+    const { data: rows, error } = await (context.supabase as any)
+      .from("staff_academy_article_history")
+      .select("id,article_id,action,from_status,to_status,title,slug,changed_by,snapshot,created_at")
+      .eq("article_id", data.article_id)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    const list = (rows ?? []) as any[];
+    const ids = Array.from(new Set(list.map((r) => r.changed_by).filter(Boolean)));
+    const emailMap = new Map<string, string>();
+    if (ids.length > 0) {
+      const { data: profs } = await (context.supabase as any)
+        .from("profiles")
+        .select("id,email")
+        .in("id", ids);
+      for (const p of profs ?? []) emailMap.set(p.id, p.email ?? "");
+    }
+    return list.map((r) => ({
+      id: String(r.id),
+      article_id: String(r.article_id),
+      action: r.action,
+      from_status: r.from_status ?? null,
+      to_status: r.to_status ?? null,
+      title: r.title ?? null,
+      slug: r.slug ?? null,
+      changed_by: r.changed_by ?? null,
+      changed_by_email: r.changed_by ? emailMap.get(r.changed_by) ?? null : null,
+      snapshot: r.snapshot ?? null,
+      created_at: String(r.created_at ?? ""),
+    }));
+  });
+
