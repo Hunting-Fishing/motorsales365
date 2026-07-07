@@ -14,6 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { isStaffEmail } from "@/lib/staff-domain";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
