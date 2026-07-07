@@ -4,11 +4,22 @@ import { QRCodeCanvas } from "qrcode.react";
 import jsQR from "jsqr";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import { Camera, CameraOff, CheckCircle2, Circle, RefreshCw, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { siteOrigin } from "@/lib/site-config";
+import { computeQuietZoneModules, type QrLevel } from "@/lib/qr-quiet-zone";
 
 export const Route = createFileRoute("/dashboard/qr-scan-test")({
   component: QrScanTest,
