@@ -271,7 +271,7 @@ export function ZoomableQr({
         aria-describedby={instructionsId}
         aria-roledescription="Zoomable image"
         className="relative touch-none overflow-hidden select-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-        style={{ cursor: scale > 1 ? "grab" : "zoom-in" }}
+        style={{ cursor: "grab" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
