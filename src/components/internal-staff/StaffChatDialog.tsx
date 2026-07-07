@@ -102,15 +102,29 @@ export function StaffChatDialog({
     if (!open || !user) return;
     const unread = messages.filter((m) => m.recipient_id === user.id && !m.read_at);
     if (unread.length === 0) return;
+    const now = new Date().toISOString();
+    const ids = unread.map((m) => m.id);
     supabase
       .from("staff_dms")
-      .update({ read_at: new Date().toISOString() })
-      .in(
-        "id",
-        unread.map((m) => m.id),
-      )
+      .update({ read_at: now })
+      .in("id", ids)
       .then(() => {});
+    // Optimistically reflect locally
+    setMessages((prev) =>
+      prev.map((m) => (ids.includes(m.id) ? { ...m, read_at: m.read_at ?? now } : m)),
+    );
   }, [open, user, messages]);
+
+  // Index of the newest message I sent that the other side has read.
+  const lastReadMineIdx = useMemo(() => {
+    if (!user) return -1;
+    let idx = -1;
+    for (let i = 0; i < messages.length; i++) {
+      const m = messages[i];
+      if (m.sender_id === user.id && m.read_at) idx = i;
+    }
+    return idx;
+  }, [messages, user]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
