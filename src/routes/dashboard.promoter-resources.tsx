@@ -198,7 +198,7 @@ function PromoterResources() {
       const { data } = await sb
         .from("staff_referrals")
         .select("referral_code")
-        .eq("user_id", auth.user.id)
+        .eq("staff_user_id", auth.user.id)
         .maybeSingle();
       if (!cancelled) {
         setCode(data?.referral_code ?? null);
