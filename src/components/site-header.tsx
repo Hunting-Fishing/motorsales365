@@ -535,43 +535,13 @@ export function SiteHeader() {
                     <div className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                       365 Staff · Quick routing
                     </div>
-                    {isSales && (
-                      <>
-                        <DropdownMenuItem asChild>
-                          <Link to="/dashboard/team/leads">
-                            <Inbox className="mr-2 h-4 w-4" />
-                            My leads
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/dashboard/referral">
-                            <Briefcase className="mr-2 h-4 w-4" />
-                            My referrals
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/dashboard/team/performance">
-                            <BarChart3 className="mr-2 h-4 w-4" />
-                            Sales performance
-                          </Link>
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                    {(isAdvertising || isAdmin) && (
-                      <>
-                        <DropdownMenuItem asChild>
-                          <Link to="/admin/advertisements">
-                            <Megaphone className="mr-2 h-4 w-4" />
-                            Advertisements
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/admin/advertisements/analytics">
-                            <QrCode className="mr-2 h-4 w-4" />
-                            QR analytics
-                          </Link>
-                        </DropdownMenuItem>
-                      </>
+                    {(isSales || isAdvertising || isAdmin) && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard/partner">
+                          <LayoutDashboard className="mr-2 h-4 w-4" />
+                          Partner Hub
+                        </Link>
+                      </DropdownMenuItem>
                     )}
                     {(isModerator || isAdmin) && (
                       <>
