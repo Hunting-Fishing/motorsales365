@@ -522,10 +522,6 @@ function ReferralQrCard({
       </Dialog>
 
 
-      <div className="mt-3 text-center">
-        <div className="font-display text-lg font-bold">{fullName}</div>
-        <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
-      </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
         <ResolutionDownload
           onSelect={handleDownload}
