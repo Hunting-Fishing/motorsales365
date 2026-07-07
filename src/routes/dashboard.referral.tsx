@@ -204,51 +204,6 @@ function StaffReferral() {
         </div>
       </header>
 
-      <section className="grid gap-3 sm:grid-cols-3">
-        {[
-          {
-            to: "/dashboard/promoter-resources",
-            title: "Promoter resources",
-            body: "Copy/paste ad templates, placement tips, scanner walkthrough.",
-            Icon: Megaphone,
-            cta: "Open resources",
-          },
-          {
-            to: "/resources/qr-landing",
-            title: "Preview scanner view",
-            body: "See the exact page a new visitor sees after scanning your QR.",
-            Icon: MousePointerClick,
-            cta: "Open preview",
-          },
-          {
-            to: "/dashboard/qr-ads",
-            title: "QR Ads & print",
-            body: "Posters, arm bands, banners and shirts with your QR baked in.",
-            Icon: Printer,
-            cta: "Open QR ads",
-          },
-          {
-            to: "/dashboard/qr-scan-test",
-            title: "Test QR scanability",
-            body: "Point your phone at your QR at 3 real-world sizes to confirm it scans.",
-            Icon: ScanLine,
-            cta: "Run scan test",
-          },
-        ].map(({ to, title, body, Icon, cta }) => (
-          <Link
-            key={to}
-            to={to}
-            className="group rounded-xl border border-border bg-card p-4 transition hover:border-primary/40 hover:bg-secondary/40"
-          >
-            <Icon className="h-4 w-4 text-primary" />
-            <h3 className="mt-2 text-sm font-semibold">{title}</h3>
-            <p className="mt-1 text-sm text-muted-foreground">{body}</p>
-            <p className="mt-3 text-xs font-medium text-primary group-hover:underline">
-              {cta} →
-            </p>
-          </Link>
-        ))}
-      </section>
 
 
       <section className="grid gap-6 md:grid-cols-[260px_1fr]">
@@ -317,6 +272,54 @@ function StaffReferral() {
           </div>
         </div>
       </section>
+
+      <section className="grid gap-3 sm:grid-cols-3">
+        {[
+          {
+            to: "/dashboard/promoter-resources",
+            title: "Promoter resources",
+            body: "Copy/paste ad templates, placement tips, scanner walkthrough.",
+            Icon: Megaphone,
+            cta: "Open resources",
+          },
+          {
+            to: "/resources/qr-landing",
+            title: "Preview scanner view",
+            body: "See the exact page a new visitor sees after scanning your QR.",
+            Icon: MousePointerClick,
+            cta: "Open preview",
+          },
+          {
+            to: "/dashboard/qr-ads",
+            title: "QR Ads & print",
+            body: "Posters, arm bands, banners and shirts with your QR baked in.",
+            Icon: Printer,
+            cta: "Open QR ads",
+          },
+          {
+            to: "/dashboard/qr-scan-test",
+            title: "Test QR scanability",
+            body: "Point your phone at your QR at 3 real-world sizes to confirm it scans.",
+            Icon: ScanLine,
+            cta: "Run scan test",
+          },
+        ].map(({ to, title, body, Icon, cta }) => (
+          <Link
+            key={to}
+            to={to}
+            className="group rounded-xl border border-border bg-card p-4 transition hover:border-primary/40 hover:bg-secondary/40"
+          >
+            <Icon className="h-4 w-4 text-primary" />
+            <h3 className="mt-2 text-sm font-semibold">{title}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+            <p className="mt-3 text-xs font-medium text-primary group-hover:underline">
+              {cta} →
+            </p>
+          </Link>
+        ))}
+      </section>
+
+
 
       <section className="rounded-xl border border-border bg-card p-4">
         <h2 className="font-display text-lg font-semibold">My promotions</h2>
@@ -509,7 +512,8 @@ function ReferralQrCard({
               <div className="mt-1 break-all text-xs text-muted-foreground">{link}</div>
             </div>
             <p className="max-w-xs text-center text-xs text-muted-foreground">
-              Pinch or double-tap the QR to zoom in for a clearer scan.
+              Pinch, double-tap or use the +/− buttons to zoom (50%–400%). Drag to reposition so
+              the QR sits perfectly under the scanner.
             </p>
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
               <ResolutionDownload

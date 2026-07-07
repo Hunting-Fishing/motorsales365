@@ -14,7 +14,7 @@ import { Minus, Plus, RotateCcw } from "lucide-react";
  */
 type Point = { x: number; y: number };
 
-const MIN_SCALE = 1;
+const MIN_SCALE = 0.5;
 const MAX_SCALE = 4;
 const DOUBLE_TAP_MS = 300;
 const DOUBLE_TAP_ZOOM = 2.5;
@@ -60,8 +60,13 @@ export function ZoomableQr({
       const el = containerRef.current;
       if (!el) return t;
       const rect = el.getBoundingClientRect();
-      const maxX = ((s - 1) * rect.width) / 2;
-      const maxY = ((s - 1) * rect.height) / 2;
+      // When zoomed in, restrict pan to keep image edges within the frame.
+      // When at or below 1x, still allow the user to nudge the QR anywhere
+      // within the container so they can reposition it for a cleaner scan.
+      const zoomedMaxX = ((s - 1) * rect.width) / 2;
+      const zoomedMaxY = ((s - 1) * rect.height) / 2;
+      const maxX = Math.max(zoomedMaxX, rect.width / 2);
+      const maxY = Math.max(zoomedMaxY, rect.height / 2);
       return {
         x: Math.max(-maxX, Math.min(maxX, t.x)),
         y: Math.max(-maxY, Math.min(maxY, t.y)),
@@ -89,7 +94,7 @@ export function ZoomableQr({
             x: fx - (fx - prevT.x) * ratio,
             y: fy - (fy - prevT.y) * ratio,
           };
-          return s === MIN_SCALE ? { x: 0, y: 0 } : clampTranslate(next, s);
+          return clampTranslate(next, s);
         });
         return s;
       });
@@ -137,12 +142,10 @@ export function ZoomableQr({
       } else {
         lastTapRef.current = { t: now, x: e.clientX, y: e.clientY };
       }
-      if (scale > 1) {
-        panStartRef.current = {
-          pointer: { x: e.clientX, y: e.clientY },
-          translate,
-        };
-      }
+      panStartRef.current = {
+        pointer: { x: e.clientX, y: e.clientY },
+        translate,
+      };
     }
   };
 
@@ -220,7 +223,6 @@ export function ZoomableQr({
 
   const panBy = useCallback(
     (dx: number, dy: number) => {
-      if (scale <= 1) return;
       setTranslate((prev) => clampTranslate({ x: prev.x + dx, y: prev.y + dy }, scale));
     },
     [clampTranslate, scale],
@@ -238,7 +240,7 @@ export function ZoomableQr({
     } else if (key === "0") {
       e.preventDefault();
       reset();
-    } else if (scale > 1 && (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown")) {
+    } else if (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown") {
       e.preventDefault();
       const step = 40;
       if (key === "ArrowLeft") panBy(step, 0);
@@ -269,7 +271,7 @@ export function ZoomableQr({
         aria-describedby={instructionsId}
         aria-roledescription="Zoomable image"
         className="relative touch-none overflow-hidden select-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-        style={{ cursor: scale > 1 ? "grab" : "zoom-in" }}
+        style={{ cursor: "grab" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
