@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { TemplateCard } from "@/components/qr-ads/template-card";
 import { QrAdTemplateUpload } from "@/components/qr-ads/template-upload-dialog";
-import { useSignedCustomTemplates } from "@/components/qr-ads/use-signed-custom-templates";
+
 import { CategoryPicker } from "@/components/qr-ads/category-picker";
 import { TEMPLATES } from "@/lib/qr-ads/templates";
 import type { ShareTemplate } from "@/lib/qr-ads/types";
@@ -174,7 +174,7 @@ function AdminQrAdsPage() {
     queryFn: () => customFn(),
     enabled: !!user,
   });
-  const { data: signedCustoms } = useSignedCustomTemplates(customData?.templates);
+  
 
   const deleteFn = useServerFn(deleteQrAdTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
@@ -388,7 +388,7 @@ function AdminQrAdsPage() {
   const builtinOverrides = new Map<string, BuiltinCategoryRow>(
     (customData?.builtinCategories ?? []).map((r) => [r.template_id, r]),
   );
-  const signedRows: CustomTemplateRow[] = signedCustoms ?? customData?.templates ?? [];
+  const signedRows: CustomTemplateRow[] = customData?.templates ?? [];
   const customTemplates = signedRows.map(customToTemplate);
   const customById = new Map<string, CustomTemplateRow>(signedRows.map((r) => [`custom:${r.id}`, r]));
 
