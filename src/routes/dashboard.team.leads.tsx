@@ -3,7 +3,7 @@ import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { listOrgLeads } from "@/lib/leads.functions";
+import { listOrgLeads, listMyOrgs } from "@/lib/leads.functions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import { Inbox, MessageSquare, Truck, Wrench, Building2, Search } from "lucide-r
 import { formatDistanceToNow } from "date-fns";
 
 const searchSchema = z.object({
-  orgId: z.string().uuid(),
+  orgId: z.string().uuid().optional(),
   status: z.enum(["all", "new", "in_progress", "won", "lost"]).optional(),
   assigned: z.string().optional(),
 });
@@ -36,13 +36,31 @@ const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
 };
 
 function LeadsInbox() {
-  const { orgId, status = "all", assigned = "all" } = Route.useSearch();
+  const search = Route.useSearch();
+  const status = search.status ?? "all";
+  const assigned = search.assigned ?? "all";
   const [q, setQ] = useState("");
+  const fetchOrgs = useServerFn(listMyOrgs);
+  const { data: orgs } = useQuery({ queryKey: ["my-orgs"], queryFn: () => fetchOrgs() });
+  const orgId = search.orgId ?? (orgs && orgs[0]?.id);
   const fetchLeads = useServerFn(listOrgLeads);
   const { data: leads, isLoading } = useQuery({
     queryKey: ["org-leads", orgId, status, assigned, q],
-    queryFn: () => fetchLeads({ data: { orgId, status, assignedTo: assigned, q: q || undefined } }),
+    enabled: !!orgId,
+    queryFn: () => fetchLeads({ data: { orgId: orgId!, status, assignedTo: assigned, q: q || undefined } }),
   });
+
+  if (!orgId) {
+    return (
+      <Card className="p-10 text-center">
+        <Inbox className="mx-auto h-10 w-10 text-muted-foreground" />
+        <p className="mt-3 font-semibold">No team yet</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Create or join a team to start receiving leads.
+        </p>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-3">
