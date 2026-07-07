@@ -240,7 +240,7 @@ export function ZoomableQr({
     } else if (key === "0") {
       e.preventDefault();
       reset();
-    } else if (scale > 1 && (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown")) {
+    } else if (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown") {
       e.preventDefault();
       const step = 40;
       if (key === "ArrowLeft") panBy(step, 0);
