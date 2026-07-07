@@ -35,13 +35,22 @@ export const listStaff = createServerFn({ method: "POST" })
     await assertManager(supabase, userId, data.orgId);
     const { data: rows, error } = await supabase
       .from("organization_members")
-      .select(
-        "user_id, role, joined_at, profiles:profiles!organization_members_user_id_fkey(id, full_name, login_username, is_staff_account)",
-      )
+      .select("user_id, role, joined_at")
       .eq("organization_id", data.orgId)
       .order("joined_at", { ascending: true });
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    const ids = (rows ?? []).map((r: any) => r.user_id);
+    let profilesById = new Map<string, { id: string; full_name: string | null; login_username: string | null; is_staff_account: boolean | null }>();
+    if (ids.length) {
+      const { data: profs, error: pErr } = await supabase
+        .from("profiles")
+        .select("id, full_name, login_username, is_staff_account")
+        .in("id", ids);
+      if (pErr) throw new Error(pErr.message);
+      profilesById = new Map((profs ?? []).map((p: any) => [p.id, p]));
+    }
+    return (rows ?? []).map((r: any) => ({ ...r, profiles: profilesById.get(r.user_id) ?? null }));
+
   });
 
 export const getSeatUsage = createServerFn({ method: "POST" })
