@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Send, Check, CheckCheck, Paperclip, X, FileIcon, Loader2, Download } from "lucide-react";
+import { Send, Check, CheckCheck, Paperclip, X, FileIcon, Loader2, Download, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -40,6 +41,30 @@ function formatBytes(n?: number | null) {
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query) return <>{text}</>;
+  const re = new RegExp(`(${escapeRegExp(query)})`, "ig");
+  const parts = text.split(re);
+  return (
+    <>
+      {parts.map((p, i) =>
+        i % 2 === 1 ? (
+          <mark key={i} className="rounded bg-yellow-300/70 px-0.5 text-foreground">
+            {p}
+          </mark>
+        ) : (
+          <span key={i}>{p}</span>
+        ),
+      )}
+    </>
+  );
+}
+
 
 function AttachmentPreview({ msg }: { msg: Msg }) {
   const sign = useServerFn(getStaffDmAttachmentUrl);
@@ -127,8 +152,19 @@ export function StaffChatDialog({
   const [loading, setLoading] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [query, setQuery] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  const q = query.trim().toLowerCase();
+  const visibleMessages = useMemo(() => {
+    if (!q) return messages;
+    return messages.filter((m) => {
+      const inBody = (m.body ?? "").toLowerCase().includes(q);
+      const inName = (m.attachment_name ?? "").toLowerCase().includes(q);
+      return inBody || inName;
+    });
+  }, [messages, q]);
 
   // Initial fetch + realtime subscription
   useEffect(() => {
@@ -300,6 +336,29 @@ export function StaffChatDialog({
           <DialogTitle>Chat with {otherName}</DialogTitle>
           <DialogDescription>Internal 365 team message</DialogDescription>
         </DialogHeader>
+
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search this conversation…"
+            className="h-8 pl-7 pr-16 text-xs"
+            aria-label="Search messages in this thread"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground"
+              aria-label="Clear search"
+            >
+              {visibleMessages.length}/{messages.length}
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+
         <div
           ref={scrollRef}
           className="h-80 overflow-y-auto rounded-md border border-border bg-muted/30 p-3 space-y-2"
@@ -308,7 +367,13 @@ export function StaffChatDialog({
           {!loading && messages.length === 0 && (
             <div className="text-xs text-muted-foreground">No messages yet — say hi.</div>
           )}
-          {messages.map((m, i) => {
+          {!loading && messages.length > 0 && visibleMessages.length === 0 && (
+            <div className="text-xs text-muted-foreground">
+              No messages match “{query}”.
+            </div>
+          )}
+          {visibleMessages.map((m) => {
+            const i = messages.indexOf(m);
             const mine = m.sender_id === user?.id;
             const showReadReceipt = mine && i === lastReadMineIdx;
             return (
@@ -321,7 +386,9 @@ export function StaffChatDialog({
                   }`}
                 >
                   {m.body && (
-                    <div className="whitespace-pre-wrap break-words">{m.body}</div>
+                    <div className="whitespace-pre-wrap break-words">
+                      <Highlight text={m.body} query={q} />
+                    </div>
                   )}
                   {m.attachment_path && <AttachmentPreview msg={m} />}
                   <div
