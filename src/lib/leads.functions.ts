@@ -59,12 +59,24 @@ export const listOrgMembers = createServerFn({ method: "POST" })
     await assertOrgMember(supabase, userId, data.orgId);
     const { data: members, error } = await supabase
       .from("organization_members")
-      .select(
-        "user_id, role, joined_at, profiles:profiles!organization_members_user_id_fkey(id, full_name, avatar_url)",
-      )
+      .select("user_id, role, joined_at")
       .eq("organization_id", data.orgId);
     if (error) throw new Error(error.message);
-    return members ?? [];
+    const ids = (members ?? []).map((m: any) => m.user_id);
+    let profilesById = new Map<string, { id: string; full_name: string | null; avatar_url: string | null }>();
+    if (ids.length) {
+      const { data: profs, error: pErr } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", ids);
+      if (pErr) throw new Error(pErr.message);
+      profilesById = new Map((profs ?? []).map((p: any) => [p.id, p]));
+    }
+    return (members ?? []).map((m: any) => ({
+      ...m,
+      profiles: profilesById.get(m.user_id) ?? null,
+    }));
+
   });
 
 export const listOrgLeads = createServerFn({ method: "POST" })
