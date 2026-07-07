@@ -63,6 +63,8 @@ function Highlight({ text, query }: { text: string; query: string }) {
       )}
     </>
   );
+}
+
 
 function AttachmentPreview({ msg }: { msg: Msg }) {
   const sign = useServerFn(getStaffDmAttachmentUrl);
