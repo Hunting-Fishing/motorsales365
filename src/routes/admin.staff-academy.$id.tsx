@@ -525,6 +525,92 @@ function StaffAcademyEditor() {
           </CardContent>
         </Card>
       </div>
+
+      {!isNew && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div className="flex items-center gap-2">
+              <History className="h-4 w-4 text-primary" />
+              <CardTitle className="text-base">Publish history</CardTitle>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() =>
+                qc.invalidateQueries({ queryKey: ["admin-staff-academy-history", id] })
+              }
+              disabled={historyQ.isFetching}
+              aria-label="Refresh history"
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${historyQ.isFetching ? "animate-spin" : ""}`}
+              />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {historyQ.isLoading ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading history…
+              </div>
+            ) : (historyQ.data?.length ?? 0) === 0 ? (
+              <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+                No history yet. Publish or edit this article to record an entry.
+              </div>
+            ) : (
+              <ol className="relative space-y-3 border-l pl-4">
+                {(historyQ.data as ArticleHistoryRow[]).map((h) => (
+                  <HistoryItem key={h.id} entry={h} />
+                ))}
+              </ol>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
+
+function actionMeta(a: ArticleHistoryRow["action"]) {
+  switch (a) {
+    case "published":
+      return { label: "Published", icon: Eye, tone: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" };
+    case "unpublished":
+      return { label: "Unpublished", icon: EyeOff, tone: "bg-amber-500/15 text-amber-700 dark:text-amber-400" };
+    case "created":
+      return { label: "Created", icon: FilePlus2, tone: "bg-blue-500/15 text-blue-700 dark:text-blue-400" };
+    case "status_changed":
+      return { label: "Status changed", icon: RefreshCw, tone: "bg-muted text-foreground" };
+    default:
+      return { label: "Updated", icon: RefreshCw, tone: "bg-muted text-foreground" };
+  }
+}
+
+function HistoryItem({ entry }: { entry: ArticleHistoryRow }) {
+  const meta = actionMeta(entry.action);
+  const Icon = meta.icon;
+  const when = entry.created_at ? new Date(entry.created_at) : null;
+  const who = entry.changed_by_email
+    ? entry.changed_by_email
+    : entry.changed_by
+    ? entry.changed_by.slice(0, 8)
+    : "system";
+  return (
+    <li className="relative">
+      <span className="absolute -left-[21px] top-1 flex h-4 w-4 items-center justify-center rounded-full border bg-background">
+        <Icon className="h-2.5 w-2.5" />
+      </span>
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge className={meta.tone} variant="secondary">{meta.label}</Badge>
+        {entry.from_status && entry.to_status && entry.from_status !== entry.to_status && (
+          <span className="text-xs text-muted-foreground">
+            {entry.from_status} → {entry.to_status}
+          </span>
+        )}
+      </div>
+      <div className="mt-1 text-xs text-muted-foreground">
+        {when ? when.toLocaleString() : ""} · {who}
+      </div>
+    </li>
+  );
+}
+
