@@ -79,6 +79,15 @@ function ArticlePage() {
     ? dbRowToArticle(dbQuery.data as any)
     : staticArticle;
 
+  const recordView = useServerFn(recordStaffAcademyArticleView);
+  const loggedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!canView || !article || loggedRef.current === slug) return;
+    loggedRef.current = slug;
+    const articleId = (dbQuery.data as any)?.id ?? null;
+    recordView({ data: { slug, article_id: articleId } }).catch(() => {});
+  }, [canView, article, slug, dbQuery.data, recordView]);
+
   if (loading || dbQuery.isLoading) {
     return (
       <div className="rounded-lg border p-6 text-sm text-muted-foreground">
