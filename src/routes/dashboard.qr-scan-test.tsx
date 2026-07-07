@@ -59,6 +59,9 @@ function QrScanTest() {
   });
   const [lastDecoded, setLastDecoded] = useState<string | null>(null);
   const [fps, setFps] = useState<number>(0);
+  const [level, setLevel] = useState<QrLevel>("H");
+  const [autoQuiet, setAutoQuiet] = useState<boolean>(true);
+  const [manualMargin, setManualMargin] = useState<number>(4);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
