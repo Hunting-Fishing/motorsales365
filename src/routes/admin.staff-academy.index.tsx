@@ -59,6 +59,10 @@ function StaffAcademyAdminList() {
   const reorder = useServerFn(reorderStaffAcademyArticles);
 
   const [confirmDelete, setConfirmDelete] = useState<DbArticleRow | null>(null);
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<ArticleCategory | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "coming-soon" | "draft">("all");
+  const [updatedSince, setUpdatedSince] = useState<"all" | "7d" | "30d" | "90d">("all");
 
   const q = useQuery({
     queryKey: ["admin-staff-academy"],
@@ -66,7 +70,26 @@ function StaffAcademyAdminList() {
     enabled: !!isAdmin,
   });
 
-  const rows: DbArticleRow[] = q.data ?? [];
+  const allRows: DbArticleRow[] = q.data ?? [];
+
+  const rows = useMemo(() => {
+    const now = Date.now();
+    const cutoff =
+      updatedSince === "7d" ? now - 7 * 864e5 :
+      updatedSince === "30d" ? now - 30 * 864e5 :
+      updatedSince === "90d" ? now - 90 * 864e5 : 0;
+    const s = search.trim().toLowerCase();
+    return allRows.filter((r) => {
+      if (categoryFilter !== "all" && r.category !== categoryFilter) return false;
+      if (statusFilter !== "all" && r.status !== statusFilter) return false;
+      if (cutoff && new Date(r.updated_at).getTime() < cutoff) return false;
+      if (s) {
+        const hay = `${r.title} ${r.slug} ${r.description} ${r.tags.join(" ")}`.toLowerCase();
+        if (!hay.includes(s)) return false;
+      }
+      return true;
+    });
+  }, [allRows, search, categoryFilter, statusFilter, updatedSince]);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["admin-staff-academy"] });
