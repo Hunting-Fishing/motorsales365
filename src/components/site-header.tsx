@@ -1025,8 +1025,9 @@ export function SiteHeader() {
                             </>
                           )}
                         </div>
-                      </>
+                      </section>
                     )}
+
 
                   </>
                 )}
