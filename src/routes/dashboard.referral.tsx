@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2, ScanLine, ChevronDown } from "lucide-react";
+import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2, ScanLine, ChevronDown, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
 
