@@ -223,7 +223,6 @@ export function ZoomableQr({
 
   const panBy = useCallback(
     (dx: number, dy: number) => {
-      if (scale <= 1) return;
       setTranslate((prev) => clampTranslate({ x: prev.x + dx, y: prev.y + dy }, scale));
     },
     [clampTranslate, scale],
