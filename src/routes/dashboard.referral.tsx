@@ -10,7 +10,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2 } from "lucide-react";
+import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2, ScanLine } from "lucide-react";
 import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
 
@@ -215,6 +215,13 @@ function StaffReferral() {
             body: "Posters, arm bands, banners and shirts with your QR baked in.",
             Icon: Printer,
             cta: "Open QR ads",
+          },
+          {
+            to: "/dashboard/qr-scan-test",
+            title: "Test QR scanability",
+            body: "Point your phone at your QR at 3 real-world sizes to confirm it scans.",
+            Icon: ScanLine,
+            cta: "Run scan test",
           },
         ].map(({ to, title, body, Icon, cta }) => (
           <Link

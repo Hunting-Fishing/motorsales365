@@ -112,6 +112,7 @@ import { Route as DashboardShopFavoritesRouteImport } from './routes/dashboard.s
 import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
 import { Route as DashboardRidesRouteImport } from './routes/dashboard.rides'
 import { Route as DashboardReferralRouteImport } from './routes/dashboard.referral'
+import { Route as DashboardQrScanTestRouteImport } from './routes/dashboard.qr-scan-test'
 import { Route as DashboardQrAdsRouteImport } from './routes/dashboard.qr-ads'
 import { Route as DashboardPromoterResourcesRouteImport } from './routes/dashboard.promoter-resources'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
@@ -795,6 +796,11 @@ const DashboardRidesRoute = DashboardRidesRouteImport.update({
 const DashboardReferralRoute = DashboardReferralRouteImport.update({
   id: '/referral',
   path: '/referral',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardQrScanTestRoute = DashboardQrScanTestRouteImport.update({
+  id: '/qr-scan-test',
+  path: '/qr-scan-test',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardQrAdsRoute = DashboardQrAdsRouteImport.update({
@@ -1827,6 +1833,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
   '/dashboard/qr-ads': typeof DashboardQrAdsRoute
+  '/dashboard/qr-scan-test': typeof DashboardQrScanTestRoute
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
@@ -2097,6 +2104,7 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
   '/dashboard/qr-ads': typeof DashboardQrAdsRoute
+  '/dashboard/qr-scan-test': typeof DashboardQrScanTestRoute
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
@@ -2371,6 +2379,7 @@ export interface FileRoutesById {
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
   '/dashboard/qr-ads': typeof DashboardQrAdsRoute
+  '/dashboard/qr-scan-test': typeof DashboardQrScanTestRoute
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
@@ -2647,6 +2656,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
     | '/dashboard/qr-ads'
+    | '/dashboard/qr-scan-test'
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
@@ -2917,6 +2927,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
     | '/dashboard/qr-ads'
+    | '/dashboard/qr-scan-test'
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
@@ -3190,6 +3201,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
     | '/dashboard/qr-ads'
+    | '/dashboard/qr-scan-test'
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
@@ -4209,6 +4221,13 @@ declare module '@tanstack/react-router' {
       path: '/referral'
       fullPath: '/dashboard/referral'
       preLoaderRoute: typeof DashboardReferralRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/qr-scan-test': {
+      id: '/dashboard/qr-scan-test'
+      path: '/qr-scan-test'
+      fullPath: '/dashboard/qr-scan-test'
+      preLoaderRoute: typeof DashboardQrScanTestRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/qr-ads': {
@@ -5726,6 +5745,7 @@ interface DashboardRouteChildren {
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardPromoterResourcesRoute: typeof DashboardPromoterResourcesRoute
   DashboardQrAdsRoute: typeof DashboardQrAdsRoute
+  DashboardQrScanTestRoute: typeof DashboardQrScanTestRoute
   DashboardReferralRoute: typeof DashboardReferralRoute
   DashboardRidesRoute: typeof DashboardRidesRoute
   DashboardSearchesRoute: typeof DashboardSearchesRoute
@@ -5760,6 +5780,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardPromoterResourcesRoute: DashboardPromoterResourcesRoute,
   DashboardQrAdsRoute: DashboardQrAdsRoute,
+  DashboardQrScanTestRoute: DashboardQrScanTestRoute,
   DashboardReferralRoute: DashboardReferralRoute,
   DashboardRidesRoute: DashboardRidesRoute,
   DashboardSearchesRoute: DashboardSearchesRoute,
