@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Search, ExternalLink, GraduationCap, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { isStaffEmail } from "@/lib/staff-domain";
@@ -10,8 +12,11 @@ import { Button } from "@/components/ui/button";
 import {
   ARTICLES,
   CATEGORY_META,
+  mergeArticles,
+  type Article,
   type ArticleCategory,
 } from "@/content/staff-academy";
+import { listStaffAcademyArticles } from "@/lib/staff-academy-articles.functions";
 
 export const Route = createFileRoute("/_authenticated/staff/academy")({
   head: () => ({
