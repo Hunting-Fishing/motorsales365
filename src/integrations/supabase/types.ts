@@ -10405,7 +10405,11 @@ export type Database = {
       }
       staff_dms: {
         Row: {
-          body: string
+          attachment_name: string | null
+          attachment_path: string | null
+          attachment_size: number | null
+          attachment_type: string | null
+          body: string | null
           created_at: string
           id: string
           read_at: string | null
@@ -10413,7 +10417,11 @@ export type Database = {
           sender_id: string
         }
         Insert: {
-          body: string
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
+          attachment_type?: string | null
+          body?: string | null
           created_at?: string
           id?: string
           read_at?: string | null
@@ -10421,7 +10429,11 @@ export type Database = {
           sender_id: string
         }
         Update: {
-          body?: string
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
+          attachment_type?: string | null
+          body?: string | null
           created_at?: string
           id?: string
           read_at?: string | null
