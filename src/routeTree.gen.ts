@@ -202,6 +202,7 @@ import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 import { Route as DashboardTeamPerformanceRouteImport } from './routes/dashboard.team.performance'
 import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.team.members'
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
+import { Route as DashboardStaffInboxRouteImport } from './routes/dashboard.staff.inbox'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
 import { Route as DashboardPartnerReferralsRouteImport } from './routes/dashboard.partner.referrals'
 import { Route as DashboardPartnerQrAnalyticsRouteImport } from './routes/dashboard.partner.qr-analytics'
@@ -1267,6 +1268,11 @@ const DashboardTeamLeadsRoute = DashboardTeamLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => DashboardTeamRoute,
 } as any)
+const DashboardStaffInboxRoute = DashboardStaffInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => DashboardStaffRoute,
+} as any)
 const DashboardRidesNewRoute = DashboardRidesNewRouteImport.update({
   id: '/rides_/new',
   path: '/rides/new',
@@ -1912,7 +1918,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
-  '/dashboard/staff': typeof DashboardStaffRoute
+  '/dashboard/staff': typeof DashboardStaffRouteWithChildren
   '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
@@ -2018,6 +2024,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/partner/qr-analytics': typeof DashboardPartnerQrAnalyticsRoute
   '/dashboard/partner/referrals': typeof DashboardPartnerReferralsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
+  '/dashboard/staff/inbox': typeof DashboardStaffInboxRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
@@ -2193,7 +2200,7 @@ export interface FileRoutesByTo {
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
-  '/dashboard/staff': typeof DashboardStaffRoute
+  '/dashboard/staff': typeof DashboardStaffRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
@@ -2297,6 +2304,7 @@ export interface FileRoutesByTo {
   '/dashboard/partner/qr-analytics': typeof DashboardPartnerQrAnalyticsRoute
   '/dashboard/partner/referrals': typeof DashboardPartnerReferralsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
+  '/dashboard/staff/inbox': typeof DashboardStaffInboxRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
@@ -2479,7 +2487,7 @@ export interface FileRoutesById {
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
-  '/dashboard/staff': typeof DashboardStaffRoute
+  '/dashboard/staff': typeof DashboardStaffRouteWithChildren
   '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
@@ -2585,6 +2593,7 @@ export interface FileRoutesById {
   '/dashboard/partner/qr-analytics': typeof DashboardPartnerQrAnalyticsRoute
   '/dashboard/partner/referrals': typeof DashboardPartnerReferralsRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
+  '/dashboard/staff/inbox': typeof DashboardStaffInboxRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
@@ -2873,6 +2882,7 @@ export interface FileRouteTypes {
     | '/dashboard/partner/qr-analytics'
     | '/dashboard/partner/referrals'
     | '/dashboard/rides/new'
+    | '/dashboard/staff/inbox'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
     | '/dashboard/team/performance'
@@ -3152,6 +3162,7 @@ export interface FileRouteTypes {
     | '/dashboard/partner/qr-analytics'
     | '/dashboard/partner/referrals'
     | '/dashboard/rides/new'
+    | '/dashboard/staff/inbox'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
     | '/dashboard/team/performance'
@@ -3439,6 +3450,7 @@ export interface FileRouteTypes {
     | '/dashboard/partner/qr-analytics'
     | '/dashboard/partner/referrals'
     | '/dashboard/rides_/new'
+    | '/dashboard/staff/inbox'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
     | '/dashboard/team/performance'
@@ -4989,6 +5001,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTeamLeadsRouteImport
       parentRoute: typeof DashboardTeamRoute
     }
+    '/dashboard/staff/inbox': {
+      id: '/dashboard/staff/inbox'
+      path: '/inbox'
+      fullPath: '/dashboard/staff/inbox'
+      preLoaderRoute: typeof DashboardStaffInboxRouteImport
+      parentRoute: typeof DashboardStaffRoute
+    }
     '/dashboard/rides_/new': {
       id: '/dashboard/rides_/new'
       path: '/rides/new'
@@ -5917,6 +5936,18 @@ const DashboardPartnerRouteChildren: DashboardPartnerRouteChildren = {
 const DashboardPartnerRouteWithChildren =
   DashboardPartnerRoute._addFileChildren(DashboardPartnerRouteChildren)
 
+interface DashboardStaffRouteChildren {
+  DashboardStaffInboxRoute: typeof DashboardStaffInboxRoute
+}
+
+const DashboardStaffRouteChildren: DashboardStaffRouteChildren = {
+  DashboardStaffInboxRoute: DashboardStaffInboxRoute,
+}
+
+const DashboardStaffRouteWithChildren = DashboardStaffRoute._addFileChildren(
+  DashboardStaffRouteChildren,
+)
+
 interface DashboardTeamRouteChildren {
   DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
   DashboardTeamMembersRoute: typeof DashboardTeamMembersRoute
@@ -5992,7 +6023,7 @@ interface DashboardRouteChildren {
   DashboardSearchesRoute: typeof DashboardSearchesRoute
   DashboardShopFavoritesRoute: typeof DashboardShopFavoritesRoute
   DashboardSponsorshipsRoute: typeof DashboardSponsorshipsRoute
-  DashboardStaffRoute: typeof DashboardStaffRoute
+  DashboardStaffRoute: typeof DashboardStaffRouteWithChildren
   DashboardTeamRoute: typeof DashboardTeamRouteWithChildren
   DashboardTowRoute: typeof DashboardTowRoute
   DashboardVehiclesRoute: typeof DashboardVehiclesRoute
@@ -6028,7 +6059,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardSearchesRoute: DashboardSearchesRoute,
   DashboardShopFavoritesRoute: DashboardShopFavoritesRoute,
   DashboardSponsorshipsRoute: DashboardSponsorshipsRoute,
-  DashboardStaffRoute: DashboardStaffRoute,
+  DashboardStaffRoute: DashboardStaffRouteWithChildren,
   DashboardTeamRoute: DashboardTeamRouteWithChildren,
   DashboardTowRoute: DashboardTowRoute,
   DashboardVehiclesRoute: DashboardVehiclesRoute,
