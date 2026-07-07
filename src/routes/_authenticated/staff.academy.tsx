@@ -49,6 +49,7 @@ function StaffAcademyHub() {
   const { user, loading, isAdmin } = useAuth();
   const [query, setQuery] = useState("");
   const loadDb = useServerFn(listStaffAcademyArticles);
+  const loadAssets = useServerFn(listStaffAcademyAssets);
 
   const isStaff = isStaffEmail(user?.email);
 
@@ -59,9 +60,21 @@ function StaffAcademyHub() {
     staleTime: 60_000,
   });
 
+  const assetsQuery = useQuery({
+    queryKey: ["staff-academy-assets"],
+    queryFn: () => loadAssets(),
+    enabled: !!user && (isStaff || isAdmin),
+    staleTime: 60_000,
+  });
+
   const articles: Article[] = useMemo(
     () => mergeArticles(dbQuery.data, { includeDrafts: isAdmin }),
     [dbQuery.data, isAdmin],
+  );
+
+  const assets: StaffAcademyAsset[] = useMemo(
+    () => (assetsQuery.data ?? []).filter((a) => a.status === "active" || isAdmin),
+    [assetsQuery.data, isAdmin],
   );
 
   const filtered = useMemo(() => {
