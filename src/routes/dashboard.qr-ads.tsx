@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { TemplateCard } from "@/components/qr-ads/template-card";
 import { QrAdTemplateUpload } from "@/components/qr-ads/template-upload-dialog";
-import { useSignedCustomTemplates } from "@/components/qr-ads/use-signed-custom-templates";
+
 import { TEMPLATES } from "@/lib/qr-ads/templates";
 import type { ShareTemplate } from "@/lib/qr-ads/types";
 import {
