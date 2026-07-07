@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Download, ExternalLink } from "lucide-react";
 import { siteOrigin } from "@/lib/site-config";
 import { computeQuietZoneModules } from "@/lib/qr-quiet-zone";
+import { ZoomableQr } from "@/components/qr/zoomable-qr";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/r/$code/qr")({
