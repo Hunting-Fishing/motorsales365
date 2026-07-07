@@ -496,7 +496,7 @@ function ReferralQrCard({
               opacity: 0,
             }}
           >
-            <QRCodeCanvas value={link} size={1024} level="H" includeMargin />
+            <QRCodeCanvas value={link} size={1024} level="H" marginSize={computeQuietZoneModules(1024, "H" as QrLevel)} />
           </div>
         </DialogContent>
       </Dialog>
