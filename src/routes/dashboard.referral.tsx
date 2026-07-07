@@ -494,12 +494,19 @@ function ReferralQrCard({
               Ask the scanner to fit the whole white square in their camera — the
               extra white border helps the scan work even at odd angles.
             </p>
-            <ResolutionDownload
-              onSelect={handleDownload}
-              options={DOWNLOAD_RESOLUTIONS}
-              triggerLabel="Download PNG"
-              className="w-full sm:w-auto"
-            />
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+              <ResolutionDownload
+                onSelect={handleDownload}
+                options={DOWNLOAD_RESOLUTIONS}
+                triggerLabel="Download PNG"
+                className="w-full sm:w-auto"
+              />
+              <ShareQrPageButton
+                referralCode={referralCode}
+                fullName={fullName}
+                className="w-full sm:w-auto"
+              />
+            </div>
           </div>
         </DialogContent>
       </Dialog>
