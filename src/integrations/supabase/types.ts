@@ -10152,6 +10152,60 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_academy_assets: {
+        Row: {
+          created_at: string
+          description: string
+          file_size: number | null
+          file_url: string
+          id: string
+          kind: string
+          mime_type: string | null
+          sort_order: number
+          status: string
+          storage_path: string
+          tags: string[]
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          kind: string
+          mime_type?: string | null
+          sort_order?: number
+          status?: string
+          storage_path: string
+          tags?: string[]
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          kind?: string
+          mime_type?: string | null
+          sort_order?: number
+          status?: string
+          storage_path?: string
+          tags?: string[]
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       staff_client_contact_audit: {
         Row: {
           action: Database["public"]["Enums"]["staff_contact_audit_action"]
@@ -12117,6 +12171,7 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      is_staff_academy_viewer: { Args: { _user_id: string }; Returns: boolean }
       is_towing_provider: { Args: { _user_id: string }; Returns: boolean }
       list_open_lead_offers: {
         Args: { _category_slug?: string; _limit?: number; _region?: string }
