@@ -208,6 +208,7 @@ import { Route as DashboardPartnerQrAnalyticsRouteImport } from './routes/dashbo
 import { Route as DashboardPartnerQrAdsRouteImport } from './routes/dashboard.partner.qr-ads'
 import { Route as DashboardPartnerOverviewRouteImport } from './routes/dashboard.partner.overview'
 import { Route as DashboardPartnerInboxRouteImport } from './routes/dashboard.partner.inbox'
+import { Route as DashboardPartnerAdvertisementsRouteImport } from './routes/dashboard.partner.advertisements'
 import { Route as DashboardDispatchHistoryRouteImport } from './routes/dashboard.dispatch.history'
 import { Route as DashboardBusinessBusinessIdRouteImport } from './routes/dashboard.business.$businessId'
 import { Route as ClubsApplySuccessRouteImport } from './routes/clubs.apply.success'
@@ -1297,6 +1298,12 @@ const DashboardPartnerInboxRoute = DashboardPartnerInboxRouteImport.update({
   path: '/inbox',
   getParentRoute: () => DashboardPartnerRoute,
 } as any)
+const DashboardPartnerAdvertisementsRoute =
+  DashboardPartnerAdvertisementsRouteImport.update({
+    id: '/advertisements',
+    path: '/advertisements',
+    getParentRoute: () => DashboardPartnerRoute,
+  } as any)
 const DashboardDispatchHistoryRoute =
   DashboardDispatchHistoryRouteImport.update({
     id: '/history',
@@ -1988,6 +1995,7 @@ export interface FileRoutesByFullPath {
   '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdRouteWithChildren
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
+  '/dashboard/partner/advertisements': typeof DashboardPartnerAdvertisementsRoute
   '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
   '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
   '/dashboard/partner/qr-ads': typeof DashboardPartnerQrAdsRoute
@@ -2264,6 +2272,7 @@ export interface FileRoutesByTo {
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
   '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
+  '/dashboard/partner/advertisements': typeof DashboardPartnerAdvertisementsRoute
   '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
   '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
   '/dashboard/partner/qr-ads': typeof DashboardPartnerQrAdsRoute
@@ -2549,6 +2558,7 @@ export interface FileRoutesById {
   '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdRouteWithChildren
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
+  '/dashboard/partner/advertisements': typeof DashboardPartnerAdvertisementsRoute
   '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
   '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
   '/dashboard/partner/qr-ads': typeof DashboardPartnerQrAdsRoute
@@ -2834,6 +2844,7 @@ export interface FileRouteTypes {
     | '/clubs/apply/success'
     | '/dashboard/business/$businessId'
     | '/dashboard/dispatch/history'
+    | '/dashboard/partner/advertisements'
     | '/dashboard/partner/inbox'
     | '/dashboard/partner/overview'
     | '/dashboard/partner/qr-ads'
@@ -3110,6 +3121,7 @@ export interface FileRouteTypes {
     | '/businesses/$slug/book'
     | '/clubs/apply/success'
     | '/dashboard/dispatch/history'
+    | '/dashboard/partner/advertisements'
     | '/dashboard/partner/inbox'
     | '/dashboard/partner/overview'
     | '/dashboard/partner/qr-ads'
@@ -3394,6 +3406,7 @@ export interface FileRouteTypes {
     | '/clubs/apply/success'
     | '/dashboard/business/$businessId'
     | '/dashboard/dispatch/history'
+    | '/dashboard/partner/advertisements'
     | '/dashboard/partner/inbox'
     | '/dashboard/partner/overview'
     | '/dashboard/partner/qr-ads'
@@ -4992,6 +5005,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardPartnerInboxRouteImport
       parentRoute: typeof DashboardPartnerRoute
     }
+    '/dashboard/partner/advertisements': {
+      id: '/dashboard/partner/advertisements'
+      path: '/advertisements'
+      fullPath: '/dashboard/partner/advertisements'
+      preLoaderRoute: typeof DashboardPartnerAdvertisementsRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
     '/dashboard/dispatch/history': {
       id: '/dashboard/dispatch/history'
       path: '/history'
@@ -5831,6 +5851,7 @@ const DashboardDispatchRouteWithChildren =
   DashboardDispatchRoute._addFileChildren(DashboardDispatchRouteChildren)
 
 interface DashboardPartnerRouteChildren {
+  DashboardPartnerAdvertisementsRoute: typeof DashboardPartnerAdvertisementsRoute
   DashboardPartnerInboxRoute: typeof DashboardPartnerInboxRoute
   DashboardPartnerOverviewRoute: typeof DashboardPartnerOverviewRoute
   DashboardPartnerQrAdsRoute: typeof DashboardPartnerQrAdsRoute
@@ -5840,6 +5861,7 @@ interface DashboardPartnerRouteChildren {
 }
 
 const DashboardPartnerRouteChildren: DashboardPartnerRouteChildren = {
+  DashboardPartnerAdvertisementsRoute: DashboardPartnerAdvertisementsRoute,
   DashboardPartnerInboxRoute: DashboardPartnerInboxRoute,
   DashboardPartnerOverviewRoute: DashboardPartnerOverviewRoute,
   DashboardPartnerQrAdsRoute: DashboardPartnerQrAdsRoute,
