@@ -60,8 +60,13 @@ export function ZoomableQr({
       const el = containerRef.current;
       if (!el) return t;
       const rect = el.getBoundingClientRect();
-      const maxX = ((s - 1) * rect.width) / 2;
-      const maxY = ((s - 1) * rect.height) / 2;
+      // When zoomed in, restrict pan to keep image edges within the frame.
+      // When at or below 1x, still allow the user to nudge the QR anywhere
+      // within the container so they can reposition it for a cleaner scan.
+      const zoomedMaxX = ((s - 1) * rect.width) / 2;
+      const zoomedMaxY = ((s - 1) * rect.height) / 2;
+      const maxX = Math.max(zoomedMaxX, rect.width / 2);
+      const maxY = Math.max(zoomedMaxY, rect.height / 2);
       return {
         x: Math.max(-maxX, Math.min(maxX, t.x)),
         y: Math.max(-maxY, Math.min(maxY, t.y)),
