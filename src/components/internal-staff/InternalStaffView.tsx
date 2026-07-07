@@ -98,10 +98,10 @@ export function InternalStaffView({
                   currentUserId={currentUserId}
                   onAdd={(mid) => setAddOpen({ managerId: mid })}
                   onMove={(m) => setMoveFor(m)}
+                  onChat={(m) => setChatWith(m)}
                   onDeactivate={async (uid) => {
                     if (!window.confirm("Deactivate this staff account? They will not be able to sign in.")) return;
                     try {
-                      // eslint-disable-next-line @typescript-eslint/no-use-before-define
                       await deactivateFn({ data: { userId: uid } });
                       toast.success("Staff deactivated");
                       refresh();
@@ -112,6 +112,7 @@ export function InternalStaffView({
                 />
               ))}
             </div>
+
           )
         ) : (
           <div className="divide-y">
