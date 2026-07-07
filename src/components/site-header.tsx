@@ -28,6 +28,7 @@ import {
   QrCode,
   ListChecks,
   ChevronDown,
+  LayoutDashboard,
 } from "lucide-react";
 import { useAuth, type SellerType, type AppRole } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
