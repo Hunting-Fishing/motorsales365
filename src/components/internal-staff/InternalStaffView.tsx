@@ -179,6 +179,7 @@ function TreeRow({
   currentUserId,
   onAdd,
   onMove,
+  onChat,
   onDeactivate,
 }: {
   node: Node;
@@ -187,6 +188,7 @@ function TreeRow({
   currentUserId: string;
   onAdd: (managerId: string) => void;
   onMove: (m: InternalStaffMember) => void;
+  onChat: (m: InternalStaffMember) => void;
   onDeactivate: (userId: string) => void;
 }) {
   return (
@@ -208,11 +210,9 @@ function TreeRow({
           </div>
         </div>
         <Staff365Badge size="xs" />
-        {node.email && node.user_id !== currentUserId && (
-          <Button asChild size="sm" variant="outline">
-            <a href={`mailto:${node.email}`}>
-              <Mail className="mr-1 h-3.5 w-3.5" /> Message
-            </a>
+        {node.user_id !== currentUserId && (
+          <Button size="sm" variant="outline" onClick={() => onChat(node)}>
+            <MessageSquare className="mr-1 h-3.5 w-3.5" /> Message
           </Button>
         )}
         {isAdmin && (
@@ -242,6 +242,7 @@ function TreeRow({
           currentUserId={currentUserId}
           onAdd={onAdd}
           onMove={onMove}
+          onChat={onChat}
           onDeactivate={onDeactivate}
         />
       ))}
@@ -253,15 +254,20 @@ function FlatRow({
   m,
   members,
   isAdmin,
+  currentUserId,
+  onChat,
   onMove,
   onDeactivate,
 }: {
   m: InternalStaffMember;
   members: InternalStaffMember[];
   isAdmin: boolean;
+  currentUserId: string;
+  onChat: () => void;
   onMove: () => void;
   onDeactivate: () => void;
 }) {
+
   const manager = members.find((x) => x.user_id === m.manager_user_id);
   return (
     <div className="flex flex-wrap items-center gap-3 py-3">
