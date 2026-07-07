@@ -36,6 +36,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, X } from "lucide-react";
 import {
   listAllStaffAcademyArticlesAdmin,
   deleteStaffAcademyArticle,
@@ -59,6 +68,10 @@ function StaffAcademyAdminList() {
   const reorder = useServerFn(reorderStaffAcademyArticles);
 
   const [confirmDelete, setConfirmDelete] = useState<DbArticleRow | null>(null);
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<ArticleCategory | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "coming-soon" | "draft">("all");
+  const [updatedSince, setUpdatedSince] = useState<"all" | "7d" | "30d" | "90d">("all");
 
   const q = useQuery({
     queryKey: ["admin-staff-academy"],
@@ -66,7 +79,26 @@ function StaffAcademyAdminList() {
     enabled: !!isAdmin,
   });
 
-  const rows: DbArticleRow[] = q.data ?? [];
+  const allRows: DbArticleRow[] = q.data ?? [];
+
+  const rows = useMemo(() => {
+    const now = Date.now();
+    const cutoff =
+      updatedSince === "7d" ? now - 7 * 864e5 :
+      updatedSince === "30d" ? now - 30 * 864e5 :
+      updatedSince === "90d" ? now - 90 * 864e5 : 0;
+    const s = search.trim().toLowerCase();
+    return allRows.filter((r) => {
+      if (categoryFilter !== "all" && r.category !== categoryFilter) return false;
+      if (statusFilter !== "all" && r.status !== statusFilter) return false;
+      if (cutoff && new Date(r.updated_at).getTime() < cutoff) return false;
+      if (s) {
+        const hay = `${r.title} ${r.slug} ${r.description} ${r.tags.join(" ")}`.toLowerCase();
+        if (!hay.includes(s)) return false;
+      }
+      return true;
+    });
+  }, [allRows, search, categoryFilter, statusFilter, updatedSince]);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["admin-staff-academy"] });
@@ -113,10 +145,11 @@ function StaffAcademyAdminList() {
     onError: (e: any) => toast.error(e?.message ?? "Failed"),
   });
 
-  const moveRow = (index: number, dir: -1 | 1) => {
-    const next = [...rows];
+  const moveRow = (id: string, dir: -1 | 1) => {
+    const next = [...allRows];
+    const index = next.findIndex((r) => r.id === id);
     const target = index + dir;
-    if (target < 0 || target >= next.length) return;
+    if (index < 0 || target < 0 || target >= next.length) return;
     const [item] = next.splice(index, 1);
     next.splice(target, 0, item);
     move.mutate(next.map((r) => r.id));
@@ -169,12 +202,65 @@ function StaffAcademyAdminList() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All articles ({rows.length})</CardTitle>
+          <CardTitle>
+            All articles ({rows.length}
+            {rows.length !== allRows.length ? ` of ${allRows.length}` : ""})
+          </CardTitle>
           <CardDescription>
             Publish or unpublish, reorder within a category, or delete DB-authored
             articles. In-repo defaults still show on the hub unless a DB row uses the
             same slug (DB wins).
           </CardDescription>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search title, slug, tags…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-8 pr-8"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label="Clear search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v as any)}>
+              <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All categories</SelectItem>
+                {(Object.keys(CATEGORY_META) as ArticleCategory[]).map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {CATEGORY_META[c].emoji} {CATEGORY_META[c].label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+              <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="active">Published</SelectItem>
+                <SelectItem value="coming-soon">Coming soon</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={updatedSince} onValueChange={(v) => setUpdatedSince(v as any)}>
+              <SelectTrigger><SelectValue placeholder="Updated" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Any time</SelectItem>
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           {q.isLoading ? (
@@ -183,8 +269,9 @@ function StaffAcademyAdminList() {
             </div>
           ) : rows.length === 0 ? (
             <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-              No DB articles yet. In-repo defaults still render on the live hub.
-              Create a new article to override or extend them.
+              {allRows.length === 0
+                ? "No DB articles yet. In-repo defaults still render on the live hub. Create a new article to override or extend them."
+                : "No articles match your filters."}
             </div>
           ) : (
             (Object.keys(CATEGORY_META) as ArticleCategory[]).map((cat) => {
@@ -208,7 +295,6 @@ function StaffAcademyAdminList() {
                       </TableHeader>
                       <TableBody>
                         {list.map((r) => {
-                          const globalIndex = rows.findIndex((x) => x.id === r.id);
                           return (
                             <TableRow key={r.id}>
                               <TableCell>
@@ -216,7 +302,7 @@ function StaffAcademyAdminList() {
                                   <Button
                                     size="icon"
                                     variant="ghost"
-                                    onClick={() => moveRow(globalIndex, -1)}
+                                    onClick={() => moveRow(r.id, -1)}
                                     disabled={move.isPending}
                                     aria-label="Move up"
                                   >
@@ -225,7 +311,7 @@ function StaffAcademyAdminList() {
                                   <Button
                                     size="icon"
                                     variant="ghost"
-                                    onClick={() => moveRow(globalIndex, 1)}
+                                    onClick={() => moveRow(r.id, 1)}
                                     disabled={move.isPending}
                                     aria-label="Move down"
                                   >
