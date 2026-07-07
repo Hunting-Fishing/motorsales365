@@ -154,6 +154,16 @@ function buildHubs(opts: {
   return hubs;
 }
 
+const HUB_TONES = [
+  { bg: "bg-primary/10", border: "border-primary", text: "text-primary" },
+  { bg: "bg-amber-500/10", border: "border-amber-500", text: "text-amber-600 dark:text-amber-400" },
+  { bg: "bg-emerald-500/10", border: "border-emerald-500", text: "text-emerald-600 dark:text-emerald-400" },
+  { bg: "bg-sky-500/10", border: "border-sky-500", text: "text-sky-600 dark:text-sky-400" },
+  { bg: "bg-violet-500/10", border: "border-violet-500", text: "text-violet-600 dark:text-violet-400" },
+  { bg: "bg-fuchsia-500/10", border: "border-fuchsia-500", text: "text-fuchsia-600 dark:text-fuchsia-400" },
+  { bg: "bg-teal-500/10", border: "border-teal-500", text: "text-teal-600 dark:text-teal-400" },
+];
+
 function itemMatches(path: string, item: NavItem) {
   return item.exact ? path === item.to : path === item.to || path.startsWith(item.to + "/");
 }
