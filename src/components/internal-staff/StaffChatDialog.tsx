@@ -173,8 +173,9 @@ export function StaffChatDialog({
               No messages yet — say hi.
             </div>
           )}
-          {messages.map((m) => {
+          {messages.map((m, i) => {
             const mine = m.sender_id === user?.id;
+            const showReadReceipt = mine && i === lastReadMineIdx;
             return (
               <div
                 key={m.id}
@@ -189,11 +190,37 @@ export function StaffChatDialog({
                 >
                   <div className="whitespace-pre-wrap break-words">{m.body}</div>
                   <div
-                    className={`mt-1 text-[10px] ${
+                    className={`mt-1 flex items-center gap-1 text-[10px] ${
                       mine ? "text-primary-foreground/70" : "text-muted-foreground"
                     }`}
                   >
-                    {new Date(m.created_at).toLocaleString()}
+                    <span>{new Date(m.created_at).toLocaleString()}</span>
+                    {mine && (
+                      <span
+                        className="ml-auto inline-flex items-center gap-0.5"
+                        title={
+                          m.read_at
+                            ? `Read ${new Date(m.read_at).toLocaleString()}`
+                            : "Sent"
+                        }
+                        aria-label={m.read_at ? "Read" : "Sent"}
+                      >
+                        {m.read_at ? (
+                          <CheckCheck className="h-3 w-3" />
+                        ) : (
+                          <Check className="h-3 w-3" />
+                        )}
+                        {showReadReceipt && m.read_at && (
+                          <span className="ml-1">
+                            Read{" "}
+                            {new Date(m.read_at).toLocaleTimeString([], {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        )}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
