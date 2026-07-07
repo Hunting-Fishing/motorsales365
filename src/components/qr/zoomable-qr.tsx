@@ -200,19 +200,82 @@ export function ZoomableQr({
     };
   }, []);
 
+  const zoomPct = Math.round(scale * 100);
+  const canZoomOut = scale > MIN_SCALE + 0.001;
+  const canZoomIn = scale < MAX_SCALE - 0.001;
+  const canReset = !(scale === 1 && translate.x === 0 && translate.y === 0);
+
+  const zoomFromCenter = useCallback(
+    (delta: number) => {
+      const el = containerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      applyZoomAt(scale + delta, {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      });
+    },
+    [applyZoomAt, scale],
+  );
+
+  const panBy = useCallback(
+    (dx: number, dy: number) => {
+      if (scale <= 1) return;
+      setTranslate((prev) => clampTranslate({ x: prev.x + dx, y: prev.y + dy }, scale));
+    },
+    [clampTranslate, scale],
+  );
+
+  // Keyboard: +/= zoom in, -/_ zoom out, 0 reset, arrows to pan.
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const key = e.key;
+    if (key === "+" || key === "=") {
+      e.preventDefault();
+      zoomFromCenter(0.5);
+    } else if (key === "-" || key === "_") {
+      e.preventDefault();
+      zoomFromCenter(-0.5);
+    } else if (key === "0") {
+      e.preventDefault();
+      reset();
+    } else if (scale > 1 && (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown")) {
+      e.preventDefault();
+      const step = 40;
+      if (key === "ArrowLeft") panBy(step, 0);
+      else if (key === "ArrowRight") panBy(-step, 0);
+      else if (key === "ArrowUp") panBy(0, step);
+      else panBy(0, -step);
+    } else if (key === "Enter" || key === " ") {
+      // Space / Enter toggles zoom (mimics double-tap for keyboard users)
+      e.preventDefault();
+      if (scale > 1.1) reset();
+      else zoomFromCenter(DOUBLE_TAP_ZOOM - scale);
+    }
+  };
+
+  const instructionsId = useId();
+
   return (
     <div className={`relative ${className}`}>
+      <p id={instructionsId} className="sr-only">
+        Zoomable QR code. Use plus and minus keys or the buttons below to zoom, zero to reset, and
+        arrow keys to pan when zoomed. On touch devices, pinch to zoom and double-tap to toggle.
+      </p>
       <div
         ref={containerRef}
-        role="group"
+        role="application"
+        tabIndex={0}
         aria-label={ariaLabel ?? "Zoomable QR code"}
-        className="relative touch-none overflow-hidden select-none"
+        aria-describedby={instructionsId}
+        aria-roledescription="Zoomable image"
+        className="relative touch-none overflow-hidden select-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         style={{ cursor: scale > 1 ? "grab" : "zoom-in" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         onWheel={onWheel}
+        onKeyDown={onKeyDown}
       >
         <div
           className="origin-center transition-transform duration-75 ease-out"
@@ -225,59 +288,55 @@ export function ZoomableQr({
         </div>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center">
-        <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-background/90 px-1.5 py-1 shadow-sm ring-1 ring-border backdrop-blur">
+      {/* Polite live region so screen readers announce zoom changes */}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        Zoom {zoomPct} percent
+      </div>
+
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center"
+        role="toolbar"
+        aria-label="QR zoom controls"
+      >
+        <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-background/95 px-1.5 py-1 shadow-sm ring-1 ring-border backdrop-blur">
           <Button
             type="button"
             size="icon"
             variant="ghost"
-            className="h-8 w-8"
-            aria-label="Zoom out"
-            onClick={() => {
-              const el = containerRef.current;
-              if (!el) return;
-              const rect = el.getBoundingClientRect();
-              applyZoomAt(scale - 0.5, {
-                x: rect.left + rect.width / 2,
-                y: rect.top + rect.height / 2,
-              });
-            }}
-            disabled={scale <= MIN_SCALE + 0.001}
+            className="min-h-11 min-w-11 sm:min-h-9 sm:min-w-9"
+            aria-label={`Zoom out. Current zoom ${zoomPct}%`}
+            onClick={() => zoomFromCenter(-0.5)}
+            disabled={!canZoomOut}
           >
-            <Minus className="h-4 w-4" />
+            <Minus className="h-4 w-4" aria-hidden="true" />
           </Button>
-          <span className="w-10 text-center text-[11px] font-medium tabular-nums text-muted-foreground">
-            {scale.toFixed(1)}x
+          <span
+            className="w-12 text-center text-xs font-medium tabular-nums text-foreground"
+            aria-hidden="true"
+          >
+            {zoomPct}%
           </span>
           <Button
             type="button"
             size="icon"
             variant="ghost"
-            className="h-8 w-8"
-            aria-label="Zoom in"
-            onClick={() => {
-              const el = containerRef.current;
-              if (!el) return;
-              const rect = el.getBoundingClientRect();
-              applyZoomAt(scale + 0.5, {
-                x: rect.left + rect.width / 2,
-                y: rect.top + rect.height / 2,
-              });
-            }}
-            disabled={scale >= MAX_SCALE - 0.001}
+            className="min-h-11 min-w-11 sm:min-h-9 sm:min-w-9"
+            aria-label={`Zoom in. Current zoom ${zoomPct}%`}
+            onClick={() => zoomFromCenter(0.5)}
+            disabled={!canZoomIn}
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-4 w-4" aria-hidden="true" />
           </Button>
           <Button
             type="button"
             size="icon"
             variant="ghost"
-            className="h-8 w-8"
-            aria-label="Reset zoom"
+            className="min-h-11 min-w-11 sm:min-h-9 sm:min-w-9"
+            aria-label="Reset zoom and center the QR"
             onClick={reset}
-            disabled={scale === 1 && translate.x === 0 && translate.y === 0}
+            disabled={!canReset}
           >
-            <RotateCcw className="h-4 w-4" />
+            <RotateCcw className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
       </div>
