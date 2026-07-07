@@ -174,7 +174,7 @@ function AdminQrAdsPage() {
     queryFn: () => customFn(),
     enabled: !!user,
   });
-  const { data: signedCustoms } = useSignedCustomTemplates(customData?.templates);
+  
 
   const deleteFn = useServerFn(deleteQrAdTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
