@@ -70,12 +70,34 @@ function StaffPage() {
   const [addOpen, setAddOpen] = useState(false);
 
   if (loading) return <div className="p-6 text-muted-foreground">Loading…</div>;
+
+  // Internal 365 staff see the unified internal-team view.
+  if (is365 && user) {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="font-display text-2xl font-bold flex items-center gap-2">
+              <Users className="h-6 w-6 text-primary" /> Staff & Access
+              <StaffInfoPopover />
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Internal 365 MotorSales team — everyone on <code className="rounded bg-muted px-1">@365motorsales.com</code>.
+            </p>
+          </div>
+        </div>
+        <InternalStaffView currentUserId={user.id} isAdmin={isAdmin} variant="list" />
+      </div>
+    );
+  }
+
   if (!org)
     return (
       <Card className="p-6 text-sm text-muted-foreground">
         You don't own a seller account yet. <Link to="/dashboard/profile" className="text-primary underline">Set up your profile</Link> first.
       </Card>
     );
+
 
   const used = seats?.used ?? 0;
   const max = seats?.max;
