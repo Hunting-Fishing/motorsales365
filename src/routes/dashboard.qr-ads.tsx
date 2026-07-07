@@ -179,11 +179,11 @@ function QrAdsPage() {
     for (const t of TEMPLATES) {
       if (t.kind === "image" && t.imageUrl) urls.add(t.imageUrl);
     }
-    for (const r of signedCustoms ?? customData?.templates ?? []) {
+    for (const r of customData?.templates ?? []) {
       if (r.image_url) urls.add(r.image_url);
     }
     urls.forEach(prewarmBase);
-  }, [context, signedCustoms, customData?.templates]);
+  }, [context, customData?.templates]);
 
   const deleteFn = useServerFn(deleteQrAdTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
