@@ -117,6 +117,7 @@ import { Route as DashboardQrAdsRouteImport } from './routes/dashboard.qr-ads'
 import { Route as DashboardPromoterResourcesRouteImport } from './routes/dashboard.promoter-resources'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardPartnerProgramRouteImport } from './routes/dashboard.partner-program'
+import { Route as DashboardPartnerRouteImport } from './routes/dashboard.partner'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
 import { Route as DashboardLearningRouteImport } from './routes/dashboard.learning'
@@ -185,6 +186,7 @@ import { Route as AuthenticatedCompleteProfileRouteImport } from './routes/_auth
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
+import { Route as DashboardPartnerIndexRouteImport } from './routes/dashboard.partner.index'
 import { Route as AdminStaffAcademyIndexRouteImport } from './routes/admin.staff-academy.index'
 import { Route as AdminAdvertisementsIndexRouteImport } from './routes/admin.advertisements.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
@@ -201,6 +203,14 @@ import { Route as DashboardTeamPerformanceRouteImport } from './routes/dashboard
 import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.team.members'
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
+import { Route as DashboardPartnerReferralsRouteImport } from './routes/dashboard.partner.referrals'
+import { Route as DashboardPartnerQrAnalyticsRouteImport } from './routes/dashboard.partner.qr-analytics'
+import { Route as DashboardPartnerQrAdsRouteImport } from './routes/dashboard.partner.qr-ads'
+import { Route as DashboardPartnerPerformanceRouteImport } from './routes/dashboard.partner.performance'
+import { Route as DashboardPartnerOverviewRouteImport } from './routes/dashboard.partner.overview'
+import { Route as DashboardPartnerInboxRouteImport } from './routes/dashboard.partner.inbox'
+import { Route as DashboardPartnerAdvertisementsRouteImport } from './routes/dashboard.partner.advertisements'
+import { Route as DashboardPartnerActivityRouteImport } from './routes/dashboard.partner.activity'
 import { Route as DashboardDispatchHistoryRouteImport } from './routes/dashboard.dispatch.history'
 import { Route as DashboardBusinessBusinessIdRouteImport } from './routes/dashboard.business.$businessId'
 import { Route as ClubsApplySuccessRouteImport } from './routes/clubs.apply.success'
@@ -825,6 +835,11 @@ const DashboardPartnerProgramRoute = DashboardPartnerProgramRouteImport.update({
   path: '/partner-program',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPartnerRoute = DashboardPartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardMessagesRoute = DashboardMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
@@ -1170,6 +1185,11 @@ const DashboardTeamIndexRoute = DashboardTeamIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardTeamRoute,
 } as any)
+const DashboardPartnerIndexRoute = DashboardPartnerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardPartnerRoute,
+} as any)
 const AdminStaffAcademyIndexRoute = AdminStaffAcademyIndexRouteImport.update({
   id: '/staff-academy/',
   path: '/staff-academy/',
@@ -1252,6 +1272,52 @@ const DashboardRidesNewRoute = DashboardRidesNewRouteImport.update({
   path: '/rides/new',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPartnerReferralsRoute =
+  DashboardPartnerReferralsRouteImport.update({
+    id: '/referrals',
+    path: '/referrals',
+    getParentRoute: () => DashboardPartnerRoute,
+  } as any)
+const DashboardPartnerQrAnalyticsRoute =
+  DashboardPartnerQrAnalyticsRouteImport.update({
+    id: '/qr-analytics',
+    path: '/qr-analytics',
+    getParentRoute: () => DashboardPartnerRoute,
+  } as any)
+const DashboardPartnerQrAdsRoute = DashboardPartnerQrAdsRouteImport.update({
+  id: '/qr-ads',
+  path: '/qr-ads',
+  getParentRoute: () => DashboardPartnerRoute,
+} as any)
+const DashboardPartnerPerformanceRoute =
+  DashboardPartnerPerformanceRouteImport.update({
+    id: '/performance',
+    path: '/performance',
+    getParentRoute: () => DashboardPartnerRoute,
+  } as any)
+const DashboardPartnerOverviewRoute =
+  DashboardPartnerOverviewRouteImport.update({
+    id: '/overview',
+    path: '/overview',
+    getParentRoute: () => DashboardPartnerRoute,
+  } as any)
+const DashboardPartnerInboxRoute = DashboardPartnerInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => DashboardPartnerRoute,
+} as any)
+const DashboardPartnerAdvertisementsRoute =
+  DashboardPartnerAdvertisementsRouteImport.update({
+    id: '/advertisements',
+    path: '/advertisements',
+    getParentRoute: () => DashboardPartnerRoute,
+  } as any)
+const DashboardPartnerActivityRoute =
+  DashboardPartnerActivityRouteImport.update({
+    id: '/activity',
+    path: '/activity',
+    getParentRoute: () => DashboardPartnerRoute,
+  } as any)
 const DashboardDispatchHistoryRoute =
   DashboardDispatchHistoryRouteImport.update({
     id: '/history',
@@ -1835,6 +1901,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/partner': typeof DashboardPartnerRouteWithChildren
   '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
@@ -1942,6 +2009,14 @@ export interface FileRoutesByFullPath {
   '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdRouteWithChildren
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
+  '/dashboard/partner/activity': typeof DashboardPartnerActivityRoute
+  '/dashboard/partner/advertisements': typeof DashboardPartnerAdvertisementsRoute
+  '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
+  '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
+  '/dashboard/partner/performance': typeof DashboardPartnerPerformanceRoute
+  '/dashboard/partner/qr-ads': typeof DashboardPartnerQrAdsRoute
+  '/dashboard/partner/qr-analytics': typeof DashboardPartnerQrAnalyticsRoute
+  '/dashboard/partner/referrals': typeof DashboardPartnerReferralsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -1958,6 +2033,7 @@ export interface FileRoutesByFullPath {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/admin/staff-academy/': typeof AdminStaffAcademyIndexRoute
+  '/dashboard/partner/': typeof DashboardPartnerIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2212,6 +2288,14 @@ export interface FileRoutesByTo {
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
   '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
+  '/dashboard/partner/activity': typeof DashboardPartnerActivityRoute
+  '/dashboard/partner/advertisements': typeof DashboardPartnerAdvertisementsRoute
+  '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
+  '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
+  '/dashboard/partner/performance': typeof DashboardPartnerPerformanceRoute
+  '/dashboard/partner/qr-ads': typeof DashboardPartnerQrAdsRoute
+  '/dashboard/partner/qr-analytics': typeof DashboardPartnerQrAnalyticsRoute
+  '/dashboard/partner/referrals': typeof DashboardPartnerReferralsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -2228,6 +2312,7 @@ export interface FileRoutesByTo {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements': typeof AdminAdvertisementsIndexRoute
   '/admin/staff-academy': typeof AdminStaffAcademyIndexRoute
+  '/dashboard/partner': typeof DashboardPartnerIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2383,6 +2468,7 @@ export interface FileRoutesById {
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/partner': typeof DashboardPartnerRouteWithChildren
   '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
@@ -2490,6 +2576,14 @@ export interface FileRoutesById {
   '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdRouteWithChildren
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
+  '/dashboard/partner/activity': typeof DashboardPartnerActivityRoute
+  '/dashboard/partner/advertisements': typeof DashboardPartnerAdvertisementsRoute
+  '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
+  '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
+  '/dashboard/partner/performance': typeof DashboardPartnerPerformanceRoute
+  '/dashboard/partner/qr-ads': typeof DashboardPartnerQrAdsRoute
+  '/dashboard/partner/qr-analytics': typeof DashboardPartnerQrAnalyticsRoute
+  '/dashboard/partner/referrals': typeof DashboardPartnerReferralsRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -2506,6 +2600,7 @@ export interface FileRoutesById {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/admin/staff-academy/': typeof AdminStaffAcademyIndexRoute
+  '/dashboard/partner/': typeof DashboardPartnerIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/_authenticated/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2661,6 +2756,7 @@ export interface FileRouteTypes {
     | '/dashboard/learning'
     | '/dashboard/likes'
     | '/dashboard/messages'
+    | '/dashboard/partner'
     | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
@@ -2768,6 +2864,14 @@ export interface FileRouteTypes {
     | '/clubs/apply/success'
     | '/dashboard/business/$businessId'
     | '/dashboard/dispatch/history'
+    | '/dashboard/partner/activity'
+    | '/dashboard/partner/advertisements'
+    | '/dashboard/partner/inbox'
+    | '/dashboard/partner/overview'
+    | '/dashboard/partner/performance'
+    | '/dashboard/partner/qr-ads'
+    | '/dashboard/partner/qr-analytics'
+    | '/dashboard/partner/referrals'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -2784,6 +2888,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/admin/staff-academy/'
+    | '/dashboard/partner/'
     | '/dashboard/team/'
     | '/dashboard/clubs/$id'
     | '/staff/academy/$slug'
@@ -3038,6 +3143,14 @@ export interface FileRouteTypes {
     | '/businesses/$slug/book'
     | '/clubs/apply/success'
     | '/dashboard/dispatch/history'
+    | '/dashboard/partner/activity'
+    | '/dashboard/partner/advertisements'
+    | '/dashboard/partner/inbox'
+    | '/dashboard/partner/overview'
+    | '/dashboard/partner/performance'
+    | '/dashboard/partner/qr-ads'
+    | '/dashboard/partner/qr-analytics'
+    | '/dashboard/partner/referrals'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -3054,6 +3167,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements'
     | '/admin/staff-academy'
+    | '/dashboard/partner'
     | '/dashboard/team'
     | '/dashboard/clubs/$id'
     | '/staff/academy/$slug'
@@ -3208,6 +3322,7 @@ export interface FileRouteTypes {
     | '/dashboard/learning'
     | '/dashboard/likes'
     | '/dashboard/messages'
+    | '/dashboard/partner'
     | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
@@ -3315,6 +3430,14 @@ export interface FileRouteTypes {
     | '/clubs/apply/success'
     | '/dashboard/business/$businessId'
     | '/dashboard/dispatch/history'
+    | '/dashboard/partner/activity'
+    | '/dashboard/partner/advertisements'
+    | '/dashboard/partner/inbox'
+    | '/dashboard/partner/overview'
+    | '/dashboard/partner/performance'
+    | '/dashboard/partner/qr-ads'
+    | '/dashboard/partner/qr-analytics'
+    | '/dashboard/partner/referrals'
     | '/dashboard/rides_/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -3331,6 +3454,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/admin/staff-academy/'
+    | '/dashboard/partner/'
     | '/dashboard/team/'
     | '/_authenticated/dashboard/clubs_/$id'
     | '/_authenticated/staff/academy/$slug'
@@ -4270,6 +4394,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardPartnerProgramRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/partner': {
+      id: '/dashboard/partner'
+      path: '/partner'
+      fullPath: '/dashboard/partner'
+      preLoaderRoute: typeof DashboardPartnerRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/messages': {
       id: '/dashboard/messages'
       path: '/messages'
@@ -4746,6 +4877,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTeamIndexRouteImport
       parentRoute: typeof DashboardTeamRoute
     }
+    '/dashboard/partner/': {
+      id: '/dashboard/partner/'
+      path: '/'
+      fullPath: '/dashboard/partner/'
+      preLoaderRoute: typeof DashboardPartnerIndexRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
     '/admin/staff-academy/': {
       id: '/admin/staff-academy/'
       path: '/staff-academy'
@@ -4857,6 +4995,62 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/rides/new'
       preLoaderRoute: typeof DashboardRidesNewRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/partner/referrals': {
+      id: '/dashboard/partner/referrals'
+      path: '/referrals'
+      fullPath: '/dashboard/partner/referrals'
+      preLoaderRoute: typeof DashboardPartnerReferralsRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
+    '/dashboard/partner/qr-analytics': {
+      id: '/dashboard/partner/qr-analytics'
+      path: '/qr-analytics'
+      fullPath: '/dashboard/partner/qr-analytics'
+      preLoaderRoute: typeof DashboardPartnerQrAnalyticsRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
+    '/dashboard/partner/qr-ads': {
+      id: '/dashboard/partner/qr-ads'
+      path: '/qr-ads'
+      fullPath: '/dashboard/partner/qr-ads'
+      preLoaderRoute: typeof DashboardPartnerQrAdsRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
+    '/dashboard/partner/performance': {
+      id: '/dashboard/partner/performance'
+      path: '/performance'
+      fullPath: '/dashboard/partner/performance'
+      preLoaderRoute: typeof DashboardPartnerPerformanceRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
+    '/dashboard/partner/overview': {
+      id: '/dashboard/partner/overview'
+      path: '/overview'
+      fullPath: '/dashboard/partner/overview'
+      preLoaderRoute: typeof DashboardPartnerOverviewRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
+    '/dashboard/partner/inbox': {
+      id: '/dashboard/partner/inbox'
+      path: '/inbox'
+      fullPath: '/dashboard/partner/inbox'
+      preLoaderRoute: typeof DashboardPartnerInboxRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
+    '/dashboard/partner/advertisements': {
+      id: '/dashboard/partner/advertisements'
+      path: '/advertisements'
+      fullPath: '/dashboard/partner/advertisements'
+      preLoaderRoute: typeof DashboardPartnerAdvertisementsRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
+    '/dashboard/partner/activity': {
+      id: '/dashboard/partner/activity'
+      path: '/activity'
+      fullPath: '/dashboard/partner/activity'
+      preLoaderRoute: typeof DashboardPartnerActivityRouteImport
+      parentRoute: typeof DashboardPartnerRoute
     }
     '/dashboard/dispatch/history': {
       id: '/dashboard/dispatch/history'
@@ -5696,6 +5890,33 @@ const DashboardDispatchRouteChildren: DashboardDispatchRouteChildren = {
 const DashboardDispatchRouteWithChildren =
   DashboardDispatchRoute._addFileChildren(DashboardDispatchRouteChildren)
 
+interface DashboardPartnerRouteChildren {
+  DashboardPartnerActivityRoute: typeof DashboardPartnerActivityRoute
+  DashboardPartnerAdvertisementsRoute: typeof DashboardPartnerAdvertisementsRoute
+  DashboardPartnerInboxRoute: typeof DashboardPartnerInboxRoute
+  DashboardPartnerOverviewRoute: typeof DashboardPartnerOverviewRoute
+  DashboardPartnerPerformanceRoute: typeof DashboardPartnerPerformanceRoute
+  DashboardPartnerQrAdsRoute: typeof DashboardPartnerQrAdsRoute
+  DashboardPartnerQrAnalyticsRoute: typeof DashboardPartnerQrAnalyticsRoute
+  DashboardPartnerReferralsRoute: typeof DashboardPartnerReferralsRoute
+  DashboardPartnerIndexRoute: typeof DashboardPartnerIndexRoute
+}
+
+const DashboardPartnerRouteChildren: DashboardPartnerRouteChildren = {
+  DashboardPartnerActivityRoute: DashboardPartnerActivityRoute,
+  DashboardPartnerAdvertisementsRoute: DashboardPartnerAdvertisementsRoute,
+  DashboardPartnerInboxRoute: DashboardPartnerInboxRoute,
+  DashboardPartnerOverviewRoute: DashboardPartnerOverviewRoute,
+  DashboardPartnerPerformanceRoute: DashboardPartnerPerformanceRoute,
+  DashboardPartnerQrAdsRoute: DashboardPartnerQrAdsRoute,
+  DashboardPartnerQrAnalyticsRoute: DashboardPartnerQrAnalyticsRoute,
+  DashboardPartnerReferralsRoute: DashboardPartnerReferralsRoute,
+  DashboardPartnerIndexRoute: DashboardPartnerIndexRoute,
+}
+
+const DashboardPartnerRouteWithChildren =
+  DashboardPartnerRoute._addFileChildren(DashboardPartnerRouteChildren)
+
 interface DashboardTeamRouteChildren {
   DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
   DashboardTeamMembersRoute: typeof DashboardTeamMembersRoute
@@ -5760,6 +5981,7 @@ interface DashboardRouteChildren {
   DashboardLearningRoute: typeof DashboardLearningRoute
   DashboardLikesRoute: typeof DashboardLikesRoute
   DashboardMessagesRoute: typeof DashboardMessagesRoute
+  DashboardPartnerRoute: typeof DashboardPartnerRouteWithChildren
   DashboardPartnerProgramRoute: typeof DashboardPartnerProgramRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardPromoterResourcesRoute: typeof DashboardPromoterResourcesRoute
@@ -5795,6 +6017,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLearningRoute: DashboardLearningRoute,
   DashboardLikesRoute: DashboardLikesRoute,
   DashboardMessagesRoute: DashboardMessagesRoute,
+  DashboardPartnerRoute: DashboardPartnerRouteWithChildren,
   DashboardPartnerProgramRoute: DashboardPartnerProgramRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardPromoterResourcesRoute: DashboardPromoterResourcesRoute,
