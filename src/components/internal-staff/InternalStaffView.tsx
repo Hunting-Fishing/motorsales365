@@ -154,25 +154,8 @@ export function InternalStaffView({
     </div>
   );
 
-  // Placed after the return so it's hoisted; used inside handlers above.
-  // eslint-disable-next-line no-inner-declarations
-  function deactivateFn(args: { data: { userId: string } }) {
-    return deactivate(args);
-  }
 }
 
-// Server-fn wrappers hoisted at module scope
-function useDeactivate() {
-  return useServerFn(deactivateInternalStaff);
-}
-
-// We define a module-level deactivate stub replaced at first call. Simpler:
-// use a local hook inside the component. Rework:
-const deactivate = async (args: { data: { userId: string } }) => {
-  // Direct call to the server fn reference works because createServerFn
-  // returns a callable client stub.
-  return deactivateInternalStaff(args);
-};
 
 function TreeRow({
   node,
