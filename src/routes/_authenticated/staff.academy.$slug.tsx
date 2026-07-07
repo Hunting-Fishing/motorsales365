@@ -164,7 +164,7 @@ function ArticlePage() {
                         {s.cta.label}
                       </a>
                     ) : (
-                      <a href={s.cta.to}>{s.cta.label}</a>
+                      <Link to={s.cta.to as any}>{s.cta.label}</Link>
                     )}
                   </Button>
                 </div>
