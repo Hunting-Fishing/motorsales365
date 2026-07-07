@@ -145,10 +145,11 @@ function StaffAcademyAdminList() {
     onError: (e: any) => toast.error(e?.message ?? "Failed"),
   });
 
-  const moveRow = (index: number, dir: -1 | 1) => {
-    const next = [...rows];
+  const moveRow = (id: string, dir: -1 | 1) => {
+    const next = [...allRows];
+    const index = next.findIndex((r) => r.id === id);
     const target = index + dir;
-    if (target < 0 || target >= next.length) return;
+    if (index < 0 || target < 0 || target >= next.length) return;
     const [item] = next.splice(index, 1);
     next.splice(target, 0, item);
     move.mutate(next.map((r) => r.id));
