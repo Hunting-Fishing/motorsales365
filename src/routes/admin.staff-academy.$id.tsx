@@ -14,6 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { isStaffEmail } from "@/lib/staff-domain";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -82,7 +83,8 @@ function slugify(text: string): string {
 }
 
 function StaffAcademyEditor() {
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, user } = useAuth();
+  const canManage = !!isAdmin && isStaffEmail(user?.email);
   const { id } = Route.useParams();
   const isNew = id === "new";
   const navigate = useNavigate();
@@ -97,7 +99,7 @@ function StaffAcademyEditor() {
   const q = useQuery({
     queryKey: ["admin-staff-academy", id],
     queryFn: () => loadOne({ data: { id } }),
-    enabled: !!isAdmin && !isNew,
+    enabled: canManage && !isNew,
   });
 
   useEffect(() => {
@@ -146,14 +148,14 @@ function StaffAcademyEditor() {
   const historyQ = useQuery({
     queryKey: ["admin-staff-academy-history", id],
     queryFn: () => loadHistory({ data: { article_id: id } }),
-    enabled: !!isAdmin && !isNew,
+    enabled: canManage && !isNew,
   });
 
   const loadStats = useServerFn(getStaffAcademyArticleStats);
   const statsQ = useQuery({
     queryKey: ["admin-staff-academy-stats", id],
     queryFn: () => loadStats({ data: { article_id: id } }),
-    enabled: !!isAdmin && !isNew,
+    enabled: canManage && !isNew,
     staleTime: 30_000,
   });
 
@@ -171,10 +173,10 @@ function StaffAcademyEditor() {
       <div className="rounded-lg border p-6 text-sm text-muted-foreground">Loading…</div>
     );
   }
-  if (!isAdmin) {
+  if (!canManage) {
     return (
       <div className="rounded-lg border p-6 text-sm text-muted-foreground">
-        Admins only.
+        Restricted — requires an admin account on the <b>@365motorsales.com</b> domain.
       </div>
     );
   }

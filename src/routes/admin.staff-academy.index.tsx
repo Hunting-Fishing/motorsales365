@@ -15,6 +15,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { isStaffEmail } from "@/lib/staff-domain";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -60,7 +61,8 @@ export const Route = createFileRoute("/admin/staff-academy/")({
 });
 
 function StaffAcademyAdminList() {
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, user } = useAuth();
+  const canManage = !!isAdmin && isStaffEmail(user?.email);
   const qc = useQueryClient();
   const fetchAll = useServerFn(listAllStaffAcademyArticlesAdmin);
   const del = useServerFn(deleteStaffAcademyArticle);
@@ -76,7 +78,7 @@ function StaffAcademyAdminList() {
   const q = useQuery({
     queryKey: ["admin-staff-academy"],
     queryFn: () => fetchAll(),
-    enabled: !!isAdmin,
+    enabled: canManage,
   });
 
   const allRows: DbArticleRow[] = q.data ?? [];
@@ -170,10 +172,10 @@ function StaffAcademyAdminList() {
       <div className="rounded-lg border p-6 text-sm text-muted-foreground">Loading…</div>
     );
   }
-  if (!isAdmin) {
+  if (!canManage) {
     return (
       <div className="rounded-lg border p-6 text-sm text-muted-foreground">
-        Admins only.
+        Restricted — requires an admin account on the <b>@365motorsales.com</b> domain.
       </div>
     );
   }

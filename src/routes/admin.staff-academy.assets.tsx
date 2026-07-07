@@ -14,6 +14,7 @@ import {
   Upload,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { isStaffEmail } from "@/lib/staff-domain";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -101,7 +102,8 @@ function guessKind(file: File): StaffAcademyAsset["kind"] {
 }
 
 function StaffAcademyAssetsAdmin() {
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, user } = useAuth();
+  const canManage = !!isAdmin && isStaffEmail(user?.email);
   const qc = useQueryClient();
   const fetchAll = useServerFn(listAllStaffAcademyAssetsAdmin);
   const upsert = useServerFn(upsertStaffAcademyAsset);
@@ -114,7 +116,7 @@ function StaffAcademyAssetsAdmin() {
   const q = useQuery({
     queryKey: ["admin-staff-academy-assets"],
     queryFn: () => fetchAll(),
-    enabled: !!isAdmin,
+    enabled: canManage,
   });
 
   const rows: StaffAcademyAsset[] = q.data ?? [];
@@ -166,9 +168,11 @@ function StaffAcademyAssetsAdmin() {
   if (loading) {
     return <div className="rounded-lg border p-6 text-sm text-muted-foreground">Loading…</div>;
   }
-  if (!isAdmin) {
+  if (!canManage) {
     return (
-      <div className="rounded-lg border p-6 text-sm text-muted-foreground">Admins only.</div>
+      <div className="rounded-lg border p-6 text-sm text-muted-foreground">
+        Restricted — requires an admin account on the <b>@365motorsales.com</b> domain.
+      </div>
     );
   }
 
