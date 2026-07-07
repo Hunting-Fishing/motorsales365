@@ -31,12 +31,14 @@ import {
   getStaffAcademyArticleById,
   upsertStaffAcademyArticle,
   listStaffAcademyArticleHistory,
+  getStaffAcademyArticleStats,
   type DbArticleRow,
   type DbArticleSection,
   type ArticleHistoryRow,
+  type ArticleViewStats,
 } from "@/lib/staff-academy-articles.functions";
 import { CATEGORY_META, type ArticleCategory } from "@/content/staff-academy";
-import { History, Eye, EyeOff, FilePlus2, RefreshCw } from "lucide-react";
+import { History, Eye, EyeOff, FilePlus2, RefreshCw, BarChart3, Users, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/admin/staff-academy/$id")({
   head: () => ({ meta: [{ title: "Edit article — Staff Academy" }] }),
@@ -145,6 +147,14 @@ function StaffAcademyEditor() {
     queryKey: ["admin-staff-academy-history", id],
     queryFn: () => loadHistory({ data: { article_id: id } }),
     enabled: !!isAdmin && !isNew,
+  });
+
+  const loadStats = useServerFn(getStaffAcademyArticleStats);
+  const statsQ = useQuery({
+    queryKey: ["admin-staff-academy-stats", id],
+    queryFn: () => loadStats({ data: { article_id: id } }),
+    enabled: !!isAdmin && !isNew,
+    staleTime: 30_000,
   });
 
   // Refresh history when a save happens
@@ -530,6 +540,37 @@ function StaffAcademyEditor() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <div className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-primary" />
+              <CardTitle className="text-base">Reader analytics</CardTitle>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() =>
+                qc.invalidateQueries({ queryKey: ["admin-staff-academy-stats", id] })
+              }
+              disabled={statsQ.isFetching}
+              aria-label="Refresh analytics"
+            >
+              <RefreshCw className={`h-4 w-4 ${statsQ.isFetching ? "animate-spin" : ""}`} />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {statsQ.isLoading ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading analytics…
+              </div>
+            ) : (
+              <StatsPanel stats={statsQ.data as ArticleViewStats | undefined} />
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {!isNew && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div className="flex items-center gap-2">
               <History className="h-4 w-4 text-primary" />
               <CardTitle className="text-base">Publish history</CardTitle>
             </div>
@@ -614,3 +655,79 @@ function HistoryItem({ entry }: { entry: ArticleHistoryRow }) {
   );
 }
 
+
+function StatsPanel({ stats }: { stats: ArticleViewStats | undefined }) {
+  if (!stats) {
+    return (
+      <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+        No analytics available yet.
+      </div>
+    );
+  }
+  const last = stats.last_viewed_at ? new Date(stats.last_viewed_at) : null;
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <StatTile icon={Eye} label="Total views" value={stats.views.toLocaleString()} />
+        <StatTile
+          icon={Users}
+          label="Unique viewers"
+          value={stats.unique_viewers.toLocaleString()}
+        />
+        <StatTile
+          icon={Clock}
+          label="Last accessed"
+          value={last ? last.toLocaleString() : "—"}
+          small
+        />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <StatTile icon={BarChart3} label="Views · last 7 days" value={String(stats.views_last_7d)} />
+        <StatTile icon={BarChart3} label="Views · last 30 days" value={String(stats.views_last_30d)} />
+      </div>
+      {stats.recent.length > 0 && (
+        <div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Recent viewers
+          </div>
+          <ul className="divide-y rounded-md border">
+            {stats.recent.map((r, i) => (
+              <li key={i} className="flex items-center justify-between px-3 py-2 text-sm">
+                <span className="truncate">
+                  {r.viewer_email ?? (r.viewer_id ? r.viewer_id.slice(0, 8) : "anonymous")}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(r.created_at).toLocaleString()}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StatTile({
+  icon: Icon,
+  label,
+  value,
+  small,
+}: {
+  icon: any;
+  label: string;
+  value: string;
+  small?: boolean;
+}) {
+  return (
+    <div className="rounded-md border bg-muted/30 p-3">
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Icon className="h-3.5 w-3.5" />
+        {label}
+      </div>
+      <div className={small ? "mt-1 text-sm font-medium" : "mt-1 text-2xl font-bold"}>
+        {value}
+      </div>
+    </div>
+  );
+}

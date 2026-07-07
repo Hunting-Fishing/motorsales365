@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Calendar } from "lucide-react";
@@ -14,7 +15,10 @@ import {
   getArticle,
   type Article,
 } from "@/content/staff-academy";
-import { getStaffAcademyArticleBySlug } from "@/lib/staff-academy-articles.functions";
+import {
+  getStaffAcademyArticleBySlug,
+  recordStaffAcademyArticleView,
+} from "@/lib/staff-academy-articles.functions";
 
 export const Route = createFileRoute("/_authenticated/staff/academy/$slug")({
   head: ({ params }) => {
@@ -74,6 +78,15 @@ function ArticlePage() {
   const article: Article | undefined = dbQuery.data
     ? dbRowToArticle(dbQuery.data as any)
     : staticArticle;
+
+  const recordView = useServerFn(recordStaffAcademyArticleView);
+  const loggedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!canView || !article || loggedRef.current === slug) return;
+    loggedRef.current = slug;
+    const articleId = (dbQuery.data as any)?.id ?? null;
+    recordView({ data: { slug, article_id: articleId } }).catch(() => {});
+  }, [canView, article, slug, dbQuery.data, recordView]);
 
   if (loading || dbQuery.isLoading) {
     return (
