@@ -45,6 +45,21 @@ const upsertSchema = z.object({
   active: z.boolean().default(true),
 });
 
+const TPL_BUCKET = "share-kit-templates";
+const TPL_PUBLIC_PREFIX = `/storage/v1/object/public/${TPL_BUCKET}/`;
+const TPL_SIGNED_PREFIX = `/storage/v1/object/sign/${TPL_BUCKET}/`;
+
+function extractTemplatePath(url: string): string | null {
+  const i = url.indexOf(TPL_PUBLIC_PREFIX);
+  if (i !== -1) return decodeURIComponent(url.slice(i + TPL_PUBLIC_PREFIX.length));
+  const j = url.indexOf(TPL_SIGNED_PREFIX);
+  if (j !== -1) {
+    const rest = url.slice(j + TPL_SIGNED_PREFIX.length).split("?")[0];
+    return decodeURIComponent(rest);
+  }
+  return null;
+}
+
 // List active custom templates + hidden built-in ids + admin builtin category overrides (any authed staff)
 export const listQrAdTemplates = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -62,12 +77,34 @@ export const listQrAdTemplates = createServerFn({ method: "GET" })
     if (tplRes.error) throw new Error(tplRes.error.message);
     if (hidRes.error) throw new Error(hidRes.error.message);
     if (biRes.error) throw new Error(biRes.error.message);
+
+    // The share-kit-templates bucket is private; swap stored public URLs for
+    // signed URLs so the client never issues 400s trying to load them.
+    const rawTemplates = (tplRes.data ?? []) as CustomTemplateRow[];
+    const paths = rawTemplates
+      .map((r) => extractTemplatePath(r.image_url))
+      .filter((p): p is string => !!p);
+    let signedMap: Record<string, string> = {};
+    if (paths.length > 0) {
+      const { data: signed } = await supabase.storage
+        .from(TPL_BUCKET)
+        .createSignedUrls(paths, 60 * 60);
+      (signed ?? []).forEach((s: any, idx: number) => {
+        if (s?.signedUrl) signedMap[paths[idx]] = s.signedUrl;
+      });
+    }
+    const templates = rawTemplates.map((r) => {
+      const p = extractTemplatePath(r.image_url);
+      return p && signedMap[p] ? { ...r, image_url: signedMap[p] } : r;
+    });
+
     return {
-      templates: (tplRes.data ?? []) as CustomTemplateRow[],
+      templates,
       hiddenBuiltins: ((hidRes.data ?? []) as { template_id: string }[]).map((r) => r.template_id),
       builtinCategories: (biRes.data ?? []) as BuiltinCategoryRow[],
     };
   });
+
 
 
 export const upsertQrAdTemplate = createServerFn({ method: "POST" })
