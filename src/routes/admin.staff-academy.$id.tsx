@@ -30,10 +30,13 @@ import {
 import {
   getStaffAcademyArticleById,
   upsertStaffAcademyArticle,
+  listStaffAcademyArticleHistory,
   type DbArticleRow,
   type DbArticleSection,
+  type ArticleHistoryRow,
 } from "@/lib/staff-academy-articles.functions";
 import { CATEGORY_META, type ArticleCategory } from "@/content/staff-academy";
+import { History, Eye, EyeOff, FilePlus2, RefreshCw } from "lucide-react";
 
 export const Route = createFileRoute("/admin/staff-academy/$id")({
   head: () => ({ meta: [{ title: "Edit article — Staff Academy" }] }),
