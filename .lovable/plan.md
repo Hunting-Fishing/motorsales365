@@ -1,33 +1,38 @@
-## What's broken
+## Problem
 
-Two distinct issues showing in the console/network on `/resources/qr-landing`:
+The QR ads page fires a 400 (Bad Request) for every custom template image, hundreds at a time. The `share-kit-templates` bucket is private (workspace blocks public buckets), but each `qr_ad_templates` row still stores a `/object/public/...` URL. There is a client hook (`useSignedCustomTemplates`) that rewrites these to signed URLs, but:
 
-**1. React duplicate-key warning (spammed 4×)**
-`src/routes/dashboard.tsx` lines 122–123 have the same tile listed twice in an array that uses `to` as its `key`:
+1. Rendering falls back to `customData?.templates` (raw public URLs) while the signing query is in-flight, so every card immediately requests a URL that 400s.
+2. A `useEffect` prewarm loop also `fetch`es each raw URL, multiplying the failures.
+3. Each failed image triggers "Template render failed" errors in `template-card.tsx`.
 
-```
-{ to: "/resources/qr-landing", label: "Preview scanner view", Icon: QrCode },
-{ to: "/resources/qr-landing", label: "Preview scanner view", Icon: QrCode },
-```
+Net effect: slow load + massive console noise.
 
-React logs "Encountered two children with the same key, `/resources/qr-landing`".
+## Fix
 
-**2. Supabase 400 – `column staff_referrals.user_id does not exist`**
-`src/routes/dashboard.promoter-resources.tsx` line 201 queries the wrong column:
+Sign the URLs server-side once, so the client never sees the broken public URLs.
 
-```
-.from("staff_referrals").select("referral_code").eq("user_id", auth.user.id)
-```
+### Changes
 
-The real column is `staff_user_id` (used correctly everywhere else — `my-qr.tsx`, `dashboard.qr-scan-test.tsx`, `dashboard.tsx`, `dashboard.qr-ads.tsx`). The bad request returns HTTP 400 and the promoter never gets their referral code loaded on that page.
+1. **`src/lib/qr-ad-templates.functions.ts` — `listQrAdTemplates`**
+   - After fetching `qr_ad_templates`, extract the storage path from each row's `image_url` (parse `/storage/v1/object/public/share-kit-templates/...` or `/object/sign/...`).
+   - Batch `supabase.storage.from("share-kit-templates").createSignedUrls(paths, 3600)`.
+   - Return rows with `image_url` replaced by the signed URL. Rows whose path can't be resolved keep the original URL (harmless fallback).
 
-## Fixes
+2. **`src/routes/dashboard.qr-ads.tsx`**
+   - Drop the `useSignedCustomTemplates` call and the `signedCustoms ?? customData?.templates` fallback; use `customData?.templates` directly (now already signed).
+   - Same for the `prewarmBase` effect — it will now prewarm signed URLs, so no 400s.
 
-1. **`src/routes/dashboard.tsx`** — delete the duplicate tile on line 123 so the "Preview scanner view" card appears once.
-2. **`src/routes/dashboard.promoter-resources.tsx`** — change `.eq("user_id", auth.user.id)` to `.eq("staff_user_id", auth.user.id)` on the `staff_referrals` query.
+3. **`src/components/qr-ads/use-signed-custom-templates.ts`**
+   - No longer referenced. Delete the file to keep the code path single.
 
-Then reload `/resources/qr-landing` and `/dashboard/promoter-resources` and confirm the console is clean and no more 400s on `staff_referrals`.
+### Why this works
 
-## Out of scope
+- No client render ever uses a raw `/object/public/...` URL, so the browser stops issuing 400s.
+- One server round trip (already happening) returns usable URLs — no second "sign" query, so first paint of cards is faster.
+- Signed URLs live 1 hour, matching the previous client hook's TTL; the `qr-ad-templates` query's staleTime keeps them fresh within that window.
 
-No schema changes, no other routes touched, no visual redesign.
+### Out of scope
+
+- Not switching the bucket to public (workspace policy blocks it).
+- Not migrating stored URLs in the DB — parsing at read time keeps the change contained and reversible.
