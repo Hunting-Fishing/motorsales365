@@ -190,6 +190,7 @@ import { Route as AdminAdvertisementsIndexRouteImport } from './routes/admin.adv
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
 import { Route as ShopDepartmentSlugRouteImport } from './routes/shop.department.$slug'
 import { Route as ShopBrandSlugRouteImport } from './routes/shop.brand.$slug'
+import { Route as RCodeQrRouteImport } from './routes/r.$code.qr'
 import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
 import { Route as PartsCSlugRouteImport } from './routes/parts.c.$slug'
@@ -1195,6 +1196,11 @@ const ShopBrandSlugRoute = ShopBrandSlugRouteImport.update({
   path: '/shop/brand/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RCodeQrRoute = RCodeQrRouteImport.update({
+  id: '/qr',
+  path: '/qr',
+  getParentRoute: () => RCodeRoute,
+} as any)
 const RCodePosterRoute = RCodePosterRouteImport.update({
   id: '/poster',
   path: '/poster',
@@ -1946,6 +1952,7 @@ export interface FileRoutesByFullPath {
   '/parts/c/$slug': typeof PartsCSlugRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/r/$code/qr': typeof RCodeQrRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
@@ -2215,6 +2222,7 @@ export interface FileRoutesByTo {
   '/parts/c/$slug': typeof PartsCSlugRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/r/$code/qr': typeof RCodeQrRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
@@ -2492,6 +2500,7 @@ export interface FileRoutesById {
   '/parts/c/$slug': typeof PartsCSlugRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/r/$code/qr': typeof RCodeQrRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
@@ -2769,6 +2778,7 @@ export interface FileRouteTypes {
     | '/parts/c/$slug'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
+    | '/r/$code/qr'
     | '/shop/brand/$slug'
     | '/shop/department/$slug'
     | '/shop/p/$slug'
@@ -3038,6 +3048,7 @@ export interface FileRouteTypes {
     | '/parts/c/$slug'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
+    | '/r/$code/qr'
     | '/shop/brand/$slug'
     | '/shop/department/$slug'
     | '/shop/p/$slug'
@@ -3314,6 +3325,7 @@ export interface FileRouteTypes {
     | '/parts/c/$slug'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
+    | '/r/$code/qr'
     | '/shop/brand/$slug'
     | '/shop/department/$slug'
     | '/shop/p/$slug'
@@ -4769,6 +4781,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopBrandSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/r/$code/qr': {
+      id: '/r/$code/qr'
+      path: '/qr'
+      fullPath: '/r/$code/qr'
+      preLoaderRoute: typeof RCodeQrRouteImport
+      parentRoute: typeof RCodeRoute
+    }
     '/r/$code/poster': {
       id: '/r/$code/poster'
       path: '/poster'
@@ -5924,10 +5943,12 @@ const PartnersPartsRouteWithChildren = PartnersPartsRoute._addFileChildren(
 
 interface RCodeRouteChildren {
   RCodePosterRoute: typeof RCodePosterRoute
+  RCodeQrRoute: typeof RCodeQrRoute
 }
 
 const RCodeRouteChildren: RCodeRouteChildren = {
   RCodePosterRoute: RCodePosterRoute,
+  RCodeQrRoute: RCodeQrRoute,
 }
 
 const RCodeRouteWithChildren = RCodeRoute._addFileChildren(RCodeRouteChildren)

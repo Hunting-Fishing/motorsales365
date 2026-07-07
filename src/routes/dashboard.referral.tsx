@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2, ScanLine, ChevronDown } from "lucide-react";
+import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2, ScanLine, ChevronDown, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
 
@@ -494,12 +494,19 @@ function ReferralQrCard({
               Ask the scanner to fit the whole white square in their camera — the
               extra white border helps the scan work even at odd angles.
             </p>
-            <ResolutionDownload
-              onSelect={handleDownload}
-              options={DOWNLOAD_RESOLUTIONS}
-              triggerLabel="Download PNG"
-              className="w-full sm:w-auto"
-            />
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+              <ResolutionDownload
+                onSelect={handleDownload}
+                options={DOWNLOAD_RESOLUTIONS}
+                triggerLabel="Download PNG"
+                className="w-full sm:w-auto"
+              />
+              <ShareQrPageButton
+                referralCode={referralCode}
+                fullName={fullName}
+                className="w-full sm:w-auto"
+              />
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -591,5 +598,47 @@ function ResolutionDownload({
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+function ShareQrPageButton({
+  referralCode,
+  fullName,
+  className,
+}: {
+  referralCode: string;
+  fullName: string;
+  className?: string;
+}) {
+  const shareUrl = `${siteOrigin()}/r/${referralCode}/qr`;
+
+  const onShare = async () => {
+    const shareData = {
+      title: `${fullName} — 365 Motor Sales`,
+      text: `Scan or open my 365 Motor Sales referral QR:`,
+      url: shareUrl,
+    };
+    if (typeof navigator !== "undefined" && (navigator as any).share) {
+      try {
+        await (navigator as any).share(shareData);
+        return;
+      } catch (err: any) {
+        // User cancelled — nothing to do.
+        if (err?.name === "AbortError") return;
+        // Fall through to clipboard on any other share failure.
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("QR page link copied — paste it in chat to share.");
+    } catch {
+      toast.error("Could not copy link.");
+    }
+  };
+
+  return (
+    <Button variant="outline" onClick={onShare} className={className}>
+      <Share2 className="mr-2 h-4 w-4" /> Share QR page
+    </Button>
   );
 }
