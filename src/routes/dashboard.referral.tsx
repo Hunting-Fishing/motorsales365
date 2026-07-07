@@ -403,6 +403,7 @@ function ReferralQrCard({
   storedQrUrl: string | null;
   posterUrl: string;
 }) {
+  const [qrOpen, setQrOpen] = useState(false);
   const DOWNLOAD_RESOLUTIONS: Array<{ px: number; label: string; hint: string; recommended?: boolean }> = [
     { px: 512, label: "512 px", hint: "Best for chat / social DMs — small file, quick to share" },
     { px: 1024, label: "1024 px", hint: "Recommended — social posts, web, screen sharing", recommended: true },
@@ -432,7 +433,7 @@ function ReferralQrCard({
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
-      <Dialog>
+      <Dialog open={qrOpen} onOpenChange={setQrOpen}>
         <DialogTrigger asChild>
           <button
             type="button"
@@ -483,6 +484,7 @@ function ReferralQrCard({
               <ZoomableQr
                 ariaLabel={`QR code for ${fullName} — pinch or double-tap to zoom`}
                 className="mx-auto"
+                resetSignal={qrOpen}
               >
                 <div
                   className="flex items-center justify-center"
