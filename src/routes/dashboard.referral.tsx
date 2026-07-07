@@ -484,6 +484,7 @@ function ReferralQrCard({
               <ZoomableQr
                 ariaLabel={`QR code for ${fullName} — pinch or double-tap to zoom`}
                 className="mx-auto"
+                resetSignal={qrOpen}
               >
                 <div
                   className="flex items-center justify-center"
