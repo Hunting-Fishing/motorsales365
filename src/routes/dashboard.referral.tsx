@@ -402,7 +402,12 @@ function ReferralQrCard({
   storedQrUrl: string | null;
   posterUrl: string;
 }) {
-  const hiddenHiResRef = useRef<HTMLDivElement>(null);
+  const DOWNLOAD_RESOLUTIONS: Array<{ px: number; label: string; hint: string; recommended?: boolean }> = [
+    { px: 512, label: "512 px", hint: "Best for chat / social DMs — small file, quick to share" },
+    { px: 1024, label: "1024 px", hint: "Recommended — social posts, web, screen sharing", recommended: true },
+    { px: 2048, label: "2048 px", hint: "Print-ready — posters, flyers, business cards" },
+  ];
+
 
   const handleDownload = async (px: number) => {
     try {
