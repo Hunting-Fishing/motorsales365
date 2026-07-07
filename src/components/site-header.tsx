@@ -899,54 +899,18 @@ export function SiteHeader() {
                         <summary className="sticky top-0 z-10 -mx-2 -mt-1.5 mb-1 flex cursor-pointer list-none items-center justify-between rounded-t-lg bg-rose-100 dark:bg-rose-500/25 px-3 py-2 text-xs font-bold uppercase tracking-wider text-rose-800 dark:text-rose-200 shadow-sm">{isAdmin ? "365 Staff" : isAdvertising ? "Partner / Advertising" : isModerator ? "Moderation" : isSupport ? "Support" : "Sales Rep"}<ChevronDown className="h-3.5 w-3.5 shrink-0 transition-transform group-open/sec:rotate-180" /></summary>
                         <div className="flex flex-col gap-0.5">
 
-                          {isSales && (
-                            <>
-                              <SheetClose asChild>
-                                <Link
-                                  to="/dashboard/team/leads"
-                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
-                                >
-                                  <Inbox className="h-4 w-4" /> My leads
-                                </Link>
-                              </SheetClose>
-                              <SheetClose asChild>
-                                <Link
-                                  to="/dashboard/referral"
-                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
-                                >
-                                  <Briefcase className="h-4 w-4" /> My referrals
-                                </Link>
-                              </SheetClose>
-                              <SheetClose asChild>
-                                <Link
-                                  to="/dashboard/team/performance"
-                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
-                                >
-                                  <BarChart3 className="h-4 w-4" /> Performance
-                                </Link>
-                              </SheetClose>
-                            </>
+                          {(isSales || isAdvertising || isAdmin) && (
+                            <SheetClose asChild>
+                              <Link
+                                to="/dashboard/partner"
+                                className="flex items-center gap-2 rounded-md bg-primary px-3 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+                              >
+                                <LayoutDashboard className="h-4 w-4" /> Partner Hub
+                                <span className="ml-auto text-[10px] font-medium opacity-80">All-in-one</span>
+                              </Link>
+                            </SheetClose>
                           )}
-                          {(isAdvertising || isAdmin) && (
-                            <>
-                              <SheetClose asChild>
-                                <Link
-                                  to="/admin/advertisements"
-                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
-                                >
-                                  <Megaphone className="h-4 w-4" /> Advertisements
-                                </Link>
-                              </SheetClose>
-                              <SheetClose asChild>
-                                <Link
-                                  to="/admin/advertisements/analytics"
-                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
-                                >
-                                  <QrCode className="h-4 w-4" /> QR analytics
-                                </Link>
-                              </SheetClose>
-                            </>
-                          )}
+
                           {(isModerator || isAdmin) && (
                             <>
                               <SheetClose asChild>
