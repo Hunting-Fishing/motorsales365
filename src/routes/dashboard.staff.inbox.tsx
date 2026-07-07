@@ -45,7 +45,7 @@ function timeAgo(iso: string) {
 
 function StaffInboxPage() {
   const { user, loading } = useAuth();
-  const { scope, loading: scopeLoading } = useStaffScope();
+  const { scope, isLoading: scopeLoading } = useStaffScope();
   const is365 = !!scope?.is365Staff;
   const fetchConvos = useServerFn(listStaffDmConversations);
 
