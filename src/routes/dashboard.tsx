@@ -154,6 +154,16 @@ function buildHubs(opts: {
   return hubs;
 }
 
+const HUB_TONES = [
+  { bg: "bg-primary/10", border: "border-primary", text: "text-primary" },
+  { bg: "bg-amber-500/10", border: "border-amber-500", text: "text-amber-600 dark:text-amber-400" },
+  { bg: "bg-emerald-500/10", border: "border-emerald-500", text: "text-emerald-600 dark:text-emerald-400" },
+  { bg: "bg-sky-500/10", border: "border-sky-500", text: "text-sky-600 dark:text-sky-400" },
+  { bg: "bg-violet-500/10", border: "border-violet-500", text: "text-violet-600 dark:text-violet-400" },
+  { bg: "bg-fuchsia-500/10", border: "border-fuchsia-500", text: "text-fuchsia-600 dark:text-fuchsia-400" },
+  { bg: "bg-teal-500/10", border: "border-teal-500", text: "text-teal-600 dark:text-teal-400" },
+];
+
 function itemMatches(path: string, item: NavItem) {
   return item.exact ? path === item.to : path === item.to || path.startsWith(item.to + "/");
 }
@@ -338,43 +348,53 @@ function MobileNavMenu({
       <DropdownMenuContent
         align="start"
         sideOffset={6}
-        className="w-[calc(100vw-1.5rem)] max-h-[70vh] overflow-y-auto"
+        className="w-[calc(100vw-1.5rem)] max-h-[70vh] overflow-y-auto space-y-1.5 p-1.5"
       >
-        {hubs.map((hub, hi) => (
-          <div key={hub.key}>
-            {hi > 0 && <DropdownMenuSeparator />}
-            <DropdownMenuLabel className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-              <hub.Icon className="h-3.5 w-3.5" />
-              {hub.label}
-            </DropdownMenuLabel>
-            {hub.items.map(({ to, label, Icon, exact }) => {
-              const isActive = itemMatches(pathname, { to, label, Icon, exact });
-              return (
-                <DropdownMenuItem key={to} asChild className="min-h-11">
-                  <Link
-                    to={to}
-                    activeOptions={{ exact: !!exact }}
-                    className="flex w-full items-center gap-3 px-3 py-2.5 text-sm"
-                  >
-                    <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="flex-1 truncate">{label}</span>
-                    {isActive && <Check className="h-4 w-4 text-primary" />}
-                  </Link>
-                </DropdownMenuItem>
-              );
-            })}
-          </div>
-        ))}
+        {hubs.map((hub, hi) => {
+          const tone = HUB_TONES[hi % HUB_TONES.length];
+          return (
+            <div
+              key={hub.key}
+              className={`rounded-lg border-l-2 ${tone.bg} ${tone.border} px-1 py-1`}
+            >
+              <DropdownMenuLabel
+                className={`flex items-center gap-2 text-[11px] uppercase tracking-wider ${tone.text}`}
+              >
+                <hub.Icon className="h-3.5 w-3.5" />
+                {hub.label}
+              </DropdownMenuLabel>
+              {hub.items.map(({ to, label, Icon, exact }) => {
+                const isActive = itemMatches(pathname, { to, label, Icon, exact });
+                return (
+                  <DropdownMenuItem key={to} asChild className="min-h-11 focus:bg-background/70">
+                    <Link
+                      to={to}
+                      activeOptions={{ exact: !!exact }}
+                      className="flex w-full items-center gap-3 px-3 py-2.5 text-sm"
+                    >
+                      <Icon className={`h-4 w-4 shrink-0 ${tone.text}`} />
+                      <span className="flex-1 truncate">{label}</span>
+                      {isActive && <Check className={`h-4 w-4 ${tone.text}`} />}
+                    </Link>
+                  </DropdownMenuItem>
+                );
+              })}
+            </div>
+          );
+        })}
         {isAdmin && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild className="min-h-11">
+          <div className="rounded-lg border-l-2 border-rose-500 bg-rose-500/10 px-1 py-1">
+            <DropdownMenuLabel className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-rose-600 dark:text-rose-400">
+              <Shield className="h-3.5 w-3.5" />
+              Admin
+            </DropdownMenuLabel>
+            <DropdownMenuItem asChild className="min-h-11 focus:bg-background/70">
               <Link to="/admin" className="flex w-full items-center gap-3 px-3 py-2.5 text-sm">
-                <Shield className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <span className="flex-1 truncate">Admin</span>
+                <Shield className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
+                <span className="flex-1 truncate">Admin dashboard</span>
               </Link>
             </DropdownMenuItem>
-          </>
+          </div>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
