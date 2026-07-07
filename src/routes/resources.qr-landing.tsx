@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, QrCode, Share2, Users } from "lucide-react";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, ArrowRight, QrCode, Share2, Users } from "lucide-react";
 import { QrLandingContent } from "@/components/qr-landing-content";
+import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 import bannerAsset from "@/assets/qr-landing-uploaded/365-motor-sales-banner.png.asset.json";
 
 export const Route = createFileRoute("/resources/qr-landing")({
@@ -19,8 +21,34 @@ export const Route = createFileRoute("/resources/qr-landing")({
 });
 
 function ResourceQrLandingPreview() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const isLoggedIn = Boolean(user);
+
   return (
-    <div>
+    <SiteLayout>
+      {isLoggedIn && (
+        <div className="border-b border-border bg-background">
+          <div className="container mx-auto max-w-7xl px-4 py-3 flex items-center justify-between gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.history.back()}
+              className="gap-1.5"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+            <Link to="/dashboard/promoter-resources">
+              <Button variant="outline" size="sm">
+                Promoter resources
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+      <div>
+
       <section className="border-b border-border bg-secondary/40">
         <div className="container mx-auto max-w-7xl px-4 py-6 sm:py-10">
           <div className="overflow-hidden rounded-xl border border-border bg-white grid grid-cols-1 md:grid-cols-[1.2fr_0.8fr]">
