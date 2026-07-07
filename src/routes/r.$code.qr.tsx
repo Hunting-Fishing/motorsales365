@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Download, ExternalLink } from "lucide-react";
 import { siteOrigin } from "@/lib/site-config";
 import { computeQuietZoneModules } from "@/lib/qr-quiet-zone";
+import { ZoomableQr } from "@/components/qr/zoomable-qr";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/r/$code/qr")({
@@ -95,27 +96,31 @@ function ReferralQrFullscreen() {
         </div>
 
         <div
-          className="w-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-border"
+          className="w-full rounded-2xl bg-white p-4 shadow-sm ring-1 ring-border"
           role="img"
           aria-label={`QR code for ${name ?? code}`}
         >
-          {qrDataUrl ? (
-            <img
-              src={qrDataUrl}
-              alt={`QR code linking to ${link}`}
-              className="mx-auto block h-auto w-full max-w-[360px]"
-            />
-          ) : (
-            <div className="mx-auto aspect-square w-full max-w-[360px] animate-pulse rounded-md bg-muted" />
-          )}
+          <ZoomableQr ariaLabel="Pinch or double-tap the QR to zoom in for scanning">
+            {qrDataUrl ? (
+              <img
+                src={qrDataUrl}
+                alt={`QR code linking to ${link}`}
+                draggable={false}
+                className="mx-auto block h-auto w-full max-w-[360px]"
+              />
+            ) : (
+              <div className="mx-auto aspect-square w-full max-w-[360px] animate-pulse rounded-md bg-muted" />
+            )}
+          </ZoomableQr>
           <div className="mt-3 text-center font-mono text-[11px] text-muted-foreground">
             {code}
           </div>
         </div>
 
         <p className="max-w-xs text-center text-xs text-muted-foreground">
-          Point your phone camera at the square. Or tap the button below to open the link directly.
+          Pinch, double-tap, or use the +/− buttons to zoom. Or tap "Open link" below.
         </p>
+
 
         <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-3">
           <a href={link} target="_blank" rel="noreferrer" className="sm:col-span-1">
