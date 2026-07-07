@@ -48,13 +48,34 @@ function mapRow(row: any): DbArticleRow {
   };
 }
 
-async function isAdmin(context: any): Promise<boolean> {
+const STAFF_DOMAIN = "@365motorsales.com";
+
+function isStaffEmail(email: string | null | undefined): boolean {
+  return !!email && email.trim().toLowerCase().endsWith(STAFF_DOMAIN);
+}
+
+/**
+ * Staff Academy admin gate: the caller must both hold the `admin` role
+ * AND sign in with a verified @365motorsales.com email. This is stricter
+ * than a plain `admin` check to prevent a non-staff admin from editing
+ * internal training content.
+ */
+async function isStaffAdmin(context: any): Promise<boolean> {
+  const email: string | undefined = context.claims?.email;
+  const emailVerified: boolean =
+    context.claims?.email_verified === true ||
+    context.claims?.user_metadata?.email_verified === true;
+  if (!email || !isStaffEmail(email) || !emailVerified) return false;
   const { data } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
   });
   return !!data;
 }
+
+// Back-compat alias so existing call sites keep working.
+const isAdmin = isStaffAdmin;
+
 
 /** Staff read: RLS returns published rows to staff, all rows to admins. */
 export const listStaffAcademyArticles = createServerFn({ method: "GET" })
