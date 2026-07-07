@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Send, Check, CheckCheck, Paperclip, X, FileIcon, Loader2, Download } from "lucide-react";
+import { Send, Check, CheckCheck, Paperclip, X, FileIcon, Loader2, Download, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
