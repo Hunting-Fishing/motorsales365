@@ -156,6 +156,9 @@ function StaffAcademyAdminList() {
           <Button asChild variant="outline">
             <Link to="/staff/academy">View live hub</Link>
           </Button>
+          <Button asChild variant="outline">
+            <Link to="/admin/staff-academy/assets">Assets library</Link>
+          </Button>
           <Button asChild>
             <Link to="/admin/staff-academy/$id" params={{ id: "new" }}>
               <Plus className="mr-1.5 h-4 w-4" /> New article

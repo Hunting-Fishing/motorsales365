@@ -2,7 +2,16 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Search, ExternalLink, GraduationCap, Sparkles } from "lucide-react";
+import {
+  Search,
+  ExternalLink,
+  GraduationCap,
+  Sparkles,
+  Download,
+  FileText,
+  Film,
+  Image as ImageIcon,
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { isStaffEmail } from "@/lib/staff-domain";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +25,10 @@ import {
   type ArticleCategory,
 } from "@/content/staff-academy";
 import { listStaffAcademyArticles } from "@/lib/staff-academy-articles.functions";
+import {
+  listStaffAcademyAssets,
+  type StaffAcademyAsset,
+} from "@/lib/staff-academy-assets.functions";
 
 export const Route = createFileRoute("/_authenticated/staff/academy")({
   head: () => ({
@@ -36,6 +49,7 @@ function StaffAcademyHub() {
   const { user, loading, isAdmin } = useAuth();
   const [query, setQuery] = useState("");
   const loadDb = useServerFn(listStaffAcademyArticles);
+  const loadAssets = useServerFn(listStaffAcademyAssets);
 
   const isStaff = isStaffEmail(user?.email);
 
@@ -46,9 +60,21 @@ function StaffAcademyHub() {
     staleTime: 60_000,
   });
 
+  const assetsQuery = useQuery({
+    queryKey: ["staff-academy-assets"],
+    queryFn: () => loadAssets(),
+    enabled: !!user && (isStaff || isAdmin),
+    staleTime: 60_000,
+  });
+
   const articles: Article[] = useMemo(
     () => mergeArticles(dbQuery.data, { includeDrafts: isAdmin }),
     [dbQuery.data, isAdmin],
+  );
+
+  const assets: StaffAcademyAsset[] = useMemo(
+    () => (assetsQuery.data ?? []).filter((a) => a.status === "active" || isAdmin),
+    [assetsQuery.data, isAdmin],
   );
 
   const filtered = useMemo(() => {
@@ -253,6 +279,83 @@ function StaffAcademyHub() {
           </div>
         )}
       </section>
+
+      {assets.length > 0 && (
+        <section>
+          <div className="mb-3 flex items-baseline justify-between gap-4">
+            <div>
+              <h2 className="font-display text-lg font-semibold">
+                <span className="mr-2">🖼️</span>Media library
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Infographics, scripts, images and videos uploaded by the team.
+              </p>
+            </div>
+            {isAdmin && (
+              <Button asChild size="sm" variant="outline">
+                <Link to="/admin/staff-academy/assets">Manage assets</Link>
+              </Button>
+            )}
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {assets.map((a) => {
+              const isImage = a.mime_type?.startsWith("image/");
+              const isVideo = a.mime_type?.startsWith("video/");
+              const Icon = isVideo ? Film : isImage ? ImageIcon : FileText;
+              return (
+                <a
+                  key={a.id}
+                  href={a.file_url}
+                  target="_blank"
+                  rel="noopener"
+                  className="group block"
+                >
+                  <Card className="h-full overflow-hidden transition hover:border-primary">
+                    <div className="aspect-video bg-muted flex items-center justify-center overflow-hidden">
+                      {isImage ? (
+                        <img
+                          src={a.file_url}
+                          alt={a.title}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : isVideo ? (
+                        <video
+                          src={a.file_url}
+                          className="h-full w-full object-cover"
+                          muted
+                          playsInline
+                        />
+                      ) : (
+                        <Icon className="h-10 w-10 text-muted-foreground" />
+                      )}
+                    </div>
+                    <CardContent className="p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="text-sm font-medium leading-snug group-hover:text-primary">
+                          {a.title}
+                        </h3>
+                        <Badge variant="outline" className="text-[10px] capitalize">
+                          {a.kind}
+                        </Badge>
+                      </div>
+                      {a.description && (
+                        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                          {a.description}
+                        </p>
+                      )}
+                      <div className="mt-2 inline-flex items-center text-xs text-primary">
+                        <Download className="mr-1 h-3 w-3" /> Open / download
+                      </div>
+                    </CardContent>
+                  </Card>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
 
       <section className="rounded-xl border bg-muted/30 p-5">
         <h2 className="font-display text-base font-semibold">Need something that's not here?</h2>
