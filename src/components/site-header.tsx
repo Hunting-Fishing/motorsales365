@@ -689,7 +689,7 @@ export function SiteHeader() {
                   </Link>
                 </SheetClose>
 
-                <section className="rounded-lg border-l-2 border-sky-500 bg-sky-500/10 px-2 py-1.5">
+                <section className="rounded-lg border border-sky-300 bg-sky-100 dark:border-sky-500/40 dark:bg-sky-500/15 px-2 py-1.5">
                   <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-sky-700 dark:text-sky-300">
                     Browse
                   </p>
@@ -718,7 +718,7 @@ export function SiteHeader() {
                   </div>
                 </section>
 
-                <section className="rounded-lg border-l-2 border-emerald-500 bg-emerald-500/10 px-2 py-1.5">
+                <section className="rounded-lg border border-emerald-300 bg-emerald-100 dark:border-emerald-500/40 dark:bg-emerald-500/15 px-2 py-1.5">
                   <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                     Marketplace
                   </p>
@@ -818,7 +818,7 @@ export function SiteHeader() {
                 {user && (
                   <>
                     {(myBusinesses.length > 0 || businessSetup.needed) && (
-                      <section className="rounded-lg border-l-2 border-amber-500 bg-amber-500/10 px-2 py-1.5">
+                      <section className="rounded-lg border border-amber-300 bg-amber-100 dark:border-amber-500/40 dark:bg-amber-500/15 px-2 py-1.5">
                         <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
                           My businesses
                         </p>
@@ -869,7 +869,7 @@ export function SiteHeader() {
                         </div>
                       </section>
                     )}
-                    <section className="rounded-lg border-l-2 border-violet-500 bg-violet-500/10 px-2 py-1.5">
+                    <section className="rounded-lg border border-violet-300 bg-violet-100 dark:border-violet-500/40 dark:bg-violet-500/15 px-2 py-1.5">
                       <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-violet-700 dark:text-violet-300">
                         Account
                       </p>
@@ -902,7 +902,7 @@ export function SiteHeader() {
                       </div>
                     </section>
                     {isStaff && (
-                      <section className="rounded-lg border-l-2 border-rose-500 bg-rose-500/10 px-2 py-1.5">
+                      <section className="rounded-lg border border-rose-300 bg-rose-100 dark:border-rose-500/40 dark:bg-rose-500/15 px-2 py-1.5">
                         <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-rose-700 dark:text-rose-300">
                           {isAdmin ? "365 Staff" : isAdvertising ? "Partner / Advertising" : isModerator ? "Moderation" : isSupport ? "Support" : "Sales Rep"}
                         </p>
