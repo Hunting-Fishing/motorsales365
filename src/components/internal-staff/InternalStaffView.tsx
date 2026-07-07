@@ -63,8 +63,10 @@ export function InternalStaffView({
   const roots = useMemo(() => buildTree(members), [members]);
   const [addOpen, setAddOpen] = useState<{ managerId: string } | null>(null);
   const [moveFor, setMoveFor] = useState<InternalStaffMember | null>(null);
+  const [chatWith, setChatWith] = useState<InternalStaffMember | null>(null);
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["internal-staff"] });
+
 
   if (isLoading) {
     return <div className="p-6 text-muted-foreground">Loading team…</div>;
