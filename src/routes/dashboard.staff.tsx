@@ -5,12 +5,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Users, Plus, KeyRound, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useStaffScope } from "@/hooks/use-staff-scope";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyOwnedOrg, listStaff, getSeatUsage } from "@/lib/seller-staff.functions";
+import { InternalStaffView } from "@/components/internal-staff/InternalStaffView";
+import { StaffInfoPopover } from "@/components/internal-staff/StaffInfoPopover";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
