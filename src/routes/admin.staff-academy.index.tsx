@@ -241,7 +241,6 @@ function StaffAcademyAdminList() {
                       </TableHeader>
                       <TableBody>
                         {list.map((r) => {
-                          const globalIndex = rows.findIndex((x) => x.id === r.id);
                           return (
                             <TableRow key={r.id}>
                               <TableCell>
@@ -249,7 +248,7 @@ function StaffAcademyAdminList() {
                                   <Button
                                     size="icon"
                                     variant="ghost"
-                                    onClick={() => moveRow(globalIndex, -1)}
+                                    onClick={() => moveRow(r.id, -1)}
                                     disabled={move.isPending}
                                     aria-label="Move up"
                                   >
@@ -258,7 +257,7 @@ function StaffAcademyAdminList() {
                                   <Button
                                     size="icon"
                                     variant="ghost"
-                                    onClick={() => moveRow(globalIndex, 1)}
+                                    onClick={() => moveRow(r.id, 1)}
                                     disabled={move.isPending}
                                     aria-label="Move down"
                                   >
