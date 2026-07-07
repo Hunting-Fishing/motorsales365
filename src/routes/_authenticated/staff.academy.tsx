@@ -96,7 +96,7 @@ function StaffAcademyHub() {
     );
   }
 
-  if (!isStaff) {
+  if (!isStaff && !isAdmin) {
     return (
       <div className="mx-auto max-w-lg">
         <Card>
