@@ -184,6 +184,7 @@ import { Route as AuthenticatedCompleteProfileRouteImport } from './routes/_auth
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
+import { Route as AdminStaffAcademyIndexRouteImport } from './routes/admin.staff-academy.index'
 import { Route as AdminAdvertisementsIndexRouteImport } from './routes/admin.advertisements.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
 import { Route as ShopDepartmentSlugRouteImport } from './routes/shop.department.$slug'
@@ -1160,6 +1161,11 @@ const DashboardTeamIndexRoute = DashboardTeamIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardTeamRoute,
 } as any)
+const AdminStaffAcademyIndexRoute = AdminStaffAcademyIndexRouteImport.update({
+  id: '/staff-academy/',
+  path: '/staff-academy/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAdvertisementsIndexRoute =
   AdminAdvertisementsIndexRouteImport.update({
     id: '/',
@@ -1923,6 +1929,7 @@ export interface FileRoutesByFullPath {
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
+  '/admin/staff-academy/': typeof AdminStaffAcademyIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2188,6 +2195,7 @@ export interface FileRoutesByTo {
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements': typeof AdminAdvertisementsIndexRoute
+  '/admin/staff-academy': typeof AdminStaffAcademyIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2461,6 +2469,7 @@ export interface FileRoutesById {
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
+  '/admin/staff-academy/': typeof AdminStaffAcademyIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/_authenticated/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2734,6 +2743,7 @@ export interface FileRouteTypes {
     | '/shop/department/$slug'
     | '/shop/p/$slug'
     | '/admin/advertisements/'
+    | '/admin/staff-academy/'
     | '/dashboard/team/'
     | '/dashboard/clubs/$id'
     | '/staff/academy/$slug'
@@ -2999,6 +3009,7 @@ export interface FileRouteTypes {
     | '/shop/department/$slug'
     | '/shop/p/$slug'
     | '/admin/advertisements'
+    | '/admin/staff-academy'
     | '/dashboard/team'
     | '/dashboard/clubs/$id'
     | '/staff/academy/$slug'
@@ -3271,6 +3282,7 @@ export interface FileRouteTypes {
     | '/shop/department/$slug'
     | '/shop/p/$slug'
     | '/admin/advertisements/'
+    | '/admin/staff-academy/'
     | '/dashboard/team/'
     | '/_authenticated/dashboard/clubs_/$id'
     | '/_authenticated/staff/academy/$slug'
@@ -4679,6 +4691,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTeamIndexRouteImport
       parentRoute: typeof DashboardTeamRoute
     }
+    '/admin/staff-academy/': {
+      id: '/admin/staff-academy/'
+      path: '/staff-academy'
+      fullPath: '/admin/staff-academy/'
+      preLoaderRoute: typeof AdminStaffAcademyIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/advertisements/': {
       id: '/admin/advertisements/'
       path: '/'
@@ -5533,6 +5552,7 @@ interface AdminRouteChildren {
   AdminVerificationsRoute: typeof AdminVerificationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminRedemptionsStaffIdRoute: typeof AdminRedemptionsStaffIdRoute
+  AdminStaffAcademyIndexRoute: typeof AdminStaffAcademyIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -5580,6 +5600,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminVerificationsRoute: AdminVerificationsRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminRedemptionsStaffIdRoute: AdminRedemptionsStaffIdRoute,
+  AdminStaffAcademyIndexRoute: AdminStaffAcademyIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
