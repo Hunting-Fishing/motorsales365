@@ -122,11 +122,12 @@ export function InternalStaffView({
                 m={m}
                 members={members}
                 isAdmin={isAdmin}
+                currentUserId={currentUserId}
+                onChat={() => setChatWith(m)}
                 onMove={() => setMoveFor(m)}
                 onDeactivate={async () => {
                   if (!window.confirm("Deactivate this staff account?")) return;
                   try {
-                    // eslint-disable-next-line @typescript-eslint/no-use-before-define
                     await deactivateFn({ data: { userId: m.user_id } });
                     toast.success("Staff deactivated");
                     refresh();
@@ -135,6 +136,7 @@ export function InternalStaffView({
                   }
                 }}
               />
+
             ))}
           </div>
         )}
