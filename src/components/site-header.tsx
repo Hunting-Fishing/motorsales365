@@ -902,11 +902,12 @@ export function SiteHeader() {
                       </div>
                     </section>
                     {isStaff && (
-                      <>
-                        <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      <section className="rounded-lg border-l-2 border-rose-500 bg-rose-500/10 px-2 py-1.5">
+                        <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-rose-700 dark:text-rose-300">
                           {isAdmin ? "365 Staff" : isAdvertising ? "Partner / Advertising" : isModerator ? "Moderation" : isSupport ? "Support" : "Sales Rep"}
                         </p>
                         <div className="flex flex-col gap-0.5">
+
                           {isSales && (
                             <>
                               <SheetClose asChild>
