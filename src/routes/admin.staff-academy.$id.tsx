@@ -99,7 +99,7 @@ function StaffAcademyEditor() {
   const q = useQuery({
     queryKey: ["admin-staff-academy", id],
     queryFn: () => loadOne({ data: { id } }),
-    enabled: !!isAdmin && !isNew,
+    enabled: canManage && !isNew,
   });
 
   useEffect(() => {
@@ -148,14 +148,14 @@ function StaffAcademyEditor() {
   const historyQ = useQuery({
     queryKey: ["admin-staff-academy-history", id],
     queryFn: () => loadHistory({ data: { article_id: id } }),
-    enabled: !!isAdmin && !isNew,
+    enabled: canManage && !isNew,
   });
 
   const loadStats = useServerFn(getStaffAcademyArticleStats);
   const statsQ = useQuery({
     queryKey: ["admin-staff-academy-stats", id],
     queryFn: () => loadStats({ data: { article_id: id } }),
-    enabled: !!isAdmin && !isNew,
+    enabled: canManage && !isNew,
     staleTime: 30_000,
   });
 
