@@ -10101,6 +10101,57 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_academy_articles: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          hero_emoji: string | null
+          hero_image_url: string | null
+          id: string
+          sections: Json
+          slug: string
+          sort_order: number
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string
+          hero_emoji?: string | null
+          hero_image_url?: string | null
+          id?: string
+          sections?: Json
+          slug: string
+          sort_order?: number
+          status?: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          hero_emoji?: string | null
+          hero_image_url?: string | null
+          id?: string
+          sections?: Json
+          slug?: string
+          sort_order?: number
+          status?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       staff_client_contact_audit: {
         Row: {
           action: Database["public"]["Enums"]["staff_contact_audit_action"]
