@@ -116,7 +116,7 @@ function StaffAcademyAssetsAdmin() {
   const q = useQuery({
     queryKey: ["admin-staff-academy-assets"],
     queryFn: () => fetchAll(),
-    enabled: !!isAdmin,
+    enabled: canManage,
   });
 
   const rows: StaffAcademyAsset[] = q.data ?? [];
