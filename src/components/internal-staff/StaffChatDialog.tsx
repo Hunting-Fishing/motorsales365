@@ -128,8 +128,19 @@ export function StaffChatDialog({
   const [loading, setLoading] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [query, setQuery] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  const q = query.trim().toLowerCase();
+  const visibleMessages = useMemo(() => {
+    if (!q) return messages;
+    return messages.filter((m) => {
+      const inBody = (m.body ?? "").toLowerCase().includes(q);
+      const inName = (m.attachment_name ?? "").toLowerCase().includes(q);
+      return inBody || inName;
+    });
+  }, [messages, q]);
 
   // Initial fetch + realtime subscription
   useEffect(() => {
