@@ -243,3 +243,101 @@ export const listStaffAcademyArticleHistory = createServerFn({ method: "GET" })
     }));
   });
 
+export const recordStaffAcademyArticleView = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        slug: z.string().min(1).max(120),
+        article_id: z.string().uuid().nullable().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    await (context.supabase as any)
+      .from("staff_academy_article_views")
+      .insert({
+        article_id: data.article_id ?? null,
+        slug: data.slug,
+        viewer_id: context.userId,
+      });
+    return { ok: true };
+  });
+
+export type ArticleViewStats = {
+  views: number;
+  unique_viewers: number;
+  last_viewed_at: string | null;
+  views_last_7d: number;
+  views_last_30d: number;
+  recent: { viewer_id: string | null; viewer_email: string | null; created_at: string }[];
+};
+
+export const getStaffAcademyArticleStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        article_id: z.string().uuid().nullable().optional(),
+        slug: z.string().min(1).max(120).optional(),
+      })
+      .refine((v) => v.article_id || v.slug, "article_id or slug required")
+      .parse(input),
+  )
+  .handler(async ({ data, context }): Promise<ArticleViewStats> => {
+    if (!(await isAdmin(context))) throw new Error("Forbidden");
+    let query = (context.supabase as any)
+      .from("staff_academy_article_views")
+      .select("viewer_id,created_at")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    if (data.article_id) query = query.eq("article_id", data.article_id);
+    else if (data.slug) query = query.eq("slug", data.slug);
+    const { data: rows, error } = await query;
+    if (error) throw new Error(error.message);
+    const list = (rows ?? []) as { viewer_id: string | null; created_at: string }[];
+    const now = Date.now();
+    const uniq = new Set<string>();
+    let v7 = 0, v30 = 0;
+    for (const r of list) {
+      if (r.viewer_id) uniq.add(r.viewer_id);
+      const t = new Date(r.created_at).getTime();
+      if (now - t <= 7 * 864e5) v7++;
+      if (now - t <= 30 * 864e5) v30++;
+    }
+    const last = list[0]?.created_at ?? null;
+
+    const recentList: { viewer_id: string | null; created_at: string }[] = [];
+    const seen = new Set<string>();
+    for (const r of list) {
+      const key = r.viewer_id ?? `anon-${r.created_at}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      recentList.push(r);
+      if (recentList.length >= 10) break;
+    }
+    const ids = recentList.map((r) => r.viewer_id).filter(Boolean) as string[];
+    const emailMap = new Map<string, string>();
+    if (ids.length > 0) {
+      const { data: profs } = await (context.supabase as any)
+        .from("profiles")
+        .select("id,email")
+        .in("id", ids);
+      for (const p of profs ?? []) emailMap.set(p.id, p.email ?? "");
+    }
+
+    return {
+      views: list.length,
+      unique_viewers: uniq.size,
+      last_viewed_at: last,
+      views_last_7d: v7,
+      views_last_30d: v30,
+      recent: recentList.map((r) => ({
+        viewer_id: r.viewer_id,
+        viewer_email: r.viewer_id ? emailMap.get(r.viewer_id) ?? null : null,
+        created_at: r.created_at,
+      })),
+    };
+  });
+
+
