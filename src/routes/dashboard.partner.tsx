@@ -91,8 +91,3 @@ function PartnerHubLayout() {
     </div>
   );
 }
-
-// Redirect helper for the index
-export function redirectToOverview() {
-  throw redirect({ to: "/dashboard/partner/overview" });
-}
