@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Plus, Mail, Trash2, MoveRight, ShieldCheck } from "lucide-react";
+import { Plus, MessageSquare, Trash2, MoveRight, ShieldCheck } from "lucide-react";
+import { StaffChatDialog } from "@/components/internal-staff/StaffChatDialog";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
