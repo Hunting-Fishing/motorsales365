@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet, useRouterState, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, Inbox, Users, QrCode, BarChart3, Megaphone, LifeBuoy } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
