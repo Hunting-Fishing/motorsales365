@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Send } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Send, Check, CheckCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -73,7 +73,20 @@ export function StaffChatDialog({
           const inThread =
             (m.sender_id === user.id && m.recipient_id === otherUserId) ||
             (m.sender_id === otherUserId && m.recipient_id === user.id);
-          if (inThread) setMessages((prev) => [...prev, m]);
+          if (inThread)
+            setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "staff_dms" },
+        (payload) => {
+          const m = payload.new as Msg;
+          const inThread =
+            (m.sender_id === user.id && m.recipient_id === otherUserId) ||
+            (m.sender_id === otherUserId && m.recipient_id === user.id);
+          if (!inThread) return;
+          setMessages((prev) => prev.map((x) => (x.id === m.id ? { ...x, read_at: m.read_at } : x)));
         },
       )
       .subscribe();
@@ -89,15 +102,29 @@ export function StaffChatDialog({
     if (!open || !user) return;
     const unread = messages.filter((m) => m.recipient_id === user.id && !m.read_at);
     if (unread.length === 0) return;
+    const now = new Date().toISOString();
+    const ids = unread.map((m) => m.id);
     supabase
       .from("staff_dms")
-      .update({ read_at: new Date().toISOString() })
-      .in(
-        "id",
-        unread.map((m) => m.id),
-      )
+      .update({ read_at: now })
+      .in("id", ids)
       .then(() => {});
+    // Optimistically reflect locally
+    setMessages((prev) =>
+      prev.map((m) => (ids.includes(m.id) ? { ...m, read_at: m.read_at ?? now } : m)),
+    );
   }, [open, user, messages]);
+
+  // Index of the newest message I sent that the other side has read.
+  const lastReadMineIdx = useMemo(() => {
+    if (!user) return -1;
+    let idx = -1;
+    for (let i = 0; i < messages.length; i++) {
+      const m = messages[i];
+      if (m.sender_id === user.id && m.read_at) idx = i;
+    }
+    return idx;
+  }, [messages, user]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -146,8 +173,9 @@ export function StaffChatDialog({
               No messages yet — say hi.
             </div>
           )}
-          {messages.map((m) => {
+          {messages.map((m, i) => {
             const mine = m.sender_id === user?.id;
+            const showReadReceipt = mine && i === lastReadMineIdx;
             return (
               <div
                 key={m.id}
@@ -162,11 +190,37 @@ export function StaffChatDialog({
                 >
                   <div className="whitespace-pre-wrap break-words">{m.body}</div>
                   <div
-                    className={`mt-1 text-[10px] ${
+                    className={`mt-1 flex items-center gap-1 text-[10px] ${
                       mine ? "text-primary-foreground/70" : "text-muted-foreground"
                     }`}
                   >
-                    {new Date(m.created_at).toLocaleString()}
+                    <span>{new Date(m.created_at).toLocaleString()}</span>
+                    {mine && (
+                      <span
+                        className="ml-auto inline-flex items-center gap-0.5"
+                        title={
+                          m.read_at
+                            ? `Read ${new Date(m.read_at).toLocaleString()}`
+                            : "Sent"
+                        }
+                        aria-label={m.read_at ? "Read" : "Sent"}
+                      >
+                        {m.read_at ? (
+                          <CheckCheck className="h-3 w-3" />
+                        ) : (
+                          <Check className="h-3 w-3" />
+                        )}
+                        {showReadReceipt && m.read_at && (
+                          <span className="ml-1">
+                            Read{" "}
+                            {new Date(m.read_at).toLocaleTimeString([], {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        )}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
