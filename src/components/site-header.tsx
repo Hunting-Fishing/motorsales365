@@ -818,20 +818,20 @@ export function SiteHeader() {
                 {user && (
                   <>
                     {(myBusinesses.length > 0 || businessSetup.needed) && (
-                      <>
-                        <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      <section className="rounded-lg border-l-2 border-amber-500 bg-amber-500/10 px-2 py-1.5">
+                        <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
                           My businesses
                         </p>
                         <div className="flex flex-col gap-0.5">
                           {myBusinesses.map((b) => (
-                            <div key={b.id} className="flex items-center gap-1 px-3">
+                            <div key={b.id} className="flex items-center gap-1 px-1">
                               <SheetClose asChild>
                                 <Link
                                   to="/dashboard/business/$businessId"
                                   params={{ businessId: b.id }}
-                                  className="flex-1 flex items-center gap-2 rounded-md py-3 text-sm font-medium hover:bg-secondary"
+                                  className="flex-1 flex items-center gap-2 rounded-md px-2 py-2.5 text-sm font-medium hover:bg-background/60"
                                 >
-                                  <Building2 className="h-4 w-4 text-primary" />
+                                  <Building2 className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                                   <span className="truncate">{b.name}</span>
                                 </Link>
                               </SheetClose>
@@ -840,7 +840,7 @@ export function SiteHeader() {
                                   to="/dashboard/business/$businessId/billing"
                                   params={{ businessId: b.id }}
                                   aria-label="Billing & plan"
-                                  className="rounded-md p-2 hover:bg-secondary"
+                                  className="rounded-md p-2 hover:bg-background/60"
                                 >
                                   <CreditCard className="h-4 w-4" />
                                 </Link>
@@ -848,11 +848,11 @@ export function SiteHeader() {
                             </div>
                           ))}
                           {businessSetup.needed && (
-                            <div className="px-3">
+                            <div className="px-1">
                               <SheetClose asChild>
                                 <Link
                                   to="/businesses/submit"
-                                  className="flex items-start gap-2 rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-3 text-sm font-medium text-amber-800 hover:bg-amber-500/20 dark:text-amber-200"
+                                  className="flex items-start gap-2 rounded-md border border-amber-500/50 bg-amber-500/20 px-3 py-3 text-sm font-medium text-amber-800 hover:bg-amber-500/30 dark:text-amber-200"
                                 >
                                   <Plus className="mt-0.5 h-4 w-4 shrink-0" />
                                   <span className="min-w-0">
@@ -867,7 +867,7 @@ export function SiteHeader() {
                             </div>
                           )}
                         </div>
-                      </>
+                      </section>
                     )}
                     <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                       Account
