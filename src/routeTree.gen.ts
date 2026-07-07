@@ -186,6 +186,7 @@ import { Route as AuthenticatedCompleteProfileRouteImport } from './routes/_auth
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
+import { Route as DashboardPartnerIndexRouteImport } from './routes/dashboard.partner.index'
 import { Route as AdminStaffAcademyIndexRouteImport } from './routes/admin.staff-academy.index'
 import { Route as AdminAdvertisementsIndexRouteImport } from './routes/admin.advertisements.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
@@ -1176,6 +1177,11 @@ const DashboardTeamIndexRoute = DashboardTeamIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardTeamRoute,
 } as any)
+const DashboardPartnerIndexRoute = DashboardPartnerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardPartnerRoute,
+} as any)
 const AdminStaffAcademyIndexRoute = AdminStaffAcademyIndexRouteImport.update({
   id: '/staff-academy/',
   path: '/staff-academy/',
@@ -1841,7 +1847,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
-  '/dashboard/partner': typeof DashboardPartnerRoute
+  '/dashboard/partner': typeof DashboardPartnerRouteWithChildren
   '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
@@ -1965,6 +1971,7 @@ export interface FileRoutesByFullPath {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/admin/staff-academy/': typeof AdminStaffAcademyIndexRoute
+  '/dashboard/partner/': typeof DashboardPartnerIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2114,7 +2121,6 @@ export interface FileRoutesByTo {
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
-  '/dashboard/partner': typeof DashboardPartnerRoute
   '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
@@ -2236,6 +2242,7 @@ export interface FileRoutesByTo {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements': typeof AdminAdvertisementsIndexRoute
   '/admin/staff-academy': typeof AdminStaffAcademyIndexRoute
+  '/dashboard/partner': typeof DashboardPartnerIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2391,7 +2398,7 @@ export interface FileRoutesById {
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
-  '/dashboard/partner': typeof DashboardPartnerRoute
+  '/dashboard/partner': typeof DashboardPartnerRouteWithChildren
   '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
@@ -2515,6 +2522,7 @@ export interface FileRoutesById {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/admin/staff-academy/': typeof AdminStaffAcademyIndexRoute
+  '/dashboard/partner/': typeof DashboardPartnerIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/_authenticated/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2794,6 +2802,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/admin/staff-academy/'
+    | '/dashboard/partner/'
     | '/dashboard/team/'
     | '/dashboard/clubs/$id'
     | '/staff/academy/$slug'
@@ -2943,7 +2952,6 @@ export interface FileRouteTypes {
     | '/dashboard/learning'
     | '/dashboard/likes'
     | '/dashboard/messages'
-    | '/dashboard/partner'
     | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
@@ -3065,6 +3073,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements'
     | '/admin/staff-academy'
+    | '/dashboard/partner'
     | '/dashboard/team'
     | '/dashboard/clubs/$id'
     | '/staff/academy/$slug'
@@ -3343,6 +3352,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/admin/staff-academy/'
+    | '/dashboard/partner/'
     | '/dashboard/team/'
     | '/_authenticated/dashboard/clubs_/$id'
     | '/_authenticated/staff/academy/$slug'
@@ -4765,6 +4775,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTeamIndexRouteImport
       parentRoute: typeof DashboardTeamRoute
     }
+    '/dashboard/partner/': {
+      id: '/dashboard/partner/'
+      path: '/'
+      fullPath: '/dashboard/partner/'
+      preLoaderRoute: typeof DashboardPartnerIndexRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
     '/admin/staff-academy/': {
       id: '/admin/staff-academy/'
       path: '/staff-academy'
@@ -5715,6 +5732,17 @@ const DashboardDispatchRouteChildren: DashboardDispatchRouteChildren = {
 const DashboardDispatchRouteWithChildren =
   DashboardDispatchRoute._addFileChildren(DashboardDispatchRouteChildren)
 
+interface DashboardPartnerRouteChildren {
+  DashboardPartnerIndexRoute: typeof DashboardPartnerIndexRoute
+}
+
+const DashboardPartnerRouteChildren: DashboardPartnerRouteChildren = {
+  DashboardPartnerIndexRoute: DashboardPartnerIndexRoute,
+}
+
+const DashboardPartnerRouteWithChildren =
+  DashboardPartnerRoute._addFileChildren(DashboardPartnerRouteChildren)
+
 interface DashboardTeamRouteChildren {
   DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
   DashboardTeamMembersRoute: typeof DashboardTeamMembersRoute
@@ -5779,7 +5807,7 @@ interface DashboardRouteChildren {
   DashboardLearningRoute: typeof DashboardLearningRoute
   DashboardLikesRoute: typeof DashboardLikesRoute
   DashboardMessagesRoute: typeof DashboardMessagesRoute
-  DashboardPartnerRoute: typeof DashboardPartnerRoute
+  DashboardPartnerRoute: typeof DashboardPartnerRouteWithChildren
   DashboardPartnerProgramRoute: typeof DashboardPartnerProgramRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardPromoterResourcesRoute: typeof DashboardPromoterResourcesRoute
@@ -5815,7 +5843,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLearningRoute: DashboardLearningRoute,
   DashboardLikesRoute: DashboardLikesRoute,
   DashboardMessagesRoute: DashboardMessagesRoute,
-  DashboardPartnerRoute: DashboardPartnerRoute,
+  DashboardPartnerRoute: DashboardPartnerRouteWithChildren,
   DashboardPartnerProgramRoute: DashboardPartnerProgramRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardPromoterResourcesRoute: DashboardPromoterResourcesRoute,
