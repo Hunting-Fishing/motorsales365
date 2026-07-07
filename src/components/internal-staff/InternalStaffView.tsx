@@ -52,6 +52,7 @@ export function InternalStaffView({
 }) {
   const qc = useQueryClient();
   const fetchStaff = useServerFn(listInternalStaff);
+  const deactivateFn = useServerFn(deactivateInternalStaff);
   const { data: members = [], isLoading } = useQuery({
     queryKey: ["internal-staff"],
     queryFn: () => fetchStaff(),
@@ -66,6 +67,7 @@ export function InternalStaffView({
   if (isLoading) {
     return <div className="p-6 text-muted-foreground">Loading team…</div>;
   }
+
 
   return (
     <div className="space-y-4">
