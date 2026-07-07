@@ -94,7 +94,7 @@ export function ZoomableQr({
             x: fx - (fx - prevT.x) * ratio,
             y: fy - (fy - prevT.y) * ratio,
           };
-          return s === MIN_SCALE ? { x: 0, y: 0 } : clampTranslate(next, s);
+          return clampTranslate(next, s);
         });
         return s;
       });
