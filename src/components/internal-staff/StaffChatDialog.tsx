@@ -42,6 +42,28 @@ function formatBytes(n?: number | null) {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query) return <>{text}</>;
+  const re = new RegExp(`(${escapeRegExp(query)})`, "ig");
+  const parts = text.split(re);
+  return (
+    <>
+      {parts.map((p, i) =>
+        i % 2 === 1 ? (
+          <mark key={i} className="rounded bg-yellow-300/70 px-0.5 text-foreground">
+            {p}
+          </mark>
+        ) : (
+          <span key={i}>{p}</span>
+        ),
+      )}
+    </>
+  );
+
 function AttachmentPreview({ msg }: { msg: Msg }) {
   const sign = useServerFn(getStaffDmAttachmentUrl);
   const [url, setUrl] = useState<string | null>(null);
