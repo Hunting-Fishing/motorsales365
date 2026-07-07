@@ -140,6 +140,20 @@ function StaffAcademyEditor() {
     onError: (e: any) => toast.error(e?.message ?? "Save failed"),
   });
 
+  const loadHistory = useServerFn(listStaffAcademyArticleHistory);
+  const historyQ = useQuery({
+    queryKey: ["admin-staff-academy-history", id],
+    queryFn: () => loadHistory({ data: { article_id: id } }),
+    enabled: !!isAdmin && !isNew,
+  });
+
+  // Refresh history when a save happens
+  useEffect(() => {
+    if (save.isSuccess && !isNew) {
+      qc.invalidateQueries({ queryKey: ["admin-staff-academy-history", id] });
+    }
+  }, [save.isSuccess, isNew, id, qc]);
+
   const previewArticle = useMemo(() => form, [form]);
 
   if (loading) {
