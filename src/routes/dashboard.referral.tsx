@@ -600,3 +600,45 @@ function ResolutionDownload({
     </DropdownMenu>
   );
 }
+
+function ShareQrPageButton({
+  referralCode,
+  fullName,
+  className,
+}: {
+  referralCode: string;
+  fullName: string;
+  className?: string;
+}) {
+  const shareUrl = `${siteOrigin()}/r/${referralCode}/qr`;
+
+  const onShare = async () => {
+    const shareData = {
+      title: `${fullName} — 365 Motor Sales`,
+      text: `Scan or open my 365 Motor Sales referral QR:`,
+      url: shareUrl,
+    };
+    if (typeof navigator !== "undefined" && (navigator as any).share) {
+      try {
+        await (navigator as any).share(shareData);
+        return;
+      } catch (err: any) {
+        // User cancelled — nothing to do.
+        if (err?.name === "AbortError") return;
+        // Fall through to clipboard on any other share failure.
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("QR page link copied — paste it in chat to share.");
+    } catch {
+      toast.error("Could not copy link.");
+    }
+  };
+
+  return (
+    <Button variant="outline" onClick={onShare} className={className}>
+      <Share2 className="mr-2 h-4 w-4" /> Share QR page
+    </Button>
+  );
+}
