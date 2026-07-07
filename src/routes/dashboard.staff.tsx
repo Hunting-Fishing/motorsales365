@@ -39,9 +39,13 @@ export const Route = createFileRoute("/dashboard/staff")({
 function StaffPage() {
   const { user, loading } = useAuth();
   const qc = useQueryClient();
+  const { scope } = useStaffScope();
+  const is365 = !!scope?.is365Staff;
+  const isAdmin = !!scope?.isAdmin;
   const fetchOrg = useServerFn(getMyOwnedOrg);
   const fetchStaff = useServerFn(listStaff);
   const fetchSeats = useServerFn(getSeatUsage);
+
 
   const { data: org } = useQuery({
     queryKey: ["my-owned-org", user?.id],
