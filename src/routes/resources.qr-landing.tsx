@@ -127,6 +127,8 @@ function ResourceQrLandingPreview() {
       </section>
 
       <QrLandingContent code={null} preview />
-    </div>
+      </div>
+    </SiteLayout>
   );
 }
+
