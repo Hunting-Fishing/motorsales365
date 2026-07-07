@@ -15,7 +15,10 @@ import {
   getArticle,
   type Article,
 } from "@/content/staff-academy";
-import { getStaffAcademyArticleBySlug } from "@/lib/staff-academy-articles.functions";
+import {
+  getStaffAcademyArticleBySlug,
+  recordStaffAcademyArticleView,
+} from "@/lib/staff-academy-articles.functions";
 
 export const Route = createFileRoute("/_authenticated/staff/academy/$slug")({
   head: ({ params }) => {
