@@ -512,7 +512,8 @@ function ReferralQrCard({
               <div className="mt-1 break-all text-xs text-muted-foreground">{link}</div>
             </div>
             <p className="max-w-xs text-center text-xs text-muted-foreground">
-              Pinch or double-tap the QR to zoom in for a clearer scan.
+              Pinch, double-tap or use the +/− buttons to zoom (50%–400%). Drag to reposition so
+              the QR sits perfectly under the scanner.
             </p>
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
               <ResolutionDownload
