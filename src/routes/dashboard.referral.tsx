@@ -475,25 +475,30 @@ function ReferralQrCard({
           </VisuallyHidden>
           <div className="flex flex-col items-center gap-4">
             <div
-              className="rounded-2xl bg-white p-6 sm:p-10 shadow-sm ring-1 ring-border"
+              className="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-border"
               role="img"
               aria-label={`QR code for ${fullName}`}
             >
-              <div
-                className="flex items-center justify-center"
-                style={{
-                  width: "min(72vw, 420px)",
-                  height: "min(72vw, 420px)",
-                }}
+              <ZoomableQr
+                ariaLabel={`QR code for ${fullName} — pinch or double-tap to zoom`}
+                className="mx-auto"
               >
-                <QRCodeCanvas
-                  value={link}
-                  size={1024}
-                  level="H"
-                  marginSize={computeQuietZoneModules(1024, "H" as QrLevel)}
-                  style={{ width: "100%", height: "100%" }}
-                />
-              </div>
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: "min(72vw, 420px)",
+                    height: "min(72vw, 420px)",
+                  }}
+                >
+                  <QRCodeCanvas
+                    value={link}
+                    size={1024}
+                    level="H"
+                    marginSize={computeQuietZoneModules(1024, "H" as QrLevel)}
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                </div>
+              </ZoomableQr>
             </div>
             <div className="text-center">
               <div className="font-display text-lg sm:text-xl font-bold">{fullName}</div>
@@ -501,8 +506,7 @@ function ReferralQrCard({
               <div className="mt-1 break-all text-xs text-muted-foreground">{link}</div>
             </div>
             <p className="max-w-xs text-center text-xs text-muted-foreground">
-              Ask the scanner to fit the whole white square in their camera — the
-              extra white border helps the scan work even at odd angles.
+              Pinch or double-tap the QR to zoom in for a clearer scan.
             </p>
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
               <ResolutionDownload
