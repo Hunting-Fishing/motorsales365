@@ -23,14 +23,27 @@ export function ZoomableQr({
   children,
   className = "",
   ariaLabel,
+  resetSignal,
 }: {
   children: ReactNode;
   className?: string;
   ariaLabel?: string;
+  /**
+   * When this value changes, zoom + pan snap back to the default (1x, centered)
+   * so scanning always starts at the best default. Consumers pass the dialog
+   * `open` boolean, a route param, or any changing key.
+   */
+  resetSignal?: unknown;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
   const [translate, setTranslate] = useState<Point>({ x: 0, y: 0 });
+
+  useEffect(() => {
+    setScale(1);
+    setTranslate({ x: 0, y: 0 });
+  }, [resetSignal]);
+
 
   const pointersRef = useRef<Map<number, Point>>(new Map());
   const pinchStartRef = useRef<{
