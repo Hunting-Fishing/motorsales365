@@ -385,11 +385,18 @@ function ReferralQrCard({
   storedQrUrl: string | null;
   posterUrl: string;
 }) {
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const hiddenHiResRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = () => {
-    const canvas = canvasRef.current?.querySelector("canvas");
-    if (!canvas) return;
+    // Prefer the hi-res offscreen canvas rendered inside the dialog. Fall back
+    // to the visible thumbnail so download works even before the dialog opens.
+    const canvas =
+      hiddenHiResRef.current?.querySelector("canvas") ||
+      document.querySelector<HTMLCanvasElement>(`canvas[data-qr="${referralCode}"]`);
+    if (!canvas) {
+      toast.error("QR not ready yet — open the QR preview and try again.");
+      return;
+    }
     const url = canvas.toDataURL("image/png");
     const a = document.createElement("a");
     a.href = url;
@@ -403,17 +410,21 @@ function ReferralQrCard({
         <DialogTrigger asChild>
           <button
             type="button"
-            className="group relative block aspect-square w-full overflow-hidden rounded-md bg-white p-3 ring-1 ring-border transition hover:ring-primary"
+            className="group relative block aspect-square w-full overflow-hidden rounded-xl bg-white p-6 sm:p-5 ring-1 ring-border transition hover:ring-primary"
             aria-label="View QR full screen"
           >
-            <div ref={canvasRef} className="flex h-full w-full items-center justify-center">
+            <div
+              className="flex h-full w-full items-center justify-center"
+              role="img"
+              aria-label={`QR code for ${fullName}`}
+            >
               {link ? (
                 <QRCodeCanvas
                   value={link}
                   size={512}
                   level="H"
-                  includeMargin={false}
-                  className="h-full w-full"
+                  includeMargin
+                  data-qr={referralCode}
                   style={{ width: "100%", height: "100%" }}
                 />
               ) : null}
@@ -423,19 +434,61 @@ function ReferralQrCard({
             </span>
           </button>
         </DialogTrigger>
-        <DialogContent className="max-w-2xl">
-          <div className="flex flex-col items-center gap-4 p-4">
-            <div className="rounded-lg bg-white p-6">
-              <QRCodeCanvas value={link} size={480} level="H" includeMargin />
+        <DialogContent className="w-[95vw] max-w-md sm:max-w-lg p-4 sm:p-6">
+          <VisuallyHidden>
+            <DialogTitle>QR code for {fullName}</DialogTitle>
+          </VisuallyHidden>
+          <div className="flex flex-col items-center gap-4">
+            <div
+              className="rounded-2xl bg-white p-6 sm:p-10 shadow-sm ring-1 ring-border"
+              role="img"
+              aria-label={`QR code for ${fullName}`}
+            >
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  width: "min(72vw, 420px)",
+                  height: "min(72vw, 420px)",
+                }}
+              >
+                <QRCodeCanvas
+                  value={link}
+                  size={1024}
+                  level="H"
+                  includeMargin
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </div>
             </div>
             <div className="text-center">
-              <div className="font-display text-xl font-bold">{fullName}</div>
+              <div className="font-display text-lg sm:text-xl font-bold">{fullName}</div>
               <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
               <div className="mt-1 break-all text-xs text-muted-foreground">{link}</div>
             </div>
-            <Button onClick={handleDownload}>
+            <p className="max-w-xs text-center text-xs text-muted-foreground">
+              Ask the scanner to fit the whole white square in their camera — the
+              extra white border helps the scan work even at odd angles.
+            </p>
+            <Button onClick={handleDownload} className="w-full sm:w-auto">
               <Download className="mr-2 h-4 w-4" /> Download PNG
             </Button>
+          </div>
+
+          {/* Hidden hi-res canvas used as the download source */}
+          <div
+            ref={hiddenHiResRef}
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: "-99999px",
+              top: 0,
+              width: 1024,
+              height: 1024,
+              pointerEvents: "none",
+              opacity: 0,
+            }}
+          >
+            <QRCodeCanvas value={link} size={1024} level="H" includeMargin />
           </div>
         </DialogContent>
       </Dialog>
