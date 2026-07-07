@@ -540,6 +540,37 @@ function StaffAcademyEditor() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <div className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-primary" />
+              <CardTitle className="text-base">Reader analytics</CardTitle>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() =>
+                qc.invalidateQueries({ queryKey: ["admin-staff-academy-stats", id] })
+              }
+              disabled={statsQ.isFetching}
+              aria-label="Refresh analytics"
+            >
+              <RefreshCw className={`h-4 w-4 ${statsQ.isFetching ? "animate-spin" : ""}`} />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {statsQ.isLoading ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading analytics…
+              </div>
+            ) : (
+              <StatsPanel stats={statsQ.data as ArticleViewStats | undefined} />
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {!isNew && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div className="flex items-center gap-2">
               <History className="h-4 w-4 text-primary" />
               <CardTitle className="text-base">Publish history</CardTitle>
             </div>
