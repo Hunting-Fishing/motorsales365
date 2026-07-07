@@ -83,7 +83,8 @@ function slugify(text: string): string {
 }
 
 function StaffAcademyEditor() {
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, user } = useAuth();
+  const canManage = !!isAdmin && isStaffEmail(user?.email);
   const { id } = Route.useParams();
   const isNew = id === "new";
   const navigate = useNavigate();
