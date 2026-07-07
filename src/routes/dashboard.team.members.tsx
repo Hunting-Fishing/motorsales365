@@ -35,6 +35,8 @@ const ROLES = ["owner", "admin", "manager", "member", "viewer"] as const;
 
 function MembersPage() {
   const { orgId } = Route.useSearch();
+  const { user } = useAuth();
+  const { scope } = useStaffScope();
   const qc = useQueryClient();
   const fetchMembers = useServerFn(listOrgMembers);
   const fetchInvites = useServerFn(listOrgInvites);
@@ -42,10 +44,29 @@ function MembersPage() {
   const roleFn = useServerFn(updateMemberRole);
   const removeFn = useServerFn(removeMember);
 
+  // Internal 365 staff share one org and see a unified team tree instead
+  // of the seller invite flow.
+  if (scope?.is365Staff && user) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <h2 className="font-semibold">Internal team</h2>
+          <StaffInfoPopover />
+        </div>
+        <InternalStaffView
+          currentUserId={user.id}
+          isAdmin={!!scope.isAdmin}
+          variant="tree"
+        />
+      </div>
+    );
+  }
+
   const { data: members } = useQuery({
     queryKey: ["org-members", orgId],
     queryFn: () => fetchMembers({ data: { orgId } }),
   });
+
   const { data: invites } = useQuery({
     queryKey: ["org-invites", orgId],
     queryFn: () => fetchInvites({ data: { orgId } }),
