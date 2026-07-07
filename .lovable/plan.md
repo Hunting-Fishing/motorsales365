@@ -1,85 +1,43 @@
+
 ## Goal
 
-Let admins create, edit, reorder, publish, and unpublish Staff Academy articles (including new infographics and scripts) from `/admin/staff-academy` — no code deploys needed. Existing in-repo articles keep working; DB articles are additive and can override by slug.
+Jocelyn's screenshot shows the personal referral QR on `/dashboard/referral` rendered nearly edge‑to‑edge on her phone, with a very thin white border. When someone else tries to scan that off her screen (or off a screenshot she forwards), the QR often fails because there is not enough "quiet zone" (white margin) around the code — scanners need clear white space on all four sides.
 
-## What ships
+Make the QR forgiving of imperfect framing on mobile, without changing any business logic (referral tracking, storage, promotions all stay identical).
 
-### 1. Database
+## Scope
 
-New table `public.staff_academy_articles`:
+One file: `src/routes/dashboard.referral.tsx`, specifically the `ReferralQrCard` component and the fullscreen QR dialog. No route, data, or auth changes.
 
-- `slug` (unique, url-safe)
-- `title`, `description`
-- `category` — same enum values as code: `playbook | feature | coming-soon | infographic | script | compliance`
-- `tags` (text[])
-- `status` — `active | coming-soon | draft`
-- `hero_emoji`, `hero_image_url` (optional)
-- `sections` (jsonb) — array of `{ heading?, body?, bullets?[], cta?: {label,to,external?} }` matching current Article shape
-- `sort_order` (int, default 0)
-- `updated_at`, `updated_by`, `created_at`
+## Changes
 
-Access rules (plain English):
-- Anyone signed in with a `@365motorsales.com` email OR any admin/moderator/support/sales role can read **published** articles (`status <> 'draft'`). Anon cannot read.
-- Only admins can read drafts, insert, update, delete, and reorder.
-- `service_role` full access.
+1. Card thumbnail (small QR on the dashboard)
+   - Add a large, always‑white padded frame around the QR so there is a real quiet zone even when the card is narrow on mobile.
+   - Cap the QR itself to a comfortable size on phones (e.g. ~72–80% of the card width) and center it — the remaining space becomes guaranteed white margin.
+   - Turn on `includeMargin` on `QRCodeCanvas` so the encoded PNG download itself also has a proper quiet zone.
+   - Keep the "tap to open full screen" behaviour and hover hint.
 
-Uses existing `is_staff(auth.uid())` helper for the staff read policy; admin writes use `has_role(uid,'admin')`.
+2. Fullscreen QR dialog (what Jocelyn actually shows to the scanner)
+   - Make the dialog mobile‑first: `w-[95vw] max-w-md sm:max-w-lg`, safe padding, scroll disabled.
+   - Wrap the QR in a large white panel with generous padding (e.g. `p-6 sm:p-10`) and rounded corners so the code is visually isolated from the page chrome / status bar / bottom nav that appear in phone screenshots.
+   - Size the QR responsively: use a CSS width like `min(78vw, 420px)` so it never touches the screen edges regardless of phone size, orientation, or browser UI.
+   - Add a short helper line under the QR: "Ask the scanner to fit the whole white square in their camera."
+   - Keep the name, referral code, link, and Download PNG button.
 
-### 2. Server functions (`src/lib/staff-academy.functions.ts`)
+3. PNG download
+   - Rebuild the download from a fresh offscreen `QRCodeCanvas` render at a fixed high resolution (e.g. 1024×1024) with `includeMargin` so the downloaded/shared image is high‑DPI and has its own quiet zone — independent of whatever size the on‑screen canvas happens to be.
 
-- `listStaffAcademyArticles()` — staff/admin: returns all visible rows ordered by `sort_order, updated_at desc`.
-- `listAllStaffAcademyArticlesAdmin()` — admin only: includes drafts.
-- `getStaffAcademyArticleBySlug({ slug })` — staff/admin.
-- `upsertStaffAcademyArticle({...})` — admin, Zod-validated (slug regex, section shape, category enum).
-- `deleteStaffAcademyArticle({ id })` — admin.
-- `reorderStaffAcademyArticles({ ids: string[] })` — admin, assigns `sort_order = index`.
-
-All use `requireSupabaseAuth`; admin gate via `has_role` RPC.
-
-### 3. Reader integration
-
-`src/content/staff-academy/index.ts` keeps the 8 seed articles. New helper `mergeArticles(dbRows, staticRows)`:
-- Maps each DB row to the `Article` type.
-- Drops static entries whose slug is overridden by a DB row.
-- Filters out `draft` for non-admins.
-
-`/staff/academy` and `/staff/academy/$slug` fetch DB rows via a Query loader and merge with the static array. Cache stale time 60s. If the DB fetch fails, fall back to static only (no blank page).
-
-### 4. Admin editor
-
-New routes under existing `_authenticated` layout, admin-gated in the component (matches other admin pages):
-
-- `/admin/staff-academy` — list page
-  - Table: title, category, status pill, tags, updated at, actions.
-  - "New article" button.
-  - Drag-handle reorder (uses `@dnd-kit/*` if already installed, else simple up/down arrows) → calls `reorderStaffAcademyArticles`.
-  - Publish/unpublish toggle (status ↔ draft/active) and Delete confirm.
-  - Filter chips by category + status.
-- `/admin/staff-academy/new` and `/admin/staff-academy/$id` — editor
-  - Form fields: slug (auto-derived from title, editable), title, description, category (select), status (select), tags (chips input), hero emoji, hero image URL.
-  - Sections editor: repeatable blocks with heading, body (textarea), bullets (one per line), optional CTA `{label,to,external}`. Add / remove / drag-reorder sections.
-  - Live preview panel on the right using the same section renderer as `/staff/academy/$slug`.
-  - Save (upsert) + Save & Publish + Delete.
-
-Sidebar entry "Staff Academy" added to admin nav (admin only) via the existing permissions catalog (`nav.staff-academy`) so it can also be granted to sales/support later if wanted.
-
-### 5. Seed migration
-
-Insert the current 8 static articles into `staff_academy_articles` as `status='active'` so editors have real content to start from. Static file stays as fallback + template reference; admins can safely delete DB rows to reveal the static version.
+4. Accessibility / semantics
+   - Preserve existing `aria-label` on the trigger, add `role="img"` + `aria-label={\`QR code for ${fullName}\`}` on the QR wrapper, keep `DialogTitle` (visually hidden if needed) so Radix a11y doesn't warn.
 
 ## Out of scope
 
-- No rich-text/Markdown editor — sections structure stays JSON to keep parity with existing reader.
-- No image uploads — hero uses URL string (upload can come later via existing storage bucket).
-- No per-article ACLs (staff-wide read only).
-- No history/audit view beyond `updated_by` + `updated_at`.
+- `share-qr.tsx`, `listing-qr.tsx`, poster route (`/r/$code/poster`), and QR ad composer are unchanged.
+- No changes to referral tracking, Supabase queries, promotions, KPIs, or storage.
+- No copy changes to headers, KPIs, or "My promotions" section.
 
-## Order of operations
+## Technical notes
 
-1. Migration (table + RLS + seed).
-2. Server functions + admin gate.
-3. Reader merge + refactor `/staff/academy` pages to Query.
-4. Admin list + editor routes.
-5. Nav entry + permission key.
-
-Reader page keeps working throughout — static seed remains until DB is populated.
+- QR quiet zone: QR spec requires ≥ 4 modules of white on every side. `qrcode.react` provides this via `includeMargin`; the card view currently passes `includeMargin={false}` which is the root cause.
+- Responsive sizing uses inline `style={{ width: "min(78vw, 420px)", height: "min(78vw, 420px)" }}` because Tailwind arbitrary values don't compose `min()` cleanly for both axes.
+- Offscreen render for download: mount a hidden `QRCodeCanvas` at 1024px inside the dialog (or via a ref‑only container) and read its canvas — avoids sampling the small thumbnail.
