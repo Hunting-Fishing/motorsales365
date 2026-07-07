@@ -432,6 +432,5 @@ function MoveDialog({
   );
 }
 
-// Suppress unused import warning for icon we kept for future use.
 void ShieldCheck;
-void useDeactivate;
+
