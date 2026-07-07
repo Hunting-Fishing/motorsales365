@@ -4866,6 +4866,32 @@ export type Database = {
         }
         Relationships: []
       }
+      internal_org_settings: {
+        Row: {
+          key: string
+          org_id: string
+          updated_at: string
+        }
+        Insert: {
+          key: string
+          org_id: string
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          org_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_org_settings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       internal_webhook_keys: {
         Row: {
           name: string
@@ -12049,6 +12075,7 @@ export type Database = {
         Returns: boolean
       }
       can_support: { Args: { _user_id: string }; Returns: boolean }
+      canonical_365_org_id: { Args: never; Returns: string }
       cleanup_unverified_users: { Args: never; Returns: number }
       compute_user_tier: { Args: { _user_id: string }; Returns: string }
       current_plan_tier: { Args: { _user_id: string }; Returns: string }
@@ -12237,6 +12264,8 @@ export type Database = {
         Args: { _club: string; _user: string }
         Returns: boolean
       }
+      is_internal_365_email: { Args: { _email: string }; Returns: boolean }
+      is_internal_365_staff: { Args: { _user_id: string }; Returns: boolean }
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
