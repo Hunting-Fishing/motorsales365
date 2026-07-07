@@ -537,3 +537,59 @@ function ReferralQrCard({
     </div>
   );
 }
+
+type ResolutionOption = { px: number; label: string; hint: string; recommended?: boolean };
+
+function ResolutionDownload({
+  onSelect,
+  options,
+  triggerLabel,
+  size = "default",
+  variant = "default",
+  className,
+}: {
+  onSelect: (px: number) => void | Promise<void>;
+  options: ResolutionOption[];
+  triggerLabel: string;
+  size?: "default" | "sm";
+  variant?: "default" | "outline";
+  className?: string;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size={size} variant={variant} className={className}>
+          <Download className="mr-1 h-4 w-4" />
+          {triggerLabel}
+          <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-70" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-72">
+        <DropdownMenuLabel className="text-xs">Choose resolution</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {options.map((o) => (
+          <DropdownMenuItem
+            key={o.px}
+            onSelect={(e) => {
+              e.preventDefault();
+              void onSelect(o.px);
+            }}
+            className="flex flex-col items-start gap-0.5 py-2"
+          >
+            <div className="flex w-full items-center justify-between">
+              <span className="text-sm font-medium">
+                {o.label}
+                {o.recommended ? (
+                  <span className="ml-1.5 rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                    Recommended
+                  </span>
+                ) : null}
+              </span>
+            </div>
+            <span className="text-[11px] leading-tight text-muted-foreground">{o.hint}</span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
