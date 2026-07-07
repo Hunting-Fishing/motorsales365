@@ -432,7 +432,7 @@ function ReferralQrCard({
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
-      <Dialog>
+      <Dialog open={qrOpen} onOpenChange={setQrOpen}>
         <DialogTrigger asChild>
           <button
             type="button"
