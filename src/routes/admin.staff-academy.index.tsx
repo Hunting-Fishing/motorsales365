@@ -15,6 +15,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { isStaffEmail } from "@/lib/staff-domain";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
