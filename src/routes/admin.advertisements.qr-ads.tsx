@@ -388,7 +388,7 @@ function AdminQrAdsPage() {
   const builtinOverrides = new Map<string, BuiltinCategoryRow>(
     (customData?.builtinCategories ?? []).map((r) => [r.template_id, r]),
   );
-  const signedRows: CustomTemplateRow[] = signedCustoms ?? customData?.templates ?? [];
+  const signedRows: CustomTemplateRow[] = customData?.templates ?? [];
   const customTemplates = signedRows.map(customToTemplate);
   const customById = new Map<string, CustomTemplateRow>(signedRows.map((r) => [`custom:${r.id}`, r]));
 
