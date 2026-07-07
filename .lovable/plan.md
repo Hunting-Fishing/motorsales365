@@ -1,68 +1,85 @@
-## What's already there vs. what's missing
+## Goal
 
-- `/learn` + `/dashboard/learning` — public automotive courses (parts, mechanics). Not staff training.
-- `/partner-training` — external partner schools directory. Not staff training.
-- `/help/*`, `/guidelines`, `/start-selling`, `/support` — public help pages for buyers/sellers.
-- `/admin/staff-365` — admin roster of staff accounts.
-- `/dashboard/staff` — seller's own staff (business seat management), NOT internal 365 training.
+Let admins create, edit, reorder, publish, and unpublish Staff Academy articles (including new infographics and scripts) from `/admin/staff-academy` — no code deploys needed. Existing in-repo articles keep working; DB articles are additive and can override by slug.
 
-**No dedicated internal staff training / knowledge hub exists.** That's what we need for Jocelyn, Marwin, Joan, etc.
+## What ships
 
-## Build: `/staff/academy` — 365 Staff Academy
+### 1. Database
 
-An internal training / enablement hub gated to `@365motorsales.com` accounts (uses existing `isStaffEmail` helper in `src/lib/staff-domain.ts`).
+New table `public.staff_academy_articles`:
 
-### Route structure (all under `_authenticated/`, `noindex,nofollow`)
+- `slug` (unique, url-safe)
+- `title`, `description`
+- `category` — same enum values as code: `playbook | feature | coming-soon | infographic | script | compliance`
+- `tags` (text[])
+- `status` — `active | coming-soon | draft`
+- `hero_emoji`, `hero_image_url` (optional)
+- `sections` (jsonb) — array of `{ heading?, body?, bullets?[], cta?: {label,to,external?} }` matching current Article shape
+- `sort_order` (int, default 0)
+- `updated_at`, `updated_by`, `created_at`
 
-```
-src/routes/_authenticated/staff.academy.tsx           → hub landing (categories + search + featured)
-src/routes/_authenticated/staff.academy.$slug.tsx     → article/guide reader
-```
+Access rules (plain English):
+- Anyone signed in with a `@365motorsales.com` email OR any admin/moderator/support/sales role can read **published** articles (`status <> 'draft'`). Anon cannot read.
+- Only admins can read drafts, insert, update, delete, and reorder.
+- `service_role` full access.
 
-Route gate: on mount check `isStaffEmail(user.email)`; if not staff → render a friendly "Staff-only" card with a link to `/support`. No SSR (already true for `_authenticated`).
+Uses existing `is_staff(auth.uid())` helper for the staff read policy; admin writes use `has_role(uid,'admin')`.
 
-### Landing page sections
+### 2. Server functions (`src/lib/staff-academy.functions.ts`)
 
-1. **Welcome / your name / staff badge** — pulls first name from `profiles`, shows current role (from `user_roles`) as a chip.
-2. **Search bar** — filters the article list client-side by title/tag/body excerpt.
-3. **Category tiles** (icon + short blurb + count):
-   - Selling Playbook — how to pitch 365 to sellers, walk them through posting a listing, boost, business claim
-   - Feature Guides — one card per major app area (Listings, Boosts, Businesses, Parts, Tow, QR referrals, Passport, Ads)
-   - Coming Soon — roadmap items with expected windows (Insurance compare, Live auctions, Vehicle history badges, Trade-in offers, Driver education hub, Loan/financing match — reuse existing `/roadmap-*` art)
-   - Infographics & Shareables — downloadable PNG/PDF one-pagers (already have `src/assets/qr-landing-uploaded/*` and `src/assets/referral/*`)
-   - Scripts & Objections — copy-paste sales scripts, objection-handling talking points
-   - Compliance & Policy — links to `/terms`, `/privacy`, `/refund-policy`, Partner Program disclosure, Clubs accreditation rules
-4. **Featured / recently updated** — latest 3 articles.
-5. **Ask for help** — link to internal Slack/email + `/support` fallback.
+- `listStaffAcademyArticles()` — staff/admin: returns all visible rows ordered by `sort_order, updated_at desc`.
+- `listAllStaffAcademyArticlesAdmin()` — admin only: includes drafts.
+- `getStaffAcademyArticleBySlug({ slug })` — staff/admin.
+- `upsertStaffAcademyArticle({...})` — admin, Zod-validated (slug regex, section shape, category enum).
+- `deleteStaffAcademyArticle({ id })` — admin.
+- `reorderStaffAcademyArticles({ ids: string[] })` — admin, assigns `sort_order = index`.
 
-### Content model
+All use `requireSupabaseAuth`; admin gate via `has_role` RPC.
 
-Two flavors — pick per article — kept simple to avoid a heavy CMS:
+### 3. Reader integration
 
-- **Static MDX-style TSX articles** for polished playbooks. File-based under `src/content/staff-academy/*.tsx`. Each exports `{ meta, Body }` with `meta = { slug, title, description, category, tags, updatedAt, status: "active"|"coming-soon"|"draft", heroImage? }`. A small `staff-academy-index.ts` aggregates them. This is fastest to iterate on and version-controlled.
-- **Optional DB-backed articles** — only if the user wants non-devs to publish. Skipped in this first pass unless requested; add later as a `staff_academy_articles` table with RLS restricted to staff role.
+`src/content/staff-academy/index.ts` keeps the 8 seed articles. New helper `mergeArticles(dbRows, staticRows)`:
+- Maps each DB row to the `Article` type.
+- Drops static entries whose slug is overridden by a DB row.
+- Filters out `draft` for non-admins.
 
-Initial content seed (10-12 articles) covering the categories above, each ~200-400 words + a hero image + 3-5 bullet key takeaways + "next steps" CTA. Use existing `src/assets/qr-landing-uploaded/*` and `src/assets/referral/*` covers where they fit; no new image generation in the first pass.
+`/staff/academy` and `/staff/academy/$slug` fetch DB rows via a Query loader and merge with the static array. Cache stale time 60s. If the DB fetch fails, fall back to static only (no blank page).
 
-### Reader page (`staff.academy.$slug.tsx`)
+### 4. Admin editor
 
-- Hero image, title, category chip, "Last updated" date, status pill (Active / Coming Soon / Draft).
-- Body renders the TSX `<Body />` component (typographic prose using existing tokens).
-- Sticky sidebar (desktop): table of contents + "Related articles" (same category).
-- Footer: "Was this helpful?" thumbs up/down (writes to `form_feedback` table which already exists) + a "Suggest an edit" mailto to team@.
+New routes under existing `_authenticated` layout, admin-gated in the component (matches other admin pages):
 
-### Navigation entry points
+- `/admin/staff-academy` — list page
+  - Table: title, category, status pill, tags, updated at, actions.
+  - "New article" button.
+  - Drag-handle reorder (uses `@dnd-kit/*` if already installed, else simple up/down arrows) → calls `reorderStaffAcademyArticles`.
+  - Publish/unpublish toggle (status ↔ draft/active) and Delete confirm.
+  - Filter chips by category + status.
+- `/admin/staff-academy/new` and `/admin/staff-academy/$id` — editor
+  - Form fields: slug (auto-derived from title, editable), title, description, category (select), status (select), tags (chips input), hero emoji, hero image URL.
+  - Sections editor: repeatable blocks with heading, body (textarea), bullets (one per line), optional CTA `{label,to,external}`. Add / remove / drag-reorder sections.
+  - Live preview panel on the right using the same section renderer as `/staff/academy/$slug`.
+  - Save (upsert) + Save & Publish + Delete.
 
-- Add "Academy" to the dashboard sidebar for staff users only (existing sidebar already conditionally hides sections based on role — piggyback the same check).
-- Add a Staff Academy card on `/admin/staff-365` linking to `/staff/academy` so admins can send new hires straight there.
+Sidebar entry "Staff Academy" added to admin nav (admin only) via the existing permissions catalog (`nav.staff-academy`) so it can also be granted to sales/support later if wanted.
 
-### Head / SEO
+### 5. Seed migration
 
-`noindex,nofollow` on both routes (internal only). Route-specific `head()` titles like "Staff Academy — 365 Motor Sales" and per-article `head()`.
+Insert the current 8 static articles into `staff_academy_articles` as `status='active'` so editors have real content to start from. Static file stays as fallback + template reference; admins can safely delete DB rows to reveal the static version.
 
-### Out of scope for this pass
+## Out of scope
 
-- No DB table (all content in-repo).
-- No video hosting beyond linking to YouTube/Loom URLs already provided.
-- No progress tracking / certificates — that lives on `/learn` for public courses. Can be added later.
-- No new image generation — reuse existing uploaded assets. New hero art can be added incrementally.
+- No rich-text/Markdown editor — sections structure stays JSON to keep parity with existing reader.
+- No image uploads — hero uses URL string (upload can come later via existing storage bucket).
+- No per-article ACLs (staff-wide read only).
+- No history/audit view beyond `updated_by` + `updated_at`.
+
+## Order of operations
+
+1. Migration (table + RLS + seed).
+2. Server functions + admin gate.
+3. Reader merge + refactor `/staff/academy` pages to Query.
+4. Admin list + editor routes.
+5. Nav entry + permission key.
+
+Reader page keeps working throughout — static seed remains until DB is populated.

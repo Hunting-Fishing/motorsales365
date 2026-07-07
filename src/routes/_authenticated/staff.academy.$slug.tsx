@@ -1,4 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { isStaffEmail } from "@/lib/staff-domain";
@@ -8,32 +10,31 @@ import { Button } from "@/components/ui/button";
 import {
   ARTICLES,
   CATEGORY_META,
+  dbRowToArticle,
   getArticle,
   type Article,
 } from "@/content/staff-academy";
+import { getStaffAcademyArticleBySlug } from "@/lib/staff-academy-articles.functions";
 
 export const Route = createFileRoute("/_authenticated/staff/academy/$slug")({
-  loader: ({ params }) => {
+  head: ({ params }) => {
     const article = getArticle(params.slug);
-    if (!article) throw notFound();
-    return { article };
+    return {
+      meta: [
+        {
+          title: article
+            ? `${article.title} — Staff Academy`
+            : "Staff Academy",
+        },
+        { name: "robots", content: "noindex,nofollow" },
+        {
+          name: "description",
+          content: article?.description ?? "Internal staff article.",
+        },
+      ],
+    };
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: loaderData
-          ? `${loaderData.article.title} — Staff Academy`
-          : "Staff Academy",
-      },
-      { name: "robots", content: "noindex,nofollow" },
-      {
-        name: "description",
-        content: loaderData?.article.description ?? "Internal staff article.",
-      },
-    ],
-  }),
   component: ArticlePage,
-  notFoundComponent: NotFound,
 });
 
 function NotFound() {
@@ -55,10 +56,26 @@ function NotFound() {
 }
 
 function ArticlePage() {
-  const { user, loading } = useAuth();
-  const { article } = Route.useLoaderData() as { article: Article };
+  const { user, loading, isAdmin } = useAuth();
+  const { slug } = Route.useParams();
+  const loadDb = useServerFn(getStaffAcademyArticleBySlug);
 
-  if (loading) {
+  const isStaff = isStaffEmail(user?.email);
+  const canView = !!user && (isStaff || isAdmin);
+
+  const dbQuery = useQuery({
+    queryKey: ["staff-academy-article", slug],
+    queryFn: () => loadDb({ data: { slug } }),
+    enabled: canView,
+    staleTime: 60_000,
+  });
+
+  const staticArticle = getArticle(slug);
+  const article: Article | undefined = dbQuery.data
+    ? dbRowToArticle(dbQuery.data as any)
+    : staticArticle;
+
+  if (loading || dbQuery.isLoading) {
     return (
       <div className="rounded-lg border p-6 text-sm text-muted-foreground">
         Loading…
@@ -66,7 +83,7 @@ function ArticlePage() {
     );
   }
 
-  if (!isStaffEmail(user?.email)) {
+  if (!canView) {
     return (
       <div className="mx-auto max-w-lg">
         <Card>
@@ -80,6 +97,8 @@ function ArticlePage() {
       </div>
     );
   }
+
+  if (!article) return <NotFound />;
 
   const related: Article[] = ARTICLES.filter(
     (a) => a.category === article.category && a.slug !== article.slug,
@@ -128,7 +147,7 @@ function ArticlePage() {
                 <h2 className="font-display text-lg font-semibold">{s.heading}</h2>
               )}
               {s.body && (
-                <p className="text-sm leading-relaxed text-foreground/90">{s.body}</p>
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{s.body}</p>
               )}
               {s.bullets && s.bullets.length > 0 && (
                 <ul className="list-disc space-y-1.5 pl-5 text-sm text-foreground/90">
@@ -145,7 +164,7 @@ function ArticlePage() {
                         {s.cta.label}
                       </a>
                     ) : (
-                      <Link to={s.cta.to}>{s.cta.label}</Link>
+                      <Link to={s.cta.to as any}>{s.cta.label}</Link>
                     )}
                   </Button>
                 </div>

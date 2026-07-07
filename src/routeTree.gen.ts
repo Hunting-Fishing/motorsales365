@@ -184,6 +184,7 @@ import { Route as AuthenticatedCompleteProfileRouteImport } from './routes/_auth
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
+import { Route as AdminStaffAcademyIndexRouteImport } from './routes/admin.staff-academy.index'
 import { Route as AdminAdvertisementsIndexRouteImport } from './routes/admin.advertisements.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
 import { Route as ShopDepartmentSlugRouteImport } from './routes/shop.department.$slug'
@@ -208,6 +209,7 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as ApiAdminBackfillProfilesRouteImport } from './routes/api/admin/backfill-profiles'
+import { Route as AdminStaffAcademyIdRouteImport } from './routes/admin.staff-academy.$id'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
 import { Route as AdminPartsOutreachRouteImport } from './routes/admin.parts.outreach'
 import { Route as AdminPartsFeedsRouteImport } from './routes/admin.parts.feeds'
@@ -1160,6 +1162,11 @@ const DashboardTeamIndexRoute = DashboardTeamIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardTeamRoute,
 } as any)
+const AdminStaffAcademyIndexRoute = AdminStaffAcademyIndexRouteImport.update({
+  id: '/staff-academy/',
+  path: '/staff-academy/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAdvertisementsIndexRoute =
   AdminAdvertisementsIndexRouteImport.update({
     id: '/',
@@ -1285,6 +1292,11 @@ const ApiAdminBackfillProfilesRoute =
     path: '/api/admin/backfill-profiles',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminStaffAcademyIdRoute = AdminStaffAcademyIdRouteImport.update({
+  id: '/staff-academy/$id',
+  path: '/staff-academy/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   id: '/redemptions_/$staffId',
   path: '/redemptions/$staffId',
@@ -1899,6 +1911,7 @@ export interface FileRoutesByFullPath {
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/admin/staff-academy/$id': typeof AdminStaffAcademyIdRoute
   '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1923,6 +1936,7 @@ export interface FileRoutesByFullPath {
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
+  '/admin/staff-academy/': typeof AdminStaffAcademyIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2165,6 +2179,7 @@ export interface FileRoutesByTo {
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/admin/staff-academy/$id': typeof AdminStaffAcademyIdRoute
   '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2188,6 +2203,7 @@ export interface FileRoutesByTo {
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements': typeof AdminAdvertisementsIndexRoute
+  '/admin/staff-academy': typeof AdminStaffAcademyIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2437,6 +2453,7 @@ export interface FileRoutesById {
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/admin/staff-academy/$id': typeof AdminStaffAcademyIdRoute
   '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2461,6 +2478,7 @@ export interface FileRoutesById {
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
+  '/admin/staff-academy/': typeof AdminStaffAcademyIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/_authenticated/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2710,6 +2728,7 @@ export interface FileRouteTypes {
     | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
+    | '/admin/staff-academy/$id'
     | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2734,6 +2753,7 @@ export interface FileRouteTypes {
     | '/shop/department/$slug'
     | '/shop/p/$slug'
     | '/admin/advertisements/'
+    | '/admin/staff-academy/'
     | '/dashboard/team/'
     | '/dashboard/clubs/$id'
     | '/staff/academy/$slug'
@@ -2976,6 +2996,7 @@ export interface FileRouteTypes {
     | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
+    | '/admin/staff-academy/$id'
     | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2999,6 +3020,7 @@ export interface FileRouteTypes {
     | '/shop/department/$slug'
     | '/shop/p/$slug'
     | '/admin/advertisements'
+    | '/admin/staff-academy'
     | '/dashboard/team'
     | '/dashboard/clubs/$id'
     | '/staff/academy/$slug'
@@ -3247,6 +3269,7 @@ export interface FileRouteTypes {
     | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions_/$staffId'
+    | '/admin/staff-academy/$id'
     | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -3271,6 +3294,7 @@ export interface FileRouteTypes {
     | '/shop/department/$slug'
     | '/shop/p/$slug'
     | '/admin/advertisements/'
+    | '/admin/staff-academy/'
     | '/dashboard/team/'
     | '/_authenticated/dashboard/clubs_/$id'
     | '/_authenticated/staff/academy/$slug'
@@ -4679,6 +4703,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTeamIndexRouteImport
       parentRoute: typeof DashboardTeamRoute
     }
+    '/admin/staff-academy/': {
+      id: '/admin/staff-academy/'
+      path: '/staff-academy'
+      fullPath: '/admin/staff-academy/'
+      preLoaderRoute: typeof AdminStaffAcademyIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/advertisements/': {
       id: '/admin/advertisements/'
       path: '/'
@@ -4846,6 +4877,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/admin/backfill-profiles'
       preLoaderRoute: typeof ApiAdminBackfillProfilesRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/staff-academy/$id': {
+      id: '/admin/staff-academy/$id'
+      path: '/staff-academy/$id'
+      fullPath: '/admin/staff-academy/$id'
+      preLoaderRoute: typeof AdminStaffAcademyIdRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/redemptions_/$staffId': {
       id: '/admin/redemptions_/$staffId'
@@ -5533,6 +5571,8 @@ interface AdminRouteChildren {
   AdminVerificationsRoute: typeof AdminVerificationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminRedemptionsStaffIdRoute: typeof AdminRedemptionsStaffIdRoute
+  AdminStaffAcademyIdRoute: typeof AdminStaffAcademyIdRoute
+  AdminStaffAcademyIndexRoute: typeof AdminStaffAcademyIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -5580,6 +5620,8 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminVerificationsRoute: AdminVerificationsRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminRedemptionsStaffIdRoute: AdminRedemptionsStaffIdRoute,
+  AdminStaffAcademyIdRoute: AdminStaffAcademyIdRoute,
+  AdminStaffAcademyIndexRoute: AdminStaffAcademyIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

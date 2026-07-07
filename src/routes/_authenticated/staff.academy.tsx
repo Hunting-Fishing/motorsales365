@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Search, ExternalLink, GraduationCap, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { isStaffEmail } from "@/lib/staff-domain";
@@ -8,10 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  ARTICLES,
   CATEGORY_META,
+  mergeArticles,
+  type Article,
   type ArticleCategory,
 } from "@/content/staff-academy";
+import { listStaffAcademyArticles } from "@/lib/staff-academy-articles.functions";
 
 export const Route = createFileRoute("/_authenticated/staff/academy")({
   head: () => ({
@@ -29,15 +33,28 @@ export const Route = createFileRoute("/_authenticated/staff/academy")({
 });
 
 function StaffAcademyHub() {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const [query, setQuery] = useState("");
+  const loadDb = useServerFn(listStaffAcademyArticles);
 
   const isStaff = isStaffEmail(user?.email);
 
+  const dbQuery = useQuery({
+    queryKey: ["staff-academy-articles"],
+    queryFn: () => loadDb(),
+    enabled: !!user && (isStaff || isAdmin),
+    staleTime: 60_000,
+  });
+
+  const articles: Article[] = useMemo(
+    () => mergeArticles(dbQuery.data, { includeDrafts: isAdmin }),
+    [dbQuery.data, isAdmin],
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return ARTICLES;
-    return ARTICLES.filter((a) => {
+    if (!q) return articles;
+    return articles.filter((a) => {
       const haystack = [
         a.title,
         a.description,
@@ -50,10 +67,10 @@ function StaffAcademyHub() {
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [query]);
+  }, [query, articles]);
 
   const grouped = useMemo(() => {
-    const m = new Map<ArticleCategory, typeof ARTICLES>();
+    const m = new Map<ArticleCategory, Article[]>();
     for (const a of filtered) {
       const list = m.get(a.category) ?? [];
       list.push(a);
@@ -64,10 +81,10 @@ function StaffAcademyHub() {
 
   const recentlyUpdated = useMemo(
     () =>
-      [...ARTICLES]
+      [...articles]
         .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
         .slice(0, 3),
-    [],
+    [articles],
   );
 
   if (loading) {
@@ -78,7 +95,7 @@ function StaffAcademyHub() {
     );
   }
 
-  if (!isStaff) {
+  if (!isStaff && !isAdmin) {
     return (
       <div className="mx-auto max-w-lg">
         <Card>

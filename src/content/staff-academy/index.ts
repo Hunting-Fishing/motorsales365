@@ -347,3 +347,51 @@ export function getArticle(slug: string): Article | undefined {
 export function articlesByCategory(category: ArticleCategory): Article[] {
   return ARTICLES.filter((a) => a.category === category);
 }
+
+/** Convert a DB row (shape from staff-academy-articles.functions) to an Article. */
+export function dbRowToArticle(row: {
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  status: string;
+  hero_emoji: string | null;
+  sections: unknown;
+  updated_at: string;
+}): Article {
+  return {
+    slug: row.slug,
+    title: row.title,
+    description: row.description,
+    category: row.category as ArticleCategory,
+    tags: row.tags ?? [],
+    status: (row.status as ArticleStatus) ?? "active",
+    heroEmoji: row.hero_emoji ?? undefined,
+    sections: Array.isArray(row.sections) ? (row.sections as ArticleSection[]) : [],
+    updatedAt: (row.updated_at ?? "").slice(0, 10),
+  };
+}
+
+/**
+ * Merge DB-authored articles with the in-repo defaults. DB rows override
+ * static articles by slug; static rows remain as fallback. Drafts are
+ * excluded unless `includeDrafts` is true (admins only).
+ */
+export function mergeArticles(
+  dbRows: Array<Parameters<typeof dbRowToArticle>[0]> | undefined | null,
+  opts?: { includeDrafts?: boolean },
+): Article[] {
+  const includeDrafts = !!opts?.includeDrafts;
+  const bySlug = new Map<string, Article>();
+  for (const s of ARTICLES) bySlug.set(s.slug, s);
+  for (const r of dbRows ?? []) {
+    const a = dbRowToArticle(r);
+    if (a.status === "draft" && !includeDrafts) {
+      bySlug.delete(a.slug);
+      continue;
+    }
+    bySlug.set(a.slug, a);
+  }
+  return Array.from(bySlug.values());
+}
