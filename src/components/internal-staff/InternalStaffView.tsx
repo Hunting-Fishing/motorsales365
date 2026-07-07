@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Plus, Mail, Trash2, MoveRight, ShieldCheck } from "lucide-react";
+import { Plus, MessageSquare, Trash2, MoveRight, ShieldCheck } from "lucide-react";
+import { StaffChatDialog } from "@/components/internal-staff/StaffChatDialog";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,8 +63,10 @@ export function InternalStaffView({
   const roots = useMemo(() => buildTree(members), [members]);
   const [addOpen, setAddOpen] = useState<{ managerId: string } | null>(null);
   const [moveFor, setMoveFor] = useState<InternalStaffMember | null>(null);
+  const [chatWith, setChatWith] = useState<InternalStaffMember | null>(null);
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["internal-staff"] });
+
 
   if (isLoading) {
     return <div className="p-6 text-muted-foreground">Loading team…</div>;
@@ -94,10 +98,10 @@ export function InternalStaffView({
                   currentUserId={currentUserId}
                   onAdd={(mid) => setAddOpen({ managerId: mid })}
                   onMove={(m) => setMoveFor(m)}
+                  onChat={(m) => setChatWith(m)}
                   onDeactivate={async (uid) => {
                     if (!window.confirm("Deactivate this staff account? They will not be able to sign in.")) return;
                     try {
-                      // eslint-disable-next-line @typescript-eslint/no-use-before-define
                       await deactivateFn({ data: { userId: uid } });
                       toast.success("Staff deactivated");
                       refresh();
@@ -108,6 +112,7 @@ export function InternalStaffView({
                 />
               ))}
             </div>
+
           )
         ) : (
           <div className="divide-y">
@@ -117,11 +122,12 @@ export function InternalStaffView({
                 m={m}
                 members={members}
                 isAdmin={isAdmin}
+                currentUserId={currentUserId}
+                onChat={() => setChatWith(m)}
                 onMove={() => setMoveFor(m)}
                 onDeactivate={async () => {
                   if (!window.confirm("Deactivate this staff account?")) return;
                   try {
-                    // eslint-disable-next-line @typescript-eslint/no-use-before-define
                     await deactivateFn({ data: { userId: m.user_id } });
                     toast.success("Staff deactivated");
                     refresh();
@@ -130,6 +136,7 @@ export function InternalStaffView({
                   }
                 }}
               />
+
             ))}
           </div>
         )}
@@ -151,10 +158,18 @@ export function InternalStaffView({
           onSaved={refresh}
         />
       )}
+      {chatWith && (
+        <StaffChatDialog
+          open={!!chatWith}
+          onOpenChange={(o) => !o && setChatWith(null)}
+          otherUserId={chatWith.user_id}
+          otherName={chatWith.full_name ?? chatWith.email ?? "Teammate"}
+        />
+      )}
     </div>
   );
-
 }
+
 
 
 function TreeRow({
@@ -164,6 +179,7 @@ function TreeRow({
   currentUserId,
   onAdd,
   onMove,
+  onChat,
   onDeactivate,
 }: {
   node: Node;
@@ -172,6 +188,7 @@ function TreeRow({
   currentUserId: string;
   onAdd: (managerId: string) => void;
   onMove: (m: InternalStaffMember) => void;
+  onChat: (m: InternalStaffMember) => void;
   onDeactivate: (userId: string) => void;
 }) {
   return (
@@ -193,11 +210,9 @@ function TreeRow({
           </div>
         </div>
         <Staff365Badge size="xs" />
-        {node.email && node.user_id !== currentUserId && (
-          <Button asChild size="sm" variant="outline">
-            <a href={`mailto:${node.email}`}>
-              <Mail className="mr-1 h-3.5 w-3.5" /> Message
-            </a>
+        {node.user_id !== currentUserId && (
+          <Button size="sm" variant="outline" onClick={() => onChat(node)}>
+            <MessageSquare className="mr-1 h-3.5 w-3.5" /> Message
           </Button>
         )}
         {isAdmin && (
@@ -227,6 +242,7 @@ function TreeRow({
           currentUserId={currentUserId}
           onAdd={onAdd}
           onMove={onMove}
+          onChat={onChat}
           onDeactivate={onDeactivate}
         />
       ))}
@@ -238,15 +254,20 @@ function FlatRow({
   m,
   members,
   isAdmin,
+  currentUserId,
+  onChat,
   onMove,
   onDeactivate,
 }: {
   m: InternalStaffMember;
   members: InternalStaffMember[];
   isAdmin: boolean;
+  currentUserId: string;
+  onChat: () => void;
   onMove: () => void;
   onDeactivate: () => void;
 }) {
+
   const manager = members.find((x) => x.user_id === m.manager_user_id);
   return (
     <div className="flex flex-wrap items-center gap-3 py-3">
@@ -260,13 +281,12 @@ function FlatRow({
         </div>
       </div>
       <Staff365Badge size="xs" />
-      {m.email && (
-        <Button asChild size="sm" variant="outline">
-          <a href={`mailto:${m.email}`}>
-            <Mail className="mr-1 h-3.5 w-3.5" /> Message
-          </a>
+      {m.user_id !== currentUserId && (
+        <Button size="sm" variant="outline" onClick={onChat}>
+          <MessageSquare className="mr-1 h-3.5 w-3.5" /> Message
         </Button>
       )}
+
       {isAdmin && !m.is_admin && (
         <>
           <Button size="sm" variant="ghost" onClick={onMove} title="Change manager">
