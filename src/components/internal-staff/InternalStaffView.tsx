@@ -158,10 +158,18 @@ export function InternalStaffView({
           onSaved={refresh}
         />
       )}
+      {chatWith && (
+        <StaffChatDialog
+          open={!!chatWith}
+          onOpenChange={(o) => !o && setChatWith(null)}
+          otherUserId={chatWith.user_id}
+          otherName={chatWith.full_name ?? chatWith.email ?? "Teammate"}
+        />
+      )}
     </div>
   );
-
 }
+
 
 
 function TreeRow({
