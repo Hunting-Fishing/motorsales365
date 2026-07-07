@@ -43,7 +43,19 @@ function mapRow(row: any): StaffAcademyAsset {
   };
 }
 
+const STAFF_DOMAIN = "@365motorsales.com";
+
+function isStaffEmailAddr(email: string | null | undefined): boolean {
+  return !!email && email.trim().toLowerCase().endsWith(STAFF_DOMAIN);
+}
+
+/** Admin + verified @365motorsales.com email — Staff Academy admin gate. */
 async function isAdmin(context: any): Promise<boolean> {
+  const email: string | undefined = context.claims?.email;
+  const emailVerified: boolean =
+    context.claims?.email_verified === true ||
+    context.claims?.user_metadata?.email_verified === true;
+  if (!email || !isStaffEmailAddr(email) || !emailVerified) return false;
   const { data } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
