@@ -1,79 +1,58 @@
-# Partner / Advertising Hub — consolidation plan
+## Goal
 
-Right now partner/advertising users have to hop across seven scattered routes (My leads, My referrals, Performance, Advertisements, QR analytics, Activity & reports, QR leads), some of which live under `/dashboard/team/*` and others under `/admin/*`. On top of that, "My leads" (Inbox) crashes because `/dashboard/team/leads` requires an `orgId` search param and the hamburger link doesn't pass one — that's the "Something went wrong" screen and `orgId invalid_type` error you're seeing.
+Treat every `@365motorsales.com` signup as internal staff of the single canonical **365 MotorSales** organization (owned by `Admin@365motorsales.com`) instead of spinning up a separate business/org for each of them.
 
-This plan pulls everything under one roof, merges the pieces that overlap, and adds a first-run experience.
+## Findings
 
-## New unified route
+- There is already **one canonical org**: `365 MotorSales` (id `d45bc407-1510-46e5-9ff2-a9789ad002fa`, kind `dealership`), owned by the admin user.
+- Two other orgs (`365 TOWING TEST` x2) are test seed data owned by different users — not related.
+- `public.profiles` already has the exact fields we need: `parent_org_id`, `is_staff_account`, `signup_intent`.
+- `handle_new_user()` currently branches on `signup_intent` from client metadata; for `business`/`service_provider` intents it writes business fields into the profile, and downstream flows (dashboard / claim / onboarding) then let them create their own business + org. That's what's producing the "independent business" behavior for @365 emails.
+- Recent `@365motorsales.com` accounts (e.g. Joan Gadin) already show `1 of 3 seats used` under their own "Staff & Access" — confirming an auto-provisioned personal org.
 
-Create **`/dashboard/partner`** as the single "Partner & Advertising" hub with a persistent tab bar (same visual style as `/admin/advertisements`). Only tabs the user has access to are shown.
+## Plan
 
-```text
-/dashboard/partner
-├── overview        (Home — first-time guided cards + shortcuts)
-├── inbox           (unified leads: sales leads + QR leads, tabbed by source)
-├── referrals       (My referrals + share links + QR)
-├── qr-ads          (personal QR templates — moved from admin)
-├── qr-analytics    (scans / signups / redemptions)
-├── advertisements  (campaigns/promotions — admin/advertising only)
-├── performance     (sales performance + commissions)
-└── activity        (activity & reports — admin/support only)
-```
+### 1. Server-side gate on signup (new migration)
 
-Old routes stay as redirects to their new tab so bookmarks keep working.
+Update `public.handle_new_user()` so that when `lower(NEW.email)` ends with `@365motorsales.com`:
 
-## What gets merged
+- Force `signup_intent := 'internal_staff'` (new value) — ignore any client-sent `business`/`service_provider` intent.
+- Do **not** populate `business_name` / `business_*` fields on the profile.
+- Set `is_staff_account := true`, `parent_org_id := <canonical 365 org id>`.
+- Set `seller_type := 'private'` (they sell nothing personally).
+- Insert a row into `public.organization_members` with `organization_id = <canonical>`, `role = 'staff'` (or `member` — see Q1 below), `user_id = NEW.id`.
+- Do this via a `SECURITY DEFINER` helper so the trigger can write to `organization_members` without granting anon/authenticated write on that table.
 
-| Old label | Was at | New location | Reason |
-|---|---|---|---|
-| My leads | `/dashboard/team/leads` | Inbox → "Sales leads" tab | Both are lead inboxes |
-| QR leads | `/admin/qr-leads` | Inbox → "QR leads" tab | Same |
-| My referrals | `/dashboard/referral` | Referrals tab | Direct move |
-| Performance | `/dashboard/team/performance` | Performance tab | Direct move |
-| Advertisements | `/admin/advertisements` | Advertisements tab (keeps its own sub-tabs) | Nested, no functional change |
-| QR analytics | `/admin/advertisements/analytics` | QR Analytics tab (promoted to top-level) | Currently buried two levels deep |
-| Activity & reports | `/admin/reports` | Activity tab | Direct move |
+The canonical org id is stored in a single `public.internal_org_settings` row (or hard-coded constant inside the function) so we're not looking it up by slug every insert.
 
-QR Ads (personal QR templates the user prints/shares) is promoted from an admin sub-tab to its own top-level tab in the hub, because it's the primary tool for partners.
+### 2. Block "create my business" for internal staff
 
-## Fixing the broken Inbox
+- Add an RLS check + client guard: profiles where `is_staff_account = true AND parent_org_id = <canonical>` cannot own a `businesses` or `organizations` row (owner_id / created_by can't equal their user id, except for the canonical org itself). Enforced via a `BEFORE INSERT` trigger on `businesses` and `organizations` that raises a friendly error.
+- On the frontend, hide "Create business / Add my business" CTAs when `profile.is_staff_account && profile.parent_org_id === CANONICAL_365_ORG_ID`, and instead show a "You're on the 365 MotorSales internal team" badge that links to `/dashboard/team`.
 
-Root cause: `/dashboard/team/leads` declares `validateSearch` with `orgId: z.string().uuid()` as required, but the hamburger link navigates without any search params.
+### 3. Backfill existing @365motorsales.com users
 
-Fix in the new Inbox tab:
-- Make `orgId` optional in the search schema.
-- If missing, the loader picks the user's default org (first org they belong to). If they have none, show an empty state with a "Create/join a business" call to action instead of an error screen.
-- Add an org picker to the top of Inbox when the user belongs to more than one org.
+Same migration:
 
-## First-time onboarding
+- For every `auth.users` row with email ending in `@365motorsales.com`:
+  - Set `profiles.is_staff_account = true`, `parent_org_id = <canonical>`, `signup_intent = 'internal_staff'`.
+  - Upsert into `organization_members` (canonical org, chosen role).
+- For any `businesses` / `organizations` those users own that are NOT the canonical org: mark `status = 'archived'` (don't hard-delete — preserves any listings/leads history) and reassign `owner_id` / `created_by` to the admin user. Log each change to `admin_audit_log`.
+- Test seed rows (`365 TOWING TEST` x2) — leave alone (owned by non-@365 emails).
 
-Overview tab shows a checklist card for new users:
-1. Set up your referral link (links to Referrals tab)
-2. Print/share your QR ad (links to QR Ads tab)
-3. See your first scan (links to QR Analytics tab)
-4. Reply to your first lead (links to Inbox)
+### 4. Route users into the internal team UI
 
-Each item shows a green check once done (detected from existing data — first referral event, first QR template created, first scan, first lead reply). Card auto-dismisses once all four are complete.
+- On login, if `is_staff_account && parent_org_id = canonical`, the default dashboard org context becomes the canonical 365 org so they land on `/dashboard/team?orgId=<canonical>` and see the real internal inbox / members / performance — not their old personal org.
 
-## Hamburger menu change
+## Open questions
 
-The pink "Partner / Advertising" section collapses to a **single** entry: **"Partner Hub"** → `/dashboard/partner`. All the individual links go away from the drawer. This is the main "one roof" ask.
+1. **Role name for new internal staff** in `organization_members` — `staff`, `member`, or `admin`? Current default assumption: `staff`. Admin-level access still requires an explicit grant via `user_roles`.
+2. **Domain scope** — only `@365motorsales.com`, or also `@365motorsales.ph` / other variants? Current assumption: exact match on `@365motorsales.com` (case-insensitive).
+3. **Backfill of existing personal businesses** — archive (recommended, reversible) vs delete. Current assumption: archive + reassign to admin, no deletion.
 
-Staff-only tools that aren't partner-facing (Moderate listings, Business directory, Verifications, Manage sales reps) stay where they are — they don't belong in the partner hub.
+## Technical notes
 
-## Files touched
-
-- **New:** `src/routes/dashboard.partner.tsx` (layout + tab bar), `src/routes/dashboard.partner.overview.tsx`, `.inbox.tsx`, `.referrals.tsx`, `.qr-ads.tsx`, `.qr-analytics.tsx`, `.advertisements.tsx`, `.performance.tsx`, `.activity.tsx`, `.index.tsx` (redirects to overview).
-- **Edited:** `src/routes/dashboard.team.leads.tsx` — make `orgId` optional, fall back to default org, remove crash.
-- **Edited:** `src/components/site-header.tsx` — collapse the partner/advertising block in both the desktop dropdown and mobile drawer down to a single "Partner Hub" link (keeps the pink section styling).
-- **Edited:** existing routes `/dashboard/team/leads`, `/dashboard/team/performance`, `/dashboard/referral`, `/admin/qr-leads`, `/admin/advertisements/analytics` — add `beforeLoad` redirects to their new hub tab so old links/bookmarks still work. Admin `/admin/advertisements/*` stays functional for admins who want the full page too.
-
-## Not in scope
-
-- No change to the actual advertising CRM, campaigns, or QR analytics data model — this is purely a navigation/UX reshuffle plus the Inbox fix.
-- No change to how commissions or partner applications are approved.
-
-## Confirm before I build
-
-1. OK to keep `/admin/advertisements` reachable for admins as-is, and just mirror it into the hub? (Recommended — avoids breaking existing admin muscle memory.)
-2. OK to merge "My leads" + "QR leads" into one Inbox with source tabs? (They're both lead lists, just different sources.)
+- New enum value `'internal_staff'` on the `signup_intent` text field (it's a `text`, not an enum, so no enum migration needed).
+- New table `public.internal_org_settings (key text primary key, org_id uuid)` seeded with `('canonical_365', 'd45bc407-1510-46e5-9ff2-a9789ad002fa')` — with GRANTs and RLS `USING (false)` for direct client access, read via `SECURITY DEFINER` helper.
+- Guard triggers on `businesses` / `organizations` use `SECURITY DEFINER` helper `is_internal_365_staff(uuid)` to avoid recursive RLS.
+- No changes to auth config, no new secrets, no edge functions.
