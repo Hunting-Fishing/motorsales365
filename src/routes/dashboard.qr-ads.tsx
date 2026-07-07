@@ -169,7 +169,7 @@ function QrAdsPage() {
     queryFn: () => customFn(),
     enabled: !!user,
   });
-  const { data: signedCustoms } = useSignedCustomTemplates(customData?.templates);
+  
 
   // Pre-warm the shared QR + base-image caches so individual cards mount instantly.
   useEffect(() => {
