@@ -27,6 +27,7 @@ import {
   ShieldCheck,
   QrCode,
   ListChecks,
+  ChevronDown,
 } from "lucide-react";
 import { useAuth, type SellerType, type AppRole } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -689,10 +690,8 @@ export function SiteHeader() {
                   </Link>
                 </SheetClose>
 
-                <section className="rounded-lg border border-sky-300 bg-sky-100 dark:border-sky-500/40 dark:bg-sky-500/15 px-2 py-1.5">
-                  <p className="px-2 pb-1 text-xs font-bold uppercase tracking-wider text-sky-800 dark:text-sky-200">
-                    Browse
-                  </p>
+                <details open className="group/sec rounded-lg border overflow-hidden border-sky-300 bg-sky-100 dark:border-sky-500/40 dark:bg-sky-500/15 px-2 py-1.5">
+                  <summary className="sticky top-0 z-10 -mx-2 -mt-1.5 mb-1 flex cursor-pointer list-none items-center justify-between rounded-t-lg bg-sky-100 dark:bg-sky-500/25 px-3 py-2 text-xs font-bold uppercase tracking-wider text-sky-800 dark:text-sky-200 shadow-sm">Browse<ChevronDown className="h-3.5 w-3.5 shrink-0 transition-transform group-open/sec:rotate-180" /></summary>
                   <div className="flex flex-col gap-0.5">
                     {NAV.map((n) => (
                       <SheetClose asChild key={n.category}>
@@ -716,12 +715,10 @@ export function SiteHeader() {
                       </Link>
                     </SheetClose>
                   </div>
-                </section>
+                </details>
 
-                <section className="rounded-lg border border-emerald-300 bg-emerald-100 dark:border-emerald-500/40 dark:bg-emerald-500/15 px-2 py-1.5">
-                  <p className="px-2 pb-1 text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-200">
-                    Marketplace
-                  </p>
+                <details open className="group/sec rounded-lg border overflow-hidden border-emerald-300 bg-emerald-100 dark:border-emerald-500/40 dark:bg-emerald-500/15 px-2 py-1.5">
+                  <summary className="sticky top-0 z-10 -mx-2 -mt-1.5 mb-1 flex cursor-pointer list-none items-center justify-between rounded-t-lg bg-emerald-100 dark:bg-emerald-500/25 px-3 py-2 text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-200 shadow-sm">Marketplace<ChevronDown className="h-3.5 w-3.5 shrink-0 transition-transform group-open/sec:rotate-180" /></summary>
                   <div className="flex flex-col gap-0.5">
                     <SheetClose asChild>
                       <Link
@@ -812,16 +809,14 @@ export function SiteHeader() {
                       </Link>
                     </SheetClose>
                   </div>
-                </section>
+                </details>
 
 
                 {user && (
                   <>
                     {(myBusinesses.length > 0 || businessSetup.needed) && (
-                      <section className="rounded-lg border border-amber-300 bg-amber-100 dark:border-amber-500/40 dark:bg-amber-500/15 px-2 py-1.5">
-                        <p className="px-2 pb-1 text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-200">
-                          My businesses
-                        </p>
+                      <details open className="group/sec rounded-lg border overflow-hidden border-amber-300 bg-amber-100 dark:border-amber-500/40 dark:bg-amber-500/15 px-2 py-1.5">
+                        <summary className="sticky top-0 z-10 -mx-2 -mt-1.5 mb-1 flex cursor-pointer list-none items-center justify-between rounded-t-lg bg-amber-100 dark:bg-amber-500/25 px-3 py-2 text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-200 shadow-sm">My businesses<ChevronDown className="h-3.5 w-3.5 shrink-0 transition-transform group-open/sec:rotate-180" /></summary>
                         <div className="flex flex-col gap-0.5">
                           {myBusinesses.map((b) => (
                             <div key={b.id} className="flex items-center gap-1 px-1">
@@ -867,12 +862,10 @@ export function SiteHeader() {
                             </div>
                           )}
                         </div>
-                      </section>
+                      </details>
                     )}
-                    <section className="rounded-lg border border-violet-300 bg-violet-100 dark:border-violet-500/40 dark:bg-violet-500/15 px-2 py-1.5">
-                      <p className="px-2 pb-1 text-xs font-bold uppercase tracking-wider text-violet-800 dark:text-violet-200">
-                        Account
-                      </p>
+                    <details open className="group/sec rounded-lg border overflow-hidden border-violet-300 bg-violet-100 dark:border-violet-500/40 dark:bg-violet-500/15 px-2 py-1.5">
+                      <summary className="sticky top-0 z-10 -mx-2 -mt-1.5 mb-1 flex cursor-pointer list-none items-center justify-between rounded-t-lg bg-violet-100 dark:bg-violet-500/25 px-3 py-2 text-xs font-bold uppercase tracking-wider text-violet-800 dark:text-violet-200 shadow-sm">Account<ChevronDown className="h-3.5 w-3.5 shrink-0 transition-transform group-open/sec:rotate-180" /></summary>
                       <div className="flex flex-col gap-0.5">
                         <SheetClose asChild>
                           <Link to="/dashboard" className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60">
@@ -900,12 +893,10 @@ export function SiteHeader() {
                           </Link>
                         </SheetClose>
                       </div>
-                    </section>
+                    </details>
                     {isStaff && (
-                      <section className="rounded-lg border border-rose-300 bg-rose-100 dark:border-rose-500/40 dark:bg-rose-500/15 px-2 py-1.5">
-                        <p className="px-2 pb-1 text-xs font-bold uppercase tracking-wider text-rose-800 dark:text-rose-200">
-                          {isAdmin ? "365 Staff" : isAdvertising ? "Partner / Advertising" : isModerator ? "Moderation" : isSupport ? "Support" : "Sales Rep"}
-                        </p>
+                      <details open className="group/sec rounded-lg border overflow-hidden border-rose-300 bg-rose-100 dark:border-rose-500/40 dark:bg-rose-500/15 px-2 py-1.5">
+                        <summary className="sticky top-0 z-10 -mx-2 -mt-1.5 mb-1 flex cursor-pointer list-none items-center justify-between rounded-t-lg bg-rose-100 dark:bg-rose-500/25 px-3 py-2 text-xs font-bold uppercase tracking-wider text-rose-800 dark:text-rose-200 shadow-sm">{isAdmin ? "365 Staff" : isAdvertising ? "Partner / Advertising" : isModerator ? "Moderation" : isSupport ? "Support" : "Sales Rep"}<ChevronDown className="h-3.5 w-3.5 shrink-0 transition-transform group-open/sec:rotate-180" /></summary>
                         <div className="flex flex-col gap-0.5">
 
                           {isSales && (
@@ -1025,7 +1016,7 @@ export function SiteHeader() {
                             </>
                           )}
                         </div>
-                      </section>
+                      </details>
                     )}
 
 
