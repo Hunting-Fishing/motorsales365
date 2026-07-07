@@ -61,7 +61,8 @@ export const Route = createFileRoute("/admin/staff-academy/")({
 });
 
 function StaffAcademyAdminList() {
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, user } = useAuth();
+  const canManage = !!isAdmin && isStaffEmail(user?.email);
   const qc = useQueryClient();
   const fetchAll = useServerFn(listAllStaffAcademyArticlesAdmin);
   const del = useServerFn(deleteStaffAcademyArticle);
