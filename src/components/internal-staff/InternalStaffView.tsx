@@ -281,13 +281,12 @@ function FlatRow({
         </div>
       </div>
       <Staff365Badge size="xs" />
-      {m.email && (
-        <Button asChild size="sm" variant="outline">
-          <a href={`mailto:${m.email}`}>
-            <Mail className="mr-1 h-3.5 w-3.5" /> Message
-          </a>
+      {m.user_id !== currentUserId && (
+        <Button size="sm" variant="outline" onClick={onChat}>
+          <MessageSquare className="mr-1 h-3.5 w-3.5" /> Message
         </Button>
       )}
+
       {isAdmin && !m.is_admin && (
         <>
           <Button size="sm" variant="ghost" onClick={onMove} title="Change manager">
