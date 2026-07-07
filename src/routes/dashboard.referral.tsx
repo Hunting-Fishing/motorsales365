@@ -463,7 +463,7 @@ function ReferralQrCard({
                   value={link}
                   size={1024}
                   level="H"
-                  includeMargin
+                  marginSize={computeQuietZoneModules(1024, "H" as QrLevel)}
                   style={{ width: "100%", height: "100%" }}
                 />
               </div>
