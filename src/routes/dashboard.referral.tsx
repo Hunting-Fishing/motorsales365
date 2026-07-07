@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 
 import { QRCodeCanvas } from "qrcode.react";
+import { computeQuietZoneModules, type QrLevel } from "@/lib/qr-quiet-zone";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -430,7 +431,7 @@ function ReferralQrCard({
                   value={link}
                   size={512}
                   level="H"
-                  includeMargin
+                  marginSize={computeQuietZoneModules(512, "H" as QrLevel)}
                   data-qr={referralCode}
                   style={{ width: "100%", height: "100%" }}
                 />
@@ -462,7 +463,7 @@ function ReferralQrCard({
                   value={link}
                   size={1024}
                   level="H"
-                  includeMargin
+                  marginSize={computeQuietZoneModules(1024, "H" as QrLevel)}
                   style={{ width: "100%", height: "100%" }}
                 />
               </div>
@@ -495,7 +496,7 @@ function ReferralQrCard({
               opacity: 0,
             }}
           >
-            <QRCodeCanvas value={link} size={1024} level="H" includeMargin />
+            <QRCodeCanvas value={link} size={1024} level="H" marginSize={computeQuietZoneModules(1024, "H" as QrLevel)} />
           </div>
         </DialogContent>
       </Dialog>
