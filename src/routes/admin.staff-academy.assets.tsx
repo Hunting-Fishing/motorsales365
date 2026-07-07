@@ -168,9 +168,11 @@ function StaffAcademyAssetsAdmin() {
   if (loading) {
     return <div className="rounded-lg border p-6 text-sm text-muted-foreground">Loading…</div>;
   }
-  if (!isAdmin) {
+  if (!canManage) {
     return (
-      <div className="rounded-lg border p-6 text-sm text-muted-foreground">Admins only.</div>
+      <div className="rounded-lg border p-6 text-sm text-muted-foreground">
+        Restricted — requires an admin account on the <b>@365motorsales.com</b> domain.
+      </div>
     );
   }
 
