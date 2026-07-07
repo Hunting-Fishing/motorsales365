@@ -102,7 +102,8 @@ function guessKind(file: File): StaffAcademyAsset["kind"] {
 }
 
 function StaffAcademyAssetsAdmin() {
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, user } = useAuth();
+  const canManage = !!isAdmin && isStaffEmail(user?.email);
   const qc = useQueryClient();
   const fetchAll = useServerFn(listAllStaffAcademyAssetsAdmin);
   const upsert = useServerFn(upsertStaffAcademyAsset);
