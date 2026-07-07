@@ -10148,6 +10148,38 @@ export type Database = {
           },
         ]
       }
+      staff_academy_article_views: {
+        Row: {
+          article_id: string | null
+          created_at: string
+          id: string
+          slug: string
+          viewer_id: string | null
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string
+          id?: string
+          slug: string
+          viewer_id?: string | null
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string
+          id?: string
+          slug?: string
+          viewer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_academy_article_views_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "staff_academy_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_academy_articles: {
         Row: {
           category: string
