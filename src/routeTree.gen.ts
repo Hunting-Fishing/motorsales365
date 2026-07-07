@@ -203,6 +203,7 @@ import { Route as DashboardTeamPerformanceRouteImport } from './routes/dashboard
 import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.team.members'
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
+import { Route as DashboardPartnerReferralsRouteImport } from './routes/dashboard.partner.referrals'
 import { Route as DashboardPartnerOverviewRouteImport } from './routes/dashboard.partner.overview'
 import { Route as DashboardPartnerInboxRouteImport } from './routes/dashboard.partner.inbox'
 import { Route as DashboardDispatchHistoryRouteImport } from './routes/dashboard.dispatch.history'
@@ -1266,6 +1267,12 @@ const DashboardRidesNewRoute = DashboardRidesNewRouteImport.update({
   path: '/rides/new',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPartnerReferralsRoute =
+  DashboardPartnerReferralsRouteImport.update({
+    id: '/referrals',
+    path: '/referrals',
+    getParentRoute: () => DashboardPartnerRoute,
+  } as any)
 const DashboardPartnerOverviewRoute =
   DashboardPartnerOverviewRouteImport.update({
     id: '/overview',
@@ -1970,6 +1977,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
   '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
   '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
+  '/dashboard/partner/referrals': typeof DashboardPartnerReferralsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -2243,6 +2251,7 @@ export interface FileRoutesByTo {
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
   '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
   '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
+  '/dashboard/partner/referrals': typeof DashboardPartnerReferralsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -2525,6 +2534,7 @@ export interface FileRoutesById {
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
   '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
   '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
+  '/dashboard/partner/referrals': typeof DashboardPartnerReferralsRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -2807,6 +2817,7 @@ export interface FileRouteTypes {
     | '/dashboard/dispatch/history'
     | '/dashboard/partner/inbox'
     | '/dashboard/partner/overview'
+    | '/dashboard/partner/referrals'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -3080,6 +3091,7 @@ export interface FileRouteTypes {
     | '/dashboard/dispatch/history'
     | '/dashboard/partner/inbox'
     | '/dashboard/partner/overview'
+    | '/dashboard/partner/referrals'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -3361,6 +3373,7 @@ export interface FileRouteTypes {
     | '/dashboard/dispatch/history'
     | '/dashboard/partner/inbox'
     | '/dashboard/partner/overview'
+    | '/dashboard/partner/referrals'
     | '/dashboard/rides_/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -4919,6 +4932,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRidesNewRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/partner/referrals': {
+      id: '/dashboard/partner/referrals'
+      path: '/referrals'
+      fullPath: '/dashboard/partner/referrals'
+      preLoaderRoute: typeof DashboardPartnerReferralsRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
     '/dashboard/partner/overview': {
       id: '/dashboard/partner/overview'
       path: '/overview'
@@ -5774,12 +5794,14 @@ const DashboardDispatchRouteWithChildren =
 interface DashboardPartnerRouteChildren {
   DashboardPartnerInboxRoute: typeof DashboardPartnerInboxRoute
   DashboardPartnerOverviewRoute: typeof DashboardPartnerOverviewRoute
+  DashboardPartnerReferralsRoute: typeof DashboardPartnerReferralsRoute
   DashboardPartnerIndexRoute: typeof DashboardPartnerIndexRoute
 }
 
 const DashboardPartnerRouteChildren: DashboardPartnerRouteChildren = {
   DashboardPartnerInboxRoute: DashboardPartnerInboxRoute,
   DashboardPartnerOverviewRoute: DashboardPartnerOverviewRoute,
+  DashboardPartnerReferralsRoute: DashboardPartnerReferralsRoute,
   DashboardPartnerIndexRoute: DashboardPartnerIndexRoute,
 }
 
