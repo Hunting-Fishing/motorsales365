@@ -23,6 +23,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2, ScanLine, ChevronDown, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
+import { ZoomableQr } from "@/components/qr/zoomable-qr";
 
 export const Route = createFileRoute("/dashboard/referral")({
   component: StaffReferral,
