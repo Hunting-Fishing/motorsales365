@@ -142,12 +142,10 @@ export function ZoomableQr({
       } else {
         lastTapRef.current = { t: now, x: e.clientX, y: e.clientY };
       }
-      if (scale > 1) {
-        panStartRef.current = {
-          pointer: { x: e.clientX, y: e.clientY },
-          translate,
-        };
-      }
+      panStartRef.current = {
+        pointer: { x: e.clientX, y: e.clientY },
+        translate,
+      };
     }
   };
 
