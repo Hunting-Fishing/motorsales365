@@ -428,8 +428,8 @@ function QrScanTest() {
                   <QRCodeCanvas
                     value={link}
                     size={s.px}
-                    includeMargin
-                    level="H"
+                    marginSize={autoQuiet ? computeQuietZoneModules(s.px, level) : manualMargin}
+                    level={level}
                     style={{ width: s.px, height: s.px, maxWidth: "100%" }}
                   />
                 ) : (
