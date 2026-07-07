@@ -31,12 +31,14 @@ import {
   getStaffAcademyArticleById,
   upsertStaffAcademyArticle,
   listStaffAcademyArticleHistory,
+  getStaffAcademyArticleStats,
   type DbArticleRow,
   type DbArticleSection,
   type ArticleHistoryRow,
+  type ArticleViewStats,
 } from "@/lib/staff-academy-articles.functions";
 import { CATEGORY_META, type ArticleCategory } from "@/content/staff-academy";
-import { History, Eye, EyeOff, FilePlus2, RefreshCw } from "lucide-react";
+import { History, Eye, EyeOff, FilePlus2, RefreshCw, BarChart3, Users, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/admin/staff-academy/$id")({
   head: () => ({ meta: [{ title: "Edit article — Staff Academy" }] }),
