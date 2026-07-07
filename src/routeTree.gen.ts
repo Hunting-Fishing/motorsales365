@@ -209,6 +209,7 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as ApiAdminBackfillProfilesRouteImport } from './routes/api/admin/backfill-profiles'
+import { Route as AdminStaffAcademyIdRouteImport } from './routes/admin.staff-academy.$id'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
 import { Route as AdminPartsOutreachRouteImport } from './routes/admin.parts.outreach'
 import { Route as AdminPartsFeedsRouteImport } from './routes/admin.parts.feeds'
@@ -1291,6 +1292,11 @@ const ApiAdminBackfillProfilesRoute =
     path: '/api/admin/backfill-profiles',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminStaffAcademyIdRoute = AdminStaffAcademyIdRouteImport.update({
+  id: '/staff-academy/$id',
+  path: '/staff-academy/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   id: '/redemptions_/$staffId',
   path: '/redemptions/$staffId',
@@ -1905,6 +1911,7 @@ export interface FileRoutesByFullPath {
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/admin/staff-academy/$id': typeof AdminStaffAcademyIdRoute
   '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2172,6 +2179,7 @@ export interface FileRoutesByTo {
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/admin/staff-academy/$id': typeof AdminStaffAcademyIdRoute
   '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2445,6 +2453,7 @@ export interface FileRoutesById {
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/admin/staff-academy/$id': typeof AdminStaffAcademyIdRoute
   '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2719,6 +2728,7 @@ export interface FileRouteTypes {
     | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
+    | '/admin/staff-academy/$id'
     | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2986,6 +2996,7 @@ export interface FileRouteTypes {
     | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
+    | '/admin/staff-academy/$id'
     | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -3258,6 +3269,7 @@ export interface FileRouteTypes {
     | '/admin/parts/feeds'
     | '/admin/parts/outreach'
     | '/admin/redemptions_/$staffId'
+    | '/admin/staff-academy/$id'
     | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -4866,6 +4878,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminBackfillProfilesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/staff-academy/$id': {
+      id: '/admin/staff-academy/$id'
+      path: '/staff-academy/$id'
+      fullPath: '/admin/staff-academy/$id'
+      preLoaderRoute: typeof AdminStaffAcademyIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/redemptions_/$staffId': {
       id: '/admin/redemptions_/$staffId'
       path: '/redemptions/$staffId'
@@ -5552,6 +5571,7 @@ interface AdminRouteChildren {
   AdminVerificationsRoute: typeof AdminVerificationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminRedemptionsStaffIdRoute: typeof AdminRedemptionsStaffIdRoute
+  AdminStaffAcademyIdRoute: typeof AdminStaffAcademyIdRoute
   AdminStaffAcademyIndexRoute: typeof AdminStaffAcademyIndexRoute
 }
 
@@ -5600,6 +5620,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminVerificationsRoute: AdminVerificationsRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminRedemptionsStaffIdRoute: AdminRedemptionsStaffIdRoute,
+  AdminStaffAcademyIdRoute: AdminStaffAcademyIdRoute,
   AdminStaffAcademyIndexRoute: AdminStaffAcademyIndexRoute,
 }
 
