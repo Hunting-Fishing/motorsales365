@@ -494,29 +494,16 @@ function ReferralQrCard({
               Ask the scanner to fit the whole white square in their camera — the
               extra white border helps the scan work even at odd angles.
             </p>
-            <Button onClick={handleDownload} className="w-full sm:w-auto">
-              <Download className="mr-2 h-4 w-4" /> Download PNG
-            </Button>
-          </div>
-
-          {/* Hidden hi-res canvas used as the download source */}
-          <div
-            ref={hiddenHiResRef}
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              left: "-99999px",
-              top: 0,
-              width: 1024,
-              height: 1024,
-              pointerEvents: "none",
-              opacity: 0,
-            }}
-          >
-            <QRCodeCanvas value={link} size={1024} level="H" marginSize={computeQuietZoneModules(1024, "H" as QrLevel)} />
+            <ResolutionDownload
+              onSelect={handleDownload}
+              options={DOWNLOAD_RESOLUTIONS}
+              triggerLabel="Download PNG"
+              className="w-full sm:w-auto"
+            />
           </div>
         </DialogContent>
       </Dialog>
+
 
       <div className="mt-3 text-center">
         <div className="font-display text-lg font-bold">{fullName}</div>
