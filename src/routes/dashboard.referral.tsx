@@ -216,6 +216,13 @@ function StaffReferral() {
             Icon: Printer,
             cta: "Open QR ads",
           },
+          {
+            to: "/dashboard/qr-scan-test",
+            title: "Test QR scanability",
+            body: "Point your phone at your QR at 3 real-world sizes to confirm it scans.",
+            Icon: ScanLine,
+            cta: "Run scan test",
+          },
         ].map(({ to, title, body, Icon, cta }) => (
           <Link
             key={to}
