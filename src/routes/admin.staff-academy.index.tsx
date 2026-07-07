@@ -78,7 +78,7 @@ function StaffAcademyAdminList() {
   const q = useQuery({
     queryKey: ["admin-staff-academy"],
     queryFn: () => fetchAll(),
-    enabled: !!isAdmin,
+    enabled: canManage,
   });
 
   const allRows: DbArticleRow[] = q.data ?? [];
