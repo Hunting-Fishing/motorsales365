@@ -204,6 +204,7 @@ import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.tea
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
 import { Route as DashboardPartnerOverviewRouteImport } from './routes/dashboard.partner.overview'
+import { Route as DashboardPartnerInboxRouteImport } from './routes/dashboard.partner.inbox'
 import { Route as DashboardDispatchHistoryRouteImport } from './routes/dashboard.dispatch.history'
 import { Route as DashboardBusinessBusinessIdRouteImport } from './routes/dashboard.business.$businessId'
 import { Route as ClubsApplySuccessRouteImport } from './routes/clubs.apply.success'
@@ -1271,6 +1272,11 @@ const DashboardPartnerOverviewRoute =
     path: '/overview',
     getParentRoute: () => DashboardPartnerRoute,
   } as any)
+const DashboardPartnerInboxRoute = DashboardPartnerInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => DashboardPartnerRoute,
+} as any)
 const DashboardDispatchHistoryRoute =
   DashboardDispatchHistoryRouteImport.update({
     id: '/history',
@@ -1962,6 +1968,7 @@ export interface FileRoutesByFullPath {
   '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdRouteWithChildren
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
+  '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
   '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
@@ -2234,6 +2241,7 @@ export interface FileRoutesByTo {
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
   '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
+  '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
   '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
@@ -2515,6 +2523,7 @@ export interface FileRoutesById {
   '/clubs/apply/success': typeof ClubsApplySuccessRoute
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdRouteWithChildren
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
+  '/dashboard/partner/inbox': typeof DashboardPartnerInboxRoute
   '/dashboard/partner/overview': typeof DashboardPartnerOverviewRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
@@ -2796,6 +2805,7 @@ export interface FileRouteTypes {
     | '/clubs/apply/success'
     | '/dashboard/business/$businessId'
     | '/dashboard/dispatch/history'
+    | '/dashboard/partner/inbox'
     | '/dashboard/partner/overview'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
@@ -3068,6 +3078,7 @@ export interface FileRouteTypes {
     | '/businesses/$slug/book'
     | '/clubs/apply/success'
     | '/dashboard/dispatch/history'
+    | '/dashboard/partner/inbox'
     | '/dashboard/partner/overview'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
@@ -3348,6 +3359,7 @@ export interface FileRouteTypes {
     | '/clubs/apply/success'
     | '/dashboard/business/$businessId'
     | '/dashboard/dispatch/history'
+    | '/dashboard/partner/inbox'
     | '/dashboard/partner/overview'
     | '/dashboard/rides_/new'
     | '/dashboard/team/leads'
@@ -4914,6 +4926,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardPartnerOverviewRouteImport
       parentRoute: typeof DashboardPartnerRoute
     }
+    '/dashboard/partner/inbox': {
+      id: '/dashboard/partner/inbox'
+      path: '/inbox'
+      fullPath: '/dashboard/partner/inbox'
+      preLoaderRoute: typeof DashboardPartnerInboxRouteImport
+      parentRoute: typeof DashboardPartnerRoute
+    }
     '/dashboard/dispatch/history': {
       id: '/dashboard/dispatch/history'
       path: '/history'
@@ -5753,11 +5772,13 @@ const DashboardDispatchRouteWithChildren =
   DashboardDispatchRoute._addFileChildren(DashboardDispatchRouteChildren)
 
 interface DashboardPartnerRouteChildren {
+  DashboardPartnerInboxRoute: typeof DashboardPartnerInboxRoute
   DashboardPartnerOverviewRoute: typeof DashboardPartnerOverviewRoute
   DashboardPartnerIndexRoute: typeof DashboardPartnerIndexRoute
 }
 
 const DashboardPartnerRouteChildren: DashboardPartnerRouteChildren = {
+  DashboardPartnerInboxRoute: DashboardPartnerInboxRoute,
   DashboardPartnerOverviewRoute: DashboardPartnerOverviewRoute,
   DashboardPartnerIndexRoute: DashboardPartnerIndexRoute,
 }
