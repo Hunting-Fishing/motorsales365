@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { QRCodeCanvas } from "qrcode.react";
+import { ResponsiveQr } from "@/components/qr/responsive-qr";
 import { SiteLayout } from "@/components/site-layout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -128,8 +128,8 @@ function PartnerDashboard() {
         {/* QR + stats overlap */}
         <div className="mt-6 grid gap-4 md:grid-cols-[260px_1fr]">
           <Card className="flex flex-col items-center gap-3 rounded-2xl border-border/70 p-5 shadow-sm">
-            <div className="rounded-2xl border border-border/60 bg-white p-3">
-              <QRCodeCanvas value={link} size={200} includeMargin />
+            <div className="w-full max-w-[220px] min-w-0 rounded-2xl border border-border/60 bg-white p-3">
+              <ResponsiveQr value={link} maxPx={200} minPx={140} />
             </div>
             <p className="text-xs text-muted-foreground text-center break-all">{link}</p>
             <Button

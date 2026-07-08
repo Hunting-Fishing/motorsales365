@@ -6,9 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
 
-import { QRCodeCanvas } from "qrcode.react";
-import QRCode from "qrcode";
-import { computeQuietZoneModules, type QrLevel } from "@/lib/qr-quiet-zone";
+import { ResponsiveQr } from "@/components/qr/responsive-qr";
+import { renderQrPng } from "@/lib/qr-image";
+import type { QrLevel } from "@/lib/qr-quiet-zone";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
@@ -416,12 +416,10 @@ function ReferralQrCard({
 
   const handleDownload = async (px: number) => {
     try {
-      const margin = computeQuietZoneModules(px, "H" as QrLevel);
-      const dataUrl = await QRCode.toDataURL(link, {
-        errorCorrectionLevel: "H",
-        margin,
-        width: px,
-        color: { dark: "#000000", light: "#ffffff" },
+      const dataUrl = await renderQrPng({
+        value: link,
+        sizePx: px,
+        level: "H" as QrLevel,
       });
       const a = document.createElement("a");
       a.href = dataUrl;
@@ -450,13 +448,12 @@ function ReferralQrCard({
                 aria-label={`QR code for ${fullName}`}
               >
                 {link ? (
-                  <QRCodeCanvas
+                  <ResponsiveQr
                     value={link}
-                    size={512}
                     level="H"
-                    marginSize={computeQuietZoneModules(512, "H" as QrLevel)}
+                    maxPx={512}
+                    minPx={128}
                     data-qr={referralCode}
-                    style={{ width: "100%", height: "100%", maxWidth: "100%", display: "block" }}
                   />
                 ) : null}
               </div>
@@ -496,12 +493,12 @@ function ReferralQrCard({
                     height: "min(72vw, 420px)",
                   }}
                 >
-                  <QRCodeCanvas
+                  <ResponsiveQr
                     value={link}
-                    size={1024}
                     level="H"
-                    marginSize={computeQuietZoneModules(1024, "H" as QrLevel)}
-                    style={{ width: "100%", height: "100%" }}
+                    maxPx={1024}
+                    minPx={192}
+                    data-qr={referralCode}
                   />
                 </div>
               </ZoomableQr>
