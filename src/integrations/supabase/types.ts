@@ -7762,6 +7762,7 @@ export type Database = {
         Row: {
           account_status: Database["public"]["Enums"]["account_status"]
           avatar_url: string | null
+          barangay: string | null
           business_address: string | null
           business_barangay: string | null
           business_city: string | null
@@ -7800,6 +7801,7 @@ export type Database = {
           phone_e164: string | null
           phone_verified_at: string | null
           postal_code: string | null
+          referral_code: string | null
           reviews_updated_at: string | null
           seller_rating_avg: number
           seller_rating_count: number
@@ -7820,6 +7822,7 @@ export type Database = {
         Insert: {
           account_status?: Database["public"]["Enums"]["account_status"]
           avatar_url?: string | null
+          barangay?: string | null
           business_address?: string | null
           business_barangay?: string | null
           business_city?: string | null
@@ -7858,6 +7861,7 @@ export type Database = {
           phone_e164?: string | null
           phone_verified_at?: string | null
           postal_code?: string | null
+          referral_code?: string | null
           reviews_updated_at?: string | null
           seller_rating_avg?: number
           seller_rating_count?: number
@@ -7878,6 +7882,7 @@ export type Database = {
         Update: {
           account_status?: Database["public"]["Enums"]["account_status"]
           avatar_url?: string | null
+          barangay?: string | null
           business_address?: string | null
           business_barangay?: string | null
           business_city?: string | null
@@ -7916,6 +7921,7 @@ export type Database = {
           phone_e164?: string | null
           phone_verified_at?: string | null
           postal_code?: string | null
+          referral_code?: string | null
           reviews_updated_at?: string | null
           seller_rating_avg?: number
           seller_rating_count?: number
@@ -8216,6 +8222,7 @@ export type Database = {
           status: string
           updated_at: string
           user_agent: string | null
+          user_id: string | null
           visitor_id: string | null
         }
         Insert: {
@@ -8231,6 +8238,7 @@ export type Database = {
           status?: string
           updated_at?: string
           user_agent?: string | null
+          user_id?: string | null
           visitor_id?: string | null
         }
         Update: {
@@ -8246,6 +8254,7 @@ export type Database = {
           status?: string
           updated_at?: string
           user_agent?: string | null
+          user_id?: string | null
           visitor_id?: string | null
         }
         Relationships: []
@@ -8258,6 +8267,7 @@ export type Database = {
           id: string
           referral_code: string
           scanned_at: string
+          user_id: string | null
           visitor_id: string | null
         }
         Insert: {
@@ -8267,6 +8277,7 @@ export type Database = {
           id?: string
           referral_code: string
           scanned_at?: string
+          user_id?: string | null
           visitor_id?: string | null
         }
         Update: {
@@ -8276,6 +8287,7 @@ export type Database = {
           id?: string
           referral_code?: string
           scanned_at?: string
+          user_id?: string | null
           visitor_id?: string | null
         }
         Relationships: []
@@ -8350,6 +8362,10 @@ export type Database = {
           landing_page: string | null
           last_referral_code: string | null
           last_seen_at: string
+          linked_at: string | null
+          linked_user_id: string | null
+          qr_lead_capture_id: string | null
+          signup_source: string | null
           user_agent: string | null
           visitor_id: string
         }
@@ -8362,6 +8378,10 @@ export type Database = {
           landing_page?: string | null
           last_referral_code?: string | null
           last_seen_at?: string
+          linked_at?: string | null
+          linked_user_id?: string | null
+          qr_lead_capture_id?: string | null
+          signup_source?: string | null
           user_agent?: string | null
           visitor_id: string
         }
@@ -8374,10 +8394,22 @@ export type Database = {
           landing_page?: string | null
           last_referral_code?: string | null
           last_seen_at?: string
+          linked_at?: string | null
+          linked_user_id?: string | null
+          qr_lead_capture_id?: string | null
+          signup_source?: string | null
           user_agent?: string | null
           visitor_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "referral_visits_qr_lead_capture_id_fkey"
+            columns: ["qr_lead_capture_id"]
+            isOneToOne: false
+            referencedRelation: "qr_lead_captures"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       report_actions: {
         Row: {
@@ -12330,6 +12362,15 @@ export type Database = {
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       is_staff_academy_viewer: { Args: { _user_id: string }; Returns: boolean }
       is_towing_provider: { Args: { _user_id: string }; Returns: boolean }
+      link_signup_attribution: {
+        Args: {
+          _referral_code?: string
+          _signup_source?: string
+          _user_id: string
+          _visitor_id: string
+        }
+        Returns: Json
+      }
       list_open_lead_offers: {
         Args: { _category_slug?: string; _limit?: number; _region?: string }
         Returns: {

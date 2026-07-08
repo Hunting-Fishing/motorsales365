@@ -659,13 +659,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               error: result.error,
             });
           }
+          // Cold-cookie linkage: an OAuth user whose localStorage stash was
+          // cleared before returning still has the mref_vid / mref_credit
+          // cookies from the /r/ hop. Re-run the RPC directly so attribution
+          // is not lost. Safe to call every sign-in — the RPC is idempotent
+          // and a no-op when nothing to link.
+          if (event !== "SIGNED_IN" || typeof window === "undefined") {
+            // Still run the redirect gate for INITIAL_SESSION below.
+          } else {
+            try {
+              const { linkPostAuthAttribution } = await import(
+                "@/lib/attribution.functions"
+              );
+              const { getVisitorId, getCreditedCode, getCreditedSource } =
+                await import("@/lib/referral");
+              const vid = getVisitorId();
+              const code = getCreditedCode() ?? undefined;
+              const src = getCreditedSource();
+              if (vid || code) {
+                await linkPostAuthAttribution({
+                  data: {
+                    visitor_id: vid,
+                    referral_code: code,
+                    signup_source: src as "qr" | "link" | "direct",
+                  },
+                }).catch((err) => {
+                  authLog("warn", {
+                    event: "attribution.link_failed",
+                    uid: newSession.user?.id,
+                    error: errMsg(err),
+                  });
+                });
+              }
+            } catch (err) {
+              authLog("warn", {
+                event: "attribution.link_failed",
+                uid: newSession.user?.id,
+                error: errMsg(err),
+              });
+            }
+          }
           // Block OAuth signups from proceeding with an incomplete profile.
-          // Only trigger on SIGNED_IN (fresh sign-in this tab) so existing
-          // users aren't yanked mid-session on hard refresh.
           if (event !== "SIGNED_IN" || typeof window === "undefined") return;
           const path = window.location.pathname;
-          // Never bounce from routes that are already part of the auth /
-          // completion flow, or from the completion page itself.
           const bypass = [
             "/complete-profile",
             "/auth",

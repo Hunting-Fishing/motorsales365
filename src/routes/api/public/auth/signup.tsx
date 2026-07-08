@@ -6,6 +6,7 @@ import { createHash } from "crypto";
 import { validatePhone } from "@/data/country-codes";
 import { BUSINESS_KIND_VALUES } from "@/data/business-kinds";
 import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
+import { CORS_HEADERS, corsPreflight, withCors } from "@/lib/cors";
 
 // Non-sensitive audit for failed signups. We record ONLY:
 //   - reason category
@@ -82,6 +83,8 @@ const Body = z
     // Personal address (required unless business-like)
     street_address: z.string().trim().max(200).optional().default(""),
     postal_code: z.string().trim().max(20).optional().default(""),
+    barangay: z.string().trim().max(120).optional().default(""),
+    personal_email: z.string().trim().email().max(255).optional(),
     // Business fields (required when intent is business/service_provider)
     business_name: z.string().trim().max(160).optional().default(""),
     business_kind: z.enum(BUSINESS_KIND_VALUES).optional(),
@@ -89,6 +92,14 @@ const Body = z
     business_postal_code: z.string().trim().max(20).optional().default(""),
     referral_code: z.string().trim().max(80).optional().default(""),
     signup_source: z.enum(["qr", "link", "direct"]).optional(),
+    // Opaque QR/referral visitor id (client-minted UUID). When present the
+    // route back-fills qr_scans / qr_lead_captures / referral_visits with
+    // the new user_id via the link_signup_attribution RPC.
+    visitor_id: z.string().trim().uuid().optional(),
+    // Optional invite token the client wants to auto-accept after signup.
+    // Signup itself does not touch org invites; the client uses the token to
+    // route the user back to /invites/<token> after verify.
+    invite: z.string().trim().max(200).optional(),
     redirect: z.string().trim().max(500).optional().default(""),
     origin: z.string().trim().url().max(500),
     agreed: z.literal(true),
@@ -134,9 +145,14 @@ function pub() {
   });
 }
 
+// All responses go through this helper so CORS headers land on every
+// success and failure path — cross-origin partner integrations depend on it.
+const respond = (body: unknown, init?: ResponseInit) => withCors(Response.json(body, init));
+
 export const Route = createFileRoute("/api/public/auth/signup")({
   server: {
     handlers: {
+      OPTIONS: async () => corsPreflight(),
       POST: async ({ request }) => {
         const sbAdmin = admin();
         try {
@@ -156,7 +172,7 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               error_code: "zod_schema_invalid",
               error_message: errors.map((e) => `${e.field}: ${e.message}`).join("; "),
             });
-            return Response.json({ ok: false, errors }, { status: 422 });
+            return respond({ ok: false, errors }, { status: 422 });
           }
           const input = parsed.data;
           const errors: ErrorList = [];
@@ -171,7 +187,7 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               error_code: "staff_domain_blocked",
               error_message: `${STAFF_EMAIL_DOMAIN} is reserved for 365 employees.`,
             });
-            return Response.json(
+            return respond(
               {
                 ok: false,
                 errors: [
@@ -221,7 +237,7 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               error_code: "field_validation_failed",
               error_message: errors.map((e) => `${e.field}: ${e.message}`).join("; "),
             });
-            return Response.json({ ok: false, errors }, { status: 422 });
+            return respond({ ok: false, errors }, { status: 422 });
           }
 
           const emailLower = input.email.toLowerCase();
@@ -243,7 +259,7 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               error_code: "email_exists_preflight",
               error_message: "Email already present in auth.users",
             });
-            return Response.json(
+            return respond(
               { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
               { status: 409 },
             );
@@ -288,7 +304,7 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               error_code: "invalid_origin",
               error_message: `Unparseable origin: ${String(input.origin).slice(0, 200)}`,
             });
-            return Response.json(
+            return respond(
               { ok: false, errors: [{ field: "origin", message: "Invalid origin." }] },
               { status: 400 },
             );
@@ -320,7 +336,7 @@ export const Route = createFileRoute("/api/public/auth/signup")({
                 error_code: providerCode ?? "email_exists_provider",
                 error_message: msg,
               });
-              return Response.json(
+              return respond(
                 { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
                 { status: 409 },
               );
@@ -334,7 +350,7 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               error_code: providerCode ?? "auth_signup_error",
               error_message: msg,
             });
-            return Response.json({ ok: false, errors: [{ field: "email", message: msg }] }, { status: 400 });
+            return respond({ ok: false, errors: [{ field: "email", message: msg }] }, { status: 400 });
           }
           const identities = (data.user as { identities?: unknown[] } | null)?.identities;
           if (data.user && Array.isArray(identities) && identities.length === 0) {
@@ -347,7 +363,7 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               error_code: "empty_identities",
               error_message: "auth.signUp returned user with no identities (email exists)",
             });
-            return Response.json(
+            return respond(
               { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
               { status: 409 },
             );
@@ -364,6 +380,14 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               signup_city: input.signup_city,
               street_address: input.street_address || null,
               postal_code: isBusinessLike ? input.business_postal_code : input.postal_code,
+              // Persist attribution + capture fields the audit flagged as
+              // silently dropped. Empty strings collapse to null so we don't
+              // overwrite a good value with "".
+              personal_email: input.personal_email || input.email.toLowerCase(),
+              barangay: input.barangay || null,
+              referral_code: input.referral_code || null,
+              signup_source:
+                input.signup_source ?? (input.referral_code ? "link" : "direct"),
             };
             if (isBusinessLike) {
               profilePatch.business_name = input.business_name;
@@ -374,23 +398,85 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               profilePatch.business_province = input.signup_province;
               profilePatch.business_city = input.signup_city;
             }
-            const { error: profileErr } = await (sbAdmin.from("profiles") as any)
-              .update(profilePatch)
-              .eq("id", data.user.id);
-            if (profileErr) {
+            // Race guard: the `on_auth_user_created` trigger fires
+            // asynchronously in a separate txn, so the profiles row may not
+            // exist yet when we hit it here. `.select()` returns the affected
+            // rows, so we retry once on 0-row updates before logging a hard
+            // failure (still 200 to the client — the auth account was created
+            // successfully; profile fields are recoverable).
+            let updatedRows = 0;
+            let profileErr: any = null;
+            for (let attempt = 0; attempt < 3; attempt++) {
+              const { data: updated, error } = await (sbAdmin.from("profiles") as any)
+                .update(profilePatch)
+                .eq("id", data.user.id)
+                .select("id");
+              profileErr = error;
+              updatedRows = Array.isArray(updated) ? updated.length : 0;
+              if (updatedRows > 0 || error) break;
+              await new Promise((r) => setTimeout(r, 150 * (attempt + 1)));
+            }
+            if (profileErr || updatedRows === 0) {
               await logSignupFailure(sbAdmin, request, {
                 reason: "profile_update_failed",
                 missing_fields: [],
                 status_code: 200,
                 intent: input.intent,
                 phone_iso: input.phone_iso,
-                error_code: (profileErr as any)?.code ?? "profile_update_failed",
-                error_message: (profileErr as any)?.message ?? String(profileErr),
+                error_code:
+                  (profileErr as any)?.code ??
+                  (updatedRows === 0 ? "profile_row_missing" : "profile_update_failed"),
+                error_message:
+                  (profileErr as any)?.message ??
+                  (updatedRows === 0
+                    ? "profiles.update affected 0 rows after retries"
+                    : "profile update failed"),
               });
+            }
+
+            // Back-fill qr_scans / qr_lead_captures / referral_visits with
+            // the new user_id, and insert a user_referrals row if the
+            // visitor arrived with a valid referral code. Soft-fail: log
+            // and continue, never block signup.
+            if (input.visitor_id || input.referral_code) {
+              try {
+                const { error: linkErr } = await (sbAdmin as any).rpc(
+                  "link_signup_attribution",
+                  {
+                    _visitor_id: input.visitor_id ?? null,
+                    _user_id: data.user.id,
+                    _referral_code: input.referral_code || null,
+                    _signup_source:
+                      input.signup_source ??
+                      (input.referral_code ? "link" : "direct"),
+                  },
+                );
+                if (linkErr) {
+                  await logSignupFailure(sbAdmin, request, {
+                    reason: "qr_attribution_missing",
+                    missing_fields: [],
+                    status_code: 200,
+                    intent: input.intent,
+                    phone_iso: input.phone_iso,
+                    error_code: (linkErr as any)?.code ?? "link_attribution_failed",
+                    error_message: (linkErr as any)?.message ?? String(linkErr),
+                  });
+                }
+              } catch (linkExc: any) {
+                await logSignupFailure(sbAdmin, request, {
+                  reason: "qr_attribution_missing",
+                  missing_fields: [],
+                  status_code: 200,
+                  intent: input.intent,
+                  phone_iso: input.phone_iso,
+                  error_code: linkExc?.code ?? linkExc?.name ?? "link_attribution_exc",
+                  error_message: String(linkExc?.message ?? linkExc).slice(0, 500),
+                });
+              }
             }
           }
 
-          return Response.json({
+          return respond({
             ok: true,
             needs_verify: !data.session,
             user_id: data.user?.id ?? null,
@@ -405,7 +491,7 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               (e?.message ? String(e.message) : "Unhandled") +
               (e?.stack ? ` | ${String(e.stack).split("\n").slice(0, 3).join(" | ")}` : ""),
           });
-          return Response.json(
+          return respond(
             { ok: false, errors: [{ field: "", message: e?.message ?? "Unhandled" }] },
             { status: 500 },
           );

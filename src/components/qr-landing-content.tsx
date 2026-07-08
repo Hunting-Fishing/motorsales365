@@ -303,6 +303,16 @@ export type QrLandingContentProps = {
 
 export function QrLandingContent({ code, preview = false }: QrLandingContentProps) {
   const navigate = useNavigate();
+  // Belt-and-braces: pass the referral code + visitor id + explicit source
+  // through the /signup URL so attribution survives even when the /r/ hop's
+  // cookie / localStorage was cleared before the CTA click.
+  const signupSearch = preview
+    ? {}
+    : ({
+        ref: code,
+        vid: typeof window !== "undefined" ? getVisitorId() : undefined,
+        src: "qr",
+      } as any);
   const [staffName, setStaffName] = useState<string | null>(null);
   const [staffEmail, setStaffEmail] = useState<string | null>(null);
   const [active, setActive] = useState<boolean | null>(preview ? true : null);
@@ -484,7 +494,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                 </div>
 
                 <div className="mt-7 flex flex-wrap gap-3">
-                  <Button size="lg" onClick={() => navigate({ to: "/signup" })}>
+                  <Button size="lg" onClick={() => navigate({ to: "/signup", search: signupSearch })}>
                     Create free account
                   </Button>
                   <Button size="lg" variant="outline" onClick={() => navigate({ to: "/" })}>
@@ -805,7 +815,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                 </div>
 
                 <div className="flex flex-wrap gap-3 lg:justify-end">
-                  <Button size="lg" onClick={() => navigate({ to: "/signup" })}>
+                  <Button size="lg" onClick={() => navigate({ to: "/signup", search: signupSearch })}>
                     Sign up free <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                   <Button size="lg" variant="outline" onClick={() => navigate({ to: "/businesses" })}>

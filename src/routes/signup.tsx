@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { getCreditedCode, getCreditedSource, recordTouch } from "@/lib/referral";
+import { getCreditedCode, getCreditedSource, getVisitorId, recordTouch } from "@/lib/referral";
 import { SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid.types";
 import type { LocationValue } from "@/components/location-picker";
 import { siteOrigin } from "@/lib/site-config";
@@ -40,12 +40,92 @@ const PhoneInput = lazy(() =>
 type PhoneApi = typeof import("@/data/country-codes");
 
 
-type SignupSearch = { type?: SignupIntent; redirect?: string };
+type SignupSearch = {
+  type?: SignupIntent;
+  redirect?: string;
+  /** Invite token forwarded from `/invites/$token` — the user is bounced
+   * back to that page after the account is created + verified. */
+  invite?: string;
+  /** Email pre-fill (e.g. from an invite so the user can't accidentally
+   * change it). */
+  email?: string;
+  /** Explicit referral code overrides / seeds the cookie value. */
+  ref?: string;
+  /** Opaque QR visitor id (mref_vid) forwarded from the /r/<code> landing
+   * page so attribution survives across a browser session. */
+  vid?: string;
+  /** "qr" | "link" — what kind of touch created the referral. */
+  src?: string;
+};
 
 function safeInternalPath(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
   if (!value.startsWith("/") || value.startsWith("//")) return undefined;
   return value;
+}
+
+function safeEmail(v: unknown): string | undefined {
+  if (typeof v !== "string") return undefined;
+  const trimmed = v.trim();
+  if (!trimmed || trimmed.length > 255) return undefined;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed) ? trimmed : undefined;
+}
+
+function safeUuid(v: unknown): string | undefined {
+  if (typeof v !== "string") return undefined;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v.trim())
+    ? v.trim()
+    : undefined;
+}
+
+function safeShortToken(v: unknown, max = 200): string | undefined {
+  if (typeof v !== "string") return undefined;
+  const t = v.trim();
+  if (!t || t.length > max) return undefined;
+  return /^[A-Za-z0-9._~\-]+$/.test(t) ? t : undefined;
+}
+
+function safeReferralCode(v: unknown): string | undefined {
+  if (typeof v !== "string") return undefined;
+  const t = v.trim();
+  if (!t || t.length > 80) return undefined;
+  return /^[A-Za-z0-9._~\-]+$/.test(t) ? t : undefined;
+}
+
+function SignupErrorFallback({ error, reset }: { error: Error; reset: () => void }) {
+  return (
+    <div className="min-h-dvh flex items-center justify-center bg-navy-50 px-4 py-10">
+      <div className="max-w-md rounded-2xl bg-white p-6 shadow border border-slate-200">
+        <h1 className="text-lg font-semibold text-slate-900">Signup is temporarily unavailable</h1>
+        <p className="mt-2 text-sm text-slate-600">
+          Something went wrong loading the signup form. Your data has not been changed.
+        </p>
+        <p className="mt-3 text-xs text-slate-500 break-words">
+          {error?.message?.slice(0, 200) ?? "unknown_error"}
+        </p>
+        <button
+          type="button"
+          onClick={reset}
+          className="mt-4 rounded-lg bg-navy-600 px-4 py-2 text-sm font-medium text-white"
+        >
+          Try again
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SignupNotFound() {
+  return (
+    <div className="min-h-dvh flex items-center justify-center bg-navy-50 px-4 py-10">
+      <div className="max-w-md rounded-2xl bg-white p-6 shadow border border-slate-200 text-center">
+        <h1 className="text-lg font-semibold text-slate-900">Signup page not found</h1>
+        <p className="mt-2 text-sm text-slate-600">
+          The signup route is missing. Please try again in a moment.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export const Route = createFileRoute("/signup")({
@@ -55,8 +135,15 @@ export const Route = createFileRoute("/signup")({
     return {
       type: typeof t === "string" && valid.includes(t) ? (t as SignupIntent) : undefined,
       redirect: safeInternalPath(search.redirect),
+      invite: safeShortToken(search.invite),
+      email: safeEmail(search.email),
+      ref: safeReferralCode(search.ref),
+      vid: safeUuid(search.vid),
+      src: safeShortToken(search.src, 20),
     };
   },
+  errorComponent: SignupErrorFallback,
+  notFoundComponent: SignupNotFound,
   component: SignupPage,
 });
 
@@ -347,9 +434,13 @@ function SignupPage() {
     errorFor(field) ? "border-destructive focus-visible:ring-destructive" : "";
 
   useEffect(() => {
-    // Prefer an explicit ?ref=/?r=/?code= on /signup so direct QR/link
-    // targets attribute even when cookies were blocked on the /r/ hop.
-    if (typeof window !== "undefined") {
+    // Prefer validated ?ref=/?vid=/?src= from the router (invite-safe,
+    // uuid-checked). Fall back to raw URL params, then to the mref_credit
+    // cookie set by the /r/ landing page.
+    if (search.ref) {
+      recordTouch(search.ref, search.src === "qr" ? "qr" : "link");
+      setRefCode(search.ref);
+    } else if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const urlCode = (params.get("ref") || params.get("r") || params.get("code") || "").trim();
       const src = (params.get("src") || params.get("s") || "").toLowerCase();
@@ -358,9 +449,15 @@ function SignupPage() {
         setRefCode(urlCode);
         return;
       }
+      const c = getCreditedCode();
+      if (c) setRefCode(c);
     }
-    const c = getCreditedCode();
-    if (c) setRefCode(c);
+    if (search.email && !email) setEmail(search.email);
+    // Seed / freshen the visitor id cookie so submit always has one.
+    if (typeof window !== "undefined") {
+      try { getVisitorId(); } catch { /* ignore */ }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Preload heavy sub-modules after mount so they're ready by the time the
@@ -408,16 +505,22 @@ function SignupPage() {
       if (p.street_address !== undefined) setStreetAddress(p.street_address);
       if (p.postal_code !== undefined) setPostalCode(p.postal_code);
       if (p.business_postal_code !== undefined) setBusinessPostalCode(p.business_postal_code);
-      if (p.region !== undefined || p.province !== undefined || p.city !== undefined) {
+      if (
+        p.region !== undefined ||
+        p.province !== undefined ||
+        p.city !== undefined ||
+        p.barangay !== undefined
+      ) {
         setLocation({
           region: p.region ?? null,
           province: p.province ?? null,
           city: p.city ?? null,
-          barangay: null,
+          barangay: p.barangay ?? null,
         });
       }
       if (typeof p.agreed === "boolean") setAgreed(p.agreed);
-      if (p.ref_code !== undefined) setRefCode(p.ref_code);
+      if (p.referral_code !== undefined) setRefCode(p.referral_code);
+      else if (p.ref_code !== undefined) setRefCode(p.ref_code);
       // Keep the stash: the post-auth applier will clear it once the
       // profile row is patched. If the user returns to this form (e.g.
       // "Wrong email? Start over"), we still want their inputs available.
@@ -435,7 +538,11 @@ function SignupPage() {
   }, []);
 
   const goAfterSignup = (fallback: string) => {
-    const dest = search.redirect || fallback;
+    // Invite tokens take priority: after signup we bounce the user back to
+    // the invite acceptance page so a click on "Create account" from an
+    // invite ends where they started.
+    const inviteDest = search.invite ? `/invites/${encodeURIComponent(search.invite)}` : null;
+    const dest = inviteDest || search.redirect || fallback;
     if (dest.startsWith("/") && !dest.startsWith("//")) {
       window.location.assign(dest);
     } else {
@@ -473,9 +580,13 @@ function SignupPage() {
       region: location.region ?? undefined,
       province: location.province ?? undefined,
       city: location.city ?? undefined,
+      barangay: location.barangay ?? undefined,
       is_business: isBusinessLike,
       agreed,
-      ref_code: refCode.trim() || undefined,
+      referral_code: refCode.trim() || undefined,
+      signup_source: getCreditedSource(),
+      visitor_id: search.vid || (typeof window !== "undefined" ? getVisitorId() : undefined),
+      ref_code: refCode.trim() || undefined, // legacy field for old readers
       saved_at: Date.now(),
     });
   };
@@ -550,6 +661,7 @@ function SignupPage() {
         body: JSON.stringify({
           intent,
           email: email.trim(),
+          personal_email: email.trim(),
           password,
           first_name: firstName.trim(),
           last_name: lastName.trim(),
@@ -558,6 +670,7 @@ function SignupPage() {
           signup_region: location.region,
           signup_province: location.province,
           signup_city: location.city,
+          barangay: location.barangay ?? undefined,
           street_address: streetAddress.trim(),
           postal_code: postalCode.trim(),
           business_name: businessName.trim(),
@@ -566,6 +679,10 @@ function SignupPage() {
           business_postal_code: businessPostalCode.trim(),
           referral_code: refCode || "",
           signup_source: getCreditedSource(),
+          // Send the visitor id (from cookie / localStorage) so the server
+          // can back-fill qr_scans / qr_lead_captures / referral_visits.
+          visitor_id: search.vid || getVisitorId(),
+          invite: search.invite,
           redirect: search.redirect ?? "",
           origin: siteOrigin(),
           agreed: true,

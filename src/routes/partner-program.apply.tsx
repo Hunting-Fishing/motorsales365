@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { submitPartnerProgramApplication } from "@/lib/partner-program.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 const TITLE = "Apply — 365 Partner Program";
 const DESCRIPTION =
@@ -32,6 +33,20 @@ export const Route = createFileRoute("/partner-program/apply")({
       { property: "og:description", content: DESCRIPTION },
     ],
   }),
+  // Auth guard: the underlying server fn requires auth, so submitting without
+  // a session used to fail silently on the client. Send unauthenticated users
+  // to sign up (business intent) with a redirect back here so the flow
+  // finishes on this page after account creation.
+  beforeLoad: async ({ location }) => {
+    if (typeof window === "undefined") return;
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) {
+      throw redirect({
+        to: "/signup",
+        search: { type: "business", redirect: location.pathname } as any,
+      });
+    }
+  },
   component: ApplyPage,
 });
 
