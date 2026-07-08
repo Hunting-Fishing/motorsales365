@@ -105,6 +105,7 @@ function StatusBadge({ code }: { code: number | null }) {
 function SignupFailuresPage() {
   const listFn = useServerFn(listSignupFailures);
   const summaryFn = useServerFn(getSignupFailureSummary);
+  const detailFn = useServerFn(getSignupFailureById);
 
   const [reason, setReason] = useState<string>(ALL);
   const [statusCode, setStatusCode] = useState<string>("");
@@ -113,6 +114,7 @@ function SignupFailuresPage() {
   const [since, setSince] = useState<string>("");
   const [until, setUntil] = useState<string>("");
   const [page, setPage] = useState(0);
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   // Free-text inputs are debounced so typing doesn't fire a query per
   // keystroke. Any change to the debounced values resets pagination.
