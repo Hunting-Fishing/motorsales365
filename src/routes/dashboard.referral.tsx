@@ -416,12 +416,10 @@ function ReferralQrCard({
 
   const handleDownload = async (px: number) => {
     try {
-      const margin = computeQuietZoneModules(px, "H" as QrLevel);
-      const dataUrl = await QRCode.toDataURL(link, {
-        errorCorrectionLevel: "H",
-        margin,
-        width: px,
-        color: { dark: "#000000", light: "#ffffff" },
+      const dataUrl = await renderQrPng({
+        value: link,
+        sizePx: px,
+        level: "H" as QrLevel,
       });
       const a = document.createElement("a");
       a.href = dataUrl;
