@@ -144,6 +144,7 @@ import { Route as AdminVerificationsRouteImport } from './routes/admin.verificat
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTypeSuggestionsRouteImport } from './routes/admin.type-suggestions'
 import { Route as AdminStaff365RouteImport } from './routes/admin.staff-365'
+import { Route as AdminSignupFailuresRouteImport } from './routes/admin.signup-failures'
 import { Route as AdminShopRouteImport } from './routes/admin.shop'
 import { Route as AdminServiceSuggestionsRouteImport } from './routes/admin.service-suggestions'
 import { Route as AdminServiceSuggestionAuditRouteImport } from './routes/admin.service-suggestion-audit'
@@ -971,6 +972,11 @@ const AdminTypeSuggestionsRoute = AdminTypeSuggestionsRouteImport.update({
 const AdminStaff365Route = AdminStaff365RouteImport.update({
   id: '/staff-365',
   path: '/staff-365',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSignupFailuresRoute = AdminSignupFailuresRouteImport.update({
+  id: '/signup-failures',
+  path: '/signup-failures',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminShopRoute = AdminShopRouteImport.update({
@@ -1894,6 +1900,7 @@ export interface FileRoutesByFullPath {
   '/admin/service-suggestion-audit': typeof AdminServiceSuggestionAuditRoute
   '/admin/service-suggestions': typeof AdminServiceSuggestionsRoute
   '/admin/shop': typeof AdminShopRoute
+  '/admin/signup-failures': typeof AdminSignupFailuresRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -2179,6 +2186,7 @@ export interface FileRoutesByTo {
   '/admin/service-suggestion-audit': typeof AdminServiceSuggestionAuditRoute
   '/admin/service-suggestions': typeof AdminServiceSuggestionsRoute
   '/admin/shop': typeof AdminShopRoute
+  '/admin/signup-failures': typeof AdminSignupFailuresRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -2467,6 +2475,7 @@ export interface FileRoutesById {
   '/admin/service-suggestion-audit': typeof AdminServiceSuggestionAuditRoute
   '/admin/service-suggestions': typeof AdminServiceSuggestionsRoute
   '/admin/shop': typeof AdminShopRoute
+  '/admin/signup-failures': typeof AdminSignupFailuresRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -2758,6 +2767,7 @@ export interface FileRouteTypes {
     | '/admin/service-suggestion-audit'
     | '/admin/service-suggestions'
     | '/admin/shop'
+    | '/admin/signup-failures'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
     | '/admin/users'
@@ -3043,6 +3053,7 @@ export interface FileRouteTypes {
     | '/admin/service-suggestion-audit'
     | '/admin/service-suggestions'
     | '/admin/shop'
+    | '/admin/signup-failures'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
     | '/admin/users'
@@ -3330,6 +3341,7 @@ export interface FileRouteTypes {
     | '/admin/service-suggestion-audit'
     | '/admin/service-suggestions'
     | '/admin/shop'
+    | '/admin/signup-failures'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
     | '/admin/users'
@@ -4622,6 +4634,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStaff365RouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/signup-failures': {
+      id: '/admin/signup-failures'
+      path: '/signup-failures'
+      fullPath: '/admin/signup-failures'
+      preLoaderRoute: typeof AdminSignupFailuresRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/shop': {
       id: '/admin/shop'
       path: '/shop'
@@ -5876,6 +5895,7 @@ interface AdminRouteChildren {
   AdminServiceSuggestionAuditRoute: typeof AdminServiceSuggestionAuditRoute
   AdminServiceSuggestionsRoute: typeof AdminServiceSuggestionsRoute
   AdminShopRoute: typeof AdminShopRoute
+  AdminSignupFailuresRoute: typeof AdminSignupFailuresRoute
   AdminStaff365Route: typeof AdminStaff365Route
   AdminTypeSuggestionsRoute: typeof AdminTypeSuggestionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -5926,6 +5946,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminServiceSuggestionAuditRoute: AdminServiceSuggestionAuditRoute,
   AdminServiceSuggestionsRoute: AdminServiceSuggestionsRoute,
   AdminShopRoute: AdminShopRoute,
+  AdminSignupFailuresRoute: AdminSignupFailuresRoute,
   AdminStaff365Route: AdminStaff365Route,
   AdminTypeSuggestionsRoute: AdminTypeSuggestionsRoute,
   AdminUsersRoute: AdminUsersRoute,
