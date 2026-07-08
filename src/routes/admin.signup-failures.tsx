@@ -95,31 +95,64 @@ function StatusBadge({ code }: { code: number | null }) {
 
 function SignupFailuresPage() {
   const listFn = useServerFn(listSignupFailures);
+  const summaryFn = useServerFn(getSignupFailureSummary);
 
   const [reason, setReason] = useState<string>(ALL);
   const [statusCode, setStatusCode] = useState<string>("");
+  const [errorCode, setErrorCode] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [since, setSince] = useState<string>("");
   const [until, setUntil] = useState<string>("");
   const [page, setPage] = useState(0);
 
-  const filters = useMemo(
+  // Free-text inputs are debounced so typing doesn't fire a query per
+  // keystroke. Any change to the debounced values resets pagination.
+  const debouncedErrorCode = useDebounced(errorCode.trim(), 300);
+  const debouncedErrorMessage = useDebounced(errorMessage.trim(), 300);
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedErrorCode, debouncedErrorMessage]);
+
+  const baseFilters = useMemo(
     () => ({
       reason: reason === ALL ? undefined : reason,
       status_code:
         statusCode.trim() && !Number.isNaN(Number(statusCode))
           ? Number(statusCode)
           : undefined,
+      error_code: debouncedErrorCode || undefined,
+      error_message: debouncedErrorMessage || undefined,
       since: toIsoOrUndef(since),
       until: toIsoOrUndef(until),
+    }),
+    [
+      reason,
+      statusCode,
+      debouncedErrorCode,
+      debouncedErrorMessage,
+      since,
+      until,
+    ],
+  );
+
+  const filters = useMemo(
+    () => ({
+      ...baseFilters,
       limit: PAGE_SIZE,
       offset: page * PAGE_SIZE,
     }),
-    [reason, statusCode, since, until, page],
+    [baseFilters, page],
   );
 
   const query = useQuery({
     queryKey: ["admin", "signup-failures", filters],
     queryFn: () => listFn({ data: filters }),
+    staleTime: 15_000,
+  });
+
+  const summaryQuery = useQuery({
+    queryKey: ["admin", "signup-failures", "summary", baseFilters],
+    queryFn: () => summaryFn({ data: baseFilters }),
     staleTime: 15_000,
   });
 
@@ -131,10 +164,13 @@ function SignupFailuresPage() {
   const resetFilters = () => {
     setReason(ALL);
     setStatusCode("");
+    setErrorCode("");
+    setErrorMessage("");
     setSince("");
     setUntil("");
     setPage(0);
   };
+
 
   return (
     <div className="mx-auto max-w-7xl p-4 md:p-6 space-y-4">
