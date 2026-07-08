@@ -311,6 +311,14 @@ function SignupFailuresPage() {
         </CardContent>
       </Card>
 
+      <SummarySection
+        summary={summaryQuery.data}
+        isLoading={summaryQuery.isLoading}
+        error={summaryQuery.error as Error | null}
+      />
+
+
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <div>
