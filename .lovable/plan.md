@@ -1,37 +1,49 @@
-## Goal
-Add Playwright e2e tests that fail if the referral page's QR card, referral-link card, or promoter resource cards overlap (or overflow the viewport) at 360, 390, and 414 CSS px widths.
 
-## Scope
-- One new spec: `e2e/referral-mobile-layout.spec.ts`.
-- Reuses the existing sandbox Supabase session pattern (same as `e2e/qr-responsive.spec.ts`), skipping with a warning if `LOVABLE_BROWSER_AUTH_STATUS !== "injected"`.
-- No app code changes. No new helpers beyond this spec file. No visual/pixel-diff.
+## Problem
 
-## What the test asserts (per viewport: 360, 390, 414)
+Nobody could sign up from the public site today. Jocelyn reported "Database error saving new user"; what the user actually saw was the toast "Signup failed (404)." — the client parses a 404 HTML page and falls back to a generic message.
 
-For the route `/dashboard/referral`, after login + `networkidle`:
+Verified today:
 
-1. **No horizontal page overflow** — `document.documentElement.scrollWidth <= viewport.width`.
-2. **QR canvas fits** — the `<canvas>` inside the QR card has `getBoundingClientRect().right <= viewport.width` and `width === height` (square).
-3. **Referral-link card fits** — the card containing `<code>` with the referral URL has `right <= viewport.width` and its inner `<code>` element is not wider than its parent (no horizontal clip beyond `truncate`).
-4. **No overlap between the three regions**, tested pairwise using `DOMRect` intersection on:
-   - QR card (the QR `<button>` wrapper)
-   - Referral-link card (the card with the copy button)
-   - Each promoter resource `<a>` card in the `/dashboard/promoter-resources`, `/resources/qr-landing`, `/dashboard/qr-ads`, `/dashboard/qr-scan-test` grid
-   Rects overlap iff `r1.left < r2.right && r2.left < r1.right && r1.top < r2.bottom && r2.top < r1.bottom`. Fail with a message naming both elements and their rects.
-5. **Promoter resource cards don't overflow** — every card's `right <= viewport.width`.
+- `POST https://365motorsales.com/api/public/auth/signup` → **404** (custom domain and `motorsales365.lovable.app`).
+- `POST https://365motorsales.com/api/public/payment-events` → 200, `POST /api/public/hooks/dispatch-expand` → 200. So the deployed Worker is healthy — only the `auth/signup` route is missing.
+- Supabase auth logs: **0** `/signup` POSTs in the last 24 h — requests never reach Supabase Auth.
+- Postgres logs: no `handle_new_user` / trigger errors in the last 72 h.
+- `signup_failure_events` table is empty (server-side audit never runs because the route never runs).
+- Last successful profile insert: **July 5**. The `src/routes/api/public/auth/signup.tsx` route was introduced after that, so the currently-published Worker predates it.
 
-## Element selection strategy
-- QR card: `[data-qr]` (already on `ResponsiveQr`) → `.closest('button')`.
-- Referral-link card: locate by the visible label text "Your referral link", then its enclosing `.rounded-xl` card.
-- Promoter cards: the section immediately following the QR/stats section — select the four `<a>` elements by their headings ("Promoter resources", "Preview scanner view", "QR Ads & print", "Test QR scanability").
+Everything else about signup is fine — `handle_new_user`, `profiles` RLS, the tightened `is_staff_account` policy from today's security migration all pass a simulated insert cleanly.
 
-## Failure output
-On failure, print: viewport width, offending selector(s), each rect (`x,y,w,h`), and save a screenshot to `e2e/__screenshots__/mobile/referral-<width>.png` (folder already gitignored via `e2e/.gitignore`).
+## Fix
+
+Two-part fix. Rebuild + republish restores the route immediately; the follow-up hardening makes the same class of failure visible next time instead of silently showing "Signup failed (404)".
+
+### 1. Republish the site (primary fix)
+
+- Trigger a fresh build + publish so the deployed Worker picks up `src/routes/api/public/auth/signup.tsx` (already registered in `routeTree.gen.ts`).
+- Verify after publish:
+  - `curl -sSL -o /dev/null -w "%{http_code}\n" -X POST https://365motorsales.com/api/public/auth/signup -H 'content-type: application/json' -d '{}'` → expects **422** (schema_invalid), not 404.
+  - Attempt a real signup end-to-end from `https://365motorsales.com/signup` with a throwaway email; expect the verify-email screen.
+- Confirm one row lands in `public.signup_failure_events` from the empty-body probe, and one confirmed row in `public.profiles` from the real signup.
+
+### 2. Guardrails so this failure mode is loud next time (small code change)
+
+Add two low-risk safeguards in `src/routes/signup.tsx`:
+
+- When `res.status === 404` (or `res.status >= 500` with no JSON body), show a clearer toast: "Signup service is temporarily unavailable. Please try again in a minute." and `console.error` the response text.
+- On any non-OK response where `body` is `null` (JSON parse failed), post a small beacon to `ops_alerts` via the existing `/api/public/hooks/*` pattern is out of scope; instead just `console.error({ status, text })` so it shows up in the browser console + ClickHouse worker logs when a user reports it.
+
+No RLS, DB, or trigger changes. No changes to `handle_new_user`. No changes to the signup validator or route logic itself.
 
 ## Out of scope
-- Tablet/desktop viewports.
-- Other dashboard pages (covered by separate mobile-audit plan if approved later).
-- CI wiring, pixel snapshots, accessibility checks.
 
-## Run
-`bunx playwright test e2e/referral-mobile-layout.spec.ts --project=mobile` (uses the existing `mobile` project in `playwright.config.ts` if present; otherwise the spec calls `page.setViewportSize()` per test so the default project works too).
+- Rewriting the signup route.
+- Touching `profiles` RLS or the trigger chain (already verified healthy).
+- Retro-notifying users who couldn't sign up.
+
+## Verification checklist
+
+- [ ] Production `POST /api/public/auth/signup` returns 422 with empty body (route exists).
+- [ ] Real signup from the site reaches `/verify-email`.
+- [ ] `signup_failure_events` receives probe rows.
+- [ ] Jocelyn's tester receives the confirmation email.

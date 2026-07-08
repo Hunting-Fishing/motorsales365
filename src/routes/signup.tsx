@@ -528,8 +528,10 @@ function SignupPage() {
     });
     setSubmitting(false);
     let body: any = null;
+    let rawText = "";
     try {
-      body = await res.json();
+      rawText = await res.clone().text();
+      body = JSON.parse(rawText);
     } catch {
       /* ignore */
     }
@@ -539,6 +541,19 @@ function SignupPage() {
       if (res.status === 409) {
         toast.error("That email is already registered. Try signing in instead.");
         navigate({ to: "/login", search: { redirect: search.redirect } as any });
+        return;
+      }
+      // Route missing / server down / HTML error page → surface a clearer
+      // message instead of a generic "Signup failed (404)." that reads to
+      // users as "database error".
+      if (!body && (res.status === 404 || res.status >= 500)) {
+        console.error("[signup] non-JSON response from /api/public/auth/signup", {
+          status: res.status,
+          text: rawText.slice(0, 500),
+        });
+        toast.error(
+          "Signup is temporarily unavailable. Please try again in a minute or contact support if it keeps happening.",
+        );
         return;
       }
       toast.error(first?.message ?? `Signup failed (${res.status}).`);
