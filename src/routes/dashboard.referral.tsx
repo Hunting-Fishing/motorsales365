@@ -6,9 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
 
-import { QRCodeCanvas } from "qrcode.react";
-import QRCode from "qrcode";
-import { computeQuietZoneModules, type QrLevel } from "@/lib/qr-quiet-zone";
+import { ResponsiveQr } from "@/components/qr/responsive-qr";
+import { renderQrPng } from "@/lib/qr-image";
+import type { QrLevel } from "@/lib/qr-quiet-zone";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
