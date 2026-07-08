@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Loader2, RefreshCw } from "lucide-react";
+import { AlertTriangle, Loader2, RefreshCw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,10 +30,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  getSignupFailureSummary,
   listSignupFailures,
   REASON_OPTIONS,
   type SignupFailureRow,
+  type SignupFailureSummary,
 } from "@/lib/admin-signup-failures.functions";
+
+function useDebounced<T>(value: T, ms = 300): T {
+  const [v, setV] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setV(value), ms);
+    return () => clearTimeout(t);
+  }, [value, ms]);
+  return v;
+}
 
 export const Route = createFileRoute("/admin/signup-failures")({
   component: SignupFailuresPage,
@@ -84,31 +95,64 @@ function StatusBadge({ code }: { code: number | null }) {
 
 function SignupFailuresPage() {
   const listFn = useServerFn(listSignupFailures);
+  const summaryFn = useServerFn(getSignupFailureSummary);
 
   const [reason, setReason] = useState<string>(ALL);
   const [statusCode, setStatusCode] = useState<string>("");
+  const [errorCode, setErrorCode] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [since, setSince] = useState<string>("");
   const [until, setUntil] = useState<string>("");
   const [page, setPage] = useState(0);
 
-  const filters = useMemo(
+  // Free-text inputs are debounced so typing doesn't fire a query per
+  // keystroke. Any change to the debounced values resets pagination.
+  const debouncedErrorCode = useDebounced(errorCode.trim(), 300);
+  const debouncedErrorMessage = useDebounced(errorMessage.trim(), 300);
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedErrorCode, debouncedErrorMessage]);
+
+  const baseFilters = useMemo(
     () => ({
       reason: reason === ALL ? undefined : reason,
       status_code:
         statusCode.trim() && !Number.isNaN(Number(statusCode))
           ? Number(statusCode)
           : undefined,
+      error_code: debouncedErrorCode || undefined,
+      error_message: debouncedErrorMessage || undefined,
       since: toIsoOrUndef(since),
       until: toIsoOrUndef(until),
+    }),
+    [
+      reason,
+      statusCode,
+      debouncedErrorCode,
+      debouncedErrorMessage,
+      since,
+      until,
+    ],
+  );
+
+  const filters = useMemo(
+    () => ({
+      ...baseFilters,
       limit: PAGE_SIZE,
       offset: page * PAGE_SIZE,
     }),
-    [reason, statusCode, since, until, page],
+    [baseFilters, page],
   );
 
   const query = useQuery({
     queryKey: ["admin", "signup-failures", filters],
     queryFn: () => listFn({ data: filters }),
+    staleTime: 15_000,
+  });
+
+  const summaryQuery = useQuery({
+    queryKey: ["admin", "signup-failures", "summary", baseFilters],
+    queryFn: () => summaryFn({ data: baseFilters }),
     staleTime: 15_000,
   });
 
@@ -120,10 +164,13 @@ function SignupFailuresPage() {
   const resetFilters = () => {
     setReason(ALL);
     setStatusCode("");
+    setErrorCode("");
+    setErrorMessage("");
     setSince("");
     setUntil("");
     setPage(0);
   };
+
 
   return (
     <div className="mx-auto max-w-7xl p-4 md:p-6 space-y-4">
@@ -145,7 +192,7 @@ function SignupFailuresPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="space-y-1">
               <Label htmlFor="reason">Reason</Label>
               <Select
@@ -180,6 +227,38 @@ function SignupFailuresPage() {
                   setStatusCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 3));
                 }}
               />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="error_code">Error code</Label>
+              <div className="relative">
+                <Search
+                  className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                  aria-hidden
+                />
+                <Input
+                  id="error_code"
+                  placeholder="e.g. http_500, route_404"
+                  className="pl-8"
+                  value={errorCode}
+                  onChange={(e) => setErrorCode(e.target.value.slice(0, 100))}
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="error_message">Error message contains</Label>
+              <div className="relative">
+                <Search
+                  className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                  aria-hidden
+                />
+                <Input
+                  id="error_message"
+                  placeholder="substring, case-insensitive"
+                  className="pl-8"
+                  value={errorMessage}
+                  onChange={(e) => setErrorMessage(e.target.value.slice(0, 200))}
+                />
+              </div>
             </div>
             <div className="space-y-1">
               <Label htmlFor="since">From</Label>
@@ -231,6 +310,14 @@ function SignupFailuresPage() {
           </div>
         </CardContent>
       </Card>
+
+      <SummarySection
+        summary={summaryQuery.data}
+        isLoading={summaryQuery.isLoading}
+        error={summaryQuery.error as Error | null}
+      />
+
+
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -322,3 +409,172 @@ function SignupFailuresPage() {
     </div>
   );
 }
+
+function Stat({ label, value }: { label: string; value: number | string }) {
+  return (
+    <div className="rounded-lg border bg-card p-3">
+      <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
+      <div className="mt-1 text-2xl font-bold tabular-nums">{value}</div>
+    </div>
+  );
+}
+
+function BreakdownList({
+  title,
+  items,
+  formatKey,
+}: {
+  title: string;
+  items: Array<{ key: string; count: number }>;
+  formatKey?: (k: string) => React.ReactNode;
+}) {
+  const max = items[0]?.count ?? 1;
+  return (
+    <div>
+      <div className="text-xs font-semibold text-muted-foreground mb-2">{title}</div>
+      {items.length === 0 ? (
+        <p className="text-xs text-muted-foreground">—</p>
+      ) : (
+        <ul className="space-y-1.5">
+          {items.slice(0, 6).map((it) => (
+            <li key={it.key} className="text-xs">
+              <div className="flex items-center justify-between gap-2">
+                <span className="truncate font-mono">
+                  {formatKey ? formatKey(it.key) : it.key}
+                </span>
+                <span className="tabular-nums text-muted-foreground">{it.count}</span>
+              </div>
+              <div className="mt-1 h-1 rounded bg-muted overflow-hidden">
+                <div
+                  className="h-full bg-primary/60"
+                  style={{ width: `${Math.max(4, (it.count / max) * 100)}%` }}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function SummarySection({
+  summary,
+  isLoading,
+  error,
+}: {
+  summary: SignupFailureSummary | undefined;
+  isLoading: boolean;
+  error: Error | null;
+}) {
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-destructive">{error.message}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const total = summary?.total ?? 0;
+  const scanned = summary?.scanned ?? 0;
+  const truncated = summary?.truncated ?? false;
+  const byReason = (summary?.by_reason ?? []).map((r) => ({
+    key: r.reason,
+    count: r.count,
+  }));
+  const byStatus = (summary?.by_status ?? []).map((r) => ({
+    key: String(r.status_code),
+    count: r.count,
+  }));
+  const byErrorCode = (summary?.by_error_code ?? []).map((r) => ({
+    key: r.error_code,
+    count: r.count,
+  }));
+  const routes = summary?.top_failing_routes ?? [];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Summary</CardTitle>
+        <CardDescription>
+          {isLoading
+            ? "Computing…"
+            : truncated
+              ? `Aggregating the most recent ${scanned.toLocaleString()} of ${total.toLocaleString()} matching failures.`
+              : `Aggregating all ${total.toLocaleString()} matching failures.`}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Stat label="Total (filtered)" value={total.toLocaleString()} />
+          <Stat label="Distinct reasons" value={byReason.length} />
+          <Stat label="Distinct HTTP statuses" value={byStatus.length} />
+          <Stat label="Distinct error codes" value={byErrorCode.length} />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <BreakdownList title="Top reasons" items={byReason} />
+          <BreakdownList title="Top HTTP statuses" items={byStatus} />
+          <BreakdownList title="Top error codes" items={byErrorCode} />
+        </div>
+
+        <div>
+          <div className="text-xs font-semibold text-muted-foreground mb-2">
+            Top failing routes
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-2">
+            Each row is a distinct failure surface (reason × HTTP × error code)
+            on <code>/api/public/auth/signup</code>. Fix the top rows first —
+            they represent the largest share of failed signups.
+          </p>
+          {routes.length === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              No grouped failures in the selected window.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Reason</TableHead>
+                    <TableHead>HTTP</TableHead>
+                    <TableHead>Error code</TableHead>
+                    <TableHead className="text-right">Count</TableHead>
+                    <TableHead>Last seen</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {routes.map((b) => (
+                    <TableRow key={b.key}>
+                      <TableCell className="text-xs">{b.reason ?? "—"}</TableCell>
+                      <TableCell>
+                        <StatusBadge code={b.status_code} />
+                      </TableCell>
+                      <TableCell className="text-xs font-mono">
+                        {b.error_code ?? "—"}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums font-semibold">
+                        {b.count.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-xs whitespace-nowrap">
+                        {fmtDate(b.last_seen_at)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
