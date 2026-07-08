@@ -285,6 +285,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 400,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: "invalid_origin",
+              error_message: `Unparseable origin: ${String(input.origin).slice(0, 200)}`,
             });
             return Response.json(
               { ok: false, errors: [{ field: "origin", message: "Invalid origin." }] },
