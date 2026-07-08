@@ -153,6 +153,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 422,
               intent: (json as any)?.intent ?? null,
               phone_iso: (json as any)?.phone_iso ?? null,
+              error_code: "zod_schema_invalid",
+              error_message: errors.map((e) => `${e.field}: ${e.message}`).join("; "),
             });
             return Response.json({ ok: false, errors }, { status: 422 });
           }
