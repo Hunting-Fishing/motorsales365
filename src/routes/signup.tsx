@@ -574,16 +574,17 @@ function SignupPage() {
     } catch (netErr: any) {
       setSubmitting(false);
       console.error("[signup] network error posting to /api/public/auth/signup", netErr);
-      reportClientFailure({
+      const ref = await reportClientFailure({
         reason: "client_network_error",
         status_code: 0,
         error_code: netErr?.name ?? "network_error",
         error_message: String(netErr?.message ?? netErr).slice(0, 500),
       });
-      toast.error("Signup service unreachable", {
-        description:
-          "We couldn't reach the signup service (network error). Check your connection and try again in a moment.",
-      });
+      const title = "Signup service unreachable";
+      const description =
+        "We couldn't reach the signup service (network error). Check your connection and try again in a moment.";
+      setApiFailure({ status: 0, ref, title, description });
+      toast.error(title, { description });
       return;
     }
     setSubmitting(false);
