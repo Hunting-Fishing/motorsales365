@@ -435,17 +435,17 @@ function ReferralQrCard({
 
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div className="min-w-0 rounded-xl border border-border bg-card p-4">
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
         <DialogTrigger asChild>
           <button
             type="button"
-            className="group relative -m-2 block w-[calc(100%+1rem)] rounded-2xl p-2 text-left transition active:scale-[0.99] hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:-m-1 sm:w-[calc(100%+0.5rem)] sm:p-1"
+            className="group relative -m-2 block w-[calc(100%+1rem)] min-w-0 rounded-2xl p-2 text-left transition active:scale-[0.99] hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:-m-1 sm:w-[calc(100%+0.5rem)] sm:p-1"
             aria-label={`View QR full screen for ${fullName}`}
           >
-            <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-white p-6 sm:p-5 ring-1 ring-border transition group-hover:ring-primary">
+            <div className="relative aspect-square w-full min-w-0 overflow-hidden rounded-xl bg-white p-4 sm:p-5 ring-1 ring-border transition group-hover:ring-primary">
               <div
-                className="flex h-full w-full items-center justify-center"
+                className="flex h-full w-full min-w-0 items-center justify-center"
                 role="img"
                 aria-label={`QR code for ${fullName}`}
               >
@@ -456,7 +456,7 @@ function ReferralQrCard({
                     level="H"
                     marginSize={computeQuietZoneModules(512, "H" as QrLevel)}
                     data-qr={referralCode}
-                    style={{ width: "100%", height: "100%" }}
+                    style={{ width: "100%", height: "100%", maxWidth: "100%", display: "block" }}
                   />
                 ) : null}
               </div>
