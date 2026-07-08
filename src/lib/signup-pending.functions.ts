@@ -27,6 +27,7 @@ const Pending = z
     region: z.string().trim().max(120).optional(),
     province: z.string().trim().max(120).optional(),
     city: z.string().trim().max(120).optional(),
+    barangay: z.string().trim().max(120).optional(),
     street_address: z.string().trim().max(200).optional(),
     postal_code: z.string().trim().max(20).optional(),
     business_name: z.string().trim().max(160).optional(),
@@ -34,6 +35,12 @@ const Pending = z
     business_address: z.string().trim().max(300).optional(),
     business_postal_code: z.string().trim().max(20).optional(),
     is_business: z.boolean().optional(),
+    // Attribution passthrough — accepted here so OAuth signups (which
+    // detour through this pending applier) don't lose referral / visitor
+    // context between the stash and the profile write.
+    referral_code: z.string().trim().max(80).optional(),
+    signup_source: z.enum(["qr", "link", "direct"]).optional(),
+    visitor_id: z.string().trim().uuid().optional(),
   })
   .strict();
 
@@ -82,10 +89,16 @@ export const applyPendingSignupProfile = createServerFn({ method: "POST" })
     set("signup_region", data.region);
     set("signup_province", data.province);
     set("signup_city", data.city);
+    set("barangay", data.barangay);
     set("street_address", data.street_address);
     set(
       "postal_code",
       isBusinessLike ? data.business_postal_code ?? data.postal_code : data.postal_code,
+    );
+    set("referral_code", data.referral_code);
+    set(
+      "signup_source",
+      data.signup_source ?? (data.referral_code ? "link" : undefined),
     );
 
     if (isBusinessLike) {
@@ -98,11 +111,42 @@ export const applyPendingSignupProfile = createServerFn({ method: "POST" })
       set("business_city", data.city);
     }
 
-    if (Object.keys(patch).length === 0) {
-      return { ok: true as const, updated: 0, skipped: "empty_patch" as const };
+    let updated = 0;
+    if (Object.keys(patch).length > 0) {
+      const { error } = await (supabase.from("profiles") as any).update(patch).eq("id", userId);
+      if (error) throw new Error(error.message);
+      updated = Object.keys(patch).length;
     }
 
-    const { error } = await (supabase.from("profiles") as any).update(patch).eq("id", userId);
-    if (error) throw new Error(error.message);
-    return { ok: true as const, updated: Object.keys(patch).length };
+    // Back-fill QR / referral attribution rows with the new user_id whenever
+    // we have either a visitor id (QR scan touched the browser) or an
+    // explicit referral code. Uses the caller's own RLS scope via the
+    // SECURITY DEFINER RPC — safe to call from an authenticated context.
+    let attribution_linked = false;
+    let attribution_error: string | null = null;
+    if (data.visitor_id || data.referral_code) {
+      const { error: linkErr } = await (supabase as any).rpc(
+        "link_signup_attribution",
+        {
+          _visitor_id: data.visitor_id ?? null,
+          _user_id: userId,
+          _referral_code: data.referral_code ?? null,
+          _signup_source:
+            data.signup_source ?? (data.referral_code ? "link" : null),
+        },
+      );
+      if (linkErr) {
+        // Soft-fail: attribution linkage failing must not block profile save.
+        attribution_error = String(linkErr.message ?? "link_failed").slice(0, 300);
+      } else {
+        attribution_linked = true;
+      }
+    }
+
+    return {
+      ok: true as const,
+      updated,
+      attribution_linked,
+      attribution_error,
+    };
   });

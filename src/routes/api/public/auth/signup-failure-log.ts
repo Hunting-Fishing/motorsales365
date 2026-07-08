@@ -19,6 +19,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
 import { createHash, randomBytes } from "crypto";
+import { CORS_HEADERS, corsPreflight } from "@/lib/cors";
 
 const ReasonEnum = z.enum([
   "client_route_missing",       // signup POST returned 404
@@ -65,13 +66,14 @@ function fallbackRef(): string {
 function jsonRef(status: number, ref: string, extra?: Record<string, unknown>) {
   return new Response(JSON.stringify({ ref, ...(extra ?? {}) }), {
     status,
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", ...CORS_HEADERS },
   });
 }
 
 export const Route = createFileRoute("/api/public/auth/signup-failure-log")({
   server: {
     handlers: {
+      OPTIONS: async () => corsPreflight(),
       POST: async ({ request }) => {
         // A synthesized ref is prepared up-front so every error path — including
         // the outer catch — can return the same { ref } shape. Overwritten with

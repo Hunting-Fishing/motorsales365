@@ -14,13 +14,14 @@ import { applyPendingSignupProfile, type PendingSignupPayload } from "./signup-p
 export const SIGNUP_PENDING_KEY = "signup.pending";
 
 // The stash carries a few extra client-side fields (`saved_at`, `agreed`,
-// `full_name`, `phone`, `ref_code`) that the server fn intentionally ignores.
+// `full_name`, `phone`, `ref_code`) that the server fn ignores or renames.
 // Keep them optional so old payloads still parse.
 export type PendingStash = PendingSignupPayload & {
   saved_at?: number;
   agreed?: boolean;
   full_name?: string;
   phone?: string;
+  /** Legacy alias for `referral_code`; the applier maps it. */
   ref_code?: string;
 };
 
@@ -65,14 +66,16 @@ export function clearPending(): void {
 }
 
 // Strip the client-only extras and undefined/empty values before shipping to
-// the server function's strict validator.
+// the server function's strict validator. `ref_code` (legacy) is folded into
+// `referral_code` so OAuth signups don't silently drop attribution.
 function toServerPayload(p: PendingStash): PendingSignupPayload {
   const {
     saved_at: _sa,
     agreed: _ag,
     full_name: _fn,
     phone: _ph,
-    ref_code: _rc,
+    ref_code,
+    referral_code,
     ...rest
   } = p;
   const out: Record<string, unknown> = {};
@@ -81,6 +84,8 @@ function toServerPayload(p: PendingStash): PendingSignupPayload {
     if (typeof v === "string" && v.trim() === "") continue;
     out[k] = v;
   }
+  const resolvedCode = (referral_code ?? ref_code ?? "").toString().trim();
+  if (resolvedCode) out.referral_code = resolvedCode;
   return out as PendingSignupPayload;
 }
 
