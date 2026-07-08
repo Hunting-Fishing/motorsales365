@@ -73,18 +73,30 @@ export const Route = createFileRoute("/api/public/auth/signup-failure-log")({
           const ua = (request.headers.get("user-agent") ?? "").slice(0, 200);
 
           const sb = admin();
-          await (sb.from("signup_failure_events") as any).insert({
-            reason: input.reason,
-            missing_fields: [],
-            status_code: input.status_code,
-            intent: input.intent || null,
-            phone_iso: input.phone_iso || null,
-            ip_hash,
-            user_agent: ua || null,
-            error_code: input.error_code || null,
-            error_message: input.error_message || null,
+          const { data: inserted } = await (sb.from("signup_failure_events") as any)
+            .insert({
+              reason: input.reason,
+              missing_fields: [],
+              status_code: input.status_code,
+              intent: input.intent || null,
+              phone_iso: input.phone_iso || null,
+              ip_hash,
+              user_agent: ua || null,
+              error_code: input.error_code || null,
+              error_message: input.error_message || null,
+            })
+            .select("id")
+            .single();
+          // Return a short, user-shareable reference ID derived from the row
+          // UUID. Support can look it up in `signup_failure_events` by
+          // matching the suffix. Falls back to 204 if the row id is missing.
+          const id: string | undefined = inserted?.id;
+          if (!id) return new Response(null, { status: 204 });
+          const ref = `SF-${id.replace(/-/g, "").slice(-8).toUpperCase()}`;
+          return new Response(JSON.stringify({ ref }), {
+            status: 200,
+            headers: { "content-type": "application/json" },
           });
-          return new Response(null, { status: 204 });
         } catch {
           // Never let logging failures surface to the browser.
           return new Response(null, { status: 204 });

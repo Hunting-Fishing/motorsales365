@@ -134,6 +134,15 @@ function SignupPage() {
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [apiFailure, setApiFailure] = useState<
+    | {
+        status: number;
+        ref: string | null;
+        title: string;
+        description: string;
+      }
+    | null
+  >(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const markTouched = (k: string) => setTouched((t) => (t[k] ? t : { ...t, [k]: true }));
 
@@ -475,6 +484,7 @@ function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitAttempted(true);
+    setApiFailure(null);
     if (issues.length > 0) {
       toast.error(
         `Please fix ${issues.length} ${issues.length === 1 ? "field" : "fields"} before continuing.`,
@@ -502,7 +512,7 @@ function SignupPage() {
     // Fire-and-forget reporter for failures the server route cannot log
     // itself (404 when the route is missing from the deployed Worker,
     // network errors, non-JSON HTML shells). Never awaited, never throws.
-    const reportClientFailure = (payload: {
+    const reportClientFailure = async (payload: {
       reason:
         | "client_route_missing"
         | "client_server_error"
@@ -512,9 +522,9 @@ function SignupPage() {
       status_code: number;
       error_code?: string;
       error_message?: string;
-    }) => {
+    }): Promise<string | null> => {
       try {
-        void fetch("/api/public/auth/signup-failure-log", {
+        const r = await fetch("/api/public/auth/signup-failure-log", {
           method: "POST",
           headers: { "content-type": "application/json" },
           keepalive: true,
@@ -523,9 +533,12 @@ function SignupPage() {
             intent,
             phone_iso: phoneIso,
           }),
-        }).catch(() => {});
+        });
+        if (!r.ok) return null;
+        const j = await r.json().catch(() => null);
+        return (j && typeof j.ref === "string") ? j.ref : null;
       } catch {
-        /* never let logging break the UX */
+        return null;
       }
     };
 
@@ -561,16 +574,17 @@ function SignupPage() {
     } catch (netErr: any) {
       setSubmitting(false);
       console.error("[signup] network error posting to /api/public/auth/signup", netErr);
-      reportClientFailure({
+      const ref = await reportClientFailure({
         reason: "client_network_error",
         status_code: 0,
         error_code: netErr?.name ?? "network_error",
         error_message: String(netErr?.message ?? netErr).slice(0, 500),
       });
-      toast.error("Signup service unreachable", {
-        description:
-          "We couldn't reach the signup service (network error). Check your connection and try again in a moment.",
-      });
+      const title = "Signup service unreachable";
+      const description =
+        "We couldn't reach the signup service (network error). Check your connection and try again in a moment.";
+      setApiFailure({ status: 0, ref, title, description });
+      toast.error(title, { description });
       return;
     }
     setSubmitting(false);
@@ -598,7 +612,7 @@ function SignupPage() {
           status: res.status,
           text: rawText.slice(0, 500),
         });
-        reportClientFailure({
+        const ref = await reportClientFailure({
           reason: res.status === 404 ? "client_route_missing" : "client_server_error",
           status_code: res.status,
           error_code: res.status === 404 ? "route_404" : `http_${res.status}`,
@@ -612,21 +626,23 @@ function SignupPage() {
           res.status === 404
             ? "The signup service is being redeployed. Please try again in about a minute — no account was created."
             : "The signup service returned a server error. Please try again shortly or contact support if it keeps happening.";
+        setApiFailure({ status: res.status, ref, title, description });
         toast.error(title, { description });
         return;
       }
       // Non-JSON body but a 2xx/3xx/4xx we didn't classify above.
       if (!body) {
-        reportClientFailure({
+        const ref = await reportClientFailure({
           reason: "client_non_json_response",
           status_code: res.status,
           error_code: `http_${res.status}`,
           error_message: rawText.slice(0, 500),
         });
-        toast.error(`Signup temporarily unavailable (HTTP ${res.status})`, {
-          description:
-            "The server returned an unexpected response. Please try again in a moment.",
-        });
+        const title = `Signup temporarily unavailable (HTTP ${res.status})`;
+        const description =
+          "The server returned an unexpected response. Please try again in a moment.";
+        setApiFailure({ status: res.status, ref, title, description });
+        toast.error(title, { description });
         return;
       }
       toast.error(first?.message ?? `Signup failed (${res.status}).`);
@@ -777,6 +793,38 @@ function SignupPage() {
               </p>
             </header>
 
+            {apiFailure && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="mb-3 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive"
+              >
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold">{apiFailure.title}</p>
+                    <p className="mt-1 text-destructive/90">{apiFailure.description}</p>
+                    <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-destructive/90">
+                      <div className="flex items-center gap-1">
+                        <dt className="font-semibold">HTTP status:</dt>
+                        <dd className="font-mono">
+                          {apiFailure.status === 0 ? "network error" : apiFailure.status}
+                        </dd>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <dt className="font-semibold">Reference ID:</dt>
+                        <dd className="font-mono">
+                          {apiFailure.ref ?? "unavailable"}
+                        </dd>
+                      </div>
+                    </dl>
+                    <p className="mt-2 text-[11px] text-destructive/80">
+                      Please share the HTTP status and reference ID above with support so we can locate this attempt in our logs.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4" noValidate>
 
               {/* Account type — segmented control */}
