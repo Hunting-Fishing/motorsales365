@@ -1,36 +1,33 @@
-## Goal
-Add a Playwright e2e spec that, for each of `buyer`, `business`, and `service_provider`:
-1. Signs up via `POST /api/public/auth/signup` (real code path).
-2. Auto-confirms the account (email delivery isn't available in CI) using the Supabase Admin API.
-3. Signs in through the UI at `/login`.
-4. Confirms the user lands on the correct destination for that intent.
+## What I found
 
-## Landing destinations (verified from code)
-- `buyer` → `/dashboard` (login always routes here).
-- `business` / `service_provider` → `/businesses/submit` (per `POST_ROUTE` in `src/routes/verify-email.tsx`).
+Yes — a Google Maps key is set up, but it's the **Lovable-managed** one (`GOOGLE_MAPS_API_KEY` / `GOOGLE_MAPS_BROWSER_KEY` / `GOOGLE_MAPS_TRACKING_ID` in your secrets, all "managed by connector").
 
-Because `/login` sends everyone to `/dashboard`, intent-based routing lives on `/verify-email`. After signing in, the test navigates to `/verify-email?intent=<intent>&email=<email>`; the page detects `email_confirmed_at` and forwards to the intent's dashboard. This mirrors the real flow: after clicking the verification link, users land back on `/verify-email` where the auto-forward fires.
+That key is locked (referrer-restricted) to `*.lovable.app` and `*.lovableproject.com`. On your custom domain `365motorsales.com` (and `www.365motorsales.com`), every browser Maps call comes back as `REQUEST_DENIED` and the map renders blank — which is exactly what the "Will not load" warning on your Publish dialog is telling you, and why businesses aren't drawn on mobile.
 
-## New file
-`e2e/signup-login-lands-on-dashboard.spec.ts`
+The managed key's allowlist is not user-configurable, so the fix is to use **your own** Google Cloud API key on the custom domain. The managed key can stay for previews; the custom one will kick in once you connect it.
 
-Test structure:
-- One `test()` per intent, tagged `@post-deploy` so it runs in the same lane as the other signup smoke specs.
-- Skip cleanly (`test.skip`) when `SUPABASE_SERVICE_ROLE_KEY` / `SUPABASE_URL` env vars are not present, matching `scripts/smoke-signup-matrix.mjs` gating.
-- Each test:
-  1. Synthesizes a `+timestamp-nonce@365motorsales-smoke.example` email and strong random password.
-  2. `fetch('/api/public/auth/signup', …)` with the right intent-specific body (buyer uses personal address; business/service_provider use business address + `business_kind: "repair_shop"`). Asserts `200 { ok, user_id, needs_verify: true }`.
-  3. Calls Supabase Auth Admin `PUT /auth/v1/admin/users/{user_id}` with `{ email_confirm: true }` to mark the email verified.
-  4. Drives `/login`: fills email + password, submits, waits for either `/dashboard` (buyer) or navigates to `/verify-email?intent=…&email=…` and waits for `**/businesses/submit` (business/service_provider).
-  5. Asserts the final `page.url()` matches the expected destination and a stable landmark is visible on the page (e.g. `getByRole('heading')` on `/dashboard` for buyer, the submit-business form heading for business/service_provider).
-  6. Screenshots to `test-results/signup-login/{intent}.png` for debug.
-- After all cases, best-effort cleanup: `DELETE /auth/v1/admin/users/{user_id}` for each created user (wrapped in try/catch so a failure doesn't fail the suite).
+## What we'll do together (no code changes yet)
 
-## Test infra changes
-- Extend `playwright.config.ts` `webServer` only if not already covering `http://localhost:8080` — check first; likely no change needed.
-- Add a short helper `e2e/helpers/supabase-admin.ts` (test-only) exporting `adminFetch(path, init)` that bails when the service role key is missing. Keeps admin creds out of the spec body.
+1. In Google Cloud Console, in a project with **billing enabled**:
+   - Enable **Maps JavaScript API** and **Places API (New)** (plus Geocoding / Routes / Air Quality / Weather if you use them — I'll confirm which ones based on your code).
+   - Create an **API key**.
+   - Add **HTTP referrer restrictions** for your domains — all four patterns:
+     - `https://365motorsales.com/*`
+     - `https://*.365motorsales.com/*`
+     - `https://www.365motorsales.com/*`
+     - `https://365motorsales.lovable.app/*` (optional, keeps the preview working with the same key)
+   - Restrict the key to the APIs you enabled above.
 
-## Non-goals
-- No production code changes.
-- No actual email delivery / real verification-link click; the admin `email_confirm: true` shortcut is what our other smoke tests use and is documented as safe for test users.
-- Not asserting profile columns — that's covered by `scripts/smoke-signup-matrix.mjs`.
+2. Once you have the key in hand, I'll run the connect flow (`google_maps` connector → **custom / bring-your-own** option) so you can paste the key into a secure form. This creates a second connection alongside the managed one and swaps in your `GOOGLE_MAPS_BROWSER_KEY` on the custom domain.
+
+3. Republish. I'll then reload `/businesses` on mobile viewport (Playwright) and confirm markers render — no more `REQUEST_DENIED` in the console.
+
+## What I need from you before step 2
+
+Just reply once the API key is created with the referrer allowlist above, and I'll open the secure connect form. Don't paste the key into chat.
+
+## Not doing
+
+- No code changes — the app already reads `VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY`, which auto-switches to the custom connection when it's linked.
+- Not disconnecting the managed connection — it can stay for `*.lovable.app` previews.
+- Not rotating any Lovable keys — this isn't a Lovable-auth issue.
