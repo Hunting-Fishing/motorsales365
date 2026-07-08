@@ -448,13 +448,12 @@ function ReferralQrCard({
                 aria-label={`QR code for ${fullName}`}
               >
                 {link ? (
-                  <QRCodeCanvas
+                  <ResponsiveQr
                     value={link}
-                    size={512}
                     level="H"
-                    marginSize={computeQuietZoneModules(512, "H" as QrLevel)}
+                    maxPx={512}
+                    minPx={128}
                     data-qr={referralCode}
-                    style={{ width: "100%", height: "100%", maxWidth: "100%", display: "block" }}
                   />
                 ) : null}
               </div>
