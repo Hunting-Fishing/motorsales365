@@ -438,10 +438,10 @@ function ReferralQrCard({
         <DialogTrigger asChild>
           <button
             type="button"
-            className="group relative -m-2 block w-[calc(100%+1rem)] min-w-0 rounded-2xl p-2 text-left transition active:scale-[0.99] hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:-m-1 sm:w-[calc(100%+0.5rem)] sm:p-1"
+            className="group relative block w-full min-w-0 rounded-2xl p-1 text-left transition active:scale-[0.99] hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label={`View QR full screen for ${fullName}`}
           >
-            <div className="relative aspect-square w-full min-w-0 overflow-hidden rounded-xl bg-white p-4 sm:p-5 ring-1 ring-border transition group-hover:ring-primary">
+            <div className="relative aspect-square w-full min-w-0 overflow-hidden rounded-xl bg-white p-3 sm:p-5 ring-1 ring-border transition group-hover:ring-primary">
               <div
                 className="flex h-full w-full min-w-0 items-center justify-center"
                 role="img"
