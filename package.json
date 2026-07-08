@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "smoke:signup": "node scripts/smoke-signup.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.51",
