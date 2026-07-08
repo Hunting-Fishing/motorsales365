@@ -889,26 +889,51 @@ function SignupPage() {
         </aside>
 
         {/* Right: compact form */}
-        <div className="flex-1 bg-white p-4 sm:p-6 md:p-10">
+        <div className="flex-1 bg-white p-3 sm:p-6 md:p-10 pb-32 md:pb-10">
           <div className="mx-auto max-w-md">
+            {/* Compact mobile hero (mobile only) */}
+            <div className="md:hidden mb-3 rounded-xl bg-navy-900 text-white p-4 relative overflow-hidden">
+              <div className="pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-navy-500/20 blur-3xl" />
+              <Link to="/" className="relative inline-flex items-center gap-2">
+                <BrandLogo size={28} className="rounded-md shadow-md shadow-navy-500/30" />
+                <span
+                  className="text-base font-bold tracking-tight"
+                  style={{ fontFamily: "var(--font-sora)" }}
+                >
+                  MotorSales
+                </span>
+              </Link>
+              <p
+                className="relative mt-2 text-sm font-semibold leading-snug"
+                style={{ fontFamily: "var(--font-sora)" }}
+              >
+                Join the Philippines' trusted motor marketplace.
+              </p>
+              <ul className="relative mt-3 flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] text-slate-300">
+                {["Verified inventory", "Secure transactions", "Nationwide reach"].map((t) => (
+                  <li key={t} className="inline-flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3 text-navy-50" aria-hidden />
+                    <span>{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
             <header className="mb-3 md:mb-6">
-              <div className="md:hidden mb-2 flex items-center gap-2">
-                <BrandLogo size={28} className="rounded-md" />
-                <span className="text-sm font-bold text-navy-900 tracking-tight" style={{ fontFamily: "var(--font-sora)" }}>MotorSales</span>
-              </div>
               <h1
-                className="text-xl md:text-2xl font-bold text-navy-900"
+                className="text-2xl md:text-2xl font-bold text-navy-900"
                 style={{ fontFamily: "var(--font-sora)" }}
               >
                 Create your account
               </h1>
-              <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-slate-500">
+              <p className="mt-0.5 md:mt-1 text-sm md:text-sm text-slate-500">
                 Already have an account?{" "}
                 <Link to="/login" className="font-semibold text-navy-700 hover:text-navy-900 hover:underline">
                   Sign in
                 </Link>
               </p>
             </header>
+
 
             {apiFailure && (
               <div
