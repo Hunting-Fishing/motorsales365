@@ -83,9 +83,11 @@ async function signInViaUI(page: Page, email: string, password: string) {
   await page.goto("/login");
   await page.locator("#email").fill(email);
   await page.locator("#password").fill(password);
+  // Scope to the form's submit button — the site header also has a "Sign in"
+  // link that would otherwise match by accessible name.
   await Promise.all([
     page.waitForURL((url) => url.pathname !== "/login", { timeout: 20_000 }),
-    page.getByRole("button", { name: /sign in|log in/i }).first().click(),
+    page.locator('form button[type="submit"]').click(),
   ]);
 }
 
