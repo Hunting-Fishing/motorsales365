@@ -3,19 +3,18 @@
 // if enough time has elapsed since the last successful run.
 
 import { createFileRoute } from "@tanstack/react-router";
+import { verifyInternalCronToken } from "@/integrations/supabase/internal-secrets.server";
 
 export const Route = createFileRoute("/api/public/hooks/flashcards-autosync")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apikey = request.headers.get("apikey") ?? request.headers.get("x-api-key");
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
-        if (!expected || apikey !== expected) {
-          return new Response(JSON.stringify({ error: "unauthorized" }), {
-            status: 401,
-            headers: { "content-type": "application/json" },
-          });
-        }
+        const authed = await verifyInternalCronToken({
+          jobName: "flashcards_autosync",
+          tokenHeader: request.headers.get("x-cron-token"),
+        });
+        if (!authed) return new Response("Unauthorized", { status: 401 });
+
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { runFlashcardSync, isAutoSyncDue } = await import(
