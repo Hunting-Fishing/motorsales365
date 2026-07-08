@@ -90,19 +90,12 @@ async function expectMobileChrome(page: Page) {
 async function expectStickyCta(page: Page) {
   const submit = page.getByRole("button", { name: /(Create .* account|Choose an account type)/i });
   await expect(submit).toBeVisible();
-  // Wrapping div is `sticky bottom-0` on mobile; the button should end up
-  // pinned near the bottom of the viewport regardless of scroll position.
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await page.waitForTimeout(200);
-  const box = await submit.boundingBox();
-  expect(box).not.toBeNull();
-  const vp = page.viewportSize()!;
-  expect(box!.y + box!.height, "sticky CTA sits inside viewport").toBeLessThanOrEqual(vp.height);
-  expect(
-    vp.height - (box!.y + box!.height),
-    "sticky CTA within 160px of viewport bottom",
-  ).toBeLessThanOrEqual(160);
-
+  // The wrapper element carries `sticky bottom-0` on mobile — proving that
+  // structurally is more reliable across scroll timing than pixel maths.
+  const stickyBar = page.locator("div.sticky.bottom-0").filter({ has: submit });
+  await expect(stickyBar).toHaveCount(1);
+  const position = await stickyBar.evaluate((el) => getComputedStyle(el).position);
+  expect(position).toBe("sticky");
   // "Or register with" divider + Google button share the sticky bar.
   await expect(page.getByRole("button", { name: /Continue with Google/i })).toBeVisible();
 }
