@@ -28,7 +28,7 @@ export const listFeaturedPartnerBrands = createServerFn({ method: "POST" })
       .limit(5000);
     if (error) return [];
     const counts = new Map<string, number>();
-    for (const r of (rows as { brand: string | null }[]) ?? []) {
+    for (const r of (rows as unknown as { brand: string | null }[]) ?? []) {
       const b = (r.brand ?? "").trim();
       if (!b || b.length > 40) continue;
       const key = b.toUpperCase();
