@@ -374,7 +374,20 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               profilePatch.business_province = input.signup_province;
               profilePatch.business_city = input.signup_city;
             }
-            await (sbAdmin.from("profiles") as any).update(profilePatch).eq("id", data.user.id);
+            const { error: profileErr } = await (sbAdmin.from("profiles") as any)
+              .update(profilePatch)
+              .eq("id", data.user.id);
+            if (profileErr) {
+              await logSignupFailure(sbAdmin, request, {
+                reason: "profile_update_failed",
+                missing_fields: [],
+                status_code: 200,
+                intent: input.intent,
+                phone_iso: input.phone_iso,
+                error_code: (profileErr as any)?.code ?? "profile_update_failed",
+                error_message: (profileErr as any)?.message ?? String(profileErr),
+              });
+            }
           }
 
           return Response.json({
@@ -387,6 +400,10 @@ export const Route = createFileRoute("/api/public/auth/signup")({
             reason: "unhandled_exception",
             missing_fields: [],
             status_code: 500,
+            error_code: e?.code ?? e?.name ?? "unhandled_exception",
+            error_message:
+              (e?.message ? String(e.message) : "Unhandled") +
+              (e?.stack ? ` | ${String(e.stack).split("\n").slice(0, 3).join(" | ")}` : ""),
           });
           return Response.json(
             { ok: false, errors: [{ field: "", message: e?.message ?? "Unhandled" }] },
