@@ -181,23 +181,23 @@ function StaffReferral() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+      <header className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <h1 className="font-display text-2xl font-bold">My referral</h1>
           <p className="text-sm text-muted-foreground">
             Share your QR or link. Anyone who scans and signs up in the same browser within 90 days
             is credited to you.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link to="/resources/qr-landing">
-            <Button size="sm" variant="outline">Preview scanner view</Button>
+            <Button size="sm" variant="outline" className="w-full sm:w-auto">Preview scanner view</Button>
           </Link>
           <Link to="/dashboard/qr-ads">
-            <Button size="sm">Open QR ads</Button>
+            <Button size="sm" className="w-full sm:w-auto">Open QR ads</Button>
           </Link>
           <span
-            className={`rounded-full px-3 py-1 text-xs ${staff.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
+            className={`shrink-0 rounded-full px-3 py-1 text-xs ${staff.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
           >
             {staff.active ? "Active" : "Inactive"}
           </span>
@@ -273,7 +273,7 @@ function StaffReferral() {
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-3">
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
           {
             to: "/dashboard/promoter-resources",
@@ -438,10 +438,10 @@ function ReferralQrCard({
         <DialogTrigger asChild>
           <button
             type="button"
-            className="group relative -m-2 block w-[calc(100%+1rem)] min-w-0 rounded-2xl p-2 text-left transition active:scale-[0.99] hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:-m-1 sm:w-[calc(100%+0.5rem)] sm:p-1"
+            className="group relative block w-full min-w-0 rounded-2xl p-1 text-left transition active:scale-[0.99] hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label={`View QR full screen for ${fullName}`}
           >
-            <div className="relative aspect-square w-full min-w-0 overflow-hidden rounded-xl bg-white p-4 sm:p-5 ring-1 ring-border transition group-hover:ring-primary">
+            <div className="relative aspect-square w-full min-w-0 overflow-hidden rounded-xl bg-white p-3 sm:p-5 ring-1 ring-border transition group-hover:ring-primary">
               <div
                 className="flex h-full w-full min-w-0 items-center justify-center"
                 role="img"
