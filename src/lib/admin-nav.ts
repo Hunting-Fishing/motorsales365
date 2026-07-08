@@ -97,6 +97,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { to: "/admin/currencies", label: "Currencies", Icon: Globe, roles: ["admin"], info: "Currency list, FX rates and auto-update settings.", section: "Platform" },
   { to: "/admin/performance", label: "Performance", Icon: Gauge, roles: ["admin"], info: "Performance flags and image/CDN tuning.", section: "Platform" },
   { to: "/admin/alerts", label: "Ops Alerts", Icon: AlertTriangle, roles: ["admin"], info: "Backend failures captured in-app.", section: "Platform" },
+  { to: "/admin/signup-failures", label: "Signup failures", Icon: AlertTriangle, roles: ["admin"], info: "Recent signup_failure_events with reason/status/time filters.", section: "Platform" },
   { to: "/admin/feature-flags", label: "Payment & plan flags", Icon: Sparkles, roles: ["admin"], info: "Server-side toggles for payment rails, boost types and plans.", section: "Platform" },
   { to: "/admin/diagnostics", label: "Permission diagnostics", Icon: ShieldCheck, roles: ["admin"], info: "Inspect roles and permissions for any user.", section: "Platform" },
   { to: "/admin/permissions", label: "Role permissions", Icon: ShieldCheck, roles: ["admin"], info: "Toggle specific permissions per role without redeploying.", section: "Platform" },
