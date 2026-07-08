@@ -81,13 +81,18 @@ async function apiSignup(
 
 async function signInViaUI(page: Page, email: string, password: string) {
   await page.goto("/login");
+  // Wait for the auth hook to finish loading — button is disabled while
+  // `loading` is true, so submitting earlier would be a no-op.
+  const submitBtn = page.locator('form button[type="submit"]');
+  await expect(submitBtn).toBeEnabled({ timeout: 15_000 });
   await page.locator("#email").fill(email);
   await page.locator("#password").fill(password);
-  // Scope to the form's submit button — the site header also has a "Sign in"
-  // link that would otherwise match by accessible name.
+  // Confirm the controlled state actually took the values before submitting.
+  await expect(page.locator("#email")).toHaveValue(email);
+  await expect(page.locator("#password")).toHaveValue(password);
   await Promise.all([
     page.waitForURL((url) => url.pathname !== "/login", { timeout: 20_000 }),
-    page.locator('form button[type="submit"]').click(),
+    submitBtn.click(),
   ]);
 }
 
