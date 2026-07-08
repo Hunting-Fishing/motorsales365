@@ -192,7 +192,7 @@ function SignupFailuresPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="space-y-1">
               <Label htmlFor="reason">Reason</Label>
               <Select
@@ -227,6 +227,38 @@ function SignupFailuresPage() {
                   setStatusCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 3));
                 }}
               />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="error_code">Error code</Label>
+              <div className="relative">
+                <Search
+                  className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                  aria-hidden
+                />
+                <Input
+                  id="error_code"
+                  placeholder="e.g. http_500, route_404"
+                  className="pl-8"
+                  value={errorCode}
+                  onChange={(e) => setErrorCode(e.target.value.slice(0, 100))}
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="error_message">Error message contains</Label>
+              <div className="relative">
+                <Search
+                  className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                  aria-hidden
+                />
+                <Input
+                  id="error_message"
+                  placeholder="substring, case-insensitive"
+                  className="pl-8"
+                  value={errorMessage}
+                  onChange={(e) => setErrorMessage(e.target.value.slice(0, 200))}
+                />
+              </div>
             </div>
             <div className="space-y-1">
               <Label htmlFor="since">From</Label>
