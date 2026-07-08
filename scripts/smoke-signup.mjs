@@ -57,27 +57,49 @@ try {
 
 const status = res.status;
 const ctype = res.headers.get("content-type") ?? "";
+const server = res.headers.get("server") ?? "";
 const raw = await res.text();
+const bytes = Buffer.byteLength(raw, "utf8");
+const preview = raw.slice(0, 200);
+
+// Structured, greppable diagnostics block that always appears on failure.
+// 200-byte body preview + status + content-type make stale-deploy / HTML-shell
+// / gateway-error responses instantly identifiable in CI logs.
+function diagnostics() {
+  return [
+    `  status:        HTTP ${status}`,
+    `  content-type:  ${ctype || "(none)"}`,
+    server ? `  server:        ${server}` : null,
+    `  body-bytes:    ${bytes}`,
+    `  body-preview:  ${JSON.stringify(preview)}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
 
 if (status === 404) {
   fail(
     `route missing on deployed Worker (HTTP 404). The build likely did not include src/routes/api/public/auth/signup.tsx.`,
-    raw.slice(0, 400),
+    diagnostics(),
   );
 }
 if (status >= 500) {
-  fail(`server error HTTP ${status}`, raw.slice(0, 400));
+  fail(`server error HTTP ${status}`, diagnostics());
 }
 if (!ctype.includes("application/json")) {
-  fail(`expected JSON, got content-type "${ctype}" (HTTP ${status})`, raw.slice(0, 400));
+  fail(
+    `expected JSON response, got content-type "${ctype || "(none)"}" — likely an HTML shell or gateway error page.`,
+    diagnostics(),
+  );
 }
 
 let body;
 try {
   body = JSON.parse(raw);
 } catch (e) {
-  fail(`response is not valid JSON: ${e?.message ?? e}`, raw.slice(0, 400));
+  fail(`response is not valid JSON: ${e?.message ?? e}`, diagnostics());
 }
+
 
 // Empty body is invalid — the route must reject with 422 + ok:false + errors[].
 if (status !== 422) {
