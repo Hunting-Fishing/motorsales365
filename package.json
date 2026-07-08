@@ -15,7 +15,8 @@
     "smoke:signup": "node scripts/smoke-signup.mjs",
     "smoke:signup:valid": "node scripts/smoke-signup-valid.mjs",
     "smoke:signup:diagnostics": "node scripts/smoke-signup-diagnostics.mjs",
-    "smoke:signup:failure-log": "node scripts/smoke-signup-failure-log.mjs"
+    "smoke:signup:failure-log": "node scripts/smoke-signup-failure-log.mjs",
+    "smoke:signup:failure-log:ref": "node scripts/smoke-signup-failure-log-ref.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.51",
