@@ -385,6 +385,9 @@ function DiagnosticsPage() {
         </div>
       </div>
 
+      {/* ROUTE HEALTH */}
+      <RouteHealthCard />
+
       {/* MY SESSION */}
       <Card>
         <CardHeader>
