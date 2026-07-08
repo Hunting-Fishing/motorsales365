@@ -30,9 +30,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  getSignupFailureById,
   getSignupFailureSummary,
   listSignupFailures,
   REASON_OPTIONS,
+  type SignupFailureDetail,
   type SignupFailureRow,
   type SignupFailureSummary,
 } from "@/lib/admin-signup-failures.functions";
