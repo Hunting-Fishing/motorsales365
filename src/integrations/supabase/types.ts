@@ -10073,6 +10073,8 @@ export type Database = {
       signup_failure_events: {
         Row: {
           created_at: string
+          error_code: string | null
+          error_message: string | null
           id: string
           intent: string | null
           ip_hash: string | null
@@ -10084,6 +10086,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          error_code?: string | null
+          error_message?: string | null
           id?: string
           intent?: string | null
           ip_hash?: string | null
@@ -10095,6 +10099,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          error_code?: string | null
+          error_message?: string | null
           id?: string
           intent?: string | null
           ip_hash?: string | null
