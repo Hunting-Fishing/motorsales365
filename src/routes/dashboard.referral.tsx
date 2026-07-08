@@ -206,7 +206,7 @@ function StaffReferral() {
 
 
 
-      <section className="grid gap-6 md:grid-cols-[260px_1fr]">
+      <section className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[260px_minmax(0,1fr)]">
         <ReferralQrCard
           link={link}
           fullName={staff.full_name}
