@@ -612,7 +612,7 @@ function SignupPage() {
           status: res.status,
           text: rawText.slice(0, 500),
         });
-        reportClientFailure({
+        const ref = await reportClientFailure({
           reason: res.status === 404 ? "client_route_missing" : "client_server_error",
           status_code: res.status,
           error_code: res.status === 404 ? "route_404" : `http_${res.status}`,
@@ -626,21 +626,23 @@ function SignupPage() {
           res.status === 404
             ? "The signup service is being redeployed. Please try again in about a minute — no account was created."
             : "The signup service returned a server error. Please try again shortly or contact support if it keeps happening.";
+        setApiFailure({ status: res.status, ref, title, description });
         toast.error(title, { description });
         return;
       }
       // Non-JSON body but a 2xx/3xx/4xx we didn't classify above.
       if (!body) {
-        reportClientFailure({
+        const ref = await reportClientFailure({
           reason: "client_non_json_response",
           status_code: res.status,
           error_code: `http_${res.status}`,
           error_message: rawText.slice(0, 500),
         });
-        toast.error(`Signup temporarily unavailable (HTTP ${res.status})`, {
-          description:
-            "The server returned an unexpected response. Please try again in a moment.",
-        });
+        const title = `Signup temporarily unavailable (HTTP ${res.status})`;
+        const description =
+          "The server returned an unexpected response. Please try again in a moment.";
+        setApiFailure({ status: res.status, ref, title, description });
+        toast.error(title, { description });
         return;
       }
       toast.error(first?.message ?? `Signup failed (${res.status}).`);
