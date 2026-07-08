@@ -793,6 +793,38 @@ function SignupPage() {
               </p>
             </header>
 
+            {apiFailure && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="mb-3 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive"
+              >
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold">{apiFailure.title}</p>
+                    <p className="mt-1 text-destructive/90">{apiFailure.description}</p>
+                    <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-destructive/90">
+                      <div className="flex items-center gap-1">
+                        <dt className="font-semibold">HTTP status:</dt>
+                        <dd className="font-mono">
+                          {apiFailure.status === 0 ? "network error" : apiFailure.status}
+                        </dd>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <dt className="font-semibold">Reference ID:</dt>
+                        <dd className="font-mono">
+                          {apiFailure.ref ?? "unavailable"}
+                        </dd>
+                      </div>
+                    </dl>
+                    <p className="mt-2 text-[11px] text-destructive/80">
+                      Please share the HTTP status and reference ID above with support so we can locate this attempt in our logs.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4" noValidate>
 
               {/* Account type — segmented control */}
