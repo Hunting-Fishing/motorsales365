@@ -24,6 +24,8 @@ async function logSignupFailure(
     status_code: number;
     intent?: string | null;
     phone_iso?: string | null;
+    error_code?: string | null;
+    error_message?: string | null;
   },
 ) {
   try {
@@ -42,11 +44,14 @@ async function logSignupFailure(
       phone_iso: args.phone_iso ?? null,
       ip_hash,
       user_agent: ua || null,
+      error_code: args.error_code ? String(args.error_code).slice(0, 100) : null,
+      error_message: args.error_message ? String(args.error_message).slice(0, 500) : null,
     });
   } catch {
     // never let audit failures block the response
   }
 }
+
 
 
 
@@ -148,6 +153,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 422,
               intent: (json as any)?.intent ?? null,
               phone_iso: (json as any)?.phone_iso ?? null,
+              error_code: "zod_schema_invalid",
+              error_message: errors.map((e) => `${e.field}: ${e.message}`).join("; "),
             });
             return Response.json({ ok: false, errors }, { status: 422 });
           }
@@ -161,6 +168,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 403,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: "staff_domain_blocked",
+              error_message: `${STAFF_EMAIL_DOMAIN} is reserved for 365 employees.`,
             });
             return Response.json(
               {
@@ -209,6 +218,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 422,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: "field_validation_failed",
+              error_message: errors.map((e) => `${e.field}: ${e.message}`).join("; "),
             });
             return Response.json({ ok: false, errors }, { status: 422 });
           }
@@ -229,6 +240,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 409,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: "email_exists_preflight",
+              error_message: "Email already present in auth.users",
             });
             return Response.json(
               { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
@@ -272,6 +285,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 400,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: "invalid_origin",
+              error_message: `Unparseable origin: ${String(input.origin).slice(0, 200)}`,
             });
             return Response.json(
               { ok: false, errors: [{ field: "origin", message: "Invalid origin." }] },
@@ -291,6 +306,10 @@ export const Route = createFileRoute("/api/public/auth/signup")({
           });
           if (error) {
             const msg = error.message || "";
+            const providerCode =
+              (error as any)?.code ??
+              (error as any)?.name ??
+              (typeof (error as any)?.status === "number" ? `http_${(error as any).status}` : null);
             if (/already|registered|exists|in use/i.test(msg)) {
               await logSignupFailure(sbAdmin, request, {
                 reason: "email_already_registered",
@@ -298,6 +317,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
                 status_code: 409,
                 intent: input.intent,
                 phone_iso: input.phone_iso,
+                error_code: providerCode ?? "email_exists_provider",
+                error_message: msg,
               });
               return Response.json(
                 { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
@@ -310,6 +331,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 400,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: providerCode ?? "auth_signup_error",
+              error_message: msg,
             });
             return Response.json({ ok: false, errors: [{ field: "email", message: msg }] }, { status: 400 });
           }
@@ -321,6 +344,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 409,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: "empty_identities",
+              error_message: "auth.signUp returned user with no identities (email exists)",
             });
             return Response.json(
               { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
@@ -349,7 +374,20 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               profilePatch.business_province = input.signup_province;
               profilePatch.business_city = input.signup_city;
             }
-            await (sbAdmin.from("profiles") as any).update(profilePatch).eq("id", data.user.id);
+            const { error: profileErr } = await (sbAdmin.from("profiles") as any)
+              .update(profilePatch)
+              .eq("id", data.user.id);
+            if (profileErr) {
+              await logSignupFailure(sbAdmin, request, {
+                reason: "profile_update_failed",
+                missing_fields: [],
+                status_code: 200,
+                intent: input.intent,
+                phone_iso: input.phone_iso,
+                error_code: (profileErr as any)?.code ?? "profile_update_failed",
+                error_message: (profileErr as any)?.message ?? String(profileErr),
+              });
+            }
           }
 
           return Response.json({
@@ -362,6 +400,10 @@ export const Route = createFileRoute("/api/public/auth/signup")({
             reason: "unhandled_exception",
             missing_fields: [],
             status_code: 500,
+            error_code: e?.code ?? e?.name ?? "unhandled_exception",
+            error_message:
+              (e?.message ? String(e.message) : "Unhandled") +
+              (e?.stack ? ` | ${String(e.stack).split("\n").slice(0, 3).join(" | ")}` : ""),
           });
           return Response.json(
             { ok: false, errors: [{ field: "", message: e?.message ?? "Unhandled" }] },

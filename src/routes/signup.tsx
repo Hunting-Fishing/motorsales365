@@ -499,33 +499,79 @@ function SignupPage() {
     setSubmitting(true);
     stashPendingProfile();
 
-    const res = await fetch("/api/public/auth/signup", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        intent,
-        email: email.trim(),
-        password,
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
-        phone_iso: phoneIso,
-        phone_national: phoneNational.trim(),
-        signup_region: location.region,
-        signup_province: location.province,
-        signup_city: location.city,
-        street_address: streetAddress.trim(),
-        postal_code: postalCode.trim(),
-        business_name: businessName.trim(),
-        business_kind: businessKind || undefined,
-        business_address: businessAddress.trim(),
-        business_postal_code: businessPostalCode.trim(),
-        referral_code: refCode || "",
-        signup_source: getCreditedSource(),
-        redirect: search.redirect ?? "",
-        origin: siteOrigin(),
-        agreed: true,
-      }),
-    });
+    // Fire-and-forget reporter for failures the server route cannot log
+    // itself (404 when the route is missing from the deployed Worker,
+    // network errors, non-JSON HTML shells). Never awaited, never throws.
+    const reportClientFailure = (payload: {
+      reason:
+        | "client_route_missing"
+        | "client_server_error"
+        | "client_non_json_response"
+        | "client_network_error"
+        | "client_unexpected_status";
+      status_code: number;
+      error_code?: string;
+      error_message?: string;
+    }) => {
+      try {
+        void fetch("/api/public/auth/signup-failure-log", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          keepalive: true,
+          body: JSON.stringify({
+            ...payload,
+            intent,
+            phone_iso: phoneIso,
+          }),
+        }).catch(() => {});
+      } catch {
+        /* never let logging break the UX */
+      }
+    };
+
+    let res: Response;
+    try {
+      res = await fetch("/api/public/auth/signup", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          intent,
+          email: email.trim(),
+          password,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          phone_iso: phoneIso,
+          phone_national: phoneNational.trim(),
+          signup_region: location.region,
+          signup_province: location.province,
+          signup_city: location.city,
+          street_address: streetAddress.trim(),
+          postal_code: postalCode.trim(),
+          business_name: businessName.trim(),
+          business_kind: businessKind || undefined,
+          business_address: businessAddress.trim(),
+          business_postal_code: businessPostalCode.trim(),
+          referral_code: refCode || "",
+          signup_source: getCreditedSource(),
+          redirect: search.redirect ?? "",
+          origin: siteOrigin(),
+          agreed: true,
+        }),
+      });
+    } catch (netErr: any) {
+      setSubmitting(false);
+      console.error("[signup] network error posting to /api/public/auth/signup", netErr);
+      reportClientFailure({
+        reason: "client_network_error",
+        status_code: 0,
+        error_code: netErr?.name ?? "network_error",
+        error_message: String(netErr?.message ?? netErr).slice(0, 500),
+      });
+      toast.error(
+        "We couldn't reach the signup service. Check your connection and try again.",
+      );
+      return;
+    }
     setSubmitting(false);
     let body: any = null;
     let rawText = "";
@@ -551,10 +597,25 @@ function SignupPage() {
           status: res.status,
           text: rawText.slice(0, 500),
         });
+        reportClientFailure({
+          reason: res.status === 404 ? "client_route_missing" : "client_server_error",
+          status_code: res.status,
+          error_code: res.status === 404 ? "route_404" : `http_${res.status}`,
+          error_message: rawText.slice(0, 500),
+        });
         toast.error(
           "Signup is temporarily unavailable. Please try again in a minute or contact support if it keeps happening.",
         );
         return;
+      }
+      // Non-JSON body but a 2xx/3xx/4xx we didn't classify above — still worth logging.
+      if (!body) {
+        reportClientFailure({
+          reason: "client_non_json_response",
+          status_code: res.status,
+          error_code: `http_${res.status}`,
+          error_message: rawText.slice(0, 500),
+        });
       }
       toast.error(first?.message ?? `Signup failed (${res.status}).`);
       if (first?.field) {
