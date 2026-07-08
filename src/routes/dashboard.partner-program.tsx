@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { QRCodeCanvas } from "qrcode.react";
+import { ResponsiveQr } from "@/components/qr/responsive-qr";
 import { SiteLayout } from "@/components/site-layout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
