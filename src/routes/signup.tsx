@@ -502,7 +502,7 @@ function SignupPage() {
     // Fire-and-forget reporter for failures the server route cannot log
     // itself (404 when the route is missing from the deployed Worker,
     // network errors, non-JSON HTML shells). Never awaited, never throws.
-    const reportClientFailure = (payload: {
+    const reportClientFailure = async (payload: {
       reason:
         | "client_route_missing"
         | "client_server_error"
@@ -512,9 +512,9 @@ function SignupPage() {
       status_code: number;
       error_code?: string;
       error_message?: string;
-    }) => {
+    }): Promise<string | null> => {
       try {
-        void fetch("/api/public/auth/signup-failure-log", {
+        const r = await fetch("/api/public/auth/signup-failure-log", {
           method: "POST",
           headers: { "content-type": "application/json" },
           keepalive: true,
@@ -523,9 +523,12 @@ function SignupPage() {
             intent,
             phone_iso: phoneIso,
           }),
-        }).catch(() => {});
+        });
+        if (!r.ok) return null;
+        const j = await r.json().catch(() => null);
+        return (j && typeof j.ref === "string") ? j.ref : null;
       } catch {
-        /* never let logging break the UX */
+        return null;
       }
     };
 
