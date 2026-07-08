@@ -567,9 +567,10 @@ function SignupPage() {
         error_code: netErr?.name ?? "network_error",
         error_message: String(netErr?.message ?? netErr).slice(0, 500),
       });
-      toast.error(
-        "We couldn't reach the signup service. Check your connection and try again.",
-      );
+      toast.error("Signup service unreachable", {
+        description:
+          "We couldn't reach the signup service (network error). Check your connection and try again in a moment.",
+      });
       return;
     }
     setSubmitting(false);
@@ -590,8 +591,8 @@ function SignupPage() {
         return;
       }
       // Route missing / server down / HTML error page → surface a clearer
-      // message instead of a generic "Signup failed (404)." that reads to
-      // users as "database error".
+      // message using the real HTTP status instead of a generic
+      // "Signup failed" that users read as "database error".
       if (!body && (res.status === 404 || res.status >= 500)) {
         console.error("[signup] non-JSON response from /api/public/auth/signup", {
           status: res.status,
@@ -603,12 +604,18 @@ function SignupPage() {
           error_code: res.status === 404 ? "route_404" : `http_${res.status}`,
           error_message: rawText.slice(0, 500),
         });
-        toast.error(
-          "Signup is temporarily unavailable. Please try again in a minute or contact support if it keeps happening.",
-        );
+        const title =
+          res.status === 404
+            ? "Signup temporarily unavailable (HTTP 404)"
+            : `Signup temporarily unavailable (HTTP ${res.status})`;
+        const description =
+          res.status === 404
+            ? "The signup service is being redeployed. Please try again in about a minute — no account was created."
+            : "The signup service returned a server error. Please try again shortly or contact support if it keeps happening.";
+        toast.error(title, { description });
         return;
       }
-      // Non-JSON body but a 2xx/3xx/4xx we didn't classify above — still worth logging.
+      // Non-JSON body but a 2xx/3xx/4xx we didn't classify above.
       if (!body) {
         reportClientFailure({
           reason: "client_non_json_response",
@@ -616,6 +623,11 @@ function SignupPage() {
           error_code: `http_${res.status}`,
           error_message: rawText.slice(0, 500),
         });
+        toast.error(`Signup temporarily unavailable (HTTP ${res.status})`, {
+          description:
+            "The server returned an unexpected response. Please try again in a moment.",
+        });
+        return;
       }
       toast.error(first?.message ?? `Signup failed (${res.status}).`);
       if (first?.field) {
