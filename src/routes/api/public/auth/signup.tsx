@@ -24,6 +24,8 @@ async function logSignupFailure(
     status_code: number;
     intent?: string | null;
     phone_iso?: string | null;
+    error_code?: string | null;
+    error_message?: string | null;
   },
 ) {
   try {
@@ -42,11 +44,14 @@ async function logSignupFailure(
       phone_iso: args.phone_iso ?? null,
       ip_hash,
       user_agent: ua || null,
+      error_code: args.error_code ? String(args.error_code).slice(0, 100) : null,
+      error_message: args.error_message ? String(args.error_message).slice(0, 500) : null,
     });
   } catch {
     // never let audit failures block the response
   }
 }
+
 
 
 
