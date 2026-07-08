@@ -279,6 +279,7 @@ import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/st
 import { Route as ApiPublicPostbackNetworkRouteImport } from './routes/api/public/postback.$network'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksSyncPartsFeedsRouteImport } from './routes/api/public/hooks/sync-parts-feeds'
+import { Route as ApiPublicHooksSignupFailureAlertsRouteImport } from './routes/api/public/hooks/signup-failure-alerts'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicHooksRecomputeTiersRouteImport } from './routes/api/public/hooks/recompute-tiers'
 import { Route as ApiPublicHooksQuarterlyBonusesRouteImport } from './routes/api/public/hooks/quarterly-bonuses'
@@ -1705,6 +1706,12 @@ const ApiPublicHooksSyncPartsFeedsRoute =
     path: '/api/public/hooks/sync-parts-feeds',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksSignupFailureAlertsRoute =
+  ApiPublicHooksSignupFailureAlertsRouteImport.update({
+    id: '/api/public/hooks/signup-failure-alerts',
+    path: '/api/public/hooks/signup-failure-alerts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksRefreshLazadaRoute =
   ApiPublicHooksRefreshLazadaRouteImport.update({
     id: '/api/public/hooks/refresh-lazada',
@@ -2080,6 +2087,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
+  '/api/public/hooks/signup-failure-alerts': typeof ApiPublicHooksSignupFailureAlertsRoute
   '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
@@ -2363,6 +2371,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
+  '/api/public/hooks/signup-failure-alerts': typeof ApiPublicHooksSignupFailureAlertsRoute
   '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
@@ -2655,6 +2664,7 @@ export interface FileRoutesById {
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
+  '/api/public/hooks/signup-failure-alerts': typeof ApiPublicHooksSignupFailureAlertsRoute
   '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
@@ -2947,6 +2957,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/quarterly-bonuses'
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
+    | '/api/public/hooks/signup-failure-alerts'
     | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
     | '/api/public/postback/$network'
@@ -3230,6 +3241,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/quarterly-bonuses'
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
+    | '/api/public/hooks/signup-failure-alerts'
     | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
     | '/api/public/postback/$network'
@@ -3521,6 +3533,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/quarterly-bonuses'
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
+    | '/api/public/hooks/signup-failure-alerts'
     | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
     | '/api/public/postback/$network'
@@ -3672,6 +3685,7 @@ export interface RootRouteChildren {
   ApiPublicHooksQuarterlyBonusesRoute: typeof ApiPublicHooksQuarterlyBonusesRoute
   ApiPublicHooksRecomputeTiersRoute: typeof ApiPublicHooksRecomputeTiersRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
+  ApiPublicHooksSignupFailureAlertsRoute: typeof ApiPublicHooksSignupFailureAlertsRoute
   ApiPublicHooksSyncPartsFeedsRoute: typeof ApiPublicHooksSyncPartsFeedsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicPostbackNetworkRoute: typeof ApiPublicPostbackNetworkRoute
@@ -5579,6 +5593,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSyncPartsFeedsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/signup-failure-alerts': {
+      id: '/api/public/hooks/signup-failure-alerts'
+      path: '/api/public/hooks/signup-failure-alerts'
+      fullPath: '/api/public/hooks/signup-failure-alerts'
+      preLoaderRoute: typeof ApiPublicHooksSignupFailureAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/refresh-lazada': {
       id: '/api/public/hooks/refresh-lazada'
       path: '/api/public/hooks/refresh-lazada'
@@ -6394,6 +6415,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksQuarterlyBonusesRoute: ApiPublicHooksQuarterlyBonusesRoute,
   ApiPublicHooksRecomputeTiersRoute: ApiPublicHooksRecomputeTiersRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
+  ApiPublicHooksSignupFailureAlertsRoute:
+    ApiPublicHooksSignupFailureAlertsRoute,
   ApiPublicHooksSyncPartsFeedsRoute: ApiPublicHooksSyncPartsFeedsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicPostbackNetworkRoute: ApiPublicPostbackNetworkRoute,
