@@ -218,6 +218,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 422,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: "field_validation_failed",
+              error_message: errors.map((e) => `${e.field}: ${e.message}`).join("; "),
             });
             return Response.json({ ok: false, errors }, { status: 422 });
           }
