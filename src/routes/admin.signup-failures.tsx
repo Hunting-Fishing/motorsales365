@@ -604,3 +604,177 @@ function SummarySection({
   );
 }
 
+// -----------------------------------------------------------------------------
+// Detail dialog
+// -----------------------------------------------------------------------------
+
+function DetailField({
+  label,
+  value,
+  mono,
+}: {
+  label: string;
+  value: React.ReactNode;
+  mono?: boolean;
+}) {
+  return (
+    <div className="space-y-0.5">
+      <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
+      <div className={mono ? "text-xs font-mono break-all" : "text-sm break-words"}>
+        {value ?? <span className="text-muted-foreground">—</span>}
+      </div>
+    </div>
+  );
+}
+
+function Snippet({ label, value }: { label: string; value: string | null | undefined }) {
+  return (
+    <div className="space-y-1">
+      <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
+      {value ? (
+        <pre className="text-xs bg-muted rounded p-2 whitespace-pre-wrap break-words max-h-48 overflow-auto">
+          {value}
+        </pre>
+      ) : (
+        <p className="text-xs text-muted-foreground">— not recorded —</p>
+      )}
+    </div>
+  );
+}
+
+function FailureDetailDialog({
+  id,
+  onOpenChange,
+  fetchDetail,
+}: {
+  id: string | null;
+  onOpenChange: (open: boolean) => void;
+  fetchDetail: (args: { data: { id: string } }) => Promise<SignupFailureDetail | null>;
+}) {
+  const detailQuery = useQuery({
+    queryKey: ["admin", "signup-failures", "detail", id],
+    queryFn: () => fetchDetail({ data: { id: id! } }),
+    enabled: !!id,
+    staleTime: 60_000,
+  });
+
+  const d = detailQuery.data ?? null;
+
+  // Compose "request" and "response" snippet views from the fields the row
+  // actually stores. The underlying table does not persist raw HTTP bodies,
+  // so we render structured JSON summaries of what IS captured — enough
+  // context for support triage without inventing fields.
+  const requestSnippet = d
+    ? JSON.stringify(
+        {
+          intent: d.intent,
+          phone_iso: d.phone_iso,
+          user_agent: d.user_agent,
+          ip_hash: d.ip_hash,
+        },
+        null,
+        2,
+      )
+    : null;
+  const responseSnippet = d
+    ? JSON.stringify(
+        {
+          status_code: d.status_code,
+          error_code: d.error_code,
+          error_message: d.error_message,
+          missing_fields: d.missing_fields,
+        },
+        null,
+        2,
+      )
+    : null;
+
+  return (
+    <Dialog open={!!id} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-mono text-base">
+            {d?.ref ?? "Signup failure"}
+          </DialogTitle>
+          <DialogDescription>
+            Full details from <code>signup_failure_events</code>.
+          </DialogDescription>
+        </DialogHeader>
+
+        {detailQuery.isLoading ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground py-8 justify-center">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+          </div>
+        ) : detailQuery.error ? (
+          <p className="text-sm text-destructive">
+            {(detailQuery.error as Error).message}
+          </p>
+        ) : !d ? (
+          <p className="text-sm text-muted-foreground">Event not found.</p>
+        ) : (
+          <div className="space-y-5">
+            <div className="grid grid-cols-2 gap-4">
+              <DetailField label="Reference ID" value={d.ref} mono />
+              <DetailField
+                label="Created at"
+                value={<span title={d.created_at}>{fmtDate(d.created_at)}</span>}
+              />
+              <DetailField label="Reason" value={d.reason} mono />
+              <DetailField
+                label="HTTP status"
+                value={<StatusBadge code={d.status_code} />}
+              />
+              <DetailField label="Intent" value={d.intent} />
+              <DetailField label="Phone ISO" value={d.phone_iso} />
+              <DetailField label="Error code" value={d.error_code} mono />
+              <DetailField label="Row UUID" value={d.id} mono />
+            </div>
+
+            {d.error_message && (
+              <div className="space-y-1">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Error message
+                </div>
+                <p className="text-sm bg-muted rounded p-2 whitespace-pre-wrap break-words">
+                  {d.error_message}
+                </p>
+              </div>
+            )}
+
+            {d.missing_fields.length > 0 && (
+              <div className="space-y-1">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Missing fields
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {d.missing_fields.map((f) => (
+                    <Badge key={f} variant="secondary" className="font-mono text-[10px]">
+                      {f}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <Snippet label="Request snippet (captured context)" value={requestSnippet} />
+            <Snippet label="Response snippet (captured outcome)" value={responseSnippet} />
+
+            <p className="text-[11px] text-muted-foreground border-t pt-2">
+              Note: <code>signup_failure_events</code> doesn't persist raw HTTP
+              request/response bodies — the snippets above summarize what the
+              row captured. Ask to add <code>request_body</code> /{" "}
+              <code>response_body</code> columns if full payloads are needed
+              for triage.
+            </p>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
