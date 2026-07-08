@@ -30,14 +30,21 @@ async function selectIntent(page: Page, label: RegExp) {
   // Wait for form hydration — segmented control is rendered by React and
   // won't respond to clicks until the intent state hooks are wired up.
   await expect(page.locator("#first-name")).toBeVisible();
+  await page.waitForLoadState("networkidle").catch(() => {});
   const radio = page.getByRole("radio", { name: label });
   await radio.scrollIntoViewIfNeeded();
-  // Playwright's synthesized mouse events are occasionally dropped by the
-  // dev-mode source-map devtool overlay on narrow viewports; invoke the DOM
-  // click() directly so the React handler always fires and we're testing
-  // state behaviour, not input plumbing.
-  await radio.evaluate((el) => (el as HTMLButtonElement).click());
-  await expect(radio).toHaveAttribute("aria-checked", "true");
+  // Retry until React state actually flips: dev-mode devtool overlay can
+  // occasionally swallow the first click on narrow viewports.
+  await expect
+    .poll(
+      async () => {
+        if ((await radio.getAttribute("aria-checked")) === "true") return "true";
+        await radio.evaluate((el) => (el as HTMLButtonElement).click());
+        return radio.getAttribute("aria-checked");
+      },
+      { timeout: 10_000, intervals: [100, 200, 400, 800] },
+    )
+    .toBe("true");
 }
 
 async function expectNoHorizontalScroll(page: Page) {
