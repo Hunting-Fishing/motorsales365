@@ -306,6 +306,10 @@ export const Route = createFileRoute("/api/public/auth/signup")({
           });
           if (error) {
             const msg = error.message || "";
+            const providerCode =
+              (error as any)?.code ??
+              (error as any)?.name ??
+              (typeof (error as any)?.status === "number" ? `http_${(error as any).status}` : null);
             if (/already|registered|exists|in use/i.test(msg)) {
               await logSignupFailure(sbAdmin, request, {
                 reason: "email_already_registered",
@@ -313,6 +317,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
                 status_code: 409,
                 intent: input.intent,
                 phone_iso: input.phone_iso,
+                error_code: providerCode ?? "email_exists_provider",
+                error_message: msg,
               });
               return Response.json(
                 { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
@@ -325,6 +331,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 400,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: providerCode ?? "auth_signup_error",
+              error_message: msg,
             });
             return Response.json({ ok: false, errors: [{ field: "email", message: msg }] }, { status: 400 });
           }
@@ -336,6 +344,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 409,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: "empty_identities",
+              error_message: "auth.signUp returned user with no identities (email exists)",
             });
             return Response.json(
               { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
