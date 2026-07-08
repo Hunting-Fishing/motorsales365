@@ -181,23 +181,23 @@ function StaffReferral() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+      <header className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <h1 className="font-display text-2xl font-bold">My referral</h1>
           <p className="text-sm text-muted-foreground">
             Share your QR or link. Anyone who scans and signs up in the same browser within 90 days
             is credited to you.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link to="/resources/qr-landing">
-            <Button size="sm" variant="outline">Preview scanner view</Button>
+            <Button size="sm" variant="outline" className="w-full sm:w-auto">Preview scanner view</Button>
           </Link>
           <Link to="/dashboard/qr-ads">
-            <Button size="sm">Open QR ads</Button>
+            <Button size="sm" className="w-full sm:w-auto">Open QR ads</Button>
           </Link>
           <span
-            className={`rounded-full px-3 py-1 text-xs ${staff.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
+            className={`shrink-0 rounded-full px-3 py-1 text-xs ${staff.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
           >
             {staff.active ? "Active" : "Inactive"}
           </span>
