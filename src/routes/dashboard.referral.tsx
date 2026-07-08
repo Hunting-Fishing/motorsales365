@@ -493,12 +493,12 @@ function ReferralQrCard({
                     height: "min(72vw, 420px)",
                   }}
                 >
-                  <QRCodeCanvas
+                  <ResponsiveQr
                     value={link}
-                    size={1024}
                     level="H"
-                    marginSize={computeQuietZoneModules(1024, "H" as QrLevel)}
-                    style={{ width: "100%", height: "100%" }}
+                    maxPx={1024}
+                    minPx={192}
+                    data-qr={referralCode}
                   />
                 </div>
               </ZoomableQr>
