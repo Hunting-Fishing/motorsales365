@@ -240,6 +240,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 409,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: "email_exists_preflight",
+              error_message: "Email already present in auth.users",
             });
             return Response.json(
               { ok: false, errors: [{ field: "email", message: "That email is already registered." }] },
