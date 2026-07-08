@@ -18,7 +18,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
-import { createHash } from "crypto";
+import { createHash, randomBytes } from "crypto";
 
 const ReasonEnum = z.enum([
   "client_route_missing",       // signup POST returned 404
@@ -47,17 +47,43 @@ function admin() {
   );
 }
 
+// Format a UUID (or raw hex) as a short shareable ref: SF-XXXXXXXX (8 hex).
+// Uppercase so it visually matches the row-derived refs used elsewhere in
+// admin tooling. Suffix of the row UUID is what support matches against
+// `signup_failure_events.id`.
+function toRef(idOrHex: string): string {
+  return `SF-${idOrHex.replace(/-/g, "").slice(-8).toUpperCase()}`;
+}
+
+// Generate a fallback ref when we could not insert a row (bad input, insert
+// error, unhandled exception). Callers still get a shareable ID to hand to
+// support, and the response shape stays identical across every code path.
+function fallbackRef(): string {
+  return toRef(randomBytes(8).toString("hex"));
+}
+
+function jsonRef(status: number, ref: string, extra?: Record<string, unknown>) {
+  return new Response(JSON.stringify({ ref, ...(extra ?? {}) }), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
+}
+
 export const Route = createFileRoute("/api/public/auth/signup-failure-log")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // A synthesized ref is prepared up-front so every error path — including
+        // the outer catch — can return the same { ref } shape. Overwritten with
+        // the row-derived ref if the insert succeeds.
+        let ref = fallbackRef();
         try {
           const raw = await request.json().catch(() => null);
           const parsed = Body.safeParse(raw);
           if (!parsed.success) {
-            // Silent no-op on bad input — this endpoint must never be a vector
-            // for noise. Return 204 so client fire-and-forget stays clean.
-            return new Response(null, { status: 204 });
+            // Bad input still yields a shareable ref (client can quote it to
+            // support). 400 makes the misuse visible in logs; we never 204.
+            return jsonRef(400, ref, { error: "invalid_payload" });
           }
           const input = parsed.data;
 
@@ -73,7 +99,7 @@ export const Route = createFileRoute("/api/public/auth/signup-failure-log")({
           const ua = (request.headers.get("user-agent") ?? "").slice(0, 200);
 
           const sb = admin();
-          const { data: inserted } = await (sb.from("signup_failure_events") as any)
+          const { data: inserted, error } = await (sb.from("signup_failure_events") as any)
             .insert({
               reason: input.reason,
               missing_fields: [],
@@ -87,19 +113,27 @@ export const Route = createFileRoute("/api/public/auth/signup-failure-log")({
             })
             .select("id")
             .single();
-          // Return a short, user-shareable reference ID derived from the row
-          // UUID. Support can look it up in `signup_failure_events` by
-          // matching the suffix. Falls back to 204 if the row id is missing.
+
           const id: string | undefined = inserted?.id;
-          if (!id) return new Response(null, { status: 204 });
-          const ref = `SF-${id.replace(/-/g, "").slice(-8).toUpperCase()}`;
-          return new Response(JSON.stringify({ ref }), {
-            status: 200,
-            headers: { "content-type": "application/json" },
+          if (id) {
+            ref = toRef(id);
+            return jsonRef(200, ref);
+          }
+          // Insert produced no row (RLS/schema drift/etc). Fall through with
+          // the fallback ref so support still has a handle; 502 flags that
+          // the event was NOT persisted.
+          return jsonRef(502, ref, {
+            error: "insert_failed",
+            detail: error?.message?.slice(0, 200) ?? null,
           });
-        } catch {
-          // Never let logging failures surface to the browser.
-          return new Response(null, { status: 204 });
+        } catch (e) {
+          // Unhandled exception — still return the pre-generated ref so the
+          // client-side error banner has something to show and support can
+          // correlate with server logs.
+          return jsonRef(500, ref, {
+            error: "internal_error",
+            detail: e instanceof Error ? e.message.slice(0, 200) : null,
+          });
         }
       },
     },
