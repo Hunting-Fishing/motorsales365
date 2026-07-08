@@ -987,7 +987,7 @@ function SignupPage() {
                         aria-checked={active}
                         onClick={() => setIntent(t.id)}
                         className={cn(
-                          "rounded-md px-2 py-2 text-[11px] sm:text-xs font-semibold transition",
+                          "rounded-md px-2 min-h-11 sm:min-h-0 py-2 text-[11px] sm:text-xs font-semibold leading-tight text-center transition",
                           active
                             ? "bg-white text-navy-900 shadow-sm border border-slate-200"
                             : "text-slate-500 hover:text-navy-700 hover:bg-white/60",
@@ -998,6 +998,7 @@ function SignupPage() {
                     );
                   })}
                 </div>
+
                 {intent && intentMeta?.note && (
                   <p className="mt-2 text-[11px] text-slate-500 leading-snug">
                     {intentMeta.note}
