@@ -386,7 +386,16 @@ function SignupFailuresPage() {
                       <TableCell className="whitespace-nowrap text-xs">
                         {fmtDate(r.created_at)}
                       </TableCell>
-                      <TableCell className="font-mono text-xs">{r.ref}</TableCell>
+                      <TableCell className="font-mono text-xs">
+                        <button
+                          type="button"
+                          onClick={() => setDetailId(r.id)}
+                          className="underline-offset-2 hover:underline text-primary"
+                          title="Show full details"
+                        >
+                          {r.ref}
+                        </button>
+                      </TableCell>
                       <TableCell className="text-xs">{r.reason ?? "—"}</TableCell>
                       <TableCell>
                         <StatusBadge code={r.status_code} />
