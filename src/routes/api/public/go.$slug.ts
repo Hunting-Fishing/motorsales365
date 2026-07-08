@@ -106,16 +106,28 @@ export const Route = createFileRoute("/api/public/go/$slug")({
           ? (process.env[l.affiliate_id_env as string] ?? "")
           : "";
 
-        // Pre-built deeplink (from ingested partner_products tiles): take it as-is.
-        // Country gate above still applies; Involve Asia deeplinks are already tracked.
+        // Pre-built deeplink (from ingested partner_products tiles): must match a
+        // known deeplink for this supplier — never trust an arbitrary user-supplied URL.
         const prebuiltDeeplink = url.searchParams.get("dl");
         let target: string;
         if (prebuiltDeeplink) {
+          let candidate: string;
           try {
-            target = decodeURIComponent(prebuiltDeeplink);
+            candidate = decodeURIComponent(prebuiltDeeplink);
           } catch {
-            target = prebuiltDeeplink;
+            candidate = prebuiltDeeplink;
           }
+          const { data: pp } = await supabaseAdmin
+            .from("partner_products" as any)
+            .select("id")
+            .eq("merchant_slug", slug)
+            .eq("deeplink", candidate)
+            .limit(1)
+            .maybeSingle();
+          if (!pp) {
+            return new Response("Invalid deeplink", { status: 400 });
+          }
+          target = candidate;
         } else {
           target = String(l.url_template)
             .replaceAll("{QUERY}", encodeURIComponent(query))
@@ -137,6 +149,7 @@ export const Route = createFileRoute("/api/public/go/$slug")({
             target += `${sep}${param}=${encodeURIComponent(affiliateId)}`;
           }
         }
+
 
 
         // Fire-and-forget click log (don't block redirect on failure).
