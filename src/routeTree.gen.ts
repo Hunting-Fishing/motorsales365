@@ -290,6 +290,7 @@ import { Route as ApiPublicHooksAnnualBonusesRouteImport } from './routes/api/pu
 import { Route as ApiPublicGoSlugRouteImport } from './routes/api/public/go.$slug'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 import { Route as ApiPublicFlashcardsContentRouteImport } from './routes/api/public/flashcards.content'
+import { Route as ApiPublicAuthSignupFailureLogRouteImport } from './routes/api/public/auth/signup-failure-log'
 import { Route as ApiPublicAuthSignupRouteImport } from './routes/api/public/auth/signup'
 import { Route as AdminAdvertisementsAnalyticsCodeRouteImport } from './routes/admin.advertisements.analytics.$code'
 import { Route as AuthenticatedStaffAcademySlugRouteImport } from './routes/_authenticated/staff.academy.$slug'
@@ -1767,6 +1768,12 @@ const ApiPublicFlashcardsContentRoute =
     path: '/api/public/flashcards/content',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAuthSignupFailureLogRoute =
+  ApiPublicAuthSignupFailureLogRouteImport.update({
+    id: '/api/public/auth/signup-failure-log',
+    path: '/api/public/auth/signup-failure-log',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAuthSignupRoute = ApiPublicAuthSignupRouteImport.update({
   id: '/api/public/auth/signup',
   path: '/api/public/auth/signup',
@@ -2046,6 +2053,7 @@ export interface FileRoutesByFullPath {
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
+  '/api/public/auth/signup-failure-log': typeof ApiPublicAuthSignupFailureLogRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
@@ -2326,6 +2334,7 @@ export interface FileRoutesByTo {
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
+  '/api/public/auth/signup-failure-log': typeof ApiPublicAuthSignupFailureLogRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
@@ -2615,6 +2624,7 @@ export interface FileRoutesById {
   '/_authenticated/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
+  '/api/public/auth/signup-failure-log': typeof ApiPublicAuthSignupFailureLogRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
@@ -2904,6 +2914,7 @@ export interface FileRouteTypes {
     | '/staff/academy/$slug'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
+    | '/api/public/auth/signup-failure-log'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/go/$slug'
@@ -3184,6 +3195,7 @@ export interface FileRouteTypes {
     | '/staff/academy/$slug'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
+    | '/api/public/auth/signup-failure-log'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/go/$slug'
@@ -3472,6 +3484,7 @@ export interface FileRouteTypes {
     | '/_authenticated/staff/academy/$slug'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
+    | '/api/public/auth/signup-failure-log'
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/go/$slug'
@@ -3621,6 +3634,7 @@ export interface RootRouteChildren {
   ShopDepartmentSlugRoute: typeof ShopDepartmentSlugRoute
   ShopPSlugRoute: typeof ShopPSlugRoute
   ApiPublicAuthSignupRoute: typeof ApiPublicAuthSignupRoute
+  ApiPublicAuthSignupFailureLogRoute: typeof ApiPublicAuthSignupFailureLogRoute
   ApiPublicFlashcardsContentRoute: typeof ApiPublicFlashcardsContentRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   ApiPublicGoSlugRoute: typeof ApiPublicGoSlugRoute
@@ -5617,6 +5631,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFlashcardsContentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/auth/signup-failure-log': {
+      id: '/api/public/auth/signup-failure-log'
+      path: '/api/public/auth/signup-failure-log'
+      fullPath: '/api/public/auth/signup-failure-log'
+      preLoaderRoute: typeof ApiPublicAuthSignupFailureLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/auth/signup': {
       id: '/api/public/auth/signup'
       path: '/api/public/auth/signup'
@@ -6318,6 +6339,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopDepartmentSlugRoute: ShopDepartmentSlugRoute,
   ShopPSlugRoute: ShopPSlugRoute,
   ApiPublicAuthSignupRoute: ApiPublicAuthSignupRoute,
+  ApiPublicAuthSignupFailureLogRoute: ApiPublicAuthSignupFailureLogRoute,
   ApiPublicFlashcardsContentRoute: ApiPublicFlashcardsContentRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   ApiPublicGoSlugRoute: ApiPublicGoSlugRoute,
