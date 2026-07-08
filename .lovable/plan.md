@@ -1,85 +1,37 @@
-# Responsive QR Component
+## Goal
+Add Playwright e2e tests that fail if the referral page's QR card, referral-link card, or promoter resource cards overlap (or overflow the viewport) at 360, 390, and 414 CSS px widths.
 
-Ship one shared `<ResponsiveQr>` component that every QR rendering site uses, so the "canvas intrinsic size forces the parent wider than the viewport" bug can't come back on any page — including ones we haven't fixed yet.
+## Scope
+- One new spec: `e2e/referral-mobile-layout.spec.ts`.
+- Reuses the existing sandbox Supabase session pattern (same as `e2e/qr-responsive.spec.ts`), skipping with a warning if `LOVABLE_BROWSER_AUTH_STATUS !== "injected"`.
+- No app code changes. No new helpers beyond this spec file. No visual/pixel-diff.
 
-## The rule the component enforces
+## What the test asserts (per viewport: 360, 390, 414)
 
-A `<canvas>` (and to a lesser extent `<img>`) contributes its **intrinsic pixel size** as min-content in flex/grid layouts. `qrcode.react`'s `<QRCodeCanvas size={512} />` therefore tries to make every ancestor ≥ 512px, and `style={{width:'100%'}}` only clips it *after* layout is decided. The fix used on `/dashboard/referral` was ad-hoc (`min-w-0` on parents + `grid-cols-[minmax(0,1fr)]`). We codify it in the component itself.
+For the route `/dashboard/referral`, after login + `networkidle`:
 
-## Component API
+1. **No horizontal page overflow** — `document.documentElement.scrollWidth <= viewport.width`.
+2. **QR canvas fits** — the `<canvas>` inside the QR card has `getBoundingClientRect().right <= viewport.width` and `width === height` (square).
+3. **Referral-link card fits** — the card containing `<code>` with the referral URL has `right <= viewport.width` and its inner `<code>` element is not wider than its parent (no horizontal clip beyond `truncate`).
+4. **No overlap between the three regions**, tested pairwise using `DOMRect` intersection on:
+   - QR card (the QR `<button>` wrapper)
+   - Referral-link card (the card with the copy button)
+   - Each promoter resource `<a>` card in the `/dashboard/promoter-resources`, `/resources/qr-landing`, `/dashboard/qr-ads`, `/dashboard/qr-scan-test` grid
+   Rects overlap iff `r1.left < r2.right && r2.left < r1.right && r1.top < r2.bottom && r2.top < r1.bottom`. Fail with a message naming both elements and their rects.
+5. **Promoter resource cards don't overflow** — every card's `right <= viewport.width`.
 
-`src/components/qr/responsive-qr.tsx`
+## Element selection strategy
+- QR card: `[data-qr]` (already on `ResponsiveQr`) → `.closest('button')`.
+- Referral-link card: locate by the visible label text "Your referral link", then its enclosing `.rounded-xl` card.
+- Promoter cards: the section immediately following the QR/stats section — select the four `<a>` elements by their headings ("Promoter resources", "Preview scanner view", "QR Ads & print", "Test QR scanability").
 
-```text
-<ResponsiveQr
-  value="https://…"
-  level="H"                   // "L" | "M" | "Q" | "H"; default "H"
-  maxPx={512}                 // hard cap on rendered size; default 512
-  minPx={128}                 // never render smaller; default 128
-  quietZone="auto"            // "auto" (uses computeQuietZoneModules) | number
-  imageSettings={...}         // optional logo overlay, passed through
-  className=""                // wrapper classes
-  aria-label="…"
-  data-qr="…"                 // for tests
-/>
-```
-
-Renders a wrapper that:
-
-1. Measures its own width with a `ResizeObserver`.
-2. Picks a rendered pixel size = `clamp(minPx, floor(container-width), maxPx)`, rounded to the nearest QR module count to keep modules crisp.
-3. Renders `QRCodeCanvas` with `size={pickedPx}` and inline `style={{ width: pickedPx, height: pickedPx, maxWidth: '100%', display: 'block' }}`.
-4. The wrapper itself is `inline-block max-w-full min-w-0` with `aspect-square` only when consumers want it (opt-in via `aspectSquare` prop) — otherwise it sizes to the canvas.
-5. Sets `containIntrinsicSize` / `contain: 'size layout'` so the canvas cannot influence grid track sizing during initial layout before the observer fires; a small SSR placeholder (`minPx` square) shows for the first frame to avoid layout jump.
-6. Zero horizontal contribution: the wrapper's `min-width: 0` is set inline as a style prop (not just a Tailwind class) so it applies even in styling-hostile environments.
-
-Result: the canvas can never push its parent wider than the container it's placed in — even inside a raw CSS grid with no `minmax(0,1fr)`.
-
-## Utility for downloadable PNGs
-
-Downloads still need a large (1024–2048px) PNG regardless of on-screen size. Add a paired helper:
-
-```text
-src/lib/qr-image.ts
-  renderQrPng({ value, sizePx, level, quietZone }): Promise<string>  // wraps qrcode.toDataURL
-```
-
-Consumers keep calling this for "Download PNG" buttons. The on-screen `<ResponsiveQr>` no longer does double duty as a print asset.
-
-## Migration — one PR, one component per call site
-
-Replace direct `QRCodeCanvas` / hand-rolled `<img>` renders in these files with `<ResponsiveQr>`:
-
-- `src/routes/dashboard.referral.tsx` (both the card trigger and the fullscreen dialog inside `<ZoomableQr>`)
-- `src/routes/my-qr.tsx`
-- `src/routes/r.$code.qr.tsx`
-- `src/routes/r.$code.poster.tsx` (kept fixed-size for print; opts in via `maxPx={900} minPx={900}`)
-- `src/routes/dashboard.qr-scan-test.tsx`
-- `src/routes/dashboard.partner-program.tsx`
-- `src/routes/admin.referrals.tsx`
-- `src/components/share-qr.tsx`
-- `src/components/listing-qr.tsx`
-- `src/components/admin/staff-qr-dialog.tsx`
-
-`ZoomableQr` keeps working — it just wraps `<ResponsiveQr>` and lets the child render at its natural size while the transform handles zoom/pan.
-
-The ad-hoc `min-w-0` / `grid-cols-[minmax(0,1fr)]` patches added on `/dashboard/referral` last turn are left in place (belt-and-suspenders) but are no longer required for correctness once the component ships.
-
-## Verification
-
-- Manual: load `/dashboard/referral`, `/my-qr`, `/r/<code>/qr` at 360, 390, 414 px. Confirm QR fits, no page horizontal scroll, canvas rendered size matches container width (checked via DevTools).
-- Playwright smoke: one new test `e2e/qr-responsive.spec.ts` that visits each of those routes at 360×780 and asserts:
-  - no element right-edge exceeds 360px,
-  - the QR canvas width equals its wrapper width,
-  - the QR canvas is a perfect square.
-  This is the minimum needed to prevent this specific regression; the broader mobile audit suite is a separate ask.
+## Failure output
+On failure, print: viewport width, offending selector(s), each rect (`x,y,w,h`), and save a screenshot to `e2e/__screenshots__/mobile/referral-<width>.png` (folder already gitignored via `e2e/.gitignore`).
 
 ## Out of scope
+- Tablet/desktop viewports.
+- Other dashboard pages (covered by separate mobile-audit plan if approved later).
+- CI wiring, pixel snapshots, accessibility checks.
 
-- No visual/design changes (colors, borders, layout order).
-- No new tablet/desktop coverage.
-- No admin-only pages beyond `admin.referrals.tsx` (already listed) and `staff-qr-dialog.tsx`.
-- No changes to the download filename, ECC defaults, or quiet-zone math.
-- Not touching print/poster/ad-composer PNG generation paths beyond wiring them to `renderQrPng`.
-
-Approve and I'll add `<ResponsiveQr>`, migrate the call sites, and land the smoke test.
+## Run
+`bunx playwright test e2e/referral-mobile-layout.spec.ts --project=mobile` (uses the existing `mobile` project in `playwright.config.ts` if present; otherwise the spec calls `page.setViewportSize()` per test so the default project works too).
