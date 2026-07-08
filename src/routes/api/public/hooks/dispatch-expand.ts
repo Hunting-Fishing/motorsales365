@@ -1,10 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { verifyInternalCronToken } from "@/integrations/supabase/internal-secrets.server";
 
 export const Route = createFileRoute("/api/public/hooks/dispatch-expand")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const authed = await verifyInternalCronToken({
+          jobName: "dispatch_expand",
+          tokenHeader: request.headers.get("x-cron-token"),
+        });
+        if (!authed) return new Response("Unauthorized", { status: 401 });
+
         const { data, error } = await (supabaseAdmin as any).rpc("dispatch_expand_stale");
         if (error) {
           console.error("[dispatch-expand] rpc error:", error);
