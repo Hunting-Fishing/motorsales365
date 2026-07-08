@@ -14,6 +14,13 @@ export type SignupFailureRow = {
   ref: string;
 };
 
+// Full record used by the detail panel. Includes everything the row stores,
+// including fields we don't render in the summary table.
+export type SignupFailureDetail = SignupFailureRow & {
+  missing_fields: string[];
+  ip_hash: string | null;
+};
+
 export type ListSignupFailuresResult = {
   rows: SignupFailureRow[];
   total: number;
