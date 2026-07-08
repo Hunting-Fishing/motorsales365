@@ -108,15 +108,15 @@ function MyQrPage() {
         )}
       </div>
 
-      <Card className="flex flex-col items-center gap-5 p-6">
+      <Card className="flex flex-col items-center gap-5 p-4 sm:p-6">
         {qrDataUrl ? (
           <img
             src={qrDataUrl}
             alt={`Scannable QR for ${name || code}`}
-            className="h-[320px] w-[320px] rounded-md border border-border bg-white object-contain p-3 sm:h-[420px] sm:w-[420px]"
+            className="aspect-square w-full max-w-[420px] rounded-md border border-border bg-white object-contain p-3"
           />
         ) : (
-          <div className="h-[320px] w-[320px] animate-pulse rounded-md bg-muted sm:h-[420px] sm:w-[420px]" />
+          <div className="aspect-square w-full max-w-[420px] animate-pulse rounded-md bg-muted" />
         )}
 
         <div className="w-full text-center">
