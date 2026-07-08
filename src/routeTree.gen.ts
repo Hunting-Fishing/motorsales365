@@ -287,6 +287,7 @@ import { Route as ApiPublicHooksFlashcardsAutosyncRouteImport } from './routes/a
 import { Route as ApiPublicHooksDispatchExpandRouteImport } from './routes/api/public/hooks/dispatch-expand'
 import { Route as ApiPublicHooksDiscoverSyncRouteImport } from './routes/api/public/hooks/discover-sync'
 import { Route as ApiPublicHooksAnnualBonusesRouteImport } from './routes/api/public/hooks/annual-bonuses'
+import { Route as ApiPublicHealthRoutesRouteImport } from './routes/api/public/health/routes'
 import { Route as ApiPublicGoSlugRouteImport } from './routes/api/public/go.$slug'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 import { Route as ApiPublicFlashcardsContentRouteImport } from './routes/api/public/flashcards.content'
@@ -1752,6 +1753,11 @@ const ApiPublicHooksAnnualBonusesRoute =
     path: '/api/public/hooks/annual-bonuses',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHealthRoutesRoute = ApiPublicHealthRoutesRouteImport.update({
+  id: '/api/public/health/routes',
+  path: '/api/public/health/routes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicGoSlugRoute = ApiPublicGoSlugRouteImport.update({
   id: '/api/public/go/$slug',
   path: '/api/public/go/$slug',
@@ -2057,6 +2063,7 @@ export interface FileRoutesByFullPath {
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
+  '/api/public/health/routes': typeof ApiPublicHealthRoutesRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
@@ -2338,6 +2345,7 @@ export interface FileRoutesByTo {
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
+  '/api/public/health/routes': typeof ApiPublicHealthRoutesRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
@@ -2628,6 +2636,7 @@ export interface FileRoutesById {
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
+  '/api/public/health/routes': typeof ApiPublicHealthRoutesRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
@@ -2918,6 +2927,7 @@ export interface FileRouteTypes {
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/go/$slug'
+    | '/api/public/health/routes'
     | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
@@ -3199,6 +3209,7 @@ export interface FileRouteTypes {
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/go/$slug'
+    | '/api/public/health/routes'
     | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
@@ -3488,6 +3499,7 @@ export interface FileRouteTypes {
     | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/go/$slug'
+    | '/api/public/health/routes'
     | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
@@ -3638,6 +3650,7 @@ export interface RootRouteChildren {
   ApiPublicFlashcardsContentRoute: typeof ApiPublicFlashcardsContentRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   ApiPublicGoSlugRoute: typeof ApiPublicGoSlugRoute
+  ApiPublicHealthRoutesRoute: typeof ApiPublicHealthRoutesRoute
   ApiPublicHooksAnnualBonusesRoute: typeof ApiPublicHooksAnnualBonusesRoute
   ApiPublicHooksDiscoverSyncRoute: typeof ApiPublicHooksDiscoverSyncRoute
   ApiPublicHooksDispatchExpandRoute: typeof ApiPublicHooksDispatchExpandRoute
@@ -5610,6 +5623,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksAnnualBonusesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/health/routes': {
+      id: '/api/public/health/routes'
+      path: '/api/public/health/routes'
+      fullPath: '/api/public/health/routes'
+      preLoaderRoute: typeof ApiPublicHealthRoutesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/go/$slug': {
       id: '/api/public/go/$slug'
       path: '/api/public/go/$slug'
@@ -6343,6 +6363,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicFlashcardsContentRoute: ApiPublicFlashcardsContentRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   ApiPublicGoSlugRoute: ApiPublicGoSlugRoute,
+  ApiPublicHealthRoutesRoute: ApiPublicHealthRoutesRoute,
   ApiPublicHooksAnnualBonusesRoute: ApiPublicHooksAnnualBonusesRoute,
   ApiPublicHooksDiscoverSyncRoute: ApiPublicHooksDiscoverSyncRoute,
   ApiPublicHooksDispatchExpandRoute: ApiPublicHooksDispatchExpandRoute,

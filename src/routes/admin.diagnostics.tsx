@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Search, ShieldCheck, X } from "lucide-react";
+import { Check, Loader2, RefreshCw, Search, ShieldCheck, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth, type AppRole } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -157,6 +157,168 @@ function NavMatrix({
   );
 }
 
+// ---------------------------------------------------------------------------
+// Route health card
+// ---------------------------------------------------------------------------
+
+type HealthRoute = {
+  path: string;
+  method: string;
+  label: string;
+  purpose: string;
+  status: number;
+  ok: boolean;
+  latency_ms: number;
+  error?: string;
+};
+type HealthResponse = {
+  checked_at: string;
+  base_url: string;
+  summary: { total: number; ok: number; failed: number; all_ok: boolean };
+  routes: HealthRoute[];
+};
+
+async function fetchRouteHealth(): Promise<HealthResponse> {
+  const res = await fetch("/api/public/health/routes", {
+    method: "GET",
+    headers: { accept: "application/json" },
+    cache: "no-store",
+  });
+  const text = await res.text();
+  // Endpoint returns 503 when any route fails — still parse the body.
+  try {
+    return JSON.parse(text) as HealthResponse;
+  } catch {
+    throw new Error(`Health endpoint returned non-JSON (HTTP ${res.status}).`);
+  }
+}
+
+function RouteHealthCard() {
+  const q = useQuery({
+    queryKey: ["admin", "route-health"],
+    queryFn: fetchRouteHealth,
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
+  });
+  const data = q.data;
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-start justify-between gap-4">
+        <div>
+          <CardTitle className="text-base">API route health</CardTitle>
+          <CardDescription>
+            Live probe of critical <code>/api/public/*</code> endpoints in this deployment.
+            HEAD is used so no handler side-effects fire. 404 means the route is missing
+            from the deployed Worker (likely a stale publish).
+          </CardDescription>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => q.refetch()}
+          disabled={q.isFetching}
+        >
+          {q.isFetching ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="mr-2 h-4 w-4" />
+          )}
+          Recheck
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {q.isError && (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {(q.error as Error)?.message ?? "Failed to reach /api/public/health/routes."}
+          </div>
+        )}
+        {data && (
+          <>
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              <Badge
+                variant="outline"
+                className={
+                  data.summary.all_ok
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                    : "border-destructive/40 bg-destructive/10 text-destructive"
+                }
+              >
+                {data.summary.all_ok
+                  ? `All ${data.summary.total} routes reachable`
+                  : `${data.summary.failed} of ${data.summary.total} routes failing`}
+              </Badge>
+              <span className="text-xs text-muted-foreground">
+                Base: <code>{data.base_url}</code>
+              </span>
+              <span className="text-xs text-muted-foreground">
+                Checked: {new Date(data.checked_at).toLocaleTimeString()}
+              </span>
+            </div>
+
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[28%]">Route</TableHead>
+                  <TableHead>Purpose</TableHead>
+                  <TableHead className="w-[80px]">Method</TableHead>
+                  <TableHead className="w-[90px] text-right">HTTP</TableHead>
+                  <TableHead className="w-[90px] text-right">Latency</TableHead>
+                  <TableHead className="w-[110px] text-right">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data.routes.map((r) => (
+                  <TableRow key={`${r.method}-${r.path}`}>
+                    <TableCell>
+                      <div className="font-medium">{r.label}</div>
+                      <div className="break-all font-mono text-[10px] text-muted-foreground">
+                        {r.path}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {r.purpose}
+                      {r.error && (
+                        <div className="mt-1 text-destructive">Error: {r.error}</div>
+                      )}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">{r.method}</TableCell>
+                    <TableCell className="text-right font-mono text-xs">
+                      {r.status || "—"}
+                    </TableCell>
+                    <TableCell className="text-right font-mono text-xs text-muted-foreground">
+                      {r.latency_ms}ms
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {r.ok ? (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                          <Check className="h-3 w-3" /> OK
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-destructive/40 bg-destructive/10 px-2 py-0.5 text-xs font-semibold text-destructive">
+                          <X className="h-3 w-3" />
+                          {r.status === 404 ? "404 missing" : r.status === 0 ? "unreachable" : `HTTP ${r.status}`}
+                        </span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </>
+        )}
+        {!data && !q.isError && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Probing routes…
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+
+
 function Boolean({ label, on }: { label: string; on: boolean }) {
   return (
     <div className="flex items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2 text-sm">
@@ -222,6 +384,9 @@ function DiagnosticsPage() {
           </p>
         </div>
       </div>
+
+      {/* ROUTE HEALTH */}
+      <RouteHealthCard />
 
       {/* MY SESSION */}
       <Card>
