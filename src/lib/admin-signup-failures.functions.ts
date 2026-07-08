@@ -14,6 +14,13 @@ export type SignupFailureRow = {
   ref: string;
 };
 
+// Full record used by the detail panel. Includes everything the row stores,
+// including fields we don't render in the summary table.
+export type SignupFailureDetail = SignupFailureRow & {
+  missing_fields: string[];
+  ip_hash: string | null;
+};
+
 export type ListSignupFailuresResult = {
   rows: SignupFailureRow[];
   total: number;
@@ -244,6 +251,47 @@ export const getSignupFailureSummary = createServerFn({ method: "POST" })
       top_failing_routes: sortByCountDesc(Array.from(bucketMap.values())).slice(0, 10),
     };
   });
+
+// Fetch a single failure row for the detail panel. Looked up by full UUID —
+// the admin list already knows the row `id`, so callers pass that rather
+// than the short SF- ref (which is only the trailing 8 hex chars and would
+// require a suffix scan on every row).
+export const getSignupFailureById = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => {
+    const id = String(input?.id ?? "").trim();
+    if (!/^[0-9a-f-]{32,36}$/i.test(id)) throw new Error("invalid id");
+    return { id };
+  })
+  .handler(async ({ data, context }): Promise<SignupFailureDetail | null> => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
+      .from("signup_failure_events")
+      .select(
+        "id, created_at, reason, status_code, intent, phone_iso, error_code, error_message, user_agent, missing_fields, ip_hash",
+      )
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) return null;
+    const r = row as any;
+    return {
+      id: r.id,
+      created_at: r.created_at,
+      reason: r.reason,
+      status_code: r.status_code,
+      intent: r.intent,
+      phone_iso: r.phone_iso,
+      error_code: r.error_code,
+      error_message: r.error_message,
+      user_agent: r.user_agent,
+      missing_fields: Array.isArray(r.missing_fields) ? r.missing_fields : [],
+      ip_hash: r.ip_hash,
+      ref: shortRef(r.id),
+    };
+  });
+
 
 export const REASON_OPTIONS = [
   "client_route_missing",
