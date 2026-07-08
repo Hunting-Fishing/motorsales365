@@ -484,6 +484,7 @@ function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitAttempted(true);
+    setApiFailure(null);
     if (issues.length > 0) {
       toast.error(
         `Please fix ${issues.length} ${issues.length === 1 ? "field" : "fields"} before continuing.`,
