@@ -426,6 +426,12 @@ function SignupFailuresPage() {
           )}
         </CardContent>
       </Card>
+
+      <FailureDetailDialog
+        id={detailId}
+        onOpenChange={(open) => !open && setDetailId(null)}
+        fetchDetail={detailFn}
+      />
     </div>
   );
 }
