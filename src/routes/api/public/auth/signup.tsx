@@ -168,6 +168,8 @@ export const Route = createFileRoute("/api/public/auth/signup")({
               status_code: 403,
               intent: input.intent,
               phone_iso: input.phone_iso,
+              error_code: "staff_domain_blocked",
+              error_message: `${STAFF_EMAIL_DOMAIN} is reserved for 365 employees.`,
             });
             return Response.json(
               {
