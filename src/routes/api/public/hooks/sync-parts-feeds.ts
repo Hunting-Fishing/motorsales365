@@ -1,21 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { verifyInternalCronToken } from "@/integrations/supabase/internal-secrets.server";
 
 /**
  * Cron-triggered ingestion of partner product feeds.
- * Auth: Supabase anon key in `apikey` header (set by pg_cron).
+ * Auth: internal cron token in `x-cron-token` header.
  */
 export const Route = createFileRoute("/api/public/hooks/sync-parts-feeds")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
-        const got = request.headers.get("apikey") ?? request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-        if (!expected || got !== expected) {
-          return new Response(JSON.stringify({ error: "unauthorized" }), {
-            status: 401,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
+        const authed = await verifyInternalCronToken({
+          jobName: "sync_parts_feeds",
+          tokenHeader: request.headers.get("x-cron-token"),
+        });
+        if (!authed) return new Response("Unauthorized", { status: 401 });
+
         try {
           const { syncAllEnabledFeeds } = await import("@/lib/partner-feed.server");
           const results = await syncAllEnabledFeeds();
@@ -27,3 +26,4 @@ export const Route = createFileRoute("/api/public/hooks/sync-parts-feeds")({
     },
   },
 });
+

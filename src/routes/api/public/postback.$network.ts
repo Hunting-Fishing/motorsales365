@@ -52,24 +52,33 @@ async function handle({ request, params }: { request: Request; params: { network
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  // Verify HMAC signature if we have a secret for this network
+  // Require an HMAC signature for every accepted network. Networks without a
+  // configured secret are rejected — no unsigned conversions are ever recorded.
   const { data: secretRow } = await supabaseAdmin
     .from("affiliate_postback_secrets" as any)
     .select("secret")
     .eq("network", network)
     .maybeSingle();
   const secret = (secretRow as any)?.secret as string | undefined;
-  if (secret) {
-    const sig = payload.sig ?? "";
-    delete payload.sig;
-    const canonical = Object.keys(payload).sort().map((k) => `${k}=${payload[k]}`).join("&");
-    const expected = createHmac("sha256", secret).update(canonical).digest("hex");
+  if (!secret) {
+    return new Response("Unknown or unconfigured network", { status: 401 });
+  }
+  const sig = payload.sig ?? "";
+  delete payload.sig;
+  const canonical = Object.keys(payload).sort().map((k) => `${k}=${payload[k]}`).join("&");
+  const expected = createHmac("sha256", secret).update(canonical).digest("hex");
+  let sigOk = false;
+  try {
     const a = Buffer.from(sig, "hex");
     const b = Buffer.from(expected, "hex");
-    if (a.length !== b.length || !timingSafeEqual(a, b)) {
-      return new Response("Invalid signature", { status: 401 });
-    }
+    sigOk = a.length === b.length && timingSafeEqual(a, b);
+  } catch {
+    sigOk = false;
   }
+  if (!sigOk) {
+    return new Response("Invalid signature", { status: 401 });
+  }
+
 
   const amountDecimal = Number(payload.amount ?? payload.sale_amount ?? 0);
   const order_amount_cents = Math.max(0, Math.round(amountDecimal * 100));
