@@ -1,29 +1,36 @@
 ## Goal
-Verify that the signup flow works end-to-end by creating a real new user against the running preview, exercising the same code path a real visitor hits.
+Add a Playwright e2e spec that, for each of `buyer`, `business`, and `service_provider`:
+1. Signs up via `POST /api/public/auth/signup` (real code path).
+2. Auto-confirms the account (email delivery isn't available in CI) using the Supabase Admin API.
+3. Signs in through the UI at `/login`.
+4. Confirms the user lands on the correct destination for that intent.
 
-## Approach
-Drive the live preview at `http://localhost:8080/signup` with Playwright (headless Chromium) to submit a buyer signup with a synthetic email, then verify:
+## Landing destinations (verified from code)
+- `buyer` → `/dashboard` (login always routes here).
+- `business` / `service_provider` → `/businesses/submit` (per `POST_ROUTE` in `src/routes/verify-email.tsx`).
 
-1. Client-side: form submits without validation errors, browser navigates to `/verify-email?email=...` (the post-signup destination for unverified accounts).
-2. Server-side: `POST /api/public/auth/signup` returned `200 { ok: true, needs_verify: true, user_id }`.
-3. DB-side (via `supabase--read_query`): a `profiles` row exists for `user_id` with `signup_intent='buyer'`, correct name, phone, region, and `signup_source='direct'`.
-4. Repeat once for `business` intent to confirm the segmented control + business fields path also creates a profile with `business_name` / `business_kind` populated.
+Because `/login` sends everyone to `/dashboard`, intent-based routing lives on `/verify-email`. After signing in, the test navigates to `/verify-email?intent=<intent>&email=<email>`; the page detects `email_confirmed_at` and forwards to the intent's dashboard. This mirrors the real flow: after clicking the verification link, users land back on `/verify-email` where the auto-forward fires.
 
-Both accounts use `@365motorsales-smoke.example` emails so they're clearly test data and never receive real mail.
+## New file
+`e2e/signup-login-lands-on-dashboard.spec.ts`
 
-## Steps
-1. Write `/tmp/browser/signup-live/run.py` — Playwright script:
-   - Desktop viewport 1280x1800.
-   - Fill buyer form (email, password, first/last name, PH mobile, region, street, postal), check terms, submit.
-   - Screenshot before submit + after redirect.
-   - Capture the `/api/public/auth/signup` network response JSON.
-   - Repeat with intent=Business/Dealer, filling business_name/kind/address/postal.
-   - Print both `user_id`s.
-2. Run it, view screenshots to confirm the redirect to `/verify-email`.
-3. `supabase--read_query` to confirm both `profiles` rows exist with the expected fields.
-4. Report pass/fail per case with user_ids and any error details.
+Test structure:
+- One `test()` per intent, tagged `@post-deploy` so it runs in the same lane as the other signup smoke specs.
+- Skip cleanly (`test.skip`) when `SUPABASE_SERVICE_ROLE_KEY` / `SUPABASE_URL` env vars are not present, matching `scripts/smoke-signup-matrix.mjs` gating.
+- Each test:
+  1. Synthesizes a `+timestamp-nonce@365motorsales-smoke.example` email and strong random password.
+  2. `fetch('/api/public/auth/signup', …)` with the right intent-specific body (buyer uses personal address; business/service_provider use business address + `business_kind: "repair_shop"`). Asserts `200 { ok, user_id, needs_verify: true }`.
+  3. Calls Supabase Auth Admin `PUT /auth/v1/admin/users/{user_id}` with `{ email_confirm: true }` to mark the email verified.
+  4. Drives `/login`: fills email + password, submits, waits for either `/dashboard` (buyer) or navigates to `/verify-email?intent=…&email=…` and waits for `**/businesses/submit` (business/service_provider).
+  5. Asserts the final `page.url()` matches the expected destination and a stable landmark is visible on the page (e.g. `getByRole('heading')` on `/dashboard` for buyer, the submit-business form heading for business/service_provider).
+  6. Screenshots to `test-results/signup-login/{intent}.png` for debug.
+- After all cases, best-effort cleanup: `DELETE /auth/v1/admin/users/{user_id}` for each created user (wrapped in try/catch so a failure doesn't fail the suite).
+
+## Test infra changes
+- Extend `playwright.config.ts` `webServer` only if not already covering `http://localhost:8080` — check first; likely no change needed.
+- Add a short helper `e2e/helpers/supabase-admin.ts` (test-only) exporting `adminFetch(path, init)` that bails when the service role key is missing. Keeps admin creds out of the spec body.
 
 ## Non-goals
-- No code changes. This is a verification run only.
-- Not clicking a real verification link (would require inbox access); we only assert the signup endpoint + profile row, matching what `scripts/smoke-signup-matrix.mjs` already validates in CI.
-- No cleanup of the created test users in this run (they're unverified, marked `.example`).
+- No production code changes.
+- No actual email delivery / real verification-link click; the admin `email_confirm: true` shortcut is what our other smoke tests use and is documented as safe for test users.
+- Not asserting profile columns — that's covered by `scripts/smoke-signup-matrix.mjs`.
