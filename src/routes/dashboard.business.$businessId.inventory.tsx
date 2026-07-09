@@ -12,13 +12,12 @@ import {
   deleteBusinessInventoryItem,
 } from "@/lib/business-inventory.functions";
 import {
-  getBusinessNetworkExposure,
-  setBusinessNetworkExposure,
   listShopInquiries,
   updateNetworkInquiryStatus,
   NETWORK_INQUIRY_STATUSES,
   type NetworkInquiryStatus,
 } from "@/lib/network-stock.functions";
+import { NetworkExposureCard } from "@/components/parts/network-exposure-card";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
