@@ -113,7 +113,7 @@ function NetworkStockPage() {
   }, [qc]);
 
   const setParam = (patch: Record<string, string | number>) => {
-    navigate({ search: (prev) => ({ ...prev, ...patch }) });
+    navigate({ search: (prev: any) => ({ ...prev, ...patch }) });
   };
   const resetAll = () =>
     navigate({
