@@ -77,7 +77,7 @@ function StatusPage() {
             You haven't submitted a Franchise or Partner application. Apply to join the 365 network.
           </p>
           <Button asChild className="mt-6">
-            <Link to="/franchise/apply">Apply now</Link>
+            <Link to="/franchise/apply" search={{ tier: "partner" } as any}>Apply now</Link>
           </Button>
         </div>
       </SiteLayout>
