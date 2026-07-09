@@ -153,6 +153,15 @@ function AdminOverview() {
             value={d.health.pendingClaimReviews}
             tone={d.health.pendingClaimReviews > 0 ? "warn" : "ok"}
           />
+          {isAdmin && (
+            <HealthCard
+              to="/admin/franchise"
+              icon={Handshake}
+              label="Franchise applications"
+              value={franchiseCount.data?.total ?? 0}
+              tone={(franchiseCount.data?.total ?? 0) > 0 ? "warn" : "ok"}
+            />
+          )}
         </div>
       </Section>
 
