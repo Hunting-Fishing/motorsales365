@@ -102,6 +102,9 @@ function NetworkStockPage() {
             <Button type="submit" size="lg">
               Search stock
             </Button>
+            <Button asChild type="button" size="lg" variant="outline">
+              <Link to="/parts/my-requests">My requests</Link>
+            </Button>
           </form>
         </div>
       </section>
