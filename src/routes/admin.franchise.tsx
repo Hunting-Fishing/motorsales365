@@ -32,6 +32,7 @@ import {
   adminListApplications,
   adminGetApplication,
   adminDecideApplication,
+  listActiveTiers,
   type FranchiseApplication,
 } from "@/lib/franchise.functions";
 
