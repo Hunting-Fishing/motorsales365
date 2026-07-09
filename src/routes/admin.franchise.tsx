@@ -127,12 +127,6 @@ function AdminFranchisePage() {
   const [bulkTier, setBulkTier] = useState<string>("");
   const [bulkBusy, setBulkBusy] = useState(false);
 
-  // ---- Sorting (server-side) ----
-  type SortField = "business_name" | "contact_name" | "city" | "province" | "tier_slug" | "status" | "created_at";
-  const [sort, setSort] = useState<{ field: SortField; dir: "asc" | "desc" }>({
-    field: "created_at",
-    dir: "desc",
-  });
 
   // Only pending / in_review / info_requested rows are approvable.
   const approvable = useMemo(
