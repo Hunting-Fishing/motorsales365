@@ -135,11 +135,18 @@ test.describe("@post-deploy franchise apply → payment → status update", () =
     await page.locator("#business_name").fill("E2E Franchise Shop");
     await page.locator("#city").fill("Manila");
     await page.locator("#province").fill("NCR");
-    // Terms checkbox is required by the Zod schema. Use force click to
-    // bypass the enclosing <label>'s pointer-capture.
+    // Terms checkbox is required by Zod. Radix Checkbox inside a <label>
+    // eats Playwright clicks in this layout; dispatch a real click via
+    // the DOM to trigger onCheckedChange.
+    await page.evaluate(() => {
+      const boxes = document.querySelectorAll<HTMLButtonElement>(
+        'button[role="checkbox"]',
+      );
+      const box = boxes[boxes.length - 1];
+      if (!box) throw new Error("terms checkbox not found");
+      box.click();
+    });
     const termsCheckbox = page.getByRole("checkbox").last();
-    await termsCheckbox.scrollIntoViewIfNeeded();
-    await termsCheckbox.click({ force: true });
     await expect(termsCheckbox).toHaveAttribute("data-state", "checked", { timeout: 5000 });
     const submit = page.getByRole("button", { name: /submit application/i });
     // Watch for the toast text if the submit rejects, so the failure is legible.
