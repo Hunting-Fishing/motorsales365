@@ -123,13 +123,19 @@ test.describe("@post-deploy franchise apply → payment → status update", () =
 
     // 2. Submit the franchise application via the UI
     await page.goto("/franchise/apply");
-    await expect(page.getByLabel(/your name/i)).toBeVisible({ timeout: 15_000 });
-    await page.getByLabel(/your name/i).fill("E2E Applicant");
-    await page.getByLabel(/^email/i).fill(email);
-    await page.getByLabel(/business \/ shop name/i).fill("E2E Franchise Shop");
-    await page.getByLabel(/city/i).fill("Manila");
-    await page.getByLabel(/province/i).fill("NCR");
-    await page.getByRole("button", { name: /submit application/i }).click();
+    await expect(
+      page.getByRole("heading", { name: /join the 365 network/i }),
+    ).toBeVisible({ timeout: 20_000 });
+    const nameInput = page.locator("#contact_name");
+    await nameInput.scrollIntoViewIfNeeded();
+    await nameInput.fill("E2E Applicant");
+    await page.locator("#contact_email").fill(email);
+    await page.locator("#business_name").fill("E2E Franchise Shop");
+    await page.locator("#city").fill("Manila");
+    await page.locator("#province").fill("NCR");
+    const submit = page.getByRole("button", { name: /submit application/i });
+    await submit.scrollIntoViewIfNeeded();
+    await submit.click();
 
     // Success toast → application row exists. Land on status page.
     await page.waitForURL("**/franchise/status", { timeout: 20_000 });
