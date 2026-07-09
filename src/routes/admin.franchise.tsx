@@ -25,11 +25,6 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import {
   adminListApplications,
   adminGetApplication,
   adminDecideApplication,
@@ -47,6 +42,11 @@ export const Route = createFileRoute("/admin/franchise")({
 });
 
 const STATUSES = ["all", "pending", "in_review", "info_requested", "approved", "rejected"] as const;
+
+function formatStatus(status: string) {
+  if (status === "all") return "All statuses";
+  return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 function AdminFranchisePage() {
   const listFn = useServerFn(adminListApplications);
