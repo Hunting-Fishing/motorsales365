@@ -165,6 +165,7 @@ import { Route as AdminPerformanceRouteImport } from './routes/admin.performance
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminPartsRouteImport } from './routes/admin.parts'
 import { Route as AdminPartnerProgramRouteImport } from './routes/admin.partner-program'
+import { Route as AdminNetworkExposureRouteImport } from './routes/admin.network-exposure'
 import { Route as AdminLocationCorrectionsRouteImport } from './routes/admin.location-corrections'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminLeadOffersRouteImport } from './routes/admin.lead-offers'
@@ -1089,6 +1090,11 @@ const AdminPartnerProgramRoute = AdminPartnerProgramRouteImport.update({
   path: '/partner-program',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminNetworkExposureRoute = AdminNetworkExposureRouteImport.update({
+  id: '/network-exposure',
+  path: '/network-exposure',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLocationCorrectionsRoute =
   AdminLocationCorrectionsRouteImport.update({
     id: '/location-corrections',
@@ -1944,6 +1950,7 @@ export interface FileRoutesByFullPath {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/network-exposure': typeof AdminNetworkExposureRoute
   '/admin/partner-program': typeof AdminPartnerProgramRouteWithChildren
   '/admin/parts': typeof AdminPartsRouteWithChildren
   '/admin/payments': typeof AdminPaymentsRoute
@@ -2239,6 +2246,7 @@ export interface FileRoutesByTo {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/network-exposure': typeof AdminNetworkExposureRoute
   '/admin/partner-program': typeof AdminPartnerProgramRouteWithChildren
   '/admin/parts': typeof AdminPartsRouteWithChildren
   '/admin/payments': typeof AdminPaymentsRoute
@@ -2537,6 +2545,7 @@ export interface FileRoutesById {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/network-exposure': typeof AdminNetworkExposureRoute
   '/admin/partner-program': typeof AdminPartnerProgramRouteWithChildren
   '/admin/parts': typeof AdminPartsRouteWithChildren
   '/admin/payments': typeof AdminPaymentsRoute
@@ -2838,6 +2847,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/network-exposure'
     | '/admin/partner-program'
     | '/admin/parts'
     | '/admin/payments'
@@ -3133,6 +3143,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/network-exposure'
     | '/admin/partner-program'
     | '/admin/parts'
     | '/admin/payments'
@@ -3430,6 +3441,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/network-exposure'
     | '/admin/partner-program'
     | '/admin/parts'
     | '/admin/payments'
@@ -4895,6 +4907,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPartnerProgramRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/network-exposure': {
+      id: '/admin/network-exposure'
+      path: '/network-exposure'
+      fullPath: '/admin/network-exposure'
+      preLoaderRoute: typeof AdminNetworkExposureRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/location-corrections': {
       id: '/admin/location-corrections'
       path: '/location-corrections'
@@ -6063,6 +6082,7 @@ interface AdminRouteChildren {
   AdminLeadOffersRoute: typeof AdminLeadOffersRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminLocationCorrectionsRoute: typeof AdminLocationCorrectionsRoute
+  AdminNetworkExposureRoute: typeof AdminNetworkExposureRoute
   AdminPartnerProgramRoute: typeof AdminPartnerProgramRouteWithChildren
   AdminPartsRoute: typeof AdminPartsRouteWithChildren
   AdminPaymentsRoute: typeof AdminPaymentsRoute
@@ -6116,6 +6136,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLeadOffersRoute: AdminLeadOffersRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminLocationCorrectionsRoute: AdminLocationCorrectionsRoute,
+  AdminNetworkExposureRoute: AdminNetworkExposureRoute,
   AdminPartnerProgramRoute: AdminPartnerProgramRouteWithChildren,
   AdminPartsRoute: AdminPartsRouteWithChildren,
   AdminPaymentsRoute: AdminPaymentsRoute,

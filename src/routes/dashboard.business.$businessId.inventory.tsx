@@ -12,13 +12,12 @@ import {
   deleteBusinessInventoryItem,
 } from "@/lib/business-inventory.functions";
 import {
-  getBusinessNetworkExposure,
-  setBusinessNetworkExposure,
   listShopInquiries,
   updateNetworkInquiryStatus,
   NETWORK_INQUIRY_STATUSES,
   type NetworkInquiryStatus,
 } from "@/lib/network-stock.functions";
+import { NetworkExposureCard } from "@/components/parts/network-exposure-card";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -48,8 +47,6 @@ function InventoryPage() {
   const upsertFn = useServerFn(upsertBusinessInventoryItem);
   const adjustFn = useServerFn(adjustBusinessInventory);
   const delFn = useServerFn(deleteBusinessInventoryItem);
-  const exposureLoadFn = useServerFn(getBusinessNetworkExposure);
-  const exposureSetFn = useServerFn(setBusinessNetworkExposure);
   const inquiriesFn = useServerFn(listShopInquiries);
 
   const q = useQuery({
@@ -58,11 +55,6 @@ function InventoryPage() {
     queryFn: () => loadFn({ data: { businessId } }),
   });
 
-  const exposure = useQuery({
-    queryKey: ["business-exposure", businessId],
-    enabled: !!user?.id,
-    queryFn: () => exposureLoadFn({ data: { businessId } }),
-  });
 
   const inquiries = useQuery({
     queryKey: ["business-network-inquiries", businessId],
@@ -177,15 +169,6 @@ function InventoryPage() {
     }
   }
 
-  async function toggleExposure(next: boolean) {
-    try {
-      await exposureSetFn({ data: { businessId, expose: next } });
-      qc.invalidateQueries({ queryKey: ["business-exposure", businessId] });
-      toast.success(next ? "Shop is now sharing stock with the network" : "Network sharing turned off");
-    } catch (e: any) {
-      toast.error(e?.message || "Failed");
-    }
-  }
 
   async function adjust(itemId: string, delta: number) {
     try {
@@ -227,25 +210,8 @@ function InventoryPage() {
         </Button>
       </div>
 
-      <Card className="p-4">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="font-medium flex items-center gap-2">
-              <Radio className="h-4 w-4 text-primary" /> Share stock with the 365 network
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              When on, customers browsing <span className="font-mono">/parts/network</span> can
-              see your live in-stock items, quantities, and price — and send you a request in
-              one click. Cost, location, and internal notes are never exposed.
-            </p>
-          </div>
-          <Switch
-            checked={!!exposure.data?.expose}
-            onCheckedChange={toggleExposure}
-            aria-label="Toggle network stock sharing"
-          />
-        </div>
-      </Card>
+      <NetworkExposureCard businessId={businessId} />
+
 
       {inquiries.data && inquiries.data.length > 0 && (
         <Card className="divide-y">

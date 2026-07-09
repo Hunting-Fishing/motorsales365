@@ -2362,6 +2362,53 @@ export type Database = {
           },
         ]
       }
+      business_network_exposure_audit: {
+        Row: {
+          action: string
+          actor_id: string | null
+          business_id: string
+          created_at: string
+          id: string
+          new_expose: boolean | null
+          new_status: string | null
+          note: string | null
+          previous_expose: boolean | null
+          previous_status: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          business_id: string
+          created_at?: string
+          id?: string
+          new_expose?: boolean | null
+          new_status?: string | null
+          note?: string | null
+          previous_expose?: boolean | null
+          previous_status?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          business_id?: string
+          created_at?: string
+          id?: string
+          new_expose?: boolean | null
+          new_status?: string | null
+          note?: string | null
+          previous_expose?: boolean | null
+          previous_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_network_exposure_audit_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_page_events: {
         Row: {
           business_id: string
@@ -3079,6 +3126,11 @@ export type Database = {
           logo_url: string | null
           messenger_url: string | null
           name: string
+          network_exposure_requested_at: string | null
+          network_exposure_review_note: string | null
+          network_exposure_reviewed_at: string | null
+          network_exposure_reviewed_by: string | null
+          network_exposure_status: string
           organization_id: string | null
           owner_id: string | null
           phone: string | null
@@ -3135,6 +3187,11 @@ export type Database = {
           logo_url?: string | null
           messenger_url?: string | null
           name: string
+          network_exposure_requested_at?: string | null
+          network_exposure_review_note?: string | null
+          network_exposure_reviewed_at?: string | null
+          network_exposure_reviewed_by?: string | null
+          network_exposure_status?: string
           organization_id?: string | null
           owner_id?: string | null
           phone?: string | null
@@ -3191,6 +3248,11 @@ export type Database = {
           logo_url?: string | null
           messenger_url?: string | null
           name?: string
+          network_exposure_requested_at?: string | null
+          network_exposure_review_note?: string | null
+          network_exposure_reviewed_at?: string | null
+          network_exposure_reviewed_by?: string | null
+          network_exposure_status?: string
           organization_id?: string | null
           owner_id?: string | null
           phone?: string | null
@@ -12866,10 +12928,18 @@ export type Database = {
         }
         Returns: Json
       }
+      request_network_exposure: {
+        Args: { _business_id: string; _expose: boolean; _note?: string }
+        Returns: Json
+      }
       resolve_login_to_email: { Args: { _input: string }; Returns: string }
       resolve_report_dispute: {
         Args: { _decision: string; _dispute_id: string; _response: string }
         Returns: string
+      }
+      review_network_exposure: {
+        Args: { _business_id: string; _decision: string; _note?: string }
+        Returns: Json
       }
       rotate_internal_cron_token: {
         Args: { _job_name: string }
