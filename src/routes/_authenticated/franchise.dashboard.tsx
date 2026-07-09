@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { SiteLayout } from "@/components/site-layout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,8 +13,15 @@ import {
   Users,
   LayoutDashboard,
   ExternalLink,
+  CreditCard,
 } from "lucide-react";
-import { getMyApplication, listActiveTiers } from "@/lib/franchise.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
+import {
+  getMyApplication,
+  listActiveTiers,
+  createFranchisePortalSession,
+} from "@/lib/franchise.functions";
+
 
 export const Route = createFileRoute("/_authenticated/franchise/dashboard")({
   head: () => ({
