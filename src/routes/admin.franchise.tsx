@@ -634,7 +634,7 @@ function Info({ label, value }: { label: string; value: string }) {
   );
 }
 
-type SortField = "business_name" | "contact_name" | "location" | "tier_slug" | "status" | "created_at";
+type SortField = "business_name" | "contact_name" | "city" | "province" | "tier_slug" | "status" | "created_at";
 
 function SortHeader({
   field,
