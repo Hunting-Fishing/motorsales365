@@ -43,14 +43,12 @@ export function NetworkPartInquiryDialog({
     if (row) {
       setForm((f) => ({
         ...f,
-        contact_name: (profile as any)?.full_name ?? f.contact_name,
         contact_email: user?.email ?? f.contact_email,
-        contact_phone: (profile as any)?.phone ?? f.contact_phone,
         quantity: 1,
         message: "",
       }));
     }
-  }, [row, user, profile]);
+  }, [row, user]);
 
   if (!row) return null;
 
