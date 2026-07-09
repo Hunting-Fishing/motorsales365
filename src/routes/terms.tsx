@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "July 3, 2026 (added Club Member Discount — 5% off internal 365 purchases for active members of verified clubs)";
+  const lastUpdated = "July 9, 2026 (added 365 Franchise & Partner Program: two membership tiers, applications, network parts discounts, advertising discounts, membership fees, shared customer CRM data flow, termination and discount misuse terms)";
 
   return (
     <SiteLayout>
