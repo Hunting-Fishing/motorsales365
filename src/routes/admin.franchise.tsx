@@ -25,11 +25,6 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import {
   adminListApplications,
   adminGetApplication,
   adminDecideApplication,
@@ -47,6 +42,11 @@ export const Route = createFileRoute("/admin/franchise")({
 });
 
 const STATUSES = ["all", "pending", "in_review", "info_requested", "approved", "rejected"] as const;
+
+function formatStatus(status: string) {
+  if (status === "all") return "All statuses";
+  return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 function AdminFranchisePage() {
   const listFn = useServerFn(adminListApplications);
@@ -241,15 +241,21 @@ function AdminFranchisePage() {
         </div>
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <Tabs value={status} onValueChange={(v) => setStatus(v as any)}>
-            <TabsList>
-              {STATUSES.map((s) => (
-                <TabsTrigger key={s} value={s}>
-                  {s.replace("_", " ")}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Status</span>
+            <Select value={status} onValueChange={(v) => setStatus(v as (typeof STATUSES)[number])}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {formatStatus(s)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <Input
             placeholder="Search name / business / email"
             value={search}
