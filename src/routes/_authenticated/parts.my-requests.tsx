@@ -140,6 +140,45 @@ function MyRequestsPage() {
                       {STATUS_LABEL[status]}
                     </Badge>
                   </div>
+                  {(r.fulfilled_price != null ||
+                    r.fulfilled_quantity != null ||
+                    r.fulfilled_eta ||
+                    r.fulfilled_message) && (
+                    <div className="mt-3 rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
+                      <p className="text-[10px] uppercase tracking-wide text-primary">
+                        Fulfillment update
+                      </p>
+                      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                        {r.fulfilled_price != null && (
+                          <span>
+                            <span className="text-muted-foreground">Price:</span>{" "}
+                            <span className="font-semibold">
+                              ₱{Number(r.fulfilled_price).toLocaleString()}
+                            </span>
+                          </span>
+                        )}
+                        {r.fulfilled_quantity != null && (
+                          <span>
+                            <span className="text-muted-foreground">Qty:</span>{" "}
+                            <span className="font-semibold">
+                              {Number(r.fulfilled_quantity)}
+                            </span>
+                          </span>
+                        )}
+                        {r.fulfilled_eta && (
+                          <span>
+                            <span className="text-muted-foreground">ETA:</span>{" "}
+                            <span className="font-semibold">
+                              {new Date(r.fulfilled_eta).toLocaleString()}
+                            </span>
+                          </span>
+                        )}
+                      </div>
+                      {r.fulfilled_message && (
+                        <p className="mt-2">{r.fulfilled_message}</p>
+                      )}
+                    </div>
+                  )}
                   {r.response_note && (
                     <div className="mt-3 rounded-md border bg-muted/40 p-3 text-sm">
                       <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
