@@ -78,10 +78,13 @@ function AdminTiersPage() {
 function TierEditor({
   tier,
   onSave,
+  onSyncStripe,
 }: {
   tier: FranchiseTier;
   onSave: (payload: FranchiseTier) => Promise<void>;
+  onSyncStripe: () => Promise<void>;
 }) {
+
   const [state, setState] = useState<FranchiseTier>(tier);
   useEffect(() => setState(tier), [tier]);
   const set = <K extends keyof FranchiseTier>(k: K, v: FranchiseTier[K]) =>
