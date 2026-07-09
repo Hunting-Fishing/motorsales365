@@ -135,12 +135,20 @@ test.describe("@post-deploy franchise apply → payment → status update", () =
     await page.locator("#business_name").fill("E2E Franchise Shop");
     await page.locator("#city").fill("Manila");
     await page.locator("#province").fill("NCR");
-    // Terms checkbox is required by the Zod schema.
-    const checkbox = page.locator('button[role="checkbox"]').last();
-    await checkbox.scrollIntoViewIfNeeded();
-    await checkbox.click();
+    // Terms checkbox is required by the Zod schema. Click the checkbox
+    // inside the "I have read and agree" label.
+    const termsLabel = page.locator("label", { hasText: /I have read and agree/i });
+    await termsLabel.scrollIntoViewIfNeeded();
+    await termsLabel.locator('button[role="checkbox"]').click();
+    await expect(termsLabel.locator('button[role="checkbox"]')).toHaveAttribute(
+      "data-state",
+      "checked",
+    );
     const submit = page.getByRole("button", { name: /submit application/i });
-    await submit.scrollIntoViewIfNeeded();
+    // Watch for the toast text if the submit rejects, so the failure is legible.
+    page.on("console", (msg) => {
+      if (msg.type() === "error") console.log("[page-error]", msg.text());
+    });
     await submit.click();
 
     // Success toast → application row exists. Land on status page.
