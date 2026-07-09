@@ -105,6 +105,7 @@ function InventoryPage() {
     name: "",
     sku: "",
     category: "",
+    brand: "",
     unit: "pc",
     qty_on_hand: 0,
     reorder_at: "",
