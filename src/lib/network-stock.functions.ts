@@ -124,6 +124,23 @@ export const submitNetworkPartInquiry = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const supabase = publicClient();
+
+    // If the caller is signed in, tag the row with their user id so they can
+    // track it in "My requests".
+    let requester_user_id: string | null = null;
+    try {
+      const { getRequestHeader } = await import("@tanstack/react-start/server");
+      const auth =
+        getRequestHeader("authorization") ?? getRequestHeader("Authorization");
+      const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+      if (token) {
+        const { data: u } = await supabase.auth.getUser(token);
+        requester_user_id = u.user?.id ?? null;
+      }
+    } catch {
+      requester_user_id = null;
+    }
+
     const { data: row, error } = await supabase
       .from("network_part_inquiries")
       .insert({
@@ -136,11 +153,76 @@ export const submitNetworkPartInquiry = createServerFn({ method: "POST" })
         contact_email: data.contact_email,
         contact_phone: data.contact_phone ?? null,
         message: data.message ?? null,
+        requester_user_id,
       })
       .select("id")
       .single();
     if (error) throw error;
     return { ok: true, id: row.id };
+  });
+
+export const NETWORK_INQUIRY_STATUSES = [
+  "pending",
+  "accepted",
+  "rejected",
+  "fulfilled",
+  "closed",
+] as const;
+export type NetworkInquiryStatus = (typeof NETWORK_INQUIRY_STATUSES)[number];
+
+export const updateNetworkInquiryStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (d: {
+      id: string;
+      businessId: string;
+      status: NetworkInquiryStatus;
+      note?: string | null;
+    }) =>
+      z
+        .object({
+          id: z.string().uuid(),
+          businessId: z.string().uuid(),
+          status: z.enum(NETWORK_INQUIRY_STATUSES),
+          note: z.string().trim().max(2000).nullable().optional(),
+        })
+        .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: ok } = await supabase.rpc("has_business_role", {
+      _user: userId,
+      _business: data.businessId,
+      _role: "manager",
+    });
+    if (!ok) throw new Error("Forbidden");
+
+    const { data: row, error } = await supabase
+      .from("network_part_inquiries")
+      .update({
+        status: data.status,
+        response_note: data.note ?? null,
+      })
+      .eq("id", data.id)
+      .eq("business_id", data.businessId)
+      .select("*")
+      .single();
+    if (error) throw error;
+    return row;
+  });
+
+export const listMyNetworkInquiries = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: rows, error } = await supabase
+      .from("network_part_inquiries")
+      .select("*, businesses:business_id(name, slug, city, province)")
+      .eq("requester_user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    return rows ?? [];
   });
 
 export const listShopInquiries = createServerFn({ method: "POST" })
