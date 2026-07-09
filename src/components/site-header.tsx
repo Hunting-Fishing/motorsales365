@@ -602,6 +602,12 @@ export function SiteHeader() {
                   </>
                 )}
                 <DropdownMenuItem asChild>
+                  <Link to="/franchise/status">
+                    <Handshake className="mr-2 h-4 w-4" />
+                    Franchise status
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/dashboard/profile">Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
