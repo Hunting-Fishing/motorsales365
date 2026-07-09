@@ -6111,6 +6111,10 @@ export type Database = {
           contact_name: string
           contact_phone: string | null
           created_at: string
+          fulfilled_eta: string | null
+          fulfilled_message: string | null
+          fulfilled_price: number | null
+          fulfilled_quantity: number | null
           id: string
           item_id: string | null
           message: string | null
@@ -6130,6 +6134,10 @@ export type Database = {
           contact_name: string
           contact_phone?: string | null
           created_at?: string
+          fulfilled_eta?: string | null
+          fulfilled_message?: string | null
+          fulfilled_price?: number | null
+          fulfilled_quantity?: number | null
           id?: string
           item_id?: string | null
           message?: string | null
@@ -6149,6 +6157,10 @@ export type Database = {
           contact_name?: string
           contact_phone?: string | null
           created_at?: string
+          fulfilled_eta?: string | null
+          fulfilled_message?: string | null
+          fulfilled_price?: number | null
+          fulfilled_quantity?: number | null
           id?: string
           item_id?: string | null
           message?: string | null

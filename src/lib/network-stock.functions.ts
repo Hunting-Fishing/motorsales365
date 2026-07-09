@@ -178,6 +178,10 @@ export const updateNetworkInquiryStatus = createServerFn({ method: "POST" })
       businessId: string;
       status: NetworkInquiryStatus;
       note?: string | null;
+      fulfilled_price?: number | null;
+      fulfilled_quantity?: number | null;
+      fulfilled_eta?: string | null;
+      fulfilled_message?: string | null;
     }) =>
       z
         .object({
@@ -185,6 +189,10 @@ export const updateNetworkInquiryStatus = createServerFn({ method: "POST" })
           businessId: z.string().uuid(),
           status: z.enum(NETWORK_INQUIRY_STATUSES),
           note: z.string().trim().max(2000).nullable().optional(),
+          fulfilled_price: z.number().nonnegative().max(99999999).nullable().optional(),
+          fulfilled_quantity: z.number().positive().max(9999).nullable().optional(),
+          fulfilled_eta: z.string().datetime().nullable().optional(),
+          fulfilled_message: z.string().trim().max(2000).nullable().optional(),
         })
         .parse(d),
   )
@@ -197,12 +205,20 @@ export const updateNetworkInquiryStatus = createServerFn({ method: "POST" })
     });
     if (!ok) throw new Error("Forbidden");
 
+    const patch: Record<string, unknown> = {
+      status: data.status,
+      response_note: data.note ?? null,
+    };
+    // Only overwrite fulfillment fields when explicitly provided so a later
+    // status change (e.g. Closed after Fulfilled) doesn't blank prior details.
+    if (data.fulfilled_price !== undefined) patch.fulfilled_price = data.fulfilled_price;
+    if (data.fulfilled_quantity !== undefined) patch.fulfilled_quantity = data.fulfilled_quantity;
+    if (data.fulfilled_eta !== undefined) patch.fulfilled_eta = data.fulfilled_eta;
+    if (data.fulfilled_message !== undefined) patch.fulfilled_message = data.fulfilled_message;
+
     const { data: row, error } = await supabase
       .from("network_part_inquiries")
-      .update({
-        status: data.status,
-        response_note: data.note ?? null,
-      })
+      .update(patch as any)
       .eq("id", data.id)
       .eq("business_id", data.businessId)
       .select("*")
