@@ -125,10 +125,7 @@ test.describe("@post-deploy franchise apply → payment → status update", () =
     // Preload cookie-consent so the banner doesn't intercept clicks.
     await page.evaluate(() => {
       try {
-        localStorage.setItem(
-          "cookie_consent_v1",
-          JSON.stringify({ analytics: false, ts: Date.now() }),
-        );
+        localStorage.setItem("ms_cookie_consent_v1", "declined");
       } catch {}
     });
     await page.goto("/franchise/apply", { waitUntil: "domcontentloaded" });
