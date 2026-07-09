@@ -287,12 +287,25 @@ function NetworkStockPage() {
           ) : (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                {rows.length} live listing{rows.length === 1 ? "" : "s"}
+                Showing {rows.length}
+                {total != null ? ` of ${total}` : ""} live listing
+                {(total ?? rows.length) === 1 ? "" : "s"}
                 {search.q ? ` for "${search.q}"` : ""}
               </p>
               {rows.map((r) => (
                 <StockRow key={r.id} row={r} onInquire={setInquiry} />
               ))}
+              {hasNextPage && (
+                <div className="flex justify-center pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                  >
+                    {isFetchingNextPage ? "Loading…" : "Load more"}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>
