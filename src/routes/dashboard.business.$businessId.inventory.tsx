@@ -699,6 +699,52 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={reserveOpen} onOpenChange={setReserveOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Accept & hold stock</DialogTitle>
+            <DialogDescription>
+              Reserve stock for this customer so it can't be sold to anyone else while you
+              coordinate pickup. The hold auto-expires when the window ends.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Quantity to hold</Label>
+              <Input
+                type="number"
+                min={1}
+                step="1"
+                value={reserve.quantity}
+                onChange={(e) => setReserve({ ...reserve, quantity: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Hold for (hours)</Label>
+              <Input
+                type="number"
+                min={1}
+                max={168}
+                step="1"
+                value={reserve.hours}
+                onChange={(e) => setReserve({ ...reserve, hours: e.target.value })}
+              />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Common windows: 4h, 24h, 48h. Max 168h (7 days).
+          </p>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setReserveOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={submitReserve} disabled={busy !== null}>
+              {busy === "reserve" ? "Reserving…" : "Accept & hold"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
