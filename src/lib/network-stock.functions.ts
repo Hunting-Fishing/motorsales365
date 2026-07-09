@@ -20,6 +20,8 @@ export type NetworkStockRow = {
   category: string | null;
   unit: string;
   qty_on_hand: number;
+  available_qty: number;
+  reserved_qty: number;
   price: number | null;
   catalog_part_id: string | null;
   updated_at: string;
@@ -446,5 +448,55 @@ export const adminListNetworkExposureAudit = createServerFn({ method: "POST" })
       .limit(200);
     if (error) throw error;
     return ((rows as any[]) ?? []) as NetworkExposureAuditRow[];
+  });
+
+// ============================================================
+// Short-term stock reservations
+// ============================================================
+
+export const reserveNetworkInquiry = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (d: {
+      inquiryId: string;
+      businessId: string;
+      quantity: number;
+      hours: number;
+      note?: string | null;
+    }) =>
+      z
+        .object({
+          inquiryId: z.string().uuid(),
+          businessId: z.string().uuid(),
+          quantity: z.number().positive().max(9999),
+          hours: z.number().int().positive().max(168),
+          note: z.string().trim().max(1000).nullable().optional(),
+        })
+        .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: res, error } = await context.supabase.rpc("reserve_network_inquiry", {
+      _inquiry_id: data.inquiryId,
+      _business_id: data.businessId,
+      _quantity: data.quantity,
+      _hours: data.hours,
+      _note: data.note ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return res as { reserved_quantity: number; reserved_until: string };
+  });
+
+export const releaseNetworkInquiry = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { inquiryId: string; businessId: string }) =>
+    z.object({ inquiryId: z.string().uuid(), businessId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("release_network_inquiry", {
+      _inquiry_id: data.inquiryId,
+      _business_id: data.businessId,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 

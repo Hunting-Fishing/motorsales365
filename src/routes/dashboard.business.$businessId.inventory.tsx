@@ -14,6 +14,8 @@ import {
 import {
   listShopInquiries,
   updateNetworkInquiryStatus,
+  reserveNetworkInquiry,
+  releaseNetworkInquiry,
   NETWORK_INQUIRY_STATUSES,
   type NetworkInquiryStatus,
 } from "@/lib/network-stock.functions";
@@ -406,9 +408,16 @@ const STATUS_VARIANT: Record<NetworkInquiryStatus, "default" | "secondary" | "de
 function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
   const qc = useQueryClient();
   const updateFn = useServerFn(updateNetworkInquiryStatus);
+  const reserveFn = useServerFn(reserveNetworkInquiry);
+  const releaseFn = useServerFn(releaseNetworkInquiry);
   const [note, setNote] = useState(row.response_note ?? "");
-  const [busy, setBusy] = useState<NetworkInquiryStatus | null>(null);
+  const [busy, setBusy] = useState<NetworkInquiryStatus | "reserve" | "release" | null>(null);
   const [fulfillFor, setFulfillFor] = useState<NetworkInquiryStatus | null>(null);
+  const [reserveOpen, setReserveOpen] = useState(false);
+  const [reserve, setReserve] = useState({
+    quantity: String(row.reserved_quantity ?? row.quantity ?? 1),
+    hours: "24",
+  });
   const [fulfill, setFulfill] = useState({
     price: row.fulfilled_price != null ? String(row.fulfilled_price) : "",
     quantity:
@@ -451,8 +460,58 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
       setFulfillFor(s);
       return;
     }
+    if (s === "accepted" && row.item_id) {
+      setReserveOpen(true);
+      return;
+    }
     setStatus(s);
   }
+
+  async function submitReserve() {
+    const qty = Number(reserve.quantity);
+    const hours = Number(reserve.hours);
+    if (!Number.isFinite(qty) || qty <= 0) {
+      toast.error("Enter a valid quantity to hold");
+      return;
+    }
+    if (!Number.isInteger(hours) || hours <= 0 || hours > 168) {
+      toast.error("Hold window must be 1–168 hours");
+      return;
+    }
+    setBusy("reserve");
+    try {
+      await reserveFn({
+        data: {
+          inquiryId: row.id,
+          businessId,
+          quantity: qty,
+          hours,
+          note: note.trim() || null,
+        },
+      });
+      toast.success(`Reserved ${qty} for ${hours}h`);
+      setReserveOpen(false);
+      qc.invalidateQueries({ queryKey: ["business-network-inquiries", businessId] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to reserve");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function releaseHold() {
+    setBusy("release");
+    try {
+      await releaseFn({ data: { inquiryId: row.id, businessId } });
+      toast.success("Reservation released");
+      qc.invalidateQueries({ queryKey: ["business-network-inquiries", businessId] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to release");
+    } finally {
+      setBusy(null);
+    }
+  }
+
 
   async function submitFulfill() {
     if (!fulfillFor) return;
@@ -520,6 +579,24 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
           {row.fulfilled_message && (
             <p className="mt-1 text-muted-foreground">{row.fulfilled_message}</p>
           )}
+        </div>
+      )}
+
+      {row.reserved_quantity && row.reserved_until && (
+        <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-2 text-xs">
+          <p className="font-medium text-amber-700 dark:text-amber-400">
+            Holding {Number(row.reserved_quantity)} unit(s)
+            {new Date(row.reserved_until) > new Date()
+              ? ` · expires ${new Date(row.reserved_until).toLocaleString()}`
+              : " · hold expired"}
+          </p>
+          <button
+            onClick={releaseHold}
+            disabled={busy !== null}
+            className="mt-1 text-xs underline text-amber-700 dark:text-amber-400 disabled:opacity-50"
+          >
+            {busy === "release" ? "Releasing…" : "Release hold"}
+          </button>
         </div>
       )}
 
@@ -618,6 +695,52 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
             </Button>
             <Button onClick={submitFulfill} disabled={busy !== null}>
               {busy ? "Saving…" : `Mark ${fulfillFor}`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={reserveOpen} onOpenChange={setReserveOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Accept & hold stock</DialogTitle>
+            <DialogDescription>
+              Reserve stock for this customer so it can't be sold to anyone else while you
+              coordinate pickup. The hold auto-expires when the window ends.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Quantity to hold</Label>
+              <Input
+                type="number"
+                min={1}
+                step="1"
+                value={reserve.quantity}
+                onChange={(e) => setReserve({ ...reserve, quantity: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Hold for (hours)</Label>
+              <Input
+                type="number"
+                min={1}
+                max={168}
+                step="1"
+                value={reserve.hours}
+                onChange={(e) => setReserve({ ...reserve, hours: e.target.value })}
+              />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Common windows: 4h, 24h, 48h. Max 168h (7 days).
+          </p>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setReserveOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={submitReserve} disabled={busy !== null}>
+              {busy === "reserve" ? "Reserving…" : "Accept & hold"}
             </Button>
           </DialogFooter>
         </DialogContent>
