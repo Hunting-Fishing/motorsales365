@@ -133,6 +133,8 @@ test.describe("@post-deploy franchise apply → payment → status update", () =
     await page.locator("#business_name").fill("E2E Franchise Shop");
     await page.locator("#city").fill("Manila");
     await page.locator("#province").fill("NCR");
+    // Terms checkbox is required by the Zod schema.
+    await page.locator('button[role="checkbox"]').first().click();
     const submit = page.getByRole("button", { name: /submit application/i });
     await submit.scrollIntoViewIfNeeded();
     await submit.click();
