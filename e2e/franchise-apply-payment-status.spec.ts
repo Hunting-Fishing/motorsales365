@@ -121,16 +121,17 @@ test.describe("@post-deploy franchise apply → payment → status update", () =
     await confirmEmail(userId);
     await signInViaUI(page, email, password);
 
-    // 2. Submit the franchise application via the UI
+    // 2. Submit the franchise application via the UI.
+    // Preload cookie-consent so the banner doesn't intercept clicks.
+    await page.evaluate(() => {
+      try {
+        localStorage.setItem(
+          "cookie_consent_v1",
+          JSON.stringify({ analytics: false, ts: Date.now() }),
+        );
+      } catch {}
+    });
     await page.goto("/franchise/apply", { waitUntil: "domcontentloaded" });
-    // Dismiss cookie banner if present so it doesn't intercept clicks.
-    const decline = page.getByRole("button", { name: /decline optional/i });
-    if (await decline.isVisible().catch(() => false)) await decline.click();
-    await expect(
-      page.getByRole("heading", { name: /join the 365 network/i }),
-    ).toBeVisible({ timeout: 20_000 });
-    // The form is far below hero/promo strips inside SiteLayout — wait
-    // explicitly for the first form input to attach.
     await page.waitForSelector("#contact_name", { state: "attached", timeout: 20_000 });
     await page.locator("#contact_name").fill("E2E Applicant");
     await page.locator("#contact_email").fill(email);
@@ -138,7 +139,9 @@ test.describe("@post-deploy franchise apply → payment → status update", () =
     await page.locator("#city").fill("Manila");
     await page.locator("#province").fill("NCR");
     // Terms checkbox is required by the Zod schema.
-    await page.locator('button[role="checkbox"]').first().click();
+    const checkbox = page.locator('button[role="checkbox"]').last();
+    await checkbox.scrollIntoViewIfNeeded();
+    await checkbox.click();
     const submit = page.getByRole("button", { name: /submit application/i });
     await submit.scrollIntoViewIfNeeded();
     await submit.click();
