@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "July 3, 2026 (added Clubs feature: accreditation documents uploaded to a private Lovable Cloud bucket, visible only to the club's owner/admins and our moderation team; retained while the club is active; deleted on rejection or removal request.)";
+  const lastUpdated = "July 9, 2026 (added 365 Franchise & Partner Program: shared customer CRM across approved partner shops — only with the customer's opt-in consent, with the ability to withdraw at any time; retained while the customer remains active and deleted on request; internal application data (contact, business info, shop details) is retained for the life of the application record and up to 24 months after a final decision.)";
 
   return (
     <SiteLayout>

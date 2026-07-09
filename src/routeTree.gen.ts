@@ -38,6 +38,7 @@ import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as LeadsMarketplaceRouteImport } from './routes/leads-marketplace'
 import { Route as GuidelinesRouteImport } from './routes/guidelines'
 import { Route as GameRouteImport } from './routes/game'
+import { Route as FranchiseRouteImport } from './routes/franchise'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExportRouteImport } from './routes/export'
 import { Route as DispatchRouteImport } from './routes/dispatch'
@@ -97,6 +98,7 @@ import { Route as HelpTrustScoreRouteImport } from './routes/help.trust-score'
 import { Route as HelpPostingEtiquetteRouteImport } from './routes/help.posting-etiquette'
 import { Route as HelpPayWithGcashRouteImport } from './routes/help.pay-with-gcash'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
+import { Route as FranchiseApplyRouteImport } from './routes/franchise.apply'
 import { Route as ExportTrustRouteImport } from './routes/export.trust'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DispatchJoinRouteImport } from './routes/dispatch.join'
@@ -166,6 +168,8 @@ import { Route as AdminLocationCorrectionsRouteImport } from './routes/admin.loc
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminLeadOffersRouteImport } from './routes/admin.lead-offers'
 import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
+import { Route as AdminFranchiseTiersRouteImport } from './routes/admin.franchise-tiers'
+import { Route as AdminFranchiseRouteImport } from './routes/admin.franchise'
 import { Route as AdminFlashcardsRouteImport } from './routes/admin.flashcards'
 import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-flags'
 import { Route as AdminEducationRouteImport } from './routes/admin.education'
@@ -244,6 +248,8 @@ import { Route as AdminAdvertisementsApprovalsRouteImport } from './routes/admin
 import { Route as AdminAdvertisementsAnalyticsRouteImport } from './routes/admin.advertisements.analytics'
 import { Route as AdminAccountsBackfillRouteImport } from './routes/admin.accounts.backfill'
 import { Route as AuthenticatedStaffAcademyRouteImport } from './routes/_authenticated/staff.academy'
+import { Route as AuthenticatedFranchiseStatusRouteImport } from './routes/_authenticated/franchise.status'
+import { Route as AuthenticatedFranchiseDashboardRouteImport } from './routes/_authenticated/franchise.dashboard'
 import { Route as AuthenticatedDisputeReportIdRouteImport } from './routes/_authenticated/dispute.$reportId'
 import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './routes/_authenticated/dashboard.staff-requests'
 import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
@@ -443,6 +449,11 @@ const GuidelinesRoute = GuidelinesRouteImport.update({
 const GameRoute = GameRouteImport.update({
   id: '/game',
   path: '/game',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FranchiseRoute = FranchiseRouteImport.update({
+  id: '/franchise',
+  path: '/franchise',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -738,6 +749,11 @@ const GoProductIdRoute = GoProductIdRouteImport.update({
   id: '/go/$productId',
   path: '/go/$productId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const FranchiseApplyRoute = FranchiseApplyRouteImport.update({
+  id: '/apply',
+  path: '/apply',
+  getParentRoute: () => FranchiseRoute,
 } as any)
 const ExportTrustRoute = ExportTrustRouteImport.update({
   id: '/trust',
@@ -1085,6 +1101,16 @@ const AdminLeadOffersRoute = AdminLeadOffersRouteImport.update({
 const AdminInquiriesRoute = AdminInquiriesRouteImport.update({
   id: '/inquiries',
   path: '/inquiries',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFranchiseTiersRoute = AdminFranchiseTiersRouteImport.update({
+  id: '/franchise-tiers',
+  path: '/franchise-tiers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFranchiseRoute = AdminFranchiseRouteImport.update({
+  id: '/franchise',
+  path: '/franchise',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminFlashcardsRoute = AdminFlashcardsRouteImport.update({
@@ -1504,6 +1530,18 @@ const AuthenticatedStaffAcademyRoute =
     path: '/staff/academy',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFranchiseStatusRoute =
+  AuthenticatedFranchiseStatusRouteImport.update({
+    id: '/franchise/status',
+    path: '/franchise/status',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFranchiseDashboardRoute =
+  AuthenticatedFranchiseDashboardRouteImport.update({
+    id: '/franchise/dashboard',
+    path: '/franchise/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDisputeReportIdRoute =
   AuthenticatedDisputeReportIdRouteImport.update({
     id: '/dispute/$reportId',
@@ -1837,6 +1875,7 @@ export interface FileRoutesByFullPath {
   '/dispatch': typeof DispatchRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
+  '/franchise': typeof FranchiseRouteWithChildren
   '/game': typeof GameRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
@@ -1886,6 +1925,8 @@ export interface FileRoutesByFullPath {
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/flashcards': typeof AdminFlashcardsRoute
+  '/admin/franchise': typeof AdminFranchiseRoute
+  '/admin/franchise-tiers': typeof AdminFranchiseTiersRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
@@ -1955,6 +1996,7 @@ export interface FileRoutesByFullPath {
   '/dispatch/join': typeof DispatchJoinRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
+  '/franchise/apply': typeof FranchiseApplyRoute
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
@@ -2011,6 +2053,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
+  '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -2125,6 +2169,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
+  '/franchise': typeof FranchiseRouteWithChildren
   '/game': typeof GameRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
@@ -2173,6 +2218,8 @@ export interface FileRoutesByTo {
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/flashcards': typeof AdminFlashcardsRoute
+  '/admin/franchise': typeof AdminFranchiseRoute
+  '/admin/franchise-tiers': typeof AdminFranchiseTiersRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
@@ -2240,6 +2287,7 @@ export interface FileRoutesByTo {
   '/dispatch/join': typeof DispatchJoinRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
+  '/franchise/apply': typeof FranchiseApplyRoute
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
@@ -2296,6 +2344,8 @@ export interface FileRoutesByTo {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
+  '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -2414,6 +2464,7 @@ export interface FileRoutesById {
   '/dispatch': typeof DispatchRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
+  '/franchise': typeof FranchiseRouteWithChildren
   '/game': typeof GameRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
@@ -2463,6 +2514,8 @@ export interface FileRoutesById {
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/flashcards': typeof AdminFlashcardsRoute
+  '/admin/franchise': typeof AdminFranchiseRoute
+  '/admin/franchise-tiers': typeof AdminFranchiseTiersRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
@@ -2532,6 +2585,7 @@ export interface FileRoutesById {
   '/dispatch/join': typeof DispatchJoinRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
+  '/franchise/apply': typeof FranchiseApplyRoute
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
@@ -2588,6 +2642,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/_authenticated/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/_authenticated/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/_authenticated/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
+  '/_authenticated/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/_authenticated/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -2707,6 +2763,7 @@ export interface FileRouteTypes {
     | '/dispatch'
     | '/export'
     | '/forgot-password'
+    | '/franchise'
     | '/game'
     | '/guidelines'
     | '/leads-marketplace'
@@ -2756,6 +2813,8 @@ export interface FileRouteTypes {
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/flashcards'
+    | '/admin/franchise'
+    | '/admin/franchise-tiers'
     | '/admin/inquiries'
     | '/admin/lead-offers'
     | '/admin/listings'
@@ -2825,6 +2884,7 @@ export interface FileRouteTypes {
     | '/dispatch/join'
     | '/email/unsubscribe'
     | '/export/trust'
+    | '/franchise/apply'
     | '/go/$productId'
     | '/help/pay-with-gcash'
     | '/help/posting-etiquette'
@@ -2881,6 +2941,8 @@ export interface FileRouteTypes {
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
+    | '/franchise/dashboard'
+    | '/franchise/status'
     | '/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
@@ -2995,6 +3057,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/export'
     | '/forgot-password'
+    | '/franchise'
     | '/game'
     | '/guidelines'
     | '/leads-marketplace'
@@ -3043,6 +3106,8 @@ export interface FileRouteTypes {
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/flashcards'
+    | '/admin/franchise'
+    | '/admin/franchise-tiers'
     | '/admin/inquiries'
     | '/admin/lead-offers'
     | '/admin/listings'
@@ -3110,6 +3175,7 @@ export interface FileRouteTypes {
     | '/dispatch/join'
     | '/email/unsubscribe'
     | '/export/trust'
+    | '/franchise/apply'
     | '/go/$productId'
     | '/help/pay-with-gcash'
     | '/help/posting-etiquette'
@@ -3166,6 +3232,8 @@ export interface FileRouteTypes {
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
+    | '/franchise/dashboard'
+    | '/franchise/status'
     | '/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
@@ -3283,6 +3351,7 @@ export interface FileRouteTypes {
     | '/dispatch'
     | '/export'
     | '/forgot-password'
+    | '/franchise'
     | '/game'
     | '/guidelines'
     | '/leads-marketplace'
@@ -3332,6 +3401,8 @@ export interface FileRouteTypes {
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/flashcards'
+    | '/admin/franchise'
+    | '/admin/franchise-tiers'
     | '/admin/inquiries'
     | '/admin/lead-offers'
     | '/admin/listings'
@@ -3401,6 +3472,7 @@ export interface FileRouteTypes {
     | '/dispatch/join'
     | '/email/unsubscribe'
     | '/export/trust'
+    | '/franchise/apply'
     | '/go/$productId'
     | '/help/pay-with-gcash'
     | '/help/posting-etiquette'
@@ -3457,6 +3529,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/parts-wanted'
     | '/_authenticated/dashboard/staff-requests'
     | '/_authenticated/dispute/$reportId'
+    | '/_authenticated/franchise/dashboard'
+    | '/_authenticated/franchise/status'
     | '/_authenticated/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
@@ -3576,6 +3650,7 @@ export interface RootRouteChildren {
   DispatchRoute: typeof DispatchRouteWithChildren
   ExportRoute: typeof ExportRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  FranchiseRoute: typeof FranchiseRouteWithChildren
   GameRoute: typeof GameRoute
   GuidelinesRoute: typeof GuidelinesRoute
   LeadsMarketplaceRoute: typeof LeadsMarketplaceRoute
@@ -3904,6 +3979,13 @@ declare module '@tanstack/react-router' {
       path: '/game'
       fullPath: '/game'
       preLoaderRoute: typeof GameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/franchise': {
+      id: '/franchise'
+      path: '/franchise'
+      fullPath: '/franchise'
+      preLoaderRoute: typeof FranchiseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -4318,6 +4400,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/go/$productId'
       preLoaderRoute: typeof GoProductIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/franchise/apply': {
+      id: '/franchise/apply'
+      path: '/apply'
+      fullPath: '/franchise/apply'
+      preLoaderRoute: typeof FranchiseApplyRouteImport
+      parentRoute: typeof FranchiseRoute
     }
     '/export/trust': {
       id: '/export/trust'
@@ -4800,6 +4889,20 @@ declare module '@tanstack/react-router' {
       path: '/inquiries'
       fullPath: '/admin/inquiries'
       preLoaderRoute: typeof AdminInquiriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/franchise-tiers': {
+      id: '/admin/franchise-tiers'
+      path: '/franchise-tiers'
+      fullPath: '/admin/franchise-tiers'
+      preLoaderRoute: typeof AdminFranchiseTiersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/franchise': {
+      id: '/admin/franchise'
+      path: '/franchise'
+      fullPath: '/admin/franchise'
+      preLoaderRoute: typeof AdminFranchiseRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/flashcards': {
@@ -5348,6 +5451,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStaffAcademyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/franchise/status': {
+      id: '/_authenticated/franchise/status'
+      path: '/franchise/status'
+      fullPath: '/franchise/status'
+      preLoaderRoute: typeof AuthenticatedFranchiseStatusRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/franchise/dashboard': {
+      id: '/_authenticated/franchise/dashboard'
+      path: '/franchise/dashboard'
+      fullPath: '/franchise/dashboard'
+      preLoaderRoute: typeof AuthenticatedFranchiseDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dispute/$reportId': {
       id: '/_authenticated/dispute/$reportId'
       path: '/dispute/$reportId'
@@ -5761,6 +5878,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
   AuthenticatedDashboardStaffRequestsRoute: typeof AuthenticatedDashboardStaffRequestsRoute
   AuthenticatedDisputeReportIdRoute: typeof AuthenticatedDisputeReportIdRoute
+  AuthenticatedFranchiseDashboardRoute: typeof AuthenticatedFranchiseDashboardRoute
+  AuthenticatedFranchiseStatusRoute: typeof AuthenticatedFranchiseStatusRoute
   AuthenticatedStaffAcademyRoute: typeof AuthenticatedStaffAcademyRouteWithChildren
   AuthenticatedDashboardClubsIdRoute: typeof AuthenticatedDashboardClubsIdRoute
 }
@@ -5780,6 +5899,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardStaffRequestsRoute:
     AuthenticatedDashboardStaffRequestsRoute,
   AuthenticatedDisputeReportIdRoute: AuthenticatedDisputeReportIdRoute,
+  AuthenticatedFranchiseDashboardRoute: AuthenticatedFranchiseDashboardRoute,
+  AuthenticatedFranchiseStatusRoute: AuthenticatedFranchiseStatusRoute,
   AuthenticatedStaffAcademyRoute: AuthenticatedStaffAcademyRouteWithChildren,
   AuthenticatedDashboardClubsIdRoute: AuthenticatedDashboardClubsIdRoute,
 }
@@ -5895,6 +6016,8 @@ interface AdminRouteChildren {
   AdminEducationRoute: typeof AdminEducationRoute
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
   AdminFlashcardsRoute: typeof AdminFlashcardsRoute
+  AdminFranchiseRoute: typeof AdminFranchiseRoute
+  AdminFranchiseTiersRoute: typeof AdminFranchiseTiersRoute
   AdminInquiriesRoute: typeof AdminInquiriesRoute
   AdminLeadOffersRoute: typeof AdminLeadOffersRoute
   AdminListingsRoute: typeof AdminListingsRoute
@@ -5946,6 +6069,8 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEducationRoute: AdminEducationRoute,
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
   AdminFlashcardsRoute: AdminFlashcardsRoute,
+  AdminFranchiseRoute: AdminFranchiseRoute,
+  AdminFranchiseTiersRoute: AdminFranchiseTiersRoute,
   AdminInquiriesRoute: AdminInquiriesRoute,
   AdminLeadOffersRoute: AdminLeadOffersRoute,
   AdminListingsRoute: AdminListingsRoute,
@@ -6188,6 +6313,18 @@ const ExportRouteChildren: ExportRouteChildren = {
 const ExportRouteWithChildren =
   ExportRoute._addFileChildren(ExportRouteChildren)
 
+interface FranchiseRouteChildren {
+  FranchiseApplyRoute: typeof FranchiseApplyRoute
+}
+
+const FranchiseRouteChildren: FranchiseRouteChildren = {
+  FranchiseApplyRoute: FranchiseApplyRoute,
+}
+
+const FranchiseRouteWithChildren = FranchiseRoute._addFileChildren(
+  FranchiseRouteChildren,
+)
+
 interface PartnerProgramRouteChildren {
   PartnerProgramApplyRoute: typeof PartnerProgramApplyRoute
   PartnerProgramTermsRoute: typeof PartnerProgramTermsRoute
@@ -6305,6 +6442,7 @@ const rootRouteChildren: RootRouteChildren = {
   DispatchRoute: DispatchRouteWithChildren,
   ExportRoute: ExportRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  FranchiseRoute: FranchiseRouteWithChildren,
   GameRoute: GameRoute,
   GuidelinesRoute: GuidelinesRoute,
   LeadsMarketplaceRoute: LeadsMarketplaceRoute,
