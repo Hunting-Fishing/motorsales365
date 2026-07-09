@@ -17,7 +17,7 @@ const DESCRIPTION =
   "Join the 365 network as a Partner or Franchise. Get parts discounts, shared customer CRM, network stock visibility, marketing boost, and bundled Shop Manager tools.";
 const URL = "https://www.365motorsales.com/franchise";
 
-export const Route = createFileRoute("/franchise")({
+export const Route = createFileRoute("/franchise/")({
   head: () => ({
     meta: [
       { title: TITLE },
