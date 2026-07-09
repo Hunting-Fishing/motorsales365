@@ -582,6 +582,24 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
         </div>
       )}
 
+      {row.reserved_quantity && row.reserved_until && (
+        <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-2 text-xs">
+          <p className="font-medium text-amber-700 dark:text-amber-400">
+            Holding {Number(row.reserved_quantity)} unit(s)
+            {new Date(row.reserved_until) > new Date()
+              ? ` · expires ${new Date(row.reserved_until).toLocaleString()}`
+              : " · hold expired"}
+          </p>
+          <button
+            onClick={releaseHold}
+            disabled={busy !== null}
+            className="mt-1 text-xs underline text-amber-700 dark:text-amber-400 disabled:opacity-50"
+          >
+            {busy === "release" ? "Releasing…" : "Release hold"}
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <Input
           value={note}
