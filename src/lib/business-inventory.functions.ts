@@ -69,7 +69,7 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       }
     }
 
-    const payload: Record<string, unknown> = {
+    const payload = {
       id: data.id,
       business_id: data.businessId,
       sku: data.sku ?? null,
