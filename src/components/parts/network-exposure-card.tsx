@@ -21,7 +21,7 @@ const STATUS_LABEL: Record<NetworkExposureStatus, string> = {
   revoked: "Revoked by admin",
 };
 
-const STATUS_ICON: Record<NetworkExposureStatus, JSX.Element> = {
+const STATUS_ICON: Record<NetworkExposureStatus, ReactNode> = {
   none: <Radio className="h-3.5 w-3.5" />,
   pending: <Clock className="h-3.5 w-3.5" />,
   approved: <ShieldCheck className="h-3.5 w-3.5" />,
