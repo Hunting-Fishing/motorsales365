@@ -240,8 +240,9 @@ async function ensureAdmin(ctx: { supabase: any; userId: string }) {
 export const adminListApplications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (d: { status?: string | null; search?: string | null; limit?: number } | undefined) => ({
+    (d: { status?: string | null; tier?: string | null; search?: string | null; limit?: number } | undefined) => ({
       status: d?.status ?? null,
+      tier: (d?.tier ?? "").trim() || null,
       search: (d?.search ?? "").trim() || null,
       limit: Math.max(1, Math.min(500, Number(d?.limit ?? 200))),
     }),
@@ -254,6 +255,13 @@ export const adminListApplications = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(data.limit);
     if (data.status) q = q.eq("status", data.status);
+    if (data.tier) {
+      if (data.tier === "requested_only") {
+        q = q.is("assigned_tier_slug", null);
+      } else {
+        q = q.eq("assigned_tier_slug", data.tier);
+      }
+    }
     if (data.search) {
       const s = data.search.replace(/[%_]/g, " ");
       q = q.or(
