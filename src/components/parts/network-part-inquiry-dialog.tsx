@@ -69,6 +69,17 @@ export function NetworkPartInquiryDialog({
           message: form.message || null,
         },
       });
+      if (user) {
+        toast.success("Request sent", {
+          description: "Track its status in My part requests.",
+          action: {
+            label: "Track",
+            onClick: () => {
+              window.location.href = "/parts/my-requests";
+            },
+          },
+        });
+      }
       onSubmitted?.();
       onClose();
     } catch (err: any) {

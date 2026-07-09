@@ -6117,6 +6117,9 @@ export type Database = {
           part_name: string
           quantity: number
           requester_user_id: string | null
+          responded_at: string | null
+          responded_by: string | null
+          response_note: string | null
           sku: string | null
           status: string
           updated_at: string
@@ -6133,6 +6136,9 @@ export type Database = {
           part_name: string
           quantity?: number
           requester_user_id?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          response_note?: string | null
           sku?: string | null
           status?: string
           updated_at?: string
@@ -6149,6 +6155,9 @@ export type Database = {
           part_name?: string
           quantity?: number
           requester_user_id?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          response_note?: string | null
           sku?: string | null
           status?: string
           updated_at?: string

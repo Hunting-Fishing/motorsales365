@@ -249,6 +249,7 @@ import { Route as AdminAdvertisementsApprovalsRouteImport } from './routes/admin
 import { Route as AdminAdvertisementsAnalyticsRouteImport } from './routes/admin.advertisements.analytics'
 import { Route as AdminAccountsBackfillRouteImport } from './routes/admin.accounts.backfill'
 import { Route as AuthenticatedStaffAcademyRouteImport } from './routes/_authenticated/staff.academy'
+import { Route as AuthenticatedPartsMyRequestsRouteImport } from './routes/_authenticated/parts.my-requests'
 import { Route as AuthenticatedFranchiseStatusRouteImport } from './routes/_authenticated/franchise.status'
 import { Route as AuthenticatedFranchiseDashboardRouteImport } from './routes/_authenticated/franchise.dashboard'
 import { Route as AuthenticatedDisputeReportIdRouteImport } from './routes/_authenticated/dispute.$reportId'
@@ -1536,6 +1537,12 @@ const AuthenticatedStaffAcademyRoute =
     path: '/staff/academy',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPartsMyRequestsRoute =
+  AuthenticatedPartsMyRequestsRouteImport.update({
+    id: '/parts/my-requests',
+    path: '/parts/my-requests',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFranchiseStatusRoute =
   AuthenticatedFranchiseStatusRouteImport.update({
     id: '/franchise/status',
@@ -2062,6 +2069,7 @@ export interface FileRoutesByFullPath {
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
+  '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -2354,6 +2362,7 @@ export interface FileRoutesByTo {
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
+  '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -2653,6 +2662,7 @@ export interface FileRoutesById {
   '/_authenticated/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
   '/_authenticated/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/_authenticated/franchise/status': typeof AuthenticatedFranchiseStatusRoute
+  '/_authenticated/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/_authenticated/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -2953,6 +2963,7 @@ export interface FileRouteTypes {
     | '/dispute/$reportId'
     | '/franchise/dashboard'
     | '/franchise/status'
+    | '/parts/my-requests'
     | '/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
@@ -3245,6 +3256,7 @@ export interface FileRouteTypes {
     | '/dispute/$reportId'
     | '/franchise/dashboard'
     | '/franchise/status'
+    | '/parts/my-requests'
     | '/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
@@ -3543,6 +3555,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dispute/$reportId'
     | '/_authenticated/franchise/dashboard'
     | '/_authenticated/franchise/status'
+    | '/_authenticated/parts/my-requests'
     | '/_authenticated/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
@@ -5470,6 +5483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStaffAcademyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/parts/my-requests': {
+      id: '/_authenticated/parts/my-requests'
+      path: '/parts/my-requests'
+      fullPath: '/parts/my-requests'
+      preLoaderRoute: typeof AuthenticatedPartsMyRequestsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/franchise/status': {
       id: '/_authenticated/franchise/status'
       path: '/franchise/status'
@@ -5899,6 +5919,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDisputeReportIdRoute: typeof AuthenticatedDisputeReportIdRoute
   AuthenticatedFranchiseDashboardRoute: typeof AuthenticatedFranchiseDashboardRoute
   AuthenticatedFranchiseStatusRoute: typeof AuthenticatedFranchiseStatusRoute
+  AuthenticatedPartsMyRequestsRoute: typeof AuthenticatedPartsMyRequestsRoute
   AuthenticatedStaffAcademyRoute: typeof AuthenticatedStaffAcademyRouteWithChildren
   AuthenticatedDashboardClubsIdRoute: typeof AuthenticatedDashboardClubsIdRoute
 }
@@ -5920,6 +5941,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDisputeReportIdRoute: AuthenticatedDisputeReportIdRoute,
   AuthenticatedFranchiseDashboardRoute: AuthenticatedFranchiseDashboardRoute,
   AuthenticatedFranchiseStatusRoute: AuthenticatedFranchiseStatusRoute,
+  AuthenticatedPartsMyRequestsRoute: AuthenticatedPartsMyRequestsRoute,
   AuthenticatedStaffAcademyRoute: AuthenticatedStaffAcademyRouteWithChildren,
   AuthenticatedDashboardClubsIdRoute: AuthenticatedDashboardClubsIdRoute,
 }

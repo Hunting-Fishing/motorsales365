@@ -15,6 +15,9 @@ import {
   getBusinessNetworkExposure,
   setBusinessNetworkExposure,
   listShopInquiries,
+  updateNetworkInquiryStatus,
+  NETWORK_INQUIRY_STATUSES,
+  type NetworkInquiryStatus,
 } from "@/lib/network-stock.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -245,28 +248,13 @@ function InventoryPage() {
       {inquiries.data && inquiries.data.length > 0 && (
         <Card className="divide-y">
           <div className="p-4">
-            <p className="font-medium">Recent network requests</p>
+            <p className="font-medium">Network part requests</p>
             <p className="text-sm text-muted-foreground">
-              Customers who requested a part from your stock feed.
+              Track requests through Pending → Accepted / Rejected → Fulfilled.
             </p>
           </div>
-          {inquiries.data.slice(0, 10).map((r: any) => (
-            <div key={r.id} className="p-4 flex items-center justify-between gap-3 text-sm">
-              <div className="min-w-0">
-                <p className="font-medium truncate">
-                  {r.part_name}
-                  {r.sku ? <span className="text-muted-foreground"> · {r.sku}</span> : null}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {r.contact_name} · {r.contact_email}
-                  {r.contact_phone ? ` · ${r.contact_phone}` : ""} · qty {Number(r.quantity)}
-                </p>
-                {r.message ? (
-                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{r.message}</p>
-                ) : null}
-              </div>
-              <Badge variant={r.status === "new" ? "default" : "outline"}>{r.status}</Badge>
-            </div>
+          {inquiries.data.slice(0, 20).map((r: any) => (
+            <InquiryRow key={r.id} row={r} businessId={businessId} />
           ))}
         </Card>
       )}
@@ -435,6 +423,87 @@ function InventoryPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+const STATUS_VARIANT: Record<NetworkInquiryStatus, "default" | "secondary" | "destructive" | "outline"> = {
+  pending: "default",
+  accepted: "secondary",
+  rejected: "destructive",
+  fulfilled: "outline",
+  closed: "outline",
+};
+
+function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
+  const qc = useQueryClient();
+  const updateFn = useServerFn(updateNetworkInquiryStatus);
+  const [note, setNote] = useState(row.response_note ?? "");
+  const [busy, setBusy] = useState<NetworkInquiryStatus | null>(null);
+
+  async function setStatus(status: NetworkInquiryStatus) {
+    setBusy(status);
+    try {
+      await updateFn({
+        data: { id: row.id, businessId, status, note: note.trim() || null },
+      });
+      toast.success(`Marked ${status}`);
+      qc.invalidateQueries({ queryKey: ["business-network-inquiries", businessId] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to update");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  const status = (row.status ?? "pending") as NetworkInquiryStatus;
+  return (
+    <div className="p-4 space-y-2 text-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-medium truncate">
+            {row.part_name}
+            {row.sku ? <span className="text-muted-foreground"> · {row.sku}</span> : null}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {row.contact_name} · {row.contact_email}
+            {row.contact_phone ? ` · ${row.contact_phone}` : ""} · qty {Number(row.quantity)}
+          </p>
+          {row.message ? (
+            <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{row.message}</p>
+          ) : null}
+        </div>
+        <Badge variant={STATUS_VARIANT[status] ?? "outline"} className="capitalize">
+          {status}
+        </Badge>
+      </div>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Input
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Optional note to the customer (price, ETA, reason…)"
+          className="h-8 text-xs"
+        />
+        <div className="flex flex-wrap gap-1.5">
+          {NETWORK_INQUIRY_STATUSES.filter((s) => s !== status).map((s) => (
+            <Button
+              key={s}
+              size="sm"
+              variant={s === "rejected" ? "destructive" : s === "accepted" ? "default" : "outline"}
+              disabled={busy !== null}
+              onClick={() => setStatus(s)}
+              className="capitalize"
+            >
+              {busy === s ? "…" : s}
+            </Button>
+          ))}
+        </div>
+      </div>
+      {row.responded_at && (
+        <p className="text-[11px] text-muted-foreground">
+          Last updated {new Date(row.responded_at).toLocaleString()}
+        </p>
+      )}
     </div>
   );
 }
