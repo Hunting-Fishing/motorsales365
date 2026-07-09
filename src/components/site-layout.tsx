@@ -6,6 +6,7 @@ import { CookieBanner } from "./cookie-banner";
 import { PaymentTestModeBanner } from "./PaymentTestModeBanner";
 import { MobileTabBar } from "./mobile-tab-bar";
 import { FloatingHelpWidget } from "./support/floating-help-widget";
+import { NotificationsListener } from "./notifications-listener";
 import bannerImage from "@/assets/banner.webp";
 
 // Hotspots overlaid on the banner image's tile strip.
