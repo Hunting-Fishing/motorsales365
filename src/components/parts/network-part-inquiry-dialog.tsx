@@ -28,7 +28,7 @@ export function NetworkPartInquiryDialog({
   onClose: () => void;
   onSubmitted?: () => void;
 }) {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const submitFn = useServerFn(submitNetworkPartInquiry);
   const [form, setForm] = useState({
     contact_name: "",
