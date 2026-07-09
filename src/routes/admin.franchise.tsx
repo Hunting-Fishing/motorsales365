@@ -548,6 +548,13 @@ function AdminFranchisePage() {
               </div>
 
               <div>
+                <p className="text-xs uppercase text-muted-foreground">Admin audit trail</p>
+                <div className="mt-2">
+                  <ApplicationAuditTrail applicationId={detail.data.application.id} />
+                </div>
+              </div>
+
+              <div>
                 <p className="text-xs uppercase text-muted-foreground">Thread</p>
                 <div className="mt-2 space-y-2">
                   {detail.data.messages.length === 0 ? (
