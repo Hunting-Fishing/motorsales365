@@ -20,6 +20,7 @@ import {
   Truck,
   Globe,
   BadgePercent,
+  Handshake,
   type LucideIcon,
 } from "lucide-react";
 
