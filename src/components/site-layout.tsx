@@ -92,6 +92,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <CookieBanner />
       <FloatingHelpWidget />
       <MobileTabBar />
+      <NotificationsListener />
     </div>
   );
 }
