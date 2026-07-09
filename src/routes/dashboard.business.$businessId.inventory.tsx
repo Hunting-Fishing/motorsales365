@@ -47,8 +47,6 @@ function InventoryPage() {
   const upsertFn = useServerFn(upsertBusinessInventoryItem);
   const adjustFn = useServerFn(adjustBusinessInventory);
   const delFn = useServerFn(deleteBusinessInventoryItem);
-  const exposureLoadFn = useServerFn(getBusinessNetworkExposure);
-  const exposureSetFn = useServerFn(setBusinessNetworkExposure);
   const inquiriesFn = useServerFn(listShopInquiries);
 
   const q = useQuery({
@@ -57,11 +55,6 @@ function InventoryPage() {
     queryFn: () => loadFn({ data: { businessId } }),
   });
 
-  const exposure = useQuery({
-    queryKey: ["business-exposure", businessId],
-    enabled: !!user?.id,
-    queryFn: () => exposureLoadFn({ data: { businessId } }),
-  });
 
   const inquiries = useQuery({
     queryKey: ["business-network-inquiries", businessId],
