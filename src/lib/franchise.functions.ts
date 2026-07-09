@@ -426,3 +426,322 @@ export const adminUpsertTier = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+// -------- Public partner directory --------
+
+export type PublicPartner = {
+  membership_id: string;
+  tier_slug: string;
+  tier_name: string | null;
+  member_number: string;
+  started_at: string;
+  business_id: string;
+  business_name: string;
+  business_slug: string;
+  city: string | null;
+  province: string | null;
+  logo_url: string | null;
+  cover_url: string | null;
+};
+
+export const listPublicPartners = createServerFn({ method: "GET" })
+  .inputValidator(
+    (d: { tier?: string | null; province?: string | null; limit?: number } | undefined) => ({
+      tier: d?.tier?.trim() || null,
+      province: d?.province?.trim() || null,
+      limit: Math.max(1, Math.min(200, Number(d?.limit ?? 60))),
+    }),
+  )
+  .handler(async ({ data }): Promise<PublicPartner[]> => {
+    const sb = publicClient();
+    const { data: rows, error } = await (sb as any).rpc("list_public_partners", {
+      _tier_slug: data.tier,
+      _province: data.province,
+      _limit: data.limit,
+    });
+    if (error) return [];
+    return ((rows as any[]) ?? []) as PublicPartner[];
+  });
+
+// -------- Presence (for site header/menu) --------
+
+export const getMyFranchisePresence = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(
+    async ({
+      context,
+    }): Promise<{
+      hasApplication: boolean;
+      applicationStatus: FranchiseApplication["status"] | null;
+      hasMembership: boolean;
+      membershipStatus: FranchiseMembership["status"] | null;
+    }> => {
+      const { supabase, userId, claims } = context;
+      const email = ((claims?.email as string | undefined) ?? "").toLowerCase();
+      let q = supabase
+        .from("franchise_applications" as any)
+        .select("status")
+        .order("created_at", { ascending: false })
+        .limit(1);
+      q = email ? q.or(`user_id.eq.${userId},contact_email.eq.${email}`) : q.eq("user_id", userId);
+      const { data: apps } = await q;
+      const app = ((apps as any[]) ?? [])[0] ?? null;
+
+      const { data: mem } = await supabase
+        .from("franchise_memberships" as any)
+        .select("status")
+        .eq("user_id", userId)
+        .in("status", ["pending_payment", "active", "past_due"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      return {
+        hasApplication: !!app,
+        applicationStatus: (app?.status ?? null) as any,
+        hasMembership: !!mem,
+        membershipStatus: (mem?.status ?? null) as any,
+      };
+    },
+  );
+
+// -------- Stripe: membership checkout & portal --------
+
+export const createFranchiseCheckoutSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (d: { membershipId: string; returnUrl: string; environment: "sandbox" | "live" }) => {
+      if (!/^[0-9a-f-]{36}$/i.test(d.membershipId)) throw new Error("Invalid membershipId");
+      if (d.environment !== "sandbox" && d.environment !== "live") throw new Error("Invalid env");
+      return d;
+    },
+  )
+  .handler(async ({ data, context }): Promise<{ clientSecret: string } | { error: string }> => {
+    const { supabase, userId, claims } = context;
+    const { data: mem, error: mErr } = await supabase
+      .from("franchise_memberships" as any)
+      .select("*")
+      .eq("id", data.membershipId)
+      .maybeSingle();
+    if (mErr || !mem) return { error: "Membership not found" };
+    if ((mem as any).user_id !== userId) return { error: "Not your membership" };
+    if ((mem as any).status === "active") return { error: "Already active" };
+
+    const tierSlug = ((mem as any).pending_tier_slug ?? (mem as any).tier_slug) as string;
+    const { data: tier } = await supabase
+      .from("franchise_tiers" as any)
+      .select("*")
+      .eq("slug", tierSlug)
+      .maybeSingle();
+    if (!tier) return { error: "Tier not found" };
+    const t = tier as any;
+    if (!t.stripe_monthly_price_id) {
+      return { error: "This tier isn't wired to Stripe yet. An admin needs to sync it." };
+    }
+
+    try {
+      const { createStripeClient, getStripeErrorMessage, validateReturnUrl } = await import(
+        "@/lib/stripe.server"
+      );
+      validateReturnUrl(data.returnUrl);
+      const stripe = createStripeClient(data.environment);
+      const email = (claims as any)?.email as string | undefined;
+
+      // Resolve/create customer with userId metadata.
+      let customerId: string | null = (mem as any).stripe_customer_id ?? null;
+      if (!customerId) {
+        const found = await stripe.customers.search({
+          query: `metadata['userId']:'${userId}'`,
+          limit: 1,
+        });
+        if (found.data.length) customerId = found.data[0].id;
+      }
+      if (!customerId) {
+        const created = await stripe.customers.create({
+          ...(email && { email }),
+          metadata: { userId },
+        });
+        customerId = created.id;
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        mode: "subscription",
+        ui_mode: "embedded_page",
+        return_url: data.returnUrl,
+        customer: customerId,
+        line_items: [{ price: t.stripe_monthly_price_id as string, quantity: 1 }],
+        ...(t.stripe_setup_price_id
+          ? {
+              subscription_data: {
+                description: `${t.name} membership`,
+                metadata: {
+                  userId,
+                  kind: "franchise",
+                  franchise_membership_id: data.membershipId,
+                  tier_slug: tierSlug,
+                },
+                add_invoice_items: [{ price: t.stripe_setup_price_id as string, quantity: 1 }],
+              },
+            }
+          : {
+              subscription_data: {
+                description: `${t.name} membership`,
+                metadata: {
+                  userId,
+                  kind: "franchise",
+                  franchise_membership_id: data.membershipId,
+                  tier_slug: tierSlug,
+                },
+              },
+            }),
+        metadata: {
+          userId,
+          kind: "franchise",
+          franchise_membership_id: data.membershipId,
+          tier_slug: tierSlug,
+        },
+      } as any);
+
+      // Persist customer for portal + resume flows.
+      await supabase
+        .from("franchise_memberships" as any)
+        .update({ stripe_customer_id: customerId })
+        .eq("id", data.membershipId);
+
+      return { clientSecret: session.client_secret ?? "" };
+    } catch (err) {
+      const { getStripeErrorMessage } = await import("@/lib/stripe.server");
+      return { error: getStripeErrorMessage(err) };
+    }
+  });
+
+export const createFranchisePortalSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { returnUrl: string; environment: "sandbox" | "live" }) => {
+    if (d.environment !== "sandbox" && d.environment !== "live") throw new Error("Invalid env");
+    return d;
+  })
+  .handler(async ({ data, context }): Promise<{ url: string } | { error: string }> => {
+    const { supabase, userId } = context;
+    const { data: mem } = await supabase
+      .from("franchise_memberships" as any)
+      .select("stripe_customer_id")
+      .eq("user_id", userId)
+      .not("stripe_customer_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const customerId = (mem as any)?.stripe_customer_id;
+    if (!customerId) return { error: "No billing account yet" };
+    try {
+      const { createStripeClient, getStripeErrorMessage, validateReturnUrl } = await import(
+        "@/lib/stripe.server"
+      );
+      validateReturnUrl(data.returnUrl);
+      const stripe = createStripeClient(data.environment);
+      const portal = await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: data.returnUrl,
+      });
+      return { url: portal.url };
+    } catch (err) {
+      const { getStripeErrorMessage } = await import("@/lib/stripe.server");
+      return { error: getStripeErrorMessage(err) };
+    }
+  });
+
+// -------- Admin: sync a tier's product/prices into Stripe --------
+
+export const adminSyncTierToStripe = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { slug: string; environment: "sandbox" | "live" }) => {
+    if (!/^[a-z0-9_-]+$/.test(d.slug)) throw new Error("Invalid slug");
+    if (d.environment !== "sandbox" && d.environment !== "live") throw new Error("Invalid env");
+    return d;
+  })
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { data: tier, error } = await context.supabase
+      .from("franchise_tiers" as any)
+      .select("*")
+      .eq("slug", data.slug)
+      .maybeSingle();
+    if (error || !tier) throw new Error("Tier not found");
+    const t = tier as any;
+
+    const { createStripeClient } = await import("@/lib/stripe.server");
+    const stripe = createStripeClient(data.environment);
+
+    // Upsert product
+    let productId: string | null = t.stripe_product_id ?? null;
+    if (productId) {
+      await stripe.products.update(productId, {
+        name: `365 ${t.name} Membership`,
+        description: t.tagline ?? undefined,
+        active: !!t.is_active,
+      });
+    } else {
+      const p = await stripe.products.create({
+        name: `365 ${t.name} Membership`,
+        description: t.tagline ?? undefined,
+        active: !!t.is_active,
+        metadata: { kind: "franchise_tier", tier_slug: t.slug },
+      });
+      productId = p.id;
+    }
+
+    // Monthly recurring price (create new when amount differs; Stripe prices are immutable)
+    const monthlyLookup = `franchise_${t.slug}_monthly`;
+    const setupLookup = `franchise_${t.slug}_setup`;
+
+    async function upsertPrice(
+      lookupKey: string,
+      unitAmount: number,
+      recurring: boolean,
+    ): Promise<string | null> {
+      if (unitAmount <= 0) return null;
+      const existing = await stripe.prices.list({ lookup_keys: [lookupKey], active: true, limit: 1 });
+      const current = existing.data[0];
+      if (
+        current &&
+        current.unit_amount === unitAmount &&
+        current.product === productId &&
+        (recurring ? current.recurring?.interval === "month" : !current.recurring)
+      ) {
+        return current.id;
+      }
+      // Deactivate old + create new with same lookup_key (Stripe transfers key).
+      if (current) {
+        await stripe.prices.update(current.id, { active: false, lookup_key: null as any } as any).catch(() => {});
+      }
+      const created = await stripe.prices.create({
+        product: productId!,
+        currency: "php",
+        unit_amount: unitAmount,
+        lookup_key: lookupKey,
+        nickname: `365 ${t.name} — ${recurring ? "monthly" : "setup"}`,
+        ...(recurring ? { recurring: { interval: "month" } } : {}),
+      });
+      return created.id;
+    }
+
+    const monthlyId = await upsertPrice(monthlyLookup, Number(t.monthly_fee_cents ?? 0), true);
+    const setupId = await upsertPrice(setupLookup, Number(t.setup_fee_cents ?? 0), false);
+
+    await context.supabase
+      .from("franchise_tiers" as any)
+      .update({
+        stripe_product_id: productId,
+        stripe_monthly_price_id: monthlyId,
+        stripe_setup_price_id: setupId,
+        stripe_synced_at: new Date().toISOString(),
+      })
+      .eq("slug", data.slug);
+
+    return {
+      ok: true,
+      stripe_product_id: productId,
+      stripe_monthly_price_id: monthlyId,
+      stripe_setup_price_id: setupId,
+    };
+  });
