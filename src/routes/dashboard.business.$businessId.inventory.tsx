@@ -14,6 +14,8 @@ import {
 import {
   listShopInquiries,
   updateNetworkInquiryStatus,
+  reserveNetworkInquiry,
+  releaseNetworkInquiry,
   NETWORK_INQUIRY_STATUSES,
   type NetworkInquiryStatus,
 } from "@/lib/network-stock.functions";
