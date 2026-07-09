@@ -611,6 +611,10 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
         await activateListingFromSession(env, session);
         break;
       }
+      if (session.metadata?.kind === "franchise") {
+        await activateFranchiseMembershipFromSession(env, session);
+        break;
+      }
       if (session.mode === "subscription" && session.subscription) {
         const stripe = createStripeClient(env);
         const subId =
@@ -626,6 +630,7 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
       }
       break;
     }
+
     case "invoice.paid":
     case "invoice.payment_succeeded": {
       await recordPaymentFromInvoice(env, event.data.object as Stripe.Invoice);
