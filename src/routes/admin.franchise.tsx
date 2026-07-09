@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site-layout";
 import { Card } from "@/components/ui/card";
@@ -51,6 +51,18 @@ function formatStatus(status: string) {
   return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function getPageNumbers(current: number, totalPages: number): (number | "ellipsis")[] {
+  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  const pages: (number | "ellipsis")[] = [1];
+  if (current > 3) pages.push("ellipsis");
+  const start = Math.max(2, current - 1);
+  const end = Math.min(totalPages - 1, current + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (current < totalPages - 2) pages.push("ellipsis");
+  if (totalPages > 1) pages.push(totalPages);
+  return pages;
+}
+
 function AdminFranchisePage() {
   const listFn = useServerFn(adminListApplications);
   const getFn = useServerFn(adminGetApplication);
@@ -69,18 +81,46 @@ function AdminFranchisePage() {
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
 
-  const { data: rows = [], refetch } = useQuery({
-    queryKey: ["admin", "franchise", status, search, tierFilter],
+  // ---- Sorting (server-side) ----
+  type SortField = "business_name" | "contact_name" | "city" | "province" | "tier_slug" | "status" | "created_at";
+  const [sort, setSort] = useState<{ field: SortField; dir: "asc" | "desc" }>({
+    field: "created_at",
+    dir: "desc",
+  });
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+
+  const offset = (page - 1) * pageSize;
+
+  // Reset pagination when filters or search change.
+  useEffect(() => {
+    setPage(1);
+  }, [status, tierFilter, search]);
+
+  const {
+    data: listData,
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ["admin", "franchise", status, search, tierFilter, page, pageSize, sort.field, sort.dir],
     queryFn: () =>
       listFn({
         data: {
           status: status === "all" ? null : status,
           tier: tierFilter === "all" ? null : tierFilter,
           search: search || null,
-          limit: 200,
+          limit: pageSize,
+          offset,
+          sortField: sort.field,
+          sortDir: sort.dir,
         },
       }),
   });
+
+  const rows = listData?.rows ?? [];
+  const total = listData?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   const detail = useQuery({
     queryKey: ["admin", "franchise", "detail", openId],
@@ -99,33 +139,6 @@ function AdminFranchisePage() {
   const [bulkTier, setBulkTier] = useState<string>("");
   const [bulkBusy, setBulkBusy] = useState(false);
 
-  // ---- Sorting ----
-  type SortField = "business_name" | "contact_name" | "location" | "tier_slug" | "status" | "created_at";
-  const [sort, setSort] = useState<{ field: SortField; dir: "asc" | "desc" }>({
-    field: "created_at",
-    dir: "desc",
-  });
-  const sortedRows = useMemo(() => {
-    const copy = [...rows];
-    const dir = sort.dir === "asc" ? 1 : -1;
-    const key = (r: FranchiseApplication) => {
-      switch (sort.field) {
-        case "business_name": return r.business_name?.toLowerCase() ?? "";
-        case "contact_name": return r.contact_name?.toLowerCase() ?? "";
-        case "location": return [r.province, r.city].filter(Boolean).join(",").toLowerCase();
-        case "tier_slug": return (r.assigned_tier_slug ?? r.tier_slug ?? "").toLowerCase();
-        case "status": return r.status ?? "";
-        case "created_at": return r.created_at ?? "";
-      }
-    };
-    copy.sort((a, b) => {
-      const av = key(a), bv = key(b);
-      if (av < bv) return -1 * dir;
-      if (av > bv) return 1 * dir;
-      return 0;
-    });
-    return copy;
-  }, [rows, sort]);
 
   // Only pending / in_review / info_requested rows are approvable.
   const approvable = useMemo(
@@ -287,7 +300,7 @@ function AdminFranchisePage() {
             </Select>
           </div>
           <Input
-            placeholder="Search name / business / email"
+            placeholder="Search business, contact, or location"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="max-w-xs"
@@ -346,112 +359,168 @@ function AdminFranchisePage() {
         ) : null}
 
         <Card className="mt-4 overflow-hidden">
-          {rows.length === 0 ? (
+          {isLoading ? (
+            <div className="p-6 text-sm text-muted-foreground">Loading applications…</div>
+          ) : rows.length === 0 ? (
             <div className="p-6 text-sm text-muted-foreground">No applications found.</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-sm">
-                <thead className="border-b bg-muted/40 text-xs uppercase text-muted-foreground">
-                  <tr>
-                    <th className="w-10 px-3 py-2">
-                      <Checkbox
-                        checked={allSelected ? true : someSelected ? "indeterminate" : false}
-                        onCheckedChange={(v) => toggleAll(v === true)}
-                        aria-label="Select all approvable"
-                      />
-                    </th>
-                    <SortHeader field="business_name" sort={sort} setSort={setSort}>Business</SortHeader>
-                    <SortHeader field="contact_name" sort={sort} setSort={setSort}>Contact</SortHeader>
-                    <SortHeader field="location" sort={sort} setSort={setSort}>Location</SortHeader>
-                    <SortHeader field="tier_slug" sort={sort} setSort={setSort}>Tier</SortHeader>
-                    <SortHeader field="status" sort={sort} setSort={setSort}>Status</SortHeader>
-                    <SortHeader field="created_at" sort={sort} setSort={setSort} align="right">Applied</SortHeader>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedRows.map((r: FranchiseApplication) => {
-                    const isApprovable = r.status !== "approved" && r.status !== "rejected";
-                    const isSelected = !!selected[r.id];
-                    const effectiveTier = r.assigned_tier_slug ?? r.tier_slug;
-                    const tierMeta = tierOptions.find((t) => t.slug === effectiveTier);
-                    return (
-                      <tr
-                        key={r.id}
-                        className={`border-b transition-colors last:border-0 hover:bg-secondary/40 ${
-                          isSelected ? "bg-primary/5" : ""
-                        }`}
-                      >
-                        <td className="px-3 py-2 align-middle">
-                          {isApprovable ? (
-                            <Checkbox
-                              checked={isSelected}
-                              onCheckedChange={(v) =>
-                                setSelected((prev) => ({ ...prev, [r.id]: v === true }))
-                              }
-                              aria-label={`Select ${r.business_name}`}
-                            />
-                          ) : null}
-                        </td>
-                        <td className="px-3 py-2 align-middle">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setOpenId(r.id);
-                              setTier(
-                                rowTier[r.id] ??
-                                  r.assigned_tier_slug ??
-                                  r.tier_slug ??
-                                  tierOptions[0]?.slug ??
-                                  "",
-                              );
-                              setNotes(r.reviewer_notes ?? "");
-                            }}
-                            className="text-left font-semibold hover:underline"
-                          >
-                            {r.business_name}
-                          </button>
-                        </td>
-                        <td className="px-3 py-2 align-middle">
-                          <div className="truncate">{r.contact_name}</div>
-                          <div className="truncate text-xs text-muted-foreground">{r.contact_email}</div>
-                        </td>
-                        <td className="px-3 py-2 align-middle text-muted-foreground">
-                          {[r.city, r.province].filter(Boolean).join(", ") || "—"}
-                        </td>
-                        <td className="px-3 py-2 align-middle">
-                          {isApprovable && isSelected ? (
-                            <Select
-                              value={tierFor(r)}
-                              onValueChange={(v) => setRowTier((prev) => ({ ...prev, [r.id]: v }))}
-                              disabled={tierOptions.length === 0}
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[900px] text-sm">
+                  <thead className="border-b bg-muted/40 text-xs uppercase text-muted-foreground">
+                    <tr>
+                      <th className="w-10 px-3 py-2">
+                        <Checkbox
+                          checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                          onCheckedChange={(v) => toggleAll(v === true)}
+                          aria-label="Select all approvable"
+                        />
+                      </th>
+                      <SortHeader field="business_name" sort={sort} setSort={setSort}>Business</SortHeader>
+                      <SortHeader field="contact_name" sort={sort} setSort={setSort}>Contact</SortHeader>
+                      <SortHeader field="province" sort={sort} setSort={setSort}>Location</SortHeader>
+                      <SortHeader field="tier_slug" sort={sort} setSort={setSort}>Tier</SortHeader>
+                      <SortHeader field="status" sort={sort} setSort={setSort}>Status</SortHeader>
+                      <SortHeader field="created_at" sort={sort} setSort={setSort} align="right">Applied</SortHeader>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r: FranchiseApplication) => {
+                      const isApprovable = r.status !== "approved" && r.status !== "rejected";
+                      const isSelected = !!selected[r.id];
+                      const effectiveTier = r.assigned_tier_slug ?? r.tier_slug;
+                      const tierMeta = tierOptions.find((t) => t.slug === effectiveTier);
+                      return (
+                        <tr
+                          key={r.id}
+                          className={`border-b transition-colors last:border-0 hover:bg-secondary/40 ${
+                            isSelected ? "bg-primary/5" : ""
+                          }`}
+                        >
+                          <td className="px-3 py-2 align-middle">
+                            {isApprovable ? (
+                              <Checkbox
+                                checked={isSelected}
+                                onCheckedChange={(v) =>
+                                  setSelected((prev) => ({ ...prev, [r.id]: v === true }))
+                                }
+                                aria-label={`Select ${r.business_name}`}
+                              />
+                            ) : null}
+                          </td>
+                          <td className="px-3 py-2 align-middle">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenId(r.id);
+                                setTier(
+                                  rowTier[r.id] ??
+                                    r.assigned_tier_slug ??
+                                    r.tier_slug ??
+                                    tierOptions[0]?.slug ??
+                                    "",
+                                );
+                                setNotes(r.reviewer_notes ?? "");
+                              }}
+                              className="text-left font-semibold hover:underline"
                             >
-                              <SelectTrigger className="h-8 w-[160px] text-xs">
-                                <SelectValue placeholder="Tier…" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {tierOptions.map((t) => (
-                                  <SelectItem key={t.slug} value={t.slug}>
-                                    {t.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <TierBadge slug={effectiveTier} name={tierMeta?.name} assigned={!!r.assigned_tier_slug} />
-                          )}
-                        </td>
-                        <td className="px-3 py-2 align-middle">
-                          <StatusBadge status={r.status} />
-                        </td>
-                        <td className="px-3 py-2 align-middle text-right text-xs text-muted-foreground">
-                          {new Date(r.created_at).toLocaleDateString()}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                              {r.business_name}
+                            </button>
+                          </td>
+                          <td className="px-3 py-2 align-middle">
+                            <div className="truncate">{r.contact_name}</div>
+                            <div className="truncate text-xs text-muted-foreground">{r.contact_email}</div>
+                          </td>
+                          <td className="px-3 py-2 align-middle text-muted-foreground">
+                            {[r.city, r.province].filter(Boolean).join(", ") || "—"}
+                          </td>
+                          <td className="px-3 py-2 align-middle">
+                            {isApprovable && isSelected ? (
+                              <Select
+                                value={tierFor(r)}
+                                onValueChange={(v) => setRowTier((prev) => ({ ...prev, [r.id]: v }))}
+                                disabled={tierOptions.length === 0}
+                              >
+                                <SelectTrigger className="h-8 w-[160px] text-xs">
+                                  <SelectValue placeholder="Tier…" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {tierOptions.map((t) => (
+                                    <SelectItem key={t.slug} value={t.slug}>
+                                      {t.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <TierBadge slug={effectiveTier} name={tierMeta?.name} assigned={!!r.assigned_tier_slug} />
+                            )}
+                          </td>
+                          <td className="px-3 py-2 align-middle">
+                            <StatusBadge status={r.status} />
+                          </td>
+                          <td className="px-3 py-2 align-middle text-right text-xs text-muted-foreground">
+                            {new Date(r.created_at).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {totalPages > 1 && (
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3 text-sm">
+                  <div className="text-muted-foreground">
+                    Showing {Math.min(total, (page - 1) * pageSize + 1)}–{Math.min(total, page * pageSize)} of {total}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                    >
+                      Previous
+                    </Button>
+                    {getPageNumbers(page, totalPages).map((p, i) =>
+                      p === "ellipsis" ? (
+                        <span key={`ellipsis-${i}`} className="px-2 text-muted-foreground">…</span>
+                      ) : (
+                        <Button
+                          key={p}
+                          variant={p === page ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setPage(p)}
+                        >
+                          {p}
+                        </Button>
+                      )
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Rows</span>
+                    <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setPage(1); }}>
+                      <SelectTrigger className="h-8 w-[80px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[10, 20, 50, 100].map((n) => (
+                          <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </Card>
       </section>
@@ -633,7 +702,7 @@ function Info({ label, value }: { label: string; value: string }) {
   );
 }
 
-type SortField = "business_name" | "contact_name" | "location" | "tier_slug" | "status" | "created_at";
+type SortField = "business_name" | "contact_name" | "city" | "province" | "tier_slug" | "status" | "created_at";
 
 function SortHeader({
   field,
