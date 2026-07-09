@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "July 9, 2026 (added 365 Franchise & Partner Program: two membership tiers, applications, network parts discounts, advertising discounts, membership fees, shared customer CRM data flow, termination and discount misuse terms)";
+  const lastUpdated = "July 9, 2026 (365 Franchise & Partner Program billing: setup + monthly membership fees are collected via our card processor at approval; fees are non-refundable once your membership is activated; membership auto-renews monthly until you cancel from your partner dashboard; unpaid renewals may suspend your membership benefits including the ad discount code)";
 
   return (
     <SiteLayout>
