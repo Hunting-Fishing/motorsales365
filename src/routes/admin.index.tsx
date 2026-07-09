@@ -43,10 +43,19 @@ function fmt(n: number | null | undefined): string {
 }
 
 function AdminOverview() {
+  const { isAdmin } = useAuth();
   const call = useServerFn(getAdminOverview);
   const q = useQuery<AdminOverviewData>({
     queryKey: ["admin", "overview"],
     queryFn: () => call(),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
+  const franchiseCountFn = useServerFn(adminCountFranchiseApplications);
+  const franchiseCount = useQuery({
+    queryKey: ["admin", "franchise", "count"],
+    queryFn: () => franchiseCountFn(),
+    enabled: isAdmin,
     staleTime: 60_000,
     refetchOnWindowFocus: false,
   });
