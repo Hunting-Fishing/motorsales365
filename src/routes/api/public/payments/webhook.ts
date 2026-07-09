@@ -661,6 +661,37 @@ async function activateFranchiseMembershipFromSession(
     .eq("id", membershipId);
 }
 
+async function syncFranchiseMembershipFromSubscription(env: StripeEnv, sub: Stripe.Subscription) {
+  const membershipId = sub.metadata?.franchise_membership_id;
+  if (!membershipId) return;
+  const item = sub.items?.data?.[0];
+  const end =
+    (item as any)?.current_period_end ?? (sub as any).current_period_end ?? null;
+  const periodEnd = end ? new Date(end * 1000).toISOString() : null;
+  // Map Stripe status to our membership status enum.
+  const status =
+    sub.status === "active" || sub.status === "trialing"
+      ? "active"
+      : sub.status === "past_due" || sub.status === "unpaid"
+      ? "past_due"
+      : sub.status === "canceled" || sub.status === "incomplete_expired"
+      ? "cancelled"
+      : sub.status === "paused"
+      ? "suspended"
+      : "active";
+  await supabaseAdmin
+    .from("franchise_memberships" as any)
+    .update({
+      status,
+      stripe_subscription_id: sub.id,
+      stripe_price_id: item?.price?.id ?? null,
+      current_period_end: periodEnd,
+      renews_at: periodEnd,
+      cancel_at_period_end: !!sub.cancel_at_period_end,
+    })
+    .eq("id", membershipId);
+}
+
 async function handleEvent(env: StripeEnv, event: Stripe.Event) {
   switch (event.type) {
     case "customer.subscription.created":
@@ -673,6 +704,7 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
       await upsertSubscription(env, sub);
       break;
     }
+
 
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
