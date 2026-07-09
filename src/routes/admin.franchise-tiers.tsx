@@ -190,9 +190,28 @@ function TierEditor({
           />
         </div>
       </div>
-      <div className="mt-4 flex justify-end">
-        <Button onClick={() => onSave(state)}>Save</Button>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="text-xs text-muted-foreground">
+          Stripe:{" "}
+          {(tier as any).stripe_product_id ? (
+            <span>
+              product <code>{(tier as any).stripe_product_id}</code>
+              {(tier as any).stripe_synced_at
+                ? ` · synced ${new Date((tier as any).stripe_synced_at).toLocaleString()}`
+                : ""}
+            </span>
+          ) : (
+            <span className="text-amber-600">not synced yet</span>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => onSyncStripe()}>
+            Sync to Stripe
+          </Button>
+          <Button onClick={() => onSave(state)}>Save</Button>
+        </div>
       </div>
     </Card>
   );
 }
+
