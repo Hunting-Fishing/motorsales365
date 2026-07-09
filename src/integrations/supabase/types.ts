@@ -4934,12 +4934,18 @@ export type Database = {
           ad_discount_code: string | null
           application_id: string | null
           business_id: string | null
+          cancel_at_period_end: boolean
           created_at: string
+          current_period_end: string | null
           id: string
           member_number: string
+          pending_tier_slug: string | null
           renews_at: string | null
           started_at: string
           status: string
+          stripe_customer_id: string | null
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
           tier_slug: string
           updated_at: string
           user_id: string
@@ -4948,12 +4954,18 @@ export type Database = {
           ad_discount_code?: string | null
           application_id?: string | null
           business_id?: string | null
+          cancel_at_period_end?: boolean
           created_at?: string
+          current_period_end?: string | null
           id?: string
           member_number?: string
+          pending_tier_slug?: string | null
           renews_at?: string | null
           started_at?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
           tier_slug: string
           updated_at?: string
           user_id: string
@@ -4962,12 +4974,18 @@ export type Database = {
           ad_discount_code?: string | null
           application_id?: string | null
           business_id?: string | null
+          cancel_at_period_end?: boolean
           created_at?: string
+          current_period_end?: string | null
           id?: string
           member_number?: string
+          pending_tier_slug?: string | null
           renews_at?: string | null
           started_at?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
           tier_slug?: string
           updated_at?: string
           user_id?: string
@@ -5006,6 +5024,10 @@ export type Database = {
           setup_fee_cents: number
           slug: string
           sort_order: number
+          stripe_monthly_price_id: string | null
+          stripe_product_id: string | null
+          stripe_setup_price_id: string | null
+          stripe_synced_at: string | null
           tagline: string | null
           updated_at: string
         }
@@ -5025,6 +5047,10 @@ export type Database = {
           setup_fee_cents?: number
           slug: string
           sort_order?: number
+          stripe_monthly_price_id?: string | null
+          stripe_product_id?: string | null
+          stripe_setup_price_id?: string | null
+          stripe_synced_at?: string | null
           tagline?: string | null
           updated_at?: string
         }
@@ -5044,6 +5070,10 @@ export type Database = {
           setup_fee_cents?: number
           slug?: string
           sort_order?: number
+          stripe_monthly_price_id?: string | null
+          stripe_product_id?: string | null
+          stripe_setup_price_id?: string | null
+          stripe_synced_at?: string | null
           tagline?: string | null
           updated_at?: string
         }
@@ -12888,6 +12918,23 @@ export type Database = {
           vehicle_make: string
           vehicle_model: string
           vehicle_year: number
+        }[]
+      }
+      list_public_partners: {
+        Args: { _limit?: number; _province?: string; _tier_slug?: string }
+        Returns: {
+          business_id: string
+          business_name: string
+          business_slug: string
+          city: string
+          cover_url: string
+          logo_url: string
+          member_number: string
+          membership_id: string
+          province: string
+          started_at: string
+          tier_name: string
+          tier_slug: string
         }[]
       }
       match_listing_to_parts_wanted: {

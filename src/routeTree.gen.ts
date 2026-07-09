@@ -99,6 +99,7 @@ import { Route as HelpTrustScoreRouteImport } from './routes/help.trust-score'
 import { Route as HelpPostingEtiquetteRouteImport } from './routes/help.posting-etiquette'
 import { Route as HelpPayWithGcashRouteImport } from './routes/help.pay-with-gcash'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
+import { Route as FranchisePartnersRouteImport } from './routes/franchise.partners'
 import { Route as FranchiseApplyRouteImport } from './routes/franchise.apply'
 import { Route as ExportTrustRouteImport } from './routes/export.trust'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -757,6 +758,11 @@ const GoProductIdRoute = GoProductIdRouteImport.update({
   id: '/go/$productId',
   path: '/go/$productId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const FranchisePartnersRoute = FranchisePartnersRouteImport.update({
+  id: '/partners',
+  path: '/partners',
+  getParentRoute: () => FranchiseRoute,
 } as any)
 const FranchiseApplyRoute = FranchiseApplyRouteImport.update({
   id: '/apply',
@@ -2017,6 +2023,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
+  '/franchise/partners': typeof FranchisePartnersRoute
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
@@ -2311,6 +2318,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
+  '/franchise/partners': typeof FranchisePartnersRoute
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
@@ -2612,6 +2620,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
+  '/franchise/partners': typeof FranchisePartnersRoute
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
@@ -2914,6 +2923,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/export/trust'
     | '/franchise/apply'
+    | '/franchise/partners'
     | '/go/$productId'
     | '/help/pay-with-gcash'
     | '/help/posting-etiquette'
@@ -3208,6 +3218,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/export/trust'
     | '/franchise/apply'
+    | '/franchise/partners'
     | '/go/$productId'
     | '/help/pay-with-gcash'
     | '/help/posting-etiquette'
@@ -3508,6 +3519,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/export/trust'
     | '/franchise/apply'
+    | '/franchise/partners'
     | '/go/$productId'
     | '/help/pay-with-gcash'
     | '/help/posting-etiquette'
@@ -4444,6 +4456,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/go/$productId'
       preLoaderRoute: typeof GoProductIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/franchise/partners': {
+      id: '/franchise/partners'
+      path: '/partners'
+      fullPath: '/franchise/partners'
+      preLoaderRoute: typeof FranchisePartnersRouteImport
+      parentRoute: typeof FranchiseRoute
     }
     '/franchise/apply': {
       id: '/franchise/apply'
@@ -6377,10 +6396,12 @@ const ExportRouteWithChildren =
 
 interface FranchiseRouteChildren {
   FranchiseApplyRoute: typeof FranchiseApplyRoute
+  FranchisePartnersRoute: typeof FranchisePartnersRoute
 }
 
 const FranchiseRouteChildren: FranchiseRouteChildren = {
   FranchiseApplyRoute: FranchiseApplyRoute,
+  FranchisePartnersRoute: FranchisePartnersRoute,
 }
 
 const FranchiseRouteWithChildren = FranchiseRoute._addFileChildren(

@@ -10,11 +10,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { getStripeEnvironment } from "@/lib/stripe";
 import {
   adminListTiers,
   adminUpsertTier,
+  adminSyncTierToStripe,
   type FranchiseTier,
 } from "@/lib/franchise.functions";
+
 
 export const Route = createFileRoute("/admin/franchise-tiers")({
   head: () => ({
@@ -26,6 +29,7 @@ export const Route = createFileRoute("/admin/franchise-tiers")({
 function AdminTiersPage() {
   const listFn = useServerFn(adminListTiers);
   const upsertFn = useServerFn(adminUpsertTier);
+  const syncFn = useServerFn(adminSyncTierToStripe);
   const { data: tiers = [], refetch } = useQuery({
     queryKey: ["admin", "franchise-tiers"],
     queryFn: () => listFn(),
@@ -36,7 +40,8 @@ function AdminTiersPage() {
       <section className="container mx-auto max-w-4xl px-4 py-8">
         <h1 className="font-display text-3xl font-bold">Franchise tiers</h1>
         <p className="text-sm text-muted-foreground">
-          Edit the tiers shown on the public /franchise page.
+          Edit the tiers shown on the public /franchise page. Sync a tier to Stripe to make its
+          membership fees chargeable.
         </p>
         <div className="mt-6 space-y-4">
           {tiers.map((t) => (
@@ -48,6 +53,19 @@ function AdminTiersPage() {
                 toast.success("Tier saved");
                 refetch();
               }}
+              onSyncStripe={async () => {
+                try {
+                  const r = await syncFn({
+                    data: { slug: t.slug, environment: getStripeEnvironment() },
+                  });
+                  toast.success(
+                    `Synced to Stripe (monthly: ${r.stripe_monthly_price_id ?? "—"})`,
+                  );
+                  refetch();
+                } catch (e: any) {
+                  toast.error(e?.message ?? "Sync failed");
+                }
+              }}
             />
           ))}
         </div>
@@ -56,13 +74,17 @@ function AdminTiersPage() {
   );
 }
 
+
 function TierEditor({
   tier,
   onSave,
+  onSyncStripe,
 }: {
   tier: FranchiseTier;
   onSave: (payload: FranchiseTier) => Promise<void>;
+  onSyncStripe: () => Promise<void>;
 }) {
+
   const [state, setState] = useState<FranchiseTier>(tier);
   useEffect(() => setState(tier), [tier]);
   const set = <K extends keyof FranchiseTier>(k: K, v: FranchiseTier[K]) =>
@@ -168,9 +190,28 @@ function TierEditor({
           />
         </div>
       </div>
-      <div className="mt-4 flex justify-end">
-        <Button onClick={() => onSave(state)}>Save</Button>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="text-xs text-muted-foreground">
+          Stripe:{" "}
+          {(tier as any).stripe_product_id ? (
+            <span>
+              product <code>{(tier as any).stripe_product_id}</code>
+              {(tier as any).stripe_synced_at
+                ? ` · synced ${new Date((tier as any).stripe_synced_at).toLocaleString()}`
+                : ""}
+            </span>
+          ) : (
+            <span className="text-amber-600">not synced yet</span>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => onSyncStripe()}>
+            Sync to Stripe
+          </Button>
+          <Button onClick={() => onSave(state)}>Save</Button>
+        </div>
       </div>
     </Card>
   );
 }
+
