@@ -528,6 +528,19 @@ export const adminBulkApproveApplications = createServerFn({ method: "POST" })
           });
         }
 
+        await context.supabase.from("franchise_application_audit" as any).insert({
+          application_id: item.id,
+          actor_id: context.userId,
+          action: "bulk_approve",
+          from_status: (app as any).status ?? null,
+          to_status: "approved",
+          from_tier: (app as any).assigned_tier_slug ?? null,
+          to_tier: item.assigned_tier_slug,
+          reviewer_notes: data.reviewer_notes?.trim() || null,
+          message_to_applicant: data.message_to_applicant?.trim() || null,
+          metadata: membershipId ? { membership_id: membershipId } : {},
+        });
+
         results.push({ id: item.id, ok: true, membershipId, error: null });
       } catch (e: any) {
         results.push({
