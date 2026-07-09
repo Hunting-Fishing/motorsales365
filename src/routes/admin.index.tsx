@@ -18,6 +18,7 @@ import {
   Bell,
   ClipboardCheck,
   ExternalLink,
+  Handshake,
 } from "lucide-react";
 import { formatPHP } from "@/lib/format";
 import {
@@ -27,6 +28,8 @@ import {
   type OverviewRevenue,
   type TopReferrer,
 } from "@/lib/admin-overview.functions";
+import { adminCountFranchiseApplications } from "@/lib/franchise.functions";
+import { useAuth } from "@/hooks/use-auth";
 import { OverviewTrends } from "@/components/admin/overview-trends";
 
 
@@ -40,10 +43,19 @@ function fmt(n: number | null | undefined): string {
 }
 
 function AdminOverview() {
+  const { isAdmin } = useAuth();
   const call = useServerFn(getAdminOverview);
   const q = useQuery<AdminOverviewData>({
     queryKey: ["admin", "overview"],
     queryFn: () => call(),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
+  const franchiseCountFn = useServerFn(adminCountFranchiseApplications);
+  const franchiseCount = useQuery({
+    queryKey: ["admin", "franchise", "count"],
+    queryFn: () => franchiseCountFn(),
+    enabled: isAdmin,
     staleTime: 60_000,
     refetchOnWindowFocus: false,
   });
@@ -141,6 +153,15 @@ function AdminOverview() {
             value={d.health.pendingClaimReviews}
             tone={d.health.pendingClaimReviews > 0 ? "warn" : "ok"}
           />
+          {isAdmin && (
+            <HealthCard
+              to="/admin/franchise"
+              icon={Handshake}
+              label="Franchise applications"
+              value={franchiseCount.data?.total ?? 0}
+              tone={(franchiseCount.data?.total ?? 0) > 0 ? "warn" : "ok"}
+            />
+          )}
         </div>
       </Section>
 

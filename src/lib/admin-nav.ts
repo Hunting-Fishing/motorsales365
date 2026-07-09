@@ -20,6 +20,7 @@ import {
   Truck,
   Globe,
   BadgePercent,
+  Handshake,
   type LucideIcon,
 } from "lucide-react";
 
@@ -64,6 +65,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { to: "/admin/businesses", label: "Directory", Icon: Store, roles: ["admin", "moderator"], info: "Approve and moderate the Business directory.", section: "Businesses" },
   { to: "/admin/discover-businesses", label: "Discover", Icon: Store, roles: ["admin", "moderator"], info: "Find, verify and import businesses from Google & Facebook.", section: "Businesses" },
   { to: "/admin/claims", label: "Claims", Icon: ShieldCheck, roles: ["admin", "moderator"], info: "Review claim requests for seeded businesses.", section: "Businesses" },
+  { to: "/admin/franchise", label: "Franchise queue", Icon: Handshake, roles: ["admin"], info: "Review franchise applications, assign tiers, and approve in bulk.", section: "Businesses" },
   { to: "/admin/verifications", label: "Verifications", Icon: ShieldCheck, roles: ["admin", "moderator"], info: "Approve or reject business verification requests.", section: "Businesses" },
   { to: "/admin/type-suggestions", label: "Type suggestions", Icon: Sparkles, roles: ["admin"], info: "Review user-submitted new business types.", section: "Businesses" },
   { to: "/admin/service-suggestions", label: "Service suggestions", Icon: Sparkles, roles: ["admin"], info: "Approve user-submitted services into the shared catalog.", section: "Businesses" },
