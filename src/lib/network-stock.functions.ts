@@ -218,7 +218,7 @@ export const updateNetworkInquiryStatus = createServerFn({ method: "POST" })
 
     const { data: row, error } = await supabase
       .from("network_part_inquiries")
-      .update(patch)
+      .update(patch as any)
       .eq("id", data.id)
       .eq("business_id", data.businessId)
       .select("*")
