@@ -207,7 +207,7 @@ export const updateNetworkInquiryStatus = createServerFn({ method: "POST" })
 
     const patch: Record<string, unknown> = {
       status: data.status,
-      response_note: data.note ?? undefined,
+      response_note: data.note ?? null,
     };
     // Only overwrite fulfillment fields when explicitly provided so a later
     // status change (e.g. Closed after Fulfilled) doesn't blank prior details.
