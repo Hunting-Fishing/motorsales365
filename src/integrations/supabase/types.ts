@@ -6183,6 +6183,9 @@ export type Database = {
           part_name: string
           quantity: number
           requester_user_id: string | null
+          reserved_item_id: string | null
+          reserved_quantity: number | null
+          reserved_until: string | null
           responded_at: string | null
           responded_by: string | null
           response_note: string | null
@@ -6206,6 +6209,9 @@ export type Database = {
           part_name: string
           quantity?: number
           requester_user_id?: string | null
+          reserved_item_id?: string | null
+          reserved_quantity?: number | null
+          reserved_until?: string | null
           responded_at?: string | null
           responded_by?: string | null
           response_note?: string | null
@@ -6229,6 +6235,9 @@ export type Database = {
           part_name?: string
           quantity?: number
           requester_user_id?: string | null
+          reserved_item_id?: string | null
+          reserved_quantity?: number | null
+          reserved_until?: string | null
           responded_at?: string | null
           responded_by?: string | null
           response_note?: string | null
@@ -6254,6 +6263,20 @@ export type Database = {
           {
             foreignKeyName: "network_part_inquiries_item_id_fkey"
             columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "network_stock"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "network_part_inquiries_reserved_item_id_fkey"
+            columns: ["reserved_item_id"]
+            isOneToOne: false
+            referencedRelation: "business_inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "network_part_inquiries_reserved_item_id_fkey"
+            columns: ["reserved_item_id"]
             isOneToOne: false
             referencedRelation: "network_stock"
             referencedColumns: ["id"]
@@ -12335,6 +12358,7 @@ export type Database = {
       }
       network_stock: {
         Row: {
+          available_qty: number | null
           business_id: string | null
           business_name: string | null
           business_slug: string | null
@@ -12349,6 +12373,7 @@ export type Database = {
           province: string | null
           qty_on_hand: number | null
           region: string | null
+          reserved_qty: number | null
           sku: string | null
           unit: string | null
           updated_at: string | null
@@ -12565,6 +12590,7 @@ export type Database = {
         Args: { _staff_user_id: string }
         Returns: undefined
       }
+      active_reservation_qty: { Args: { _item_id: string }; Returns: number }
       admin_overview: { Args: never; Returns: Json }
       admin_overview_trends: { Args: { days?: number }; Returns: Json }
       admin_pending_counts: { Args: never; Returns: Json }
@@ -12928,8 +12954,22 @@ export type Database = {
         }
         Returns: Json
       }
+      release_network_inquiry: {
+        Args: { _business_id: string; _inquiry_id: string }
+        Returns: undefined
+      }
       request_network_exposure: {
         Args: { _business_id: string; _expose: boolean; _note?: string }
+        Returns: Json
+      }
+      reserve_network_inquiry: {
+        Args: {
+          _business_id: string
+          _hours: number
+          _inquiry_id: string
+          _note?: string
+          _quantity: number
+        }
         Returns: Json
       }
       resolve_login_to_email: { Args: { _input: string }; Returns: string }
