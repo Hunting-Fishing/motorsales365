@@ -367,7 +367,105 @@ function AdminFranchisePage() {
             <>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[900px] text-sm">
-                  ...
+                  <thead className="border-b bg-muted/40 text-xs uppercase text-muted-foreground">
+                    <tr>
+                      <th className="w-10 px-3 py-2">
+                        <Checkbox
+                          checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                          onCheckedChange={(v) => toggleAll(v === true)}
+                          aria-label="Select all approvable"
+                        />
+                      </th>
+                      <SortHeader field="business_name" sort={sort} setSort={setSort}>Business</SortHeader>
+                      <SortHeader field="contact_name" sort={sort} setSort={setSort}>Contact</SortHeader>
+                      <SortHeader field="province" sort={sort} setSort={setSort}>Location</SortHeader>
+                      <SortHeader field="tier_slug" sort={sort} setSort={setSort}>Tier</SortHeader>
+                      <SortHeader field="status" sort={sort} setSort={setSort}>Status</SortHeader>
+                      <SortHeader field="created_at" sort={sort} setSort={setSort} align="right">Applied</SortHeader>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r: FranchiseApplication) => {
+                      const isApprovable = r.status !== "approved" && r.status !== "rejected";
+                      const isSelected = !!selected[r.id];
+                      const effectiveTier = r.assigned_tier_slug ?? r.tier_slug;
+                      const tierMeta = tierOptions.find((t) => t.slug === effectiveTier);
+                      return (
+                        <tr
+                          key={r.id}
+                          className={`border-b transition-colors last:border-0 hover:bg-secondary/40 ${
+                            isSelected ? "bg-primary/5" : ""
+                          }`}
+                        >
+                          <td className="px-3 py-2 align-middle">
+                            {isApprovable ? (
+                              <Checkbox
+                                checked={isSelected}
+                                onCheckedChange={(v) =>
+                                  setSelected((prev) => ({ ...prev, [r.id]: v === true }))
+                                }
+                                aria-label={`Select ${r.business_name}`}
+                              />
+                            ) : null}
+                          </td>
+                          <td className="px-3 py-2 align-middle">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenId(r.id);
+                                setTier(
+                                  rowTier[r.id] ??
+                                    r.assigned_tier_slug ??
+                                    r.tier_slug ??
+                                    tierOptions[0]?.slug ??
+                                    "",
+                                );
+                                setNotes(r.reviewer_notes ?? "");
+                              }}
+                              className="text-left font-semibold hover:underline"
+                            >
+                              {r.business_name}
+                            </button>
+                          </td>
+                          <td className="px-3 py-2 align-middle">
+                            <div className="truncate">{r.contact_name}</div>
+                            <div className="truncate text-xs text-muted-foreground">{r.contact_email}</div>
+                          </td>
+                          <td className="px-3 py-2 align-middle text-muted-foreground">
+                            {[r.city, r.province].filter(Boolean).join(", ") || "—"}
+                          </td>
+                          <td className="px-3 py-2 align-middle">
+                            {isApprovable && isSelected ? (
+                              <Select
+                                value={tierFor(r)}
+                                onValueChange={(v) => setRowTier((prev) => ({ ...prev, [r.id]: v }))}
+                                disabled={tierOptions.length === 0}
+                              >
+                                <SelectTrigger className="h-8 w-[160px] text-xs">
+                                  <SelectValue placeholder="Tier…" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {tierOptions.map((t) => (
+                                    <SelectItem key={t.slug} value={t.slug}>
+                                      {t.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <TierBadge slug={effectiveTier} name={tierMeta?.name} assigned={!!r.assigned_tier_slug} />
+                            )}
+                          </td>
+                          <td className="px-3 py-2 align-middle">
+                            <StatusBadge status={r.status} />
+                          </td>
+                          <td className="px-3 py-2 align-middle text-right text-xs text-muted-foreground">
+                            {new Date(r.created_at).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
                 </table>
               </div>
               {totalPages > 1 && (
