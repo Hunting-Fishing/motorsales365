@@ -151,6 +151,7 @@ function InventoryPage() {
           name: form.name,
           sku: form.sku || null,
           category: form.category || null,
+          brand: form.brand || null,
           unit: form.unit,
           qty_on_hand: Number(form.qty_on_hand) || 0,
           reorder_at: form.reorder_at === "" ? null : Number(form.reorder_at),
