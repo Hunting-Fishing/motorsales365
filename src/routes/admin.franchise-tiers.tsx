@@ -29,6 +29,7 @@ export const Route = createFileRoute("/admin/franchise-tiers")({
 function AdminTiersPage() {
   const listFn = useServerFn(adminListTiers);
   const upsertFn = useServerFn(adminUpsertTier);
+  const syncFn = useServerFn(adminSyncTierToStripe);
   const { data: tiers = [], refetch } = useQuery({
     queryKey: ["admin", "franchise-tiers"],
     queryFn: () => listFn(),
@@ -39,7 +40,8 @@ function AdminTiersPage() {
       <section className="container mx-auto max-w-4xl px-4 py-8">
         <h1 className="font-display text-3xl font-bold">Franchise tiers</h1>
         <p className="text-sm text-muted-foreground">
-          Edit the tiers shown on the public /franchise page.
+          Edit the tiers shown on the public /franchise page. Sync a tier to Stripe to make its
+          membership fees chargeable.
         </p>
         <div className="mt-6 space-y-4">
           {tiers.map((t) => (
@@ -51,6 +53,19 @@ function AdminTiersPage() {
                 toast.success("Tier saved");
                 refetch();
               }}
+              onSyncStripe={async () => {
+                try {
+                  const r = await syncFn({
+                    data: { slug: t.slug, environment: getStripeEnvironment() },
+                  });
+                  toast.success(
+                    `Synced to Stripe (monthly: ${r.stripe_monthly_price_id ?? "—"})`,
+                  );
+                  refetch();
+                } catch (e: any) {
+                  toast.error(e?.message ?? "Sync failed");
+                }
+              }}
             />
           ))}
         </div>
@@ -58,6 +73,7 @@ function AdminTiersPage() {
     </SiteLayout>
   );
 }
+
 
 function TierEditor({
   tier,
