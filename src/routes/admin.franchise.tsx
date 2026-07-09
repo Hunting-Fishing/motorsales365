@@ -93,6 +93,34 @@ function AdminFranchisePage() {
   const [bulkTier, setBulkTier] = useState<string>("");
   const [bulkBusy, setBulkBusy] = useState(false);
 
+  // ---- Sorting ----
+  type SortField = "business_name" | "contact_name" | "location" | "tier_slug" | "status" | "created_at";
+  const [sort, setSort] = useState<{ field: SortField; dir: "asc" | "desc" }>({
+    field: "created_at",
+    dir: "desc",
+  });
+  const sortedRows = useMemo(() => {
+    const copy = [...rows];
+    const dir = sort.dir === "asc" ? 1 : -1;
+    const key = (r: FranchiseApplication) => {
+      switch (sort.field) {
+        case "business_name": return r.business_name?.toLowerCase() ?? "";
+        case "contact_name": return r.contact_name?.toLowerCase() ?? "";
+        case "location": return [r.province, r.city].filter(Boolean).join(",").toLowerCase();
+        case "tier_slug": return (r.assigned_tier_slug ?? r.tier_slug ?? "").toLowerCase();
+        case "status": return r.status ?? "";
+        case "created_at": return r.created_at ?? "";
+      }
+    };
+    copy.sort((a, b) => {
+      const av = key(a), bv = key(b);
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+    return copy;
+  }, [rows, sort]);
+
   // Only pending / in_review / info_requested rows are approvable.
   const approvable = useMemo(
     () => rows.filter((r) => r.status !== "approved" && r.status !== "rejected"),
