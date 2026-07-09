@@ -29,6 +29,7 @@ import {
   ListChecks,
   ChevronDown,
   LayoutDashboard,
+  Handshake,
 } from "lucide-react";
 import { useAuth, type SellerType, type AppRole } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
