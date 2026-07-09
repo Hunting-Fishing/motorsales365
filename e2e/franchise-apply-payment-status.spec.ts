@@ -135,13 +135,11 @@ test.describe("@post-deploy franchise apply → payment → status update", () =
     await page.locator("#business_name").fill("E2E Franchise Shop");
     await page.locator("#city").fill("Manila");
     await page.locator("#province").fill("NCR");
-    // Terms checkbox is required by the Zod schema. The shadcn/Radix
-    // checkbox is a role="checkbox" button — click via keyboard to bypass
-    // any label wrapping intercepts.
+    // Terms checkbox is required by the Zod schema. Use force click to
+    // bypass the enclosing <label>'s pointer-capture.
     const termsCheckbox = page.getByRole("checkbox").last();
     await termsCheckbox.scrollIntoViewIfNeeded();
-    await termsCheckbox.focus();
-    await page.keyboard.press("Space");
+    await termsCheckbox.click({ force: true });
     await expect(termsCheckbox).toHaveAttribute("data-state", "checked", { timeout: 5000 });
     const submit = page.getByRole("button", { name: /submit application/i });
     // Watch for the toast text if the submit rejects, so the failure is legible.
