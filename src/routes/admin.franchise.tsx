@@ -261,6 +261,31 @@ function AdminFranchisePage() {
               </SelectContent>
             </Select>
           </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Tier</span>
+            <Select value={tierFilter} onValueChange={setTierFilter} disabled={tierOptions.length === 0}>
+              <SelectTrigger className="w-[220px]">
+                <SelectValue placeholder="Filter by tier" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All tiers</SelectItem>
+                <SelectSeparator />
+                <SelectGroup>
+                  <SelectLabel>Requested</SelectLabel>
+                  <SelectItem value="requested_only">Requested only</SelectItem>
+                </SelectGroup>
+                <SelectSeparator />
+                <SelectGroup>
+                  <SelectLabel>Assigned</SelectLabel>
+                  {tierOptions.map((t) => (
+                    <SelectItem key={t.slug} value={t.slug}>
+                      {t.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
           <Input
             placeholder="Search name / business / email"
             value={search}
