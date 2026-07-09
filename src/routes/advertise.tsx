@@ -393,9 +393,37 @@ function AdvertisePage() {
         </div>
       </section>
 
+      {/* Franchise/Partner callout */}
+      <section className="border-b border-border bg-primary/5">
+        <div className="container mx-auto max-w-6xl px-4 py-10">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-primary/30 bg-card p-6">
+            <div className="max-w-2xl">
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-primary">
+                Bigger discounts as a 365 Partner
+              </span>
+              <h3 className="mt-2 font-display text-2xl font-bold">
+                Advertise for less — join the 365 Franchise &amp; Partner Program
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                365 Partners and Franchisees get a standing discount on every ad buy on top of these
+                rates, plus parts pricing, shared CRM, and the Verified 365 badge.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button asChild>
+                <Link to="/franchise">Explore the program</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/franchise/partners">See our partners</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Request form */}
       <section id="request">
+
         <div className="container mx-auto max-w-4xl px-4 py-14">
           <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
             {done ? (
