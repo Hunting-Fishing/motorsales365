@@ -32,6 +32,7 @@ import {
   adminListApplications,
   adminGetApplication,
   adminDecideApplication,
+  listActiveTiers,
   type FranchiseApplication,
 } from "@/lib/franchise.functions";
 
@@ -48,6 +49,13 @@ function AdminFranchisePage() {
   const listFn = useServerFn(adminListApplications);
   const getFn = useServerFn(adminGetApplication);
   const decideFn = useServerFn(adminDecideApplication);
+  const tiersFn = useServerFn(listActiveTiers);
+
+  const tiersQuery = useQuery({
+    queryKey: ["franchise", "tiers", "active"],
+    queryFn: () => tiersFn(),
+  });
+  const tierOptions = tiersQuery.data ?? [];
 
   const [status, setStatus] = useState<(typeof STATUSES)[number]>("pending");
   const [search, setSearch] = useState("");
@@ -71,13 +79,17 @@ function AdminFranchisePage() {
     enabled: !!openId,
   });
 
-  const [tier, setTier] = useState<"partner" | "franchise">("partner");
+  const [tier, setTier] = useState<string>("");
   const [notes, setNotes] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
   const decide = async (decision: "approve" | "reject" | "request_info" | "in_review") => {
     if (!openId) return;
+    if (decision === "approve" && !tier) {
+      toast.error("Select a tier before approving.");
+      return;
+    }
     setBusy(true);
     try {
       await decideFn({
@@ -144,7 +156,7 @@ function AdminFranchisePage() {
                 className="flex cursor-pointer flex-wrap items-center justify-between gap-3 p-4 hover:bg-secondary/30"
                 onClick={() => {
                   setOpenId(r.id);
-                  setTier((r.assigned_tier_slug ?? r.tier_slug) as any);
+                  setTier(r.assigned_tier_slug ?? r.tier_slug ?? tierOptions[0]?.slug ?? "");
                   setNotes(r.reviewer_notes ?? "");
                 }}
               >
@@ -216,15 +228,38 @@ function AdminFranchisePage() {
 
               <div>
                 <p className="text-xs uppercase text-muted-foreground">Assign tier on approval</p>
-                <Select value={tier} onValueChange={(v) => setTier(v as any)}>
+                <Select
+                  value={tier}
+                  onValueChange={setTier}
+                  disabled={tiersQuery.isLoading || tierOptions.length === 0}
+                >
                   <SelectTrigger className="mt-1">
-                    <SelectValue />
+                    <SelectValue
+                      placeholder={
+                        tiersQuery.isLoading
+                          ? "Loading tiers…"
+                          : tierOptions.length === 0
+                            ? "No active tiers configured"
+                            : "Select a tier"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="partner">365 Partner</SelectItem>
-                    <SelectItem value="franchise">365 Franchise</SelectItem>
+                    {tierOptions.map((t) => (
+                      <SelectItem key={t.slug} value={t.slug}>
+                        {t.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
+                {tierOptions.length === 0 && !tiersQuery.isLoading ? (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    <a href="/admin/franchise-tiers" className="underline">
+                      Configure franchise tiers
+                    </a>{" "}
+                    before approving applications.
+                  </p>
+                ) : null}
               </div>
 
               <div>
