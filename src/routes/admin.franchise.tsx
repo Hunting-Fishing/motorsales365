@@ -70,11 +70,12 @@ function AdminFranchisePage() {
   const [openId, setOpenId] = useState<string | null>(null);
 
   const { data: rows = [], refetch } = useQuery({
-    queryKey: ["admin", "franchise", status, search],
+    queryKey: ["admin", "franchise", status, search, tierFilter],
     queryFn: () =>
       listFn({
         data: {
           status: status === "all" ? null : status,
+          tier: tierFilter === "all" ? null : tierFilter,
           search: search || null,
           limit: 200,
         },
