@@ -567,7 +567,7 @@ export type FranchiseAuditEntry = {
   to_tier: string | null;
   reviewer_notes: string | null;
   message_to_applicant: string | null;
-  metadata: Record<string, unknown>;
+  metadata: Record<string, string | number | boolean | null>;
   created_at: string;
 };
 
