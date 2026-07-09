@@ -86,11 +86,26 @@ function NetworkStockPage() {
     [search],
   );
 
-  const { data: rows = [], isFetching } = useQuery({
+  const PAGE_SIZE = 20;
+  const {
+    data,
+    isFetching,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteQuery({
     queryKey: ["network-stock", filters],
-    queryFn: () => searchFn({ data: filters }),
+    queryFn: ({ pageParam }) =>
+      searchFn({ data: { ...filters, limit: PAGE_SIZE, offset: pageParam as number } }),
+    initialPageParam: 0,
+    getNextPageParam: (last) => last.nextOffset ?? undefined,
     staleTime: 15_000,
   });
+  const rows = useMemo(
+    () => (data?.pages ?? []).flatMap((p) => p.rows),
+    [data],
+  );
+  const total = data?.pages?.[0]?.total ?? null;
 
   const { data: facets } = useQuery({
     queryKey: ["network-stock-facets"],
