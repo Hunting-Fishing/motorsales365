@@ -498,10 +498,11 @@ export const getMyFranchisePresence = createServerFn({ method: "GET" })
 
       return {
         hasApplication: !!app,
-        applicationStatus: (app?.status ?? null) as any,
+        applicationStatus: ((app as any)?.status ?? null) as any,
         hasMembership: !!mem,
-        membershipStatus: (mem?.status ?? null) as any,
+        membershipStatus: ((mem as any)?.status ?? null) as any,
       };
+
     },
   );
 
