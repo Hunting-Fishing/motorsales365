@@ -29,6 +29,7 @@ import {
   ListChecks,
   ChevronDown,
   LayoutDashboard,
+  Handshake,
 } from "lucide-react";
 import { useAuth, type SellerType, type AppRole } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -600,6 +601,12 @@ export function SiteHeader() {
                     <DropdownMenuSeparator />
                   </>
                 )}
+                <DropdownMenuItem asChild>
+                  <Link to="/franchise/status">
+                    <Handshake className="mr-2 h-4 w-4" />
+                    Franchise status
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard/profile">Profile</Link>
                 </DropdownMenuItem>
