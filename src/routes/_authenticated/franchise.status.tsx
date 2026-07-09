@@ -17,6 +17,7 @@ import {
   createFranchiseCheckoutSession,
   listActiveTiers,
 } from "@/lib/franchise.functions";
+import { ApplicationAuditTrail } from "@/components/franchise/ApplicationAuditTrail";
 
 export const Route = createFileRoute("/_authenticated/franchise/status")({
   head: () => ({
