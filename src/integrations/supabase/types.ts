@@ -4714,6 +4714,250 @@ export type Database = {
         }
         Relationships: []
       }
+      franchise_application_messages: {
+        Row: {
+          application_id: string
+          body: string
+          created_at: string
+          id: string
+          is_internal: boolean
+          sender_id: string | null
+        }
+        Insert: {
+          application_id: string
+          body: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          sender_id?: string | null
+        }
+        Update: {
+          application_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          sender_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "franchise_application_messages_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "franchise_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      franchise_applications: {
+        Row: {
+          assigned_tier_slug: string | null
+          business_id: string | null
+          business_name: string
+          city: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
+          created_at: string
+          decided_at: string | null
+          existing_brands: string[] | null
+          id: string
+          monthly_parts_spend_cents: number | null
+          notes: string | null
+          province: string | null
+          reviewer_id: string | null
+          reviewer_notes: string | null
+          shop_type: string | null
+          staff_count: number | null
+          status: string
+          tier_slug: string
+          updated_at: string
+          user_id: string | null
+          website_url: string | null
+          years_in_business: number | null
+        }
+        Insert: {
+          assigned_tier_slug?: string | null
+          business_id?: string | null
+          business_name: string
+          city?: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string
+          decided_at?: string | null
+          existing_brands?: string[] | null
+          id?: string
+          monthly_parts_spend_cents?: number | null
+          notes?: string | null
+          province?: string | null
+          reviewer_id?: string | null
+          reviewer_notes?: string | null
+          shop_type?: string | null
+          staff_count?: number | null
+          status?: string
+          tier_slug: string
+          updated_at?: string
+          user_id?: string | null
+          website_url?: string | null
+          years_in_business?: number | null
+        }
+        Update: {
+          assigned_tier_slug?: string | null
+          business_id?: string | null
+          business_name?: string
+          city?: string | null
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string
+          decided_at?: string | null
+          existing_brands?: string[] | null
+          id?: string
+          monthly_parts_spend_cents?: number | null
+          notes?: string | null
+          province?: string | null
+          reviewer_id?: string | null
+          reviewer_notes?: string | null
+          shop_type?: string | null
+          staff_count?: number | null
+          status?: string
+          tier_slug?: string
+          updated_at?: string
+          user_id?: string | null
+          website_url?: string | null
+          years_in_business?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "franchise_applications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      franchise_memberships: {
+        Row: {
+          ad_discount_code: string | null
+          application_id: string | null
+          business_id: string | null
+          created_at: string
+          id: string
+          member_number: string
+          renews_at: string | null
+          started_at: string
+          status: string
+          tier_slug: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ad_discount_code?: string | null
+          application_id?: string | null
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          member_number?: string
+          renews_at?: string | null
+          started_at?: string
+          status?: string
+          tier_slug: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ad_discount_code?: string | null
+          application_id?: string | null
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          member_number?: string
+          renews_at?: string | null
+          started_at?: string
+          status?: string
+          tier_slug?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "franchise_memberships_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "franchise_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "franchise_memberships_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      franchise_tiers: {
+        Row: {
+          ad_discount_bps: number
+          branding_rights: string | null
+          created_at: string
+          features: Json
+          id: string
+          includes_inventory: boolean
+          includes_shared_crm: boolean
+          includes_shop_manager: boolean
+          is_active: boolean
+          monthly_fee_cents: number
+          name: string
+          parts_discount_bps: number
+          setup_fee_cents: number
+          slug: string
+          sort_order: number
+          tagline: string | null
+          updated_at: string
+        }
+        Insert: {
+          ad_discount_bps?: number
+          branding_rights?: string | null
+          created_at?: string
+          features?: Json
+          id?: string
+          includes_inventory?: boolean
+          includes_shared_crm?: boolean
+          includes_shop_manager?: boolean
+          is_active?: boolean
+          monthly_fee_cents?: number
+          name: string
+          parts_discount_bps?: number
+          setup_fee_cents?: number
+          slug: string
+          sort_order?: number
+          tagline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ad_discount_bps?: number
+          branding_rights?: string | null
+          created_at?: string
+          features?: Json
+          id?: string
+          includes_inventory?: boolean
+          includes_shared_crm?: boolean
+          includes_shop_manager?: boolean
+          is_active?: boolean
+          monthly_fee_cents?: number
+          name?: string
+          parts_discount_bps?: number
+          setup_fee_cents?: number
+          slug?: string
+          sort_order?: number
+          tagline?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inspection_orders: {
         Row: {
           buyer_id: string
