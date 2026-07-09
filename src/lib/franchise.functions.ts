@@ -328,25 +328,25 @@ export const adminDecideApplication = createServerFn({ method: "POST" })
 
     let membershipId: string | null = null;
     if (data.decision === "approve" && (app as any).user_id) {
-      const code = `365-${(app as any).business_name
-        .toUpperCase()
-        .replace(/[^A-Z0-9]/g, "")
-        .slice(0, 6)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      const assignedTier = updates.assigned_tier_slug as string;
+      // Create membership in pending_payment state; ad_discount_code and
+      // active status are set by the Stripe webhook after checkout completes.
       const { data: mem, error: mErr } = await context.supabase
         .from("franchise_memberships" as any)
         .insert({
           user_id: (app as any).user_id,
           business_id: (app as any).business_id,
           application_id: data.id,
-          tier_slug: updates.assigned_tier_slug,
-          status: "active",
-          ad_discount_code: code,
+          tier_slug: assignedTier,
+          pending_tier_slug: assignedTier,
+          status: "pending_payment",
         })
         .select("id")
         .single();
       if (mErr) throw mErr;
       membershipId = (mem as any).id;
     }
+
 
     if (data.message_to_applicant && data.message_to_applicant.trim()) {
       await context.supabase.from("franchise_application_messages" as any).insert({
