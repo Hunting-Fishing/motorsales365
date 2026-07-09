@@ -86,6 +86,10 @@ function AdminFranchisePage() {
 
   const decide = async (decision: "approve" | "reject" | "request_info" | "in_review") => {
     if (!openId) return;
+    if (decision === "approve" && !tier) {
+      toast.error("Select a tier before approving.");
+      return;
+    }
     setBusy(true);
     try {
       await decideFn({
