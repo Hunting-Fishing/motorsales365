@@ -116,7 +116,7 @@ function DashboardPage() {
               </p>
             ) : null}
             <Button asChild size="sm" variant="outline" className="mt-3">
-              <Link to="/advertise">Advertise</Link>
+              <a href="/advertise">Advertise</a>
             </Button>
           </Card>
 
