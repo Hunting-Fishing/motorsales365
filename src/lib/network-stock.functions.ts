@@ -258,25 +258,40 @@ export const listShopInquiries = createServerFn({ method: "POST" })
     return rows ?? [];
   });
 
+// ============================================================
+// Network exposure (opt-in + admin approval + audit)
+// ============================================================
+
+export type NetworkExposureStatus = "none" | "pending" | "approved" | "revoked";
+
+export type NetworkExposureState = {
+  expose: boolean;
+  status: NetworkExposureStatus;
+  requested_at: string | null;
+  reviewed_at: string | null;
+  review_note: string | null;
+};
+
 export const setBusinessNetworkExposure = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { businessId: string; expose: boolean }) =>
-    z.object({ businessId: z.string().uuid(), expose: z.boolean() }).parse(d),
+  .inputValidator((d: { businessId: string; expose: boolean; note?: string | null }) =>
+    z
+      .object({
+        businessId: z.string().uuid(),
+        expose: z.boolean(),
+        note: z.string().trim().max(500).nullable().optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: ok } = await supabase.rpc("has_business_role", {
-      _user: userId,
-      _business: data.businessId,
-      _role: "manager",
+    const { supabase } = context;
+    const { data: res, error } = await supabase.rpc("request_network_exposure", {
+      _business_id: data.businessId,
+      _expose: data.expose,
+      _note: data.note ?? null,
     });
-    if (!ok) throw new Error("Forbidden");
-    const { error } = await supabase
-      .from("businesses")
-      .update({ expose_inventory_to_network: data.expose })
-      .eq("id", data.businessId);
-    if (error) throw error;
-    return { ok: true };
+    if (error) throw new Error(error.message);
+    return res as { status: NetworkExposureStatus; expose: boolean };
   });
 
 export const getBusinessNetworkExposure = createServerFn({ method: "POST" })
@@ -284,7 +299,7 @@ export const getBusinessNetworkExposure = createServerFn({ method: "POST" })
   .inputValidator((d: { businessId: string }) =>
     z.object({ businessId: z.string().uuid() }).parse(d),
   )
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data, context }): Promise<NetworkExposureState> => {
     const { supabase, userId } = context;
     const { data: ok } = await supabase.rpc("is_business_member", {
       _user: userId,
@@ -293,9 +308,143 @@ export const getBusinessNetworkExposure = createServerFn({ method: "POST" })
     if (!ok) throw new Error("Forbidden");
     const { data: row, error } = await supabase
       .from("businesses")
-      .select("expose_inventory_to_network")
+      .select(
+        "expose_inventory_to_network, network_exposure_status, network_exposure_requested_at, network_exposure_reviewed_at, network_exposure_review_note",
+      )
       .eq("id", data.businessId)
       .maybeSingle();
     if (error) throw error;
-    return { expose: !!row?.expose_inventory_to_network };
+    return {
+      expose: !!(row as any)?.expose_inventory_to_network,
+      status: (((row as any)?.network_exposure_status as NetworkExposureStatus) ?? "none"),
+      requested_at: (row as any)?.network_exposure_requested_at ?? null,
+      reviewed_at: (row as any)?.network_exposure_reviewed_at ?? null,
+      review_note: (row as any)?.network_exposure_review_note ?? null,
+    };
   });
+
+export type NetworkExposureAuditRow = {
+  id: string;
+  business_id: string;
+  actor_id: string | null;
+  action: string;
+  previous_status: string | null;
+  new_status: string | null;
+  previous_expose: boolean | null;
+  new_expose: boolean | null;
+  note: string | null;
+  created_at: string;
+};
+
+export const listNetworkExposureAudit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { businessId: string }) =>
+    z.object({ businessId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ data, context }): Promise<NetworkExposureAuditRow[]> => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("business_network_exposure_audit" as any)
+      .select("*")
+      .eq("business_id", data.businessId)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw error;
+    return ((rows as any[]) ?? []) as NetworkExposureAuditRow[];
+  });
+
+// -------- Admin --------
+
+async function ensureAdmin(ctx: { supabase: any; userId: string }) {
+  const { data } = await ctx.supabase.rpc("has_role", {
+    _user_id: ctx.userId,
+    _role: "admin",
+  });
+  if (!data) throw new Error("Forbidden");
+}
+
+export type AdminNetworkExposureRow = {
+  id: string;
+  name: string;
+  slug: string;
+  city: string | null;
+  province: string | null;
+  expose_inventory_to_network: boolean;
+  network_exposure_status: NetworkExposureStatus;
+  network_exposure_requested_at: string | null;
+  network_exposure_reviewed_at: string | null;
+  network_exposure_review_note: string | null;
+};
+
+export const adminListNetworkExposure = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { status?: NetworkExposureStatus | "all"; search?: string | null }) =>
+    z
+      .object({
+        status: z.enum(["all", "none", "pending", "approved", "revoked"]).optional(),
+        search: z.string().trim().max(120).nullable().optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }): Promise<AdminNetworkExposureRow[]> => {
+    await ensureAdmin(context);
+    let q = context.supabase
+      .from("businesses")
+      .select(
+        "id, name, slug, city, province, expose_inventory_to_network, network_exposure_status, network_exposure_requested_at, network_exposure_reviewed_at, network_exposure_review_note",
+      )
+      .order("network_exposure_requested_at", { ascending: false, nullsFirst: false })
+      .limit(300);
+
+    const status = data.status ?? "pending";
+    if (status !== "all") q = q.eq("network_exposure_status", status);
+
+    if (data.search) {
+      const s = data.search.replace(/[%_]/g, " ");
+      q = q.or(`name.ilike.%${s}%,slug.ilike.%${s}%`);
+    }
+    const { data: rows, error } = await q;
+    if (error) throw error;
+    return ((rows as any[]) ?? []) as AdminNetworkExposureRow[];
+  });
+
+export const adminReviewNetworkExposure = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (d: { businessId: string; decision: "approve" | "reject" | "revoke"; note?: string | null }) =>
+      z
+        .object({
+          businessId: z.string().uuid(),
+          decision: z.enum(["approve", "reject", "revoke"]),
+          note: z.string().trim().max(1000).nullable().optional(),
+        })
+        .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { data: res, error } = await context.supabase.rpc("review_network_exposure", {
+      _business_id: data.businessId,
+      _decision: data.decision,
+      _note: data.note ?? null,
+    });
+    if (error) throw new Error(error.message);
+    return res as { status: NetworkExposureStatus };
+  });
+
+export const adminListNetworkExposureAudit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { businessId: string }) =>
+    z.object({ businessId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ data, context }): Promise<NetworkExposureAuditRow[]> => {
+    await ensureAdmin(context);
+    const { data: rows, error } = await context.supabase
+      .from("business_network_exposure_audit" as any)
+      .select("*")
+      .eq("business_id", data.businessId)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    return ((rows as any[]) ?? []) as NetworkExposureAuditRow[];
+  });
+
