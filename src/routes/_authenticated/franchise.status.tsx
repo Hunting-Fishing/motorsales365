@@ -17,6 +17,7 @@ import {
   createFranchiseCheckoutSession,
   listActiveTiers,
 } from "@/lib/franchise.functions";
+import { ApplicationAuditTrail } from "@/components/franchise/ApplicationAuditTrail";
 
 export const Route = createFileRoute("/_authenticated/franchise/status")({
   head: () => ({
@@ -193,6 +194,16 @@ function StatusPage() {
             </Button>
           </Card>
         ) : null}
+
+        <Card className="mt-6 p-6">
+          <h2 className="font-display text-lg font-semibold">Review history</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Every action a reviewer takes on your application appears here.
+          </p>
+          <div className="mt-4">
+            <ApplicationAuditTrail applicationId={app.id} showActor={false} />
+          </div>
+        </Card>
 
         <Card className="mt-6 p-6">
           <h2 className="font-display text-lg font-semibold">Messages</h2>

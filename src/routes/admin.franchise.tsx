@@ -37,6 +37,7 @@ import {
   listActiveTiers,
   type FranchiseApplication,
 } from "@/lib/franchise.functions";
+import { ApplicationAuditTrail } from "@/components/franchise/ApplicationAuditTrail";
 
 export const Route = createFileRoute("/admin/franchise")({
   head: () => ({
@@ -545,6 +546,13 @@ function AdminFranchisePage() {
                 >
                   Request info
                 </Button>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase text-muted-foreground">Admin audit trail</p>
+                <div className="mt-2">
+                  <ApplicationAuditTrail applicationId={detail.data.application.id} />
+                </div>
               </div>
 
               <div>
