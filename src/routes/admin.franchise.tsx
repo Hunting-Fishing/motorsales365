@@ -49,6 +49,13 @@ function AdminFranchisePage() {
   const listFn = useServerFn(adminListApplications);
   const getFn = useServerFn(adminGetApplication);
   const decideFn = useServerFn(adminDecideApplication);
+  const tiersFn = useServerFn(listActiveTiers);
+
+  const tiersQuery = useQuery({
+    queryKey: ["franchise", "tiers", "active"],
+    queryFn: () => tiersFn(),
+  });
+  const tierOptions = tiersQuery.data ?? [];
 
   const [status, setStatus] = useState<(typeof STATUSES)[number]>("pending");
   const [search, setSearch] = useState("");
