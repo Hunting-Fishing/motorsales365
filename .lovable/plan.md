@@ -1,96 +1,99 @@
-
-# /parts overhaul — professional catalog + commerce-ready
-
-## Benchmark takeaways
-
-- **RockAuto** — persistent Year/Make/Model/Engine picker as the hero, then a rigid Category → Sub-category → Part tree. Dense results table with brand, price, condition, warranty, in stock.
-- **NAPA** — clean brand-forward hero, prominent YMM selector, category tiles, "Store near me" pickup toggle, deals rail.
-- **PartSouq** — VIN decoder is the primary entry; OEM exploded diagrams; part number, superseded numbers, applicable models.
-- **PartsPro.ph** — PH-local trust cues (COD, GCash, warranty, ship nationwide), curated brand grid, category mega-menu, product cards with SKU + stock badge, cart/checkout.
-
-## What /parts has today
-
-- Hero + button cluster + "market availability" strip.
-- 3 tabs (Find / Browse / Order OEM soon) plus an always-visible "Browse by category" banner and two partner rails stacked above the tabs.
-- Wizard, OEM search, affiliate rows, partner product grid, used-parts browse grid — all rendered on one long page.
-
-Problems: no single hero fitment selector; category tree hidden behind a link; no product-card commerce affordances (stock, brand, warranty, condition, ship-from); no VIN entry on the landing; PH trust cues missing; visual density looks like a dashboard, not a catalog.
-
 ## Goal
+Launch `/franchise` as the on-ramp for shops to join the 365 network — either as a lightweight **365 Partner** (keep own brand, trust badge + benefits) or a full **365 Franchise** (operate under 365 brand, deeper integration). Public marketing + application intake, admin review queue, approved-partner dashboard, and admin-editable tier configuration.
 
-Convert /parts into a category-first, YMM/VIN-first storefront that reads as a real parts store and is structurally ready to plug in cart + checkout when we turn on D2C from outlets.
+## Pages & routes
 
-## Design directions
+- `src/routes/franchise.tsx` — public pitch page (SSR, own `head()` meta).
+  - Hero: "Join the 365 network" with two-tier switcher (Partner / Franchise).
+  - Benefits grid (4 pillars): Parts pricing & network stock · Shared customer CRM · Marketing & trust boost · Software suite included.
+  - Tier comparison table (fees, parts discount %, ad discount %, software access, branding rights) — pulled from `franchise_tiers` table so admin edits are live.
+  - "How it works" 4-step (Apply → Review → Onboard → Launch).
+  - Social proof / NAPA-style positioning strip.
+  - FAQ (accordion).
+  - Sticky "Apply now" CTA → `/franchise/apply`.
+- `src/routes/franchise.apply.tsx` — public application form (works signed-out; prompts sign-in on submit if needed).
+- `src/routes/_authenticated/franchise/status.tsx` — applicant sees their submission status + messages.
+- `src/routes/_authenticated/franchise/dashboard.tsx` — approved partners: tier badge, parts discount, network stock link, shared-CRM link, Shop Manager quick-open, ad-discount code.
+- `src/routes/_authenticated/admin/franchise.tsx` — admin queue: pending/approved/rejected tabs, review drawer with notes, approve/reject/request-info, tier assignment.
+- `src/routes/_authenticated/admin/franchise-tiers.tsx` — admin CRUD for tier config.
 
-Before implementing, present 3 rendered directions (create_directions) built from a screenshot of the current /parts, with the palette/type/layout locked. Themes:
+## Data model (new tables)
 
-1. **Catalog Rigor** — RockAuto-style density, table-forward results, engineering feel.
-2. **PH Storefront** — PartsPro.ph-style trust-rich retail, brand grid, deals rail, warm palette.
-3. **VIN-First** — PartSouq-style VIN hero, exploded-diagram teaser, OEM number search prominent.
+1. `franchise_tiers` — admin-editable tier catalog.
+   - `slug` (unique: `partner` | `franchise` | future), `name`, `tagline`, `monthly_fee_cents`, `setup_fee_cents`, `parts_discount_bps`, `ad_discount_bps`, `includes_shop_manager` (bool), `includes_inventory` (bool), `includes_shared_crm` (bool), `branding_rights` (text), `features` (jsonb array of bullets), `is_active`, `sort_order`.
+   - Public SELECT for `is_active`; admin write.
 
-User picks one; we build it.
+2. `franchise_applications` — intake + review workflow.
+   - `user_id` (nullable — allow signed-out submit), `contact_name`, `contact_email`, `contact_phone`, `business_name`, `business_id` (nullable FK to `businesses`), `city`, `province`, `tier_slug` (requested), `shop_type`, `years_in_business`, `staff_count`, `monthly_parts_spend_cents`, `existing_brands` (text[]), `website_url`, `notes`, `status` (`pending`|`in_review`|`info_requested`|`approved`|`rejected`), `assigned_tier_slug` (nullable, admin sets on approve), `reviewer_id`, `reviewer_notes`, `decided_at`.
+   - Policies: insert public (rate-limit via existing patterns), owner SELECT own by `user_id` or `contact_email` match; admin full access.
 
-## Structural changes (regardless of direction)
+3. `franchise_memberships` — approved partners.
+   - `user_id`, `business_id`, `tier_slug`, `member_number` (auto), `status` (`active`|`suspended`|`cancelled`), `started_at`, `renews_at`, `ad_discount_code` (text).
+   - Owner SELECT own; admin full access.
 
-### 1. New hero: unified fitment bar
-Replace the current hero button cluster with a single sticky fitment bar containing three tabs:
-- **By Vehicle** — Year / Make / Model / (Engine/Trim) selects, persisted in `sessionStorage` so it survives navigation across `/parts`, `/parts/c/:slug`, `/parts/search`, `/parts/p/:network/:sku`.
-- **By VIN** — 17-char VIN input → routes to `/parts/search?vin=…` (already exists).
-- **By Part Number** — OEM/SKU input → uses existing `OemSearch` handler.
+4. `franchise_application_messages` — thread between applicant and reviewer.
+   - `application_id`, `sender_id`, `body`, `is_internal` (bool, admin-only visibility).
 
-### 2. Category mega-grid as the primary browse surface
-Promote the 10 curated categories from `src/data/parts-categories.ts` into a proper card grid directly on `/parts` (icon + title + short + top-3 sub-keywords), instead of the single "Browse by category" banner. Keep the dedicated `/parts/categories` page but make it feel like a continuation.
+All tables: full GRANT block per house rules, RLS on, `updated_at` trigger, timestamps.
 
-### 3. Consolidate the three tabs
-Drop the "Find (wizard) / Browse all / Order OEM" tab strip. Instead:
-- Wizard becomes an optional "Guided finder" collapsible under the fitment bar.
-- Browse-all used-parts grid moves into its own section labeled **Used & salvage parts (Banawe network)** further down.
-- "Order OEM (Soon)" becomes a banner card, not a tab.
+## Server functions (`src/lib/franchise.functions.ts`)
 
-### 4. Upgrade product cards
-Extend `PartnerProductsGrid` cards to show:
-- Brand / partner logo, condition (New/OEM/Aftermarket/Used), price + strike-through if promo, stock badge, ship-from region, warranty text when known, and a compact fitment line ("Fits: 2015–2020 Toyota Vios").
-- Wire a "Save" heart and an "Ask seller / Buy" primary action. Buy stays as affiliate redirect today; the same slot becomes Add-to-Cart when D2C launches (no additional refactor needed).
+- `listActiveTiers()` — public, publishable-key client.
+- `getTierBySlug(slug)` — public.
+- `submitFranchiseApplication(payload)` — public (no auth required); Zod-validated; attaches `user_id` when signed in.
+- `getMyApplication()` — auth; returns applicant's latest app + messages.
+- `postApplicationMessage({ applicationId, body })` — auth (applicant or admin).
+- `getMyMembership()` — auth; returns active membership + tier.
+- Admin (`ensureAdmin` gate):
+  - `adminListApplications({ status?, search?, limit })`
+  - `adminGetApplication(id)` (with internal messages)
+  - `adminDecideApplication({ id, decision: approve|reject|request_info, assigned_tier_slug?, reviewer_notes? })` — on approve, creates `franchise_memberships` row + generates `ad_discount_code`, notifies applicant.
+  - `adminListTiers()` / `adminUpsertTier(payload)` / `adminDeleteTier(id)`
 
-### 5. Deals + brand rails
-Two horizontal scroll rails between hero and category grid:
-- **Featured brands** (sourced from distinct `partner_products.brand` where non-null, capped 12).
-- **Deals & new arrivals** (server fn ordering by `created_at` desc / discount if present).
+## Components
 
-### 6. PH trust strip
-Small icon row below hero: COD available at select outlets · GCash accepted · Ships nationwide via Lalamove/J&T · 7-day return on defects · Verified partners. Wording only — no new backend behavior.
+- `src/components/franchise/tier-switcher.tsx` — segmented control Partner ↔ Franchise driving the hero + benefits copy.
+- `src/components/franchise/benefits-grid.tsx` — 4 pillars, icon + copy per tier.
+- `src/components/franchise/tier-compare-table.tsx` — data-driven table.
+- `src/components/franchise/how-it-works.tsx`.
+- `src/components/franchise/franchise-faq.tsx`.
+- `src/components/franchise/apply-form.tsx` — Zod-validated multi-step-lite form.
+- `src/components/franchise/application-status-card.tsx`.
+- `src/components/franchise/membership-card.tsx` — tier badge, discount %, ad code, quick links to Shop Manager + Stock Network.
+- `src/components/admin/franchise/applications-queue.tsx`, `application-review-drawer.tsx`, `tier-editor.tsx`.
 
-### 7. Sticky compare + recently viewed
-- Track last 8 viewed `parts.p.$network.$sku` items in `localStorage`, render a "Recently viewed" rail near the bottom of `/parts` and category pages.
-- Add "Compare" checkbox on product cards; when 2–4 selected, a floating bar links to a lightweight compare drawer (client-only, no schema).
+## Cross-linking & discovery
 
-### 8. SEO polish
-- Add `ItemList` JSON-LD listing the 10 categories on `/parts`.
-- Ensure each category page (`parts.c.$slug.tsx`) emits `BreadcrumbList` + `ItemList` of products.
-- Add `Product` JSON-LD on `parts.p.$network.$sku.tsx` (many fields already known: name, image, price, availability).
+- Add "Become a 365 Partner" link in the main footer and inside the shop-manager pricing/marketing area.
+- Add card on `/advertise` linking to franchise ("Bigger discounts as a 365 Partner").
+- Add nav entry under user avatar → "Franchise status" once an application exists.
+- Admin sidebar: new "Franchise" group with Applications + Tiers.
 
-### 9. Commerce readiness (structural only, no live checkout yet)
-- Introduce a shared `PartCard` component so future cart wiring only touches one file.
-- Add a `useCart()` stub hook + local-storage cart drawer, hidden behind an existing feature flag (e.g. `parts_cart_beta`). Add-to-cart buttons appear only when the flag is on; nothing changes for current users.
+## Design
 
-## Out of scope (do not touch this pass)
+Reuse existing 365 tokens (no new palette). Hero uses gradient-primary + existing card styles. Tier switcher = `Tabs` primitive. Comparison table = shadcn `Table`. Icons via `lucide-react` (Handshake, PackageCheck, Users, Megaphone, LayoutDashboard).
 
-- Real checkout, payments, tax, shipping quotes.
-- Partner-program business rules or fee changes → no `/terms` update needed.
-- Any privacy/data-collection change → no `/privacy` update.
-- Backend schema changes (all additions read existing tables).
+## SEO
 
-## Technical notes
+Route `head()`:
+- title: "365 Franchise & Partner Program — Grow your shop with the 365 network"
+- description: "Join the 365 network as a Partner or Franchise. Get parts discounts, shared customer CRM, network stock visibility, marketing boost, and bundled Shop Manager tools."
+- og:title / og:description matching; og:image at leaf only (skip until we have a real cover).
 
-- All work stays in `src/routes/parts.tsx`, `src/routes/parts.categories.tsx`, `src/routes/parts.c.$slug.tsx`, `src/routes/parts.p.$network.$sku.tsx`, `src/components/parts/*`, plus a new `PartCard`, `FitmentBar`, `PhTrustStrip`, `BrandRail`, `RecentlyViewedRail`, and `useCart` stub.
-- Reuse `browseUsedParts`, `getPartsForVehicle`, `listPartsCountries` server fns as-is; add one server fn `listFeaturedBrands` (SELECT DISTINCT brand… LIMIT 12) — pure read against `partner_products`.
-- Fitment selection persisted to `sessionStorage` under key `365_parts_ymm` and read by all `/parts/*` pages on mount so vehicle context follows the user.
-- Vehicle context in the URL as `?y=&mk=&md=` on category/search pages so links are shareable.
+## Policy sync
 
-## Delivery order
+Per core memory, franchise fees, discounts, memberships, and data handling touch commerce + data. In the same batch as the migration/UI:
+- Update `/terms` with a new "Franchise & Partner Program" section (fee cadence, tier obligations, termination, discount misuse) and bump "Last updated".
+- Update `/privacy` for the shared-CRM data flow (what's shared with partner shops, opt-out, retention) and bump "Last updated".
 
-1. Present 3 design directions built from a current /parts screenshot; user picks one.
-2. Build the picked direction: fitment bar, category mega-grid, `PartCard`, PH trust strip, brand + deals rails.
-3. Refactor `/parts/c/:slug` and product detail to use `PartCard` and the persistent fitment.
-4. Add JSON-LD, recently-viewed, compare drawer.
-5. Land `useCart` stub behind `parts_cart_beta` flag.
+## Out of scope for v1
+
+- Payment collection for membership fees (surface fee, collect via existing Stripe flow later).
+- Real-time cross-shop inventory sync UI (link to future stock-network route as "coming soon" for now).
+- Public partner directory page (add later once ≥5 approved).
+
+## Verification
+
+- Playwright: load `/franchise` mobile + desktop, submit application as signed-out user, sign in, view status page. Admin approves → verify membership row + dashboard renders.
+- Confirm RLS: anon cannot read `franchise_applications`; applicant cannot read others'; admin sees all.
+- Confirm GRANTs present on all four new tables.
