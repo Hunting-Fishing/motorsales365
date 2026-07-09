@@ -224,15 +224,38 @@ function AdminFranchisePage() {
 
               <div>
                 <p className="text-xs uppercase text-muted-foreground">Assign tier on approval</p>
-                <Select value={tier} onValueChange={(v) => setTier(v as any)}>
+                <Select
+                  value={tier}
+                  onValueChange={setTier}
+                  disabled={tiersQuery.isLoading || tierOptions.length === 0}
+                >
                   <SelectTrigger className="mt-1">
-                    <SelectValue />
+                    <SelectValue
+                      placeholder={
+                        tiersQuery.isLoading
+                          ? "Loading tiers…"
+                          : tierOptions.length === 0
+                            ? "No active tiers configured"
+                            : "Select a tier"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="partner">365 Partner</SelectItem>
-                    <SelectItem value="franchise">365 Franchise</SelectItem>
+                    {tierOptions.map((t) => (
+                      <SelectItem key={t.slug} value={t.slug}>
+                        {t.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
+                {tierOptions.length === 0 && !tiersQuery.isLoading ? (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    <a href="/admin/franchise-tiers" className="underline">
+                      Configure franchise tiers
+                    </a>{" "}
+                    before approving applications.
+                  </p>
+                ) : null}
               </div>
 
               <div>
