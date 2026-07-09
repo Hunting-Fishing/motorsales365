@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Package, Trash2, Pencil, Minus, Plus as PlusIcon, AlertTriangle } from "lucide-react";
+import { Plus, Package, Trash2, Pencil, Minus, Plus as PlusIcon, AlertTriangle, Radio } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   listBusinessInventory,
@@ -11,11 +11,18 @@ import {
   adjustBusinessInventory,
   deleteBusinessInventoryItem,
 } from "@/lib/business-inventory.functions";
+import {
+  getBusinessNetworkExposure,
+  setBusinessNetworkExposure,
+  listShopInquiries,
+} from "@/lib/network-stock.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -36,12 +43,62 @@ function InventoryPage() {
   const upsertFn = useServerFn(upsertBusinessInventoryItem);
   const adjustFn = useServerFn(adjustBusinessInventory);
   const delFn = useServerFn(deleteBusinessInventoryItem);
+  const exposureLoadFn = useServerFn(getBusinessNetworkExposure);
+  const exposureSetFn = useServerFn(setBusinessNetworkExposure);
+  const inquiriesFn = useServerFn(listShopInquiries);
 
   const q = useQuery({
     queryKey: ["business-inventory", businessId],
     enabled: !!user?.id,
     queryFn: () => loadFn({ data: { businessId } }),
   });
+
+  const exposure = useQuery({
+    queryKey: ["business-exposure", businessId],
+    enabled: !!user?.id,
+    queryFn: () => exposureLoadFn({ data: { businessId } }),
+  });
+
+  const inquiries = useQuery({
+    queryKey: ["business-network-inquiries", businessId],
+    enabled: !!user?.id,
+    queryFn: () => inquiriesFn({ data: { businessId } }),
+  });
+
+  // Realtime: reflect stock changes from other staff/devices instantly.
+  useEffect(() => {
+    if (!businessId) return;
+    const channel = supabase
+      .channel(`inv-${businessId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "business_inventory_items",
+          filter: `business_id=eq.${businessId}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "network_part_inquiries",
+          filter: `business_id=eq.${businessId}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["business-network-inquiries", businessId] });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [businessId, qc]);
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
