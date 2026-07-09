@@ -84,6 +84,7 @@ import { Route as PayManualRouteImport } from './routes/pay.manual'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
 import { Route as PassportPremiumCheckoutRouteImport } from './routes/passport-premium.checkout'
 import { Route as PartsSearchRouteImport } from './routes/parts.search'
+import { Route as PartsNetworkRouteImport } from './routes/parts.network'
 import { Route as PartsCategoriesRouteImport } from './routes/parts.categories'
 import { Route as PartnersPartsRouteImport } from './routes/partners.parts'
 import { Route as PartnerProgramTermsRouteImport } from './routes/partner-program.terms'
@@ -678,6 +679,11 @@ const PassportPremiumCheckoutRoute = PassportPremiumCheckoutRouteImport.update({
 const PartsSearchRoute = PartsSearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => PartsRoute,
+} as any)
+const PartsNetworkRoute = PartsNetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
   getParentRoute: () => PartsRoute,
 } as any)
 const PartsCategoriesRoute = PartsCategoriesRouteImport.update({
@@ -2011,6 +2017,7 @@ export interface FileRoutesByFullPath {
   '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
+  '/parts/network': typeof PartsNetworkRoute
   '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
@@ -2302,6 +2309,7 @@ export interface FileRoutesByTo {
   '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
+  '/parts/network': typeof PartsNetworkRoute
   '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
@@ -2600,6 +2608,7 @@ export interface FileRoutesById {
   '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
+  '/parts/network': typeof PartsNetworkRoute
   '/parts/search': typeof PartsSearchRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
@@ -2899,6 +2908,7 @@ export interface FileRouteTypes {
     | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
+    | '/parts/network'
     | '/parts/search'
     | '/passport-premium/checkout'
     | '/passport/$slug'
@@ -3190,6 +3200,7 @@ export interface FileRouteTypes {
     | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
+    | '/parts/network'
     | '/parts/search'
     | '/passport-premium/checkout'
     | '/passport/$slug'
@@ -3487,6 +3498,7 @@ export interface FileRouteTypes {
     | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
+    | '/parts/network'
     | '/parts/search'
     | '/passport-premium/checkout'
     | '/passport/$slug'
@@ -4301,6 +4313,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/parts/search'
       preLoaderRoute: typeof PartsSearchRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/parts/network': {
+      id: '/parts/network'
+      path: '/network'
+      fullPath: '/parts/network'
+      preLoaderRoute: typeof PartsNetworkRouteImport
       parentRoute: typeof PartsRoute
     }
     '/parts/categories': {
@@ -6341,6 +6360,7 @@ const PartnerProgramRouteWithChildren = PartnerProgramRoute._addFileChildren(
 
 interface PartsRouteChildren {
   PartsCategoriesRoute: typeof PartsCategoriesRoute
+  PartsNetworkRoute: typeof PartsNetworkRoute
   PartsSearchRoute: typeof PartsSearchRoute
   PartsCSlugRoute: typeof PartsCSlugRoute
   PartsPNetworkSkuRoute: typeof PartsPNetworkSkuRoute
@@ -6348,6 +6368,7 @@ interface PartsRouteChildren {
 
 const PartsRouteChildren: PartsRouteChildren = {
   PartsCategoriesRoute: PartsCategoriesRoute,
+  PartsNetworkRoute: PartsNetworkRoute,
   PartsSearchRoute: PartsSearchRoute,
   PartsCSlugRoute: PartsCSlugRoute,
   PartsPNetworkSkuRoute: PartsPNetworkSkuRoute,
