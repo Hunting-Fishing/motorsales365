@@ -102,7 +102,7 @@ function InventoryPage() {
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
-  const [form, setForm] = useState<any>({
+  const emptyForm = {
     name: "",
     sku: "",
     category: "",
@@ -110,22 +110,16 @@ function InventoryPage() {
     qty_on_hand: 0,
     reorder_at: "",
     cost: "",
+    price: "",
     location: "",
-  });
+    network_visible: true,
+  };
+  const [form, setForm] = useState<any>(emptyForm);
   const [saving, setSaving] = useState(false);
 
   function openNew() {
     setEditing(null);
-    setForm({
-      name: "",
-      sku: "",
-      category: "",
-      unit: "pc",
-      qty_on_hand: 0,
-      reorder_at: "",
-      cost: "",
-      location: "",
-    });
+    setForm({ ...emptyForm });
     setOpen(true);
   }
 
@@ -139,7 +133,9 @@ function InventoryPage() {
       qty_on_hand: row.qty_on_hand ?? 0,
       reorder_at: row.reorder_at ?? "",
       cost: row.cost ?? "",
+      price: row.price ?? "",
       location: row.location ?? "",
+      network_visible: row.network_visible ?? true,
     });
     setOpen(true);
   }
@@ -158,7 +154,9 @@ function InventoryPage() {
           qty_on_hand: Number(form.qty_on_hand) || 0,
           reorder_at: form.reorder_at === "" ? null : Number(form.reorder_at),
           cost: form.cost === "" ? null : Number(form.cost),
+          price: form.price === "" ? null : Number(form.price),
           location: form.location || null,
+          network_visible: !!form.network_visible,
         },
       });
       const { handlePlanLimitResult } = await import("@/lib/plan-limit-toast");
@@ -171,6 +169,16 @@ function InventoryPage() {
       toast.error(e?.message || "Failed");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function toggleExposure(next: boolean) {
+    try {
+      await exposureSetFn({ data: { businessId, expose: next } });
+      qc.invalidateQueries({ queryKey: ["business-exposure", businessId] });
+      toast.success(next ? "Shop is now sharing stock with the network" : "Network sharing turned off");
+    } catch (e: any) {
+      toast.error(e?.message || "Failed");
     }
   }
 
