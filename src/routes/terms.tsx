@@ -544,6 +544,57 @@ function TermsPage() {
           </li>
         </ul>
 
+        <h2 className="mt-6 text-xl font-semibold">15c. 365 Franchise &amp; Partner Program</h2>
+        <p className="mt-2 text-muted-foreground">
+          The <Link className="text-primary underline" to="/franchise">365 Franchise &amp; Partner Program</Link>{" "}
+          is an optional, application-based membership offered to established motoring shops in the
+          Philippines. Two tiers are available:
+        </p>
+        <ul className="ml-5 mt-2 list-disc space-y-1 text-muted-foreground">
+          <li>
+            <strong>365 Partner</strong> — the shop keeps its own name and branding and displays a
+            "365 Verified Partner" badge. Includes network parts discounts, discounted advertising,
+            Shop Manager software, and (with customer consent) participation in the shared customer
+            CRM.
+          </li>
+          <li>
+            <strong>365 Franchise</strong> — the shop operates under co-branded 365 signage,
+            uniforms, and marketing, and receives deeper discounts, territory support, and lead
+            routing from the 365 marketplace. Franchise-tier obligations, minimum term, and brand
+            usage rules are set out in a separate Franchise Agreement disclosed before signing.
+          </li>
+        </ul>
+        <p className="mt-2 text-muted-foreground">
+          <strong>Applications.</strong> Approval is at 365 MotorSales' sole discretion and may
+          require business registration documents, shop photos, and reference checks. Fees, parts
+          discount percentages, and advertising discounts are shown on the /franchise page and in
+          the Admin-managed tier catalog; the values displayed at the time your membership starts
+          are the values that apply, and changes are announced with reasonable notice.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          <strong>Discount codes and network pricing.</strong> Any discount code, member number, or
+          preferential parts pricing granted to a franchisee or partner is personal to that shop
+          and may not be shared, resold, or used to procure parts for third parties outside the
+          member shop's ordinary business. Misuse (including reselling discounted parts at market
+          rates outside the member shop, sharing codes on public channels, or false claims about
+          affiliation) is grounds for immediate suspension, reversal of discounts, and
+          cost-recovery.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          <strong>Shared customer CRM.</strong> Members can view service and quote history for
+          customers who have consented to network-wide sharing. Members must handle customer data
+          in accordance with our Privacy Policy and RA 10173, may only use it to serve that
+          customer, and must not export or reuse it for unrelated marketing. Consent can be
+          withdrawn by the customer at any time.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          <strong>Termination.</strong> Partner memberships are month-to-month and either side may
+          terminate on written notice. Franchise memberships follow the term set in the Franchise
+          Agreement. On termination the member must stop using 365 branding, badges, and codes and
+          return or destroy any co-branded marketing materials. Sections on payment, indemnity,
+          confidentiality, and data handling survive termination.
+        </p>
+
         <h2 className="mt-6 text-xl font-semibold">15. Privacy &amp; data protection</h2>
         <p className="mt-2 text-muted-foreground">
           Our processing of personal data is described in our{" "}
