@@ -63,12 +63,19 @@ export type FranchiseMembership = {
   business_id: string | null;
   application_id: string | null;
   tier_slug: string;
+  pending_tier_slug: string | null;
   member_number: string;
-  status: "active" | "suspended" | "cancelled";
+  status: "pending_payment" | "active" | "past_due" | "suspended" | "cancelled";
   started_at: string;
   renews_at: string | null;
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
   ad_discount_code: string | null;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  stripe_price_id: string | null;
 };
+
 
 export type FranchiseAppMessage = {
   id: string;
