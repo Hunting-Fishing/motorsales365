@@ -363,14 +363,14 @@ function AdminFranchisePage() {
                     </th>
                     <SortHeader field="business_name" sort={sort} setSort={setSort}>Business</SortHeader>
                     <SortHeader field="contact_name" sort={sort} setSort={setSort}>Contact</SortHeader>
-                    <SortHeader field="location" sort={sort} setSort={setSort}>Location</SortHeader>
+                    <SortHeader field="province" sort={sort} setSort={setSort}>Location</SortHeader>
                     <SortHeader field="tier_slug" sort={sort} setSort={setSort}>Tier</SortHeader>
                     <SortHeader field="status" sort={sort} setSort={setSort}>Status</SortHeader>
                     <SortHeader field="created_at" sort={sort} setSort={setSort} align="right">Applied</SortHeader>
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedRows.map((r: FranchiseApplication) => {
+                  {rows.map((r: FranchiseApplication) => {
                     const isApprovable = r.status !== "approved" && r.status !== "rejected";
                     const isSelected = !!selected[r.id];
                     const effectiveTier = r.assigned_tier_slug ?? r.tier_slug;
