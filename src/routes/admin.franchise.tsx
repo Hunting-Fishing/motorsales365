@@ -37,6 +37,7 @@ import {
   listActiveTiers,
   type FranchiseApplication,
 } from "@/lib/franchise.functions";
+import { ApplicationAuditTrail } from "@/components/franchise/ApplicationAuditTrail";
 
 export const Route = createFileRoute("/admin/franchise")({
   head: () => ({
