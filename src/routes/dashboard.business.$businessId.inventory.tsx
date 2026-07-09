@@ -15,6 +15,9 @@ import {
   getBusinessNetworkExposure,
   setBusinessNetworkExposure,
   listShopInquiries,
+  updateNetworkInquiryStatus,
+  NETWORK_INQUIRY_STATUSES,
+  type NetworkInquiryStatus,
 } from "@/lib/network-stock.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
