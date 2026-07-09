@@ -555,6 +555,72 @@ export const adminBulkApproveApplications = createServerFn({ method: "POST" })
     return { results };
   });
 
+export type FranchiseAuditEntry = {
+  id: string;
+  application_id: string;
+  actor_id: string | null;
+  actor_name: string | null;
+  action: "approve" | "reject" | "request_info" | "in_review" | "bulk_approve" | "tier_change" | "note_update";
+  from_status: string | null;
+  to_status: string | null;
+  from_tier: string | null;
+  to_tier: string | null;
+  reviewer_notes: string | null;
+  message_to_applicant: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+};
+
+export const listApplicationAudit = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { applicationId: string }) => {
+    if (!/^[0-9a-f-]{36}$/i.test(d.applicationId)) throw new Error("Invalid application id");
+    return d;
+  })
+  .handler(async ({ data, context }): Promise<{ entries: FranchiseAuditEntry[] }> => {
+    // RLS restricts to admins or the applicant themselves.
+    const { data: rows, error } = await context.supabase
+      .from("franchise_application_audit" as any)
+      .select("*")
+      .eq("application_id", data.applicationId)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+
+    const actorIds = Array.from(
+      new Set(((rows as any[]) ?? []).map((r) => r.actor_id).filter(Boolean)),
+    ) as string[];
+    let nameMap: Record<string, string> = {};
+    if (actorIds.length > 0) {
+      const { data: profiles } = await context.supabase
+        .from("profiles" as any)
+        .select("id, full_name, display_name, contact_email")
+        .in("id", actorIds);
+      for (const p of (profiles as any[]) ?? []) {
+        nameMap[p.id] =
+          p.full_name || p.display_name || p.contact_email || `User ${String(p.id).slice(0, 8)}`;
+      }
+    }
+
+    const entries: FranchiseAuditEntry[] = ((rows as any[]) ?? []).map((r) => ({
+      id: r.id,
+      application_id: r.application_id,
+      actor_id: r.actor_id,
+      actor_name: r.actor_id ? nameMap[r.actor_id] ?? null : null,
+      action: r.action,
+      from_status: r.from_status,
+      to_status: r.to_status,
+      from_tier: r.from_tier,
+      to_tier: r.to_tier,
+      reviewer_notes: r.reviewer_notes,
+      message_to_applicant: r.message_to_applicant,
+      metadata: r.metadata ?? {},
+      created_at: r.created_at,
+    }));
+
+    return { entries };
+  });
+
+
 
 export const adminPostInternalNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
