@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -86,11 +86,26 @@ function NetworkStockPage() {
     [search],
   );
 
-  const { data: rows = [], isFetching } = useQuery({
+  const PAGE_SIZE = 20;
+  const {
+    data,
+    isFetching,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteQuery({
     queryKey: ["network-stock", filters],
-    queryFn: () => searchFn({ data: filters }),
+    queryFn: ({ pageParam }) =>
+      searchFn({ data: { ...filters, limit: PAGE_SIZE, offset: pageParam as number } }),
+    initialPageParam: 0,
+    getNextPageParam: (last) => last.nextOffset ?? undefined,
     staleTime: 15_000,
   });
+  const rows = useMemo(
+    () => (data?.pages ?? []).flatMap((p) => p.rows),
+    [data],
+  );
+  const total = data?.pages?.[0]?.total ?? null;
 
   const { data: facets } = useQuery({
     queryKey: ["network-stock-facets"],
@@ -272,12 +287,25 @@ function NetworkStockPage() {
           ) : (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                {rows.length} live listing{rows.length === 1 ? "" : "s"}
+                Showing {rows.length}
+                {total != null ? ` of ${total}` : ""} live listing
+                {(total ?? rows.length) === 1 ? "" : "s"}
                 {search.q ? ` for "${search.q}"` : ""}
               </p>
               {rows.map((r) => (
                 <StockRow key={r.id} row={r} onInquire={setInquiry} />
               ))}
+              {hasNextPage && (
+                <div className="flex justify-center pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                  >
+                    {isFetchingNextPage ? "Loading…" : "Load more"}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>

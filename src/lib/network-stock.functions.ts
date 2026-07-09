@@ -39,6 +39,12 @@ export type NetworkStockRow = {
   year_max: number | null;
 };
 
+export type NetworkStockPage = {
+  rows: NetworkStockRow[];
+  nextOffset: number | null;
+  total: number | null;
+};
+
 export const searchNetworkStock = createServerFn({ method: "POST" })
   .inputValidator(
     (d: {
@@ -51,6 +57,7 @@ export const searchNetworkStock = createServerFn({ method: "POST" })
       year?: number;
       inStockOnly?: boolean;
       limit?: number;
+      offset?: number;
     }) =>
       z
         .object({
@@ -62,18 +69,20 @@ export const searchNetworkStock = createServerFn({ method: "POST" })
           model: z.string().trim().max(80).optional(),
           year: z.number().int().min(1900).max(2100).optional(),
           inStockOnly: z.boolean().optional(),
-          limit: z.number().int().min(1).max(200).optional(),
+          limit: z.number().int().min(1).max(100).optional(),
+          offset: z.number().int().min(0).max(10000).optional(),
         })
         .parse(d),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<NetworkStockPage> => {
     const supabase = publicClient();
-    const limit = data.limit ?? 60;
+    const limit = data.limit ?? 20;
+    const offset = data.offset ?? 0;
     let q = supabase
       .from("network_stock")
-      .select("*")
+      .select("*", { count: "exact" })
       .order("updated_at", { ascending: false })
-      .limit(limit);
+      .range(offset, offset + limit - 1);
 
     if (data.inStockOnly !== false) q = q.gt("qty_on_hand", 0);
 
@@ -92,9 +101,11 @@ export const searchNetworkStock = createServerFn({ method: "POST" })
            .or(`year_max.is.null,year_max.gte.${data.year}`);
     }
 
-    const { data: rows, error } = await q;
+    const { data: rows, error, count } = await q;
     if (error) throw error;
-    return (rows ?? []) as NetworkStockRow[];
+    const list = (rows ?? []) as NetworkStockRow[];
+    const nextOffset = list.length === limit ? offset + limit : null;
+    return { rows: list, nextOffset, total: count ?? null };
   });
 
 export type NetworkFacets = {
