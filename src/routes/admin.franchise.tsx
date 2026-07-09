@@ -65,6 +65,7 @@ function AdminFranchisePage() {
   const tierOptions = tiersQuery.data ?? [];
 
   const [status, setStatus] = useState<(typeof STATUSES)[number]>("pending");
+  const [tierFilter, setTierFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
 
