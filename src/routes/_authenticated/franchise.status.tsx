@@ -196,6 +196,16 @@ function StatusPage() {
         ) : null}
 
         <Card className="mt-6 p-6">
+          <h2 className="font-display text-lg font-semibold">Review history</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Every action a reviewer takes on your application appears here.
+          </p>
+          <div className="mt-4">
+            <ApplicationAuditTrail applicationId={app.id} showActor={false} />
+          </div>
+        </Card>
+
+        <Card className="mt-6 p-6">
           <h2 className="font-display text-lg font-semibold">Messages</h2>
           <div className="mt-3 space-y-3">
             {data.messages.length === 0 ? (
