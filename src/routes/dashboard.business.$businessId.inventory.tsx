@@ -222,6 +222,56 @@ function InventoryPage() {
         </Button>
       </div>
 
+      <Card className="p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="font-medium flex items-center gap-2">
+              <Radio className="h-4 w-4 text-primary" /> Share stock with the 365 network
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              When on, customers browsing <span className="font-mono">/parts/network</span> can
+              see your live in-stock items, quantities, and price — and send you a request in
+              one click. Cost, location, and internal notes are never exposed.
+            </p>
+          </div>
+          <Switch
+            checked={!!exposure.data?.expose}
+            onCheckedChange={toggleExposure}
+            aria-label="Toggle network stock sharing"
+          />
+        </div>
+      </Card>
+
+      {inquiries.data && inquiries.data.length > 0 && (
+        <Card className="divide-y">
+          <div className="p-4">
+            <p className="font-medium">Recent network requests</p>
+            <p className="text-sm text-muted-foreground">
+              Customers who requested a part from your stock feed.
+            </p>
+          </div>
+          {inquiries.data.slice(0, 10).map((r: any) => (
+            <div key={r.id} className="p-4 flex items-center justify-between gap-3 text-sm">
+              <div className="min-w-0">
+                <p className="font-medium truncate">
+                  {r.part_name}
+                  {r.sku ? <span className="text-muted-foreground"> · {r.sku}</span> : null}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {r.contact_name} · {r.contact_email}
+                  {r.contact_phone ? ` · ${r.contact_phone}` : ""} · qty {Number(r.quantity)}
+                </p>
+                {r.message ? (
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{r.message}</p>
+                ) : null}
+              </div>
+              <Badge variant={r.status === "new" ? "default" : "outline"}>{r.status}</Badge>
+            </div>
+          ))}
+        </Card>
+      )}
+
+
       <Card className="divide-y">
         {q.isLoading && <div className="p-4 text-sm text-muted-foreground">Loading…</div>}
         {!q.isLoading && rows.length === 0 && (
