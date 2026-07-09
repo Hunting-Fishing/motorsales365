@@ -169,15 +169,6 @@ function InventoryPage() {
     }
   }
 
-  async function toggleExposure(next: boolean) {
-    try {
-      await exposureSetFn({ data: { businessId, expose: next } });
-      qc.invalidateQueries({ queryKey: ["business-exposure", businessId] });
-      toast.success(next ? "Shop is now sharing stock with the network" : "Network sharing turned off");
-    } catch (e: any) {
-      toast.error(e?.message || "Failed");
-    }
-  }
 
   async function adjust(itemId: string, delta: number) {
     try {
