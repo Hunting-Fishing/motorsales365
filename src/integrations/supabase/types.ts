@@ -4805,6 +4805,59 @@ export type Database = {
         }
         Relationships: []
       }
+      franchise_application_audit: {
+        Row: {
+          action: string
+          actor_id: string | null
+          application_id: string
+          created_at: string
+          from_status: string | null
+          from_tier: string | null
+          id: string
+          message_to_applicant: string | null
+          metadata: Json
+          reviewer_notes: string | null
+          to_status: string | null
+          to_tier: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          application_id: string
+          created_at?: string
+          from_status?: string | null
+          from_tier?: string | null
+          id?: string
+          message_to_applicant?: string | null
+          metadata?: Json
+          reviewer_notes?: string | null
+          to_status?: string | null
+          to_tier?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          application_id?: string
+          created_at?: string
+          from_status?: string | null
+          from_tier?: string | null
+          id?: string
+          message_to_applicant?: string | null
+          metadata?: Json
+          reviewer_notes?: string | null
+          to_status?: string | null
+          to_tier?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "franchise_application_audit_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "franchise_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       franchise_application_messages: {
         Row: {
           application_id: string
