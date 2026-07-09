@@ -585,14 +585,95 @@ async function enrollCourseFromSession(env: StripeEnv, session: Stripe.Checkout.
   );
 }
 
+/**
+ * Franchise membership activation. Called on `checkout.session.completed`
+ * when the session carries `metadata.kind === "franchise"` and
+ * `metadata.franchise_membership_id` from `createFranchiseCheckoutSession`.
+ * Flips the membership from pending_payment → active, stamps the Stripe
+ * customer/subscription IDs, and generates the ad discount code.
+ */
+async function activateFranchiseMembershipFromSession(
+  env: StripeEnv,
+  session: Stripe.Checkout.Session,
+) {
+  const membershipId = session.metadata?.franchise_membership_id;
+  if (!membershipId) return;
+
+  const { data: mem } = await supabaseAdmin
+    .from("franchise_memberships" as any)
+    .select("id, tier_slug, pending_tier_slug, ad_discount_code, business_id, application_id")
+    .eq("id", membershipId)
+    .maybeSingle();
+  if (!mem) return;
+  const m = mem as any;
+
+  // Look up business name for discount code, if available.
+  let bizName = "365";
+  if (m.business_id) {
+    const { data: biz } = await supabaseAdmin
+      .from("businesses")
+      .select("name")
+      .eq("id", m.business_id)
+      .maybeSingle();
+    if (biz) bizName = (biz as any).name;
+  }
+  const code =
+    m.ad_discount_code ??
+    `365-${bizName
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 6)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+
+  // Fetch subscription for period end + price id.
+  let periodEnd: string | null = null;
+  let priceId: string | null = null;
+  let subId: string | null = null;
+  if (session.subscription) {
+    const stripe = createStripeClient(env);
+    subId = typeof session.subscription === "string" ? session.subscription : session.subscription.id;
+    try {
+      const sub = await stripe.subscriptions.retrieve(subId);
+      const item = sub.items?.data?.[0];
+      const end =
+        (item as any)?.current_period_end ?? (sub as any).current_period_end ?? null;
+      periodEnd = end ? new Date(end * 1000).toISOString() : null;
+      priceId = item?.price?.id ?? null;
+    } catch (e) {
+      console.error("[webhook] franchise subscription lookup failed", e);
+    }
+  }
+
+  await supabaseAdmin
+    .from("franchise_memberships" as any)
+    .update({
+      status: "active",
+      tier_slug: m.pending_tier_slug ?? m.tier_slug,
+      pending_tier_slug: null,
+      ad_discount_code: code,
+      stripe_customer_id:
+        typeof session.customer === "string" ? session.customer : (session.customer as any)?.id ?? null,
+      stripe_subscription_id: subId,
+      stripe_price_id: priceId,
+      current_period_end: periodEnd,
+      renews_at: periodEnd,
+      started_at: new Date().toISOString(),
+    })
+    .eq("id", membershipId);
+}
+
 async function handleEvent(env: StripeEnv, event: Stripe.Event) {
   switch (event.type) {
     case "customer.subscription.created":
     case "customer.subscription.updated":
     case "customer.subscription.deleted": {
-      await upsertSubscription(env, event.data.object as Stripe.Subscription);
+      const sub = event.data.object as Stripe.Subscription;
+      if (sub.metadata?.kind === "franchise" && sub.metadata?.franchise_membership_id) {
+        await syncFranchiseMembershipFromSubscription(env, sub);
+      }
+      await upsertSubscription(env, sub);
       break;
     }
+
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.metadata?.kind === "boost") {
