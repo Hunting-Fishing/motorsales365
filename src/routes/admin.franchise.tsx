@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site-layout";
 import { Card } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -32,6 +33,7 @@ import {
   adminListApplications,
   adminGetApplication,
   adminDecideApplication,
+  adminBulkApproveApplications,
   listActiveTiers,
   type FranchiseApplication,
 } from "@/lib/franchise.functions";
@@ -49,6 +51,7 @@ function AdminFranchisePage() {
   const listFn = useServerFn(adminListApplications);
   const getFn = useServerFn(adminGetApplication);
   const decideFn = useServerFn(adminDecideApplication);
+  const bulkApproveFn = useServerFn(adminBulkApproveApplications);
   const tiersFn = useServerFn(listActiveTiers);
 
   const tiersQuery = useQuery({
@@ -83,6 +86,86 @@ function AdminFranchisePage() {
   const [notes, setNotes] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // ---- Bulk selection state ----
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [rowTier, setRowTier] = useState<Record<string, string>>({});
+  const [bulkTier, setBulkTier] = useState<string>("");
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  // Only pending / in_review / info_requested rows are approvable.
+  const approvable = useMemo(
+    () => rows.filter((r) => r.status !== "approved" && r.status !== "rejected"),
+    [rows],
+  );
+  const approvableIds = useMemo(() => approvable.map((r) => r.id), [approvable]);
+  const selectedIds = useMemo(
+    () => approvableIds.filter((id) => selected[id]),
+    [approvableIds, selected],
+  );
+  const allSelected = approvableIds.length > 0 && selectedIds.length === approvableIds.length;
+  const someSelected = selectedIds.length > 0 && !allSelected;
+
+  const toggleAll = (checked: boolean) => {
+    const next: Record<string, boolean> = {};
+    if (checked) for (const id of approvableIds) next[id] = true;
+    setSelected(next);
+  };
+
+  const tierFor = (r: FranchiseApplication) =>
+    rowTier[r.id] ??
+    r.assigned_tier_slug ??
+    r.tier_slug ??
+    bulkTier ??
+    tierOptions[0]?.slug ??
+    "";
+
+  const applyBulkTierToSelected = () => {
+    if (!bulkTier) {
+      toast.error("Pick a tier to apply.");
+      return;
+    }
+    const next = { ...rowTier };
+    for (const id of selectedIds) next[id] = bulkTier;
+    setRowTier(next);
+    toast.success(`Applied "${bulkTier}" to ${selectedIds.length} row(s).`);
+  };
+
+  const bulkApprove = async () => {
+    if (selectedIds.length === 0) return;
+    const items = selectedIds.map((id) => {
+      const row = approvable.find((r) => r.id === id)!;
+      return { id, assigned_tier_slug: tierFor(row) };
+    });
+    const missing = items.filter((i) => !i.assigned_tier_slug);
+    if (missing.length > 0) {
+      toast.error(`${missing.length} row(s) still need a tier.`);
+      return;
+    }
+    setBulkBusy(true);
+    try {
+      const { results } = await bulkApproveFn({ data: { items } });
+      const ok = results.filter((r) => r.ok).length;
+      const failed = results.filter((r) => !r.ok);
+      if (ok > 0) toast.success(`Approved ${ok} application(s).`);
+      if (failed.length > 0) {
+        toast.error(
+          `Failed ${failed.length}: ${failed
+            .slice(0, 3)
+            .map((f) => f.error)
+            .join("; ")}${failed.length > 3 ? "…" : ""}`,
+        );
+      }
+      setSelected({});
+      setRowTier({});
+      refetch();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Bulk approve failed");
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
 
   const decide = async (decision: "approve" | "reject" | "request_info" | "in_review") => {
     if (!openId) return;
@@ -146,39 +229,138 @@ function AdminFranchisePage() {
           />
         </div>
 
-        <div className="mt-6 space-y-2">
+        {approvable.length > 0 ? (
+          <Card className="mt-6 flex flex-wrap items-center gap-3 border-primary/30 bg-primary/5 p-3">
+            <label className="flex items-center gap-2 text-sm">
+              <Checkbox
+                checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                onCheckedChange={(v) => toggleAll(v === true)}
+                aria-label="Select all approvable"
+              />
+              <span>
+                {selectedIds.length > 0
+                  ? `${selectedIds.length} selected`
+                  : `Select approvable (${approvable.length})`}
+              </span>
+            </label>
+
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <Select
+                value={bulkTier}
+                onValueChange={setBulkTier}
+                disabled={tierOptions.length === 0}
+              >
+                <SelectTrigger className="h-9 w-[200px]">
+                  <SelectValue placeholder="Bulk tier…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {tierOptions.map((t) => (
+                    <SelectItem key={t.slug} value={t.slug}>
+                      {t.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={applyBulkTierToSelected}
+                disabled={selectedIds.length === 0 || !bulkTier}
+              >
+                Apply to selected
+              </Button>
+              <Button
+                size="sm"
+                onClick={bulkApprove}
+                disabled={selectedIds.length === 0 || bulkBusy}
+              >
+                {bulkBusy ? "Approving…" : `Approve ${selectedIds.length || ""}`.trim()}
+              </Button>
+            </div>
+          </Card>
+        ) : null}
+
+        <div className="mt-4 space-y-2">
           {rows.length === 0 ? (
             <Card className="p-6 text-sm text-muted-foreground">No applications found.</Card>
           ) : (
-            rows.map((r: FranchiseApplication) => (
-              <Card
-                key={r.id}
-                className="flex cursor-pointer flex-wrap items-center justify-between gap-3 p-4 hover:bg-secondary/30"
-                onClick={() => {
-                  setOpenId(r.id);
-                  setTier(r.assigned_tier_slug ?? r.tier_slug ?? tierOptions[0]?.slug ?? "");
-                  setNotes(r.reviewer_notes ?? "");
-                }}
-              >
-                <div>
-                  <p className="font-semibold">{r.business_name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {r.contact_name} · {r.contact_email} ·{" "}
-                    {[r.city, r.province].filter(Boolean).join(", ") || "—"}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline">{r.tier_slug}</Badge>
-                  <Badge>{r.status}</Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(r.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-              </Card>
-            ))
+            rows.map((r: FranchiseApplication) => {
+              const isApprovable = r.status !== "approved" && r.status !== "rejected";
+              const isSelected = !!selected[r.id];
+              return (
+                <Card
+                  key={r.id}
+                  className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-4 hover:bg-secondary/30 ${
+                    isSelected ? "border-primary/60 bg-primary/5" : ""
+                  }`}
+                >
+                  <div className="flex items-center">
+                    {isApprovable ? (
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={(v) =>
+                          setSelected((prev) => ({ ...prev, [r.id]: v === true }))
+                        }
+                        aria-label={`Select ${r.business_name}`}
+                      />
+                    ) : (
+                      <span className="inline-block h-4 w-4" />
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenId(r.id);
+                      setTier(
+                        rowTier[r.id] ??
+                          r.assigned_tier_slug ??
+                          r.tier_slug ??
+                          tierOptions[0]?.slug ??
+                          "",
+                      );
+                      setNotes(r.reviewer_notes ?? "");
+                    }}
+                    className="min-w-0 text-left"
+                  >
+                    <p className="truncate font-semibold">{r.business_name}</p>
+                    <p className="truncate text-sm text-muted-foreground">
+                      {r.contact_name} · {r.contact_email} ·{" "}
+                      {[r.city, r.province].filter(Boolean).join(", ") || "—"}
+                    </p>
+                  </button>
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    {isApprovable && isSelected ? (
+                      <Select
+                        value={tierFor(r)}
+                        onValueChange={(v) => setRowTier((prev) => ({ ...prev, [r.id]: v }))}
+                        disabled={tierOptions.length === 0}
+                      >
+                        <SelectTrigger className="h-8 w-[160px] text-xs">
+                          <SelectValue placeholder="Tier…" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {tierOptions.map((t) => (
+                            <SelectItem key={t.slug} value={t.slug}>
+                              {t.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Badge variant="outline">{r.tier_slug}</Badge>
+                    )}
+                    <Badge>{r.status}</Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(r.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </Card>
+              );
+            })
           )}
         </div>
       </section>
+
 
       <Sheet open={!!openId} onOpenChange={(o) => !o && setOpenId(null)}>
         <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
