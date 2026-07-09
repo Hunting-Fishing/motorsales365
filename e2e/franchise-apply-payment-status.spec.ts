@@ -182,7 +182,6 @@ test.describe("@post-deploy franchise apply → payment → status update", () =
         status: "active",
         member_number: memberNumber,
         ad_discount_code: "E2ETEST5",
-        activated_at: new Date().toISOString(),
       }),
       returning: false,
     });
