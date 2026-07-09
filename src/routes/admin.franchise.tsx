@@ -241,15 +241,21 @@ function AdminFranchisePage() {
         </div>
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <Tabs value={status} onValueChange={(v) => setStatus(v as any)}>
-            <TabsList>
-              {STATUSES.map((s) => (
-                <TabsTrigger key={s} value={s}>
-                  {s.replace("_", " ")}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Status</span>
+            <Select value={status} onValueChange={(v) => setStatus(v as (typeof STATUSES)[number])}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {formatStatus(s)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <Input
             placeholder="Search name / business / email"
             value={search}
