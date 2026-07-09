@@ -59,6 +59,7 @@ import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
+import { Route as FranchiseIndexRouteImport } from './routes/franchise.index'
 import { Route as DispatchIndexRouteImport } from './routes/dispatch.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ClubsIndexRouteImport } from './routes/clubs.index'
@@ -558,6 +559,11 @@ const GamesIndexRoute = GamesIndexRouteImport.update({
   id: '/games/',
   path: '/games/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const FranchiseIndexRoute = FranchiseIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => FranchiseRoute,
 } as any)
 const DispatchIndexRoute = DispatchIndexRouteImport.update({
   id: '/',
@@ -2064,6 +2070,7 @@ export interface FileRoutesByFullPath {
   '/clubs/': typeof ClubsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
+  '/franchise/': typeof FranchiseIndexRoute
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
@@ -2198,7 +2205,6 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
-  '/franchise': typeof FranchiseRouteWithChildren
   '/game': typeof GameRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
@@ -2359,6 +2365,7 @@ export interface FileRoutesByTo {
   '/clubs': typeof ClubsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dispatch': typeof DispatchIndexRoute
+  '/franchise': typeof FranchiseIndexRoute
   '/games': typeof GamesIndexRoute
   '/learn': typeof LearnIndexRoute
   '/rides': typeof RidesIndexRoute
@@ -2661,6 +2668,7 @@ export interface FileRoutesById {
   '/clubs/': typeof ClubsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
+  '/franchise/': typeof FranchiseIndexRoute
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
@@ -2964,6 +2972,7 @@ export interface FileRouteTypes {
     | '/clubs/'
     | '/dashboard/'
     | '/dispatch/'
+    | '/franchise/'
     | '/games/'
     | '/learn/'
     | '/rides/'
@@ -3098,7 +3107,6 @@ export interface FileRouteTypes {
     | '/contact'
     | '/export'
     | '/forgot-password'
-    | '/franchise'
     | '/game'
     | '/guidelines'
     | '/leads-marketplace'
@@ -3259,6 +3267,7 @@ export interface FileRouteTypes {
     | '/clubs'
     | '/dashboard'
     | '/dispatch'
+    | '/franchise'
     | '/games'
     | '/learn'
     | '/rides'
@@ -3560,6 +3569,7 @@ export interface FileRouteTypes {
     | '/clubs/'
     | '/dashboard/'
     | '/dispatch/'
+    | '/franchise/'
     | '/games/'
     | '/learn/'
     | '/rides/'
@@ -4176,6 +4186,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/games/'
       preLoaderRoute: typeof GamesIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/franchise/': {
+      id: '/franchise/'
+      path: '/'
+      fullPath: '/franchise/'
+      preLoaderRoute: typeof FranchiseIndexRouteImport
+      parentRoute: typeof FranchiseRoute
     }
     '/dispatch/': {
       id: '/dispatch/'
@@ -6397,11 +6414,13 @@ const ExportRouteWithChildren =
 interface FranchiseRouteChildren {
   FranchiseApplyRoute: typeof FranchiseApplyRoute
   FranchisePartnersRoute: typeof FranchisePartnersRoute
+  FranchiseIndexRoute: typeof FranchiseIndexRoute
 }
 
 const FranchiseRouteChildren: FranchiseRouteChildren = {
   FranchiseApplyRoute: FranchiseApplyRoute,
   FranchisePartnersRoute: FranchisePartnersRoute,
+  FranchiseIndexRoute: FranchiseIndexRoute,
 }
 
 const FranchiseRouteWithChildren = FranchiseRoute._addFileChildren(
