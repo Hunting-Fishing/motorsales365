@@ -122,13 +122,17 @@ test.describe("@post-deploy franchise apply → payment → status update", () =
     await signInViaUI(page, email, password);
 
     // 2. Submit the franchise application via the UI
-    await page.goto("/franchise/apply");
+    await page.goto("/franchise/apply", { waitUntil: "domcontentloaded" });
+    // Dismiss cookie banner if present so it doesn't intercept clicks.
+    const decline = page.getByRole("button", { name: /decline optional/i });
+    if (await decline.isVisible().catch(() => false)) await decline.click();
     await expect(
       page.getByRole("heading", { name: /join the 365 network/i }),
     ).toBeVisible({ timeout: 20_000 });
-    const nameInput = page.locator("#contact_name");
-    await nameInput.scrollIntoViewIfNeeded();
-    await nameInput.fill("E2E Applicant");
+    // The form is far below hero/promo strips inside SiteLayout — wait
+    // explicitly for the first form input to attach.
+    await page.waitForSelector("#contact_name", { state: "attached", timeout: 20_000 });
+    await page.locator("#contact_name").fill("E2E Applicant");
     await page.locator("#contact_email").fill(email);
     await page.locator("#business_name").fill("E2E Franchise Shop");
     await page.locator("#city").fill("Manila");
