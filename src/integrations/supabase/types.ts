@@ -2173,6 +2173,7 @@ export type Database = {
       business_inventory_items: {
         Row: {
           active: boolean
+          brand: string | null
           business_id: string
           catalog_part_id: string | null
           category: string | null
@@ -2192,6 +2193,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          brand?: string | null
           business_id: string
           catalog_part_id?: string | null
           category?: string | null
@@ -2211,6 +2213,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          brand?: string | null
           business_id?: string
           catalog_part_id?: string | null
           category?: string | null
@@ -12359,12 +12362,15 @@ export type Database = {
       network_stock: {
         Row: {
           available_qty: number | null
+          brand: string | null
           business_id: string | null
           business_name: string | null
           business_slug: string | null
           catalog_part_id: string | null
           category: string | null
           city: string | null
+          compatible_makes: string[] | null
+          compatible_models: string[] | null
           id: string | null
           lat: number | null
           lng: number | null
@@ -12377,6 +12383,8 @@ export type Database = {
           sku: string | null
           unit: string | null
           updated_at: string | null
+          year_max: number | null
+          year_min: number | null
         }
         Relationships: [
           {

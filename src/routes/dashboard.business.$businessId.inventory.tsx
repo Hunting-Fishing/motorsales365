@@ -105,6 +105,7 @@ function InventoryPage() {
     name: "",
     sku: "",
     category: "",
+    brand: "",
     unit: "pc",
     qty_on_hand: 0,
     reorder_at: "",
@@ -128,6 +129,7 @@ function InventoryPage() {
       name: row.name,
       sku: row.sku ?? "",
       category: row.category ?? "",
+      brand: row.brand ?? "",
       unit: row.unit ?? "pc",
       qty_on_hand: row.qty_on_hand ?? 0,
       reorder_at: row.reorder_at ?? "",
@@ -149,6 +151,7 @@ function InventoryPage() {
           name: form.name,
           sku: form.sku || null,
           category: form.category || null,
+          brand: form.brand || null,
           unit: form.unit,
           qty_on_hand: Number(form.qty_on_hand) || 0,
           reorder_at: form.reorder_at === "" ? null : Number(form.reorder_at),
@@ -319,6 +322,14 @@ function InventoryPage() {
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 placeholder="strap / dolly / fuel"
+              />
+            </div>
+            <div>
+              <Label>Brand</Label>
+              <Input
+                value={form.brand}
+                onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                placeholder="Bosch / Denso / OEM"
               />
             </div>
             <div>
