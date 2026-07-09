@@ -442,20 +442,74 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
   const updateFn = useServerFn(updateNetworkInquiryStatus);
   const [note, setNote] = useState(row.response_note ?? "");
   const [busy, setBusy] = useState<NetworkInquiryStatus | null>(null);
+  const [fulfillFor, setFulfillFor] = useState<NetworkInquiryStatus | null>(null);
+  const [fulfill, setFulfill] = useState({
+    price: row.fulfilled_price != null ? String(row.fulfilled_price) : "",
+    quantity:
+      row.fulfilled_quantity != null
+        ? String(row.fulfilled_quantity)
+        : String(row.quantity ?? 1),
+    eta: row.fulfilled_eta
+      ? new Date(row.fulfilled_eta).toISOString().slice(0, 16)
+      : "",
+    message: row.fulfilled_message ?? "",
+  });
 
-  async function setStatus(status: NetworkInquiryStatus) {
+  async function setStatus(
+    status: NetworkInquiryStatus,
+    extras?: Parameters<typeof updateFn>[0]["data"],
+  ) {
     setBusy(status);
     try {
       await updateFn({
-        data: { id: row.id, businessId, status, note: note.trim() || null },
+        data: {
+          id: row.id,
+          businessId,
+          status,
+          note: note.trim() || null,
+          ...extras,
+        } as any,
       });
       toast.success(`Marked ${status}`);
       qc.invalidateQueries({ queryKey: ["business-network-inquiries", businessId] });
+      setFulfillFor(null);
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to update");
     } finally {
       setBusy(null);
     }
+  }
+
+  function handleClick(s: NetworkInquiryStatus) {
+    if (s === "fulfilled" || s === "closed") {
+      setFulfillFor(s);
+      return;
+    }
+    setStatus(s);
+  }
+
+  async function submitFulfill() {
+    if (!fulfillFor) return;
+    const priceNum = fulfill.price.trim() === "" ? null : Number(fulfill.price);
+    const qtyNum = fulfill.quantity.trim() === "" ? null : Number(fulfill.quantity);
+    if (priceNum != null && (Number.isNaN(priceNum) || priceNum < 0)) {
+      toast.error("Enter a valid price");
+      return;
+    }
+    if (qtyNum != null && (Number.isNaN(qtyNum) || qtyNum <= 0)) {
+      toast.error("Enter a valid quantity");
+      return;
+    }
+    await setStatus(fulfillFor, {
+      id: row.id,
+      businessId,
+      status: fulfillFor,
+      note: note.trim() || null,
+      fulfilled_price: priceNum,
+      fulfilled_quantity: qtyNum,
+      fulfilled_eta: fulfill.eta ? new Date(fulfill.eta).toISOString() : null,
+      fulfilled_message: fulfill.message.trim() || null,
+    });
   }
 
   const status = (row.status ?? "pending") as NetworkInquiryStatus;
@@ -479,11 +533,35 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
           {status}
         </Badge>
       </div>
+
+      {(row.fulfilled_price != null ||
+        row.fulfilled_quantity != null ||
+        row.fulfilled_eta ||
+        row.fulfilled_message) && (
+        <div className="rounded-md border bg-muted/40 p-2 text-xs">
+          <p className="font-medium">Fulfillment update</p>
+          <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-muted-foreground">
+            {row.fulfilled_price != null && (
+              <span>Price ₱{Number(row.fulfilled_price).toLocaleString()}</span>
+            )}
+            {row.fulfilled_quantity != null && (
+              <span>Qty {Number(row.fulfilled_quantity)}</span>
+            )}
+            {row.fulfilled_eta && (
+              <span>ETA {new Date(row.fulfilled_eta).toLocaleString()}</span>
+            )}
+          </div>
+          {row.fulfilled_message && (
+            <p className="mt-1 text-muted-foreground">{row.fulfilled_message}</p>
+          )}
+        </div>
+      )}
+
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <Input
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Optional note to the customer (price, ETA, reason…)"
+          placeholder="Short note to the customer (reason, callback time…)"
           className="h-8 text-xs"
         />
         <div className="flex flex-wrap gap-1.5">
@@ -491,9 +569,15 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
             <Button
               key={s}
               size="sm"
-              variant={s === "rejected" ? "destructive" : s === "accepted" ? "default" : "outline"}
+              variant={
+                s === "rejected"
+                  ? "destructive"
+                  : s === "accepted"
+                    ? "default"
+                    : "outline"
+              }
               disabled={busy !== null}
-              onClick={() => setStatus(s)}
+              onClick={() => handleClick(s)}
               className="capitalize"
             >
               {busy === s ? "…" : s}
@@ -506,6 +590,72 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
           Last updated {new Date(row.responded_at).toLocaleString()}
         </p>
       )}
+
+      <Dialog open={!!fulfillFor} onOpenChange={(o) => !o && setFulfillFor(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              Mark as {fulfillFor === "closed" ? "Closed" : "Fulfilled"}
+            </DialogTitle>
+            <DialogDescription>
+              Attach the final price, quantity, ETA, and a message. The customer sees
+              this on their request status.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Final price (₱)</Label>
+              <Input
+                type="number"
+                min={0}
+                step="0.01"
+                value={fulfill.price}
+                onChange={(e) => setFulfill({ ...fulfill, price: e.target.value })}
+                placeholder="e.g. 1250"
+              />
+            </div>
+            <div>
+              <Label>Quantity ready</Label>
+              <Input
+                type="number"
+                min={0}
+                step="1"
+                value={fulfill.quantity}
+                onChange={(e) => setFulfill({ ...fulfill, quantity: e.target.value })}
+              />
+            </div>
+            <div className="col-span-2">
+              <Label>ETA / pickup time</Label>
+              <Input
+                type="datetime-local"
+                value={fulfill.eta}
+                onChange={(e) => setFulfill({ ...fulfill, eta: e.target.value })}
+              />
+            </div>
+            <div className="col-span-2">
+              <Label>Message to customer</Label>
+              <Textarea
+                rows={3}
+                value={fulfill.message}
+                onChange={(e) => setFulfill({ ...fulfill, message: e.target.value })}
+                placeholder={
+                  fulfillFor === "closed"
+                    ? "e.g. Customer did not confirm; closing request."
+                    : "e.g. Ready for pickup at counter 2 tomorrow after 10am."
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setFulfillFor(null)}>
+              Cancel
+            </Button>
+            <Button onClick={submitFulfill} disabled={busy !== null}>
+              {busy ? "Saving…" : `Mark ${fulfillFor}`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
