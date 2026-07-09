@@ -54,7 +54,8 @@ function PartnersPage() {
   ).sort();
 
   const setSearch = (patch: Partial<PartnerSearch>) =>
-    navigate({ search: (prev) => ({ ...prev, ...patch }) as any });
+    navigate({ search: (prev: PartnerSearch) => ({ ...prev, ...patch }) as any });
+
 
   return (
     <SiteLayout>
