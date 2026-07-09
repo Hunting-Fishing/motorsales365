@@ -68,6 +68,14 @@ function AdminFranchisePage() {
   const [tierFilter, setTierFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
+
+  // ---- Sorting (server-side) ----
+  type SortField = "business_name" | "contact_name" | "city" | "province" | "tier_slug" | "status" | "created_at";
+  const [sort, setSort] = useState<{ field: SortField; dir: "asc" | "desc" }>({
+    field: "created_at",
+    dir: "desc",
+  });
+
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
