@@ -408,9 +408,16 @@ const STATUS_VARIANT: Record<NetworkInquiryStatus, "default" | "secondary" | "de
 function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
   const qc = useQueryClient();
   const updateFn = useServerFn(updateNetworkInquiryStatus);
+  const reserveFn = useServerFn(reserveNetworkInquiry);
+  const releaseFn = useServerFn(releaseNetworkInquiry);
   const [note, setNote] = useState(row.response_note ?? "");
-  const [busy, setBusy] = useState<NetworkInquiryStatus | null>(null);
+  const [busy, setBusy] = useState<NetworkInquiryStatus | "reserve" | "release" | null>(null);
   const [fulfillFor, setFulfillFor] = useState<NetworkInquiryStatus | null>(null);
+  const [reserveOpen, setReserveOpen] = useState(false);
+  const [reserve, setReserve] = useState({
+    quantity: String(row.reserved_quantity ?? row.quantity ?? 1),
+    hours: "24",
+  });
   const [fulfill, setFulfill] = useState({
     price: row.fulfilled_price != null ? String(row.fulfilled_price) : "",
     quantity:
@@ -453,8 +460,58 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
       setFulfillFor(s);
       return;
     }
+    if (s === "accepted" && row.item_id) {
+      setReserveOpen(true);
+      return;
+    }
     setStatus(s);
   }
+
+  async function submitReserve() {
+    const qty = Number(reserve.quantity);
+    const hours = Number(reserve.hours);
+    if (!Number.isFinite(qty) || qty <= 0) {
+      toast.error("Enter a valid quantity to hold");
+      return;
+    }
+    if (!Number.isInteger(hours) || hours <= 0 || hours > 168) {
+      toast.error("Hold window must be 1–168 hours");
+      return;
+    }
+    setBusy("reserve");
+    try {
+      await reserveFn({
+        data: {
+          inquiryId: row.id,
+          businessId,
+          quantity: qty,
+          hours,
+          note: note.trim() || null,
+        },
+      });
+      toast.success(`Reserved ${qty} for ${hours}h`);
+      setReserveOpen(false);
+      qc.invalidateQueries({ queryKey: ["business-network-inquiries", businessId] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to reserve");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function releaseHold() {
+    setBusy("release");
+    try {
+      await releaseFn({ data: { inquiryId: row.id, businessId } });
+      toast.success("Reservation released");
+      qc.invalidateQueries({ queryKey: ["business-network-inquiries", businessId] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to release");
+    } finally {
+      setBusy(null);
+    }
+  }
+
 
   async function submitFulfill() {
     if (!fulfillFor) return;
