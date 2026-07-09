@@ -18,6 +18,7 @@ export type NetworkStockRow = {
   sku: string | null;
   name: string;
   category: string | null;
+  brand: string | null;
   unit: string;
   qty_on_hand: number;
   available_qty: number;
@@ -32,17 +33,38 @@ export type NetworkStockRow = {
   region: string | null;
   lat: number | null;
   lng: number | null;
+  compatible_makes: string[] | null;
+  compatible_models: string[] | null;
+  year_min: number | null;
+  year_max: number | null;
 };
 
 export const searchNetworkStock = createServerFn({ method: "POST" })
-  .inputValidator((d: { query?: string; province?: string; limit?: number }) =>
-    z
-      .object({
-        query: z.string().trim().max(120).optional(),
-        province: z.string().trim().max(80).optional(),
-        limit: z.number().int().min(1).max(200).optional(),
-      })
-      .parse(d),
+  .inputValidator(
+    (d: {
+      query?: string;
+      province?: string;
+      category?: string;
+      brand?: string;
+      make?: string;
+      model?: string;
+      year?: number;
+      inStockOnly?: boolean;
+      limit?: number;
+    }) =>
+      z
+        .object({
+          query: z.string().trim().max(120).optional(),
+          province: z.string().trim().max(80).optional(),
+          category: z.string().trim().max(80).optional(),
+          brand: z.string().trim().max(80).optional(),
+          make: z.string().trim().max(80).optional(),
+          model: z.string().trim().max(80).optional(),
+          year: z.number().int().min(1900).max(2100).optional(),
+          inStockOnly: z.boolean().optional(),
+          limit: z.number().int().min(1).max(200).optional(),
+        })
+        .parse(d),
   )
   .handler(async ({ data }) => {
     const supabase = publicClient();
@@ -50,20 +72,64 @@ export const searchNetworkStock = createServerFn({ method: "POST" })
     let q = supabase
       .from("network_stock")
       .select("*")
-      .gt("qty_on_hand", 0)
       .order("updated_at", { ascending: false })
       .limit(limit);
+
+    if (data.inStockOnly !== false) q = q.gt("qty_on_hand", 0);
 
     const term = data.query?.trim();
     if (term) {
       const like = `%${term.replace(/[%_]/g, "\\$&")}%`;
-      q = q.or(`name.ilike.${like},sku.ilike.${like},category.ilike.${like}`);
+      q = q.or(`name.ilike.${like},sku.ilike.${like},category.ilike.${like},brand.ilike.${like}`);
     }
     if (data.province) q = q.eq("province", data.province);
+    if (data.category) q = q.ilike("category", data.category);
+    if (data.brand) q = q.ilike("brand", data.brand);
+    if (data.make) q = q.contains("compatible_makes", [data.make]);
+    if (data.model) q = q.contains("compatible_models", [data.model]);
+    if (data.year) {
+      q = q.or(`year_min.is.null,year_min.lte.${data.year}`)
+           .or(`year_max.is.null,year_max.gte.${data.year}`);
+    }
 
     const { data: rows, error } = await q;
     if (error) throw error;
     return (rows ?? []) as NetworkStockRow[];
+  });
+
+export type NetworkFacets = {
+  categories: string[];
+  brands: string[];
+  makes: string[];
+  provinces: string[];
+};
+
+export const getNetworkStockFacets = createServerFn({ method: "GET" })
+  .handler(async (): Promise<NetworkFacets> => {
+    const supabase = publicClient();
+    const { data: rows, error } = await supabase
+      .from("network_stock")
+      .select("category, brand, province, compatible_makes")
+      .limit(2000);
+    if (error) throw error;
+
+    const cats = new Set<string>();
+    const brands = new Set<string>();
+    const provinces = new Set<string>();
+    const makes = new Set<string>();
+    for (const r of (rows ?? []) as any[]) {
+      if (r.category) cats.add(String(r.category));
+      if (r.brand) brands.add(String(r.brand));
+      if (r.province) provinces.add(String(r.province));
+      for (const m of (r.compatible_makes ?? []) as string[]) if (m) makes.add(m);
+    }
+    const sort = (s: Set<string>) => Array.from(s).sort((a, b) => a.localeCompare(b));
+    return {
+      categories: sort(cats),
+      brands: sort(brands),
+      makes: sort(makes),
+      provinces: sort(provinces),
+    };
   });
 
 export const getNetworkStockForSku = createServerFn({ method: "POST" })
