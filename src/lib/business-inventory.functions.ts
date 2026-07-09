@@ -43,8 +43,11 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       qty_on_hand?: number;
       reorder_at?: number | null;
       cost?: number | null;
+      price?: number | null;
       location?: string | null;
       active?: boolean;
+      network_visible?: boolean;
+      catalog_part_id?: string | null;
     }) => {
       if (!d.name?.trim()) throw new Error("Name required");
       return d;
@@ -76,8 +79,11 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       qty_on_hand: data.qty_on_hand ?? 0,
       reorder_at: data.reorder_at ?? null,
       cost: data.cost ?? null,
+      price: data.price ?? null,
       location: data.location ?? null,
       active: data.active ?? true,
+      network_visible: data.network_visible ?? true,
+      catalog_part_id: data.catalog_part_id ?? null,
     };
     const { data: row, error } = await supabase
       .from("business_inventory_items")

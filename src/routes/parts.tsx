@@ -238,6 +238,11 @@ function PartsHub() {
             </Link>
           </Button>
           <Button asChild variant="outline" size="sm">
+            <Link to="/parts/network">
+              <Recycle className="mr-1 h-4 w-4" /> Live network stock
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
             <Link to="/businesses">
               <Recycle className="mr-1 h-4 w-4" /> Salvage yards directory
             </Link>

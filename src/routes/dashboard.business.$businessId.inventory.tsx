@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Package, Trash2, Pencil, Minus, Plus as PlusIcon, AlertTriangle } from "lucide-react";
+import { Plus, Package, Trash2, Pencil, Minus, Plus as PlusIcon, AlertTriangle, Radio } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   listBusinessInventory,
@@ -11,11 +11,18 @@ import {
   adjustBusinessInventory,
   deleteBusinessInventoryItem,
 } from "@/lib/business-inventory.functions";
+import {
+  getBusinessNetworkExposure,
+  setBusinessNetworkExposure,
+  listShopInquiries,
+} from "@/lib/network-stock.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +43,9 @@ function InventoryPage() {
   const upsertFn = useServerFn(upsertBusinessInventoryItem);
   const adjustFn = useServerFn(adjustBusinessInventory);
   const delFn = useServerFn(deleteBusinessInventoryItem);
+  const exposureLoadFn = useServerFn(getBusinessNetworkExposure);
+  const exposureSetFn = useServerFn(setBusinessNetworkExposure);
+  const inquiriesFn = useServerFn(listShopInquiries);
 
   const q = useQuery({
     queryKey: ["business-inventory", businessId],
@@ -43,9 +53,56 @@ function InventoryPage() {
     queryFn: () => loadFn({ data: { businessId } }),
   });
 
+  const exposure = useQuery({
+    queryKey: ["business-exposure", businessId],
+    enabled: !!user?.id,
+    queryFn: () => exposureLoadFn({ data: { businessId } }),
+  });
+
+  const inquiries = useQuery({
+    queryKey: ["business-network-inquiries", businessId],
+    enabled: !!user?.id,
+    queryFn: () => inquiriesFn({ data: { businessId } }),
+  });
+
+  // Realtime: reflect stock changes from other staff/devices instantly.
+  useEffect(() => {
+    if (!businessId) return;
+    const channel = supabase
+      .channel(`inv-${businessId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "business_inventory_items",
+          filter: `business_id=eq.${businessId}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "network_part_inquiries",
+          filter: `business_id=eq.${businessId}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["business-network-inquiries", businessId] });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [businessId, qc]);
+
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
-  const [form, setForm] = useState<any>({
+  const emptyForm = {
     name: "",
     sku: "",
     category: "",
@@ -53,22 +110,16 @@ function InventoryPage() {
     qty_on_hand: 0,
     reorder_at: "",
     cost: "",
+    price: "",
     location: "",
-  });
+    network_visible: true,
+  };
+  const [form, setForm] = useState<any>(emptyForm);
   const [saving, setSaving] = useState(false);
 
   function openNew() {
     setEditing(null);
-    setForm({
-      name: "",
-      sku: "",
-      category: "",
-      unit: "pc",
-      qty_on_hand: 0,
-      reorder_at: "",
-      cost: "",
-      location: "",
-    });
+    setForm({ ...emptyForm });
     setOpen(true);
   }
 
@@ -82,7 +133,9 @@ function InventoryPage() {
       qty_on_hand: row.qty_on_hand ?? 0,
       reorder_at: row.reorder_at ?? "",
       cost: row.cost ?? "",
+      price: row.price ?? "",
       location: row.location ?? "",
+      network_visible: row.network_visible ?? true,
     });
     setOpen(true);
   }
@@ -101,7 +154,9 @@ function InventoryPage() {
           qty_on_hand: Number(form.qty_on_hand) || 0,
           reorder_at: form.reorder_at === "" ? null : Number(form.reorder_at),
           cost: form.cost === "" ? null : Number(form.cost),
+          price: form.price === "" ? null : Number(form.price),
           location: form.location || null,
+          network_visible: !!form.network_visible,
         },
       });
       const { handlePlanLimitResult } = await import("@/lib/plan-limit-toast");
@@ -114,6 +169,16 @@ function InventoryPage() {
       toast.error(e?.message || "Failed");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function toggleExposure(next: boolean) {
+    try {
+      await exposureSetFn({ data: { businessId, expose: next } });
+      qc.invalidateQueries({ queryKey: ["business-exposure", businessId] });
+      toast.success(next ? "Shop is now sharing stock with the network" : "Network sharing turned off");
+    } catch (e: any) {
+      toast.error(e?.message || "Failed");
     }
   }
 
@@ -156,6 +221,56 @@ function InventoryPage() {
           <Plus className="h-4 w-4 mr-1" /> Add item
         </Button>
       </div>
+
+      <Card className="p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="font-medium flex items-center gap-2">
+              <Radio className="h-4 w-4 text-primary" /> Share stock with the 365 network
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              When on, customers browsing <span className="font-mono">/parts/network</span> can
+              see your live in-stock items, quantities, and price — and send you a request in
+              one click. Cost, location, and internal notes are never exposed.
+            </p>
+          </div>
+          <Switch
+            checked={!!exposure.data?.expose}
+            onCheckedChange={toggleExposure}
+            aria-label="Toggle network stock sharing"
+          />
+        </div>
+      </Card>
+
+      {inquiries.data && inquiries.data.length > 0 && (
+        <Card className="divide-y">
+          <div className="p-4">
+            <p className="font-medium">Recent network requests</p>
+            <p className="text-sm text-muted-foreground">
+              Customers who requested a part from your stock feed.
+            </p>
+          </div>
+          {inquiries.data.slice(0, 10).map((r: any) => (
+            <div key={r.id} className="p-4 flex items-center justify-between gap-3 text-sm">
+              <div className="min-w-0">
+                <p className="font-medium truncate">
+                  {r.part_name}
+                  {r.sku ? <span className="text-muted-foreground"> · {r.sku}</span> : null}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {r.contact_name} · {r.contact_email}
+                  {r.contact_phone ? ` · ${r.contact_phone}` : ""} · qty {Number(r.quantity)}
+                </p>
+                {r.message ? (
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{r.message}</p>
+                ) : null}
+              </div>
+              <Badge variant={r.status === "new" ? "default" : "outline"}>{r.status}</Badge>
+            </div>
+          ))}
+        </Card>
+      )}
+
 
       <Card className="divide-y">
         {q.isLoading && <div className="p-4 text-sm text-muted-foreground">Loading…</div>}
@@ -280,12 +395,33 @@ function InventoryPage() {
                 onChange={(e) => setForm({ ...form, cost: e.target.value })}
               />
             </div>
+            <div>
+              <Label>Sell price (₱)</Label>
+              <Input
+                type="number"
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
+                placeholder="Shown to customers"
+              />
+            </div>
             <div className="col-span-2">
               <Label>Location</Label>
               <Input
                 value={form.location}
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
                 placeholder="Bay 2 shelf B"
+              />
+            </div>
+            <div className="col-span-2 flex items-center justify-between rounded-md border p-3">
+              <div>
+                <p className="text-sm font-medium">Show in network stock feed</p>
+                <p className="text-xs text-muted-foreground">
+                  Off = keep this item private to your shop.
+                </p>
+              </div>
+              <Switch
+                checked={!!form.network_visible}
+                onCheckedChange={(v) => setForm({ ...form, network_visible: v })}
               />
             </div>
           </div>
