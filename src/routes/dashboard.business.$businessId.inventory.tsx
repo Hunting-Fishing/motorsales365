@@ -325,6 +325,14 @@ function InventoryPage() {
               />
             </div>
             <div>
+              <Label>Brand</Label>
+              <Input
+                value={form.brand}
+                onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                placeholder="Bosch / Denso / OEM"
+              />
+            </div>
+            <div>
               <Label>Unit</Label>
               <Input
                 value={form.unit}
