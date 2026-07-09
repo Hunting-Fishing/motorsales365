@@ -129,6 +129,7 @@ function InventoryPage() {
       name: row.name,
       sku: row.sku ?? "",
       category: row.category ?? "",
+      brand: row.brand ?? "",
       unit: row.unit ?? "pc",
       qty_on_hand: row.qty_on_hand ?? 0,
       reorder_at: row.reorder_at ?? "",
