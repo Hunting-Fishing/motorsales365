@@ -207,7 +207,7 @@ export const updateNetworkInquiryStatus = createServerFn({ method: "POST" })
 
     const patch: Record<string, unknown> = {
       status: data.status,
-      response_note: data.note ?? null,
+      response_note: data.note ?? undefined,
     };
     // Only overwrite fulfillment fields when explicitly provided so a later
     // status change (e.g. Closed after Fulfilled) doesn't blank prior details.
@@ -288,7 +288,7 @@ export const setBusinessNetworkExposure = createServerFn({ method: "POST" })
     const { data: res, error } = await supabase.rpc("request_network_exposure", {
       _business_id: data.businessId,
       _expose: data.expose,
-      _note: data.note ?? null,
+      _note: data.note ?? undefined,
     });
     if (error) throw new Error(error.message);
     return res as { status: NetworkExposureStatus; expose: boolean };
@@ -425,7 +425,7 @@ export const adminReviewNetworkExposure = createServerFn({ method: "POST" })
     const { data: res, error } = await context.supabase.rpc("review_network_exposure", {
       _business_id: data.businessId,
       _decision: data.decision,
-      _note: data.note ?? null,
+      _note: data.note ?? undefined,
     });
     if (error) throw new Error(error.message);
     return res as { status: NetworkExposureStatus };
