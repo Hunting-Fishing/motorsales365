@@ -140,6 +140,21 @@ function MyRequestsPage() {
                       {STATUS_LABEL[status]}
                     </Badge>
                   </div>
+                  {r.reserved_quantity && r.reserved_until && new Date(r.reserved_until) > new Date() && (
+                    <div className="mt-3 rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
+                      <p className="text-[10px] uppercase tracking-wide text-amber-700 dark:text-amber-400">
+                        Stock reserved for you
+                      </p>
+                      <p className="mt-1">
+                        <span className="font-semibold">{Number(r.reserved_quantity)}</span>{" "}
+                        unit{Number(r.reserved_quantity) === 1 ? "" : "s"} held until{" "}
+                        <span className="font-semibold">
+                          {new Date(r.reserved_until).toLocaleString()}
+                        </span>
+                        . Please confirm with the shop before the window closes.
+                      </p>
+                    </div>
+                  )}
                   {(r.fulfilled_price != null ||
                     r.fulfilled_quantity != null ||
                     r.fulfilled_eta ||
