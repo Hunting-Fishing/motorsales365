@@ -20,6 +20,8 @@ export type NetworkStockRow = {
   category: string | null;
   unit: string;
   qty_on_hand: number;
+  available_qty: number;
+  reserved_qty: number;
   price: number | null;
   catalog_part_id: string | null;
   updated_at: string;
