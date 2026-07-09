@@ -588,3 +588,73 @@ function Info({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+type SortField = "business_name" | "contact_name" | "location" | "tier_slug" | "status" | "created_at";
+
+function SortHeader({
+  field,
+  sort,
+  setSort,
+  align = "left",
+  children,
+}: {
+  field: SortField;
+  sort: { field: SortField; dir: "asc" | "desc" };
+  setSort: (s: { field: SortField; dir: "asc" | "desc" }) => void;
+  align?: "left" | "right";
+  children: React.ReactNode;
+}) {
+  const active = sort.field === field;
+  const arrow = active ? (sort.dir === "asc" ? "▲" : "▼") : "";
+  return (
+    <th className={`px-3 py-2 font-medium ${align === "right" ? "text-right" : "text-left"}`}>
+      <button
+        type="button"
+        onClick={() =>
+          setSort({
+            field,
+            dir: active && sort.dir === "asc" ? "desc" : "asc",
+          })
+        }
+        className={`inline-flex items-center gap-1 hover:text-foreground ${active ? "text-foreground" : ""}`}
+      >
+        {children}
+        <span className="text-[10px] opacity-70">{arrow || "↕"}</span>
+      </button>
+    </th>
+  );
+}
+
+const STATUS_STYLES: Record<string, string> = {
+  pending: "border-amber-300 bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300",
+  in_review: "border-blue-300 bg-blue-50 text-blue-800 dark:bg-blue-500/10 dark:text-blue-300",
+  info_requested: "border-purple-300 bg-purple-50 text-purple-800 dark:bg-purple-500/10 dark:text-purple-300",
+  approved: "border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300",
+  rejected: "border-red-300 bg-red-50 text-red-800 dark:bg-red-500/10 dark:text-red-300",
+};
+
+function StatusBadge({ status }: { status: string }) {
+  const cls = STATUS_STYLES[status] ?? "";
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium capitalize ${cls}`}>
+      {status.replace("_", " ")}
+    </span>
+  );
+}
+
+function TierBadge({ slug, name, assigned }: { slug: string | null; name?: string; assigned: boolean }) {
+  if (!slug) return <span className="text-xs text-muted-foreground">—</span>;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium ${
+        assigned
+          ? "border-primary/40 bg-primary/10 text-primary"
+          : "border-muted-foreground/20 bg-muted/40 text-muted-foreground"
+      }`}
+      title={assigned ? "Assigned tier" : "Requested tier"}
+    >
+      {name ?? slug}
+      {assigned ? <span className="text-[9px] uppercase opacity-70">assigned</span> : null}
+    </span>
+  );
+}
