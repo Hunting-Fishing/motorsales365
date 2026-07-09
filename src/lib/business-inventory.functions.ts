@@ -39,6 +39,7 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       sku?: string | null;
       name: string;
       category?: string | null;
+      brand?: string | null;
       unit?: string;
       qty_on_hand?: number;
       reorder_at?: number | null;
