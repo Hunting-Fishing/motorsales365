@@ -293,7 +293,14 @@ function NetworkStockPage() {
                 {search.q ? ` for "${search.q}"` : ""}
               </p>
               {rows.map((r) => (
-                <StockRow key={r.id} row={r} onInquire={setInquiry} />
+                <StockRow
+                  key={r.id}
+                  row={r}
+                  onInquire={setInquiry}
+                  filterMake={search.make}
+                  filterModel={search.model}
+                  filterYear={search.year}
+                />
               ))}
               {hasNextPage && (
                 <div className="flex justify-center pt-2">
