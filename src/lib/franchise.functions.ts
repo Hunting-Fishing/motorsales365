@@ -368,6 +368,138 @@ export const adminDecideApplication = createServerFn({ method: "POST" })
     return { ok: true, membershipId };
   });
 
+export type BulkApproveItem = { id: string; assigned_tier_slug: string };
+export type BulkApproveResult = {
+  id: string;
+  ok: boolean;
+  membershipId: string | null;
+  error: string | null;
+};
+
+export const adminBulkApproveApplications = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (d: {
+      items: BulkApproveItem[];
+      reviewer_notes?: string | null;
+      message_to_applicant?: string | null;
+    }) => {
+      if (!Array.isArray(d?.items) || d.items.length === 0) throw new Error("No items provided");
+      if (d.items.length > 100) throw new Error("Too many items (max 100)");
+      const items = d.items.map((it) => {
+        if (!/^[0-9a-f-]{36}$/i.test(it.id)) throw new Error("Invalid application id");
+        const slug = (it.assigned_tier_slug ?? "").trim();
+        if (!slug) throw new Error("Every selected application needs an assigned tier");
+        return { id: it.id, assigned_tier_slug: slug };
+      });
+      return {
+        items,
+        reviewer_notes: d.reviewer_notes ?? null,
+        message_to_applicant: d.message_to_applicant ?? null,
+      };
+    },
+  )
+  .handler(async ({ data, context }): Promise<{ results: BulkApproveResult[] }> => {
+    await ensureAdmin(context);
+
+    // Validate every tier slug is active up-front.
+    const uniqueSlugs = Array.from(new Set(data.items.map((i) => i.assigned_tier_slug)));
+    const { data: activeTiers, error: tErr } = await context.supabase
+      .from("franchise_tiers" as any)
+      .select("slug,is_active")
+      .in("slug", uniqueSlugs);
+    if (tErr) throw tErr;
+    const activeSet = new Set(
+      ((activeTiers as any[]) ?? []).filter((t) => t.is_active).map((t) => t.slug as string),
+    );
+
+    const results: BulkApproveResult[] = [];
+    for (const item of data.items) {
+      try {
+        if (!activeSet.has(item.assigned_tier_slug)) {
+          results.push({
+            id: item.id,
+            ok: false,
+            membershipId: null,
+            error: `Tier "${item.assigned_tier_slug}" is not active`,
+          });
+          continue;
+        }
+
+        const { data: app, error: aErr } = await context.supabase
+          .from("franchise_applications" as any)
+          .select("*")
+          .eq("id", item.id)
+          .maybeSingle();
+        if (aErr) throw aErr;
+        if (!app) {
+          results.push({ id: item.id, ok: false, membershipId: null, error: "Not found" });
+          continue;
+        }
+        if ((app as any).status === "approved") {
+          results.push({
+            id: item.id,
+            ok: false,
+            membershipId: null,
+            error: "Already approved",
+          });
+          continue;
+        }
+
+        const { error: uErr } = await context.supabase
+          .from("franchise_applications" as any)
+          .update({
+            status: "approved",
+            reviewer_id: context.userId,
+            reviewer_notes: data.reviewer_notes ?? (app as any).reviewer_notes ?? null,
+            decided_at: new Date().toISOString(),
+            assigned_tier_slug: item.assigned_tier_slug,
+          })
+          .eq("id", item.id);
+        if (uErr) throw uErr;
+
+        let membershipId: string | null = null;
+        if ((app as any).user_id) {
+          const { data: mem, error: mErr } = await context.supabase
+            .from("franchise_memberships" as any)
+            .insert({
+              user_id: (app as any).user_id,
+              business_id: (app as any).business_id,
+              application_id: item.id,
+              tier_slug: item.assigned_tier_slug,
+              pending_tier_slug: item.assigned_tier_slug,
+              status: "pending_payment",
+            })
+            .select("id")
+            .single();
+          if (mErr) throw mErr;
+          membershipId = (mem as any).id;
+        }
+
+        if (data.message_to_applicant && data.message_to_applicant.trim()) {
+          await context.supabase.from("franchise_application_messages" as any).insert({
+            application_id: item.id,
+            sender_id: context.userId,
+            body: data.message_to_applicant.trim(),
+            is_internal: false,
+          });
+        }
+
+        results.push({ id: item.id, ok: true, membershipId, error: null });
+      } catch (e: any) {
+        results.push({
+          id: item.id,
+          ok: false,
+          membershipId: null,
+          error: e?.message ?? "Failed",
+        });
+      }
+    }
+
+    return { results };
+  });
+
+
 export const adminPostInternalNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { applicationId: string; body: string }) => d)
