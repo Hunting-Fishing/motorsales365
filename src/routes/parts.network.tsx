@@ -373,11 +373,96 @@ function StockRow({
   row: NetworkStockRow;
   onInquire: (r: NetworkStockRow) => void;
 }) {
+function StockRow({
+  row, onInquire, filterMake, filterModel, filterYear,
+}: {
+  row: NetworkStockRow;
+  onInquire: (r: NetworkStockRow) => void;
+  filterMake: string;
+  filterModel: string;
+  filterYear: number;
+}) {
   const price = row.price != null ? `₱${Number(row.price).toLocaleString()}` : null;
-  const fits =
-    (row.compatible_makes?.length || row.compatible_models?.length || row.year_min || row.year_max);
+  const hasFitmentData =
+    !!(row.compatible_makes?.length || row.compatible_models?.length || row.year_min || row.year_max);
+
+  const norm = (s: string) => s.trim().toLowerCase();
+  const makes = row.compatible_makes ?? [];
+  const models = row.compatible_models ?? [];
+
+  const wantMake = filterMake ? norm(filterMake) : "";
+  const wantModel = filterModel ? norm(filterModel) : "";
+  const wantYear = filterYear && filterYear > 0 ? filterYear : 0;
+  const hasVehicleFilter = !!(wantMake || wantModel || wantYear);
+
+  const makeMatch = wantMake ? makes.some((m) => norm(m) === wantMake) : null;
+  const modelMatch = wantModel ? models.some((m) => norm(m) === wantModel) : null;
+  const yearInRange = wantYear
+    ? (row.year_min == null || row.year_min <= wantYear) &&
+      (row.year_max == null || row.year_max >= wantYear)
+    : null;
+  const yearRangeOnly = wantYear && yearInRange && row.year_min == null && row.year_max == null;
+
+  // Overall fit tier vs. active vehicle filter.
+  type Tier = "exact" | "partial" | "year-only" | "universal" | "unknown" | "mismatch" | null;
+  let tier: Tier = null;
+  if (hasVehicleFilter) {
+    const required = [makeMatch, modelMatch, yearInRange].filter((v) => v !== null) as boolean[];
+    const matched = required.filter(Boolean).length;
+    if (!hasFitmentData) tier = "universal";
+    else if (matched === 0) tier = "mismatch";
+    else if (matched === required.length) {
+      // Full match; downgrade to "year-only" if make/model weren't asserted by the shop
+      const shopAssertsMakeModel =
+        (makes.length > 0 && wantMake) || (models.length > 0 && wantModel);
+      tier = shopAssertsMakeModel || !wantYear ? "exact" : "year-only";
+    } else tier = "partial";
+  } else if (!hasFitmentData) {
+    tier = "universal";
+  } else {
+    tier = "unknown";
+  }
+
+  const tierBadge: Record<Exclude<Tier, null>, { label: string; cls: string }> = {
+    exact: { label: "Exact fit", cls: "bg-emerald-100 text-emerald-800 border-emerald-300" },
+    partial: { label: "Partial fit", cls: "bg-amber-100 text-amber-800 border-amber-300" },
+    "year-only": { label: "Year range only", cls: "bg-amber-100 text-amber-800 border-amber-300" },
+    universal: { label: "Universal fit", cls: "bg-sky-100 text-sky-800 border-sky-300" },
+    unknown: { label: "Fitment listed", cls: "bg-secondary text-muted-foreground border-border" },
+    mismatch: { label: "May not fit", cls: "bg-rose-100 text-rose-800 border-rose-300" },
+  };
+
+  const renderTokens = (items: string[], want: string, matchAll: boolean) =>
+    items.map((item, i) => {
+      const hit = want && norm(item) === want;
+      return (
+        <span key={`${item}-${i}`}>
+          {i > 0 && ", "}
+          <span
+            className={
+              hit
+                ? "rounded bg-emerald-100 px-1 text-emerald-900 font-medium"
+                : matchAll
+                  ? "text-foreground"
+                  : ""
+            }
+          >
+            {item}
+          </span>
+        </span>
+      );
+    });
+
   return (
-    <Card className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+    <Card
+      className={`flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between ${
+        tier === "exact"
+          ? "border-emerald-300 ring-1 ring-emerald-200"
+          : tier === "mismatch"
+            ? "opacity-80"
+            : ""
+      }`}
+    >
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <p className="truncate font-semibold">{row.name}</p>
@@ -388,6 +473,13 @@ function StockRow({
           )}
           {row.brand && (
             <Badge variant="outline" className="text-[10px]">{row.brand}</Badge>
+          )}
+          {tier && (
+            <span
+              className={`inline-flex items-center rounded border px-1.5 py-0.5 text-[10px] font-medium ${tierBadge[tier].cls}`}
+            >
+              {tierBadge[tier].label}
+            </span>
           )}
         </div>
         <p className="mt-0.5 text-sm text-muted-foreground">
@@ -406,18 +498,45 @@ function StockRow({
           )}
           {row.category && <span className="ml-2">· {row.category}</span>}
         </p>
-        {fits ? (
+        {hasFitmentData ? (
           <p className="mt-1 text-xs text-muted-foreground">
-            Fits{" "}
-            {[
-              row.compatible_makes?.join(", "),
-              row.compatible_models?.join(", "),
-              row.year_min || row.year_max
-                ? `${row.year_min ?? "…"}–${row.year_max ?? "…"}`
-                : null,
-            ]
-              .filter(Boolean)
-              .join(" · ")}
+            <span className="font-medium text-foreground">Fits: </span>
+            {makes.length > 0 && (
+              <>{renderTokens(makes, wantMake, !!makeMatch)}</>
+            )}
+            {models.length > 0 && (
+              <>
+                {makes.length > 0 && " · "}
+                {renderTokens(models, wantModel, !!modelMatch)}
+              </>
+            )}
+            {(row.year_min || row.year_max) && (
+              <>
+                {(makes.length > 0 || models.length > 0) && " · "}
+                <span
+                  className={
+                    yearInRange
+                      ? "rounded bg-emerald-100 px-1 text-emerald-900 font-medium"
+                      : wantYear
+                        ? "text-rose-700"
+                        : ""
+                  }
+                >
+                  {row.year_min ?? "…"}–{row.year_max ?? "…"}
+                  {wantYear && yearInRange ? ` (incl. ${wantYear})` : ""}
+                </span>
+              </>
+            )}
+            {yearRangeOnly && (
+              <span className="ml-1 italic">
+                — no make/model listed, confirm with shop
+              </span>
+            )}
+          </p>
+        ) : hasVehicleFilter ? (
+          <p className="mt-1 text-xs italic text-muted-foreground">
+            No fitment info listed — confirm with shop that it fits your{" "}
+            {[filterYear || null, filterMake, filterModel].filter(Boolean).join(" ")}.
           </p>
         ) : null}
       </div>
