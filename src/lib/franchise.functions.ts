@@ -394,6 +394,20 @@ export const adminDecideApplication = createServerFn({ method: "POST" })
       });
     }
 
+    // Audit log — record the action, transitions, notes, and message.
+    await context.supabase.from("franchise_application_audit" as any).insert({
+      application_id: data.id,
+      actor_id: context.userId,
+      action: data.decision,
+      from_status: (app as any).status ?? null,
+      to_status: nextStatus,
+      from_tier: (app as any).assigned_tier_slug ?? null,
+      to_tier: updates.assigned_tier_slug ?? (app as any).assigned_tier_slug ?? null,
+      reviewer_notes: data.reviewer_notes?.trim() || null,
+      message_to_applicant: data.message_to_applicant?.trim() || null,
+      metadata: membershipId ? { membership_id: membershipId } : {},
+    });
+
     return { ok: true, membershipId };
   });
 
