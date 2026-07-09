@@ -190,10 +190,17 @@ function StockRow({
       </div>
       <div className="flex items-center gap-4">
         <div className="text-right">
-          <p className="text-lg font-bold text-primary">{Number(row.qty_on_hand)}</p>
-          <p className="text-[10px] uppercase text-muted-foreground">
-            {row.unit} in stock
+          <p className="text-lg font-bold text-primary">
+            {Number(row.available_qty ?? row.qty_on_hand)}
           </p>
+          <p className="text-[10px] uppercase text-muted-foreground">
+            {row.unit} available
+          </p>
+          {row.reserved_qty && Number(row.reserved_qty) > 0 ? (
+            <p className="text-[10px] text-amber-600">
+              {Number(row.reserved_qty)} on hold
+            </p>
+          ) : null}
         </div>
         {price && (
           <div className="text-right">
