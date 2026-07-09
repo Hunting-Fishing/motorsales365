@@ -237,23 +237,59 @@ async function ensureAdmin(ctx: { supabase: any; userId: string }) {
   if (!data) throw new Error("Forbidden");
 }
 
+const ADMIN_PAGE_SIZE = 20;
+
 export const adminListApplications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (d: { status?: string | null; tier?: string | null; search?: string | null; limit?: number } | undefined) => ({
-      status: d?.status ?? null,
-      tier: (d?.tier ?? "").trim() || null,
-      search: (d?.search ?? "").trim() || null,
-      limit: Math.max(1, Math.min(500, Number(d?.limit ?? 200))),
-    }),
+    (d: {
+      status?: string | null;
+      tier?: string | null;
+      search?: string | null;
+      limit?: number;
+      offset?: number;
+      sortField?: string;
+      sortDir?: "asc" | "desc";
+    } | undefined) => {
+      const sortField = (d?.sortField ?? "created_at").trim();
+      const allowedSortFields = [
+        "business_name",
+        "contact_name",
+        "city",
+        "province",
+        "status",
+        "created_at",
+        "tier_slug",
+      ];
+      return {
+        status: d?.status ?? null,
+        tier: (d?.tier ?? "").trim() || null,
+        search: (d?.search ?? "").trim() || null,
+        limit: Math.max(1, Math.min(100, Number(d?.limit ?? ADMIN_PAGE_SIZE))),
+        offset: Math.max(0, Number(d?.offset ?? 0)),
+        sortField: allowedSortFields.includes(sortField) ? sortField : "created_at",
+        sortDir: d?.sortDir === "asc" ? "asc" : "desc",
+      };
+    },
   )
-  .handler(async ({ data, context }): Promise<FranchiseApplication[]> => {
+  .handler(async ({ data, context }): Promise<{ rows: FranchiseApplication[]; total: number }> => {
     await ensureAdmin(context);
     let q = context.supabase
       .from("franchise_applications" as any)
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(data.limit);
+      .select("*", { count: "exact" })
+      .range(data.offset, data.offset + data.limit - 1);
+
+    // Server-side sorting
+    if (data.sortField === "tier_slug") {
+      q = q.order("assigned_tier_slug", { ascending: data.sortDir === "asc", nullsFirst: false });
+      q = q.order("tier_slug", { ascending: data.sortDir === "asc" });
+    } else if (data.sortField === "city") {
+      q = q.order("province", { ascending: data.sortDir === "asc" });
+      q = q.order("city", { ascending: data.sortDir === "asc" });
+    } else {
+      q = q.order(data.sortField, { ascending: data.sortDir === "asc" });
+    }
+
     if (data.status) q = q.eq("status", data.status);
     if (data.tier) {
       if (data.tier === "requested_only") {
@@ -265,12 +301,15 @@ export const adminListApplications = createServerFn({ method: "GET" })
     if (data.search) {
       const s = data.search.replace(/[%_]/g, " ");
       q = q.or(
-        `business_name.ilike.%${s}%,contact_name.ilike.%${s}%,contact_email.ilike.%${s}%`,
+        `business_name.ilike.%${s}%,contact_name.ilike.%${s}%,contact_email.ilike.%${s}%,city.ilike.%${s}%,province.ilike.%${s}%,shop_type.ilike.%${s}%`,
       );
     }
-    const { data: rows, error } = await q;
+    const { data: rows, error, count } = await q;
     if (error) throw error;
-    return ((rows as any[]) ?? []) as FranchiseApplication[];
+    return {
+      rows: ((rows as any[]) ?? []) as FranchiseApplication[],
+      total: count ?? 0,
+    };
   });
 
 export type FranchiseApplicationCounts = {
