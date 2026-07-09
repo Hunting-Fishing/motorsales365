@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "July 9, 2026 (added 365 Franchise & Partner Program: shared customer CRM across approved partner shops — only with the customer's opt-in consent, with the ability to withdraw at any time; retained while the customer remains active and deleted on request; internal application data (contact, business info, shop details) is retained for the life of the application record and up to 24 months after a final decision.)";
+  const lastUpdated = "July 9, 2026 (365 Franchise & Partner Program billing: when you become an approved partner and pay, we share your name, email, and business identifier with our card processor to create your subscription; billing history remains accessible via the partner dashboard's billing portal; approved partners appear on the public /franchise/partners directory using only your business name, city, province, tier, and public logo/cover image)";
 
   return (
     <SiteLayout>
