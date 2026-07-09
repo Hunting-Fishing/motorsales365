@@ -187,10 +187,11 @@ export const getMyApplication = createServerFn({ method: "GET" })
         .from("franchise_memberships" as any)
         .select("*")
         .eq("user_id", userId)
-        .eq("status", "active")
-        .order("started_at", { ascending: false })
+        .in("status", ["pending_payment", "active", "past_due"])
+        .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
+
 
       return {
         application: application as FranchiseApplication | null,
