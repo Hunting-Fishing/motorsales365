@@ -79,7 +79,7 @@ function AdminFranchisePage() {
     enabled: !!openId,
   });
 
-  const [tier, setTier] = useState<"partner" | "franchise">("partner");
+  const [tier, setTier] = useState<string>("");
   const [notes, setNotes] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
