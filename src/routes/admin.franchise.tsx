@@ -51,6 +51,18 @@ function formatStatus(status: string) {
   return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function getPageNumbers(current: number, totalPages: number): (number | "ellipsis")[] {
+  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  const pages: (number | "ellipsis")[] = [1];
+  if (current > 3) pages.push("ellipsis");
+  const start = Math.max(2, current - 1);
+  const end = Math.min(totalPages - 1, current + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (current < totalPages - 2) pages.push("ellipsis");
+  if (totalPages > 1) pages.push(totalPages);
+  return pages;
+}
+
 function AdminFranchisePage() {
   const listFn = useServerFn(adminListApplications);
   const getFn = useServerFn(adminGetApplication);
