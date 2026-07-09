@@ -368,12 +368,6 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
 }
 
 function StockRow({
-  row, onInquire,
-}: {
-  row: NetworkStockRow;
-  onInquire: (r: NetworkStockRow) => void;
-}) {
-function StockRow({
   row, onInquire, filterMake, filterModel, filterYear,
 }: {
   row: NetworkStockRow;
