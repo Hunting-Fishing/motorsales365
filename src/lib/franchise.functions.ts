@@ -265,6 +265,35 @@ export const adminListApplications = createServerFn({ method: "GET" })
     return ((rows as any[]) ?? []) as FranchiseApplication[];
   });
 
+export type FranchiseApplicationCounts = {
+  pending: number;
+  inReview: number;
+  infoRequested: number;
+  total: number;
+};
+
+export const adminCountFranchiseApplications = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<FranchiseApplicationCounts> => {
+    await ensureAdmin(context);
+    const { data, error } = await context.supabase
+      .from("franchise_applications" as any)
+      .select("status", { count: "exact" })
+      .in("status", ["pending", "in_review", "info_requested"]);
+    if (error) throw error;
+    const rows = (data as any[]) ?? [];
+    const counts = { pending: 0, inReview: 0, infoRequested: 0 };
+    for (const r of rows) {
+      if (r.status === "pending") counts.pending++;
+      else if (r.status === "in_review") counts.inReview++;
+      else if (r.status === "info_requested") counts.infoRequested++;
+    }
+    return {
+      ...counts,
+      total: counts.pending + counts.inReview + counts.infoRequested,
+    };
+  });
+
 export const adminGetApplication = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string }) => ({ id: z.string().uuid().parse(d.id) }))
