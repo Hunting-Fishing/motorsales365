@@ -68,19 +68,39 @@ function AdminFranchisePage() {
   const [tierFilter, setTierFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
-  const { data: rows = [], refetch } = useQuery({
-    queryKey: ["admin", "franchise", status, search, tierFilter],
+  const offset = (page - 1) * pageSize;
+
+  // Reset pagination when filters or search change.
+  useEffect(() => {
+    setPage(1);
+  }, [status, tierFilter, search]);
+
+  const {
+    data: listData,
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ["admin", "franchise", status, search, tierFilter, page, pageSize, sort.field, sort.dir],
     queryFn: () =>
       listFn({
         data: {
           status: status === "all" ? null : status,
           tier: tierFilter === "all" ? null : tierFilter,
           search: search || null,
-          limit: 200,
+          limit: pageSize,
+          offset,
+          sortField: sort.field,
+          sortDir: sort.dir,
         },
       }),
   });
+
+  const rows = listData?.rows ?? [];
+  const total = listData?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   const detail = useQuery({
     queryKey: ["admin", "franchise", "detail", openId],
@@ -99,33 +119,12 @@ function AdminFranchisePage() {
   const [bulkTier, setBulkTier] = useState<string>("");
   const [bulkBusy, setBulkBusy] = useState(false);
 
-  // ---- Sorting ----
-  type SortField = "business_name" | "contact_name" | "location" | "tier_slug" | "status" | "created_at";
+  // ---- Sorting (server-side) ----
+  type SortField = "business_name" | "contact_name" | "city" | "province" | "tier_slug" | "status" | "created_at";
   const [sort, setSort] = useState<{ field: SortField; dir: "asc" | "desc" }>({
     field: "created_at",
     dir: "desc",
   });
-  const sortedRows = useMemo(() => {
-    const copy = [...rows];
-    const dir = sort.dir === "asc" ? 1 : -1;
-    const key = (r: FranchiseApplication) => {
-      switch (sort.field) {
-        case "business_name": return r.business_name?.toLowerCase() ?? "";
-        case "contact_name": return r.contact_name?.toLowerCase() ?? "";
-        case "location": return [r.province, r.city].filter(Boolean).join(",").toLowerCase();
-        case "tier_slug": return (r.assigned_tier_slug ?? r.tier_slug ?? "").toLowerCase();
-        case "status": return r.status ?? "";
-        case "created_at": return r.created_at ?? "";
-      }
-    };
-    copy.sort((a, b) => {
-      const av = key(a), bv = key(b);
-      if (av < bv) return -1 * dir;
-      if (av > bv) return 1 * dir;
-      return 0;
-    });
-    return copy;
-  }, [rows, sort]);
 
   // Only pending / in_review / info_requested rows are approvable.
   const approvable = useMemo(
