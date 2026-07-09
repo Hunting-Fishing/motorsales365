@@ -210,25 +210,8 @@ function InventoryPage() {
         </Button>
       </div>
 
-      <Card className="p-4">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="font-medium flex items-center gap-2">
-              <Radio className="h-4 w-4 text-primary" /> Share stock with the 365 network
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              When on, customers browsing <span className="font-mono">/parts/network</span> can
-              see your live in-stock items, quantities, and price — and send you a request in
-              one click. Cost, location, and internal notes are never exposed.
-            </p>
-          </div>
-          <Switch
-            checked={!!exposure.data?.expose}
-            onCheckedChange={toggleExposure}
-            aria-label="Toggle network stock sharing"
-          />
-        </div>
-      </Card>
+      <NetworkExposureCard businessId={businessId} />
+
 
       {inquiries.data && inquiries.data.length > 0 && (
         <Card className="divide-y">
