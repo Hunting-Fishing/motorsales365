@@ -152,7 +152,7 @@ function AdminFranchisePage() {
                 className="flex cursor-pointer flex-wrap items-center justify-between gap-3 p-4 hover:bg-secondary/30"
                 onClick={() => {
                   setOpenId(r.id);
-                  setTier((r.assigned_tier_slug ?? r.tier_slug) as any);
+                  setTier(r.assigned_tier_slug ?? r.tier_slug ?? tierOptions[0]?.slug ?? "");
                   setNotes(r.reviewer_notes ?? "");
                 }}
               >
