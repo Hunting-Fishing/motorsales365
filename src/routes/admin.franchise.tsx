@@ -300,7 +300,7 @@ function AdminFranchisePage() {
             </Select>
           </div>
           <Input
-            placeholder="Search name / business / email"
+            placeholder="Search business, contact, or location"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="max-w-xs"
