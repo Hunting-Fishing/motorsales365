@@ -36,6 +36,7 @@ export const Route = createFileRoute("/_authenticated/franchise/dashboard")({
 function DashboardPage() {
   const getMy = useServerFn(getMyApplication);
   const getTiers = useServerFn(listActiveTiers);
+  const portalFn = useServerFn(createFranchisePortalSession);
   const my = useQuery({ queryKey: ["franchise", "my-app"], queryFn: () => getMy() });
   const tiers = useQuery({
     queryKey: ["franchise", "tiers", "active"],
@@ -44,6 +45,20 @@ function DashboardPage() {
 
   const membership = my.data?.membership;
   const tier = tiers.data?.find((t) => t.slug === membership?.tier_slug);
+
+  const openPortal = useMutation({
+    mutationFn: async () => {
+      const r = await portalFn({
+        data: {
+          returnUrl: `${window.location.origin}/franchise/dashboard`,
+          environment: getStripeEnvironment(),
+        },
+      });
+      if ("error" in r) throw new Error(r.error);
+      window.open(r.url, "_blank");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Could not open billing portal"),
+  });
 
   if (my.isLoading) {
     return (
@@ -55,7 +70,7 @@ function DashboardPage() {
     );
   }
 
-  if (!membership) {
+  if (!membership || membership.status !== "active") {
     return (
       <SiteLayout>
         <div className="container mx-auto max-w-2xl px-4 py-16 text-center">
@@ -77,13 +92,17 @@ function DashboardPage() {
     );
   }
 
+  const renews = membership.current_period_end
+    ? new Date(membership.current_period_end).toLocaleDateString()
+    : null;
+
   return (
     <SiteLayout>
       <section className="container mx-auto max-w-5xl px-4 py-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <Link to="/franchise" className="text-sm text-muted-foreground hover:text-foreground">
-              ← 365 Franchise & Partner Program
+              ← 365 Franchise &amp; Partner Program
             </Link>
             <h1 className="mt-2 font-display text-3xl font-bold">
               {tier?.name ?? "365 Partner"} dashboard
@@ -91,12 +110,29 @@ function DashboardPage() {
             <p className="text-sm text-muted-foreground">
               Member number <strong>{membership.member_number}</strong> · Active since{" "}
               {new Date(membership.started_at).toLocaleDateString()}
+              {renews ? <> · Renews {renews}</> : null}
+              {membership.cancel_at_period_end ? (
+                <span className="ml-2 text-destructive">(cancels at period end)</span>
+              ) : null}
             </p>
           </div>
-          <Badge variant="default" className="text-sm">
-            <Handshake className="mr-1 h-3 w-3" /> Active
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => openPortal.mutate()}
+              disabled={openPortal.isPending}
+            >
+              <CreditCard className="mr-1 h-3 w-3" />
+              {openPortal.isPending ? "Opening…" : "Manage billing"}
+            </Button>
+            <Badge variant="default" className="text-sm">
+              <Handshake className="mr-1 h-3 w-3" /> Active
+            </Badge>
+          </div>
         </div>
+
+
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Card className="p-5">
