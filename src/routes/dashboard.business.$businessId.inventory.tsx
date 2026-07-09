@@ -395,12 +395,33 @@ function InventoryPage() {
                 onChange={(e) => setForm({ ...form, cost: e.target.value })}
               />
             </div>
+            <div>
+              <Label>Sell price (₱)</Label>
+              <Input
+                type="number"
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
+                placeholder="Shown to customers"
+              />
+            </div>
             <div className="col-span-2">
               <Label>Location</Label>
               <Input
                 value={form.location}
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
                 placeholder="Bay 2 shelf B"
+              />
+            </div>
+            <div className="col-span-2 flex items-center justify-between rounded-md border p-3">
+              <div>
+                <p className="text-sm font-medium">Show in network stock feed</p>
+                <p className="text-xs text-muted-foreground">
+                  Off = keep this item private to your shop.
+                </p>
+              </div>
+              <Switch
+                checked={!!form.network_visible}
+                onCheckedChange={(v) => setForm({ ...form, network_visible: v })}
               />
             </div>
           </div>
