@@ -18,6 +18,7 @@ import {
   Bell,
   ClipboardCheck,
   ExternalLink,
+  Handshake,
 } from "lucide-react";
 import { formatPHP } from "@/lib/format";
 import {
@@ -27,6 +28,8 @@ import {
   type OverviewRevenue,
   type TopReferrer,
 } from "@/lib/admin-overview.functions";
+import { adminCountFranchiseApplications } from "@/lib/franchise.functions";
+import { useAuth } from "@/hooks/use-auth";
 import { OverviewTrends } from "@/components/admin/overview-trends";
 
 
