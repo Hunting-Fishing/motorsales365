@@ -32,7 +32,7 @@ const Schema = z.object({
   monthly_parts_spend_php: z.string().optional(),
   website_url: z.string().trim().optional(),
   notes: z.string().trim().max(2000).optional(),
-  agreed_terms: z.literal(true, { errorMap: () => ({ message: "You must accept the terms" }) }),
+  agreed_terms: z.literal(true, { message: "You must accept the terms" }),
 });
 
 export function ApplyForm({ defaultTier = "partner" }: { defaultTier?: "partner" | "franchise" }) {
