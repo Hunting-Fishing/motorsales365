@@ -38,6 +38,7 @@ import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as LeadsMarketplaceRouteImport } from './routes/leads-marketplace'
 import { Route as GuidelinesRouteImport } from './routes/guidelines'
 import { Route as GameRouteImport } from './routes/game'
+import { Route as FranchiseRouteImport } from './routes/franchise'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExportRouteImport } from './routes/export'
 import { Route as DispatchRouteImport } from './routes/dispatch'
@@ -455,6 +456,11 @@ const GameRoute = GameRouteImport.update({
   path: '/game',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FranchiseRoute = FranchiseRouteImport.update({
+  id: '/franchise',
+  path: '/franchise',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -555,9 +561,9 @@ const GamesIndexRoute = GamesIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const FranchiseIndexRoute = FranchiseIndexRouteImport.update({
-  id: '/franchise/',
-  path: '/franchise/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => FranchiseRoute,
 } as any)
 const DispatchIndexRoute = DispatchIndexRouteImport.update({
   id: '/',
@@ -760,14 +766,14 @@ const GoProductIdRoute = GoProductIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const FranchisePartnersRoute = FranchisePartnersRouteImport.update({
-  id: '/franchise/partners',
-  path: '/franchise/partners',
-  getParentRoute: () => rootRouteImport,
+  id: '/partners',
+  path: '/partners',
+  getParentRoute: () => FranchiseRoute,
 } as any)
 const FranchiseApplyRoute = FranchiseApplyRouteImport.update({
-  id: '/franchise/apply',
-  path: '/franchise/apply',
-  getParentRoute: () => rootRouteImport,
+  id: '/apply',
+  path: '/apply',
+  getParentRoute: () => FranchiseRoute,
 } as any)
 const ExportTrustRoute = ExportTrustRouteImport.update({
   id: '/trust',
@@ -1900,6 +1906,7 @@ export interface FileRoutesByFullPath {
   '/dispatch': typeof DispatchRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
+  '/franchise': typeof FranchiseRouteWithChildren
   '/game': typeof GameRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
@@ -2497,6 +2504,7 @@ export interface FileRoutesById {
   '/dispatch': typeof DispatchRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
+  '/franchise': typeof FranchiseRouteWithChildren
   '/game': typeof GameRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
@@ -2800,6 +2808,7 @@ export interface FileRouteTypes {
     | '/dispatch'
     | '/export'
     | '/forgot-password'
+    | '/franchise'
     | '/game'
     | '/guidelines'
     | '/leads-marketplace'
@@ -3396,6 +3405,7 @@ export interface FileRouteTypes {
     | '/dispatch'
     | '/export'
     | '/forgot-password'
+    | '/franchise'
     | '/game'
     | '/guidelines'
     | '/leads-marketplace'
@@ -3699,6 +3709,7 @@ export interface RootRouteChildren {
   DispatchRoute: typeof DispatchRouteWithChildren
   ExportRoute: typeof ExportRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  FranchiseRoute: typeof FranchiseRouteWithChildren
   GameRoute: typeof GameRoute
   GuidelinesRoute: typeof GuidelinesRoute
   LeadsMarketplaceRoute: typeof LeadsMarketplaceRoute
@@ -3743,8 +3754,6 @@ export interface RootRouteChildren {
   ClubsApplyRoute: typeof ClubsApplyRouteWithChildren
   ClubsStartRoute: typeof ClubsStartRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
-  FranchiseApplyRoute: typeof FranchiseApplyRoute
-  FranchisePartnersRoute: typeof FranchisePartnersRoute
   GoProductIdRoute: typeof GoProductIdRoute
   HelpPayWithGcashRoute: typeof HelpPayWithGcashRoute
   HelpPostingEtiquetteRoute: typeof HelpPostingEtiquetteRoute
@@ -3777,7 +3786,6 @@ export interface RootRouteChildren {
   WantedNewRoute: typeof WantedNewRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
   ClubsIndexRoute: typeof ClubsIndexRoute
-  FranchiseIndexRoute: typeof FranchiseIndexRoute
   GamesIndexRoute: typeof GamesIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
@@ -4032,6 +4040,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/franchise': {
+      id: '/franchise'
+      path: '/franchise'
+      fullPath: '/franchise'
+      preLoaderRoute: typeof FranchiseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
@@ -4174,10 +4189,10 @@ declare module '@tanstack/react-router' {
     }
     '/franchise/': {
       id: '/franchise/'
-      path: '/franchise'
+      path: '/'
       fullPath: '/franchise/'
       preLoaderRoute: typeof FranchiseIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof FranchiseRoute
     }
     '/dispatch/': {
       id: '/dispatch/'
@@ -4461,17 +4476,17 @@ declare module '@tanstack/react-router' {
     }
     '/franchise/partners': {
       id: '/franchise/partners'
-      path: '/franchise/partners'
+      path: '/partners'
       fullPath: '/franchise/partners'
       preLoaderRoute: typeof FranchisePartnersRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof FranchiseRoute
     }
     '/franchise/apply': {
       id: '/franchise/apply'
-      path: '/franchise/apply'
+      path: '/apply'
       fullPath: '/franchise/apply'
       preLoaderRoute: typeof FranchiseApplyRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof FranchiseRoute
     }
     '/export/trust': {
       id: '/export/trust'
@@ -6396,6 +6411,22 @@ const ExportRouteChildren: ExportRouteChildren = {
 const ExportRouteWithChildren =
   ExportRoute._addFileChildren(ExportRouteChildren)
 
+interface FranchiseRouteChildren {
+  FranchiseApplyRoute: typeof FranchiseApplyRoute
+  FranchisePartnersRoute: typeof FranchisePartnersRoute
+  FranchiseIndexRoute: typeof FranchiseIndexRoute
+}
+
+const FranchiseRouteChildren: FranchiseRouteChildren = {
+  FranchiseApplyRoute: FranchiseApplyRoute,
+  FranchisePartnersRoute: FranchisePartnersRoute,
+  FranchiseIndexRoute: FranchiseIndexRoute,
+}
+
+const FranchiseRouteWithChildren = FranchiseRoute._addFileChildren(
+  FranchiseRouteChildren,
+)
+
 interface PartnerProgramRouteChildren {
   PartnerProgramApplyRoute: typeof PartnerProgramApplyRoute
   PartnerProgramTermsRoute: typeof PartnerProgramTermsRoute
@@ -6515,6 +6546,7 @@ const rootRouteChildren: RootRouteChildren = {
   DispatchRoute: DispatchRouteWithChildren,
   ExportRoute: ExportRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  FranchiseRoute: FranchiseRouteWithChildren,
   GameRoute: GameRoute,
   GuidelinesRoute: GuidelinesRoute,
   LeadsMarketplaceRoute: LeadsMarketplaceRoute,
@@ -6560,8 +6592,6 @@ const rootRouteChildren: RootRouteChildren = {
   ClubsApplyRoute: ClubsApplyRouteWithChildren,
   ClubsStartRoute: ClubsStartRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
-  FranchiseApplyRoute: FranchiseApplyRoute,
-  FranchisePartnersRoute: FranchisePartnersRoute,
   GoProductIdRoute: GoProductIdRoute,
   HelpPayWithGcashRoute: HelpPayWithGcashRoute,
   HelpPostingEtiquetteRoute: HelpPostingEtiquetteRoute,
@@ -6594,7 +6624,6 @@ const rootRouteChildren: RootRouteChildren = {
   WantedNewRoute: WantedNewRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
   ClubsIndexRoute: ClubsIndexRoute,
-  FranchiseIndexRoute: FranchiseIndexRoute,
   GamesIndexRoute: GamesIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
