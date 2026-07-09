@@ -2174,13 +2174,16 @@ export type Database = {
         Row: {
           active: boolean
           business_id: string
+          catalog_part_id: string | null
           category: string | null
           cost: number | null
           created_at: string
           id: string
           location: string | null
           name: string
+          network_visible: boolean
           notes: string | null
+          price: number | null
           qty_on_hand: number
           reorder_at: number | null
           sku: string | null
@@ -2190,13 +2193,16 @@ export type Database = {
         Insert: {
           active?: boolean
           business_id: string
+          catalog_part_id?: string | null
           category?: string | null
           cost?: number | null
           created_at?: string
           id?: string
           location?: string | null
           name: string
+          network_visible?: boolean
           notes?: string | null
+          price?: number | null
           qty_on_hand?: number
           reorder_at?: number | null
           sku?: string | null
@@ -2206,13 +2212,16 @@ export type Database = {
         Update: {
           active?: boolean
           business_id?: string
+          catalog_part_id?: string | null
           category?: string | null
           cost?: number | null
           created_at?: string
           id?: string
           location?: string | null
           name?: string
+          network_visible?: boolean
           notes?: string | null
+          price?: number | null
           qty_on_hand?: number
           reorder_at?: number | null
           sku?: string | null
@@ -2225,6 +2234,13 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_inventory_items_catalog_part_id_fkey"
+            columns: ["catalog_part_id"]
+            isOneToOne: false
+            referencedRelation: "parts_catalog"
             referencedColumns: ["id"]
           },
         ]
@@ -2273,6 +2289,13 @@ export type Database = {
             columns: ["item_id"]
             isOneToOne: false
             referencedRelation: "business_inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_inventory_movements_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "network_stock"
             referencedColumns: ["id"]
           },
         ]
@@ -3042,6 +3065,7 @@ export type Database = {
           cta_primary: string
           description: string | null
           email: string | null
+          expose_inventory_to_network: boolean
           facebook_url: string | null
           featured: boolean
           featured_until: string | null
@@ -3097,6 +3121,7 @@ export type Database = {
           cta_primary?: string
           description?: string | null
           email?: string | null
+          expose_inventory_to_network?: boolean
           facebook_url?: string | null
           featured?: boolean
           featured_until?: string | null
@@ -3152,6 +3177,7 @@ export type Database = {
           cta_primary?: string
           description?: string | null
           email?: string | null
+          expose_inventory_to_network?: boolean
           facebook_url?: string | null
           featured?: boolean
           featured_until?: string | null
@@ -6074,6 +6100,79 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      network_part_inquiries: {
+        Row: {
+          business_id: string
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
+          created_at: string
+          id: string
+          item_id: string | null
+          message: string | null
+          part_name: string
+          quantity: number
+          requester_user_id: string | null
+          sku: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          message?: string | null
+          part_name: string
+          quantity?: number
+          requester_user_id?: string | null
+          sku?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          message?: string | null
+          part_name?: string
+          quantity?: number
+          requester_user_id?: string | null
+          sku?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "network_part_inquiries_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "network_part_inquiries_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "business_inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "network_part_inquiries_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "network_stock"
             referencedColumns: ["id"]
           },
         ]
@@ -12148,6 +12247,43 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "boost_products"
             referencedColumns: ["slug"]
+          },
+        ]
+      }
+      network_stock: {
+        Row: {
+          business_id: string | null
+          business_name: string | null
+          business_slug: string | null
+          catalog_part_id: string | null
+          category: string | null
+          city: string | null
+          id: string | null
+          lat: number | null
+          lng: number | null
+          name: string | null
+          price: number | null
+          province: string | null
+          qty_on_hand: number | null
+          region: string | null
+          sku: string | null
+          unit: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_inventory_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_inventory_items_catalog_part_id_fkey"
+            columns: ["catalog_part_id"]
+            isOneToOne: false
+            referencedRelation: "parts_catalog"
+            referencedColumns: ["id"]
           },
         ]
       }
