@@ -1390,10 +1390,17 @@ function SellPage() {
                         if (vinState.kind !== "idle") setVinState({ kind: "idle" });
                         if (vinConflicts.length) setVinConflicts([]);
                       }}
-                      onBlur={async (e) => {
-                        const raw = normalizeVin(e.target.value);
-                        await runVinDecode(raw);
-                      }}
+                       onBlur={async (e) => {
+                         const raw = normalizeVin(e.target.value);
+                         await runVinDecode(raw);
+                       }}
+                       onKeyDown={async (e) => {
+                         if (e.key === "Enter") {
+                           e.preventDefault();
+                           const raw = normalizeVin((e.target as HTMLInputElement).value);
+                           await runVinDecode(raw);
+                         }
+                       }}
                     />
                     <VinScanDialog
                       onResult={(r) => {
@@ -1679,6 +1686,17 @@ function SellPage() {
                       </Select>
                     </div>
                   </div>
+                  {/* Category-specific attributes (Body type, Drivetrain, Owner status, OR/CR, etc.)
+                      live right here alongside Year/Make/Model instead of a separate "Car details" section. */}
+                  {isAttrCategory(category) && (
+                    <div className="mt-2 rounded-md border border-dashed border-border/70 bg-muted/20 p-2">
+                      <CategoryAttributesEditor
+                        category={category}
+                        value={categoryAttrs}
+                        onChange={setCategoryAttrs}
+                      />
+                    </div>
+                  )}
                 </>
               )}
             </SellGroup>
@@ -2201,8 +2219,9 @@ function SellPage() {
               </SellGroup>
             )}
 
-            {/* FILTERS (category-attribute categories) */}
-            {isAttrCategory(category) && (
+            {/* FILTERS — category attributes for non-vehicle categories.
+                Car & motorcycle attributes are shown inline in the Listing section above. */}
+            {isAttrCategory(category) && category !== "car" && category !== "motorcycle" && (
               <SellGroup id="filters" title={`${CATEGORY_LABEL_MAP[category] ?? "Details"} details`}>
                 <p className="text-[11px] text-muted-foreground">
                   These attributes help buyers find your listing in search.
