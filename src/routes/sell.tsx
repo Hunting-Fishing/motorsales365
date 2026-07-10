@@ -2219,8 +2219,9 @@ function SellPage() {
               </SellGroup>
             )}
 
-            {/* FILTERS (category-attribute categories) */}
-            {isAttrCategory(category) && (
+            {/* FILTERS — category attributes for non-vehicle categories.
+                Car & motorcycle attributes are shown inline in the Listing section above. */}
+            {isAttrCategory(category) && category !== "car" && category !== "motorcycle" && (
               <SellGroup id="filters" title={`${CATEGORY_LABEL_MAP[category] ?? "Details"} details`}>
                 <p className="text-[11px] text-muted-foreground">
                   These attributes help buyers find your listing in search.
