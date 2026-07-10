@@ -120,16 +120,7 @@ export const VehicleQualitySchema = z
     { path: ["plate_status"], message: "Choose a plate status from the list" },
   )
   .refine(
-    (v) =>
-      !v.registered_owner_status ||
-      OWNER_OPTIONS.includes(v.registered_owner_status),
-    { path: ["registered_owner_status"], message: "Choose an owner status from the list" },
-  )
-  .refine(
-    (v) => !v.orcr_status || ORCR_OPTIONS.includes(v.orcr_status),
-    { path: ["orcr_status"], message: "Choose an OR/CR status from the list" },
-  )
-  .refine(
+
     (v) => !v.flood_history || HISTORY_OPTIONS.includes(v.flood_history),
     { path: ["flood_history"], message: "Choose a flood history option" },
   )
