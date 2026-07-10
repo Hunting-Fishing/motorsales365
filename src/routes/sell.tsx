@@ -1177,8 +1177,7 @@ function SellPage() {
             </div>
 
             {/* LISTING */}
-            <div className="space-y-2">
-              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Listing</h3>
+            <SellGroup id="listing" title="Listing" defaultOpen>
               <div>
                 <Label htmlFor="title" className="text-[11px]">Title</Label>
                 <Input
@@ -1250,11 +1249,10 @@ function SellPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </SellGroup>
 
             {/* PRICE */}
-            <div className="space-y-2 border-t border-border/60 pt-3">
-              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Price</h3>
+            <SellGroup id="price" title="Price" defaultOpen>
               <div className="grid gap-2 sm:grid-cols-[200px_1fr] items-end">
                 <div>
                   <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
@@ -1292,12 +1290,11 @@ function SellPage() {
                   </span>
                 </div>
               </div>
-            </div>
+            </SellGroup>
 
             {/* VEHICLE (car / motorcycle only) */}
             {(category === "car" || category === "motorcycle") && (
-              <div className="space-y-2 border-t border-border/60 pt-3">
-                <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Vehicle</h3>
+              <SellGroup id="vehicle" title="Vehicle" defaultOpen>
                 <div>
                   <Label className="text-xs">VIN / chassis</Label>
                   <div className="flex gap-2">
@@ -1380,7 +1377,7 @@ function SellPage() {
                     </Select>
                   </div>
                 </div>
-              </div>
+              </SellGroup>
             )}
 
             {/* CATEGORY DETAILS — service tags + category-specific block */}
@@ -1389,10 +1386,11 @@ function SellPage() {
               category === "carwash" || category === "parts" || category === "used_part" ||
               category === "drone" || category === "towing" ||
               !(category === "car" || category === "motorcycle")) && (
-              <div className="space-y-2 border-t border-border/60 pt-3">
-                <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  {SERVICE_CATEGORIES.has(category) ? "What you offer" : "Category details"}
-                </h3>
+              <SellGroup
+                id="category-details"
+                title={SERVICE_CATEGORIES.has(category) ? "What you offer" : "Category details"}
+                defaultOpen
+              >
                 {SERVICE_CATEGORIES.has(category) && (
                   <div className="space-y-1">
                     <p className="text-[11px] text-muted-foreground">
@@ -1840,28 +1838,24 @@ function SellPage() {
                     </div>
                   </div>
                 ) : null}
-              </div>
+              </SellGroup>
             )}
 
             {/* CONDITION & QUALITY (car / motorcycle) */}
             {(category === "car" || category === "motorcycle") && (
-              <div className="space-y-2 border-t border-border/60 pt-3">
-                <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Condition &amp; quality</h3>
+              <SellGroup id="quality" title="Condition & quality">
                 <VehicleQualityFields
                   category={category as "car" | "motorcycle"}
                   value={vehicleQuality}
                   onChange={setVehicleQuality}
                   issues={vehicleQualityIssues}
                 />
-              </div>
+              </SellGroup>
             )}
 
             {/* FILTERS (category-attribute categories) */}
             {isAttrCategory(category) && (
-              <div className="space-y-2 border-t border-border/60 pt-3">
-                <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  {CATEGORY_LABEL_MAP[category] ?? "Details"} details
-                </h3>
+              <SellGroup id="filters" title={`${CATEGORY_LABEL_MAP[category] ?? "Details"} details`}>
                 <p className="text-[11px] text-muted-foreground">
                   These attributes help buyers find your listing in search.
                 </p>
@@ -1870,19 +1864,18 @@ function SellPage() {
                   value={categoryAttrs}
                   onChange={setCategoryAttrs}
                 />
-              </div>
+              </SellGroup>
             )}
 
             {/* DESCRIPTION */}
-            <div className="space-y-2 border-t border-border/60 pt-3">
-              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Description</h3>
+            <SellGroup id="description" title="Description">
               <Textarea
                 rows={4}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Tell buyers what makes this listing stand out…"
               />
-            </div>
+            </SellGroup>
           </section>
 
 
