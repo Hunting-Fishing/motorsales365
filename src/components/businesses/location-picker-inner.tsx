@@ -58,6 +58,29 @@ function ClickHandler({ onPick }: { onPick: (lat: number, lng: number) => void }
   return null;
 }
 
+/**
+ * Leaflet renders half-grey tiles when its container is mounted inside a hidden
+ * or freshly-sized parent (accordion open, step change). invalidateSize() forces
+ * a re-measure once the container has real dimensions.
+ */
+function InvalidateOnMount() {
+  const map = useMap();
+  useEffect(() => {
+    const el = map.getContainer();
+    const kick = () => map.invalidateSize();
+    const t1 = setTimeout(kick, 0);
+    const t2 = setTimeout(kick, 250);
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(kick) : null;
+    ro?.observe(el);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      ro?.disconnect();
+    };
+  }, [map]);
+  return null;
+}
+
 export function LocationPickerInner({
   lat,
   lng,
