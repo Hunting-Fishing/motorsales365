@@ -537,11 +537,18 @@ function SellPage() {
       );
     }
     const accepted = files.slice(0, Math.max(remaining, 0));
+    const startIndex = photos.length;
     setPhotos((p) => [...p, ...accepted].slice(0, maxPhotos));
     setPhotoUploads((u) =>
       [...u, ...accepted.map(() => ({ status: "idle" as const, percent: 0 }))].slice(0, maxPhotos),
     );
     e.target.value = "";
+    // Kick off eager uploads to a per-user draft path so progress is visible immediately.
+    if (user) {
+      accepted.forEach((file, offset) => {
+        void uploadOnePhoto(startIndex + offset, file, null);
+      });
+    }
   };
 
   const removePhoto = (i: number) => {
