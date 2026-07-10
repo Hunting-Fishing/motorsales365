@@ -12740,6 +12740,7 @@ export type Database = {
       cleanup_unverified_users: { Args: never; Returns: number }
       compute_user_tier: { Args: { _user_id: string }; Returns: string }
       current_plan_tier: { Args: { _user_id: string }; Returns: string }
+      current_user_owns_email: { Args: { _email: string }; Returns: boolean }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
