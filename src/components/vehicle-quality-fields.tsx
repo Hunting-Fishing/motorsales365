@@ -19,8 +19,6 @@ export type VehicleQuality = {
   color?: string;
   plate_ending?: string;
   plate_status?: string; // moto
-  registered_owner_status?: string;
-  orcr_status?: string;
   last_registration_date?: string;
   registration_expiry?: string; // moto
   flood_history?: string;
@@ -37,8 +35,6 @@ export const VEHICLE_QUALITY_KEYS: (keyof VehicleQuality)[] = [
   "color",
   "plate_ending",
   "plate_status",
-  "registered_owner_status",
-  "orcr_status",
   "last_registration_date",
   "registration_expiry",
   "flood_history",
@@ -50,33 +46,20 @@ export const VEHICLE_QUALITY_KEYS: (keyof VehicleQuality)[] = [
   "price_negotiable",
 ];
 
+
 // -----------------------------
 // Validation
 // -----------------------------
 
-const OWNER_OPTIONS = [
-  "1st owner",
-  "2nd owner",
-  "3rd owner or later",
-  "Casa-maintained",
-  "Unknown",
-];
-const ORCR_OPTIONS = [
-  "Complete (OR + CR, owner's name)",
-  "Complete (OR + CR, open deed of sale)",
-  "OR only",
-  "CR only",
-  "No documents (project / parts)",
-  "Lost — affidavit ready",
-  "Encumbered / financed",
-];
 const PLATE_STATUS_OPTIONS = [
   "Updated plate",
   "Improvised / temporary",
   "Conduction sticker only",
   "Missing",
 ];
+
 const HISTORY_OPTIONS = ["No", "Yes — disclosed below", "Unknown"];
+
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
@@ -94,8 +77,7 @@ export const VehicleQualitySchema = z
       .optional()
       .or(z.literal("")),
     plate_status: z.string().optional(),
-    registered_owner_status: z.string().optional(),
-    orcr_status: z.string().optional(),
+
     last_registration_date: z
       .string()
       .optional()
@@ -138,16 +120,7 @@ export const VehicleQualitySchema = z
     { path: ["plate_status"], message: "Choose a plate status from the list" },
   )
   .refine(
-    (v) =>
-      !v.registered_owner_status ||
-      OWNER_OPTIONS.includes(v.registered_owner_status),
-    { path: ["registered_owner_status"], message: "Choose an owner status from the list" },
-  )
-  .refine(
-    (v) => !v.orcr_status || ORCR_OPTIONS.includes(v.orcr_status),
-    { path: ["orcr_status"], message: "Choose an OR/CR status from the list" },
-  )
-  .refine(
+
     (v) => !v.flood_history || HISTORY_OPTIONS.includes(v.flood_history),
     { path: ["flood_history"], message: "Choose a flood history option" },
   )
@@ -174,16 +147,12 @@ export function validateVehicleQuality(
 const RECOMMENDED_CAR: (keyof VehicleQuality)[] = [
   "variant",
   "color",
-  "registered_owner_status",
-  "orcr_status",
   "last_registration_date",
   "flood_history",
   "accident_history",
 ];
 const RECOMMENDED_MOTO: (keyof VehicleQuality)[] = [
   "color",
-  "registered_owner_status",
-  "orcr_status",
   "plate_status",
   "registration_expiry",
   "accident_history",
@@ -194,8 +163,6 @@ const FIELD_LABELS: Record<keyof VehicleQuality, string> = {
   color: "Color",
   plate_ending: "Plate ending",
   plate_status: "Plate status",
-  registered_owner_status: "Registered owner status",
-  orcr_status: "OR/CR status",
   last_registration_date: "Last registration date",
   registration_expiry: "Registration expiry",
   flood_history: "Flood history",
@@ -206,6 +173,7 @@ const FIELD_LABELS: Record<keyof VehicleQuality, string> = {
   trade_accepted: "Trade-in accepted",
   price_negotiable: "Price negotiable",
 };
+
 
 function isFilled(v: VehicleQuality, k: keyof VehicleQuality) {
   const val = v[k];
@@ -275,39 +243,35 @@ export function VehicleQualityFields({ category, value, onChange, issues = [] }:
   const completeness = vehicleQualityCompleteness(category, value);
 
   return (
-    <div className="space-y-2 rounded-lg border border-border bg-card/40 p-3">
-      <div>
-        <h3 className="font-display text-base font-semibold">Vehicle details & documents</h3>
-        <p className="text-xs text-muted-foreground">
-          Honest disclosure builds buyer trust and reduces back-and-forth.
-        </p>
-      </div>
-
-      {/* Completeness meter */}
-      <div className="rounded-md border border-border/60 bg-background/40 p-2">
-        <div className="mb-1.5 flex items-center justify-between text-xs">
-          <span className="flex items-center gap-1.5 font-medium">
-            {completeness.percent === 100 ? (
-              <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
-            ) : (
-              <AlertCircle className="h-3.5 w-3.5 text-amber-600" />
-            )}
-            Profile completeness
-          </span>
-          <span className="text-muted-foreground">
-            {completeness.filled}/{completeness.total} recommended fields
+    <div className="space-y-2 rounded-lg border border-border bg-card/40 p-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className="font-display text-sm font-semibold">Vehicle details &amp; documents</h3>
+          <p className="text-[11px] text-muted-foreground">
+            Honest disclosure builds buyer trust and reduces back-and-forth.
+          </p>
+        </div>
+        <div className="flex min-w-[140px] flex-1 items-center gap-2 sm:max-w-[240px]">
+          {completeness.percent === 100 ? (
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-green-600" />
+          ) : (
+            <AlertCircle className="h-3.5 w-3.5 shrink-0 text-amber-600" />
+          )}
+          <Progress value={completeness.percent} className="h-1.5 flex-1" />
+          <span className="whitespace-nowrap text-[11px] text-muted-foreground">
+            {completeness.filled}/{completeness.total}
           </span>
         </div>
-        <Progress value={completeness.percent} className="h-1.5" />
-        {completeness.missing.length > 0 && (
-          <p className="mt-2 text-[11px] text-muted-foreground">
-            Recommended next:{" "}
-            <span className="text-foreground/80">{completeness.missing.join(" · ")}</span>
-          </p>
-        )}
       </div>
+      {completeness.missing.length > 0 && (
+        <p className="text-[11px] text-muted-foreground">
+          Recommended next:{" "}
+          <span className="text-foreground/80">{completeness.missing.join(" · ")}</span>
+        </p>
+      )}
 
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="grid gap-x-2 gap-y-1.5 sm:grid-cols-3">
+
         <FieldShell label="Variant / trim" error={errFor("variant")}>
           <Input
             placeholder={category === "car" ? "e.g. 1.3 E AT" : "e.g. Standard / Premium"}
@@ -354,40 +318,8 @@ export function VehicleQualityFields({ category, value, onChange, issues = [] }:
           </FieldShell>
         )}
 
-        <FieldShell label="Registered owner status" error={errFor("registered_owner_status")}>
-          <Select
-            value={value.registered_owner_status ?? ""}
-            onValueChange={(v) => set("registered_owner_status", v)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              {OWNER_OPTIONS.map((o) => (
-                <SelectItem key={o} value={o}>
-                  {o}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </FieldShell>
-        <FieldShell label="OR/CR status" error={errFor("orcr_status")}>
-          <Select
-            value={value.orcr_status ?? ""}
-            onValueChange={(v) => set("orcr_status", v)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              {ORCR_OPTIONS.map((o) => (
-                <SelectItem key={o} value={o}>
-                  {o}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </FieldShell>
+
+
 
         <FieldShell label="Last registration date" error={errFor("last_registration_date")}>
           <Input
@@ -443,7 +375,7 @@ export function VehicleQualityFields({ category, value, onChange, issues = [] }:
         </FieldShell>
 
         {category === "motorcycle" && (
-          <div className="sm:col-span-2">
+          <div className="sm:col-span-3">
             <FieldShell label="Modifications" error={errFor("modifications")}>
               <Textarea
                 rows={2}
@@ -458,7 +390,7 @@ export function VehicleQualityFields({ category, value, onChange, issues = [] }:
 
       </div>
 
-      <div className="flex flex-wrap gap-4 pt-2">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1">
         <label className="flex items-center gap-2 text-sm">
           <Checkbox
             checked={!!value.price_negotiable}
@@ -497,9 +429,10 @@ function FieldShell({
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <Label>{label}</Label>
+    <div className="space-y-0.5">
+      <Label className="text-[11px]">{label}</Label>
       {children}
+
       {hint && !error && <p className="mt-1 text-[11px] text-muted-foreground">{hint}</p>}
       {error && (
         <p className="mt-1 text-[11px] text-destructive flex items-center gap-1">
