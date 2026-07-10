@@ -142,7 +142,8 @@ export async function decodeVin(vin: string): Promise<VinDecodeResult> {
   if (engineParts.length) out.engine = engineParts.join(" ").trim();
   const trim = row.Trim || row.Series;
   if (trim) out.trim = trim;
-  if (row.BodyClass) out.bodyType = row.BodyClass;
+  if (row.BodyClass) out.bodyType = mapBodyType(row.BodyClass);
+  if (row.DriveType) out.drivetrain = mapDrivetrain(row.DriveType);
   if (row.VehicleType) {
     out.category = /motorcycle/i.test(row.VehicleType) ? "motorcycle" : "car";
   }
