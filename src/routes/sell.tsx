@@ -1326,6 +1326,7 @@ function SellPage() {
                         // Clear stale error/status while typing
                         if (vinError) setVinError(null);
                         if (vinStatus !== "idle") setVinStatus("idle");
+                        if (vinConflicts.length) setVinConflicts([]);
                       }}
                       onBlur={async (e) => {
                         const raw = normalizeVin(e.target.value);
