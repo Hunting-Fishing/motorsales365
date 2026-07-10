@@ -1391,6 +1391,60 @@ function SellPage() {
                       {vehicleQualityIssues.find((i) => i.field === "vin_chassis")?.message}
                     </p>
                   )}
+                  {vinConflicts.length > 0 && (
+                    <div className="mt-1.5 rounded-md border border-amber-400/60 bg-amber-50 p-2 text-[11px] text-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1 font-medium">
+                          <AlertCircle className="h-3 w-3" />
+                          VIN doesn't match {vinConflicts.length} field{vinConflicts.length > 1 ? "s" : ""} you already entered
+                        </div>
+                        <div className="flex gap-1">
+                          <button
+                            type="button"
+                            className="rounded border border-amber-500/60 px-1.5 py-0.5 text-[10px] font-medium hover:bg-amber-100 dark:hover:bg-amber-900/40"
+                            onClick={() => {
+                              vinConflicts.forEach((c) => c.apply());
+                              setVinConflicts([]);
+                            }}
+                          >
+                            Use VIN for all
+                          </button>
+                          <button
+                            type="button"
+                            className="rounded border border-amber-500/60 px-1.5 py-0.5 text-[10px] hover:bg-amber-100 dark:hover:bg-amber-900/40"
+                            onClick={() => setVinConflicts([])}
+                          >
+                            Keep mine
+                          </button>
+                        </div>
+                      </div>
+                      <ul className="mt-1 space-y-0.5">
+                        {vinConflicts.map((c) => (
+                          <li key={c.field} className="flex items-center justify-between gap-2">
+                            <span>
+                              <span className="font-medium">{c.label}:</span>{" "}
+                              <span className="line-through opacity-70">{c.current || "—"}</span>{" "}
+                              → <span className="font-medium">{c.decoded}</span>
+                            </span>
+                            {c.field.startsWith("title_") ? (
+                              <span className="text-[10px] opacity-70">review title</span>
+                            ) : (
+                              <button
+                                type="button"
+                                className="rounded border border-amber-500/60 px-1.5 py-0.5 text-[10px] hover:bg-amber-100 dark:hover:bg-amber-900/40"
+                                onClick={() => {
+                                  c.apply();
+                                  setVinConflicts((prev) => prev.filter((x) => x.field !== c.field));
+                                }}
+                              >
+                                Use VIN
+                              </button>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               )}
 
