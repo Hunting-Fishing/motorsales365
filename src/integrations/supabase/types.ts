@@ -5757,6 +5757,47 @@ export type Database = {
         }
         Relationships: []
       }
+      listing_documents: {
+        Row: {
+          doc_type: Database["public"]["Enums"]["lto_doc_type"]
+          file_size: number
+          id: string
+          listing_id: string
+          mime_type: string
+          storage_path: string
+          uploaded_at: string
+          user_id: string
+        }
+        Insert: {
+          doc_type: Database["public"]["Enums"]["lto_doc_type"]
+          file_size: number
+          id?: string
+          listing_id: string
+          mime_type: string
+          storage_path: string
+          uploaded_at?: string
+          user_id: string
+        }
+        Update: {
+          doc_type?: Database["public"]["Enums"]["lto_doc_type"]
+          file_size?: number
+          id?: string
+          listing_id?: string
+          mime_type?: string
+          storage_path?: string
+          uploaded_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_documents_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_fitment: {
         Row: {
           created_at: string
@@ -5948,6 +5989,50 @@ export type Database = {
           },
         ]
       }
+      listing_verifications: {
+        Row: {
+          checked_at: string | null
+          created_at: string
+          extracted_json: Json
+          listing_id: string
+          mismatches_json: Json
+          status: Database["public"]["Enums"]["listing_verification_status"]
+          updated_at: string
+          user_id: string
+          verified_by: string | null
+        }
+        Insert: {
+          checked_at?: string | null
+          created_at?: string
+          extracted_json?: Json
+          listing_id: string
+          mismatches_json?: Json
+          status?: Database["public"]["Enums"]["listing_verification_status"]
+          updated_at?: string
+          user_id: string
+          verified_by?: string | null
+        }
+        Update: {
+          checked_at?: string | null
+          created_at?: string
+          extracted_json?: Json
+          listing_id?: string
+          mismatches_json?: Json
+          status?: Database["public"]["Enums"]["listing_verification_status"]
+          updated_at?: string
+          user_id?: string
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_verifications_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: true
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_views: {
         Row: {
           created_at: string
@@ -6006,6 +6091,7 @@ export type Database = {
           updated_at: string
           user_id: string
           vehicle_id: string | null
+          verification_status: Database["public"]["Enums"]["listing_verification_status"]
           view_count: number
         }
         Insert: {
@@ -6044,6 +6130,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           vehicle_id?: string | null
+          verification_status?: Database["public"]["Enums"]["listing_verification_status"]
           view_count?: number
         }
         Update: {
@@ -6082,6 +6169,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           vehicle_id?: string | null
+          verification_status?: Database["public"]["Enums"]["listing_verification_status"]
           view_count?: number
         }
         Relationships: [
@@ -13268,6 +13356,13 @@ export type Database = {
         | "hidden"
         | "sold"
         | "pending_sale"
+      listing_verification_status:
+        | "unverified"
+        | "pending"
+        | "lto_verified"
+        | "mismatch"
+        | "expired"
+      lto_doc_type: "cr" | "or"
       media_type: "photo" | "video"
       org_role: "owner" | "admin" | "member"
       partner_tier: "featured" | "standard"
@@ -13656,6 +13751,14 @@ export const Constants = {
         "sold",
         "pending_sale",
       ],
+      listing_verification_status: [
+        "unverified",
+        "pending",
+        "lto_verified",
+        "mismatch",
+        "expired",
+      ],
+      lto_doc_type: ["cr", "or"],
       media_type: ["photo", "video"],
       org_role: ["owner", "admin", "member"],
       partner_tier: ["featured", "standard"],

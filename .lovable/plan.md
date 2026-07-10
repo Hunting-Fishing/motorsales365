@@ -1,81 +1,66 @@
-## Goal
+# LTO Document Verification for Listings
 
-Make the VIN / chassis field on `/sell` explain *why* auto-decode didn't populate anything, without ever wiping fields the user typed by hand. Also properly support Asian and European chassis numbers (JDM frame codes like `NCP150-1234567`, and non-US 17-digit VINs that NHTSA can't decode).
+Add a "Registration & Ownership" step to `/sell` where sellers upload their LTO OR (Official Receipt) and CR (Certificate of Registration). Our software runs OCR + AI comparison against the listing (VIN/chassis, make/model, year, color, plate, owner) and issues a verification badge.
 
-## Current behavior (problem)
+## User flow
 
-`src/routes/sell.tsx` shows one generic message for two very different situations:
+1. In the Sell form, a new **"Verify with LTO documents"** section appears under VIN/Chassis (collapsible, optional but strongly encouraged with an "Anti-Scam Verified" badge incentive).
+2. Seller uploads **CR** (Certificate of Registration) and **OR** (Official Receipt). PNG/JPG/PDF, up to 10 MB each.
+3. On upload, files go to a private `listing-documents` bucket, then a server function calls Lovable AI (Gemini 2.5 Flash multimodal) to extract structured fields.
+4. Extracted fields are compared to the listing form. Results show inline as chips:
+   - ✅ Green: match (VIN, Make, Model, Year, Color, Plate)
+   - ⚠️ Amber: mismatch — with the value we found vs what you typed, plus "Use document value" button
+   - 🔴 Red: registration expired / OR renewal past due (based on "valid until" date on OR)
+5. Owner-name field is compared to the signed-in user's profile name (fuzzy match). Mismatch flags "Owner name differs — additional proof may be required."
+6. If all checks pass, the listing gets a persisted `verification_status = 'lto_verified'` badge visible on the public listing page.
 
-- Format looked fine but NHTSA returned nothing → "Couldn't decode this VIN — please fill the vehicle fields manually."
-- `fetch` threw → "VIN lookup unavailable — please fill the vehicle fields manually."
+## What we verify (from your sample docs)
 
-`src/components/vin-scan-dialog.tsx` `vinFormatError` also fails Asian/EU VINs that don't pass the 17-digit ISO check digit (common on JDM Toyota/Honda imports), which currently blocks the field and looks like a "bad VIN" error.
+From **CR**: Plate No, Engine No, Chassis No, VIN, Make/Brand, Series (Model), Body Type, Color, Fuel Type, Year Model, Owner Name, CR Date.
+From **OR**: Plate No, "valid until" and "due for renewal" dates, Received From (owner), Year Model, Color, Fuel Type.
 
-Manual entries are already preserved by `applyVinDecode` (functional setters + conflict panel from the last change), so no regression risk there — the fix is purely error classification, copy, and JDM/EU acceptance.
+Cross-checks:
+- CR chassis/VIN ↔ listing VIN/chassis field
+- CR plate ↔ OR plate (must match each other)
+- CR make/series/year/color ↔ listing values
+- OR "valid until" date ↔ today (expired → red flag)
+- CR/OR owner name ↔ user profile name (fuzzy)
 
-## Failure taxonomy (what each message should say)
+## Technical details
 
-| Case | Detection | UX |
-|---|---|---|
-| Empty | no chars after normalize | no error, idle |
-| Bad characters | contains `I`, `O`, `Q`, or non-alphanumerics | red inline: "Remove I, O, Q or spaces — VIN uses only letters and numbers." Keeps fields. |
-| Too short / too long | length < 11 or > 17 | red inline: "VIN or chassis # must be 11–17 characters." Keeps fields. |
-| Chassis # (11–16 chars) | valid chars, length 11–16 | neutral info: "Saved as chassis #. Auto-fill only works for 17-character VINs — please fill the vehicle fields below." No red. |
-| 17-char, checksum fails | ISO 3779 check digit invalid | soft warning (amber, non-blocking): "Check digit didn't match — common for Asia/Europe market VINs. Saved anyway; auto-fill may not work." Still attempts decode. |
-| 17-char, NHTSA empty | decode returns no year/make/model | amber: "This looks like a non-US market VIN (Asia / Europe imports often aren't in the US database). VIN saved — please fill the vehicle fields manually." |
-| Network / API error | `fetch` throws or non-2xx | red: "VIN lookup service is unreachable right now — check your connection or fill the vehicle fields manually. Your VIN is saved." Offer a "Retry decode" button. |
-| Success | any of year/make/model returned | existing green "VIN decoded — blank fields filled in." plus the conflict panel already added. |
+**Storage**
+- New private bucket `listing-documents`, RLS: owner can read/write their own `{userId}/{listingId}/...`; admins read all.
 
-In every case except empty, `vehicleQuality.vin_chassis` is saved and no manual field is touched.
+**DB (migration)**
+- `listing_documents` table: `id, listing_id, user_id, doc_type (cr|or), storage_path, mime_type, file_size, uploaded_at`.
+- `listing_verifications` table: `listing_id (PK), status (unverified|pending|lto_verified|mismatch|expired), extracted_json, mismatches_json, checked_at, verified_by (system|admin)`.
+- Extend `listings` with `verification_status` (denormalized) + realtime trigger to keep it in sync.
+- GRANTs + RLS: users read their own; public reads only `verification_status` on listings (already public).
 
-## Changes
+**Server function** `verifyListingDocuments.functions.ts` (auth-required, `requireSupabaseAuth`):
+1. Signed URL for uploaded CR/OR.
+2. POST to Lovable AI Gateway `/v1/chat/completions` with `google/gemini-2.5-flash`, structured output (JSON schema) requesting the fields above.
+3. Normalize (uppercase VIN, strip spaces, parse dates PH format `MM/DD/YYYY`).
+4. Compare to listing row; build mismatch array.
+5. Upsert `listing_verifications`; update `listings.verification_status`.
 
-### 1. `src/components/vin-scan-dialog.tsx`
+**UI**
+- New component `src/components/sell/lto-verification.tsx`:
+  - Two `SingleFileUploader` slots (CR, OR)
+  - "Verify documents" button → calls server fn, streams status
+  - Result panel: match chips per field + "Apply document values to listing" bulk action
+  - Persistent state — re-opens with prior extraction if user comes back
+- Add "Anti-Scam Verified" badge to `/vehicles/[id]` public page when `verification_status = 'lto_verified'`.
 
-- Replace `vinFormatError` with a structured helper that returns a discriminated result:
-  ```ts
-  type VinFormatCheck =
-    | { kind: "empty" }
-    | { kind: "ok_vin" }        // 17 chars, checksum ok
-    | { kind: "ok_chassis" }    // 11–16 chars, no checksum required
-    | { kind: "warn_checksum" } // 17 chars but check digit fails (JDM/EU)
-    | { kind: "bad_chars"; message: string }
-    | { kind: "bad_length"; message: string };
-  export function checkVinFormat(v: string): VinFormatCheck;
-  ```
-  Keep `vinFormatError` as a thin wrapper for existing callers (scan dialog) so the barcode flow keeps its current strict behavior.
-- Add a `decodeVin` error signal: throw a typed `VinDecodeError` with `kind: "network" | "http"` and status, so the caller can distinguish network problems from "empty result".
+**Privacy**
+- Docs stored private; only OCR-extracted summary is shown to seller. Nothing but the badge is public — owner name, plate, and file itself never surface publicly.
+- Note in `/privacy` update: LTO documents processed by AI OCR for verification, retained for the life of the listing + 90 days.
 
-### 2. `src/routes/sell.tsx`
+## Out of scope (future)
+- Deed of Sale / Special Power of Attorney uploads for third-party sellers
+- LTO API integration (not publicly available); we rely on document OCR
+- Admin manual review queue (can add later if AI flags too many false positives)
 
-- Widen the VIN state:
-  ```ts
-  type VinState =
-    | { kind: "idle" }
-    | { kind: "checking" }
-    | { kind: "ok" }
-    | { kind: "chassis" }        // saved, no decode attempted
-    | { kind: "warn"; message: string }   // amber, non-blocking (checksum, non-US)
-    | { kind: "error"; message: string; retryable?: boolean };
-  ```
-  Replace the current `vinError` + `vinStatus` pair with this single state so we can't render conflicting messages.
-- Rewrite the `onBlur` handler to use `checkVinFormat` and the new decode error type, mapping each branch to the copy in the taxonomy table.
-- Add a "Retry decode" button next to the error message when `retryable` is true (network / HTTP failures only).
-- Do NOT clear or overwrite Category / Year / Make / Model / Trim / Engine / Fuel / Transmission / Color / Mileage in any failure branch — reuse the existing `applyVinDecode` (which already only fills blanks + surfaces conflicts).
-- Update the placeholder + help copy to reflect chassis # support: "17-char VIN or 11–16-char chassis # (Asia / Europe)."
-
-### 3. Scanner dialog
-
-- Scanner still requires a full 17-char VIN (barcodes always encode the full VIN). No copy change needed beyond passing through the new format checker.
-
-### 4. Tests / verification
-
-- Manual smoke-test matrix in the preview: empty, `1HGCM82633A004352` (valid US VIN), `1HGCM82633A00435I` (bad char), `NCP150-1234567` normalized (chassis), `JHMFA16506S000000` (17-char JDM likely-empty NHTSA), offline (throttle to offline in devtools → network error), then re-enable and hit Retry.
-- Confirm typed values in Year/Make/Model survive every failure branch.
-- `tsgo --noEmit` after edits.
-
-## Out of scope
-
-- Adding a second decoder for JDM/EU VINs (would need a paid API; the plan is to explain the gap, not fill it).
-- Persisting the chassis # anywhere other than `vehicle_quality.vin_chassis` (already stored).
-- Changes to the conflict panel added in the previous turn — it stays as-is.
+## Files touched
+- New: `supabase/migrations/<ts>_lto_verification.sql`, `src/lib/listing-verification.functions.ts`, `src/components/sell/lto-verification.tsx`, `src/components/listing/verified-badge.tsx`
+- Edit: `src/routes/sell.tsx` (insert section under VIN block), `src/routes/vehicles.$id.tsx` (badge), `src/routes/privacy.tsx` + `src/routes/terms.tsx` (policy update per memory rules)

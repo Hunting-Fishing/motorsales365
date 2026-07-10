@@ -590,6 +590,12 @@ function ListingDetailPage() {
                 {seller?.verification_status === "verified" && (
                   <VerifiedBadge size="md" showLabel />
                 )}
+                {(listing as any).verification_status === "lto_verified" && (
+                  <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">
+                    <Shield className="mr-1 h-3 w-3" />
+                    LTO Verified
+                  </Badge>
+                )}
                 {boosted && (
                   <Badge className="bg-accent text-accent-foreground">
                     <Star className="mr-1 h-3 w-3" />

@@ -34,6 +34,7 @@ import { VehiclePicker } from "@/components/vehicle-picker";
 import { TagPicker } from "@/components/tag-picker";
 import { CATEGORY_DEFAULT_GROUPS, SERVICE_CATEGORIES } from "@/data/service-tags";
 import { uploadWithRetry } from "@/lib/storage-upload";
+import { LtoVerificationSection } from "@/components/sell/lto-verification";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
 import {
   CategoryAttributesEditor,
@@ -1398,6 +1399,8 @@ function EditListingPage() {
               </>
             )}
           </section>
+
+          <LtoVerificationSection listingId={id} />
 
           <div className="flex justify-between gap-2"><FormFeedbackLink formId="edit-listing" /></div>
           <div className="flex justify-end gap-2">
