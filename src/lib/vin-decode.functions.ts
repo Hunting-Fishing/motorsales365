@@ -1,5 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import {
+  aiDecode,
+  cacheGet,
+  cacheSet,
+  mergeDecodes,
+  nhtsaDecode,
+  structuralDecode,
+  type DecodePartial,
+  type DecodedFields,
+  type FieldSource,
+} from "./vin-decode.server";
+import { regionFromWmi, type Region } from "@/data/vin-vds-tables";
 
 const InputSchema = z.object({
   value: z
@@ -11,98 +23,127 @@ const InputSchema = z.object({
     .refine((s) => /^[A-Z0-9-]+$/.test(s), "Letters, numbers, and dashes only"),
 });
 
-export type DecodedVehicle = {
+export type DecodeSuccess = {
   ok: true;
-  source: "nhtsa" | "jdm_table";
   input: string;
-  make: string;
-  model: string;
-  year: number | null;
-  engine: string | null;
-  trim: string | null;
-};
+  vin: string;
+  region: Region;
+  sources: Partial<Record<keyof DecodedFields, FieldSource>>;
+  primarySource: "nhtsa" | "vds" | "ai" | "jdm_table" | "wmi";
+  missing: string[];
+  notes: string[];
+} & DecodedFields;
+
 export type DecodeFailure = { ok: false; reason: string; input: string };
-export type DecodeResult = DecodedVehicle | DecodeFailure;
+export type DecodeResult = DecodeSuccess | DecodeFailure;
 
 function looksLikeVin17(s: string) {
-  // Standard 17-char VIN: no I/O/Q
   return /^[A-HJ-NPR-Z0-9]{17}$/.test(s);
 }
 
-async function decodeNhtsa(vin: string): Promise<DecodeResult> {
-  try {
-    const res = await fetch(
-      `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin)}?format=json`,
-      { headers: { accept: "application/json" } },
-    );
-    if (!res.ok) return { ok: false, reason: `NHTSA HTTP ${res.status}`, input: vin };
-    const json: any = await res.json();
-    const row = json?.Results?.[0];
-    if (!row) return { ok: false, reason: "NHTSA returned no results", input: vin };
-    const make = (row.Make || "").trim();
-    const model = (row.Model || "").trim();
-    if (!make || !model) {
-      return { ok: false, reason: row.ErrorText?.split(";")?.[0] || "VIN not recognized", input: vin };
+function firstConfidentSource(sources: DecodePartial["sources"]): DecodeSuccess["primarySource"] {
+  const rank: FieldSource[] = ["nhtsa", "vds", "ai", "wmi", "jdm", "vin_year"];
+  for (const src of rank) {
+    if (Object.values(sources).includes(src)) {
+      if (src === "jdm") return "jdm_table";
+      if (src === "vin_year") return "wmi";
+      return src as DecodeSuccess["primarySource"];
     }
-    const year = row.ModelYear ? Number(row.ModelYear) : null;
-    const engine =
-      [row.DisplacementL ? `${row.DisplacementL}L` : null, row.EngineModel || row.EngineConfiguration]
-        .filter(Boolean)
-        .join(" ") || null;
-    return {
-      ok: true,
-      source: "nhtsa",
-      input: vin,
-      make: titleCase(make),
-      model: titleCase(model),
-      year: Number.isFinite(year) ? (year as number) : null,
-      engine,
-      trim: row.Trim || row.Series || null,
-    };
-  } catch (e: any) {
-    return { ok: false, reason: `NHTSA unreachable: ${e?.message ?? "network error"}`, input: vin };
   }
+  return "wmi";
 }
 
-function titleCase(s: string) {
-  return s
-    .toLowerCase()
-    .split(/\s+/)
-    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
-    .join(" ");
+async function decodeChassisCode(raw: string): Promise<DecodeResult | null> {
+  const head = raw.split("-")[0];
+  const candidates = Array.from(new Set([raw, head])).filter((c) => c.length >= 2 && c.length <= 10);
+  if (!candidates.length) return null;
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: rows } = await supabaseAdmin
+    .from("jdm_chassis_codes")
+    .select("code,make,model,year_min,year_max,engine")
+    .in("code", candidates)
+    .limit(1);
+  const hit = rows?.[0];
+  if (!hit) return null;
+  return {
+    ok: true,
+    input: raw,
+    vin: raw,
+    region: "Asia",
+    sources: { make: "jdm", model: "jdm", year: "jdm", engine: "jdm" },
+    primarySource: "jdm_table",
+    missing: [],
+    notes: [`Matched JDM chassis code table (${hit.code}).`],
+    make: hit.make,
+    model: hit.model,
+    year: hit.year_min ? String(hit.year_min) : undefined,
+    engine: hit.engine ?? undefined,
+  };
 }
 
 export const decodeVin = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => InputSchema.parse(d))
   .handler(async ({ data }): Promise<DecodeResult> => {
     const raw = data.value;
-    // Try JDM chassis lookup first when it's NOT a 17-char VIN.
-    // Many JDM codes are prefixes (e.g. JZX100-0012345) — split on dash and lookup head.
+
+    // JDM chassis lookup for non-17-char inputs.
     if (!looksLikeVin17(raw)) {
-      const head = raw.split("-")[0];
-      const candidates = Array.from(new Set([raw, head])).filter((c) => c.length >= 2 && c.length <= 10);
-      if (candidates.length) {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: rows } = await supabaseAdmin
-          .from("jdm_chassis_codes")
-          .select("code,make,model,year_min,year_max,engine")
-          .in("code", candidates)
-          .limit(1);
-        const hit = rows?.[0];
-        if (hit) {
-          return {
-            ok: true,
-            source: "jdm_table",
-            input: raw,
-            make: hit.make,
-            model: hit.model,
-            year: hit.year_min ?? null,
-            engine: hit.engine ?? null,
-            trim: null,
-          };
-        }
-      }
+      const jdm = await decodeChassisCode(raw);
+      if (jdm) return jdm;
       return { ok: false, reason: "Unrecognized chassis code — try the make/model picker", input: raw };
     }
-    return decodeNhtsa(raw);
+
+    // Cache hit?
+    const cached = await cacheGet(raw);
+    if (cached) {
+      return buildSuccess(raw, cached);
+    }
+
+    // Waterfall — each step returns fields; mergeDecodes prefers earlier sources.
+    const parts: DecodePartial[] = [];
+    const nhtsa = await nhtsaDecode(raw);
+    if (nhtsa) parts.push(nhtsa);
+    const structural = structuralDecode(raw);
+    if (structural) parts.push(structural);
+
+    let merged = mergeDecodes(...parts);
+    const region = merged.region ?? regionFromWmi(raw);
+    merged.region = region;
+
+    // AI fallback when core fields still missing.
+    const coreMissing = !merged.fields.make || !merged.fields.model || !merged.fields.year;
+    if (coreMissing) {
+      const ai = await aiDecode({ vin: raw, region, known: merged.fields });
+      if (ai) merged = mergeDecodes(merged, ai);
+    }
+
+    if (!merged.fields.make && !merged.fields.model && !merged.fields.year) {
+      return {
+        ok: false,
+        reason:
+          "This VIN isn't in NHTSA and we don't have a structural pattern for its manufacturer. Please fill the vehicle fields manually.",
+        input: raw,
+      };
+    }
+
+    await cacheSet(raw, merged, firstConfidentSource(merged.sources));
+    return buildSuccess(raw, merged);
   });
+
+function buildSuccess(raw: string, merged: DecodePartial): DecodeSuccess {
+  const fields = merged.fields;
+  const missing = (
+    ["year", "make", "model", "trim", "engine", "fuel", "transmission", "bodyType", "drivetrain"] as Array<keyof DecodedFields>
+  ).filter((k) => !fields[k]);
+  return {
+    ok: true,
+    input: raw,
+    vin: raw,
+    region: merged.region ?? regionFromWmi(raw),
+    sources: merged.sources,
+    primarySource: firstConfidentSource(merged.sources),
+    missing: missing as string[],
+    notes: merged.notes ?? [],
+    ...fields,
+  };
+}

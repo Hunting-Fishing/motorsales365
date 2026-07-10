@@ -1,66 +1,52 @@
-# LTO Document Verification for Listings
+# Smarter multi-region VIN decoder
 
-Add a "Registration & Ownership" step to `/sell` where sellers upload their LTO OR (Official Receipt) and CR (Certificate of Registration). Our software runs OCR + AI comparison against the listing (VIN/chassis, make/model, year, color, plate, owner) and issues a verification badge.
+Today the decoder only calls NHTSA and falls back to a tiny WMI-make table + year-position math. For an Asia-market VIN like `PADFD15107V101467` (Honda Cars Philippines, City FD1 2007), NHTSA returns nothing, so model / trim / engine / transmission / fuel / body type / drivetrain / color all stay blank.
 
-## User flow
+Fix: turn `decodeVin` into a **server-side waterfall** that tries multiple sources in order and merges what each one returns. Client keeps a single call, no UI regressions.
 
-1. In the Sell form, a new **"Verify with LTO documents"** section appears under VIN/Chassis (collapsible, optional but strongly encouraged with an "Anti-Scam Verified" badge incentive).
-2. Seller uploads **CR** (Certificate of Registration) and **OR** (Official Receipt). PNG/JPG/PDF, up to 10 MB each.
-3. On upload, files go to a private `listing-documents` bucket, then a server function calls Lovable AI (Gemini 2.5 Flash multimodal) to extract structured fields.
-4. Extracted fields are compared to the listing form. Results show inline as chips:
-   - ✅ Green: match (VIN, Make, Model, Year, Color, Plate)
-   - ⚠️ Amber: mismatch — with the value we found vs what you typed, plus "Use document value" button
-   - 🔴 Red: registration expired / OR renewal past due (based on "valid until" date on OR)
-5. Owner-name field is compared to the signed-in user's profile name (fuzzy match). Mismatch flags "Owner name differs — additional proof may be required."
-6. If all checks pass, the listing gets a persisted `verification_status = 'lto_verified'` badge visible on the public listing page.
+## Sources, in order
 
-## What we verify (from your sample docs)
+1. **NHTSA (North America)** — unchanged. Best for WMI starting 1/2/3/4/5.
+2. **Structural WMI+VDS lookup (Asia)** — a real table keyed by manufacturer + VDS pattern. Covers Honda / Toyota / Nissan / Mazda / Mitsubishi / Suzuki / Hyundai / Kia / Isuzu built in JP/TH/PH/ID/MY/KR/IN. For `PAD FD1 5 1 07` this resolves to Honda City (GD/FD platform), 1.5L, 2007, sedan, FWD, AT.
+3. **Structural WMI+VDS lookup (Europe)** — same shape for VW/Audi/BMW/Mercedes/Peugeot/Renault/Fiat/Volvo/Skoda/Opel WMIs.
+4. **AI Gateway fallback (Lovable AI, `google/gemini-3-flash-preview`)** — server-only. Sends the VIN + region hint (from WMI) and asks for a strict JSON: `{make,model,year,trim,engine,transmission,fuel,body_type,drivetrain,category,color_hint,confidence,region,notes}`. Used only for fields still missing after 1–3, never overrides an earlier confident value.
+5. **Existing JDM chassis table** — still used when the input isn't a 17-char VIN.
 
-From **CR**: Plate No, Engine No, Chassis No, VIN, Make/Brand, Series (Model), Body Type, Color, Fuel Type, Year Model, Owner Name, CR Date.
-From **OR**: Plate No, "valid until" and "due for renewal" dates, Received From (owner), Year Model, Color, Fuel Type.
+Every field on the result gets a `sources` map (`{make:"nhtsa", model:"vds", trim:"ai", …}`) so the UI can show provenance and the seller knows what's a guess.
 
-Cross-checks:
-- CR chassis/VIN ↔ listing VIN/chassis field
-- CR plate ↔ OR plate (must match each other)
-- CR make/series/year/color ↔ listing values
-- OR "valid until" date ↔ today (expired → red flag)
-- CR/OR owner name ↔ user profile name (fuzzy)
+Color is never auto-filled with confidence — VINs don't encode paint. AI may return a `color_hint` from typical trim colors but the client leaves the color field blank and just shows the hint as a suggestion chip.
 
-## Technical details
+## Caching
 
-**Storage**
-- New private bucket `listing-documents`, RLS: owner can read/write their own `{userId}/{listingId}/...`; admins read all.
+New table `vin_decode_cache(vin PK, result jsonb, source text, decoded_at timestamptz)` with proper GRANTs + RLS (service_role write, authenticated read). Server checks cache first, writes back after a successful decode. Cuts AI-gateway spend and latency to zero on repeat lookups (scans, edits, re-decodes).
 
-**DB (migration)**
-- `listing_documents` table: `id, listing_id, user_id, doc_type (cr|or), storage_path, mime_type, file_size, uploaded_at`.
-- `listing_verifications` table: `listing_id (PK), status (unverified|pending|lto_verified|mismatch|expired), extracted_json, mismatches_json, checked_at, verified_by (system|admin)`.
-- Extend `listings` with `verification_status` (denormalized) + realtime trigger to keep it in sync.
-- GRANTs + RLS: users read their own; public reads only `verification_status` on listings (already public).
+## Server changes
 
-**Server function** `verifyListingDocuments.functions.ts` (auth-required, `requireSupabaseAuth`):
-1. Signed URL for uploaded CR/OR.
-2. POST to Lovable AI Gateway `/v1/chat/completions` with `google/gemini-2.5-flash`, structured output (JSON schema) requesting the fields above.
-3. Normalize (uppercase VIN, strip spaces, parse dates PH format `MM/DD/YYYY`).
-4. Compare to listing row; build mismatch array.
-5. Upsert `listing_verifications`; update `listings.verification_status`.
+- `src/lib/vin-decode.functions.ts` — rewrite `decodeVin` handler as the waterfall above. Return shape extended to include `bodyType`, `drivetrain`, `fuel`, `transmission`, `category`, `region`, `sources`, `missing[]`, and `partial: boolean`.
+- New `src/lib/vin-decode.server.ts` — pure helpers: `nhtsaDecode`, `structuralAsiaDecode`, `structuralEuropeDecode`, `aiDecode`, `mergeDecodes`, `cacheGet/Set`.
+- New `src/data/vin-vds-tables.ts` — the structural Asia/Europe tables (WMI → make/region, then per-make VDS regex → {model, platform, body, engine, drivetrain, transmission_hint}). Seeded with the top ~40 nameplates sold in PH so the common cases work offline without AI.
+- Expand WMI table so `PAD`, `MRH`, `PE1`, `MHF`, `MHY`, `MLH`, `LVS`, `LGX`, `LFV`, `LSJ`, `MA1`, `MB1`, `MEE`, `MEX`, `MNT`, `MPA`, `MMB`, `MMT`, `NM0`, `SJN`, `TMB`, `VF1`, `VF3`, `VF7`, `WF0`, `ZAR` all resolve with region tags.
+- New migration for `vin_decode_cache` (with `GRANT` + RLS as required by project rules).
 
-**UI**
-- New component `src/components/sell/lto-verification.tsx`:
-  - Two `SingleFileUploader` slots (CR, OR)
-  - "Verify documents" button → calls server fn, streams status
-  - Result panel: match chips per field + "Apply document values to listing" bulk action
-  - Persistent state — re-opens with prior extraction if user comes back
-- Add "Anti-Scam Verified" badge to `/vehicles/[id]` public page when `verification_status = 'lto_verified'`.
+## Client changes
 
-**Privacy**
-- Docs stored private; only OCR-extracted summary is shown to seller. Nothing but the badge is public — owner name, plate, and file itself never surface publicly.
-- Note in `/privacy` update: LTO documents processed by AI OCR for verification, retained for the life of the listing + 90 days.
+- `src/components/vin-scan-dialog.tsx` — remove the client's direct `fetch` to NHTSA; call the server function via `useServerFn(decodeVin)`. Keep the WMI/year local helpers only as a last-resort UI hint if the server call itself fails (offline). Widen `VinDecodeResult` to include the new fields + `sources` + `region`.
+- `src/routes/sell.tsx` `applyVinDecode` — already applies fields only when blank; extend to consume `bodyType`, `drivetrain`, `fuel`, `transmission`, `category`, `engine`, `trim`. Update the partial-decode banner to list only fields in `result.missing`, and show a small region chip (NA / Asia / Europe) + per-field source dots (N/V/A) next to auto-filled inputs.
+- Conflict panel already handles "Use VIN / Keep mine / Use VIN for all" — no change.
 
-## Out of scope (future)
-- Deed of Sale / Special Power of Attorney uploads for third-party sellers
-- LTO API integration (not publicly available); we rely on document OCR
-- Admin manual review queue (can add later if AI flags too many false positives)
+## Test case that must pass
 
-## Files touched
-- New: `supabase/migrations/<ts>_lto_verification.sql`, `src/lib/listing-verification.functions.ts`, `src/components/sell/lto-verification.tsx`, `src/components/listing/verified-badge.tsx`
-- Edit: `src/routes/sell.tsx` (insert section under VIN block), `src/routes/vehicles.$id.tsx` (badge), `src/routes/privacy.tsx` + `src/routes/terms.tsx` (policy update per memory rules)
+Input `PADFD15107V101467` (no NHTSA data) must return, from structural Honda VDS table alone (no AI needed):
+
+```
+make=Honda, model=City, year=2007, body_type=sedan,
+drivetrain=fwd, fuel=Gasoline, transmission=Automatic,
+engine≈"1.5L 4-cyl L15A", region=Asia, source=vds
+```
+
+AI fallback only fills `trim` (e.g. "1.5 S / VTEC") if the VDS row doesn't carry it. Color stays blank; a "Common colors for this trim" hint chip may appear.
+
+## Out of scope
+
+- Paid third-party VIN APIs (VinDecoder.eu, DataOne). Can be added later as an optional source behind a secret without touching the waterfall shape.
+- Auto-filling color from VIN (structurally impossible for most makes).
