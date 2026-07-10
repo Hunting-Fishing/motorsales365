@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import {
   Upload,
@@ -353,6 +353,7 @@ function SellPage() {
   const [vinConflicts, setVinConflicts] = useState<
     Array<{ field: string; label: string; current: string; decoded: string; apply: () => void }>
   >([]);
+  const vinAutoFilledRef = useRef<Record<string, { vin: string; value: string }>>({});
 
 
   // Towing service-specific fields
@@ -501,7 +502,8 @@ function SellPage() {
   };
 
   // Auto-fill listing fields from a decoded VIN (scanner OR manual blur).
-  // Only fills fields that are currently blank — never overwrites user input.
+  // Only fills blanks, except when the same VIN is decoded again and a stale
+  // VIN-filled value needs correction after decoder data/cache updates.
   // Records any mismatches so we can surface a conflict panel instead of silently
   // dropping decoded values or overwriting what the user typed.
   const norm = (v: unknown) => String(v ?? "").trim().toLowerCase();
@@ -512,12 +514,17 @@ function SellPage() {
     label: string,
     conflicts: Array<{ field: string; label: string; current: string; decoded: string; apply: () => void }>,
     apply: (v: T) => void,
+    vin?: string,
+    allowVinCorrection = false,
   ): T => {
     if (decoded === undefined || decoded === null || decoded === "") return cur;
     const curKey = norm(cur);
     const decKey = norm(decoded);
-    if (!curKey) {
+    const lastAutoFill = vinAutoFilledRef.current[field];
+    const wasAutoFilledForVin = !!vin && lastAutoFill?.vin === vin && norm(lastAutoFill.value) === curKey;
+    if (!curKey || wasAutoFilledForVin || (allowVinCorrection && curKey !== decKey)) {
       apply(decoded);
+      if (vin) vinAutoFilledRef.current[field] = { vin, value: String(decoded) };
       return decoded;
     }
     if (curKey !== decKey) {
@@ -526,7 +533,10 @@ function SellPage() {
         label,
         current: String(cur ?? ""),
         decoded: String(decoded ?? ""),
-        apply: () => apply(decoded),
+        apply: () => {
+          apply(decoded);
+          if (vin) vinAutoFilledRef.current[field] = { vin, value: String(decoded) };
+        },
       });
     }
     return cur;
@@ -535,18 +545,20 @@ function SellPage() {
   const applyVinDecode = (r: VinDecodeResult) => {
     setVehicleQuality((prev) => ({ ...prev, vin_chassis: r.vin }));
     const conflicts: Array<{ field: string; label: string; current: string; decoded: string; apply: () => void }> = [];
+    const decodedVin = normalizeVin(r.vin);
+    const sameVinAlreadyInForm = normalizeVin(vehicleQuality.vin_chassis ?? "") === decodedVin;
 
     // Use functional setters so we compare against the freshest value and
     // never race a stale closure. Each helper either fills the blank or
     // records a conflict for the user to resolve.
-    setCategory((cur) => fillIfBlank(cur, r.category, "category", "Category", conflicts, (v) => setCategory(v)));
-    setYear((cur) => fillIfBlank(cur, r.year, "year", "Year", conflicts, (v) => setYear(v)));
-    setMake((cur) => fillIfBlank(cur, r.make, "make", "Make", conflicts, (v) => setMake(v)));
-    setModel((cur) => fillIfBlank(cur, r.model, "model", "Model", conflicts, (v) => setModel(v)));
-    setEngine((cur) => fillIfBlank(cur, r.engine, "engine", "Engine", conflicts, (v) => setEngine(v)));
-    setFuel((cur) => fillIfBlank(cur, r.fuel, "fuel", "Fuel", conflicts, (v) => setFuel(v)));
+    setCategory((cur) => fillIfBlank(cur, r.category, "category", "Category", conflicts, (v) => setCategory(v), decodedVin, sameVinAlreadyInForm));
+    setYear((cur) => fillIfBlank(cur, r.year, "year", "Year", conflicts, (v) => setYear(v), decodedVin, sameVinAlreadyInForm));
+    setMake((cur) => fillIfBlank(cur, r.make, "make", "Make", conflicts, (v) => setMake(v), decodedVin, sameVinAlreadyInForm));
+    setModel((cur) => fillIfBlank(cur, r.model, "model", "Model", conflicts, (v) => setModel(v), decodedVin, sameVinAlreadyInForm));
+    setEngine((cur) => fillIfBlank(cur, r.engine, "engine", "Engine", conflicts, (v) => setEngine(v), decodedVin, sameVinAlreadyInForm));
+    setFuel((cur) => fillIfBlank(cur, r.fuel, "fuel", "Fuel", conflicts, (v) => setFuel(v), decodedVin, sameVinAlreadyInForm));
     setTransmission((cur) =>
-      fillIfBlank(cur, r.transmission, "transmission", "Transmission", conflicts, (v) => setTransmission(v)),
+      fillIfBlank(cur, r.transmission, "transmission", "Transmission", conflicts, (v) => setTransmission(v), decodedVin, sameVinAlreadyInForm),
     );
     setCategoryAttrs((prev) => {
       const next = { ...prev };
