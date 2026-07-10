@@ -19,8 +19,6 @@ export type VehicleQuality = {
   color?: string;
   plate_ending?: string;
   plate_status?: string; // moto
-  registered_owner_status?: string;
-  orcr_status?: string;
   last_registration_date?: string;
   registration_expiry?: string; // moto
   flood_history?: string;
@@ -37,8 +35,6 @@ export const VEHICLE_QUALITY_KEYS: (keyof VehicleQuality)[] = [
   "color",
   "plate_ending",
   "plate_status",
-  "registered_owner_status",
-  "orcr_status",
   "last_registration_date",
   "registration_expiry",
   "flood_history",
@@ -49,6 +45,7 @@ export const VEHICLE_QUALITY_KEYS: (keyof VehicleQuality)[] = [
   "trade_accepted",
   "price_negotiable",
 ];
+
 
 // -----------------------------
 // Validation
