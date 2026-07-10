@@ -1686,6 +1686,17 @@ function SellPage() {
                       </Select>
                     </div>
                   </div>
+                  {/* Category-specific attributes (Body type, Drivetrain, Owner status, OR/CR, etc.)
+                      live right here alongside Year/Make/Model instead of a separate "Car details" section. */}
+                  {isAttrCategory(category) && (
+                    <div className="mt-2 rounded-md border border-dashed border-border/70 bg-muted/20 p-2">
+                      <CategoryAttributesEditor
+                        category={category}
+                        value={categoryAttrs}
+                        onChange={setCategoryAttrs}
+                      />
+                    </div>
+                  )}
                 </>
               )}
             </SellGroup>
