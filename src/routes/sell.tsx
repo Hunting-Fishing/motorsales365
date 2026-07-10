@@ -1390,10 +1390,17 @@ function SellPage() {
                         if (vinState.kind !== "idle") setVinState({ kind: "idle" });
                         if (vinConflicts.length) setVinConflicts([]);
                       }}
-                      onBlur={async (e) => {
-                        const raw = normalizeVin(e.target.value);
-                        await runVinDecode(raw);
-                      }}
+                       onBlur={async (e) => {
+                         const raw = normalizeVin(e.target.value);
+                         await runVinDecode(raw);
+                       }}
+                       onKeyDown={async (e) => {
+                         if (e.key === "Enter") {
+                           e.preventDefault();
+                           const raw = normalizeVin((e.target as HTMLInputElement).value);
+                           await runVinDecode(raw);
+                         }
+                       }}
                     />
                     <VinScanDialog
                       onResult={(r) => {
