@@ -1095,7 +1095,7 @@ function SellPage() {
             );
           })()}
 
-          <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+          <section data-tab="details" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "details" ? "" : "hidden"}`}>
 
 
             {/* Header */}
