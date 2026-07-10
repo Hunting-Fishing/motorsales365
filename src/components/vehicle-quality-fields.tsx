@@ -147,16 +147,12 @@ export function validateVehicleQuality(
 const RECOMMENDED_CAR: (keyof VehicleQuality)[] = [
   "variant",
   "color",
-  "registered_owner_status",
-  "orcr_status",
   "last_registration_date",
   "flood_history",
   "accident_history",
 ];
 const RECOMMENDED_MOTO: (keyof VehicleQuality)[] = [
   "color",
-  "registered_owner_status",
-  "orcr_status",
   "plate_status",
   "registration_expiry",
   "accident_history",
@@ -167,8 +163,6 @@ const FIELD_LABELS: Record<keyof VehicleQuality, string> = {
   color: "Color",
   plate_ending: "Plate ending",
   plate_status: "Plate status",
-  registered_owner_status: "Registered owner status",
-  orcr_status: "OR/CR status",
   last_registration_date: "Last registration date",
   registration_expiry: "Registration expiry",
   flood_history: "Flood history",
@@ -179,6 +173,7 @@ const FIELD_LABELS: Record<keyof VehicleQuality, string> = {
   trade_accepted: "Trade-in accepted",
   price_negotiable: "Price negotiable",
 };
+
 
 function isFilled(v: VehicleQuality, k: keyof VehicleQuality) {
   const val = v[k];
