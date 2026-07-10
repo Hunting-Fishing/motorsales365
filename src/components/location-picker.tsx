@@ -157,51 +157,99 @@ export function LocationPicker({
   const grid = stacked ? "space-y-4" : "grid gap-4 sm:grid-cols-2";
   const [locating, setLocating] = useState(false);
 
+  async function resolveFromCoords(latitude: number, longitude: number, viaIp: boolean) {
+    const url = `/api/public/reverse-geocode?lat=${latitude}&lng=${longitude}&zoom=12`;
+    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error("Reverse geocoding failed");
+    const data = await res.json();
+    const a = (data.address ?? {}) as Record<string, string>;
+    return { a, viaIp };
+  }
+
+  async function ipFallback(): Promise<{ a: Record<string, string>; viaIp: boolean } | null> {
+    try {
+      const res = await fetch("/api/public/ip-location", { headers: { Accept: "application/json" } });
+      if (!res.ok) return null;
+      const j = (await res.json()) as { lat?: number; lng?: number; countryCode?: string };
+      if (typeof j.lat !== "number" || typeof j.lng !== "number") return null;
+      if (j.countryCode && j.countryCode.toLowerCase() !== "ph") {
+        toast.error("Detected location is outside the Philippines.");
+        return null;
+      }
+      return await resolveFromCoords(j.lat, j.lng, true);
+    } catch {
+      return null;
+    }
+  }
+
   async function useMyLocation() {
-    if (typeof window === "undefined" || !navigator.geolocation) {
+    if (typeof window === "undefined") {
       toast.error("Geolocation isn't supported on this device.");
       return;
     }
     setLocating(true);
     try {
-      const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 12000,
-          maximumAge: 60000,
-        });
-      });
-      const { latitude, longitude } = pos.coords;
-      const url = `/api/public/reverse-geocode?lat=${latitude}&lng=${longitude}&zoom=12`;
-      const res = await fetch(url, { headers: { Accept: "application/json" } });
-      if (!res.ok) throw new Error("Reverse geocoding failed");
-      const data = await res.json();
-      const a = (data.address ?? {}) as Record<string, string>;
+      let resolved: { a: Record<string, string>; viaIp: boolean } | null = null;
+      if (navigator.geolocation) {
+        try {
+          const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 12000,
+              maximumAge: 60000,
+            });
+          });
+          resolved = await resolveFromCoords(pos.coords.latitude, pos.coords.longitude, false);
+        } catch (err: any) {
+          // Permission denied / unavailable — fall back to IP lookup so the
+          // feature still works inside embedded previews where the
+          // Permissions-Policy blocks the Geolocation API.
+          resolved = await ipFallback();
+          if (!resolved) {
+            const code = err?.code;
+            if (code === 1)
+              toast.error("Location permission blocked. Pick your region manually below.");
+            else if (code === 2) toast.error("Position unavailable. Try again outdoors.");
+            else if (code === 3) toast.error("Location request timed out.");
+            else toast.error(err?.message ?? "Couldn't get your location.");
+            return;
+          }
+        }
+      } else {
+        resolved = await ipFallback();
+      }
+      if (!resolved) {
+        toast.error("Couldn't determine your location.");
+        return;
+      }
+      const { a, viaIp } = resolved;
       if (a.country_code && String(a.country_code).toLowerCase() !== "ph") {
         toast.error("Location is outside the Philippines.");
         return;
       }
-      const resolved = resolvePsgc({
+      const matched = resolvePsgc({
         region: a.region ?? a.state ?? null,
         province: a.province ?? a.state_district ?? null,
         city: a.city ?? null,
         municipality: a.municipality ?? null,
         town: a.town ?? a.village ?? a.suburb ?? null,
       });
-      if (!resolved.region && !resolved.province && !resolved.city) {
+      if (!matched.region && !matched.province && !matched.city) {
         toast.error("Couldn't match your location to a Philippine region.");
         return;
       }
       onChange({
-        region: resolved.region,
-        province: resolved.province,
-        city: resolved.city,
+        region: matched.region,
+        province: matched.province,
+        city: matched.city,
         barangay: a.neighbourhood ?? a.suburb ?? value.barangay ?? null,
       });
-      const summary = [resolved.city, resolved.province, resolved.region]
+      const summary = [matched.city, matched.province, matched.region]
         .filter(Boolean)
         .join(", ");
-      toast.success(`Location set: ${summary}`);
+      toast.success(
+        viaIp ? `Approximate location set: ${summary}` : `Location set: ${summary}`,
+      );
     } catch (err: any) {
       const code = err?.code;
       if (code === 1) toast.error("Permission denied. Enable location access and try again.");
