@@ -375,7 +375,7 @@ export function VehicleQualityFields({ category, value, onChange, issues = [] }:
         </FieldShell>
 
         {category === "motorcycle" && (
-          <div className="sm:col-span-2">
+          <div className="sm:col-span-3">
             <FieldShell label="Modifications" error={errFor("modifications")}>
               <Textarea
                 rows={2}
