@@ -70,6 +70,55 @@ const CATEGORY_LABEL_MAP: Record<string, string> = {
   airplane: "Aircraft",
 };
 
+function SellGroup({
+  id,
+  title,
+  defaultOpen = false,
+  status,
+  children,
+}: {
+  id: string;
+  title: string;
+  defaultOpen?: boolean;
+  status?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const storageKey = `sell:details:open:${id}`;
+  const [open, setOpen] = useState<boolean>(defaultOpen);
+  useEffect(() => {
+    try {
+      const v = window.sessionStorage.getItem(storageKey);
+      if (v !== null) setOpen(v === "1");
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    try {
+      window.sessionStorage.setItem(storageKey, open ? "1" : "0");
+    } catch {}
+  }, [open, storageKey]);
+  return (
+    <div data-sell-group={id} className="border-t border-border/60 first:border-t-0">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between gap-2 py-2 text-left hover:opacity-80"
+        aria-expanded={open}
+      >
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          {title}
+        </span>
+        <span className="flex items-center gap-2 text-[11px] text-muted-foreground">
+          {status}
+          <ChevronDown className={`h-3.5 w-3.5 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+        </span>
+      </button>
+      {open ? <div className="space-y-2 pb-2">{children}</div> : null}
+    </div>
+  );
+}
+
+
 const ListingTextSchema = z.object({
   title: z.string().trim().min(3, "Title must be at least 3 characters").max(120, "Title must be 120 characters or fewer"),
   description: z.string().trim().max(5000, "Description must be 5000 characters or fewer").optional().default(""),
