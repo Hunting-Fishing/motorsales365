@@ -342,8 +342,14 @@ function SellPage() {
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
   const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
   const [categoryAttrs, setCategoryAttrs] = useState<Record<string, any>>({});
-  const [vinError, setVinError] = useState<string | null>(null);
-  const [vinStatus, setVinStatus] = useState<"idle" | "checking" | "ok" | "failed">("idle");
+  type VinState =
+    | { kind: "idle" }
+    | { kind: "checking" }
+    | { kind: "ok" }
+    | { kind: "chassis"; message: string }
+    | { kind: "warn"; message: string }
+    | { kind: "error"; message: string; retryable?: boolean };
+  const [vinState, setVinState] = useState<VinState>({ kind: "idle" });
   const [vinConflicts, setVinConflicts] = useState<
     Array<{ field: string; label: string; current: string; decoded: string; apply: () => void }>
   >([]);
