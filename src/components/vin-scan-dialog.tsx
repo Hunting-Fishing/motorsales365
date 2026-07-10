@@ -47,12 +47,47 @@ export function normalizeVin(input: string) {
   return input.toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
-export function vinFormatError(vin: string): string | null {
-  if (!vin) return "Enter or scan a VIN";
-  if (!VIN_REGEX.test(vin)) return "VIN must be 11–17 letters/numbers (no I, O, or Q)";
-  if (vin.length === 17 && !vinChecksumValid(vin)) return "VIN check-digit failed — re-scan or re-type";
-  return null;
+export type VinFormatCheck =
+  | { kind: "empty" }
+  | { kind: "ok_vin" }
+  | { kind: "ok_chassis" }
+  | { kind: "warn_checksum" }
+  | { kind: "bad_chars"; message: string }
+  | { kind: "bad_length"; message: string };
+
+/** Structured VIN/chassis format check. Accepts Asia/Europe chassis numbers. */
+export function checkVinFormat(vin: string): VinFormatCheck {
+  if (!vin) return { kind: "empty" };
+  if (/[IOQ]/.test(vin)) {
+    return { kind: "bad_chars", message: "Remove I, O, or Q — VIN doesn't use those letters." };
+  }
+  if (!/^[A-Z0-9]+$/.test(vin)) {
+    return { kind: "bad_chars", message: "VIN uses only letters and numbers." };
+  }
+  if (vin.length < 11 || vin.length > 17) {
+    return { kind: "bad_length", message: "VIN or chassis # must be 11–17 characters." };
+  }
+  if (vin.length === 17) {
+    return vinChecksumValid(vin) ? { kind: "ok_vin" } : { kind: "warn_checksum" };
+  }
+  return { kind: "ok_chassis" };
 }
+
+/** Legacy string helper — barcode scanner path requires a full VIN. */
+export function vinFormatError(vin: string): string | null {
+  const c = checkVinFormat(vin);
+  switch (c.kind) {
+    case "empty": return "Enter or scan a VIN";
+    case "bad_chars":
+    case "bad_length": return c.message;
+    case "warn_checksum": return "VIN check-digit failed — re-scan or re-type";
+    case "ok_chassis": return "Scanner needs a full 17-character VIN";
+    case "ok_vin": return null;
+  }
+}
+
+// Suppress unused-var lint on VIN_REGEX (kept for reference).
+void VIN_REGEX;
 
 // --- NHTSA decode --------------------------------------------------------
 
