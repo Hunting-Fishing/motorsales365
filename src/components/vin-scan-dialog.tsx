@@ -100,7 +100,10 @@ export type VinDecodeResult = {
   transmission?: string;
   engine?: string;
   trim?: string;
+  /** Canonical BODY_TYPES value (sedan, suv, hatchback, …) — safe to store in listings.attributes.body_type. */
   bodyType?: string;
+  /** Canonical DRIVETRAINS value (fwd, rwd, awd, 4x4, 4x2). */
+  drivetrain?: string;
   category?: "car" | "motorcycle";
 };
 
