@@ -1399,6 +1399,8 @@ function EditListingPage() {
             )}
           </section>
 
+          <LtoVerificationSection listingId={id} />
+
           <div className="flex justify-between gap-2"><FormFeedbackLink formId="edit-listing" /></div>
           <div className="flex justify-end gap-2">
             <Button asChild type="button" variant="outline">
