@@ -390,7 +390,7 @@ export function VehicleQualityFields({ category, value, onChange, issues = [] }:
 
       </div>
 
-      <div className="flex flex-wrap gap-4 pt-2">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1">
         <label className="flex items-center gap-2 text-sm">
           <Checkbox
             checked={!!value.price_negotiable}
