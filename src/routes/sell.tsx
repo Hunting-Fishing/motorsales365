@@ -659,20 +659,27 @@ function SellPage() {
           setVinState({ kind: "ok" });
         }
       } else if (gotAnything) {
-        // Asia/Europe VIN — NHTSA didn't have it, but WMI/year fallback filled
-        // what it could. Tell the user which fields still need attention.
-        const missing = [!r.year && "year", !r.make && "make", !r.model && "model"]
+        // Waterfall filled what it could (NHTSA / structural WMI+VDS / AI).
+        // Tell the user which fields still need attention and which region
+        // the VIN was routed through.
+        const missing = (r.missing?.length ? r.missing : [!r.year && "year", !r.make && "make", !r.model && "model"])
           .filter(Boolean)
           .join(", ");
+        const regionLabel = r.region === "NA" ? "North America" : r.region === "Asia" ? "Asia" : r.region === "Europe" ? "Europe" : "this region";
+        const sourceLabel =
+          r.primarySource === "nhtsa" ? "NHTSA" :
+          r.primarySource === "vds" ? "manufacturer VDS table" :
+          r.primarySource === "ai" ? "AI VIN analyzer" :
+          r.primarySource === "jdm_table" ? "JDM chassis table" : "WMI lookup";
         setVinState({
           kind: "warn",
-          message: `Partial decode — please fill in ${missing} (Asia/Europe VINs aren't fully in the US database).`,
+          message: `Partial decode via ${sourceLabel} (${regionLabel}) — please fill in ${missing || "remaining fields"}.`,
         });
       } else {
         setVinState({
           kind: "warn",
           message:
-            "This looks like a non-US market VIN (Asia / Europe imports often aren't in the US database). VIN saved — please fill the vehicle fields manually.",
+            "We couldn't identify this VIN from NHTSA, our structural tables, or the AI analyzer. VIN saved — please fill the vehicle fields manually.",
         });
       }
     } catch (e) {
