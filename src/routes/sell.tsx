@@ -1941,7 +1941,7 @@ function SellPage() {
 
           </section>
 
-          <section data-tab="plan" className={`rounded-xl border border-border bg-card ${activeTab === "plan" ? "" : "hidden"}`}>
+          <section data-tab="plan" className={`-mt-1 ${activeTab === "plan" ? "" : "hidden"}`}>
             <details open={!!selectedBoost} className="group">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-2 p-2.5 sm:p-3">
                 <div className="flex items-center gap-2">
