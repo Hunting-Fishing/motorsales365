@@ -322,40 +322,8 @@ export function VehicleQualityFields({ category, value, onChange, issues = [] }:
           </FieldShell>
         )}
 
-        <FieldShell label="Registered owner status" error={errFor("registered_owner_status")}>
-          <Select
-            value={value.registered_owner_status ?? ""}
-            onValueChange={(v) => set("registered_owner_status", v)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              {OWNER_OPTIONS.map((o) => (
-                <SelectItem key={o} value={o}>
-                  {o}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </FieldShell>
-        <FieldShell label="OR/CR status" error={errFor("orcr_status")}>
-          <Select
-            value={value.orcr_status ?? ""}
-            onValueChange={(v) => set("orcr_status", v)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              {ORCR_OPTIONS.map((o) => (
-                <SelectItem key={o} value={o}>
-                  {o}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </FieldShell>
+
+
 
         <FieldShell label="Last registration date" error={errFor("last_registration_date")}>
           <Input
