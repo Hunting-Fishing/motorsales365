@@ -147,7 +147,7 @@ export function LtoVerificationSection({ listingId }: { listingId: string | null
   }: {
     docType: "cr" | "or";
     file?: (typeof docs)[number];
-    inputRef: React.RefObject<HTMLInputElement>;
+    inputRef: React.RefObject<HTMLInputElement | null>;
   }) => (
     <div className="rounded-md border border-border bg-background p-3">
       <div className="flex items-center justify-between gap-2">
