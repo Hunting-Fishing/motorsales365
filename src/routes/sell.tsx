@@ -34,6 +34,7 @@ import { VehiclePicker } from "@/components/vehicle-picker";
 import { TagPicker } from "@/components/tag-picker";
 import { CATEGORY_DEFAULT_GROUPS, SERVICE_CATEGORIES } from "@/data/service-tags";
 import { uploadWithRetry } from "@/lib/storage-upload";
+import { extractVideoThumbnail, formatDuration } from "@/lib/video-thumbnail";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
 import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
@@ -354,6 +355,7 @@ function SellPage() {
   };
   const [photoUploads, setPhotoUploads] = useState<UploadState[]>([]);
   const [videoUploads, setVideoUploads] = useState<UploadState[]>([]);
+  const [videoThumbs, setVideoThumbs] = useState<Array<{ dataUrl: string; duration: number } | null>>([]);
   const [listingId, setListingId] = useState<string | null>(null);
 
   const [pricing, setPricing] = useState<Record<string, number>>({});
@@ -535,11 +537,18 @@ function SellPage() {
       );
     }
     const accepted = files.slice(0, Math.max(remaining, 0));
+    const startIndex = photos.length;
     setPhotos((p) => [...p, ...accepted].slice(0, maxPhotos));
     setPhotoUploads((u) =>
       [...u, ...accepted.map(() => ({ status: "idle" as const, percent: 0 }))].slice(0, maxPhotos),
     );
     e.target.value = "";
+    // Kick off eager uploads to a per-user draft path so progress is visible immediately.
+    if (user) {
+      accepted.forEach((file, offset) => {
+        void uploadOnePhoto(startIndex + offset, file, null);
+      });
+    }
   };
 
   const removePhoto = (i: number) => {
@@ -565,26 +574,53 @@ function SellPage() {
       );
     }
     const accepted = files.slice(0, Math.max(remaining, 0));
+    const startIndex = videos.length;
     setVideos((v) => [...v, ...accepted].slice(0, maxVideos));
     setVideoUploads((u) =>
       [...u, ...accepted.map(() => ({ status: "idle" as const, percent: 0 }))].slice(0, maxVideos),
     );
+    setVideoThumbs((t) => [...t, ...accepted.map(() => null)].slice(0, maxVideos));
     e.target.value = "";
+
+    // Generate thumbnails immediately (client-side) so the user sees a preview.
+    accepted.forEach((file, offset) => {
+      const idx = startIndex + offset;
+      extractVideoThumbnail(file)
+        .then((thumb) => {
+          setVideoThumbs((t) => {
+            const next = t.slice();
+            next[idx] = { dataUrl: thumb.dataUrl, duration: thumb.durationSec };
+            return next;
+          });
+        })
+        .catch(() => {
+          /* thumbnail is best-effort */
+        });
+    });
+
+    // Kick off eager uploads to a per-user draft path so progress shows immediately.
+    if (user) {
+      accepted.forEach((file, offset) => {
+        void uploadOneVideo(startIndex + offset, file, null);
+      });
+    }
   };
 
   const removeVideo = (i: number) => {
     setVideos((v) => v.filter((_, idx) => idx !== i));
     setVideoUploads((u) => u.filter((_, idx) => idx !== i));
+    setVideoThumbs((t) => t.filter((_, idx) => idx !== i));
   };
 
   const setPhotoState = (i: number, patch: Partial<UploadState>) => {
     setPhotoUploads((u) => u.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
   };
 
-  const uploadOnePhoto = async (i: number, file: File, lid: string) => {
+  const uploadOnePhoto = async (i: number, file: File, lid: string | null) => {
     setPhotoState(i, { status: "uploading", percent: 0, error: undefined });
     try {
-      const path = `${user!.id}/${lid}/${Date.now()}-${i}-${file.name}`;
+      const scope = lid ?? "_draft";
+      const path = `${user!.id}/${scope}/${Date.now()}-${i}-${file.name}`;
       const { publicUrl } = await uploadWithRetry({
         bucket: "listing-photos",
         path,
@@ -593,13 +629,15 @@ function SellPage() {
         onProgress: (e) => setPhotoState(i, { percent: e.percent }),
       });
       setPhotoState(i, { status: "done", percent: 100, url: publicUrl, path });
-      await supabase.from("listing_media").insert({
-        listing_id: lid,
-        type: "photo",
-        url: publicUrl,
-        storage_path: path,
-        sort_order: i,
-      });
+      if (lid) {
+        await supabase.from("listing_media").insert({
+          listing_id: lid,
+          type: "photo",
+          url: publicUrl,
+          storage_path: path,
+          sort_order: i,
+        });
+      }
       return true;
     } catch (err: any) {
       setPhotoState(i, { status: "error", error: err?.message ?? "Upload failed" });
@@ -611,10 +649,11 @@ function SellPage() {
     setVideoUploads((u) => u.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
   };
 
-  const uploadOneVideo = async (i: number, file: File, lid: string) => {
+  const uploadOneVideo = async (i: number, file: File, lid: string | null) => {
     setVideoState(i, { status: "uploading", percent: 0, error: undefined });
     try {
-      const path = `${user!.id}/${lid}/${Date.now()}-${i}-${file.name}`;
+      const scope = lid ?? "_draft";
+      const path = `${user!.id}/${scope}/${Date.now()}-${i}-${file.name}`;
       const { publicUrl } = await uploadWithRetry({
         bucket: "listing-videos",
         path,
@@ -623,13 +662,15 @@ function SellPage() {
         onProgress: (e) => setVideoState(i, { percent: e.percent }),
       });
       setVideoState(i, { status: "done", percent: 100, url: publicUrl, path });
-      await supabase.from("listing_media").insert({
-        listing_id: lid,
-        type: "video",
-        url: publicUrl,
-        storage_path: path,
-        sort_order: i,
-      });
+      if (lid) {
+        await supabase.from("listing_media").insert({
+          listing_id: lid,
+          type: "video",
+          url: publicUrl,
+          storage_path: path,
+          sort_order: i,
+        });
+      }
       return true;
     } catch (err: any) {
       setVideoState(i, { status: "error", error: err?.message ?? "Upload failed" });
@@ -638,12 +679,12 @@ function SellPage() {
   };
 
   const retryPhoto = async (i: number) => {
-    if (!listingId || !photos[i]) return;
+    if (!photos[i]) return;
     await uploadOnePhoto(i, photos[i], listingId);
   };
 
   const retryVideo = async (i: number) => {
-    if (!listingId || !videos[i]) return;
+    if (!videos[i]) return;
     await uploadOneVideo(i, videos[i], listingId);
   };
 
@@ -821,7 +862,29 @@ function SellPage() {
           .select()
           .single();
 
-        if (error || !listing) throw error;
+        if (error || !listing) {
+          console.error("[sell] listings.insert failed", error);
+          const parts = [
+            error?.message,
+            (error as any)?.details,
+            (error as any)?.hint,
+          ].filter(Boolean);
+          const code = (error as any)?.code;
+          const codeHint =
+            code === "23502"
+              ? "A required field is missing."
+              : code === "23514"
+                ? "A field value isn't allowed by our checks."
+                : code === "42501"
+                  ? "Your account isn't allowed to publish this listing. Please sign in again."
+                  : code === "23505"
+                    ? "A duplicate listing was detected."
+                    : null;
+          throw new Error(
+            [codeHint, parts.join(" — ")].filter(Boolean).join(" ") ||
+              "Couldn't save your listing. Please try again.",
+          );
+        }
         lid = listing.id;
         setListingId(lid);
 
@@ -843,22 +906,54 @@ function SellPage() {
         }
       }
 
-      // Upload photos that are not already done. Run sequentially to keep the
-      // UI responsive and avoid hammering the network on flaky connections.
-      let allOk = true;
+      // Any items already uploaded eagerly to the draft path just need their
+      // listing_media row inserted now that we have a listing id.
+      const failedFiles: string[] = [];
       for (let i = 0; i < photos.length; i++) {
-        if (photoUploads[i]?.status === "done") continue;
+        const state = photoUploads[i];
+        if (state?.status === "done" && state.url && state.path) {
+          const { error: mErr } = await supabase.from("listing_media").insert({
+            listing_id: lid,
+            type: "photo",
+            url: state.url,
+            storage_path: state.path,
+            sort_order: i,
+          });
+          if (mErr) {
+            console.error("[sell] listing_media insert (photo) failed", mErr);
+            failedFiles.push(photos[i].name);
+          }
+          continue;
+        }
         const ok = await uploadOnePhoto(i, photos[i], lid);
-        if (!ok) allOk = false;
+        if (!ok) failedFiles.push(photos[i].name);
       }
       for (let i = 0; i < videos.length; i++) {
-        if (videoUploads[i]?.status === "done") continue;
+        const state = videoUploads[i];
+        if (state?.status === "done" && state.url && state.path) {
+          const { error: mErr } = await supabase.from("listing_media").insert({
+            listing_id: lid,
+            type: "video",
+            url: state.url,
+            storage_path: state.path,
+            sort_order: i,
+          });
+          if (mErr) {
+            console.error("[sell] listing_media insert (video) failed", mErr);
+            failedFiles.push(videos[i].name);
+          }
+          continue;
+        }
         const ok = await uploadOneVideo(i, videos[i], lid);
-        if (!ok) allOk = false;
+        if (!ok) failedFiles.push(videos[i].name);
       }
 
-      if (!allOk) {
-        toast.error("Some uploads failed. You can retry the failed items and submit again.");
+      if (failedFiles.length > 0) {
+        toast.error(
+          `Couldn't attach ${failedFiles.length} file${failedFiles.length === 1 ? "" : "s"}: ${failedFiles
+            .slice(0, 3)
+            .join(", ")}${failedFiles.length > 3 ? "…" : ""}. Retry from the Photos step.`,
+        );
         return;
       }
 
@@ -879,7 +974,8 @@ function SellPage() {
         navigate({ to: "/dashboard" });
       }
     } catch (err: any) {
-      toast.error(err.message ?? "Failed to publish listing");
+      console.error("[sell] publish failed", err);
+      toast.error(err?.message ?? "Failed to publish listing");
     } finally {
       setSubmitting(false);
     }
@@ -1000,6 +1096,8 @@ function SellPage() {
           })()}
 
           <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+
+
             {/* Header */}
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold">Listing details</h2>
@@ -1843,7 +1941,7 @@ function SellPage() {
 
           </section>
 
-          <section data-tab="plan" className={`rounded-xl border border-border bg-card ${activeTab === "plan" ? "" : "hidden"}`}>
+          <section data-tab="plan" className={`rounded-xl border border-border border-t-0 bg-card -mt-2 pt-1 ${activeTab === "plan" ? "" : "hidden"}`}>
             <details open={!!selectedBoost} className="group">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-2 p-2.5 sm:p-3">
                 <div className="flex items-center gap-2">
@@ -1904,32 +2002,6 @@ function SellPage() {
 
           <section data-tab="media" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "media" ? "" : "hidden"}`}>
             <h2 className="text-sm font-semibold">Photos & video</h2>
-            <div className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-[11px] text-muted-foreground">
-              <div className="mb-1 font-semibold text-foreground">Review before publishing</div>
-              <ul className="grid gap-0.5 sm:grid-cols-2">
-                <li>
-                  <span className="text-muted-foreground">Title:</span>{" "}
-                  <span className="text-foreground">{title.trim() || <em className="text-amber-700">missing</em>}</span>
-                </li>
-                <li>
-                  <span className="text-muted-foreground">Price:</span>{" "}
-                  <span className="text-foreground">{priceHidden ? "Hidden" : price ? formatPHP(Number(price)) : <em className="text-amber-700">missing</em>}</span>
-                </li>
-                <li>
-                  <span className="text-muted-foreground">Category:</span>{" "}
-                  <span className="text-foreground capitalize">{category.replace(/_/g, " ")}</span>
-                </li>
-                <li>
-                  <span className="text-muted-foreground">Location:</span>{" "}
-                  <span className="text-foreground">{[city, region].filter(Boolean).join(", ") || <em className="text-amber-700">missing</em>}</span>
-                </li>
-                <li className="sm:col-span-2">
-                  <span className="text-muted-foreground">Plan:</span>{" "}
-                  <span className="text-foreground capitalize">{plan}</span>
-                  {selectedBoost ? <span className="text-muted-foreground"> · boost on</span> : null}
-                </li>
-              </ul>
-            </div>
             {(() => {
               const tierCaps: Record<
                 "free" | "standard" | "upgraded",
@@ -2127,8 +2199,28 @@ function SellPage() {
                 <ul className="mt-2 space-y-2">
                   {videos.map((file, i) => {
                     const u = videoUploads[i] ?? { status: "idle" as const, percent: 0 };
+                    const thumb = videoThumbs[i];
                     return (
-                      <li key={i} className="space-y-1">
+                      <li key={i} className="flex gap-2">
+                        <div className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded bg-muted">
+                          {thumb ? (
+                            <>
+                              <img
+                                src={thumb.dataUrl}
+                                alt={`${file.name} preview`}
+                                className="h-full w-full object-cover"
+                              />
+                              <span className="absolute bottom-0.5 right-0.5 rounded bg-black/70 px-1 text-[10px] font-medium text-white">
+                                {formatDuration(thumb.duration)}
+                              </span>
+                            </>
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                              <VideoIcon className="h-5 w-5" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="truncate flex-1">{file.name}</span>
                           {u.status === "done" && (
@@ -2165,6 +2257,7 @@ function SellPage() {
                             </button>
                           </div>
                         )}
+                        </div>
                       </li>
                     );
                   })}
