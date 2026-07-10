@@ -11,54 +11,6 @@ import {
   CheckCircle2,
   ChevronDown,
 } from "lucide-react";
-
-function SellGroup({
-  id,
-  title,
-  defaultOpen = false,
-  status,
-  children,
-}: {
-  id: string;
-  title: string;
-  defaultOpen?: boolean;
-  status?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  const storageKey = `sell:details:open:${id}`;
-  const [open, setOpen] = useState<boolean>(defaultOpen);
-  useEffect(() => {
-    try {
-      const v = window.sessionStorage.getItem(storageKey);
-      if (v !== null) setOpen(v === "1");
-    } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useEffect(() => {
-    try {
-      window.sessionStorage.setItem(storageKey, open ? "1" : "0");
-    } catch {}
-  }, [open, storageKey]);
-  return (
-    <div data-sell-group={id} className="border-t border-border/60 first:border-t-0">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between gap-2 py-2 text-left hover:opacity-80"
-        aria-expanded={open}
-      >
-        <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-          {title}
-        </span>
-        <span className="flex items-center gap-2 text-[11px] text-muted-foreground">
-          {status}
-          <ChevronDown className={`h-3.5 w-3.5 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
-        </span>
-      </button>
-      {open ? <div className="space-y-2 pb-2">{children}</div> : null}
-    </div>
-  );
-}
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
