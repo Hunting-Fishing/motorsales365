@@ -409,6 +409,7 @@ function SellPage() {
   const [videos, setVideos] = useState<File[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
+  const submitInFlightRef = useRef(false);
 
   type UploadState = {
     status: "idle" | "uploading" | "done" | "error";
@@ -904,6 +905,7 @@ function SellPage() {
   };
 
   const removePhoto = (i: number) => {
+    if (photoUploads[i]?.status === "uploading") return;
     const file = photos[i];
     if (file) releaseFileUrl(file);
     setPhotos((p) => p.filter((_, idx) => idx !== i));
@@ -961,6 +963,7 @@ function SellPage() {
   };
 
   const removeVideo = (i: number) => {
+    if (videoUploads[i]?.status === "uploading") return;
     const file = videos[i];
     if (file) releaseFileUrl(file);
     setVideos((v) => v.filter((_, idx) => idx !== i));
@@ -1044,8 +1047,31 @@ function SellPage() {
     await uploadOneVideo(i, videos[i], listingId);
   };
 
+  const attachUploadedMedia = async (
+    lid: string,
+    media: { type: "photo" | "video"; url: string; path: string; sortOrder: number },
+  ) => {
+    const { data: existing, error: lookupError } = await supabase
+      .from("listing_media")
+      .select("id")
+      .eq("listing_id", lid)
+      .eq("storage_path", media.path)
+      .maybeSingle();
+    if (lookupError) return { error: lookupError };
+    if (existing) return { error: null };
+    const { error } = await supabase.from("listing_media").insert({
+      listing_id: lid,
+      type: media.type,
+      url: media.url,
+      storage_path: media.path,
+      sort_order: media.sortOrder,
+    });
+    return { error };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitInFlightRef.current) return;
     if (!user) return;
     if (!title || !price) {
       toast.error("Title and price are required");
@@ -1102,6 +1128,7 @@ function SellPage() {
       return;
     }
 
+    submitInFlightRef.current = true;
     setSubmitting(true);
     try {
       let lid = listingId;
@@ -1276,12 +1303,11 @@ function SellPage() {
       for (let i = 0; i < photos.length; i++) {
         const state = photoUploads[i];
         if (state?.status === "done" && state.url && state.path) {
-          const { error: mErr } = await supabase.from("listing_media").insert({
-            listing_id: lid,
+          const { error: mErr } = await attachUploadedMedia(lid, {
             type: "photo",
             url: state.url,
-            storage_path: state.path,
-            sort_order: i,
+            path: state.path,
+            sortOrder: i,
           });
           if (mErr) {
             console.error("[sell] listing_media insert (photo) failed", mErr);
@@ -1296,12 +1322,11 @@ function SellPage() {
       for (let i = 0; i < videos.length; i++) {
         const state = videoUploads[i];
         if (state?.status === "done" && state.url && state.path) {
-          const { error: mErr } = await supabase.from("listing_media").insert({
-            listing_id: lid,
+          const { error: mErr } = await attachUploadedMedia(lid, {
             type: "video",
             url: state.url,
-            storage_path: state.path,
-            sort_order: i,
+            path: state.path,
+            sortOrder: i,
           });
           if (mErr) {
             console.error("[sell] listing_media insert (video) failed", mErr);
@@ -1356,6 +1381,7 @@ function SellPage() {
       console.error("[sell] publish failed", err);
       toast.error(err?.message ?? "Failed to publish listing");
     } finally {
+      submitInFlightRef.current = false;
       setSubmitting(false);
     }
   };
@@ -2710,7 +2736,7 @@ function SellPage() {
                   const u = photoUploads[i] ?? { status: "idle" as const, percent: 0 };
                   return (
                     <div
-                      key={i}
+                      key={`${file.name}-${file.size}-${file.lastModified}`}
                       className="relative aspect-square overflow-hidden rounded-md bg-secondary"
                     >
                       <img
@@ -2718,7 +2744,7 @@ function SellPage() {
                         alt={`Listing photo ${i + 1} preview`}
                         className="h-full w-full object-cover"
                       />
-                      {u.status !== "done" && (
+                      {u.status !== "done" && u.status !== "uploading" && (
                         <button
                           type="button"
                           onClick={() => removePhoto(i)}
@@ -2794,7 +2820,7 @@ function SellPage() {
                     const u = videoUploads[i] ?? { status: "idle" as const, percent: 0 };
                     const thumb = videoThumbs[i];
                     return (
-                      <li key={i} className="flex gap-2">
+                      <li key={`${file.name}-${file.size}-${file.lastModified}`} className="flex gap-2">
                         <div className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded bg-muted">
                           {thumb ? (
                             <>
@@ -2808,8 +2834,16 @@ function SellPage() {
                               </span>
                             </>
                           ) : (
-                            <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                              <VideoIcon className="h-5 w-5" />
+                            <div className="relative h-full w-full bg-black">
+                              <video
+                                src={fileUrl(file)}
+                                className="h-full w-full object-cover opacity-80"
+                                muted
+                                preload="metadata"
+                              />
+                              <span className="absolute inset-0 flex items-center justify-center text-white">
+                                <VideoIcon className="h-5 w-5" />
+                              </span>
                             </div>
                           )}
                         </div>
