@@ -29,6 +29,8 @@ export type DecodePartial = {
   notes?: string[];
 };
 
+const DECODER_CACHE_VERSION = 2;
+
 const FIELD_KEYS: Array<keyof DecodedFields> = [
   "year", "make", "model", "trim", "engine",
   "transmission", "fuel", "bodyType", "drivetrain", "category", "color_hint",
@@ -257,7 +259,9 @@ export async function cacheGet(vin: string): Promise<DecodePartial | null> {
       .maybeSingle();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const row = data as any;
-    return row?.result ?? null;
+    const result = row?.result;
+    if (!result || result.cacheVersion !== DECODER_CACHE_VERSION) return null;
+    return result;
   } catch {
     return null;
   }
@@ -270,7 +274,7 @@ export async function cacheSet(vin: string, result: DecodePartial, source: strin
     const admin = supabaseAdmin as any;
     await admin
       .from("vin_decode_cache")
-      .upsert({ vin, result, source, decoded_at: new Date().toISOString() });
+      .upsert({ vin, result: { ...result, cacheVersion: DECODER_CACHE_VERSION }, source, decoded_at: new Date().toISOString() });
   } catch {
     /* cache write failures are non-fatal */
   }
