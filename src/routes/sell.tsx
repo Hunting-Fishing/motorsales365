@@ -2740,11 +2740,18 @@ function SellPage() {
               category === "used_part" && !usedPartSystem && "vehicle system",
               category === "used_part" && !usedPartName.trim() && "part name",
             ].filter(Boolean) as string[];
+            const anyUploading =
+              photoUploads.some((u) => u.status === "uploading") ||
+              videoUploads.some((u) => u.status === "uploading");
+            const mediaIssues = [
+              photos.length === 0 && "at least 1 photo",
+              anyUploading && "wait for uploads to finish",
+            ].filter(Boolean) as string[];
             const stepIssues: Record<(typeof order)[number], string[]> = {
               details: detailsIssues,
               location: [!region && "region", !city && "city"].filter(Boolean) as string[],
               plan: [],
-              media: [photos.length === 0 && "at least 1 photo"].filter(Boolean) as string[],
+              media: mediaIssues,
             };
             const issues = stepIssues[activeTab];
             const canAdvance = issues.length === 0;
