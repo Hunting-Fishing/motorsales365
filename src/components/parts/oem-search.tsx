@@ -58,9 +58,14 @@ export function OemSearch() {
     try {
       const result = (await decode({ data: { value: vin } })) as DecodeResult;
       if (result.ok) {
+        const yearNum = result.year ? Number(result.year) : null;
         const v: Vehicle = {
-          make: result.make, model: result.model, year: result.year,
-          engine: result.engine, source: result.source, input: result.input,
+          make: result.make ?? "",
+          model: result.model ?? "",
+          year: Number.isFinite(yearNum as number) ? (yearNum as number) : null,
+          engine: result.engine ?? null,
+          source: result.primarySource,
+          input: result.input,
         };
         setVehicle(v);
         setManualOpen(false);
