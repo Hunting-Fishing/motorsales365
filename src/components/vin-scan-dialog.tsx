@@ -143,7 +143,69 @@ export async function decodeVin(vin: string): Promise<VinDecodeResult> {
   if (row.VehicleType) {
     out.category = /motorcycle/i.test(row.VehicleType) ? "motorcycle" : "car";
   }
+
+  // Fallback for Asia/Europe VINs that NHTSA does not know:
+  // decode make from the WMI (first 3 chars) and year from position 10.
+  if (vin.length === 17) {
+    if (!out.make) {
+      const wmiMake = lookupWmiMake(vin.slice(0, 3));
+      if (wmiMake) out.make = wmiMake;
+    }
+    if (!out.year) {
+      const y = decodeVinYear(vin);
+      if (y) out.year = String(y);
+    }
+  }
   return out;
+}
+
+// VIN position 10 (index 9) encodes model year. Position 7 (index 6) is a
+// digit for years 1980–2009 and a letter for 2010–2039 — used to disambiguate
+// the repeating year code (e.g. "7" = 2007 or 2037).
+const YEAR_CHARS_1 = "ABCDEFGHJKLMNPRSTVWXY"; // 1980–2000
+const YEAR_CHARS_2 = "123456789"; // 2001–2009
+function decodeVinYear(vin: string): number | null {
+  const pos10 = vin[9];
+  const pos7 = vin[6];
+  const isModern = /[A-Z]/.test(pos7 ?? ""); // 2010+
+  const digitIdx = YEAR_CHARS_2.indexOf(pos10);
+  if (digitIdx >= 0) return (isModern ? 2031 : 2001) + digitIdx;
+  const letterIdx = YEAR_CHARS_1.indexOf(pos10);
+  if (letterIdx >= 0) return (isModern ? 2010 : 1980) + letterIdx;
+  return null;
+}
+
+// Compact World-Manufacturer-Identifier map for the makes we see most on
+// PH/Asia/Europe imports. First 2 chars are usually enough; some are 3.
+const WMI_MAKE: Array<[RegExp, string]> = [
+  [/^(1HG|2HG|3HG|5FN|5J6|JHM|JHL|MRH|PAD|MAK|SHS)/, "Honda"],
+  [/^(JT[A-Z]|4T[13]|2T[13]|5T[DF]|1NX|MR0)/, "Toyota"],
+  [/^(JN[1568]|1N4|3N1|5N1|VSK|MDH)/, "Nissan"],
+  [/^(JM[123]|4F2|MM[07])/, "Mazda"],
+  [/^(JF[12]|4S[34])/, "Subaru"],
+  [/^(JA[3467]|MMB|MMT)/, "Mitsubishi"],
+  [/^(JS[123]|MMS|MA3|LSJ)/, "Suzuki"],
+  [/^(KM[HF8]|5NP|KMH)/, "Hyundai"],
+  [/^(KN[ADM]|5XY|KND)/, "Kia"],
+  [/^(WBA|WBS|4US|5UX|WBY)/, "BMW"],
+  [/^(WDD|WDB|WDC|WDF|4JG)/, "Mercedes-Benz"],
+  [/^(WAU|WA1|TRU|WUA)/, "Audi"],
+  [/^(WVW|WV1|WV2|1VW|3VW)/, "Volkswagen"],
+  [/^(WP[01])/, "Porsche"],
+  [/^(SAL|SAJ|SAD)/, "Land Rover"],
+  [/^(YV1|YV4|YS3)/, "Volvo"],
+  [/^(VF[137])/, "Peugeot"],
+  [/^(VF[38])/, "Citroen"],
+  [/^(ZFA|ZFF)/, "Fiat"],
+  [/^(SB1|SB4)/, "Toyota"],
+  [/^(MP[BA]|MPB)/, "Isuzu"],
+  [/^(MHR|JAA)/, "Isuzu"],
+  [/^(LSV|LFV|LDC)/, "Volkswagen"],
+  [/^(LH1|LGB|L[SF])/, "Chery"],
+];
+function lookupWmiMake(wmi: string): string | undefined {
+  for (const [re, name] of WMI_MAKE) if (re.test(wmi)) return name;
+  return undefined;
 }
 
 function titleCase(s: string) {
