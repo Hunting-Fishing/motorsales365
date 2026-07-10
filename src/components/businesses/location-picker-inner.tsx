@@ -106,6 +106,7 @@ export function LocationPickerInner({
         />
         <Recenter region={region} lat={lat} lng={lng} />
         <ClickHandler onPick={onChange} />
+        <InvalidateOnMount />
         {lat != null && lng != null && (
           <Marker
             position={[lat, lng]}
