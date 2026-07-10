@@ -2736,7 +2736,7 @@ function SellPage() {
                   const u = photoUploads[i] ?? { status: "idle" as const, percent: 0 };
                   return (
                     <div
-                      key={`${file.name}-${file.size}-${file.lastModified}`}
+                      key={`${i}-${file.name}-${file.size}-${file.lastModified}`}
                       className="relative aspect-square overflow-hidden rounded-md bg-secondary"
                     >
                       <img
@@ -2820,7 +2820,7 @@ function SellPage() {
                     const u = videoUploads[i] ?? { status: "idle" as const, percent: 0 };
                     const thumb = videoThumbs[i];
                     return (
-                      <li key={`${file.name}-${file.size}-${file.lastModified}`} className="flex gap-2">
+                      <li key={`${i}-${file.name}-${file.size}-${file.lastModified}`} className="flex gap-2">
                         <div className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded bg-muted">
                           {thumb ? (
                             <>
