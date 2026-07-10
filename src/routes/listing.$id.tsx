@@ -22,6 +22,7 @@ import {
   ChevronDown,
   Play,
   Expand,
+  Edit,
 } from "lucide-react";
 import {
   Collapsible,
@@ -671,6 +672,15 @@ function ListingDetailPage() {
               <Bookmark className={`h-4 w-4 ${favorited ? "fill-current" : ""} sm:mr-1.5`} />
               <span className="hidden sm:inline">{favorited ? "Saved" : "Save"}</span>
             </Button>
+            {user?.id === listing.user_id && (
+              <Button asChild variant="outline" size="sm" className="shrink-0 rounded-full">
+                <Link to="/listing/$id/edit" params={{ id: listing.id }}>
+                  <Edit className="h-4 w-4 sm:mr-1.5" />
+                  <span className="hidden sm:inline">Edit listing</span>
+                  <span className="ml-1 sm:hidden">Edit</span>
+                </Link>
+              </Button>
+            )}
           </div>
 
 
