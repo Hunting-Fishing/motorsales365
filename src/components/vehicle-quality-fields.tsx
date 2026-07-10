@@ -51,22 +51,13 @@ export const VEHICLE_QUALITY_KEYS: (keyof VehicleQuality)[] = [
 // Validation
 // -----------------------------
 
-const OWNER_OPTIONS = [
-  "1st owner",
-  "2nd owner",
-  "3rd owner or later",
-  "Casa-maintained",
-  "Unknown",
+const PLATE_STATUS_OPTIONS = [
+  "Updated plate",
+  "Improvised / temporary",
+  "Conduction sticker only",
+  "Missing",
 ];
-const ORCR_OPTIONS = [
-  "Complete (OR + CR, owner's name)",
-  "Complete (OR + CR, open deed of sale)",
-  "OR only",
-  "CR only",
-  "No documents (project / parts)",
-  "Lost — affidavit ready",
-  "Encumbered / financed",
-];
+
 const PLATE_STATUS_OPTIONS = [
   "Updated plate",
   "Improvised / temporary",
