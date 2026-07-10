@@ -1499,7 +1499,14 @@ function SellPage() {
                   ))}
                 </div>
                 <Progress value={((idx + 1) / TABS.length) * 100} className="h-0.5 rounded-none" />
+                <div className="px-2 py-1 text-[10px] text-muted-foreground flex items-center gap-1">
+                  <span className={draftSavedAt ? "text-emerald-600" : ""}>●</span>
+                  {draftSavedAt
+                    ? `Draft auto-saved · ${draftSavedAt.toLocaleTimeString()}`
+                    : "Draft auto-saves as you type"}
+                </div>
               </div>
+
             );
           })()}
 
