@@ -1417,7 +1417,36 @@ function SellPage() {
           </div>
         ) : null}
 
-
+        {draftBanner && (
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm">
+            <div className="flex items-start gap-2">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
+              <div>
+                <div className="font-semibold">You have a saved draft</div>
+                <div className="text-xs text-muted-foreground">
+                  Last edited {new Date(draftBanner.updated_at).toLocaleString()}
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                type="button"
+                onClick={() => { applyDraft(draftBanner.form); setDraftBanner(null); }}
+              >
+                Resume draft
+              </Button>
+              <Button
+                size="sm"
+                type="button"
+                variant="outline"
+                onClick={() => { void discardDraft(); }}
+              >
+                Discard
+              </Button>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-3 space-y-2">
           {(() => {
