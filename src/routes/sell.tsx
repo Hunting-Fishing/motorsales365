@@ -810,19 +810,21 @@ function SellPage() {
     setDraftBanner(null);
   };
 
+  const [draftSavedAt, setDraftSavedAt] = useState<Date | null>(null);
   // Debounced auto-save (2s after last change).
   useEffect(() => {
     if (!user?.id || !draftLoaded) return;
-    const t = setTimeout(() => {
+    const t = setTimeout(async () => {
       const form_json = {
         category, title, description, price, negotiable, priceHidden,
         registrationStatus, region, province, city, barangay, lat, lng,
         condition, phone, phoneIso, phoneNational,
         year, make, model, mileage, transmission, fuel, engine, categoryAttrs,
       };
-      void (supabase as any)
+      const { error } = await (supabase as any)
         .from("listing_drafts")
         .upsert({ user_id: user.id, category_slug: category, form_json }, { onConflict: "user_id" });
+      if (!error) setDraftSavedAt(new Date());
     }, 2000);
     return () => clearTimeout(t);
   }, [
@@ -830,6 +832,7 @@ function SellPage() {
     registrationStatus, region, province, city, barangay, lat, lng, condition,
     phone, phoneIso, phoneNational, year, make, model, mileage, transmission, fuel, engine, categoryAttrs,
   ]);
+
 
   const sellSeo = SELL_SEO[category] ?? SELL_SEO.other;
   const sellCategoryLabel = CATEGORIES.find((c) => c.slug === category)?.name ?? "Vehicle";
@@ -1262,6 +1265,14 @@ function SellPage() {
       // Any items already uploaded eagerly to the draft path just need their
       // listing_media row inserted now that we have a listing id.
       const failedFiles: string[] = [];
+      let planLimitHit: null | { kind: "photo" | "video"; message: string } = null;
+      const captureLimit = (kind: "photo" | "video", err: any) => {
+        if (err?.code === "23514" && /limit reached/i.test(err.message ?? "")) {
+          planLimitHit = { kind, message: err.message };
+          return true;
+        }
+        return false;
+      };
       for (let i = 0; i < photos.length; i++) {
         const state = photoUploads[i];
         if (state?.status === "done" && state.url && state.path) {
@@ -1274,6 +1285,7 @@ function SellPage() {
           });
           if (mErr) {
             console.error("[sell] listing_media insert (photo) failed", mErr);
+            captureLimit("photo", mErr);
             failedFiles.push(photos[i].name);
           }
           continue;
@@ -1293,6 +1305,7 @@ function SellPage() {
           });
           if (mErr) {
             console.error("[sell] listing_media insert (video) failed", mErr);
+            captureLimit("video", mErr);
             failedFiles.push(videos[i].name);
           }
           continue;
@@ -1301,6 +1314,13 @@ function SellPage() {
         if (!ok) failedFiles.push(videos[i].name);
       }
 
+      if (planLimitHit) {
+        toast.error(
+          `${(planLimitHit as any).kind === "photo" ? "Photo" : "Video"} limit reached on your current plan`,
+          { description: `${(planLimitHit as any).message} Upgrade your plan to attach more.` },
+        );
+        return;
+      }
       if (failedFiles.length > 0) {
         toast.error(
           `Couldn't attach ${failedFiles.length} file${failedFiles.length === 1 ? "" : "s"}: ${failedFiles
@@ -1309,6 +1329,7 @@ function SellPage() {
         );
         return;
       }
+
 
       // Publish succeeded — clear the safe draft so we don't re-offer it.
       try {
@@ -1478,7 +1499,14 @@ function SellPage() {
                   ))}
                 </div>
                 <Progress value={((idx + 1) / TABS.length) * 100} className="h-0.5 rounded-none" />
+                <div className="px-2 py-1 text-[10px] text-muted-foreground flex items-center gap-1">
+                  <span className={draftSavedAt ? "text-emerald-600" : ""}>●</span>
+                  {draftSavedAt
+                    ? `Draft auto-saved · ${draftSavedAt.toLocaleTimeString()}`
+                    : "Draft auto-saves as you type"}
+                </div>
               </div>
+
             );
           })()}
 

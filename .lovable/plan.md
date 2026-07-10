@@ -1,36 +1,39 @@
-## Fix /sell publish failure, duplicates, media issues, and add drafts
+## Problem
 
-### 1. Fix publish failure (root cause found)
-The DB trigger `tg_listings_match_parts_wanted` compares `NEW.status = 'published'`, but `'published'` isn't in the `listing_status` enum (valid: `draft`, `pending_payment`, `active`, `expired`, `hidden`, `sold`, `pending_sale`). Postgres tries to cast the literal to enum on every INSERT → `22P02 invalid input value for enum listing_status: "published"`.
+The publish + media uploads fail with:
+- `Photo limit reached for free plan (max 1)`
+- `Video limit reached for free plan (max 0)`
 
-Migration: replace `'published'` with `'active'` inside the trigger function.
+Root cause: DB trigger `public.enforce_listing_media_caps` (migration `20260602081428_...`) hardcodes free-plan caps as **1 photo / 0 videos**, but the UI + `FREE_PLAN_LIMITS` promise **12 photos + 1 video**. Every photo after the 1st and every video is rejected by the trigger → the toast "Couldn't attach 9 files…" and submit failure.
 
-### 2. Remove duplicate form entries (page 1 – "Details")
-- `CategoryAttributesEditor` currently renders **twice** for non-vehicle categories (parts, truck, etc.): once inline in the Listing section and again in the standalone "Details" `SellGroup`. Keep only the inline one; delete the second block.
-- The standalone "Vehicle details" block also re-renders Make/Model/Year inputs that already exist in the Listing section for non-car/motorcycle categories. Delete that duplicate block (Listing section already covers it).
+Drafts already exist (auto-save to `listing_drafts` on step change, resume banner on load). No missing feature — just needs a small visibility tweak so users can see it's saving.
 
-### 3. Map render error
-Leaflet map ends up half-rendered (blank right side) because the container is inside a hidden/accordion panel that mounts before layout is final. Call `map.invalidateSize()` on mount + on step change + on ResizeObserver in `location-picker-inner.tsx`.
+## Plan
 
-### 4. Media issues
-- Photo thumbnails call `URL.createObjectURL(file)` on **every render** → old blob URLs get GC'd and network log fills with `ERR_FILE_NOT_FOUND`. Cache blob URLs in a `Map<File, string>` (or `useMemo` per file) and `revokeObjectURL` on removal/unmount.
-- Video: same fix + ensure thumbnail preview stays visible after upload completes (currently only shows during progress).
-- Block Submit / step-forward when any photo or video is still `uploading` — show a small warning banner and disable navigation buttons instead of silently allowing submit.
+1. **DB migration — align media caps with the actual free plan**
+   Update `public.enforce_listing_media_caps()` so free/`NULL` plan = **12 photos, 1 video** (matches `FREE_PLAN_LIMITS` and the copy in `/sell` and `/start-selling`). Keep standard (5/1) and upgraded (20/3) as-is, or bump upgraded photo cap only if needed — leaving both untouched this turn.
 
-### 5. Auto-save "Safe Drafts"
-- Create table `public.listing_drafts` (user_id, category_slug, form_json, media_paths jsonb, updated_at) with RLS scoped to `auth.uid()` and grants for `authenticated` + `service_role`.
-- Debounced (2s) auto-save of the whole form state to the user's draft row while typing. Also save on step change.
-- On `/sell` mount, if a draft exists, show a banner: "Resume your draft from {date} · [Resume] [Discard]".
-- Delete the draft row on successful publish.
+   ```text
+   free/NULL → 12 photos, 1 video
+   standard  → 5 photos,  1 video     (unchanged)
+   upgraded  → 20 photos, 3 videos    (unchanged)
+   ```
 
-### 6. Phone prefill fix
-Don't silently prefill `contact_phone` from the user's profile — the user reported "a phone number that shouldn't be there". Change the prefill to only populate on explicit "Use my saved number" button, OR add an inline "×" clear affordance and skip prefill if the profile phone is different from the visible national field (keep blank by default).
+2. **sell.tsx — surface auto-save state**
+   Autosave logic already runs on step change (line ~815). Add a tiny "Draft saved · <time>" indicator next to the stepper so users know drafts are automatic (no button needed). Also toast once on first successful autosave.
 
-### Technical notes
-- Files touched: `src/routes/sell.tsx`, `src/components/businesses/location-picker-inner.tsx`, one new migration, one new `listing-drafts.functions.ts` (or direct supabase calls from client), plus regen types after migration.
-- Trigger migration is the single blocker for publishing; everything else is UX polish.
-- No changes to pricing/fees so Terms doesn't need a bump.
+3. **sell.tsx — friendlier error mapping**
+   When `listing_media` insert returns error code `23514` with "limit reached", show a single clear toast ("Upgrade your plan to add more photos/videos") instead of one toast per failed file.
 
-### Out of scope (ask if wanted)
-- Swapping tow map from Google to Leaflet.
-- Server-side draft cleanup cron.
+4. **No changes to** the eager-upload flow, blob URL cache, storage buckets, or draft schema — those are working.
+
+## Files touched
+
+- `supabase/migrations/<new>_fix_free_plan_media_caps.sql` (new)
+- `src/routes/sell.tsx` (autosave indicator + error toast dedupe)
+
+## Out of scope
+
+- Repricing tiers (only fixing the mismatch with what's already promised).
+- Rewriting media upload pipeline.
+- Adding a manual "Save draft" button — autosave already covers this; just making it visible.
