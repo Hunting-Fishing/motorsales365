@@ -182,6 +182,20 @@ export function LocationPicker({
     }
   }
 
+  function canRequestPreciseLocation() {
+    const doc = document as Document & {
+      permissionsPolicy?: { allowsFeature?: (feature: string) => boolean };
+      featurePolicy?: { allowsFeature?: (feature: string) => boolean };
+    };
+    try {
+      const policy = doc.permissionsPolicy ?? doc.featurePolicy;
+      if (policy?.allowsFeature && !policy.allowsFeature("geolocation")) return false;
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
   async function useMyLocation() {
     if (typeof window === "undefined") {
       toast.error("Geolocation isn't supported on this device.");
@@ -190,7 +204,7 @@ export function LocationPicker({
     setLocating(true);
     try {
       let resolved: { a: Record<string, string>; viaIp: boolean } | null = null;
-      if (navigator.geolocation) {
+      if (navigator.geolocation && canRequestPreciseLocation()) {
         try {
           const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject, {
