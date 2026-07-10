@@ -634,8 +634,9 @@ function SellPage() {
     try {
       const r = await decodeVin(raw);
       const gotAnything = !!(r.year || r.make || r.model);
+      const gotFull = !!(r.year && r.make && r.model);
       applyVinDecode(r);
-      if (gotAnything) {
+      if (gotFull) {
         if (fmt.kind === "warn_checksum") {
           setVinState({
             kind: "warn",
@@ -644,6 +645,16 @@ function SellPage() {
         } else {
           setVinState({ kind: "ok" });
         }
+      } else if (gotAnything) {
+        // Asia/Europe VIN — NHTSA didn't have it, but WMI/year fallback filled
+        // what it could. Tell the user which fields still need attention.
+        const missing = [!r.year && "year", !r.make && "make", !r.model && "model"]
+          .filter(Boolean)
+          .join(", ");
+        setVinState({
+          kind: "warn",
+          message: `Partial decode — please fill in ${missing} (Asia/Europe VINs aren't fully in the US database).`,
+        });
       } else {
         setVinState({
           kind: "warn",
