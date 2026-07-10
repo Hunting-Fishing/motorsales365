@@ -227,27 +227,29 @@ export function LocationPicker({
         toast.error("Location is outside the Philippines.");
         return;
       }
-      const resolved = resolvePsgc({
+      const matched = resolvePsgc({
         region: a.region ?? a.state ?? null,
         province: a.province ?? a.state_district ?? null,
         city: a.city ?? null,
         municipality: a.municipality ?? null,
         town: a.town ?? a.village ?? a.suburb ?? null,
       });
-      if (!resolved.region && !resolved.province && !resolved.city) {
+      if (!matched.region && !matched.province && !matched.city) {
         toast.error("Couldn't match your location to a Philippine region.");
         return;
       }
       onChange({
-        region: resolved.region,
-        province: resolved.province,
-        city: resolved.city,
+        region: matched.region,
+        province: matched.province,
+        city: matched.city,
         barangay: a.neighbourhood ?? a.suburb ?? value.barangay ?? null,
       });
-      const summary = [resolved.city, resolved.province, resolved.region]
+      const summary = [matched.city, matched.province, matched.region]
         .filter(Boolean)
         .join(", ");
-      toast.success(`Location set: ${summary}`);
+      toast.success(
+        viaIp ? `Approximate location set: ${summary}` : `Location set: ${summary}`,
+      );
     } catch (err: any) {
       const code = err?.code;
       if (code === 1) toast.error("Permission denied. Enable location access and try again.");
