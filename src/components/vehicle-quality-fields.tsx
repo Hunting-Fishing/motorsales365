@@ -77,8 +77,7 @@ export const VehicleQualitySchema = z
       .optional()
       .or(z.literal("")),
     plate_status: z.string().optional(),
-    registered_owner_status: z.string().optional(),
-    orcr_status: z.string().optional(),
+
     last_registration_date: z
       .string()
       .optional()
