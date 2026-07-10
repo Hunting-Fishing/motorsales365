@@ -60,6 +60,7 @@ import {
   type FitmentRow,
 } from "@/components/parts/fitment-editor";
 import { NEEDED_PARTS_GROUPS } from "@/data/needed-parts-catalog";
+import { fileUrl, releaseFileUrl } from "@/lib/blob-url";
 import { z } from "zod";
 
 const CATEGORY_LABEL_MAP: Record<string, string> = {
