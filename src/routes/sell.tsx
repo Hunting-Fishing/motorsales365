@@ -810,19 +810,21 @@ function SellPage() {
     setDraftBanner(null);
   };
 
+  const [draftSavedAt, setDraftSavedAt] = useState<Date | null>(null);
   // Debounced auto-save (2s after last change).
   useEffect(() => {
     if (!user?.id || !draftLoaded) return;
-    const t = setTimeout(() => {
+    const t = setTimeout(async () => {
       const form_json = {
         category, title, description, price, negotiable, priceHidden,
         registrationStatus, region, province, city, barangay, lat, lng,
         condition, phone, phoneIso, phoneNational,
         year, make, model, mileage, transmission, fuel, engine, categoryAttrs,
       };
-      void (supabase as any)
+      const { error } = await (supabase as any)
         .from("listing_drafts")
         .upsert({ user_id: user.id, category_slug: category, form_json }, { onConflict: "user_id" });
+      if (!error) setDraftSavedAt(new Date());
     }, 2000);
     return () => clearTimeout(t);
   }, [
@@ -830,6 +832,7 @@ function SellPage() {
     registrationStatus, region, province, city, barangay, lat, lng, condition,
     phone, phoneIso, phoneNational, year, make, model, mileage, transmission, fuel, engine, categoryAttrs,
   ]);
+
 
   const sellSeo = SELL_SEO[category] ?? SELL_SEO.other;
   const sellCategoryLabel = CATEGORIES.find((c) => c.slug === category)?.name ?? "Vehicle";
