@@ -862,7 +862,29 @@ function SellPage() {
           .select()
           .single();
 
-        if (error || !listing) throw error;
+        if (error || !listing) {
+          console.error("[sell] listings.insert failed", error);
+          const parts = [
+            error?.message,
+            (error as any)?.details,
+            (error as any)?.hint,
+          ].filter(Boolean);
+          const code = (error as any)?.code;
+          const codeHint =
+            code === "23502"
+              ? "A required field is missing."
+              : code === "23514"
+                ? "A field value isn't allowed by our checks."
+                : code === "42501"
+                  ? "Your account isn't allowed to publish this listing. Please sign in again."
+                  : code === "23505"
+                    ? "A duplicate listing was detected."
+                    : null;
+          throw new Error(
+            [codeHint, parts.join(" — ")].filter(Boolean).join(" ") ||
+              "Couldn't save your listing. Please try again.",
+          );
+        }
         lid = listing.id;
         setListingId(lid);
 
@@ -884,22 +906,54 @@ function SellPage() {
         }
       }
 
-      // Upload photos that are not already done. Run sequentially to keep the
-      // UI responsive and avoid hammering the network on flaky connections.
-      let allOk = true;
+      // Any items already uploaded eagerly to the draft path just need their
+      // listing_media row inserted now that we have a listing id.
+      const failedFiles: string[] = [];
       for (let i = 0; i < photos.length; i++) {
-        if (photoUploads[i]?.status === "done") continue;
+        const state = photoUploads[i];
+        if (state?.status === "done" && state.url && state.path) {
+          const { error: mErr } = await supabase.from("listing_media").insert({
+            listing_id: lid,
+            type: "photo",
+            url: state.url,
+            storage_path: state.path,
+            sort_order: i,
+          });
+          if (mErr) {
+            console.error("[sell] listing_media insert (photo) failed", mErr);
+            failedFiles.push(photos[i].name);
+          }
+          continue;
+        }
         const ok = await uploadOnePhoto(i, photos[i], lid);
-        if (!ok) allOk = false;
+        if (!ok) failedFiles.push(photos[i].name);
       }
       for (let i = 0; i < videos.length; i++) {
-        if (videoUploads[i]?.status === "done") continue;
+        const state = videoUploads[i];
+        if (state?.status === "done" && state.url && state.path) {
+          const { error: mErr } = await supabase.from("listing_media").insert({
+            listing_id: lid,
+            type: "video",
+            url: state.url,
+            storage_path: state.path,
+            sort_order: i,
+          });
+          if (mErr) {
+            console.error("[sell] listing_media insert (video) failed", mErr);
+            failedFiles.push(videos[i].name);
+          }
+          continue;
+        }
         const ok = await uploadOneVideo(i, videos[i], lid);
-        if (!ok) allOk = false;
+        if (!ok) failedFiles.push(videos[i].name);
       }
 
-      if (!allOk) {
-        toast.error("Some uploads failed. You can retry the failed items and submit again.");
+      if (failedFiles.length > 0) {
+        toast.error(
+          `Couldn't attach ${failedFiles.length} file${failedFiles.length === 1 ? "" : "s"}: ${failedFiles
+            .slice(0, 3)
+            .join(", ")}${failedFiles.length > 3 ? "…" : ""}. Retry from the Photos step.`,
+        );
         return;
       }
 
@@ -920,7 +974,8 @@ function SellPage() {
         navigate({ to: "/dashboard" });
       }
     } catch (err: any) {
-      toast.error(err.message ?? "Failed to publish listing");
+      console.error("[sell] publish failed", err);
+      toast.error(err?.message ?? "Failed to publish listing");
     } finally {
       setSubmitting(false);
     }
