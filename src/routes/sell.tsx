@@ -344,6 +344,9 @@ function SellPage() {
   const [categoryAttrs, setCategoryAttrs] = useState<Record<string, any>>({});
   const [vinError, setVinError] = useState<string | null>(null);
   const [vinStatus, setVinStatus] = useState<"idle" | "checking" | "ok" | "failed">("idle");
+  const [vinConflicts, setVinConflicts] = useState<
+    Array<{ field: string; label: string; current: string; decoded: string; apply: () => void }>
+  >([]);
 
 
   // Towing service-specific fields
