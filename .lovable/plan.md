@@ -1,43 +1,57 @@
 ## Goal
-Remove duplicate OR/CR + Owner status fields on `/sell` and tighten spacing so the form scrolls less and leaves room for future fields.
+Cut scrolling on `/sell` by turning the Details tab's stacked sub-sections into a collapsible accordion, without hiding any inputs or changing form logic.
 
-## The duplication (confirmed by reading the source)
-The Details tab currently asks for the same things in **three** overlapping places:
+## Scope (Details tab only, for this pass)
+The Details tab in `src/routes/sell.tsx` currently renders 6 stacked `<h3>` sub-sections in one long scroll:
 
-| Field                | Where it appears today                                                                                          |
-|----------------------|-----------------------------------------------------------------------------------------------------------------|
-| OR/CR status         | 1) Top-bar "Registration" select (`sell.tsx:1172-1190`), 2) `VehicleQualityFields` "OR/CR status" (`vehicle-quality-fields.tsx:374`), 3) `CategoryAttributesEditor` "OR / CR status" (`category-attributes-editor.tsx:228 / 242`) |
-| Owner status         | 1) `VehicleQualityFields` "Registered owner status" (`vehicle-quality-fields.tsx:357`), 2) `CategoryAttributesEditor` "Owner status" (`category-attributes-editor.tsx:227 / 244`) |
+1. Listing (title, category, condition, registration)
+2. Price (price, negotiable, currency)
+3. Vehicle (VehiclePicker, VIN, mileage, transmission, fuel)  — car/motorcycle/truck only
+4. Category attributes (`CategoryAttributesEditor`) — car/motorcycle/equipment/boat/airplane
+5. Condition & quality (`VehicleQualityFields`) — vehicle categories
+6. Description
 
-`CategoryAttributesEditor` values (`owner_status`, `or_cr_status`) are the ones the browse filters actually query (see `browse-listings.functions.ts`), so they stay as the source of truth. The other two copies get removed.
+The other tabs (`location`, `plan`, `media`) already fit on one screen — leave them as-is.
 
 ## Changes
 
-### 1. Remove duplicates (source of truth = CategoryAttributesEditor)
-- **`src/lib/category-attributes.ts`** — expand `OR_CR_STATUS` and `OWNER_STATUS` so the richer nuances from `VehicleQualityFields` aren't lost:
-  - OR/CR: add `complete_owner_name`, `complete_open_deed`, `or_only`, `cr_only`, `no_docs`, `encumbered`.
-  - Owner: keep existing options, add `casa_maintained`.
-- **`src/components/vehicle-quality-fields.tsx`** — drop the `Registered owner status` and `OR/CR status` fields, their options constants, schema refinements, and their entries in `RECOMMENDED_CAR` / `RECOMMENDED_MOTO` / `FIELD_LABELS` / `VEHICLE_QUALITY_KEYS`. Keep everything else (variant, color, plate, history, VIN, price flags).
-- **`src/routes/sell.tsx`** — delete the top-bar "Registration" select block (lines ~1172-1190) and the `registrationStatus` state (line ~256/259) plus its usage in the insert payload (grep `registration_status` to clean up).
-- **`src/routes/listing.$id.edit.tsx`** — same trim (mirror the shape so edit and create match). Ensure existing listings that had `registered_owner_status` / `orcr_status` stored under vehicle_quality attributes still display via the CategoryAttributesEditor values (which they already write to).
+### 1. Wrap sub-sections in shadcn `Accordion`
+- Use existing `@/components/ui/accordion` (Radix-based, already in the project).
+- `type="multiple"` so users can open more than one; `defaultValue` opens the two most-important groups on first render:
+  - `["listing", "vehicle"]` for vehicle categories
+  - `["listing", "price"]` for non-vehicle categories
+- Persist open state in `sessionStorage` under `sell:details:open` so navigating away and back doesn't collapse everything.
 
-### 2. Tighten the form
-Purely CSS-token/spacing changes, no logic:
-- Reduce section vertical rhythm in the Details tab: `space-y-3` → `space-y-2`, `border-t pt-3` → `pt-2`, section card padding `p-3 sm:p-4` → `p-2.5 sm:p-3`. Match the Location tab that already uses the tighter padding.
-- Collapse the "Vehicle" block (`sell.tsx:1247-1334`) grid from 3 rows of controls to a single `sm:grid-cols-6` row: VIN spans 2, Mileage/Transmission/Fuel each span 1, VehiclePicker spans full width above.
-- In `VehicleQualityFields`: change container from `p-3` to `p-2.5`, drop the standalone header block into a single line, remove the completeness meter's own bordered container (inline it under the header), switch inner grid gap `gap-2` → `gap-x-2 gap-y-1.5`, and let the "Price negotiable / Financing / Trade-in" checkboxes wrap inline with the last row instead of getting their own `pt-2` block.
-- In `CategoryAttributesEditor` car/motorcycle branches: change `grid-cols-1 sm:grid-cols-2` (current default) to `sm:grid-cols-3` for the short selects so OR/CR + Owner + Financing sit on one line on desktop.
-- Reduce `<Label>` bottom margin from default to `mb-0.5` where inputs are `h-8`/`h-9` to remove ~4px per field.
+### 2. Header design
+Each `AccordionTrigger` shows on one line:
+- Section title (was `<h3>`, keep same copy and uppercase style)
+- Right-aligned compact status: filled-field count (e.g. `4/6`) plus a red dot when a required field in that group is empty and the user has already tried to publish.
 
-Rough before/after: Details tab currently ~1900 px tall on desktop; target ~1350 px (≈30 % shorter) without hiding any information.
+That means the user can see completeness without expanding each group. Reuse the counting logic already in `VehicleQualityFields` (`completeness.filled / completeness.total`) and add trivial counters for Listing / Price / Vehicle / Description (count non-empty controlled values already in state).
 
-### 3. Non-goals
-- No DB/RLS/schema changes. Existing listings keep working — the attributes we stop writing (`registered_owner_status`, `orcr_status` under vehicle_quality, plus `registration_status`) are additive JSON keys that are safe to leave in old rows.
-- No copy changes outside the fields being removed.
+### 3. Validation-driven auto-open
+On publish failure (existing `handleSubmit` error path), if any required field is empty, force-open the offending accordion item(s) and scroll the first one into view. Hook into the current per-field error state; no new validation rules.
+
+### 4. Keep tab shell intact
+Do not replace the top-level `activeTab` tabs (`details / location / plan / media`) — only the interior of the `data-tab="details"` section becomes an accordion. This preserves the existing publish flow, mobile step nav, and the `.hidden` toggling.
+
+### 5. Non-goals
+- No change to `src/routes/listing.$id.edit.tsx` this turn. If the pattern lands well, the same wrapper can be lifted into a shared component in a follow-up.
+- No schema, RLS, or server-function changes.
+- No copy changes; same labels, same field order inside each group.
+- No change to the Photos/Video, Location, or Plan tabs.
+
+## Technical notes
+- File touched: `src/routes/sell.tsx` only.
+- New import: `Accordion, AccordionItem, AccordionTrigger, AccordionContent` from `@/components/ui/accordion`.
+- Trigger styling override: `py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hover:no-underline` so headers match the current `<h3>` visual weight.
+- Content padding: `pt-1 pb-2` to keep the tightened spacing from the previous pass.
+- Each `AccordionItem` gets a stable `value` (`listing`, `price`, `vehicle`, `attributes`, `quality`, `description`) used for both defaults and the auto-open-on-error map.
 
 ## Verification
-- `tsgo` typecheck.
-- Load `/sell` as `car`, `motorcycle`, `truck`, `parts`, `carwash` — confirm exactly one OR/CR select and one Owner select appear (only for car/motorcycle), Registration select is gone, and no field labels shift categories.
-- Load `/listing/<id>/edit` on an existing car listing — confirm owner/OR-CR pre-fill from the CategoryAttributesEditor values.
-- Publish a new car listing end-to-end and confirm `attributes.owner_status` and `attributes.or_cr_status` are set from the single remaining input.
-- Visual diff: screenshot Details tab desktop + mobile before/after; confirm ~30% less scroll distance and no clipping.
+- Typecheck.
+- Load `/sell` as `car`, `motorcycle`, `parts`, `carwash`, `service`: correct groups appear, none duplicated, defaults open as specified.
+- Collapse all → Details tab is < 200 px tall (just headers + Publish bar); expand each and confirm every previously visible field is still present and editable.
+- Trigger a publish with empty required fields: the accordion containing the first missing field auto-opens and scrolls into view.
+- Reload after collapsing a group → collapsed state persists via `sessionStorage`.
+- Screenshot desktop + mobile before/after; target another ~30–40 % vertical reduction on first paint of the Details tab.
