@@ -60,6 +60,7 @@ import {
   type FitmentRow,
 } from "@/components/parts/fitment-editor";
 import { NEEDED_PARTS_GROUPS } from "@/data/needed-parts-catalog";
+import { fileUrl, releaseFileUrl } from "@/lib/blob-url";
 import { z } from "zod";
 
 const CATEGORY_LABEL_MAP: Record<string, string> = {
@@ -739,14 +740,9 @@ function SellPage() {
         .eq("id", user.id)
         .maybeSingle();
       if (prof) {
-        if (!phoneNational && (prof.phone || prof.phone_e164)) {
-          const raw = String(prof.phone_e164 || prof.phone || "").replace(/^\+63/, "").replace(/\D/g, "");
-          if (raw) {
-            setPhoneIso("PH");
-            setPhoneNational(raw);
-            setPhone(buildE164("PH", raw) ?? "");
-          }
-        }
+        // Do NOT auto-prefill the contact phone from the profile — users
+        // reported unexpected numbers appearing. They can tap the phone input
+        // and use the browser's saved-values suggestion instead.
         if (!region && prof.signup_region) setRegion(prof.signup_region);
         if (!province && prof.signup_province) setProvince(prof.signup_province);
         if (!city && prof.signup_city) setCity(prof.signup_city);
@@ -756,6 +752,84 @@ function SellPage() {
   }, [user?.id]);
 
 
+
+  // ── Safe Drafts ──────────────────────────────────────────────────────────
+  // Auto-save the form to `listing_drafts` (one row per user) so users can
+  // resume where they left off. Media files are NOT persisted (Files can't be
+  // serialized) — only the text state.
+  const [draftLoaded, setDraftLoaded] = useState(false);
+  const [draftBanner, setDraftBanner] = useState<{ updated_at: string; form: any } | null>(null);
+  useEffect(() => {
+    if (!user?.id || draftLoaded) return;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("listing_drafts")
+        .select("form_json,updated_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data?.form_json) {
+        setDraftBanner({ updated_at: data.updated_at, form: data.form_json });
+      }
+      setDraftLoaded(true);
+    })();
+  }, [user?.id, draftLoaded]);
+
+  const applyDraft = (f: any) => {
+    if (!f || typeof f !== "object") return;
+    if (typeof f.category === "string") setCategory(f.category);
+    if (typeof f.title === "string") setTitle(f.title);
+    if (typeof f.description === "string") setDescription(f.description);
+    if (typeof f.price === "string") setPrice(f.price);
+    if (typeof f.negotiable === "boolean") setNegotiable(f.negotiable);
+    if (typeof f.priceHidden === "boolean") setPriceHidden(f.priceHidden);
+    if (typeof f.registrationStatus === "string") setRegistrationStatus(f.registrationStatus);
+    if (f.region !== undefined) setRegion(f.region);
+    if (f.province !== undefined) setProvince(f.province);
+    if (f.city !== undefined) setCity(f.city);
+    if (f.barangay !== undefined) setBarangay(f.barangay);
+    if (f.lat !== undefined) setLat(f.lat);
+    if (f.lng !== undefined) setLng(f.lng);
+    if (typeof f.condition === "string") setCondition(f.condition);
+    if (typeof f.phone === "string") setPhone(f.phone);
+    if (typeof f.phoneIso === "string") setPhoneIso(f.phoneIso);
+    if (typeof f.phoneNational === "string") setPhoneNational(f.phoneNational);
+    if (typeof f.year === "string") setYear(f.year);
+    if (typeof f.make === "string") setMake(f.make);
+    if (typeof f.model === "string") setModel(f.model);
+    if (typeof f.mileage === "string") setMileage(f.mileage);
+    if (typeof f.transmission === "string") setTransmission(f.transmission);
+    if (typeof f.fuel === "string") setFuel(f.fuel);
+    if (typeof f.engine === "string") setEngine(f.engine);
+    if (f.categoryAttrs && typeof f.categoryAttrs === "object") setCategoryAttrs(f.categoryAttrs);
+    toast.success("Draft restored");
+  };
+
+  const discardDraft = async () => {
+    if (!user?.id) return;
+    await (supabase as any).from("listing_drafts").delete().eq("user_id", user.id);
+    setDraftBanner(null);
+  };
+
+  // Debounced auto-save (2s after last change).
+  useEffect(() => {
+    if (!user?.id || !draftLoaded) return;
+    const t = setTimeout(() => {
+      const form_json = {
+        category, title, description, price, negotiable, priceHidden,
+        registrationStatus, region, province, city, barangay, lat, lng,
+        condition, phone, phoneIso, phoneNational,
+        year, make, model, mileage, transmission, fuel, engine, categoryAttrs,
+      };
+      void (supabase as any)
+        .from("listing_drafts")
+        .upsert({ user_id: user.id, category_slug: category, form_json }, { onConflict: "user_id" });
+    }, 2000);
+    return () => clearTimeout(t);
+  }, [
+    user?.id, draftLoaded, category, title, description, price, negotiable, priceHidden,
+    registrationStatus, region, province, city, barangay, lat, lng, condition,
+    phone, phoneIso, phoneNational, year, make, model, mileage, transmission, fuel, engine, categoryAttrs,
+  ]);
 
   const sellSeo = SELL_SEO[category] ?? SELL_SEO.other;
   const sellCategoryLabel = CATEGORIES.find((c) => c.slug === category)?.name ?? "Vehicle";
@@ -827,6 +901,8 @@ function SellPage() {
   };
 
   const removePhoto = (i: number) => {
+    const file = photos[i];
+    if (file) releaseFileUrl(file);
     setPhotos((p) => p.filter((_, idx) => idx !== i));
     setPhotoUploads((u) => u.filter((_, idx) => idx !== i));
   };
@@ -882,6 +958,8 @@ function SellPage() {
   };
 
   const removeVideo = (i: number) => {
+    const file = videos[i];
+    if (file) releaseFileUrl(file);
     setVideos((v) => v.filter((_, idx) => idx !== i));
     setVideoUploads((u) => u.filter((_, idx) => idx !== i));
     setVideoThumbs((t) => t.filter((_, idx) => idx !== i));
@@ -1232,6 +1310,11 @@ function SellPage() {
         return;
       }
 
+      // Publish succeeded — clear the safe draft so we don't re-offer it.
+      try {
+        await (supabase as any).from("listing_drafts").delete().eq("user_id", user.id);
+      } catch { /* best-effort */ }
+
       if (plan !== "free") {
         toast.success("Listing saved — pay to publish.");
         navigate({
@@ -1334,7 +1417,36 @@ function SellPage() {
           </div>
         ) : null}
 
-
+        {draftBanner && (
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm">
+            <div className="flex items-start gap-2">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
+              <div>
+                <div className="font-semibold">You have a saved draft</div>
+                <div className="text-xs text-muted-foreground">
+                  Last edited {new Date(draftBanner.updated_at).toLocaleString()}
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                type="button"
+                onClick={() => { applyDraft(draftBanner.form); setDraftBanner(null); }}
+              >
+                Resume draft
+              </Button>
+              <Button
+                size="sm"
+                type="button"
+                variant="outline"
+                onClick={() => { void discardDraft(); }}
+              >
+                Discard
+              </Button>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-3 space-y-2">
           {(() => {
@@ -2574,7 +2686,7 @@ function SellPage() {
                       className="relative aspect-square overflow-hidden rounded-md bg-secondary"
                     >
                       <img
-                        src={URL.createObjectURL(file)}
+                        src={fileUrl(file)}
                         alt={`Listing photo ${i + 1} preview`}
                         className="h-full w-full object-cover"
                       />
@@ -2735,11 +2847,18 @@ function SellPage() {
               category === "used_part" && !usedPartSystem && "vehicle system",
               category === "used_part" && !usedPartName.trim() && "part name",
             ].filter(Boolean) as string[];
+            const anyUploading =
+              photoUploads.some((u) => u.status === "uploading") ||
+              videoUploads.some((u) => u.status === "uploading");
+            const mediaIssues = [
+              photos.length === 0 && "at least 1 photo",
+              anyUploading && "wait for uploads to finish",
+            ].filter(Boolean) as string[];
             const stepIssues: Record<(typeof order)[number], string[]> = {
               details: detailsIssues,
               location: [!region && "region", !city && "city"].filter(Boolean) as string[],
               plan: [],
-              media: [photos.length === 0 && "at least 1 photo"].filter(Boolean) as string[],
+              media: mediaIssues,
             };
             const issues = stepIssues[activeTab];
             const canAdvance = issues.length === 0;
