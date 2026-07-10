@@ -1,60 +1,81 @@
+## Goal
 
-## Goals
+Make the VIN / chassis field on `/sell` explain *why* auto-decode didn't populate anything, without ever wiping fields the user typed by hand. Also properly support Asian and European chassis numbers (JDM frame codes like `NCP150-1234567`, and non-US 17-digit VINs that NHTSA can't decode).
 
-1. Move VIN / chassis to right under Title.
-2. When VIN is entered/scanned, auto-populate Category, Year, Make, Model, Engine, Transmission, Fuel, Trim (variant), and Color where the decoder returns them.
-3. Re-order the form to a natural step-by-step flow.
-4. Kill the wasted horizontal space visible in the screenshot — the form is currently constrained to `max-w-5xl` with narrow selects (see the tiny "Condition" dropdown), leaving big empty gutters on desktop.
+## Current behavior (problem)
+
+`src/routes/sell.tsx` shows one generic message for two very different situations:
+
+- Format looked fine but NHTSA returned nothing → "Couldn't decode this VIN — please fill the vehicle fields manually."
+- `fetch` threw → "VIN lookup unavailable — please fill the vehicle fields manually."
+
+`src/components/vin-scan-dialog.tsx` `vinFormatError` also fails Asian/EU VINs that don't pass the 17-digit ISO check digit (common on JDM Toyota/Honda imports), which currently blocks the field and looks like a "bad VIN" error.
+
+Manual entries are already preserved by `applyVinDecode` (functional setters + conflict panel from the last change), so no regression risk there — the fix is purely error classification, copy, and JDM/EU acceptance.
+
+## Failure taxonomy (what each message should say)
+
+| Case | Detection | UX |
+|---|---|---|
+| Empty | no chars after normalize | no error, idle |
+| Bad characters | contains `I`, `O`, `Q`, or non-alphanumerics | red inline: "Remove I, O, Q or spaces — VIN uses only letters and numbers." Keeps fields. |
+| Too short / too long | length < 11 or > 17 | red inline: "VIN or chassis # must be 11–17 characters." Keeps fields. |
+| Chassis # (11–16 chars) | valid chars, length 11–16 | neutral info: "Saved as chassis #. Auto-fill only works for 17-character VINs — please fill the vehicle fields below." No red. |
+| 17-char, checksum fails | ISO 3779 check digit invalid | soft warning (amber, non-blocking): "Check digit didn't match — common for Asia/Europe market VINs. Saved anyway; auto-fill may not work." Still attempts decode. |
+| 17-char, NHTSA empty | decode returns no year/make/model | amber: "This looks like a non-US market VIN (Asia / Europe imports often aren't in the US database). VIN saved — please fill the vehicle fields manually." |
+| Network / API error | `fetch` throws or non-2xx | red: "VIN lookup service is unreachable right now — check your connection or fill the vehicle fields manually. Your VIN is saved." Offer a "Retry decode" button. |
+| Success | any of year/make/model returned | existing green "VIN decoded — blank fields filled in." plus the conflict panel already added. |
+
+In every case except empty, `vehicleQuality.vin_chassis` is saved and no manual field is touched.
 
 ## Changes
 
-### 1. New "Listing" section field order
-Single top section, everything above the fold:
-```
-Title
-VIN / chassis            [Scan VIN]   ← moved here, full width
-Category   Condition   Registration   Seller
-Year   Make   Model   Trim / variant
-Transmission   Fuel   Engine   Color
-Mileage (km)   Body type (car only)   Drivetrain (car only)
-```
-- The existing separate "Vehicle" `SellGroup` collapses into this — VehiclePicker (year/make/model) and the mileage/transmission/fuel grid move up; the standalone "VIN / chassis" block is removed from its current location.
-- New fields wired to existing state: `trim` (already exists in `categoryAttrs.variant`), `color` (add `exterior_color` to categoryAttrs), `engine` (already exists as `engine` state).
+### 1. `src/components/vin-scan-dialog.tsx`
 
-### 2. VIN auto-fill (extend `VinScanDialog` + manual entry)
-- Extend `VinDecodeResult` to also carry `engine`, `trim`, `bodyType`, `vehicleType`.
-- In `decodeVin` (NHTSA), populate from: `DisplacementL`+`EngineModel` → engine; `Trim`/`Series` → trim; `BodyClass` → bodyType; `VehicleType` → category (map "MOTORCYCLE" → `motorcycle`, else `car`).
-- On result: set category, year, make, model, engine, transmission, fuel, trim, body type. (Color is not in the VIN standard — leave manual.)
-- Add the same auto-fill on manual VIN blur (not only Scan dialog), by calling the existing `decodeVin` server function when 11–17 chars are entered.
-- Show a small "Auto-filled from VIN" hint chip beside fields that got populated (dismissible).
+- Replace `vinFormatError` with a structured helper that returns a discriminated result:
+  ```ts
+  type VinFormatCheck =
+    | { kind: "empty" }
+    | { kind: "ok_vin" }        // 17 chars, checksum ok
+    | { kind: "ok_chassis" }    // 11–16 chars, no checksum required
+    | { kind: "warn_checksum" } // 17 chars but check digit fails (JDM/EU)
+    | { kind: "bad_chars"; message: string }
+    | { kind: "bad_length"; message: string };
+  export function checkVinFormat(v: string): VinFormatCheck;
+  ```
+  Keep `vinFormatError` as a thin wrapper for existing callers (scan dialog) so the barcode flow keeps its current strict behavior.
+- Add a `decodeVin` error signal: throw a typed `VinDecodeError` with `kind: "network" | "http"` and status, so the caller can distinguish network problems from "empty result".
 
-### 3. Step-by-step section order
-Reorder collapsible `SellGroup`s to a linear flow:
-1. Listing (see field order above) — open
-2. Price — open
-3. Photos & video (already in Media tab; leave tab structure)
-4. Location — open
-5. Condition & quality — open (drop the duplicated VIN block here)
-6. Category details / What you offer — open
-7. Filters / tags — collapsed
-8. Description — collapsed
+### 2. `src/routes/sell.tsx`
 
-The old "Vehicle" group is removed (merged into Listing). Non-vehicle categories simply hide the vehicle rows.
+- Widen the VIN state:
+  ```ts
+  type VinState =
+    | { kind: "idle" }
+    | { kind: "checking" }
+    | { kind: "ok" }
+    | { kind: "chassis" }        // saved, no decode attempted
+    | { kind: "warn"; message: string }   // amber, non-blocking (checksum, non-US)
+    | { kind: "error"; message: string; retryable?: boolean };
+  ```
+  Replace the current `vinError` + `vinStatus` pair with this single state so we can't render conflicting messages.
+- Rewrite the `onBlur` handler to use `checkVinFormat` and the new decode error type, mapping each branch to the copy in the taxonomy table.
+- Add a "Retry decode" button next to the error message when `retryable` is true (network / HTTP failures only).
+- Do NOT clear or overwrite Category / Year / Make / Model / Trim / Engine / Fuel / Transmission / Color / Mileage in any failure branch — reuse the existing `applyVinDecode` (which already only fills blanks + surfaces conflicts).
+- Update the placeholder + help copy to reflect chassis # support: "17-char VIN or 11–16-char chassis # (Asia / Europe)."
 
-### 4. Reclaim wasted width
-- Bump the form container from `max-w-5xl` to `max-w-6xl` on `lg` and `max-w-7xl` on `xl` so the two-column media/details layout fills the viewport shown in the screenshot (1018 px).
-- Widen the Listing grids: 4 columns on `sm`, 6 columns on `lg` for the compact selects (Category/Condition/Registration/Seller + Year/Make/Model/Trim). Selects grow to fill their cell (`w-full`) instead of shrinking to content.
-- Right column (media) gets `lg:col-span-2` inside a `lg:grid-cols-5` outer grid so details take 3/5 and media 2/5 — no more dead space beside the Condition dropdown.
+### 3. Scanner dialog
 
-## Technical notes
+- Scanner still requires a full 17-char VIN (barcodes always encode the full VIN). No copy change needed beyond passing through the new format checker.
 
-- Files touched: `src/routes/sell.tsx`, `src/components/vin-scan-dialog.tsx`, `src/lib/vin-decode.functions.ts` (extend NHTSA mapper to return `engine`, `trim`, `bodyType`, `vehicleType`).
-- State already present: `title`, `category`, `year`, `make`, `model`, `engine`, `transmission`, `fuel`, `mileage`, `categoryAttrs`. Add: `categoryAttrs.exterior_color`, `categoryAttrs.variant` (trim).
-- Manual VIN blur debounces and only calls the decoder for 17-char VINs (NHTSA requirement); shorter chassis codes still hit the JDM table lookup already implemented in `decodeVin`.
-- No DB migration needed — `variant`/`exterior_color`/`engine` all live in the existing `listings.attributes` JSON.
-- No changes to submit validation beyond mapping the two new attribute keys.
+### 4. Tests / verification
+
+- Manual smoke-test matrix in the preview: empty, `1HGCM82633A004352` (valid US VIN), `1HGCM82633A00435I` (bad char), `NCP150-1234567` normalized (chassis), `JHMFA16506S000000` (17-char JDM likely-empty NHTSA), offline (throttle to offline in devtools → network error), then re-enable and hit Retry.
+- Confirm typed values in Year/Make/Model survive every failure branch.
+- `tsgo --noEmit` after edits.
 
 ## Out of scope
-- Deeper redesign of Media/Location tabs.
-- Adding photo-based color detection.
-- Changing the submit flow or backend validators.
+
+- Adding a second decoder for JDM/EU VINs (would need a paid API; the plan is to explain the gap, not fill it).
+- Persisting the chassis # anywhere other than `vehicle_quality.vin_chassis` (already stored).
+- Changes to the conflict panel added in the previous turn — it stays as-is.
