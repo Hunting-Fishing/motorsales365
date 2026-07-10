@@ -574,26 +574,53 @@ function SellPage() {
       );
     }
     const accepted = files.slice(0, Math.max(remaining, 0));
+    const startIndex = videos.length;
     setVideos((v) => [...v, ...accepted].slice(0, maxVideos));
     setVideoUploads((u) =>
       [...u, ...accepted.map(() => ({ status: "idle" as const, percent: 0 }))].slice(0, maxVideos),
     );
+    setVideoThumbs((t) => [...t, ...accepted.map(() => null)].slice(0, maxVideos));
     e.target.value = "";
+
+    // Generate thumbnails immediately (client-side) so the user sees a preview.
+    accepted.forEach((file, offset) => {
+      const idx = startIndex + offset;
+      extractVideoThumbnail(file)
+        .then((thumb) => {
+          setVideoThumbs((t) => {
+            const next = t.slice();
+            next[idx] = { dataUrl: thumb.dataUrl, duration: thumb.durationSec };
+            return next;
+          });
+        })
+        .catch(() => {
+          /* thumbnail is best-effort */
+        });
+    });
+
+    // Kick off eager uploads to a per-user draft path so progress shows immediately.
+    if (user) {
+      accepted.forEach((file, offset) => {
+        void uploadOneVideo(startIndex + offset, file, null);
+      });
+    }
   };
 
   const removeVideo = (i: number) => {
     setVideos((v) => v.filter((_, idx) => idx !== i));
     setVideoUploads((u) => u.filter((_, idx) => idx !== i));
+    setVideoThumbs((t) => t.filter((_, idx) => idx !== i));
   };
 
   const setPhotoState = (i: number, patch: Partial<UploadState>) => {
     setPhotoUploads((u) => u.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
   };
 
-  const uploadOnePhoto = async (i: number, file: File, lid: string) => {
+  const uploadOnePhoto = async (i: number, file: File, lid: string | null) => {
     setPhotoState(i, { status: "uploading", percent: 0, error: undefined });
     try {
-      const path = `${user!.id}/${lid}/${Date.now()}-${i}-${file.name}`;
+      const scope = lid ?? "_draft";
+      const path = `${user!.id}/${scope}/${Date.now()}-${i}-${file.name}`;
       const { publicUrl } = await uploadWithRetry({
         bucket: "listing-photos",
         path,
@@ -602,13 +629,15 @@ function SellPage() {
         onProgress: (e) => setPhotoState(i, { percent: e.percent }),
       });
       setPhotoState(i, { status: "done", percent: 100, url: publicUrl, path });
-      await supabase.from("listing_media").insert({
-        listing_id: lid,
-        type: "photo",
-        url: publicUrl,
-        storage_path: path,
-        sort_order: i,
-      });
+      if (lid) {
+        await supabase.from("listing_media").insert({
+          listing_id: lid,
+          type: "photo",
+          url: publicUrl,
+          storage_path: path,
+          sort_order: i,
+        });
+      }
       return true;
     } catch (err: any) {
       setPhotoState(i, { status: "error", error: err?.message ?? "Upload failed" });
@@ -620,10 +649,11 @@ function SellPage() {
     setVideoUploads((u) => u.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
   };
 
-  const uploadOneVideo = async (i: number, file: File, lid: string) => {
+  const uploadOneVideo = async (i: number, file: File, lid: string | null) => {
     setVideoState(i, { status: "uploading", percent: 0, error: undefined });
     try {
-      const path = `${user!.id}/${lid}/${Date.now()}-${i}-${file.name}`;
+      const scope = lid ?? "_draft";
+      const path = `${user!.id}/${scope}/${Date.now()}-${i}-${file.name}`;
       const { publicUrl } = await uploadWithRetry({
         bucket: "listing-videos",
         path,
@@ -632,13 +662,15 @@ function SellPage() {
         onProgress: (e) => setVideoState(i, { percent: e.percent }),
       });
       setVideoState(i, { status: "done", percent: 100, url: publicUrl, path });
-      await supabase.from("listing_media").insert({
-        listing_id: lid,
-        type: "video",
-        url: publicUrl,
-        storage_path: path,
-        sort_order: i,
-      });
+      if (lid) {
+        await supabase.from("listing_media").insert({
+          listing_id: lid,
+          type: "video",
+          url: publicUrl,
+          storage_path: path,
+          sort_order: i,
+        });
+      }
       return true;
     } catch (err: any) {
       setVideoState(i, { status: "error", error: err?.message ?? "Upload failed" });
@@ -647,12 +679,12 @@ function SellPage() {
   };
 
   const retryPhoto = async (i: number) => {
-    if (!listingId || !photos[i]) return;
+    if (!photos[i]) return;
     await uploadOnePhoto(i, photos[i], listingId);
   };
 
   const retryVideo = async (i: number) => {
-    if (!listingId || !videos[i]) return;
+    if (!videos[i]) return;
     await uploadOneVideo(i, videos[i], listingId);
   };
 
