@@ -885,6 +885,8 @@ function SellPage() {
   };
 
   const removeVideo = (i: number) => {
+    const file = videos[i];
+    if (file) releaseFileUrl(file);
     setVideos((v) => v.filter((_, idx) => idx !== i));
     setVideoUploads((u) => u.filter((_, idx) => idx !== i));
     setVideoThumbs((t) => t.filter((_, idx) => idx !== i));
