@@ -108,6 +108,30 @@ function AdminOverview() {
         </button>
       </header>
 
+      {/* QUICK ACTIONS — high-priority admin shortcuts */}
+      {isAdmin && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/admin/franchise"
+            className="inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/15"
+          >
+            <Handshake className="h-4 w-4" />
+            Franchise queue
+            {(franchiseCount.data?.total ?? 0) > 0 && (
+              <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                {franchiseCount.data?.total}
+              </span>
+            )}
+          </Link>
+          <Link
+            to="/admin/franchise-tiers"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted"
+          >
+            Franchise tiers
+          </Link>
+        </div>
+      )}
+
       {/* SITE HEALTH — surfaced first so ops see problems immediately */}
       <Section title="Site health" subtitle="Queues that need admin attention right now.">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

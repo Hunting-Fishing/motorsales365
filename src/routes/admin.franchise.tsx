@@ -378,7 +378,7 @@ function AdminFranchisePage() {
                       </th>
                       <SortHeader field="business_name" sort={sort} setSort={setSort}>Business</SortHeader>
                       <SortHeader field="contact_name" sort={sort} setSort={setSort}>Contact</SortHeader>
-                      <SortHeader field="province" sort={sort} setSort={setSort}>Location</SortHeader>
+                      <LocationSortHeader sort={sort} setSort={setSort} />
                       <SortHeader field="tier_slug" sort={sort} setSort={setSort}>Tier</SortHeader>
                       <SortHeader field="status" sort={sort} setSort={setSort}>Status</SortHeader>
                       <SortHeader field="created_at" sort={sort} setSort={setSort} align="right">Applied</SortHeader>
@@ -733,6 +733,42 @@ function SortHeader({
       >
         {children}
         <span className="text-[10px] opacity-70">{arrow || "↕"}</span>
+      </button>
+    </th>
+  );
+}
+
+function LocationSortHeader({
+  sort,
+  setSort,
+}: {
+  sort: { field: SortField; dir: "asc" | "desc" };
+  setSort: (s: { field: SortField; dir: "asc" | "desc" }) => void;
+}) {
+  const isProvince = sort.field === "province";
+  const isCity = sort.field === "city";
+  const active = isProvince || isCity;
+  // Cycle: province asc → province desc → city asc → city desc → province asc
+  function next() {
+    if (isProvince && sort.dir === "asc") return { field: "province" as const, dir: "desc" as const };
+    if (isProvince && sort.dir === "desc") return { field: "city" as const, dir: "asc" as const };
+    if (isCity && sort.dir === "asc") return { field: "city" as const, dir: "desc" as const };
+    return { field: "province" as const, dir: "asc" as const };
+  }
+  const label = isCity ? "City" : "Province";
+  const arrow = active ? (sort.dir === "asc" ? "▲" : "▼") : "↕";
+  return (
+    <th className="px-3 py-2 text-left font-medium">
+      <button
+        type="button"
+        onClick={() => setSort(next())}
+        className={`inline-flex items-center gap-1 hover:text-foreground ${active ? "text-foreground" : ""}`}
+        title="Click to cycle: Province ↑ → Province ↓ → City ↑ → City ↓"
+      >
+        Location
+        <span className="text-[10px] opacity-70">
+          {active ? `· ${label} ${arrow}` : arrow}
+        </span>
       </button>
     </th>
   );

@@ -591,6 +591,12 @@ export function SiteHeader() {
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
+                          <Link to="/admin/franchise">
+                            <Handshake className="mr-2 h-4 w-4" />
+                            Franchise queue
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
                           <Link to="/admin">
                             <Shield className="mr-2 h-4 w-4" />
                             Admin console
@@ -600,6 +606,14 @@ export function SiteHeader() {
                     )}
                     <DropdownMenuSeparator />
                   </>
+                )}
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin/franchise">
+                      <Handshake className="mr-2 h-4 w-4" />
+                      Franchise queue
+                    </Link>
+                  </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
                   <Link to="/franchise/status">
@@ -945,6 +959,14 @@ export function SiteHeader() {
                                   className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
                                 >
                                   <Users className="h-4 w-4" /> Manage sales reps
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin/franchise"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Handshake className="h-4 w-4" /> Franchise queue
                                 </Link>
                               </SheetClose>
                               <SheetClose asChild>
