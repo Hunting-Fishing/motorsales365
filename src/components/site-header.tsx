@@ -591,6 +591,12 @@ export function SiteHeader() {
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
+                          <Link to="/admin/franchise">
+                            <Handshake className="mr-2 h-4 w-4" />
+                            Franchise queue
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
                           <Link to="/admin">
                             <Shield className="mr-2 h-4 w-4" />
                             Admin console
