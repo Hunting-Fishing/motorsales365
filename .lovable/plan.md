@@ -1,68 +1,60 @@
-## Problem
-Users are getting logged out too often. Digging in, three things are working against long sessions:
 
-1. **`src/routes/_authenticated/route.tsx:65`** — every navigation into a protected route calls `supabase.auth.getUser()`, which hits `/auth/v1/user`. Any transient network hiccup (spotty wifi, backend cold-start, momentary 5xx) returns `error`, so we `throw redirect({ to: "/auth" })`. Session is still valid — we just kicked them out.
-2. **`src/hooks/use-auth.tsx:622-635`** — a single unexpected `SIGNED_OUT` (which supabase-js can emit for one failed refresh attempt, e.g. tab wake from sleep) is treated as a hard sign-out immediately, with no retry.
-3. **`src/hooks/use-auth.tsx` + `client.ts`** — no session-length policy. Refresh happens purely on Supabase's default JWT expiry, and once refresh fails once we teardown.
+## Goals
 
-The refresh-token lifetime itself is already 30 days on Supabase's default, so 7-day web / indefinite PWA is achievable — the issue is we abandon the session too eagerly.
-
-## Goal
-- **Web (browser tab):** stay signed in as long as the browser has a valid refresh token; only sign the user out if they've been away 7+ days OR they explicitly log out OR the refresh token is definitively revoked by the server.
-- **PWA (installed as app / standalone display-mode):** stay signed in indefinitely — never auto-redirect to `/auth` on a transient failure; show an inline reconnect banner instead.
+1. Move VIN / chassis to right under Title.
+2. When VIN is entered/scanned, auto-populate Category, Year, Make, Model, Engine, Transmission, Fuel, Trim (variant), and Color where the decoder returns them.
+3. Re-order the form to a natural step-by-step flow.
+4. Kill the wasted horizontal space visible in the screenshot — the form is currently constrained to `max-w-5xl` with narrow selects (see the tiny "Condition" dropdown), leaving big empty gutters on desktop.
 
 ## Changes
 
-### 1. Stop kicking users out on transient `getUser()` failure
-`src/routes/_authenticated/route.tsx`:
-- Drop the `getUser()` call from `beforeLoad`. Keep the cheap local `getSession()` check — if there's no session, redirect to `/auth`. If there is a session, trust it and let `<AuthenticatedGuard />` react to a real `SIGNED_OUT` via `useAuth`.
-- In `AuthenticatedGuard`, only redirect when `authError === "refresh_failed"` AND we've retried once, OR the user has been absent (no session) for the whole bootstrap window. Never redirect on the first tick of a transient loss.
-
-### 2. Retry once before treating a `SIGNED_OUT` as terminal
-`src/hooks/use-auth.tsx` (lines ~606-640):
-- When we see an unexpected `SIGNED_OUT` (had a user, we didn't call signOut), don't immediately null the session. Call `supabase.auth.refreshSession()` once. If it returns a session → keep the user logged in and clear `authError`. If it fails → then proceed with the existing teardown.
-- Same treatment for `TOKEN_REFRESHED` with no session: attempt one manual `refreshSession()` before flipping to `authError = "refresh_failed"`.
-
-### 3. Track "last active" and enforce the 7-day web idle policy
-Add a small helper (co-located in `use-auth.tsx` or `src/lib/session-policy.ts`):
-- On every `SIGNED_IN` / `TOKEN_REFRESHED` / user interaction (piggyback on a lightweight `visibilitychange` + `focus` listener), write `Date.now()` to `localStorage["auth:lastActiveAt"]`.
-- On bootstrap, if `!isStandalonePWA()` AND `Date.now() - lastActiveAt > 7 * 24h`, call `signOut({ scope: "local" })` before the listener fires and land the user on `/auth?reason=idle_7d`.
-- If `isStandalonePWA()` — skip the idle check entirely. Installed app = indefinite.
-
-`isStandalonePWA()`:
-```ts
-window.matchMedia("(display-mode: standalone)").matches ||
-(navigator as any).standalone === true
+### 1. New "Listing" section field order
+Single top section, everything above the fold:
 ```
+Title
+VIN / chassis            [Scan VIN]   ← moved here, full width
+Category   Condition   Registration   Seller
+Year   Make   Model   Trim / variant
+Transmission   Fuel   Engine   Color
+Mileage (km)   Body type (car only)   Drivetrain (car only)
+```
+- The existing separate "Vehicle" `SellGroup` collapses into this — VehiclePicker (year/make/model) and the mileage/transmission/fuel grid move up; the standalone "VIN / chassis" block is removed from its current location.
+- New fields wired to existing state: `trim` (already exists in `categoryAttrs.variant`), `color` (add `exterior_color` to categoryAttrs), `engine` (already exists as `engine` state).
 
-### 4. Reconnect banner instead of redirect (PWA only)
-When `isStandalonePWA()` is true and `authError` becomes `"refresh_failed"`:
-- Do NOT navigate to `/auth`.
-- Render a slim top banner ("You've been disconnected — tap to sign back in") that calls `retryAuth()`. Keep the current view mounted so the user doesn't lose form state.
-- Web (non-standalone) keeps today's redirect-to-`/auth` behavior, but only after the retry in change #2 fails.
+### 2. VIN auto-fill (extend `VinScanDialog` + manual entry)
+- Extend `VinDecodeResult` to also carry `engine`, `trim`, `bodyType`, `vehicleType`.
+- In `decodeVin` (NHTSA), populate from: `DisplacementL`+`EngineModel` → engine; `Trim`/`Series` → trim; `BodyClass` → bodyType; `VehicleType` → category (map "MOTORCYCLE" → `motorcycle`, else `car`).
+- On result: set category, year, make, model, engine, transmission, fuel, trim, body type. (Color is not in the VIN standard — leave manual.)
+- Add the same auto-fill on manual VIN blur (not only Scan dialog), by calling the existing `decodeVin` server function when 11–17 chars are entered.
+- Show a small "Auto-filled from VIN" hint chip beside fields that got populated (dismissible).
 
-### 5. Extend Supabase refresh-token lifetime (indefinite-ish for PWA)
-Supabase's default refresh token is 30 days. To honor "indefinite" for the PWA, request the auth settings bump:
-- Set JWT expiry to 1 hour (default, keep).
-- Set refresh token lifetime to the maximum available on our plan (e.g. 1 year), with rotation enabled and reuse interval 10s so multi-tab refreshes don't invalidate each other.
-- This is a Cloud auth-settings change — I'll flag it in the same turn but note it can't be toggled from code (no `configure_auth` field for it); we'll adjust via the Cloud auth settings UI.
+### 3. Step-by-step section order
+Reorder collapsible `SellGroup`s to a linear flow:
+1. Listing (see field order above) — open
+2. Price — open
+3. Photos & video (already in Media tab; leave tab structure)
+4. Location — open
+5. Condition & quality — open (drop the duplicated VIN block here)
+6. Category details / What you offer — open
+7. Filters / tags — collapsed
+8. Description — collapsed
 
-### 6. Don't nuke session on multi-tab refresh races
-Confirm `src/lib/currency.tsx:116` and `src/lib/garage.ts:116` `onAuthStateChange` subscribers don't call `signOut` on transient events. They currently just refetch, which is fine — no change expected, just verify.
+The old "Vehicle" group is removed (merged into Listing). Non-vehicle categories simply hide the vehicle rows.
 
-## Verification
-- **Web (Chrome, non-standalone):**
-  - Sign in, close all tabs, come back after 1 hour → still signed in.
-  - Sign in, come back after 6 days → still signed in.
-  - Sign in, come back after 8 days → redirected to `/auth?reason=idle_7d`.
-  - Sign in, throttle network to Offline in DevTools, navigate between protected pages → stays on the page, no redirect to `/auth`. Restore network → session refreshes silently.
-- **PWA (installed on iOS/Android home screen):**
-  - Sign in, force-close app, reopen after 30 days → still signed in (assuming Cloud refresh-token lifetime is bumped).
-  - Sign in, go airplane mode, tap around → reconnect banner shows, no redirect.
-- **Regression suite:** run `bun x vitest run src/__tests__/auth-*.test.tsx` — update the "unexpected SIGNED_OUT" and "refresh failure" tests to expect a retry before teardown.
-- **Manual:** sign out via header button → still lands on `/auth` cleanly (explicit signOut path unchanged).
+### 4. Reclaim wasted width
+- Bump the form container from `max-w-5xl` to `max-w-6xl` on `lg` and `max-w-7xl` on `xl` so the two-column media/details layout fills the viewport shown in the screenshot (1018 px).
+- Widen the Listing grids: 4 columns on `sm`, 6 columns on `lg` for the compact selects (Category/Condition/Registration/Seller + Year/Make/Model/Trim). Selects grow to fill their cell (`w-full`) instead of shrinking to content.
+- Right column (media) gets `lg:col-span-2` inside a `lg:grid-cols-5` outer grid so details take 3/5 and media 2/5 — no more dead space beside the Condition dropdown.
 
-## Non-goals
-- No changes to the login/signup UX.
-- No changes to `_authenticated` route composition beyond the `beforeLoad` / guard behavior.
-- No new dependencies.
+## Technical notes
+
+- Files touched: `src/routes/sell.tsx`, `src/components/vin-scan-dialog.tsx`, `src/lib/vin-decode.functions.ts` (extend NHTSA mapper to return `engine`, `trim`, `bodyType`, `vehicleType`).
+- State already present: `title`, `category`, `year`, `make`, `model`, `engine`, `transmission`, `fuel`, `mileage`, `categoryAttrs`. Add: `categoryAttrs.exterior_color`, `categoryAttrs.variant` (trim).
+- Manual VIN blur debounces and only calls the decoder for 17-char VINs (NHTSA requirement); shorter chassis codes still hit the JDM table lookup already implemented in `decodeVin`.
+- No DB migration needed — `variant`/`exterior_color`/`engine` all live in the existing `listings.attributes` JSON.
+- No changes to submit validation beyond mapping the two new attribute keys.
+
+## Out of scope
+- Deeper redesign of Media/Location tabs.
+- Adding photo-based color detection.
+- Changing the submit flow or backend validators.

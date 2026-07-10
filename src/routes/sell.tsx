@@ -48,7 +48,7 @@ import {
   type VehicleQuality,
   type VehicleQualityIssue,
 } from "@/components/vehicle-quality-fields";
-import { VinScanDialog } from "@/components/vin-scan-dialog";
+import { VinScanDialog, decodeVin, vinFormatError, normalizeVin, type VinDecodeResult } from "@/components/vin-scan-dialog";
 import {
   CategoryAttributesEditor,
   CATEGORY_ATTR_KEYS,
@@ -487,6 +487,26 @@ function SellPage() {
     setSourceRideId(rideId);
     toast.success("Prefilled from your ride profile");
   };
+
+  // Auto-fill listing fields from a decoded VIN (scanner OR manual blur).
+  const applyVinDecode = (r: VinDecodeResult) => {
+    setVehicleQuality((prev) => ({ ...prev, vin_chassis: r.vin }));
+    if (r.category) setCategory(r.category);
+    if (r.year) setYear(r.year);
+    if (r.make) setMake(r.make);
+    if (r.model) setModel(r.model);
+    if (r.engine) setEngine(r.engine);
+    if (r.fuel) setFuel(r.fuel);
+    if (r.transmission) setTransmission(r.transmission);
+    if (r.trim || r.bodyType) {
+      setCategoryAttrs((prev) => ({
+        ...prev,
+        ...(r.trim ? { variant: r.trim } : {}),
+        ...(r.bodyType ? { body_type: r.bodyType } : {}),
+      }));
+    }
+  };
+
 
   // Honor ?from_ride=<id> on mount.
   useEffect(() => {
@@ -1069,7 +1089,7 @@ function SellPage() {
 
   return (
     <SiteLayout>
-      <div className="sell-compact container mx-auto max-w-5xl px-3 py-3 pb-24 sm:py-4 md:pb-6">
+      <div className="sell-compact container mx-auto max-w-6xl xl:max-w-7xl px-3 py-3 pb-24 sm:py-4 md:pb-6">
         <div className="flex items-end justify-between gap-3">
           <h1 className="font-display text-xl sm:text-2xl font-bold">Post a listing</h1>
           <span className="text-xs text-muted-foreground">Reach buyers across the Philippines.</span>
@@ -1189,11 +1209,53 @@ function SellPage() {
                   placeholder="2019 Toyota Vios 1.3 E AT"
                 />
               </div>
+
+              {/* VIN / chassis — moved here, right under Title */}
+              {(category === "car" || category === "motorcycle") && (
+                <div>
+                  <Label className="text-[11px]">VIN / chassis</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      className="h-8 text-sm"
+                      placeholder="Optional — auto-fills year, make, model, engine, trans & fuel"
+                      value={vehicleQuality.vin_chassis ?? ""}
+                      maxLength={17}
+                      onChange={(e) =>
+                        setVehicleQuality((prev) => ({
+                          ...prev,
+                          vin_chassis: e.target.value.toUpperCase().replace(/\s+/g, ""),
+                        }))
+                      }
+                      onBlur={async (e) => {
+                        const raw = normalizeVin(e.target.value);
+                        if (!raw || raw.length !== 17 || vinFormatError(raw)) return;
+                        try {
+                          const r = await decodeVin(raw);
+                          applyVinDecode(r);
+                        } catch {
+                          /* ignore — user can fill manually */
+                        }
+                      }}
+                    />
+                    <VinScanDialog onResult={applyVinDecode} />
+                  </div>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    11–17 letters and numbers, no I/O/Q. Shown only when a buyer requests verification.
+                  </p>
+                  {vehicleQualityIssues.find((i) => i.field === "vin_chassis") && (
+                    <p className="mt-0.5 text-[11px] text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {vehicleQualityIssues.find((i) => i.field === "vin_chassis")?.message}
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="grid gap-2 grid-cols-2 sm:grid-cols-4">
                 <div>
                   <Label className="text-[11px]">Category</Label>
                   <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger className="h-8 text-xs">
+                    <SelectTrigger className="h-8 w-full text-xs">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="min-w-[14rem]">
@@ -1208,7 +1270,7 @@ function SellPage() {
                 <div>
                   <Label className="text-[11px]">Condition</Label>
                   <Select value={condition} onValueChange={setCondition}>
-                    <SelectTrigger className="h-8 text-xs">
+                    <SelectTrigger className="h-8 w-full text-xs">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -1225,7 +1287,7 @@ function SellPage() {
                       value={registrationStatus}
                       onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
                     >
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger className="h-8 w-full text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -1249,7 +1311,86 @@ function SellPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Vehicle year / make / model / engine (car & motorcycle) */}
+              {(category === "car" || category === "motorcycle") && (
+                <>
+                  <VehiclePicker
+                    category={category as "car" | "motorcycle"}
+                    year={year}
+                    make={make}
+                    model={model}
+                    engine={engine}
+                    onChange={(v) => {
+                      setYear(v.year);
+                      setMake(v.make);
+                      setModel(v.model);
+                      setEngine(v.engine ?? "");
+                    }}
+                  />
+                  <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+                    <div>
+                      <Label className="text-[11px]">Trim / variant</Label>
+                      <Input
+                        className="h-8 text-sm"
+                        value={(categoryAttrs.variant as string) ?? ""}
+                        onChange={(e) =>
+                          setCategoryAttrs((prev) => ({ ...prev, variant: e.target.value }))
+                        }
+                        placeholder="e.g. E, G, Sport"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[11px]">Color</Label>
+                      <Input
+                        className="h-8 text-sm"
+                        value={(categoryAttrs.exterior_color as string) ?? ""}
+                        onChange={(e) =>
+                          setCategoryAttrs((prev) => ({ ...prev, exterior_color: e.target.value }))
+                        }
+                        placeholder="e.g. Pearl White"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[11px]">Mileage (km)</Label>
+                      <Input
+                        className="h-8 text-sm"
+                        value={mileage}
+                        onChange={(e) => setMileage(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[11px]">Transmission</Label>
+                      <Select value={transmission} onValueChange={setTransmission}>
+                        <SelectTrigger className="h-8 w-full text-xs">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Automatic">Automatic</SelectItem>
+                          <SelectItem value="Manual">Manual</SelectItem>
+                          <SelectItem value="CVT">CVT</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-[11px]">Fuel</Label>
+                      <Select value={fuel} onValueChange={setFuel}>
+                        <SelectTrigger className="h-8 w-full text-xs">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Gasoline">Gasoline</SelectItem>
+                          <SelectItem value="Diesel">Diesel</SelectItem>
+                          <SelectItem value="Hybrid">Hybrid</SelectItem>
+                          <SelectItem value="Electric">Electric</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </>
+              )}
             </SellGroup>
+
 
             {/* PRICE */}
             <SellGroup id="price" title="Price" defaultOpen>
@@ -1292,93 +1433,8 @@ function SellPage() {
               </div>
             </SellGroup>
 
-            {/* VEHICLE (car / motorcycle only) */}
-            {(category === "car" || category === "motorcycle") && (
-              <SellGroup id="vehicle" title="Vehicle" defaultOpen>
-                <div>
-                  <Label className="text-xs">VIN / chassis</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      className="h-9 text-sm"
-                      placeholder="Optional"
-                      value={vehicleQuality.vin_chassis ?? ""}
-                      maxLength={17}
-                      onChange={(e) =>
-                        setVehicleQuality((prev) => ({
-                          ...prev,
-                          vin_chassis: e.target.value.toUpperCase().replace(/\s+/g, ""),
-                        }))
-                      }
-                    />
-                    <VinScanDialog
-                      onResult={(r) => {
-                        setVehicleQuality((prev) => ({ ...prev, vin_chassis: r.vin }));
-                        if (r.year) setYear(r.year);
-                        if (r.make) setMake(r.make);
-                        if (r.model) setModel(r.model);
-                        if (r.fuel) setFuel(r.fuel);
-                        if (r.transmission) setTransmission(r.transmission);
-                      }}
-                    />
-                  </div>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">
-                    11–17 letters and numbers, no I/O/Q. Shown only when a buyer requests verification.
-                  </p>
-                  {vehicleQualityIssues.find((i) => i.field === "vin_chassis") && (
-                    <p className="mt-0.5 text-[11px] text-destructive flex items-center gap-1">
-                      <AlertCircle className="h-3 w-3" />
-                      {vehicleQualityIssues.find((i) => i.field === "vin_chassis")?.message}
-                    </p>
-                  )}
-                </div>
-                <VehiclePicker
-                  category={category as "car" | "motorcycle"}
-                  year={year}
-                  make={make}
-                  model={model}
-                  engine={engine}
-                  onChange={(v) => {
-                    setYear(v.year);
-                    setMake(v.make);
-                    setModel(v.model);
-                    setEngine(v.engine ?? "");
-                  }}
-                />
-                <div className="grid gap-2 sm:grid-cols-3">
-                  <div>
-                    <Label className="text-xs">Mileage (km)</Label>
-                    <Input className="h-9 text-sm" value={mileage} onChange={(e) => setMileage(e.target.value)} />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Transmission</Label>
-                    <Select value={transmission} onValueChange={setTransmission}>
-                      <SelectTrigger className="h-9 text-sm">
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Automatic">Automatic</SelectItem>
-                        <SelectItem value="Manual">Manual</SelectItem>
-                        <SelectItem value="CVT">CVT</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Fuel</Label>
-                    <Select value={fuel} onValueChange={setFuel}>
-                      <SelectTrigger className="h-9 text-sm">
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Gasoline">Gasoline</SelectItem>
-                        <SelectItem value="Diesel">Diesel</SelectItem>
-                        <SelectItem value="Hybrid">Hybrid</SelectItem>
-                        <SelectItem value="Electric">Electric</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </SellGroup>
-            )}
+            {/* Vehicle group merged into Listing above */}
+
 
             {/* CATEGORY DETAILS — service tags + category-specific block */}
             {(SERVICE_CATEGORIES.has(category) ||
