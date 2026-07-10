@@ -608,6 +608,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     }, 8000);
 
+    // Web-only 7-day idle policy. Installed PWAs stay signed in indefinitely
+    // (isWebIdleExpired short-circuits to false in standalone mode). If the
+    // user's been away past the window on a normal browser tab, clear the
+    // local session so we don't leave a public device signed in.
+    if (isWebIdleExpired()) {
+      authLog("info", { event: "session.idle_expired" });
+      clearLastActive();
+      signOutInitiatedRef.current = true;
+      void supabase.auth.signOut({ scope: "local" }).catch(() => {});
+    }
+
+    // Track user activity so the idle window resets on every visit.
+    const stopActivityTracking = beginActivityTracking();
+
     // Listener FIRST — also clears loading so we render as soon as
     // Supabase emits INITIAL_SESSION from the persisted storage token.
     const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
