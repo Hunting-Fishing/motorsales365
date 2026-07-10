@@ -41,20 +41,23 @@ const HONDA: WmiRow[] = [
     region: "Asia",
     country: "PH",
     vds: [
-      // City GD/FD (2003–2008): "FD1..", "FD2.."; 1.3L (L13A) or 1.5L (L15A)
-      { vds: /^FD1/, model: "City", bodyType: "sedan", drivetrain: "fwd", fuel: "Gasoline", engine: "1.5L 4-cyl L15A", yearMin: 2003, yearMax: 2008 },
-      { vds: /^FD2/, model: "City", bodyType: "sedan", drivetrain: "fwd", fuel: "Gasoline", engine: "1.3L 4-cyl L13A", yearMin: 2003, yearMax: 2008 },
-      // Civic FD (2006–2011)
-      { vds: /^FD/, model: "Civic", bodyType: "sedan", drivetrain: "fwd", fuel: "Gasoline", yearMin: 2006, yearMax: 2011 },
-      // Jazz/Fit GE (2008–2013): "GE8.."
+      // Civic 8th-gen FD (2006–2011): FD1 = 1.8L R18A, FD2 = 2.0L Si K20A, FD3 = Hybrid
+      { vds: /^FD1/, model: "Civic", trim: "1.8 V", bodyType: "sedan", drivetrain: "fwd", fuel: "Gasoline", transmission: "Manual", engine: "1.8L 4-cyl R18A", yearMin: 2006, yearMax: 2011 },
+      { vds: /^FD2/, model: "Civic", trim: "2.0 Si", bodyType: "sedan", drivetrain: "fwd", fuel: "Gasoline", engine: "2.0L 4-cyl K20A", yearMin: 2006, yearMax: 2011 },
+      { vds: /^FD3/, model: "Civic Hybrid", bodyType: "sedan", drivetrain: "fwd", fuel: "Hybrid", engine: "1.3L IMA LDA", yearMin: 2006, yearMax: 2011 },
+      // City GD (2003–2008): GD6/GD8 1.5L L15A
+      { vds: /^GD[68]/, model: "City", bodyType: "sedan", drivetrain: "fwd", fuel: "Gasoline", engine: "1.5L 4-cyl L15A", yearMin: 2003, yearMax: 2008 },
+      // City GM (2008–2019): GM2/GM3/GM6 1.5L L15A
+      { vds: /^GM[236]/, model: "City", bodyType: "sedan", drivetrain: "fwd", fuel: "Gasoline", engine: "1.5L 4-cyl L15A", yearMin: 2008, yearMax: 2019 },
+      // Jazz/Fit GE (2008–2013)
       { vds: /^GE/, model: "Jazz", bodyType: "hatchback", drivetrain: "fwd", fuel: "Gasoline" },
-      // CR-V RE (2007–2011): "RE3", "RE4"
+      // CR-V RE (2007–2011)
       { vds: /^RE/, model: "CR-V", bodyType: "suv", drivetrain: "awd", fuel: "Gasoline" },
-      // BR-V DG: "DG1.."
+      // BR-V DG
       { vds: /^DG/, model: "BR-V", bodyType: "mpv", drivetrain: "fwd", fuel: "Gasoline" },
-      // Mobilio DD: "DD1.."
+      // Mobilio DD
       { vds: /^DD/, model: "Mobilio", bodyType: "mpv", drivetrain: "fwd", fuel: "Gasoline" },
-      // HR-V RU (2015–2021): "RU"
+      // HR-V RU (2015–2021)
       { vds: /^RU/, model: "HR-V", bodyType: "suv", drivetrain: "fwd", fuel: "Gasoline" },
     ],
   },
