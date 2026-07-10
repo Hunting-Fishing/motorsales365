@@ -1095,7 +1095,9 @@ function SellPage() {
             );
           })()}
 
-          <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+          {activeTab === "details" && (
+          <section data-tab="details" className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+
             {/* Header */}
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold">Listing details</h2>
