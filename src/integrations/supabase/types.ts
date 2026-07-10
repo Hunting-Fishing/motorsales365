@@ -12335,6 +12335,27 @@ export type Database = {
         }
         Relationships: []
       }
+      vin_decode_cache: {
+        Row: {
+          decoded_at: string
+          result: Json
+          source: string
+          vin: string
+        }
+        Insert: {
+          decoded_at?: string
+          result: Json
+          source: string
+          vin: string
+        }
+        Update: {
+          decoded_at?: string
+          result?: Json
+          source?: string
+          vin?: string
+        }
+        Relationships: []
+      }
       wanted_post_responses: {
         Row: {
           business_id: string | null
