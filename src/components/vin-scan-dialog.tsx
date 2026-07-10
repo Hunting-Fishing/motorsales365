@@ -89,7 +89,11 @@ export function vinFormatError(vin: string): string | null {
 // Suppress unused-var lint on VIN_REGEX (kept for reference).
 void VIN_REGEX;
 
-// --- NHTSA decode --------------------------------------------------------
+// --- VIN decode (server-side waterfall) ----------------------------------
+
+import { decodeVin as decodeVinServer } from "@/lib/vin-decode.functions";
+import type { DecodedFields, FieldSource } from "@/lib/vin-decode.server";
+import type { Region } from "@/data/vin-vds-tables";
 
 export type VinDecodeResult = {
   vin: string;
@@ -100,11 +104,16 @@ export type VinDecodeResult = {
   transmission?: string;
   engine?: string;
   trim?: string;
-  /** Canonical BODY_TYPES value (sedan, suv, hatchback, …) — safe to store in listings.attributes.body_type. */
+  /** Canonical BODY_TYPES value (sedan, suv, hatchback, …). */
   bodyType?: string;
   /** Canonical DRIVETRAINS value (fwd, rwd, awd, 4x4, 4x2). */
   drivetrain?: string;
   category?: "car" | "motorcycle";
+  region?: Region;
+  primarySource?: "nhtsa" | "vds" | "ai" | "jdm_table" | "wmi";
+  sources?: Partial<Record<keyof DecodedFields, FieldSource>>;
+  missing?: string[];
+  notes?: string[];
 };
 
 export class VinDecodeError extends Error {
@@ -117,153 +126,40 @@ export class VinDecodeError extends Error {
   }
 }
 
+/** Client wrapper around the server-side multi-region waterfall (NHTSA →
+ *  structural WMI/VDS → AI). Throws `VinDecodeError` so the caller's
+ *  existing error paths keep working. */
 export async function decodeVin(vin: string): Promise<VinDecodeResult> {
-  const url = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin)}?format=json`;
-  let r: Response;
+  let r;
   try {
-    r = await fetch(url);
+    r = await decodeVinServer({ data: { value: vin } });
   } catch (e) {
     throw new VinDecodeError("network", e instanceof Error ? e.message : "network error");
   }
-  if (!r.ok) throw new VinDecodeError("http", `NHTSA ${r.status}`, r.status);
-  const json = (await r.json()) as { Results?: Array<Record<string, string>> };
-  const row = json.Results?.[0] ?? {};
-  const out: VinDecodeResult = { vin };
-  if (row.ModelYear) out.year = row.ModelYear;
-  if (row.Make) out.make = titleCase(row.Make);
-  if (row.Model) out.model = titleCase(row.Model);
-  if (row.FuelTypePrimary) out.fuel = mapFuel(row.FuelTypePrimary);
-  if (row.TransmissionStyle) out.transmission = mapTransmission(row.TransmissionStyle);
-  const engineParts = [
-    row.DisplacementL ? `${Number(row.DisplacementL).toFixed(1)}L` : "",
-    row.EngineCylinders ? `${row.EngineCylinders}-cyl` : "",
-    row.EngineModel ? row.EngineModel : "",
-  ].filter(Boolean);
-  if (engineParts.length) out.engine = engineParts.join(" ").trim();
-  const trim = row.Trim || row.Series;
-  if (trim) out.trim = trim;
-  if (row.BodyClass) out.bodyType = mapBodyType(row.BodyClass);
-  if (row.DriveType) out.drivetrain = mapDrivetrain(row.DriveType);
-  if (row.VehicleType) {
-    out.category = /motorcycle/i.test(row.VehicleType) ? "motorcycle" : "car";
+  if (!r.ok) {
+    // Preserve the VIN so the field stays populated; surface reason via HTTP-kind error.
+    throw new VinDecodeError("http", r.reason);
   }
-
-  // Fallback for Asia/Europe VINs that NHTSA does not know:
-  // decode make from the WMI (first 3 chars) and year from position 10.
-  if (vin.length === 17) {
-    if (!out.make) {
-      const wmiMake = lookupWmiMake(vin.slice(0, 3));
-      if (wmiMake) out.make = wmiMake;
-    }
-    if (!out.year) {
-      const y = decodeVinYear(vin);
-      if (y) out.year = String(y);
-    }
-  }
-  return out;
+  return {
+    vin: r.vin,
+    year: r.year,
+    make: r.make,
+    model: r.model,
+    fuel: r.fuel,
+    transmission: r.transmission,
+    engine: r.engine,
+    trim: r.trim,
+    bodyType: r.bodyType,
+    drivetrain: r.drivetrain,
+    category: r.category,
+    region: r.region,
+    primarySource: r.primarySource,
+    sources: r.sources,
+    missing: r.missing,
+    notes: r.notes,
+  };
 }
 
-// VIN position 10 (index 9) encodes model year. Position 7 (index 6) is a
-// digit for years 1980–2009 and a letter for 2010–2039 — used to disambiguate
-// the repeating year code (e.g. "7" = 2007 or 2037).
-const YEAR_CHARS_1 = "ABCDEFGHJKLMNPRSTVWXY"; // 1980–2000
-const YEAR_CHARS_2 = "123456789"; // 2001–2009
-function decodeVinYear(vin: string): number | null {
-  const pos10 = vin[9];
-  const pos7 = vin[6];
-  const isModern = /[A-Z]/.test(pos7 ?? ""); // 2010+
-  const digitIdx = YEAR_CHARS_2.indexOf(pos10);
-  if (digitIdx >= 0) return (isModern ? 2031 : 2001) + digitIdx;
-  const letterIdx = YEAR_CHARS_1.indexOf(pos10);
-  if (letterIdx >= 0) return (isModern ? 2010 : 1980) + letterIdx;
-  return null;
-}
-
-// Compact World-Manufacturer-Identifier map for the makes we see most on
-// PH/Asia/Europe imports. First 2 chars are usually enough; some are 3.
-const WMI_MAKE: Array<[RegExp, string]> = [
-  [/^(1HG|2HG|3HG|5FN|5J6|JHM|JHL|MRH|PAD|MAK|SHS)/, "Honda"],
-  [/^(JT[A-Z]|4T[13]|2T[13]|5T[DF]|1NX|MR0)/, "Toyota"],
-  [/^(JN[1568]|1N4|3N1|5N1|VSK|MDH)/, "Nissan"],
-  [/^(JM[123]|4F2|MM[07])/, "Mazda"],
-  [/^(JF[12]|4S[34])/, "Subaru"],
-  [/^(JA[3467]|MMB|MMT)/, "Mitsubishi"],
-  [/^(JS[123]|MMS|MA3|LSJ)/, "Suzuki"],
-  [/^(KM[HF8]|5NP|KMH)/, "Hyundai"],
-  [/^(KN[ADM]|5XY|KND)/, "Kia"],
-  [/^(WBA|WBS|4US|5UX|WBY)/, "BMW"],
-  [/^(WDD|WDB|WDC|WDF|4JG)/, "Mercedes-Benz"],
-  [/^(WAU|WA1|TRU|WUA)/, "Audi"],
-  [/^(WVW|WV1|WV2|1VW|3VW)/, "Volkswagen"],
-  [/^(WP[01])/, "Porsche"],
-  [/^(SAL|SAJ|SAD)/, "Land Rover"],
-  [/^(YV1|YV4|YS3)/, "Volvo"],
-  [/^(VF[137])/, "Peugeot"],
-  [/^(VF[38])/, "Citroen"],
-  [/^(ZFA|ZFF)/, "Fiat"],
-  [/^(SB1|SB4)/, "Toyota"],
-  [/^(MP[BA]|MPB)/, "Isuzu"],
-  [/^(MHR|JAA)/, "Isuzu"],
-  [/^(LSV|LFV|LDC)/, "Volkswagen"],
-  [/^(LH1|LGB|L[SF])/, "Chery"],
-];
-function lookupWmiMake(wmi: string): string | undefined {
-  for (const [re, name] of WMI_MAKE) if (re.test(wmi)) return name;
-  return undefined;
-}
-
-function titleCase(s: string) {
-  return s
-    .toLowerCase()
-    .split(/\s+/)
-    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
-    .join(" ");
-}
-
-function mapFuel(s: string): string | undefined {
-  const x = s.toLowerCase();
-  if (x.includes("diesel")) return "Diesel";
-  if (x.includes("electric")) return "Electric";
-  if (x.includes("hybrid")) return "Hybrid";
-  if (x.includes("gas")) return "Gasoline";
-  return undefined;
-}
-
-function mapTransmission(s: string): string | undefined {
-  const x = s.toLowerCase();
-  if (x.includes("cvt") || x.includes("continuously")) return "CVT";
-  if (x.includes("manual")) return "Manual";
-  if (x.includes("auto")) return "Automatic";
-  return undefined;
-}
-
-/** Map NHTSA BodyClass (e.g. "Sedan/Saloon", "Sport Utility Vehicle (SUV)/Multi-Purpose Vehicle (MPV)")
- *  to a canonical BODY_TYPES value used by the listing editor. */
-function mapBodyType(s: string): string | undefined {
-  const x = s.toLowerCase();
-  if (x.includes("pickup") || x.includes("truck")) return "pickup";
-  if (x.includes("suv") || x.includes("sport utility") || x.includes("crossover")) return "suv";
-  if (x.includes("mpv") || x.includes("multi-purpose") || x.includes("minivan") || x.includes("auv")) return "mpv";
-  if (x.includes("van")) return "van";
-  if (x.includes("hatch") || x.includes("liftback") || x.includes("notchback")) return "hatchback";
-  if (x.includes("coupe")) return "coupe";
-  if (x.includes("convertible") || x.includes("roadster") || x.includes("cabriolet")) return "convertible";
-  if (x.includes("wagon") || x.includes("estate")) return "wagon";
-  if (x.includes("sedan") || x.includes("saloon")) return "sedan";
-  return undefined;
-}
-
-/** Map NHTSA DriveType (e.g. "AWD/All-Wheel Drive", "4WD/4-Wheel Drive", "FWD/Front-Wheel Drive")
- *  to a canonical DRIVETRAINS value. */
-function mapDrivetrain(s: string): string | undefined {
-  const x = s.toLowerCase();
-  if (x.includes("awd") || x.includes("all-wheel") || x.includes("all wheel")) return "awd";
-  if (x.includes("4wd") || x.includes("4x4") || x.includes("4-wheel") || x.includes("four-wheel")) return "4x4";
-  if (x.includes("fwd") || x.includes("front-wheel") || x.includes("front wheel")) return "fwd";
-  if (x.includes("rwd") || x.includes("rear-wheel") || x.includes("rear wheel")) return "rwd";
-  if (x.includes("2wd") || x.includes("4x2")) return "4x2";
-  return undefined;
-}
 
 // --- BarcodeDetector availability ---------------------------------------
 
