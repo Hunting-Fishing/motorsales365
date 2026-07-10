@@ -1402,9 +1402,50 @@ function SellPage() {
                       }}
                     />
                   </div>
-                  <p id="vin-help" className="mt-0.5 text-[11px] text-muted-foreground">
-                    17-char VIN auto-fills vehicle fields. 11–16-char chassis # (Asia/Europe imports) is saved but can't be decoded — fill fields manually.
-                  </p>
+                  {(() => {
+                    const raw = normalizeVin(vehicleQuality.vin_chassis ?? "");
+                    const fmt = checkVinFormat(raw);
+                    const len = raw.length;
+                    const chip = (ok: boolean | "warn", text: string) => (
+                      <span
+                        className={
+                          "inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px] " +
+                          (ok === true
+                            ? "border-emerald-400/60 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
+                            : ok === "warn"
+                            ? "border-amber-400/60 bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+                            : "border-muted bg-muted/40 text-muted-foreground")
+                        }
+                      >
+                        {text}
+                      </span>
+                    );
+                    const charsOk = len > 0 && !/[IOQ]/.test(raw) && /^[A-Z0-9]*$/.test(raw);
+                    const lengthOk = len >= 11 && len <= 17;
+                    const checksumState: boolean | "warn" =
+                      len === 17 ? (fmt.kind === "ok_vin" ? true : "warn") : false;
+                    return (
+                      <div id="vin-help" className="mt-1 flex flex-wrap items-center gap-1">
+                        {chip(charsOk, charsOk ? "Format ✓" : "Format: A–Z, 0–9 only (no I/O/Q)")}
+                        {chip(
+                          lengthOk,
+                          lengthOk
+                            ? len === 17
+                              ? "Length ✓ 17 (VIN)"
+                              : `Length ✓ ${len} (chassis)`
+                            : `Length ${len}/11–17`,
+                        )}
+                        {len === 17 &&
+                          chip(
+                            checksumState,
+                            checksumState === true ? "Checksum ✓" : "Checksum ⚠ (JDM/EU VINs often fail)",
+                          )}
+                        {fmt.kind === "ok_chassis" &&
+                          chip(true, "Chassis # — decoder skipped, fill fields manually")}
+                      </div>
+                    );
+                  })()}
+
                   {vinState.kind === "checking" && (
                     <p id="vin-msg" className="mt-0.5 text-[11px] text-muted-foreground">Decoding VIN…</p>
                   )}
