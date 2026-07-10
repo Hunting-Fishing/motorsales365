@@ -266,10 +266,11 @@ export async function cacheGet(vin: string): Promise<DecodePartial | null> {
 export async function cacheSet(vin: string, result: DecodePartial, source: string): Promise<void> {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin
-      .from("vin_decode_cache" as never)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .upsert({ vin, result: result as any, source, decoded_at: new Date().toISOString() });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const admin = supabaseAdmin as any;
+    await admin
+      .from("vin_decode_cache")
+      .upsert({ vin, result, source, decoded_at: new Date().toISOString() });
   } catch {
     /* cache write failures are non-fatal */
   }
