@@ -237,6 +237,34 @@ function mapTransmission(s: string): string | undefined {
   return undefined;
 }
 
+/** Map NHTSA BodyClass (e.g. "Sedan/Saloon", "Sport Utility Vehicle (SUV)/Multi-Purpose Vehicle (MPV)")
+ *  to a canonical BODY_TYPES value used by the listing editor. */
+function mapBodyType(s: string): string | undefined {
+  const x = s.toLowerCase();
+  if (x.includes("pickup") || x.includes("truck")) return "pickup";
+  if (x.includes("suv") || x.includes("sport utility") || x.includes("crossover")) return "suv";
+  if (x.includes("mpv") || x.includes("multi-purpose") || x.includes("minivan") || x.includes("auv")) return "mpv";
+  if (x.includes("van")) return "van";
+  if (x.includes("hatch") || x.includes("liftback") || x.includes("notchback")) return "hatchback";
+  if (x.includes("coupe")) return "coupe";
+  if (x.includes("convertible") || x.includes("roadster") || x.includes("cabriolet")) return "convertible";
+  if (x.includes("wagon") || x.includes("estate")) return "wagon";
+  if (x.includes("sedan") || x.includes("saloon")) return "sedan";
+  return undefined;
+}
+
+/** Map NHTSA DriveType (e.g. "AWD/All-Wheel Drive", "4WD/4-Wheel Drive", "FWD/Front-Wheel Drive")
+ *  to a canonical DRIVETRAINS value. */
+function mapDrivetrain(s: string): string | undefined {
+  const x = s.toLowerCase();
+  if (x.includes("awd") || x.includes("all-wheel") || x.includes("all wheel")) return "awd";
+  if (x.includes("4wd") || x.includes("4x4") || x.includes("4-wheel") || x.includes("four-wheel")) return "4x4";
+  if (x.includes("fwd") || x.includes("front-wheel") || x.includes("front wheel")) return "fwd";
+  if (x.includes("rwd") || x.includes("rear-wheel") || x.includes("rear wheel")) return "rwd";
+  if (x.includes("2wd") || x.includes("4x2")) return "4x2";
+  return undefined;
+}
+
 // --- BarcodeDetector availability ---------------------------------------
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
