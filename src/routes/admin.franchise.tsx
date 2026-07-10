@@ -378,7 +378,7 @@ function AdminFranchisePage() {
                       </th>
                       <SortHeader field="business_name" sort={sort} setSort={setSort}>Business</SortHeader>
                       <SortHeader field="contact_name" sort={sort} setSort={setSort}>Contact</SortHeader>
-                      <SortHeader field="province" sort={sort} setSort={setSort}>Location</SortHeader>
+                      <LocationSortHeader sort={sort} setSort={setSort} />
                       <SortHeader field="tier_slug" sort={sort} setSort={setSort}>Tier</SortHeader>
                       <SortHeader field="status" sort={sort} setSort={setSort}>Status</SortHeader>
                       <SortHeader field="created_at" sort={sort} setSort={setSort} align="right">Applied</SortHeader>
