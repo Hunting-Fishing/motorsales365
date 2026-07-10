@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "July 9, 2026 (365 Franchise & Partner Program billing: setup + monthly membership fees are collected via our card processor at approval; fees are non-refundable once your membership is activated; membership auto-renews monthly until you cancel from your partner dashboard; unpaid renewals may suspend your membership benefits including the ad discount code)";
+  const lastUpdated = "July 10, 2026 (Private Seller media limits corrected to 12 photos and 1 video per free listing; 365 Franchise & Partner Program billing remains: setup + monthly membership fees are collected via our card processor at approval; fees are non-refundable once your membership is activated; membership auto-renews monthly until you cancel from your partner dashboard; unpaid renewals may suspend your membership benefits including the ad discount code)";
 
   return (
     <SiteLayout>
@@ -278,6 +278,9 @@ function TermsPage() {
           Premium plan) — require payment. Sponsored content is always clearly labeled as
           "Sponsor", "Sponsored", "Featured", or "Ad" and never displaces organic listings or
           search results.
+          Private Seller free listings include up to <strong>12 photos</strong> and{" "}
+          <strong>1 video</strong> per listing; paid listing tiers may include higher media limits
+          as shown at the time of posting.
           Current listing/subscription pricing is published on our{" "}
           <Link className="text-primary underline" to="/pricing">
             Pricing page
