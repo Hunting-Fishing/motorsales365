@@ -259,28 +259,29 @@
 .sell-compact select,
 .sell-compact [data-slot="select-trigger"],
 .sell-compact button[role="combobox"] {
-  height: 2.25rem;            /* 36px */
-  min-height: 2.25rem;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-  padding-left: 0.625rem;
-  padding-right: 0.625rem;
-  font-size: 0.875rem;
+  height: 2rem;               /* 32px */
+  min-height: 2rem;
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  font-size: 0.8125rem;       /* 13px */
   border-radius: 0.5rem;
 }
 
 .sell-compact textarea {
-  padding: 0.5rem 0.625rem;
-  font-size: 0.875rem;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.8125rem;
   border-radius: 0.5rem;
-  min-height: 4.5rem;
+  min-height: 3.5rem;
 }
 
 /* Labels */
 .sell-compact label {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;       /* 11px */
   font-weight: 500;
   margin-bottom: 0.125rem;
+  line-height: 1.1;
 }
 
 /* Section header rows (h2/h3) */
@@ -290,22 +291,31 @@
 }
 
 /* Section group tighter spacing */
-.sell-compact section { padding: 0.75rem; }
+.sell-compact section { padding: 0.5rem; }
 @media (min-width: 640px) {
+  .sell-compact section { padding: 0.75rem; }
+}
+@media (min-width: 1024px) {
   .sell-compact section { padding: 1rem; }
 }
 
 /* Tighter vertical rhythm */
-.sell-compact .space-y-4 > * + * { margin-top: 0.625rem; }
-.sell-compact .space-y-3 > * + * { margin-top: 0.5rem; }
-.sell-compact .space-y-2 > * + * { margin-top: 0.375rem; }
+.sell-compact .space-y-4 > * + * { margin-top: 0.5rem; }
+.sell-compact .space-y-3 > * + * { margin-top: 0.375rem; }
+.sell-compact .space-y-2 > * + * { margin-top: 0.25rem; }
+.sell-compact .space-y-1 > * + * { margin-top: 0.125rem; }
 
 /* Inline action buttons aligned to input height (e.g. Scan VIN) */
+.sell-compact button:not([data-slot="select-trigger"]):not([role="combobox"]):not([role="tab"]).h-8,
 .sell-compact button:not([data-slot="select-trigger"]):not([role="combobox"]):not([role="tab"]).h-9,
 .sell-compact button:not([data-slot="select-trigger"]):not([role="combobox"]):not([role="tab"]).h-10 {
-  height: 2.25rem;
-  min-height: 2.25rem;
+  height: 2rem;
+  min-height: 2rem;
 }
+
+/* Group header (collapsible toggle) — smaller vertical footprint */
+.sell-compact [data-sell-group] > button { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+
 
 /* Cap Radix Select dropdown menu height (portaled, so apply globally) */
 [data-radix-select-content],
