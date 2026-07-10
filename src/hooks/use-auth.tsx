@@ -12,6 +12,13 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { applyPendingIfAny } from "@/lib/signup-pending";
+import {
+  beginActivityTracking,
+  clearLastActive,
+  isStandalonePWA,
+  isWebIdleExpired,
+  markActive,
+} from "@/lib/session-policy";
 
 export type AuthErrorKind = "refresh_failed" | "bootstrap_failed" | "safety_timeout";
 
@@ -601,6 +608,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     }, 8000);
 
+    // Web-only 7-day idle policy. Installed PWAs stay signed in indefinitely
+    // (isWebIdleExpired short-circuits to false in standalone mode). If the
+    // user's been away past the window on a normal browser tab, clear the
+    // local session so we don't leave a public device signed in.
+    if (isWebIdleExpired()) {
+      authLog("info", { event: "session.idle_expired" });
+      clearLastActive();
+      signOutInitiatedRef.current = true;
+      void supabase.auth.signOut({ scope: "local" }).catch(() => {});
+    }
+
+    // Track user activity so the idle window resets on every visit.
+    const stopActivityTracking = beginActivityTracking();
+
     // Listener FIRST — also clears loading so we render as soon as
     // Supabase emits INITIAL_SESSION from the persisted storage token.
     const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
@@ -614,7 +635,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasSession: !!newSession,
         hadUser,
       });
-      // Refresh failed / signed out / no session on init → hard reset.
+      // Refresh failed / signed out / no session on init.
       // Detect refresh failures via either:
       //   - TOKEN_REFRESHED with no session, or
       //   - SIGNED_OUT that we didn't initiate (we had a user, but no
@@ -624,13 +645,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           (event === "TOKEN_REFRESHED" && !newSession) ||
           (event === "SIGNED_OUT" && hadUser && !signOutInitiatedRef.current);
         if (refreshFailed) {
-          authLog("error", { event: "token_refresh.failed", supabaseEvent: event });
-          setAuthError("refresh_failed");
+          // Don't nuke the session on the first hiccup — supabase-js can emit
+          // a transient SIGNED_OUT / null TOKEN_REFRESHED after tab wake or a
+          // network blip. Try ONE manual refresh before tearing down. The
+          // subsequent onAuthStateChange (SIGNED_IN / TOKEN_REFRESHED with
+          // session) will land the recovered session; if refresh truly failed,
+          // fall through to the teardown path below.
+          authLog("warn", {
+            event: "token_refresh.retry_scheduled",
+            supabaseEvent: event,
+          });
+          void supabase.auth.refreshSession().then(({ data, error }) => {
+            if (cancelled) return;
+            if (data?.session) {
+              authLog("info", { event: "token_refresh.retry_succeeded" });
+              return; // recovery event will populate state
+            }
+            authLog("error", {
+              event: "token_refresh.retry_failed",
+              error: error ? errMsg(error) : "no_session",
+            });
+            signOutInitiatedRef.current = false;
+            setAuthError("refresh_failed");
+            handleSession(null);
+            setAuthLoading(false);
+            setRolesLoading(false);
+            clearLastActive();
+          });
+          return;
         }
         signOutInitiatedRef.current = false;
         handleSession(null);
         setAuthLoading(false);
         setRolesLoading(false);
+        clearLastActive();
         return;
       }
       // Successful (re-)authentication (SIGNED_IN, TOKEN_REFRESHED w/ session,
@@ -639,6 +687,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthError(null);
       handleSession(newSession);
       setAuthLoading(false);
+      markActive();
       // Persist any signup fields the user stashed before this session was
       // created (email-verify link, Google OAuth handoff, etc). The applier
       // is a no-op when the stash is missing / already applied, matches the
@@ -750,6 +799,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
       clearTimeout(safetyTimer);
+      stopActivityTracking();
       sub.subscription.unsubscribe();
     };
   }, [handleSession]);
@@ -761,6 +811,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     handleSession(null);
     setAuthLoading(false);
     setAuthError(null);
+    clearLastActive();
   };
 
   const retryAuth = useCallback(async () => {
