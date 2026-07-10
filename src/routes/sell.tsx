@@ -753,6 +753,84 @@ function SellPage() {
 
 
 
+  // ── Safe Drafts ──────────────────────────────────────────────────────────
+  // Auto-save the form to `listing_drafts` (one row per user) so users can
+  // resume where they left off. Media files are NOT persisted (Files can't be
+  // serialized) — only the text state.
+  const [draftLoaded, setDraftLoaded] = useState(false);
+  const [draftBanner, setDraftBanner] = useState<{ updated_at: string; form: any } | null>(null);
+  useEffect(() => {
+    if (!user?.id || draftLoaded) return;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("listing_drafts")
+        .select("form_json,updated_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data?.form_json) {
+        setDraftBanner({ updated_at: data.updated_at, form: data.form_json });
+      }
+      setDraftLoaded(true);
+    })();
+  }, [user?.id, draftLoaded]);
+
+  const applyDraft = (f: any) => {
+    if (!f || typeof f !== "object") return;
+    if (typeof f.category === "string") setCategory(f.category);
+    if (typeof f.title === "string") setTitle(f.title);
+    if (typeof f.description === "string") setDescription(f.description);
+    if (typeof f.price === "string") setPrice(f.price);
+    if (typeof f.negotiable === "boolean") setNegotiable(f.negotiable);
+    if (typeof f.priceHidden === "boolean") setPriceHidden(f.priceHidden);
+    if (typeof f.registrationStatus === "string") setRegistrationStatus(f.registrationStatus);
+    if (f.region !== undefined) setRegion(f.region);
+    if (f.province !== undefined) setProvince(f.province);
+    if (f.city !== undefined) setCity(f.city);
+    if (f.barangay !== undefined) setBarangay(f.barangay);
+    if (f.lat !== undefined) setLat(f.lat);
+    if (f.lng !== undefined) setLng(f.lng);
+    if (typeof f.condition === "string") setCondition(f.condition);
+    if (typeof f.phone === "string") setPhone(f.phone);
+    if (typeof f.phoneIso === "string") setPhoneIso(f.phoneIso);
+    if (typeof f.phoneNational === "string") setPhoneNational(f.phoneNational);
+    if (typeof f.year === "string") setYear(f.year);
+    if (typeof f.make === "string") setMake(f.make);
+    if (typeof f.model === "string") setModel(f.model);
+    if (typeof f.mileage === "string") setMileage(f.mileage);
+    if (typeof f.transmission === "string") setTransmission(f.transmission);
+    if (typeof f.fuel === "string") setFuel(f.fuel);
+    if (typeof f.engine === "string") setEngine(f.engine);
+    if (f.categoryAttrs && typeof f.categoryAttrs === "object") setCategoryAttrs(f.categoryAttrs);
+    toast.success("Draft restored");
+  };
+
+  const discardDraft = async () => {
+    if (!user?.id) return;
+    await (supabase as any).from("listing_drafts").delete().eq("user_id", user.id);
+    setDraftBanner(null);
+  };
+
+  // Debounced auto-save (2s after last change).
+  useEffect(() => {
+    if (!user?.id || !draftLoaded) return;
+    const t = setTimeout(() => {
+      const form_json = {
+        category, title, description, price, negotiable, priceHidden,
+        registrationStatus, region, province, city, barangay, lat, lng,
+        condition, phone, phoneIso, phoneNational,
+        year, make, model, mileage, transmission, fuel, engine, categoryAttrs,
+      };
+      void (supabase as any)
+        .from("listing_drafts")
+        .upsert({ user_id: user.id, category_slug: category, form_json }, { onConflict: "user_id" });
+    }, 2000);
+    return () => clearTimeout(t);
+  }, [
+    user?.id, draftLoaded, category, title, description, price, negotiable, priceHidden,
+    registrationStatus, region, province, city, barangay, lat, lng, condition,
+    phone, phoneIso, phoneNational, year, make, model, mileage, transmission, fuel, engine, categoryAttrs,
+  ]);
+
   const sellSeo = SELL_SEO[category] ?? SELL_SEO.other;
   const sellCategoryLabel = CATEGORIES.find((c) => c.slug === category)?.name ?? "Vehicle";
   useDynamicMeta({
