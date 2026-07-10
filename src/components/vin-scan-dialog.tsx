@@ -63,9 +63,13 @@ export type VinDecodeResult = {
   model?: string;
   fuel?: string;
   transmission?: string;
+  engine?: string;
+  trim?: string;
+  bodyType?: string;
+  category?: "car" | "motorcycle";
 };
 
-async function decodeVin(vin: string): Promise<VinDecodeResult> {
+export async function decodeVin(vin: string): Promise<VinDecodeResult> {
   const url = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin)}?format=json`;
   const r = await fetch(url);
   if (!r.ok) throw new Error(`NHTSA ${r.status}`);
@@ -77,6 +81,18 @@ async function decodeVin(vin: string): Promise<VinDecodeResult> {
   if (row.Model) out.model = titleCase(row.Model);
   if (row.FuelTypePrimary) out.fuel = mapFuel(row.FuelTypePrimary);
   if (row.TransmissionStyle) out.transmission = mapTransmission(row.TransmissionStyle);
+  const engineParts = [
+    row.DisplacementL ? `${Number(row.DisplacementL).toFixed(1)}L` : "",
+    row.EngineCylinders ? `${row.EngineCylinders}-cyl` : "",
+    row.EngineModel ? row.EngineModel : "",
+  ].filter(Boolean);
+  if (engineParts.length) out.engine = engineParts.join(" ").trim();
+  const trim = row.Trim || row.Series;
+  if (trim) out.trim = trim;
+  if (row.BodyClass) out.bodyType = row.BodyClass;
+  if (row.VehicleType) {
+    out.category = /motorcycle/i.test(row.VehicleType) ? "motorcycle" : "car";
+  }
   return out;
 }
 
