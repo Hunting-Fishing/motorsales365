@@ -2257,6 +2257,7 @@ function SellPage() {
                             </button>
                           </div>
                         )}
+                        </div>
                       </li>
                     );
                   })}
