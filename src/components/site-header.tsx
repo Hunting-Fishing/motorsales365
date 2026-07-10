@@ -963,6 +963,14 @@ export function SiteHeader() {
                               </SheetClose>
                               <SheetClose asChild>
                                 <Link
+                                  to="/admin/franchise"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Handshake className="h-4 w-4" /> Franchise queue
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
                                   to="/admin"
                                   className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
                                 >
