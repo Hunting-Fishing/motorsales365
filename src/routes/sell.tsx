@@ -489,23 +489,25 @@ function SellPage() {
   };
 
   // Auto-fill listing fields from a decoded VIN (scanner OR manual blur).
+  // Only fills fields that are currently blank — never overwrites user input.
   const applyVinDecode = (r: VinDecodeResult) => {
     setVehicleQuality((prev) => ({ ...prev, vin_chassis: r.vin }));
-    if (r.category) setCategory(r.category);
-    if (r.year) setYear(r.year);
-    if (r.make) setMake(r.make);
-    if (r.model) setModel(r.model);
-    if (r.engine) setEngine(r.engine);
-    if (r.fuel) setFuel(r.fuel);
-    if (r.transmission) setTransmission(r.transmission);
+    if (r.category) setCategory((cur) => (cur ? cur : r.category!));
+    if (r.year) setYear((cur) => (cur ? cur : r.year!));
+    if (r.make) setMake((cur) => (cur ? cur : r.make!));
+    if (r.model) setModel((cur) => (cur ? cur : r.model!));
+    if (r.engine) setEngine((cur) => (cur ? cur : r.engine!));
+    if (r.fuel) setFuel((cur) => (cur ? cur : r.fuel!));
+    if (r.transmission) setTransmission((cur) => (cur ? cur : r.transmission!));
     if (r.trim || r.bodyType) {
       setCategoryAttrs((prev) => ({
         ...prev,
-        ...(r.trim ? { variant: r.trim } : {}),
-        ...(r.bodyType ? { body_type: r.bodyType } : {}),
+        ...(r.trim && !prev.variant ? { variant: r.trim } : {}),
+        ...(r.bodyType && !prev.body_type ? { body_type: r.bodyType } : {}),
       }));
     }
   };
+
 
 
   // Honor ?from_ride=<id> on mount.
