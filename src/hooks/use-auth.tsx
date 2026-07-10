@@ -799,6 +799,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
       clearTimeout(safetyTimer);
+      stopActivityTracking();
       sub.subscription.unsubscribe();
     };
   }, [handleSession]);
