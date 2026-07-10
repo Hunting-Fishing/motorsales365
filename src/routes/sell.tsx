@@ -355,6 +355,7 @@ function SellPage() {
   };
   const [photoUploads, setPhotoUploads] = useState<UploadState[]>([]);
   const [videoUploads, setVideoUploads] = useState<UploadState[]>([]);
+  const [videoThumbs, setVideoThumbs] = useState<Array<{ dataUrl: string; duration: number } | null>>([]);
   const [listingId, setListingId] = useState<string | null>(null);
 
   const [pricing, setPricing] = useState<Record<string, number>>({});
