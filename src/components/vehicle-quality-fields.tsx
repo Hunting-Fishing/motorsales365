@@ -58,13 +58,8 @@ const PLATE_STATUS_OPTIONS = [
   "Missing",
 ];
 
-const PLATE_STATUS_OPTIONS = [
-  "Updated plate",
-  "Improvised / temporary",
-  "Conduction sticker only",
-  "Missing",
-];
 const HISTORY_OPTIONS = ["No", "Yes — disclosed below", "Unknown"];
+
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
