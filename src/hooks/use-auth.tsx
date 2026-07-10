@@ -811,6 +811,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     handleSession(null);
     setAuthLoading(false);
     setAuthError(null);
+    clearLastActive();
   };
 
   const retryAuth = useCallback(async () => {
