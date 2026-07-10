@@ -493,22 +493,112 @@ function SellPage() {
 
   // Auto-fill listing fields from a decoded VIN (scanner OR manual blur).
   // Only fills fields that are currently blank — never overwrites user input.
+  // Records any mismatches so we can surface a conflict panel instead of silently
+  // dropping decoded values or overwriting what the user typed.
+  const norm = (v: unknown) => String(v ?? "").trim().toLowerCase();
+  const fillIfBlank = <T,>(
+    cur: T,
+    decoded: T | undefined,
+    field: string,
+    label: string,
+    conflicts: Array<{ field: string; label: string; current: string; decoded: string; apply: () => void }>,
+    apply: (v: T) => void,
+  ): T => {
+    if (decoded === undefined || decoded === null || decoded === "") return cur;
+    const curKey = norm(cur);
+    const decKey = norm(decoded);
+    if (!curKey) {
+      apply(decoded);
+      return decoded;
+    }
+    if (curKey !== decKey) {
+      conflicts.push({
+        field,
+        label,
+        current: String(cur ?? ""),
+        decoded: String(decoded ?? ""),
+        apply: () => apply(decoded),
+      });
+    }
+    return cur;
+  };
+
   const applyVinDecode = (r: VinDecodeResult) => {
     setVehicleQuality((prev) => ({ ...prev, vin_chassis: r.vin }));
-    if (r.category) setCategory((cur) => (cur ? cur : r.category!));
-    if (r.year) setYear((cur) => (cur ? cur : r.year!));
-    if (r.make) setMake((cur) => (cur ? cur : r.make!));
-    if (r.model) setModel((cur) => (cur ? cur : r.model!));
-    if (r.engine) setEngine((cur) => (cur ? cur : r.engine!));
-    if (r.fuel) setFuel((cur) => (cur ? cur : r.fuel!));
-    if (r.transmission) setTransmission((cur) => (cur ? cur : r.transmission!));
-    if (r.trim || r.bodyType) {
-      setCategoryAttrs((prev) => ({
-        ...prev,
-        ...(r.trim && !prev.variant ? { variant: r.trim } : {}),
-        ...(r.bodyType && !prev.body_type ? { body_type: r.bodyType } : {}),
-      }));
-    }
+    const conflicts: Array<{ field: string; label: string; current: string; decoded: string; apply: () => void }> = [];
+
+    // Use functional setters so we compare against the freshest value and
+    // never race a stale closure. Each helper either fills the blank or
+    // records a conflict for the user to resolve.
+    setCategory((cur) => fillIfBlank(cur, r.category, "category", "Category", conflicts, (v) => setCategory(v)));
+    setYear((cur) => fillIfBlank(cur, r.year, "year", "Year", conflicts, (v) => setYear(v)));
+    setMake((cur) => fillIfBlank(cur, r.make, "make", "Make", conflicts, (v) => setMake(v)));
+    setModel((cur) => fillIfBlank(cur, r.model, "model", "Model", conflicts, (v) => setModel(v)));
+    setEngine((cur) => fillIfBlank(cur, r.engine, "engine", "Engine", conflicts, (v) => setEngine(v)));
+    setFuel((cur) => fillIfBlank(cur, r.fuel, "fuel", "Fuel", conflicts, (v) => setFuel(v)));
+    setTransmission((cur) =>
+      fillIfBlank(cur, r.transmission, "transmission", "Transmission", conflicts, (v) => setTransmission(v)),
+    );
+    setCategoryAttrs((prev) => {
+      const next = { ...prev };
+      if (r.trim) {
+        const cur = prev.variant;
+        if (!norm(cur)) next.variant = r.trim;
+        else if (norm(cur) !== norm(r.trim)) {
+          conflicts.push({
+            field: "variant",
+            label: "Variant / trim",
+            current: String(cur ?? ""),
+            decoded: String(r.trim),
+            apply: () => setCategoryAttrs((p) => ({ ...p, variant: r.trim! })),
+          });
+        }
+      }
+      if (r.bodyType) {
+        const cur = prev.body_type;
+        if (!norm(cur)) next.body_type = r.bodyType;
+        else if (norm(cur) !== norm(r.bodyType)) {
+          conflicts.push({
+            field: "body_type",
+            label: "Body type",
+            current: String(cur ?? ""),
+            decoded: String(r.bodyType),
+            apply: () => setCategoryAttrs((p) => ({ ...p, body_type: r.bodyType! })),
+          });
+        }
+      }
+      return next;
+    });
+
+    // Title conflict — check if title already includes year/make/model tokens
+    // that disagree with the VIN. We only warn (never rewrite the title).
+    setTitle((curTitle) => {
+      const t = norm(curTitle);
+      if (t) {
+        if (r.year && !t.includes(String(r.year)) && /\b(19|20)\d{2}\b/.test(t)) {
+          conflicts.push({
+            field: "title_year",
+            label: "Title year",
+            current: curTitle,
+            decoded: String(r.year),
+            apply: () => {},
+          });
+        }
+        if (r.make && !t.includes(norm(r.make)) && curTitle.length > 0) {
+          // only flag if title looks like it names a make already
+          conflicts.push({
+            field: "title_make",
+            label: "Title make",
+            current: curTitle,
+            decoded: String(r.make),
+            apply: () => {},
+          });
+        }
+      }
+      return curTitle;
+    });
+
+    setVinConflicts(conflicts);
   };
 
 
