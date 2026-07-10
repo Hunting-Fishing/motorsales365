@@ -2575,7 +2575,7 @@ function SellPage() {
                       className="relative aspect-square overflow-hidden rounded-md bg-secondary"
                     >
                       <img
-                        src={URL.createObjectURL(file)}
+                        src={fileUrl(file)}
                         alt={`Listing photo ${i + 1} preview`}
                         className="h-full w-full object-cover"
                       />
