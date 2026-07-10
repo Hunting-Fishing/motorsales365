@@ -48,7 +48,7 @@ import {
   type VehicleQuality,
   type VehicleQualityIssue,
 } from "@/components/vehicle-quality-fields";
-import { VinScanDialog, decodeVin, vinFormatError, normalizeVin, type VinDecodeResult } from "@/components/vin-scan-dialog";
+import { VinScanDialog, decodeVin, checkVinFormat, normalizeVin, VinDecodeError, type VinDecodeResult } from "@/components/vin-scan-dialog";
 import {
   CategoryAttributesEditor,
   CATEGORY_ATTR_KEYS,
