@@ -80,8 +80,8 @@ function SellGroup({
   id: string;
   title: string;
   defaultOpen?: boolean;
-  status?: React.ReactNode;
-  children: React.ReactNode;
+  status?: ReactNode;
+  children: ReactNode;
 }) {
   const storageKey = `sell:details:open:${id}`;
   const [open, setOpen] = useState<boolean>(defaultOpen);
