@@ -342,6 +342,9 @@ function SellPage() {
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
   const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
   const [categoryAttrs, setCategoryAttrs] = useState<Record<string, any>>({});
+  const [vinError, setVinError] = useState<string | null>(null);
+  const [vinStatus, setVinStatus] = useState<"idle" | "checking" | "ok" | "failed">("idle");
+
 
   // Towing service-specific fields
   const [towServiceType, setTowServiceType] = useState("");
@@ -1222,29 +1225,73 @@ function SellPage() {
                       placeholder="Optional — auto-fills year, make, model, engine, trans & fuel"
                       value={vehicleQuality.vin_chassis ?? ""}
                       maxLength={17}
-                      onChange={(e) =>
-                        setVehicleQuality((prev) => ({
-                          ...prev,
-                          vin_chassis: e.target.value.toUpperCase().replace(/\s+/g, ""),
-                        }))
-                      }
+                      aria-invalid={!!vinError}
+                      aria-describedby="vin-help vin-error"
+                      onChange={(e) => {
+                        const v = e.target.value.toUpperCase().replace(/\s+/g, "");
+                        setVehicleQuality((prev) => ({ ...prev, vin_chassis: v }));
+                        // Clear stale error/status while typing
+                        if (vinError) setVinError(null);
+                        if (vinStatus !== "idle") setVinStatus("idle");
+                      }}
                       onBlur={async (e) => {
                         const raw = normalizeVin(e.target.value);
-                        if (!raw || raw.length !== 17 || vinFormatError(raw)) return;
+                        if (!raw) {
+                          setVinError(null);
+                          setVinStatus("idle");
+                          return;
+                        }
+                        const fmt = vinFormatError(raw);
+                        if (fmt) {
+                          setVinError(fmt);
+                          setVinStatus("idle");
+                          return;
+                        }
+                        setVinError(null);
+                        if (raw.length !== 17) {
+                          // Valid short chassis code — nothing to decode
+                          setVinStatus("idle");
+                          return;
+                        }
+                        setVinStatus("checking");
                         try {
                           const r = await decodeVin(raw);
+                          const gotAnything = !!(r.year || r.make || r.model);
                           applyVinDecode(r);
+                          setVinStatus(gotAnything ? "ok" : "failed");
+                          if (!gotAnything) {
+                            setVinError("Couldn't decode this VIN — please fill the vehicle fields manually.");
+                          }
                         } catch {
-                          /* ignore — user can fill manually */
+                          setVinStatus("failed");
+                          setVinError("VIN lookup unavailable — please fill the vehicle fields manually.");
                         }
                       }}
                     />
-                    <VinScanDialog onResult={applyVinDecode} />
+                    <VinScanDialog
+                      onResult={(r) => {
+                        setVinError(null);
+                        setVinStatus("ok");
+                        applyVinDecode(r);
+                      }}
+                    />
                   </div>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  <p id="vin-help" className="mt-0.5 text-[11px] text-muted-foreground">
                     11–17 letters and numbers, no I/O/Q. Shown only when a buyer requests verification.
                   </p>
-                  {vehicleQualityIssues.find((i) => i.field === "vin_chassis") && (
+                  {vinStatus === "checking" && (
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">Decoding VIN…</p>
+                  )}
+                  {vinStatus === "ok" && !vinError && (
+                    <p className="mt-0.5 text-[11px] text-emerald-600">VIN decoded — blank fields filled in.</p>
+                  )}
+                  {vinError && (
+                    <p id="vin-error" className="mt-0.5 text-[11px] text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {vinError}
+                    </p>
+                  )}
+                  {!vinError && vehicleQualityIssues.find((i) => i.field === "vin_chassis") && (
                     <p className="mt-0.5 text-[11px] text-destructive flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" />
                       {vehicleQualityIssues.find((i) => i.field === "vin_chassis")?.message}
@@ -1252,6 +1299,7 @@ function SellPage() {
                   )}
                 </div>
               )}
+
 
               <div className="grid gap-2 grid-cols-2 sm:grid-cols-4">
                 <div>
