@@ -828,6 +828,8 @@ function SellPage() {
   };
 
   const removePhoto = (i: number) => {
+    const file = photos[i];
+    if (file) releaseFileUrl(file);
     setPhotos((p) => p.filter((_, idx) => idx !== i));
     setPhotoUploads((u) => u.filter((_, idx) => idx !== i));
   };
