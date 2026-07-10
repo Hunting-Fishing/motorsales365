@@ -372,7 +372,7 @@ function ClubDetailPage() {
             <div className="rounded-xl border border-border bg-card p-4 text-sm">
               <div className="font-semibold">Members</div>
               <div className="mt-2 text-muted-foreground">
-                {members.length === 0 ? "No active members yet." : `${club.member_count} active members`}
+                {(club.member_count ?? 0) === 0 ? "No active members yet." : `${club.member_count} active members`}
               </div>
             </div>
           </aside>
