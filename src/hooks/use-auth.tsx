@@ -12,6 +12,13 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { applyPendingIfAny } from "@/lib/signup-pending";
+import {
+  beginActivityTracking,
+  clearLastActive,
+  isStandalonePWA,
+  isWebIdleExpired,
+  markActive,
+} from "@/lib/session-policy";
 
 export type AuthErrorKind = "refresh_failed" | "bootstrap_failed" | "safety_timeout";
 
