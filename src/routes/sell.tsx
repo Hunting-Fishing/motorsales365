@@ -1310,6 +1310,11 @@ function SellPage() {
         return;
       }
 
+      // Publish succeeded — clear the safe draft so we don't re-offer it.
+      try {
+        await (supabase as any).from("listing_drafts").delete().eq("user_id", user.id);
+      } catch { /* best-effort */ }
+
       if (plan !== "free") {
         toast.success("Listing saved — pay to publish.");
         navigate({
