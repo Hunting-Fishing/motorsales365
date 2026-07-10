@@ -104,10 +104,25 @@ export type VinDecodeResult = {
   category?: "car" | "motorcycle";
 };
 
+export class VinDecodeError extends Error {
+  kind: "network" | "http";
+  status?: number;
+  constructor(kind: "network" | "http", message: string, status?: number) {
+    super(message);
+    this.kind = kind;
+    this.status = status;
+  }
+}
+
 export async function decodeVin(vin: string): Promise<VinDecodeResult> {
   const url = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin)}?format=json`;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`NHTSA ${r.status}`);
+  let r: Response;
+  try {
+    r = await fetch(url);
+  } catch (e) {
+    throw new VinDecodeError("network", e instanceof Error ? e.message : "network error");
+  }
+  if (!r.ok) throw new VinDecodeError("http", `NHTSA ${r.status}`, r.status);
   const json = (await r.json()) as { Results?: Array<Record<string, string>> };
   const row = json.Results?.[0] ?? {};
   const out: VinDecodeResult = { vin };
