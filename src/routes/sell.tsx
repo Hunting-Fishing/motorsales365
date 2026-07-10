@@ -576,6 +576,19 @@ function SellPage() {
           });
         }
       }
+      if (r.drivetrain) {
+        const cur = prev.drivetrain;
+        if (!norm(cur)) next.drivetrain = r.drivetrain;
+        else if (norm(cur) !== norm(r.drivetrain)) {
+          conflicts.push({
+            field: "drivetrain",
+            label: "Drivetrain",
+            current: String(cur ?? ""),
+            decoded: String(r.drivetrain),
+            apply: () => setCategoryAttrs((p) => ({ ...p, drivetrain: r.drivetrain! })),
+          });
+        }
+      }
       return next;
     });
 
