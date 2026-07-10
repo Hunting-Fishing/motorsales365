@@ -1321,77 +1321,66 @@ function SellPage() {
                   <div className="flex gap-2">
                     <Input
                       className="h-8 text-sm"
-                      placeholder="Optional — auto-fills year, make, model, engine, trans & fuel"
+                      placeholder="17-char VIN or 11–16-char chassis # (Asia / Europe)"
                       value={vehicleQuality.vin_chassis ?? ""}
                       maxLength={17}
-                      aria-invalid={!!vinError}
-                      aria-describedby="vin-help vin-error"
+                      aria-invalid={vinState.kind === "error"}
+                      aria-describedby="vin-help vin-msg"
                       onChange={(e) => {
                         const v = e.target.value.toUpperCase().replace(/\s+/g, "");
                         setVehicleQuality((prev) => ({ ...prev, vin_chassis: v }));
-                        // Clear stale error/status while typing
-                        if (vinError) setVinError(null);
-                        if (vinStatus !== "idle") setVinStatus("idle");
+                        if (vinState.kind !== "idle") setVinState({ kind: "idle" });
                         if (vinConflicts.length) setVinConflicts([]);
                       }}
                       onBlur={async (e) => {
                         const raw = normalizeVin(e.target.value);
-                        if (!raw) {
-                          setVinError(null);
-                          setVinStatus("idle");
-                          return;
-                        }
-                        const fmt = vinFormatError(raw);
-                        if (fmt) {
-                          setVinError(fmt);
-                          setVinStatus("idle");
-                          return;
-                        }
-                        setVinError(null);
-                        if (raw.length !== 17) {
-                          // Valid short chassis code — nothing to decode
-                          setVinStatus("idle");
-                          return;
-                        }
-                        setVinStatus("checking");
-                        try {
-                          const r = await decodeVin(raw);
-                          const gotAnything = !!(r.year || r.make || r.model);
-                          applyVinDecode(r);
-                          setVinStatus(gotAnything ? "ok" : "failed");
-                          if (!gotAnything) {
-                            setVinError("Couldn't decode this VIN — please fill the vehicle fields manually.");
-                          }
-                        } catch {
-                          setVinStatus("failed");
-                          setVinError("VIN lookup unavailable — please fill the vehicle fields manually.");
-                        }
+                        await runVinDecode(raw);
                       }}
                     />
                     <VinScanDialog
                       onResult={(r) => {
-                        setVinError(null);
-                        setVinStatus("ok");
+                        setVinState({ kind: "ok" });
                         applyVinDecode(r);
                       }}
                     />
                   </div>
                   <p id="vin-help" className="mt-0.5 text-[11px] text-muted-foreground">
-                    11–17 letters and numbers, no I/O/Q. Shown only when a buyer requests verification.
+                    17-char VIN auto-fills vehicle fields. 11–16-char chassis # (Asia/Europe imports) is saved but can't be decoded — fill fields manually.
                   </p>
-                  {vinStatus === "checking" && (
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">Decoding VIN…</p>
+                  {vinState.kind === "checking" && (
+                    <p id="vin-msg" className="mt-0.5 text-[11px] text-muted-foreground">Decoding VIN…</p>
                   )}
-                  {vinStatus === "ok" && !vinError && (
-                    <p className="mt-0.5 text-[11px] text-emerald-600">VIN decoded — blank fields filled in.</p>
+                  {vinState.kind === "ok" && (
+                    <p id="vin-msg" className="mt-0.5 text-[11px] text-emerald-600">VIN decoded — blank fields filled in.</p>
                   )}
-                  {vinError && (
-                    <p id="vin-error" className="mt-0.5 text-[11px] text-destructive flex items-center gap-1">
+                  {vinState.kind === "chassis" && (
+                    <p id="vin-msg" className="mt-0.5 text-[11px] text-muted-foreground flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" />
-                      {vinError}
+                      {vinState.message}
                     </p>
                   )}
-                  {!vinError && vehicleQualityIssues.find((i) => i.field === "vin_chassis") && (
+                  {vinState.kind === "warn" && (
+                    <p id="vin-msg" className="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {vinState.message}
+                    </p>
+                  )}
+                  {vinState.kind === "error" && (
+                    <p id="vin-msg" className="mt-0.5 text-[11px] text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      <span>{vinState.message}</span>
+                      {vinState.retryable && (
+                        <button
+                          type="button"
+                          className="ml-1 rounded border border-destructive/60 px-1.5 py-0.5 text-[10px] hover:bg-destructive/10"
+                          onClick={() => runVinDecode(normalizeVin(vehicleQuality.vin_chassis ?? ""))}
+                        >
+                          Retry decode
+                        </button>
+                      )}
+                    </p>
+                  )}
+                  {vinState.kind === "idle" && vehicleQualityIssues.find((i) => i.field === "vin_chassis") && (
                     <p className="mt-0.5 text-[11px] text-destructive flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" />
                       {vehicleQualityIssues.find((i) => i.field === "vin_chassis")?.message}
