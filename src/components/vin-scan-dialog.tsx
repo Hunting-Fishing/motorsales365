@@ -100,7 +100,10 @@ export type VinDecodeResult = {
   transmission?: string;
   engine?: string;
   trim?: string;
+  /** Canonical BODY_TYPES value (sedan, suv, hatchback, …) — safe to store in listings.attributes.body_type. */
   bodyType?: string;
+  /** Canonical DRIVETRAINS value (fwd, rwd, awd, 4x4, 4x2). */
+  drivetrain?: string;
   category?: "car" | "motorcycle";
 };
 
@@ -139,7 +142,8 @@ export async function decodeVin(vin: string): Promise<VinDecodeResult> {
   if (engineParts.length) out.engine = engineParts.join(" ").trim();
   const trim = row.Trim || row.Series;
   if (trim) out.trim = trim;
-  if (row.BodyClass) out.bodyType = row.BodyClass;
+  if (row.BodyClass) out.bodyType = mapBodyType(row.BodyClass);
+  if (row.DriveType) out.drivetrain = mapDrivetrain(row.DriveType);
   if (row.VehicleType) {
     out.category = /motorcycle/i.test(row.VehicleType) ? "motorcycle" : "car";
   }
@@ -230,6 +234,34 @@ function mapTransmission(s: string): string | undefined {
   if (x.includes("cvt") || x.includes("continuously")) return "CVT";
   if (x.includes("manual")) return "Manual";
   if (x.includes("auto")) return "Automatic";
+  return undefined;
+}
+
+/** Map NHTSA BodyClass (e.g. "Sedan/Saloon", "Sport Utility Vehicle (SUV)/Multi-Purpose Vehicle (MPV)")
+ *  to a canonical BODY_TYPES value used by the listing editor. */
+function mapBodyType(s: string): string | undefined {
+  const x = s.toLowerCase();
+  if (x.includes("pickup") || x.includes("truck")) return "pickup";
+  if (x.includes("suv") || x.includes("sport utility") || x.includes("crossover")) return "suv";
+  if (x.includes("mpv") || x.includes("multi-purpose") || x.includes("minivan") || x.includes("auv")) return "mpv";
+  if (x.includes("van")) return "van";
+  if (x.includes("hatch") || x.includes("liftback") || x.includes("notchback")) return "hatchback";
+  if (x.includes("coupe")) return "coupe";
+  if (x.includes("convertible") || x.includes("roadster") || x.includes("cabriolet")) return "convertible";
+  if (x.includes("wagon") || x.includes("estate")) return "wagon";
+  if (x.includes("sedan") || x.includes("saloon")) return "sedan";
+  return undefined;
+}
+
+/** Map NHTSA DriveType (e.g. "AWD/All-Wheel Drive", "4WD/4-Wheel Drive", "FWD/Front-Wheel Drive")
+ *  to a canonical DRIVETRAINS value. */
+function mapDrivetrain(s: string): string | undefined {
+  const x = s.toLowerCase();
+  if (x.includes("awd") || x.includes("all-wheel") || x.includes("all wheel")) return "awd";
+  if (x.includes("4wd") || x.includes("4x4") || x.includes("4-wheel") || x.includes("four-wheel")) return "4x4";
+  if (x.includes("fwd") || x.includes("front-wheel") || x.includes("front wheel")) return "fwd";
+  if (x.includes("rwd") || x.includes("rear-wheel") || x.includes("rear wheel")) return "rwd";
+  if (x.includes("2wd") || x.includes("4x2")) return "4x2";
   return undefined;
 }
 
