@@ -429,9 +429,10 @@ function FieldShell({
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <Label>{label}</Label>
+    <div className="space-y-0.5">
+      <Label className="text-[11px]">{label}</Label>
       {children}
+
       {hint && !error && <p className="mt-1 text-[11px] text-muted-foreground">{hint}</p>}
       {error && (
         <p className="mt-1 text-[11px] text-destructive flex items-center gap-1">
