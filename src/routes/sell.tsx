@@ -2199,8 +2199,28 @@ function SellPage() {
                 <ul className="mt-2 space-y-2">
                   {videos.map((file, i) => {
                     const u = videoUploads[i] ?? { status: "idle" as const, percent: 0 };
+                    const thumb = videoThumbs[i];
                     return (
-                      <li key={i} className="space-y-1">
+                      <li key={i} className="flex gap-2">
+                        <div className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded bg-muted">
+                          {thumb ? (
+                            <>
+                              <img
+                                src={thumb.dataUrl}
+                                alt={`${file.name} preview`}
+                                className="h-full w-full object-cover"
+                              />
+                              <span className="absolute bottom-0.5 right-0.5 rounded bg-black/70 px-1 text-[10px] font-medium text-white">
+                                {formatDuration(thumb.duration)}
+                              </span>
+                            </>
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                              <VideoIcon className="h-5 w-5" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="truncate flex-1">{file.name}</span>
                           {u.status === "done" && (
