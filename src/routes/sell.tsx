@@ -1095,8 +1095,8 @@ function SellPage() {
             );
           })()}
 
-          {activeTab === "details" && (
-          <section data-tab="details" className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+          <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+
 
             {/* Header */}
             <div className="flex items-center justify-between gap-2">
