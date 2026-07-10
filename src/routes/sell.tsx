@@ -1262,6 +1262,14 @@ function SellPage() {
       // Any items already uploaded eagerly to the draft path just need their
       // listing_media row inserted now that we have a listing id.
       const failedFiles: string[] = [];
+      let planLimitHit: null | { kind: "photo" | "video"; message: string } = null;
+      const captureLimit = (kind: "photo" | "video", err: any) => {
+        if (err?.code === "23514" && /limit reached/i.test(err.message ?? "")) {
+          planLimitHit = { kind, message: err.message };
+          return true;
+        }
+        return false;
+      };
       for (let i = 0; i < photos.length; i++) {
         const state = photoUploads[i];
         if (state?.status === "done" && state.url && state.path) {
@@ -1274,6 +1282,7 @@ function SellPage() {
           });
           if (mErr) {
             console.error("[sell] listing_media insert (photo) failed", mErr);
+            captureLimit("photo", mErr);
             failedFiles.push(photos[i].name);
           }
           continue;
@@ -1293,6 +1302,7 @@ function SellPage() {
           });
           if (mErr) {
             console.error("[sell] listing_media insert (video) failed", mErr);
+            captureLimit("video", mErr);
             failedFiles.push(videos[i].name);
           }
           continue;
@@ -1301,6 +1311,13 @@ function SellPage() {
         if (!ok) failedFiles.push(videos[i].name);
       }
 
+      if (planLimitHit) {
+        toast.error(
+          `${(planLimitHit as any).kind === "photo" ? "Photo" : "Video"} limit reached on your current plan`,
+          { description: `${(planLimitHit as any).message} Upgrade your plan to attach more.` },
+        );
+        return;
+      }
       if (failedFiles.length > 0) {
         toast.error(
           `Couldn't attach ${failedFiles.length} file${failedFiles.length === 1 ? "" : "s"}: ${failedFiles
@@ -1309,6 +1326,7 @@ function SellPage() {
         );
         return;
       }
+
 
       // Publish succeeded — clear the safe draft so we don't re-offer it.
       try {
