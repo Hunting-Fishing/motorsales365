@@ -488,6 +488,26 @@ function SellPage() {
     toast.success("Prefilled from your ride profile");
   };
 
+  // Auto-fill listing fields from a decoded VIN (scanner OR manual blur).
+  const applyVinDecode = (r: VinDecodeResult) => {
+    setVehicleQuality((prev) => ({ ...prev, vin_chassis: r.vin }));
+    if (r.category) setCategory(r.category);
+    if (r.year) setYear(r.year);
+    if (r.make) setMake(r.make);
+    if (r.model) setModel(r.model);
+    if (r.engine) setEngine(r.engine);
+    if (r.fuel) setFuel(r.fuel);
+    if (r.transmission) setTransmission(r.transmission);
+    if (r.trim || r.bodyType) {
+      setCategoryAttrs((prev) => ({
+        ...prev,
+        ...(r.trim ? { variant: r.trim } : {}),
+        ...(r.bodyType ? { body_type: r.bodyType } : {}),
+      }));
+    }
+  };
+
+
   // Honor ?from_ride=<id> on mount.
   useEffect(() => {
     if (typeof window === "undefined") return;
