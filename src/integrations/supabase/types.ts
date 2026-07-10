@@ -5798,6 +5798,27 @@ export type Database = {
           },
         ]
       }
+      listing_drafts: {
+        Row: {
+          category_slug: string | null
+          form_json: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_slug?: string | null
+          form_json?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_slug?: string | null
+          form_json?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       listing_fitment: {
         Row: {
           created_at: string
