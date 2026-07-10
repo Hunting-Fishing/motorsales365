@@ -1069,7 +1069,7 @@ function SellPage() {
 
   return (
     <SiteLayout>
-      <div className="sell-compact container mx-auto max-w-5xl px-3 py-3 pb-24 sm:py-4 md:pb-6">
+      <div className="sell-compact container mx-auto max-w-6xl xl:max-w-7xl px-3 py-3 pb-24 sm:py-4 md:pb-6">
         <div className="flex items-end justify-between gap-3">
           <h1 className="font-display text-xl sm:text-2xl font-bold">Post a listing</h1>
           <span className="text-xs text-muted-foreground">Reach buyers across the Philippines.</span>
