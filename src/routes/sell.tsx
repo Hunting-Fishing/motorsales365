@@ -740,14 +740,9 @@ function SellPage() {
         .eq("id", user.id)
         .maybeSingle();
       if (prof) {
-        if (!phoneNational && (prof.phone || prof.phone_e164)) {
-          const raw = String(prof.phone_e164 || prof.phone || "").replace(/^\+63/, "").replace(/\D/g, "");
-          if (raw) {
-            setPhoneIso("PH");
-            setPhoneNational(raw);
-            setPhone(buildE164("PH", raw) ?? "");
-          }
-        }
+        // Do NOT auto-prefill the contact phone from the profile — users
+        // reported unexpected numbers appearing. They can tap the phone input
+        // and use the browser's saved-values suggestion instead.
         if (!region && prof.signup_region) setRegion(prof.signup_region);
         if (!province && prof.signup_province) setProvince(prof.signup_province);
         if (!city && prof.signup_city) setCity(prof.signup_city);
