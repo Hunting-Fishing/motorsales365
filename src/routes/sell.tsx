@@ -610,6 +610,64 @@ function SellPage() {
     setVinConflicts(conflicts);
   };
 
+  // Central VIN decoder — used by onBlur + Retry. Classifies every failure
+  // mode so the user knows *why* nothing auto-filled. Never touches typed fields.
+  const runVinDecode = async (raw: string) => {
+    if (!raw) {
+      setVinState({ kind: "idle" });
+      return;
+    }
+    const fmt = checkVinFormat(raw);
+    if (fmt.kind === "bad_chars" || fmt.kind === "bad_length") {
+      setVinState({ kind: "error", message: fmt.message });
+      return;
+    }
+    if (fmt.kind === "ok_chassis") {
+      setVinState({
+        kind: "chassis",
+        message: "Saved as chassis #. Auto-fill only works for 17-character VINs — please fill the vehicle fields below.",
+      });
+      return;
+    }
+    // ok_vin or warn_checksum — attempt decode either way (many JDM/EU VINs fail checksum but still decode).
+    setVinState({ kind: "checking" });
+    try {
+      const r = await decodeVin(raw);
+      const gotAnything = !!(r.year || r.make || r.model);
+      applyVinDecode(r);
+      if (gotAnything) {
+        if (fmt.kind === "warn_checksum") {
+          setVinState({
+            kind: "warn",
+            message: "Check digit didn't match (common for Asia/Europe VINs) — decoded anyway.",
+          });
+        } else {
+          setVinState({ kind: "ok" });
+        }
+      } else {
+        setVinState({
+          kind: "warn",
+          message:
+            "This looks like a non-US market VIN (Asia / Europe imports often aren't in the US database). VIN saved — please fill the vehicle fields manually.",
+        });
+      }
+    } catch (e) {
+      if (e instanceof VinDecodeError && e.kind === "http") {
+        setVinState({
+          kind: "error",
+          message: `VIN lookup service returned an error (${e.status ?? "?"}). Your VIN is saved — please fill fields manually or retry.`,
+          retryable: true,
+        });
+      } else {
+        setVinState({
+          kind: "error",
+          message: "VIN lookup service is unreachable — check your connection. Your VIN is saved.",
+          retryable: true,
+        });
+      }
+    }
+  };
+
 
 
   // Honor ?from_ride=<id> on mount.
