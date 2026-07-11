@@ -87,7 +87,7 @@ function AdminReports() {
     if (reporterIds.length) {
       try {
         const res = await countsFn({ data: { reporterIds } });
-        setCounts(res.counts);
+        setCounts(res?.counts ?? {});
       } catch {
         setCounts({});
       }
@@ -169,7 +169,7 @@ function AdminReports() {
               <ReportCard
                 key={r.id}
                 report={r}
-                reporterCounts={r.reporter_id ? counts[r.reporter_id] : undefined}
+                reporterCounts={r.reporter_id ? counts?.[r.reporter_id] : undefined}
                 currentUserId={user?.id ?? null}
                 onChanged={load}
                 onFilterReporter={(id) => setReporter(id)}
