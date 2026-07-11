@@ -27,6 +27,7 @@ import {
   Bookmark as SavedIcon,
   Briefcase,
   Settings as SettingsIcon,
+  ScanLine,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useDispatchProvider } from "@/hooks/use-dispatch-provider";
@@ -116,9 +117,10 @@ function buildHubs(opts: {
       label: "Promote & Earn",
       Icon: Share2,
       items: [
-        { to: "/dashboard/referral", label: "My referral & stats", Icon: QrCode },
+        { to: "/dashboard/referral", label: "My referrals & status", Icon: QrCode },
         { to: "/dashboard/qr-ads", label: "QR Ads", Icon: Share2 },
         { to: "/dashboard/promoter-resources", label: "Promoter resources", Icon: Megaphone },
+        { to: "/dashboard/qr-scan-test", label: "QR scan test", Icon: ScanLine },
         { to: "/resources/qr-landing", label: "Preview scanner view", Icon: QrCode },
       ],
     });
