@@ -400,25 +400,42 @@ function ListingDetailPage() {
     }
   };
 
-  const sendMessage = async () => {
+  const sendMessage = async (payload?: {
+    body: string;
+    attachment?: {
+      type: "image" | "video" | "gif";
+      url: string;
+      thumbUrl?: string | null;
+      path?: string | null;
+      meta?: Record<string, unknown> | null;
+    };
+  }) => {
     if (!user) {
       navigate({ to: "/login" });
       return;
     }
-    if (!message.trim() || !listing) return;
+    if (!listing) return;
+    const body = (payload?.body ?? message).trim();
+    const attachment = payload?.attachment;
+    if (!body && !attachment) return;
     setSending(true);
     const { error } = await supabase.from("messages").insert({
       listing_id: listing.id,
       sender_id: user.id,
       recipient_id: listing.user_id,
-      body: message.trim(),
+      body: body || null,
+      attachment_url: attachment?.url ?? null,
+      attachment_type: attachment?.type ?? null,
+      attachment_thumb_url: attachment?.thumbUrl ?? null,
+      attachment_path: attachment?.path ?? null,
+      attachment_meta: (attachment?.meta ?? null) as any,
     });
     setSending(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    setMessage("");
+    if (!payload) setMessage("");
     toast.success("Message sent — check your messages for replies.");
   };
 

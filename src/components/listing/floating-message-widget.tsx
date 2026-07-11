@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-import { MessageSquare, X, Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { useEffect } from "react";
+import { MessageSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MessageComposer, type MessagePayload } from "@/components/messaging/message-composer";
 
 interface Props {
   sellerName?: string | null;
@@ -10,7 +9,7 @@ interface Props {
   listingTitle?: string | null;
   message: string;
   setMessage: (v: string) => void;
-  onSend: () => Promise<void> | void;
+  onSend: (payload?: MessagePayload) => Promise<void> | void;
   sending: boolean;
   open: boolean;
   setOpen: (v: boolean) => void;
@@ -18,20 +17,18 @@ interface Props {
 
 /**
  * Facebook Messenger-style floating chat widget for the listing detail page.
- * Presentation-only; reuses the existing sendMessage handler + message state.
+ * `message`/`setMessage` are retained for backwards compat but the composer
+ * owns its own text state; onSend receives a full payload with attachment.
  */
 export function FloatingMessageWidget({
   sellerName,
   sellerAvatarUrl,
   listingTitle,
-  message,
-  setMessage,
   onSend,
   sending,
   open,
   setOpen,
 }: Props) {
-  // Close on ESC
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -45,7 +42,6 @@ export function FloatingMessageWidget({
 
   return (
     <>
-      {/* Floating action button */}
       <button
         type="button"
         aria-label={open ? "Close message widget" : "Message the seller"}
@@ -62,13 +58,12 @@ export function FloatingMessageWidget({
         )}
       </button>
 
-      {/* Chat panel */}
       {open && (
         <div
           role="dialog"
           aria-label="Send a message"
           className={cn(
-            "fixed right-4 z-50 w-[min(340px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-border bg-card shadow-2xl",
+            "fixed right-4 z-50 w-[min(360px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-border bg-card shadow-2xl",
             "bottom-[8.5rem] lg:bottom-24",
             "animate-in slide-in-from-bottom-4 fade-in duration-200",
           )}
@@ -117,27 +112,12 @@ export function FloatingMessageWidget({
           </div>
 
           <div className="border-t border-border bg-card p-3">
-            <Textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+            <MessageComposer
+              onSend={(payload) => onSend(payload)}
+              sending={sending}
               placeholder="Hi, is this still available?"
-              rows={3}
-              className="resize-none text-sm"
+              compact
             />
-            <Button
-              onClick={onSend}
-              disabled={sending || !message.trim()}
-              className="mt-2 w-full"
-              size="sm"
-            >
-              {sending ? (
-                "Sending…"
-              ) : (
-                <>
-                  <Send className="mr-1.5 h-4 w-4" /> Send message
-                </>
-              )}
-            </Button>
           </div>
         </div>
       )}

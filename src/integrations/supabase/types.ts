@@ -6429,7 +6429,12 @@ export type Database = {
       }
       messages: {
         Row: {
-          body: string
+          attachment_meta: Json | null
+          attachment_path: string | null
+          attachment_thumb_url: string | null
+          attachment_type: string | null
+          attachment_url: string | null
+          body: string | null
           created_at: string
           id: string
           listing_id: string
@@ -6438,7 +6443,12 @@ export type Database = {
           sender_id: string
         }
         Insert: {
-          body: string
+          attachment_meta?: Json | null
+          attachment_path?: string | null
+          attachment_thumb_url?: string | null
+          attachment_type?: string | null
+          attachment_url?: string | null
+          body?: string | null
           created_at?: string
           id?: string
           listing_id: string
@@ -6447,7 +6457,12 @@ export type Database = {
           sender_id: string
         }
         Update: {
-          body?: string
+          attachment_meta?: Json | null
+          attachment_path?: string | null
+          attachment_thumb_url?: string | null
+          attachment_type?: string | null
+          attachment_url?: string | null
+          body?: string | null
           created_at?: string
           id?: string
           listing_id?: string
@@ -13225,6 +13240,10 @@ export type Database = {
           tier_name: string
           tier_slug: string
         }[]
+      }
+      mark_conversation_unread: {
+        Args: { p_listing_id: string; p_other_user_id: string }
+        Returns: undefined
       }
       match_listing_to_parts_wanted: {
         Args: { p_listing_id: string }
