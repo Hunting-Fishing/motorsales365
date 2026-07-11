@@ -118,7 +118,10 @@ export function ServiceWorkerRegister() {
       await cleanup();
 
       const cleanupWorkerInstalled = await installCleanupWorker();
-      if (cleanupWorkerInstalled) return;
+      if (cleanupWorkerInstalled) {
+        setStorage(window.localStorage, buildStorageKey, buildId);
+        return;
+      }
 
       if (!shouldAutoReloadForNewBuild) return;
 
