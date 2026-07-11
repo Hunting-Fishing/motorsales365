@@ -257,12 +257,32 @@ function ReportPage() {
                 </div>
               ) : (
                 <form onSubmit={onSubmit} className="space-y-5">
+                  <ReportTargetPreview
+                    listingId={listingId}
+                    businessId={businessId}
+                    sellerId={sellerId}
+                    onResolved={(p, url) => {
+                      setResolvedTargetName(
+                        p?.kind === "listing"
+                          ? (p.title ?? null)
+                          : p?.kind === "business"
+                            ? (p.name ?? null)
+                            : p?.kind === "seller"
+                              ? (p.name ?? null)
+                              : null,
+                      );
+                      if (url) setTargetUrl(url);
+                    }}
+                    onClear={clearTarget}
+                  />
+
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <Label htmlFor="target_type">What are you reporting?</Label>
                       <Select
                         value={targetType}
                         onValueChange={(v) => setTargetType(v as any)}
+                        disabled={hasKnownTarget}
                       >
                         <SelectTrigger id="target_type" className="mt-1">
                           <SelectValue />
@@ -275,6 +295,11 @@ function ReportPage() {
                           ))}
                         </SelectContent>
                       </Select>
+                      {hasKnownTarget && (
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          Locked to the item above. Use "Not the right item?" to change.
+                        </p>
+                      )}
                     </div>
                     <div>
                       <Label htmlFor="category">Reason</Label>
@@ -293,20 +318,22 @@ function ReportPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="target_url">
-                      Link to the listing, business, or profile{" "}
-                      <span className="text-muted-foreground">(if any)</span>
-                    </Label>
-                    <Input
-                      id="target_url"
-                      className="mt-1"
-                      placeholder="https://365motorsales.com/listing/..."
-                      value={targetUrl}
-                      onChange={(e) => setTargetUrl(e.target.value)}
-                      maxLength={500}
-                    />
-                  </div>
+                  {!hasKnownTarget && (
+                    <div>
+                      <Label htmlFor="target_url">
+                        Link to the listing, business, or profile{" "}
+                        <span className="text-muted-foreground">(if any)</span>
+                      </Label>
+                      <Input
+                        id="target_url"
+                        className="mt-1"
+                        placeholder="https://365motorsales.com/listing/..."
+                        value={targetUrl}
+                        onChange={(e) => setTargetUrl(e.target.value)}
+                        maxLength={500}
+                      />
+                    </div>
+                  )}
 
                   <div>
                     <Label htmlFor="details">What happened?</Label>
