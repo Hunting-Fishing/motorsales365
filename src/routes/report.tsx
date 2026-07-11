@@ -24,6 +24,8 @@ const searchSchema = z.object({
   target_type: z.enum(["listing", "business", "seller", "other"]).optional(),
   category: z.string().optional(),
   listing_id: z.string().uuid().optional(),
+  business_id: z.string().uuid().optional(),
+  seller_id: z.string().uuid().optional(),
   target_url: z.string().optional(),
   details: z.string().optional(),
 });
