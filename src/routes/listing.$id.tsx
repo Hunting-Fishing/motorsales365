@@ -272,10 +272,6 @@ function ListingDetailPage() {
   const [likeCount, setLikeCount] = useState(0);
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
-  const [reportOpen, setReportOpen] = useState(false);
-  const [reportReason, setReportReason] = useState(REPORT_REASONS[0]);
-  const [reportDetails, setReportDetails] = useState("");
-  const [submittingReport, setSubmittingReport] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const messageRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -422,30 +418,6 @@ function ListingDetailPage() {
     toast.success("Message sent — check your messages for replies.");
   };
 
-  const submitReport = async () => {
-    if (!user) {
-      navigate({ to: "/login" });
-      return;
-    }
-    setSubmittingReport(true);
-    const { error } = await supabase.from("reports").insert({
-      listing_id: id,
-      reporter_id: user.id,
-      target_type: "listing",
-      category: reportReason,
-      reason: reportReason,
-      details: reportDetails || null,
-      reporter_email: user.email ?? null,
-    });
-    setSubmittingReport(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    setReportOpen(false);
-    setReportDetails("");
-    toast.success("Report submitted. Thank you.");
-  };
 
   if (loading) {
     return (
@@ -610,13 +582,16 @@ function ListingDetailPage() {
               <div className="mt-2 flex items-start justify-between gap-2">
                 <h1 className="font-display text-3xl font-bold md:text-4xl">{listing.title}</h1>
                 <div className="flex shrink-0 items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setReportOpen(true)}
-                    className="gap-1"
-                  >
-                    <Flag className="h-4 w-4" /> Report
+                  <Button asChild variant="outline" size="sm" className="gap-1">
+                    <Link
+                      to="/report"
+                      search={{
+                        target_type: "listing",
+                        listing_id: listing.id,
+                      }}
+                    >
+                      <Flag className="h-4 w-4" /> Report
+                    </Link>
                   </Button>
                   <ListingActionsMenu
                     listingId={listing.id}
@@ -840,58 +815,13 @@ function ListingDetailPage() {
             <span>·</span>
             <span>{(listing.view_count ?? 0).toLocaleString()} views</span>
             <span>·</span>
-            <Dialog open={reportOpen} onOpenChange={setReportOpen}>
-              <DialogTrigger asChild>
-                <button className="inline-flex items-center gap-1 hover:text-destructive">
-                  <Flag className="h-3 w-3" /> Report listing
-                </button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Report this listing</DialogTitle>
-                  <DialogDescription>
-                    Help us keep 365 MotorSales Philippines safe. Our team will review your report.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-3">
-                  <div>
-                    <Label>Reason</Label>
-                    <Select value={reportReason} onValueChange={setReportReason}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {REPORT_REASONS.map((r) => (
-                          <SelectItem key={r} value={r}>
-                            {r}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Additional details (optional)</Label>
-                    <Textarea
-                      rows={3}
-                      value={reportDetails}
-                      onChange={(e) => setReportDetails(e.target.value)}
-                      placeholder="Tell us more…"
-                    />
-                  </div>
-                </div>
-                <div className="mt-3 border-t border-border pt-3">
-                  <FormFeedbackLink formId="report-listing" />
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setReportOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={submitReport} disabled={submittingReport}>
-                    {submittingReport ? "Submitting…" : "Submit report"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Link
+              to="/report"
+              search={{ target_type: "listing", listing_id: listing.id }}
+              className="inline-flex items-center gap-1 hover:text-destructive"
+            >
+              <Flag className="h-3 w-3" /> Report listing
+            </Link>
           </div>
         </div>
 
@@ -1019,12 +949,13 @@ function ListingDetailPage() {
                 </Button>
               )}
             </div>
-            <button
-              onClick={() => setReportOpen(true)}
+            <Link
+              to="/report"
+              search={{ target_type: "listing", listing_id: listing.id }}
               className="mt-3 inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive"
             >
               <Flag className="h-3 w-3" /> Report this listing
-            </button>
+            </Link>
           </div>
 
           <ListingReportsSection listingId={listing.id} />
