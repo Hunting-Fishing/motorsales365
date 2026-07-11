@@ -13226,6 +13226,10 @@ export type Database = {
         Returns: boolean
       }
       rotate_internal_webhook_key: { Args: { _name: string }; Returns: boolean }
+      sales_update_account_status: {
+        Args: { _new_status: string; _profile_id: string }
+        Returns: undefined
+      }
       self_serve_change_plan: { Args: { _plan_id: string }; Returns: Json }
       seller_account_active: { Args: { _user_id: string }; Returns: boolean }
       show_limit: { Args: never; Returns: number }
