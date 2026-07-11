@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
