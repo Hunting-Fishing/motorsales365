@@ -1,43 +1,30 @@
-## Problem
+## Activate state-based card accents
 
-The `/map` page currently shows nothing (or almost nothing) because it filters `businesses` by `status = 'active' AND lat IS NOT NULL AND lng IS NOT NULL`. Current DB state:
+Right now `ListingCard` shows status badges (NEW, Reported, Price drop, Promo, Featured/boosted, Pending Sale, Renewed) but the card border itself is only colored by seller tier. I'll add a live state-driven accent (ring + subtle glow) around the card so the state is visible at a glance while scanning the grid.
 
-- `active` with coords: **0**
-- `active` (no coords): 2
-- `archived`: 14 (mostly no coords)
-- `rejected` with coords: **88** ← the bulk of signed-up shops (67 marked `claim_state='owned'`, 21 `unclaimed`), most look like real imported carwashes/shops, not moderation rejects
+### Priority (highest wins, one accent per card)
 
-So two things are wrong: the map filter is too narrow, AND a large batch of legitimate businesses is stuck at `status='rejected'`.
+1. **Reported** (`openReports > 0`) → amber ring + amber glow
+2. **Pending sale** (`status === 'pending_sale'`) → orange ring
+3. **Price drop** (`effectiveTrend.direction === 'down'`) → emerald ring + soft green glow
+4. **Price up** (`effectiveTrend.direction === 'up'`) → rose ring
+5. **Promo active** (`effectivePromo`) → orange ring + glow
+6. **Boosted / Featured** → accent ring + amber glow
+7. **NEW** (<48h) → emerald ring
+8. **Renewed** (<24h bump) → sky ring
+9. Fallback → existing `tier.ringClass` / `tier.glowClass`
 
-## Plan
+### Changes (frontend only)
 
-### 1. Data repair (migration)
-Reset the mis-flagged discovered businesses so they are visible again:
-- Move rows where `status='rejected'` AND `owner_id IS NULL` AND `claim_state IN ('owned','unclaimed')` AND they came from the discovery import → set `status='active'` (they are directory listings, not moderation rejects).
-- Leave any truly admin-rejected rows alone (heuristic: keep rows that have a `business_claim_audit` entry with a rejection reason, or an `admin_audit_log` `reject_business` action — those are the real rejects).
-- Add a short SQL comment documenting the backfill.
+- `src/components/listing-card.tsx`
+  - Add a small `pickCardAccent(...)` helper (in-file) returning `{ ring, glow }` tailwind classes using the priority above, reading the same signals already computed (`openReports`, `boosted`, `effectiveTrend`, `effectivePromo`, `listing.status`, `listing.published_at`, `listing.updated_at`).
+  - Replace `tier.ringClass, tier.glowClass` in the outer `cn(...)` with the accent result, falling back to tier classes when no state applies.
+  - Keep all existing badges as-is (accent complements them, doesn't replace them).
 
-### 2. Map query widening (`src/routes/map.tsx`)
-Change the businesses fetch to include every publicly listable record with coordinates:
-- Filter `status IN ('active','pending')` instead of just `active`.
-- Keep the `lat/lng NOT NULL` filter (map pins require coords).
-- Bump the `.limit(500)` cap to `2000` so all PH businesses show at national zoom (still bounded).
-- Show a small "Pending review" badge on the result card + pin popup for rows with `status='pending'` so users know it's not yet fully verified.
+No backend, hook, or data changes — all signals are already fetched (`useListingReportSummary`, `useListingPriceTrend`, `useListingPromo`, plus the listing fields). No new dependencies.
 
-### 3. Businesses index parity (`src/routes/businesses.index.tsx`)
-Apply the same `status IN ('active','pending')` widening so the directory list matches the map. (Single-line change; keeps the two surfaces consistent.)
+### Verification
 
-### 4. Verify
-- After the migration, re-run the count query and confirm ~100+ `active` rows with coords.
-- Load `/map` in the preview, confirm pins render for the PH map at default zoom, and confirm a pending row shows the new badge.
-
-## Technical notes
-
-- No RLS change needed — the public SELECT policy on `businesses` already permits `status IN ('active','pending')` for anon reads (verified in existing policies).
-- No new components; only `src/routes/map.tsx`, `src/routes/businesses.index.tsx`, and one SQL migration.
-- The `BusinessesMap` / Leaflet layer already handles clustering for hundreds of pins — no perf work needed.
-
-## Out of scope
-
-- Backfilling missing lat/lng for the 2 `active` rows without coords (would need geocoding pass — separate task).
-- Re-designing the map filter bar.
+- Load `/browse/car` — cards with existing NEW/Pending Sale/Reported badges should now also have a matching colored ring.
+- Confirm only one accent renders per card (priority order).
+- Confirm tier ring still shows on cards with no active state.

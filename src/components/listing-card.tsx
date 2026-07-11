@@ -119,6 +119,65 @@ function summarizeAttributes(slug: string, attrs?: Record<string, any> | null): 
 
 export type ListingCardBadge = { label: string; tone: "exact" | "good" | "loose" };
 
+function pickCardAccent(args: {
+  openReports: number;
+  status?: string;
+  trend: PriceTrend | null;
+  promo: ListingPromo | null;
+  boosted: boolean;
+  publishedAt?: string | null;
+  updatedAt?: string | null;
+}): { ring: string; glow: string } | null {
+  const { openReports, status, trend, promo, boosted, publishedAt, updatedAt } = args;
+  if (openReports > 0)
+    return {
+      ring: "ring-2 ring-amber-500/70 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(245,158,11,0.25),0_10px_30px_-12px_rgba(245,158,11,0.55)]",
+    };
+  if (status === "pending_sale")
+    return {
+      ring: "ring-2 ring-orange-500/70 ring-offset-1 ring-offset-background",
+      glow: "",
+    };
+  if (trend?.direction === "down")
+    return {
+      ring: "ring-2 ring-emerald-500/70 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(16,185,129,0.2),0_10px_30px_-12px_rgba(16,185,129,0.5)]",
+    };
+  if (trend?.direction === "up")
+    return {
+      ring: "ring-2 ring-rose-500/70 ring-offset-1 ring-offset-background",
+      glow: "",
+    };
+  if (promo)
+    return {
+      ring: "ring-2 ring-orange-400/70 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(251,146,60,0.2),0_10px_30px_-12px_rgba(251,146,60,0.5)]",
+    };
+  if (boosted)
+    return {
+      ring: "ring-2 ring-accent/70 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(245,158,11,0.2),0_10px_30px_-12px_rgba(245,158,11,0.5)]",
+    };
+  if (publishedAt) {
+    const age = Date.now() - new Date(publishedAt).getTime();
+    if (age >= 0 && age <= 48 * 60 * 60 * 1000)
+      return {
+        ring: "ring-2 ring-emerald-500/60 ring-offset-1 ring-offset-background",
+        glow: "",
+      };
+  }
+  if (updatedAt) {
+    const age = Date.now() - new Date(updatedAt).getTime();
+    if (age >= 0 && age <= 24 * 60 * 60 * 1000)
+      return {
+        ring: "ring-2 ring-sky-500/60 ring-offset-1 ring-offset-background",
+        glow: "",
+      };
+  }
+  return null;
+}
+
 export function ListingCard({
   listing,
   matchBadge,
