@@ -418,30 +418,6 @@ function ListingDetailPage() {
     toast.success("Message sent — check your messages for replies.");
   };
 
-  const submitReport = async () => {
-    if (!user) {
-      navigate({ to: "/login" });
-      return;
-    }
-    setSubmittingReport(true);
-    const { error } = await supabase.from("reports").insert({
-      listing_id: id,
-      reporter_id: user.id,
-      target_type: "listing",
-      category: reportReason,
-      reason: reportReason,
-      details: reportDetails || null,
-      reporter_email: user.email ?? null,
-    });
-    setSubmittingReport(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    setReportOpen(false);
-    setReportDetails("");
-    toast.success("Report submitted. Thank you.");
-  };
 
   if (loading) {
     return (
