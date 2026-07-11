@@ -13369,6 +13369,7 @@ export type Database = {
         Returns: undefined
       }
       mark_thread_read: { Args: { p_thread_id: string }; Returns: undefined }
+      mark_thread_unread: { Args: { p_thread_id: string }; Returns: undefined }
       match_listing_to_parts_wanted: {
         Args: { p_listing_id: string }
         Returns: number
