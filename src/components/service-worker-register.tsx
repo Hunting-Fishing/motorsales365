@@ -67,8 +67,6 @@ export function ServiceWorkerRegister() {
       /(^|-)precache-v\d+-|(^|-)runtime-|(^|-)googleAnalytics-/.test(name);
 
     const cleanup = async () => {
-      if (!shouldAutoReloadForNewBuild) return;
-
       if (hasServiceWorker) {
         try {
           const registrations = await navigator.serviceWorker.getRegistrations();
@@ -88,6 +86,8 @@ export function ServiceWorkerRegister() {
           // Best-effort; the page still works if cleanup is blocked.
         }
       }
+
+      if (!shouldAutoReloadForNewBuild) return;
 
       try {
         if ("caches" in window) {
