@@ -1,0 +1,2 @@
+-- Update vehicle_damages column comment to reflect new 4-view structure
+COMMENT ON COLUMN work_orders.vehicle_damages IS 'Array of damage areas with properties: id, x, y, type (dent|scratch|rust|paint_damage|collision|wear|other), severity (minor|moderate|severe), view (front|back|top|side), description, notes, photos, estimatedCost, bodyPanel, createdAt, updatedAt';

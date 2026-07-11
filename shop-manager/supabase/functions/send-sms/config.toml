@@ -1,0 +1,4 @@
+
+project_id = "oudkbrnvommbvtuispla"
+allowed_http_methods = ["GET", "POST", "OPTIONS"]
+verify_jwt = true

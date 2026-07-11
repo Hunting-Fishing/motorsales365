@@ -1,0 +1,86 @@
+project_id = "oudkbrnvommbvtuispla"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[functions.confirm-payment]
+verify_jwt = false
+
+[functions.nonprofit-automation]
+verify_jwt = false
+
+[functions.process-email-sequences]
+verify_jwt = false
+
+[functions.send-donor-receipt]
+verify_jwt = false
+
+[functions.send-notification-email]
+verify_jwt = false
+
+[functions.trigger-email-campaign]
+verify_jwt = false
+
+[functions.workflow-engine]
+verify_jwt = false
+
+[functions.invite-team-member]
+verify_jwt = true
+
+[functions.update-user-email]
+verify_jwt = true
+
+[functions.rls-audit]
+verify_jwt = true
+
+[functions.process-milestone-notifications]
+verify_jwt = false
+
+[functions.send-sms]
+verify_jwt = false
+
+[functions.mapbox-route-optimization]
+verify_jwt = false
+
+[functions.mapbox-geocode]
+verify_jwt = false
+
+[functions.get-fuel-prices]
+verify_jwt = false
+
+[functions.get-weather-forecast]
+verify_jwt = false
+
+[functions.send-invoice-email]
+verify_jwt = false
+
+[functions.pt-ai-assistant]
+verify_jwt = false
+
+[functions.pt-automations]
+verify_jwt = false
+
+[functions.nutrition-food-lookup]
+verify_jwt = false
+
+[functions.nutrition-engine]
+verify_jwt = false
+
+[functions.pt-ai-chat]
+verify_jwt = false
+
+[functions.nutritionix-lookup]
+verify_jwt = false
+
+[functions.spoonacular-recipes]
+verify_jwt = false
+
+[functions.fetch-product-meta]
+verify_jwt = false
+
+[functions.welding-photo-measure]
+verify_jwt = true

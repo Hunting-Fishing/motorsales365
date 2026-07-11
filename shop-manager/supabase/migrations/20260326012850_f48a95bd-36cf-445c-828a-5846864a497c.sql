@@ -1,0 +1,1 @@
+UPDATE septic_inspection_templates SET is_published = true WHERE is_published = false;
