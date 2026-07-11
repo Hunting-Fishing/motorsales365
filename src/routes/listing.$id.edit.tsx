@@ -159,6 +159,7 @@ function EditListingPage() {
   const [phoneIso, setPhoneIso] = useState("PH");
   const [phoneNational, setPhoneNational] = useState("");
   const [allowMessages, setAllowMessages] = useState(true);
+  const [showMapPin, setShowMapPin] = useState<boolean>(false);
 
   // Vehicle attributes
   const [year, setYear] = useState("");
@@ -264,6 +265,7 @@ function EditListingPage() {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const a: Record<string, any> = (l.attributes as any) ?? {};
+    setShowMapPin(a.show_map_pin === true);
     setYear(a.year ? String(a.year) : "");
     setMake(a.make ?? "");
     setModel(a.model ?? "");
@@ -378,6 +380,8 @@ function EditListingPage() {
     ];
     for (const k of vehicleKeys) delete attributes[k];
     for (const k of VEHICLE_QUALITY_KEYS) delete attributes[k];
+    delete attributes.show_map_pin;
+    if (showMapPin && lat != null && lng != null) attributes.show_map_pin = true;
     if (year) attributes.year = year;
     if (make) attributes.make = make;
     if (model) attributes.model = model;
@@ -1220,21 +1224,36 @@ function EditListingPage() {
                 }}
               />
               {lat != null && lng != null && (
-                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                  <span>
-                    Pinned: {lat.toFixed(5)}, {lng.toFixed(5)}
-                  </span>
-                  <button
-                    type="button"
-                    className="underline hover:text-foreground"
-                    onClick={() => {
-                      setLat(null);
-                      setLng(null);
-                    }}
-                  >
-                    Clear pin
-                  </button>
-                </div>
+                <>
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                    <span>
+                      Pinned: {lat.toFixed(5)}, {lng.toFixed(5)}
+                    </span>
+                    <button
+                      type="button"
+                      className="underline hover:text-foreground"
+                      onClick={() => {
+                        setLat(null);
+                        setLng(null);
+                        setShowMapPin(false);
+                      }}
+                    >
+                      Clear pin
+                    </button>
+                  </div>
+                  <label className="mt-1 flex items-start gap-2 rounded-md border border-border bg-muted/40 p-2 text-[12px]">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5"
+                      checked={showMapPin}
+                      onChange={(e) => setShowMapPin(e.target.checked)}
+                    />
+                    <span>
+                      Show an approximate-location map on my listing (a ~400m circle,
+                      not your exact address). Similar to Facebook Marketplace.
+                    </span>
+                  </label>
+                </>
               )}
             </div>
             <div className="flex items-center gap-2">
