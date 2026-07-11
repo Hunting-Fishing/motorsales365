@@ -260,16 +260,7 @@ function ReportPage() {
                     listingId={listingId}
                     businessId={businessId}
                     sellerId={sellerId}
-                    onResolved={(p, url) => {
-                      setResolvedTargetName(
-                        p?.kind === "listing"
-                          ? (p.title ?? null)
-                          : p?.kind === "business"
-                            ? (p.name ?? null)
-                            : p?.kind === "seller"
-                              ? (p.name ?? null)
-                              : null,
-                      );
+                    onResolved={(_p, url) => {
                       if (url) setTargetUrl(url);
                     }}
                     onClear={clearTarget}
