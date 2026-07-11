@@ -225,7 +225,7 @@ function MessagesPage() {
 
     if (listingIds.length) {
       const [{ data: ls }, { data: media }] = await Promise.all([
-        supabase.from("listings").select("id,title,user_id").in("id", listingIds),
+        supabase.from("listings").select("id,title,user_id,price_php,status").in("id", listingIds),
         supabase
           .from("listing_media")
           .select("listing_id,url,type,sort_order")
@@ -237,10 +237,19 @@ function MessagesPage() {
       (media ?? []).forEach((row: any) => {
         if (!thumbMap[row.listing_id]) thumbMap[row.listing_id] = row.url;
       });
-      const map: Record<string, { title: string; user_id: string; thumb: string | null }> = {};
+      const map: Record<
+        string,
+        { title: string; user_id: string; thumb: string | null; price_php: number | null; status: string | null }
+      > = {};
       (ls ?? []).forEach(
         (l: any) =>
-          (map[l.id] = { title: l.title, user_id: l.user_id, thumb: thumbMap[l.id] ?? null }),
+          (map[l.id] = {
+            title: l.title,
+            user_id: l.user_id,
+            thumb: thumbMap[l.id] ?? null,
+            price_php: l.price_php ?? null,
+            status: l.status ?? null,
+          }),
       );
       setListingsById(map);
     }
