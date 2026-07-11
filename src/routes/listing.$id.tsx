@@ -609,13 +609,23 @@ function ListingDetailPage() {
               </div>
               <div className="mt-2 flex items-start justify-between gap-2">
                 <h1 className="font-display text-3xl font-bold md:text-4xl">{listing.title}</h1>
-                <ListingActionsMenu
-                  listingId={listing.id}
-                  sellerUserId={listing.user_id ?? null}
-                  sellerName={seller?.business_name ?? seller?.full_name ?? null}
-                  variant="inline"
-                  className="shrink-0"
-                />
+                <div className="flex shrink-0 items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setReportOpen(true)}
+                    className="gap-1"
+                  >
+                    <Flag className="h-4 w-4" /> Report
+                  </Button>
+                  <ListingActionsMenu
+                    listingId={listing.id}
+                    sellerUserId={listing.user_id ?? null}
+                    sellerName={seller?.business_name ?? seller?.full_name ?? null}
+                    variant="inline"
+                    className="shrink-0"
+                  />
+                </div>
               </div>
               <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4" />
