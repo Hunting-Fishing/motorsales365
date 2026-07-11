@@ -1,38 +1,44 @@
-## What is happening
-
-Jocelyn’s phone is not seeing the newest published app shell. The source code already has the updated dashboard label and QR layout, but the published domain is still serving an older `/sw.js` service worker file. That old worker is an offline/app-shell cache path, so her browser/PWA can keep reusing old navigation and old QR code UI even after refresh or reopening.
 
 ## Goal
 
-Make the published website behave like a normal live website: after a publish, users should get the newest navigation and QR layout, not an old cached app bundle.
+Replace every user-facing Google Maps render with OpenStreetMap via Leaflet. Leave admin-only server-side Google Places usage (business discovery, seeding, reverse-geocode fallback) alone.
 
-## Plan
+## Scope of changes
 
-1. **Replace the stale offline service worker path**
-   - Keep installability/home-screen support from the manifest.
-   - Remove offline app-shell caching behavior for the main app.
-   - Serve a same-path `/sw.js` cleanup worker for one release so devices with the old worker are forced to clear old app caches and unregister.
+### 1. Businesses map (routes: `map.tsx`, `businesses.index.tsx`, `businesses.$slug.tsx`)
+- Replace `GoogleBusinessMap` with a new `BusinessMap` built on `react-leaflet` (Leaflet is already in the project via `location-picker-inner` and `business-map-inner`).
+- Reuse the existing `business-map-inner.tsx` OSM scaffolding; extend it to accept the `GMapBusiness[]` shape (marker color by type, popup with name/rating/link, bounds-to-fit, click handler).
+- Preserve the current UX: colored pins per business type, click-to-open drawer/sheet, "recenter", cluster-optional (skip clustering v1 unless trivial).
 
-2. **Simplify the app update logic**
-   - Remove the current “register a cleanup worker every build” loop from the React app.
-   - Instead, on app load, unregister old `/sw.js` registrations and delete old Workbox/precache/offline caches.
-   - Add a lightweight build-id check that reloads once when a user crosses from an older published build to a newer one.
+### 2. Parts / browse listings map (`components/marketplace/listings-map-view.tsx`)
+- Rewrite the Google JS SDK load + `new google.maps.Map` block using Leaflet: `MapContainer`, `TileLayer` (OSM tiles), `Marker` per listing with popup linking to the listing page, `fitBounds` on markers.
 
-3. **Add a visible internal version marker**
-   - Add a tiny non-disruptive build marker in the DOM/data attribute so we can verify on a phone whether the newest bundle loaded.
-   - This helps distinguish “published build not updated yet” from “device cache still serving old code.”
+### 3. Tow request pin picker (`components/towing/tow-map-pin.tsx`)
+- Rewrite as a Leaflet map with click-to-place / drag marker, emitting the same `MapPinValue` `{lat, lng}` shape. Include a small "use current location" button (browser geolocation) to match today's behavior.
 
-4. **Verify the actual QR/navigation state**
-   - Check the current dashboard route source and mobile QR layout at phone size.
-   - Confirm the current source shows `My referrals & status` and the constrained QR/actions layout.
-   - After implementation, verify the published `/sw.js` response matches the cleanup worker once republished.
+### 4. Cleanup
+- Delete `google-business-map.tsx`, `google-business-map-inner.tsx`.
+- Move `haversineKm` and `colorForType` out of `google-maps-loader.ts` into a new `src/components/businesses/map-utils.ts`; update imports in `map.tsx`, `businesses.index.tsx`, `google-business-map-inner`'s former callers.
+- Delete `google-maps-loader.ts`.
+- Remove the "Enlarge Google Maps built-in controls" block in `src/styles.css` (Leaflet has its own control styles already handled by `leaflet/dist/leaflet.css`).
+- Do NOT touch `admin.location-corrections.tsx`'s "Open in Google Maps ↗" link — that's just a `maps.google.com` deep link, not a map render, and is useful as an external reference.
+- Do NOT touch admin Google Maps URL field in `admin.parts.outreach.tsx` (data field, not a map).
 
-5. **User-facing guidance after publish**
-   - Tell affected users to open the website once, wait for the automatic refresh, then reopen the PWA/app icon if they use it.
-   - If an installed app was pinned while the old offline worker existed, one reinstall may still be needed on some phones, but the website should stop serving the old app shell after the cleanup release.
+### Out of scope (intentionally left alone per user answer)
+- `src/lib/places.server.ts`, `business-discovery-sync.*`, `business-seed.functions.ts`, `tow-geo.functions.ts` — server-side Google Places / Geocoding stays.
+- `GOOGLE_MAPS_API_KEY` env var and the Google Maps Platform connector remain linked for those server functions.
+- Google Fonts preconnect in `__root.tsx` (fonts, not maps).
 
 ## Technical notes
 
-- The published `/sw.js` currently differs from the repository file, so the last publish either did not include the latest cleanup file or the published app is still on an older release.
-- The app should not use offline navigation caching unless offline support is explicitly required.
-- The cleanup worker should delete only app-shell cache buckets and unregister itself, leaving normal browser HTTP caching to the host’s no-cache headers.
+- All new maps use OSM tile URL `https://tile.openstreetmap.org/{z}/{x}/{y}.png` with attribution `&copy; OpenStreetMap contributors`, matching the existing `business-map-inner` and `location-picker-inner`.
+- Every Leaflet map is imported dynamically (`ClientOnly` / `lazy` + `Suspense`) to avoid SSR "window is not defined" — same pattern already used in `business-map.tsx` and `location-picker.tsx`.
+- Marker icon assets: import from `leaflet/dist/images/*` and override `L.Icon.Default.mergeOptions` once, or use a small inline `divIcon` with a colored dot for business-type pins (matches current `colorForType`).
+- No new dependencies needed — `leaflet` and `react-leaflet` are already installed.
+
+## Verification
+
+After changes:
+- `bun run build` succeeds.
+- `/map`, `/businesses`, `/businesses/[slug]`, `/parts`, `/browse/[category]`, and the tow request form all render maps with OSM tiles and no `maps.googleapis.com` network requests in the browser.
+- Existing tests (`bun run test`) still pass.

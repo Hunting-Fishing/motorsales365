@@ -232,18 +232,6 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Enlarge Google Maps built-in controls on touch devices */
-@media (hover: none) and (pointer: coarse) {
-  .gm-bundled-control button,
-  .gm-style .gm-bundled-control-on-bottom button,
-  .gmnoprint button {
-    width: 44px !important;
-    height: 44px !important;
-  }
-  .gm-style-mtc button {
-    min-height: 44px !important;
-  }
-}
 
 /* ===========================================================
    Compact form density for /sell (Post a listing).

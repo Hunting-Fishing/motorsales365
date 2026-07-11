@@ -1,5 +1,4 @@
-// Kept for backward compatibility: shared helpers used across the map UI.
-// The map now uses Leaflet + OpenStreetMap (no API key required).
+// Shared helpers for the OpenStreetMap/Leaflet-based business map UI.
 
 // Haversine distance in km between two lat/lng points.
 export function haversineKm(

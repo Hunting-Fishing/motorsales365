@@ -1,16 +1,27 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { MapPin } from "lucide-react";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import regionCentroids from "@/data/ph-region-centroids.json";
 import type { ListingCardData } from "@/components/listing-card";
 import { formatPHP } from "@/lib/format";
 
-declare global {
-  interface Window {
-    google?: any;
-    __marketplaceMapInit?: () => void;
-  }
-}
+import iconUrl from "leaflet/dist/images/marker-icon.png";
+import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
+import shadowUrl from "leaflet/dist/images/marker-shadow.png";
+
+const DefaultIcon = L.icon({
+  iconUrl,
+  iconRetinaUrl,
+  shadowUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const CENTROIDS = regionCentroids as Record<
   string,
@@ -18,36 +29,14 @@ const CENTROIDS = regionCentroids as Record<
 >;
 const PH_CENTER = { lat: 12.8797, lng: 121.774 };
 
-let loadPromise: Promise<void> | null = null;
-function loadMaps(): Promise<void> {
-  if (typeof window === "undefined") return Promise.reject(new Error("no window"));
-  if (window.google?.maps) return Promise.resolve();
-  if (loadPromise) return loadPromise;
-  loadPromise = new Promise((resolve, reject) => {
-    const key = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY;
-    const channel = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID;
-    if (!key) return reject(new Error("Missing Maps key"));
-    window.__marketplaceMapInit = () => resolve();
-    const s = document.createElement("script");
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&loading=async&callback=__marketplaceMapInit${channel ? `&channel=${channel}` : ""}`;
-    s.async = true;
-    s.defer = true;
-    s.onerror = () => reject(new Error("Maps failed to load"));
-    document.head.appendChild(s);
-  });
-  return loadPromise;
-}
-
 type Pin =
   | { kind: "exact"; lat: number; lng: number; listing: ListingCardData }
   | { kind: "region"; lat: number; lng: number; region: string; listings: ListingCardData[] };
 
-/** Build pins: exact lat/lng per listing when available; otherwise group leftovers by region centroid. */
 function buildPins(listings: ListingCardData[]): { pins: Pin[]; unmapped: number } {
   const pins: Pin[] = [];
   const byRegion = new Map<string, ListingCardData[]>();
   let unmapped = 0;
-
   for (const l of listings) {
     if (l.lat != null && l.lng != null && Number.isFinite(l.lat) && Number.isFinite(l.lng)) {
       pins.push({ kind: "exact", lat: Number(l.lat), lng: Number(l.lng), listing: l });
@@ -73,84 +62,39 @@ function buildPins(listings: ListingCardData[]): { pins: Pin[]; unmapped: number
   return { pins, unmapped };
 }
 
+function regionBadgeIcon(count: number): L.DivIcon {
+  return L.divIcon({
+    className: "",
+    html: `<div style="background:#0EA5E9;color:white;font-weight:700;border-radius:9999px;min-width:28px;height:28px;padding:0 8px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.35);border:2px solid white;font-size:12px;">${count}</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14],
+  });
+}
+
 type Selection =
   | { kind: "exact"; listing: ListingCardData }
   | { kind: "region"; region: string; listings: ListingCardData[] };
 
+function FitToPins({ pins }: { pins: Pin[] }) {
+  const map = useMap();
+  useEffect(() => {
+    if (pins.length === 0) return;
+    if (pins.length === 1) {
+      map.setView([pins[0].lat, pins[0].lng], 14);
+      return;
+    }
+    const bounds = L.latLngBounds(pins.map((p) => [p.lat, p.lng] as [number, number]));
+    map.fitBounds(bounds, { padding: [48, 48] });
+  }, [pins, map]);
+  return null;
+}
+
 export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
-  const [ready, setReady] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
   const [selected, setSelected] = useState<Selection | null>(null);
-
   const { pins, unmapped } = useMemo(() => buildPins(listings), [listings]);
-
-  useEffect(() => {
-    let cancelled = false;
-    loadMaps()
-      .then(() => {
-        if (cancelled || !ref.current || !window.google?.maps) return;
-        const map = new window.google.maps.Map(ref.current, {
-          center: PH_CENTER,
-          zoom: 6,
-          streetViewControl: false,
-          mapTypeControl: false,
-          fullscreenControl: false,
-        });
-        mapRef.current = map;
-        setReady(true);
-      })
-      .catch((e) => setErr(e?.message ?? "Map failed"));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!ready || !mapRef.current || !window.google?.maps) return;
-    markersRef.current.forEach((m) => m.setMap(null));
-    markersRef.current = [];
-
-    const bounds = new window.google.maps.LatLngBounds();
-    let hasAny = false;
-
-    for (const pin of pins) {
-      const marker = new window.google.maps.Marker({
-        position: { lat: pin.lat, lng: pin.lng },
-        map: mapRef.current,
-        title: pin.kind === "exact" ? pin.listing.title : pin.region,
-        label:
-          pin.kind === "region"
-            ? {
-                text: String(pin.listings.length),
-                color: "#ffffff",
-                fontSize: "11px",
-                fontWeight: "700",
-              }
-            : undefined,
-      });
-      marker.addListener("click", () => {
-        if (pin.kind === "exact") {
-          setSelected({ kind: "exact", listing: pin.listing });
-        } else {
-          setSelected({ kind: "region", region: pin.region, listings: pin.listings });
-        }
-        mapRef.current.panTo({ lat: pin.lat, lng: pin.lng });
-      });
-      markersRef.current.push(marker);
-      bounds.extend({ lat: pin.lat, lng: pin.lng });
-      hasAny = true;
-    }
-
-    if (hasAny && pins.length > 1) {
-      mapRef.current.fitBounds(bounds, 48);
-    } else if (hasAny && pins.length === 1) {
-      mapRef.current.setCenter({ lat: pins[0].lat, lng: pins[0].lng });
-      mapRef.current.setZoom(14);
-    }
-  }, [ready, pins]);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const selectionList: ListingCardData[] =
     selected?.kind === "exact"
@@ -167,23 +111,49 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-      <div className="relative">
-        <div
-          ref={ref}
-          className="h-[60vh] min-h-[420px] w-full overflow-hidden rounded-xl border border-border bg-muted"
-        />
-        {err && (
-          <div className="absolute inset-0 grid place-items-center rounded-xl bg-muted/80 p-6 text-center text-sm text-destructive">
-            {err}
-          </div>
-        )}
-        {!err && pins.length === 0 && (
+      <div className="relative h-[60vh] min-h-[420px] w-full overflow-hidden rounded-xl border border-border bg-muted">
+        {mounted ? (
+          <MapContainer
+            center={[PH_CENTER.lat, PH_CENTER.lng]}
+            zoom={6}
+            scrollWheelZoom
+            style={{ height: "100%", width: "100%" }}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              maxZoom={19}
+            />
+            <FitToPins pins={pins} />
+            {pins.map((pin, i) => (
+              <Marker
+                key={pin.kind === "exact" ? `x-${pin.listing.id}` : `r-${pin.region}-${i}`}
+                position={[pin.lat, pin.lng]}
+                icon={pin.kind === "region" ? regionBadgeIcon(pin.listings.length) : DefaultIcon}
+                eventHandlers={{
+                  click: () => {
+                    if (pin.kind === "exact") {
+                      setSelected({ kind: "exact", listing: pin.listing });
+                    } else {
+                      setSelected({
+                        kind: "region",
+                        region: pin.region,
+                        listings: pin.listings,
+                      });
+                    }
+                  },
+                }}
+              />
+            ))}
+          </MapContainer>
+        ) : null}
+        {pins.length === 0 && mounted && (
           <div className="pointer-events-none absolute inset-x-0 bottom-3 mx-auto w-fit rounded-full bg-background/90 px-3 py-1.5 text-xs text-muted-foreground shadow">
             No listings have a mappable location yet.
           </div>
         )}
         {unmapped > 0 && pins.length > 0 && (
-          <div className="pointer-events-none absolute right-3 top-3 rounded-full bg-background/90 px-3 py-1 text-xs text-muted-foreground shadow">
+          <div className="pointer-events-none absolute right-3 top-3 z-[400] rounded-full bg-background/90 px-3 py-1 text-xs text-muted-foreground shadow">
             {unmapped} listing{unmapped === 1 ? "" : "s"} without a location
           </div>
         )}

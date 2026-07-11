@@ -11,10 +11,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/google-business-map";
+import { BusinessesMap, type GMapBusiness } from "@/components/businesses/businesses-map";
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
 import { MapBottomSheet, type MapBottomSheetHandle } from "@/components/businesses/map-bottom-sheet";
-import { haversineKm } from "@/components/businesses/google-maps-loader";
+import { haversineKm } from "@/components/businesses/map-utils";
 import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
 const searchSchema = z.object({
@@ -438,7 +438,7 @@ function MapPage() {
         <div className="lg:grid lg:grid-cols-[360px_1fr] lg:gap-4">
           {/* Map */}
           <div className="order-1 h-[calc(100dvh-280px)] min-h-[360px] overflow-hidden rounded-lg lg:order-2 lg:h-[640px]">
-            <GoogleBusinessMap
+            <BusinessesMap
               height="100%"
               businesses={mapBusinesses}
               center={center ? { lat: center.lat, lng: center.lng } : null}
