@@ -14,7 +14,6 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
-import { InfluencerDisclosure } from "@/components/influencer-disclosure";
 import { usePromoterAnalytics } from "@/lib/use-promoter-analytics";
 
 
