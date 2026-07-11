@@ -197,6 +197,7 @@ function ReportPage() {
         reporter_email: email || user?.email || null,
         reporter_phone: phone || null,
         listing_id: listingId ?? null,
+        business_id: businessId ?? null,
       } as any);
       if (error) throw error;
 
