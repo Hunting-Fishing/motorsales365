@@ -446,37 +446,40 @@ function ReferralQrCard({
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
         <div className="group relative block w-full min-w-0 rounded-2xl p-1 text-left">
           <div
+            data-referral-qr-card
             className="relative mx-auto aspect-square w-full min-w-0 max-w-[min(68vw,248px)] overflow-hidden rounded-xl bg-white p-2 ring-1 ring-border transition group-hover:ring-primary sm:max-w-none sm:p-5"
-            role="button"
-            tabIndex={0}
-            aria-label={`Open enlarged QR code for ${fullName}`}
-            onClick={() => setQrOpen(true)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setQrOpen(true);
-              }
-            }}
           >
-            <div
-              className="flex h-full w-full min-w-0 items-center justify-center"
-              role="img"
-              aria-label={`QR code for ${fullName}`}
+            <ZoomableQr
+              ariaLabel={`QR code for ${fullName} — pinch or double-tap to zoom`}
+              className="h-full w-full"
+              enablePan={false}
+              showControls={false}
             >
-              {link ? (
-                <ResponsiveQr
-                  value={link}
-                  level="H"
-                  maxPx={512}
-                  minPx={128}
-                  data-qr={referralCode}
-                />
-              ) : null}
-            </div>
-            <span className="pointer-events-none absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/75 px-2 py-1 text-[11px] font-medium text-white shadow-sm">
+              <div
+                className="flex h-full w-full min-w-0 items-center justify-center"
+                role="img"
+                aria-label={`QR code for ${fullName}`}
+              >
+                {link ? (
+                  <ResponsiveQr
+                    value={link}
+                    level="H"
+                    maxPx={512}
+                    minPx={128}
+                    data-qr={referralCode}
+                  />
+                ) : null}
+              </div>
+            </ZoomableQr>
+            <button
+              type="button"
+              className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-foreground/80 px-2 py-1 text-[11px] font-medium text-background shadow-sm backdrop-blur transition hover:bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              onClick={() => setQrOpen(true)}
+              aria-label={`Open enlarged QR code for ${fullName}`}
+            >
               <Maximize2 className="h-3 w-3" />
               Enlarge
-            </span>
+            </button>
           </div>
           <div className="mt-2 text-center sm:mt-3">
             <div className="font-display text-base font-bold sm:text-lg">{fullName}</div>
