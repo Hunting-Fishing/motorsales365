@@ -96,6 +96,8 @@ export function BuyerResourcesCard({
 
   const [openChecklist, setOpenChecklist] = useState(false);
   const [openGuides, setOpenGuides] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+
 
   const partsSearch = useMemo(() => {
     const params = new URLSearchParams();
