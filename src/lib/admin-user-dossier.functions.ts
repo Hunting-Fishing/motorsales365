@@ -48,14 +48,22 @@ export type DossierScore = {
   breakdown: { label: string; delta: number }[];
 };
 
-async function requireMod(_supabase: any, userId: string) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const [{ data: isAdmin }, { data: isMod }] = await Promise.all([
-    supabaseAdmin.rpc("has_role", { _user_id: userId, _role: "admin" }),
-    supabaseAdmin.rpc("has_role", { _user_id: userId, _role: "moderator" }),
-  ]);
-  if (!isAdmin && !isMod) throw new Error("Forbidden");
+async function requireMod(supabase: any, userId: string) {
+  // Query user_roles directly instead of the has_role RPC. Some deployments
+  // return `data: null` from bool RPCs even when the row exists, which caused
+  // spurious Forbidden errors for real admins/moderators.
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .in("role", ["admin", "moderator"]);
+  if (error) {
+    console.error("[requireMod] user_roles query failed", error);
+    throw new Error("Forbidden");
+  }
+  if (!data || data.length === 0) throw new Error("Forbidden");
 }
+
 
 export const getUserAdminDossier = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
