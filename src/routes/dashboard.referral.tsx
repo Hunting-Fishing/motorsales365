@@ -449,8 +449,8 @@ function ReferralQrCard({
         <div className="group relative block w-full min-w-0 rounded-2xl p-1 text-left">
           <div
             data-referral-qr-card
-            className="relative mx-auto aspect-square w-full min-w-0 scroll-mb-[calc(6rem+env(safe-area-inset-bottom))] overflow-hidden rounded-xl bg-white p-2 ring-1 ring-border transition group-hover:ring-primary sm:max-w-none sm:p-5"
-            style={{ maxWidth: "min(54vw, 30dvh, 216px)" }}
+            className="relative mx-auto aspect-square w-full min-w-0 max-w-[var(--qr-mobile-max)] scroll-mb-[calc(6rem+env(safe-area-inset-bottom))] overflow-hidden rounded-xl bg-white p-2 ring-1 ring-border transition group-hover:ring-primary sm:max-w-none sm:p-5"
+            style={{ "--qr-mobile-max": "min(54vw, 30dvh, 216px)" } as React.CSSProperties}
           >
             <ZoomableQr
               ariaLabel={`QR code for ${fullName} — pinch or double-tap to zoom`}
