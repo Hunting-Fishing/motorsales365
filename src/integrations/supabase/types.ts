@@ -3304,6 +3304,110 @@ export type Database = {
           },
         ]
       }
+      buyer_checklist_items: {
+        Row: {
+          checklist_id: string
+          created_at: string
+          hint: string | null
+          id: string
+          label: string
+          position: number
+        }
+        Insert: {
+          checklist_id: string
+          created_at?: string
+          hint?: string | null
+          id?: string
+          label: string
+          position?: number
+        }
+        Update: {
+          checklist_id?: string
+          created_at?: string
+          hint?: string | null
+          id?: string
+          label?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buyer_checklist_items_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "buyer_checklists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      buyer_checklist_progress: {
+        Row: {
+          checked_at: string
+          item_id: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          checked_at?: string
+          item_id: string
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          checked_at?: string
+          item_id?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buyer_checklist_progress_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "buyer_checklist_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_checklist_progress_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      buyer_checklists: {
+        Row: {
+          category_slug: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          pdf_url: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category_slug?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          pdf_url?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category_slug?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          pdf_url?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           icon: string | null
