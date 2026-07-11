@@ -1,0 +1,11 @@
+-- Add safety equipment types to the equipment_type enum
+ALTER TYPE equipment_type ADD VALUE IF NOT EXISTS 'fire_extinguisher';
+ALTER TYPE equipment_type ADD VALUE IF NOT EXISTS 'life_raft';
+ALTER TYPE equipment_type ADD VALUE IF NOT EXISTS 'life_ring';
+ALTER TYPE equipment_type ADD VALUE IF NOT EXISTS 'epirb';
+ALTER TYPE equipment_type ADD VALUE IF NOT EXISTS 'survival_suit';
+ALTER TYPE equipment_type ADD VALUE IF NOT EXISTS 'flare';
+ALTER TYPE equipment_type ADD VALUE IF NOT EXISTS 'first_aid_kit';
+ALTER TYPE equipment_type ADD VALUE IF NOT EXISTS 'safety_harness';
+ALTER TYPE equipment_type ADD VALUE IF NOT EXISTS 'life_jacket';
+ALTER TYPE equipment_type ADD VALUE IF NOT EXISTS 'immersion_suit';

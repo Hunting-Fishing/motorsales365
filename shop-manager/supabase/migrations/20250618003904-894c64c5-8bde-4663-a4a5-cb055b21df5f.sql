@@ -1,0 +1,32 @@
+
+-- Insert default automotive inventory categories
+INSERT INTO inventory_categories (name) VALUES
+('Engine Components'),
+('Electrical'),
+('Brakes'),
+('Suspension'),
+('Exhaust'),
+('Filters'),
+('Fluids'),
+('Transmission'),
+('Cooling System'),
+('Fuel System'),
+('Body Parts'),
+('Interior'),
+('Belts & Hoses'),
+('Gaskets & Seals'),
+('Spark Plugs'),
+('Air Intake'),
+('Ignition'),
+('Fuel Injection'),
+('Steering'),
+('Tires & Wheels'),
+('Batteries'),
+('Alternators & Starters'),
+('Lights & Bulbs'),
+('Wipers'),
+('Sensors'),
+('Tools'),
+('Chemicals'),
+('Accessories')
+ON CONFLICT (name) DO NOTHING;

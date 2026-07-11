@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies and builds
 node_modules
 dist
 dist-ssr
@@ -19,6 +20,24 @@ dist-ssr
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Database and Supabase backup files
+*.dump
+*.backup
+*.bak
+*.tar
+*.tar.gz
+database-backups/
+supabase-backups/
+
+# Supabase local development files
+supabase/.temp/
+**/supabase/.temp/
 
 # Editor directories and files
 .vscode/*

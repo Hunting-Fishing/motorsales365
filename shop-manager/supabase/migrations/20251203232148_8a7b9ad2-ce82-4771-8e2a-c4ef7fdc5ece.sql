@@ -1,0 +1,1 @@
+ALTER TYPE equipment_type ADD VALUE IF NOT EXISTS 'fuel_truck';
