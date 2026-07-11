@@ -113,13 +113,25 @@ export function BuyerResourcesCard({
 
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card">
-      <div className="border-b border-border px-3 py-2">
-        <h3 className="font-display text-sm font-semibold">Buyer resources</h3>
-        <p className="text-[11px] text-muted-foreground">
-          Help &amp; safety for this listing
-        </p>
-      </div>
+      <button
+        type="button"
+        onClick={() => setCollapsed((v) => !v)}
+        aria-expanded={!collapsed}
+        className="flex w-full items-center gap-2 border-b border-border px-3 py-2 text-left hover:bg-muted/40"
+      >
+        <div className="min-w-0 flex-1">
+          <h3 className="font-display text-sm font-semibold">Buyer resources</h3>
+          <p className="text-[11px] text-muted-foreground">
+            Help &amp; safety for this listing
+          </p>
+        </div>
+        <ChevronDown
+          className={`h-4 w-4 text-muted-foreground transition-transform ${collapsed ? "-rotate-90" : ""}`}
+        />
+      </button>
+      {!collapsed && (
       <ul className="divide-y divide-border text-sm">
+
         {/* LTO / Verification status */}
         <li>
           <Link
