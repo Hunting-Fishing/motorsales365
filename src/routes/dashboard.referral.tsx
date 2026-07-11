@@ -476,13 +476,14 @@ function ReferralQrCard({
             </ZoomableQr>
             <button
               type="button"
-              className="absolute right-2 top-2 inline-flex min-h-9 items-center gap-1 rounded-full bg-foreground/80 px-2.5 py-1 text-xs font-medium text-background shadow-sm backdrop-blur transition hover:bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="absolute right-2 top-2 hidden min-h-9 items-center gap-1 rounded-full bg-foreground/80 px-2.5 py-1 text-xs font-medium text-background shadow-sm backdrop-blur transition hover:bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:inline-flex"
               onClick={() => setQrOpen(true)}
               aria-label={`Open enlarged QR code for ${fullName}`}
             >
               <Maximize2 className="h-3 w-3" />
               Enlarge
             </button>
+
           </div>
           <div className="mt-2 text-center sm:mt-3">
             <div className="font-display text-base font-bold sm:text-lg">{fullName}</div>
