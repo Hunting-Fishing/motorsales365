@@ -697,16 +697,7 @@ function MessagesPage() {
                       {c.kind === "group" ? (
                         <GroupAvatar name={c.title} size={44} />
                       ) : (
-                        <>
-                          <Avatar url={c.avatar} name={c.title} size={44} />
-                          {c.thumb && (
-                            <img
-                              src={c.thumb}
-                              alt=""
-                              className="absolute -bottom-1 -right-1 h-5 w-5 rounded-md border-2 border-card object-cover"
-                            />
-                          )}
-                        </>
+                        <Avatar url={c.avatar} name={c.title} size={44} />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -725,8 +716,41 @@ function MessagesPage() {
                           {formatDate(c.last_at)}
                         </div>
                       </div>
-                      <div className="truncate text-xs text-muted-foreground">{c.subtitle}</div>
-                      <div className="mt-0.5 flex items-center gap-2">
+                      {c.kind === "dm" && c.listing_id ? (
+                        <div className="mt-1 flex items-center gap-2 rounded-md border border-border/60 bg-background/60 px-1.5 py-1">
+                          {c.thumb ? (
+                            <img
+                              src={c.thumb}
+                              alt=""
+                              className="h-8 w-8 shrink-0 rounded object-cover"
+                            />
+                          ) : (
+                            <div className="grid h-8 w-8 shrink-0 place-items-center rounded bg-secondary text-muted-foreground">
+                              <Tag className="h-3.5 w-3.5" />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-[11px] font-medium text-foreground">
+                              {c.listing_title ?? "Listing"}
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                              {c.listing_price != null && (
+                                <span className="font-semibold text-primary">
+                                  {formatPricePHP(c.listing_price)}
+                                </span>
+                              )}
+                              {c.listing_status && c.listing_status !== "active" && (
+                                <span className="rounded bg-secondary px-1 py-0.5 uppercase">
+                                  {c.listing_status}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="truncate text-xs text-muted-foreground">{c.subtitle}</div>
+                      )}
+                      <div className="mt-1 flex items-center gap-2">
                         <div
                           className={`line-clamp-1 flex-1 text-xs ${c.unread > 0 ? "font-semibold text-foreground" : "text-foreground/70"}`}
                         >
@@ -740,12 +764,34 @@ function MessagesPage() {
                       </div>
                     </div>
                   </button>
+                  {!c.invited && (
+                    <button
+                      type="button"
+                      aria-label={c.unread > 0 ? "Mark as read" : "Mark as unread"}
+                      title={c.unread > 0 ? "Mark as read" : "Mark as unread"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleRead(c);
+                      }}
+                      className={`rounded-full p-1.5 transition-colors ${
+                        c.unread > 0
+                          ? "text-primary hover:bg-primary/10"
+                          : "text-muted-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      {c.unread > 0 ? (
+                        <CheckCheck className="h-4 w-4" />
+                      ) : (
+                        <MailOpen className="h-4 w-4" />
+                      )}
+                    </button>
+                  )}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
                         type="button"
                         aria-label="Conversation options"
-                        className="rounded-full p-1 text-muted-foreground opacity-0 hover:bg-secondary group-hover:opacity-100 focus:opacity-100"
+                        className="rounded-full p-1 text-muted-foreground hover:bg-secondary"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <MoreVertical className="h-4 w-4" />
@@ -771,6 +817,16 @@ function MessagesPage() {
                         </>
                       ) : (
                         <>
+                          {!c.invited &&
+                            (c.unread > 0 ? (
+                              <DropdownMenuItem onClick={() => markGroupRead(c)}>
+                                <CheckCheck className="mr-2 h-4 w-4" /> Mark as read
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem onClick={() => markGroupUnread(c)}>
+                                <MailOpen className="mr-2 h-4 w-4" /> Mark as unread
+                              </DropdownMenuItem>
+                            ))}
                           {!c.invited && (
                             <DropdownMenuItem
                               onClick={() => {
@@ -792,6 +848,8 @@ function MessagesPage() {
               ))}
             </div>
           </div>
+
+
 
           <div
             className={`flex flex-col overflow-hidden rounded-xl border border-border bg-card ${activeKey ? "flex" : "hidden lg:flex"}`}
