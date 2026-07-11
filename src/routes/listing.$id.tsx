@@ -609,7 +609,7 @@ function ListingDetailPage() {
                 <ListingActionsMenu
                   listingId={listing.id}
                   sellerUserId={listing.user_id ?? null}
-                  sellerName={sellerName ?? null}
+                  sellerName={seller?.business_name ?? seller?.full_name ?? null}
                   variant="inline"
                   className="shrink-0"
                 />
