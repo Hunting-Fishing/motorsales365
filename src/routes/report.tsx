@@ -418,54 +418,17 @@ function ReportPage() {
                     )}
                   </div>
 
-                  <div className="rounded-md border border-border bg-secondary/30 p-4">
-                    <p className="mb-3 text-sm font-medium">
-                      Your contact details{" "}
-                      <span className="text-xs font-normal text-muted-foreground">
-                        — optional, but lets us follow up
-                      </span>
+                  {user ? (
+                    <p className="text-xs text-muted-foreground">
+                      We'll follow up at <span className="font-medium text-foreground">{user.email}</span> if needed.
                     </p>
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      <div>
-                        <Label htmlFor="name" className="text-xs">
-                          Name
-                        </Label>
-                        <Input
-                          id="name"
-                          className="mt-1"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          maxLength={120}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="email" className="text-xs">
-                          Email
-                        </Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          className="mt-1"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder={user?.email ?? ""}
-                          maxLength={255}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="phone" className="text-xs">
-                          Phone / Viber
-                        </Label>
-                        <Input
-                          id="phone"
-                          className="mt-1"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          maxLength={40}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      <Link to="/auth" className="underline">Sign in</Link> so our team can follow up with you.
+                    </p>
+                  )}
+
+
 
                   <FormFeedbackLink formId="report-listing-page" className="mb-2" />
                   <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
