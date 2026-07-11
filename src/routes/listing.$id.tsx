@@ -274,6 +274,7 @@ function ListingDetailPage() {
   const [sending, setSending] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const messageRef = useRef<HTMLTextAreaElement | null>(null);
+  const [msgWidgetOpen, setMsgWidgetOpen] = useState(false);
 
   useEffect(() => {
     const load = async () => {
