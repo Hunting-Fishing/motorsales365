@@ -184,9 +184,9 @@ function ReportPage() {
       category,
       target_url: targetUrl,
       details,
-      reporter_name: name,
-      reporter_email: email,
-      reporter_phone: phone,
+      reporter_name: reporterName ?? "",
+      reporter_email: user?.email ?? "",
+      reporter_phone: reporterPhone ?? "",
     });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message ?? "Please review the form");
