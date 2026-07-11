@@ -220,7 +220,7 @@ function MapPage() {
         .eq("status", "active")
         .not("lat", "is", null)
         .not("lng", "is", null)
-        .limit(500);
+        .limit(2000);
       if (typeSlug) query = query.eq("type_slug", typeSlug);
       const { data } = await query;
       setItems(data ?? []);

@@ -124,7 +124,7 @@ function BusinessesIndex() {
         .order("subscription_tier", { ascending: false })
         .order("featured", { ascending: false })
         .order("rating_avg", { ascending: false })
-        .limit(200);
+        .limit(1000);
 
       if (typeSlug) query = query.eq("type_slug", typeSlug);
       if (loc.region) {

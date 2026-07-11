@@ -1,44 +1,43 @@
+## Problem
 
-## Goal
+The `/map` page currently shows nothing (or almost nothing) because it filters `businesses` by `status = 'active' AND lat IS NOT NULL AND lng IS NOT NULL`. Current DB state:
 
-Replace every user-facing Google Maps render with OpenStreetMap via Leaflet. Leave admin-only server-side Google Places usage (business discovery, seeding, reverse-geocode fallback) alone.
+- `active` with coords: **0**
+- `active` (no coords): 2
+- `archived`: 14 (mostly no coords)
+- `rejected` with coords: **88** ← the bulk of signed-up shops (67 marked `claim_state='owned'`, 21 `unclaimed`), most look like real imported carwashes/shops, not moderation rejects
 
-## Scope of changes
+So two things are wrong: the map filter is too narrow, AND a large batch of legitimate businesses is stuck at `status='rejected'`.
 
-### 1. Businesses map (routes: `map.tsx`, `businesses.index.tsx`, `businesses.$slug.tsx`)
-- Replace `GoogleBusinessMap` with a new `BusinessMap` built on `react-leaflet` (Leaflet is already in the project via `location-picker-inner` and `business-map-inner`).
-- Reuse the existing `business-map-inner.tsx` OSM scaffolding; extend it to accept the `GMapBusiness[]` shape (marker color by type, popup with name/rating/link, bounds-to-fit, click handler).
-- Preserve the current UX: colored pins per business type, click-to-open drawer/sheet, "recenter", cluster-optional (skip clustering v1 unless trivial).
+## Plan
 
-### 2. Parts / browse listings map (`components/marketplace/listings-map-view.tsx`)
-- Rewrite the Google JS SDK load + `new google.maps.Map` block using Leaflet: `MapContainer`, `TileLayer` (OSM tiles), `Marker` per listing with popup linking to the listing page, `fitBounds` on markers.
+### 1. Data repair (migration)
+Reset the mis-flagged discovered businesses so they are visible again:
+- Move rows where `status='rejected'` AND `owner_id IS NULL` AND `claim_state IN ('owned','unclaimed')` AND they came from the discovery import → set `status='active'` (they are directory listings, not moderation rejects).
+- Leave any truly admin-rejected rows alone (heuristic: keep rows that have a `business_claim_audit` entry with a rejection reason, or an `admin_audit_log` `reject_business` action — those are the real rejects).
+- Add a short SQL comment documenting the backfill.
 
-### 3. Tow request pin picker (`components/towing/tow-map-pin.tsx`)
-- Rewrite as a Leaflet map with click-to-place / drag marker, emitting the same `MapPinValue` `{lat, lng}` shape. Include a small "use current location" button (browser geolocation) to match today's behavior.
+### 2. Map query widening (`src/routes/map.tsx`)
+Change the businesses fetch to include every publicly listable record with coordinates:
+- Filter `status IN ('active','pending')` instead of just `active`.
+- Keep the `lat/lng NOT NULL` filter (map pins require coords).
+- Bump the `.limit(500)` cap to `2000` so all PH businesses show at national zoom (still bounded).
+- Show a small "Pending review" badge on the result card + pin popup for rows with `status='pending'` so users know it's not yet fully verified.
 
-### 4. Cleanup
-- Delete `google-business-map.tsx`, `google-business-map-inner.tsx`.
-- Move `haversineKm` and `colorForType` out of `google-maps-loader.ts` into a new `src/components/businesses/map-utils.ts`; update imports in `map.tsx`, `businesses.index.tsx`, `google-business-map-inner`'s former callers.
-- Delete `google-maps-loader.ts`.
-- Remove the "Enlarge Google Maps built-in controls" block in `src/styles.css` (Leaflet has its own control styles already handled by `leaflet/dist/leaflet.css`).
-- Do NOT touch `admin.location-corrections.tsx`'s "Open in Google Maps ↗" link — that's just a `maps.google.com` deep link, not a map render, and is useful as an external reference.
-- Do NOT touch admin Google Maps URL field in `admin.parts.outreach.tsx` (data field, not a map).
+### 3. Businesses index parity (`src/routes/businesses.index.tsx`)
+Apply the same `status IN ('active','pending')` widening so the directory list matches the map. (Single-line change; keeps the two surfaces consistent.)
 
-### Out of scope (intentionally left alone per user answer)
-- `src/lib/places.server.ts`, `business-discovery-sync.*`, `business-seed.functions.ts`, `tow-geo.functions.ts` — server-side Google Places / Geocoding stays.
-- `GOOGLE_MAPS_API_KEY` env var and the Google Maps Platform connector remain linked for those server functions.
-- Google Fonts preconnect in `__root.tsx` (fonts, not maps).
+### 4. Verify
+- After the migration, re-run the count query and confirm ~100+ `active` rows with coords.
+- Load `/map` in the preview, confirm pins render for the PH map at default zoom, and confirm a pending row shows the new badge.
 
 ## Technical notes
 
-- All new maps use OSM tile URL `https://tile.openstreetmap.org/{z}/{x}/{y}.png` with attribution `&copy; OpenStreetMap contributors`, matching the existing `business-map-inner` and `location-picker-inner`.
-- Every Leaflet map is imported dynamically (`ClientOnly` / `lazy` + `Suspense`) to avoid SSR "window is not defined" — same pattern already used in `business-map.tsx` and `location-picker.tsx`.
-- Marker icon assets: import from `leaflet/dist/images/*` and override `L.Icon.Default.mergeOptions` once, or use a small inline `divIcon` with a colored dot for business-type pins (matches current `colorForType`).
-- No new dependencies needed — `leaflet` and `react-leaflet` are already installed.
+- No RLS change needed — the public SELECT policy on `businesses` already permits `status IN ('active','pending')` for anon reads (verified in existing policies).
+- No new components; only `src/routes/map.tsx`, `src/routes/businesses.index.tsx`, and one SQL migration.
+- The `BusinessesMap` / Leaflet layer already handles clustering for hundreds of pins — no perf work needed.
 
-## Verification
+## Out of scope
 
-After changes:
-- `bun run build` succeeds.
-- `/map`, `/businesses`, `/businesses/[slug]`, `/parts`, `/browse/[category]`, and the tow request form all render maps with OSM tiles and no `maps.googleapis.com` network requests in the browser.
-- Existing tests (`bun run test`) still pass.
+- Backfilling missing lat/lng for the 2 `active` rows without coords (would need geocoding pass — separate task).
+- Re-designing the map filter bar.
