@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +10,7 @@ import { ResponsiveQr } from "@/components/qr/responsive-qr";
 import { renderQrPng } from "@/lib/qr-image";
 import type { QrLevel } from "@/lib/qr-quiet-zone";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -483,12 +483,6 @@ function ReferralQrCard({
             <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
           </div>
         </div>
-        <DialogTrigger asChild>
-          <Button type="button" size="sm" variant="outline" className="mt-3 w-full sm:hidden">
-            <Maximize2 className="mr-1 h-4 w-4" /> Enlarge / pinch zoom
-          </Button>
-        </DialogTrigger>
-
         <DialogContent className="w-[95vw] max-w-md p-4 sm:max-w-lg sm:p-6">
           <VisuallyHidden>
             <DialogTitle>QR code for {fullName}</DialogTitle>
