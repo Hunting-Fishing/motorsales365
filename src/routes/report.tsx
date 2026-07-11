@@ -215,9 +215,9 @@ function ReportPage() {
         target_url: targetUrl || null,
         evidence_urls,
         reporter_id: user?.id ?? null,
-        reporter_name: name || null,
-        reporter_email: email || user?.email || null,
-        reporter_phone: phone || null,
+        reporter_name: reporterName || null,
+        reporter_email: user?.email ?? null,
+        reporter_phone: reporterPhone || null,
         listing_id: listingId ?? null,
         business_id: businessId ?? null,
       } as any);
