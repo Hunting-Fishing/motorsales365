@@ -70,8 +70,8 @@ async function collectRegions(page: Page, promoterTitles: readonly string[]) {
     }
 
     const canvas = document.querySelector<HTMLCanvasElement>("canvas[data-qr]");
-    const qrButton = canvas?.closest("button") ?? null;
-    const qrRect = toRect("QR card", qrButton);
+    const qrCard = canvas?.closest("[data-referral-qr-card]") ?? null;
+    const qrRect = toRect("QR card", qrCard);
 
     // Referral-link card: find the label text, then walk up to the .rounded-xl card.
     let linkCardEl: Element | null = null;
