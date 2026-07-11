@@ -13,11 +13,7 @@ import {
   Truck,
   Eye,
   Bookmark,
-  Banknote,
   Shield,
-  FileText,
-  ClipboardCheck,
-  Wrench,
   MessageCircle,
   ChevronDown,
   Play,
@@ -34,7 +30,6 @@ import { cn } from "@/lib/utils";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
-import { ComingSoonSection, ComingSoonRow } from "@/components/coming-soon";
 import { SpecRow } from "@/components/listing/spec-display";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
@@ -54,7 +49,7 @@ import { VerifiedBadge } from "@/components/verified-badge";
 import { DealerSubscriptionBadge } from "@/components/dealer-subscription-badge";
 import { getActiveDealerStatus } from "@/lib/seller-status.functions";
 import { SellerReputationBadges } from "@/components/seller-reputation-badges";
-import { BuyerDocumentChecklist } from "@/components/buyer-document-checklist";
+import { BuyerResourcesCard } from "@/components/listing/buyer-resources-card";
 import { getSellerReputationStats } from "@/lib/reputation.functions";
 import { useQuery } from "@tanstack/react-query";
 import { Textarea } from "@/components/ui/textarea";
@@ -813,24 +808,9 @@ function ListingDetailPage() {
             </SectionCard>
           )}
 
-          {/* Buyer safety checklist — rendered at the very bottom of the main
-              column for all vehicle-type listings. */}
-          {[
-            "cars",
-            "car",
-            "motorcycles",
-            "motorcycle",
-            "trucks",
-            "truck",
-            "boats",
-            "boat",
-            "heavy-equipment",
-            "agri",
-            "agriculture",
-            "atv-utv",
-            "atv",
-            "utv",
-          ].includes(listing.category_slug) && <BuyerDocumentChecklist />}
+          {/* Buyer checklist now lives in the sidebar Buyer resources card. */}
+
+
 
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
@@ -995,43 +975,25 @@ function ListingDetailPage() {
               />
             )}
 
-          <ListingReportsSection listingId={listing.id} />
+          <BuyerResourcesCard
+            listingId={listing.id}
+            listingUserId={listing.user_id}
+            categorySlug={listing.category_slug ?? null}
+            attributes={(listing.attributes as any) ?? null}
+            ltoVerified={!!(listing as any).vehicles?.vehicle_passport_verifications?.some(
+              (v: any) => v.status === "approved",
+            )}
+          />
 
+          <ListingReportsSection listingId={listing.id} />
 
           <div className="mt-2">
             <ListingWantedBadge listingId={listing.id} />
           </div>
 
-
-
-          {/* Services around this vehicle — coming soon.
-              Revenue: lead-gen for finance/insurance/OR-CR partners (not yet wired). */}
-          <Collapsible asChild>
-            <ComingSoonSection
-              title="Need inspection or insurance for this car?"
-              subtitle="Sweet! These will be Awesome Future Services!"
-            >
-              <CollapsibleTrigger className="group flex w-full items-start justify-between gap-3 text-left">
-                <div className="min-w-0 flex-1" />
-                <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-amber-700 transition-transform group-data-[state=open]:rotate-180 dark:text-amber-300" />
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  <ComingSoonRow icon={Wrench} label="Request a pre-purchase inspection" span />
-                  <ComingSoonRow icon={Shield} label="Get insurance quote" />
-                  <ComingSoonRow icon={Banknote} label="Get financing" />
-                  <ComingSoonRow icon={FileText} label="OR/CR renewal help" />
-                  <ComingSoonRow icon={ClipboardCheck} label="Title transfer help" />
-                </div>
-                <p className="mt-3 text-[11px] text-amber-900/70 dark:text-amber-200/70">
-                  Partner network launching shortly. We'll notify you when quotes go live.
-                </p>
-              </CollapsibleContent>
-            </ComingSoonSection>
-          </Collapsible>
-
-
           <AdCarousel placement="listing_sidebar" />
+
+
 
         </aside>
       </div>
