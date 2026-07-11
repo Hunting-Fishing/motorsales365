@@ -647,16 +647,29 @@ function MessagesPage() {
     return names.join(", ") + (extra > 0 ? ` +${extra}` : "");
   };
 
+  const totalUnread = conversations.reduce(
+    (sum, c) => (c.invited ? sum : sum + c.unread),
+    0,
+  );
+
   return (
     <div>
       <div className="mb-6 flex items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-bold">Messages</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="font-display text-2xl font-bold">Messages</h1>
+          {totalUnread > 0 && (
+            <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-primary px-2 text-xs font-bold text-primary-foreground">
+              {totalUnread > 99 ? "99+" : totalUnread}
+            </span>
+          )}
+        </div>
         {user && (
           <Button size="sm" onClick={() => setShowNewGroup(true)}>
             <Plus className="mr-1 h-4 w-4" /> New group
           </Button>
         )}
       </div>
+
 
       {conversations.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
