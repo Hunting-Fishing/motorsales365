@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthUser } from '@/hooks/useAuthUser';
 import { useModuleAccess } from '@/hooks/useModuleSubscriptions';
-import { getAllModuleRoutes, UPCOMING_MODULES } from '@/config/moduleRoutes';
+import { getAllModuleRoutes } from '@/config/moduleRoutes';
 import { ModuleCard } from '@/components/module-hub/ModuleCard';
 import { ModuleHubHeader } from '@/components/module-hub/ModuleHubHeader';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -55,17 +55,8 @@ export default function ModuleHub() {
   const allModules = getAllModuleRoutes();
 
   // Group upcoming modules by category
-  const upcomingByCategory = useMemo(() => {
-    const grouped: Record<string, typeof UPCOMING_MODULES> = {};
-    UPCOMING_MODULES.forEach(module => {
-      const category = module.category || 'Other';
-      if (!grouped[category]) {
-        grouped[category] = [];
-      }
-      grouped[category].push(module);
-    });
-    return grouped;
-  }, []);
+  // Future automotive verticals will be added intentionally when ready.
+  const upcomingByCategory = useMemo(() => ({}), []);
 
   const categoryOrder = Object.keys(upcomingByCategory).sort();
   
@@ -103,10 +94,7 @@ export default function ModuleHub() {
       .filter(m => m.score > 0)
       .sort((a, b) => b.score - a.score);
 
-    const upcomingModules = UPCOMING_MODULES
-      .map(m => ({ ...m, score: matchScore(m.name, m.description, m.category) }))
-      .filter(m => m.score > 0)
-      .sort((a, b) => b.score - a.score);
+    const upcomingModules: Array<never> = [];
 
     const filteredUpcomingByCategory: Record<string, typeof upcomingModules> = {};
     upcomingModules.forEach(module => {

@@ -37,7 +37,7 @@ import { cleanupAuthState } from '@/utils/authCleanup';
 import { useEnabledModules, useUserShopId } from '@/hooks/useEnabledModules';
 import { MODULE_ROUTES } from '@/config/moduleRoutes';
 import { useQuery } from '@tanstack/react-query';
-import { SubmitChangeRequestDialog } from '@/components/gunsmith/SubmitChangeRequestDialog';
+import { SubmitChangeRequestDialog } from '@/components/feedback/SubmitChangeRequestDialog';
 
 export function HeaderActions() {
   const { isAuthenticated, userName, isLoading } = useAuthUser();

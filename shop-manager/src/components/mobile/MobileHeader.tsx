@@ -26,7 +26,7 @@ import { hasRoutePermission } from '@/utils/routeGuards';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { useActiveModuleNavigation, getModuleGroupedSections } from '@/hooks/useActiveModuleNavigation';
-import { SubmitChangeRequestDialog } from '@/components/gunsmith/SubmitChangeRequestDialog';
+import { SubmitChangeRequestDialog } from '@/components/feedback/SubmitChangeRequestDialog';
 
 interface MobileHeaderProps {
   title?: string;

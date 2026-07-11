@@ -23,7 +23,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { SubmitChangeRequestDialog } from '@/components/gunsmith/SubmitChangeRequestDialog';
+import { SubmitChangeRequestDialog } from '@/components/feedback/SubmitChangeRequestDialog';
 
 interface NavItem {
   id: string;

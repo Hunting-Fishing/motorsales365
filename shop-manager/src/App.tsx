@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useEffect, useState, Component, ErrorInfo, ReactNode } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import { Layout } from '@/components/layout/Layout';
@@ -9,8 +9,6 @@ import { authMonitor } from '@/utils/authMonitoring';
 import { GlobalUX } from '@/components/ux/GlobalUX';
 import { AuthenticatedProviders } from '@/components/auth/AuthenticatedProviders';
 import ab365Logo from '@/assets/ab365-logo.png';
-
-const Index = lazy(() => import('@/pages/Index'));
 
 // Chunk-aware error boundary that auto-recovers from stale chunk failures
 const CHUNK_RETRY_KEY = '__ab365_chunk_reload_once__';
@@ -179,12 +177,9 @@ const FeedbackFormsPage = lazy(() => import('@/pages/feedback/FeedbackFormsPage'
 const FeedbackFormEditorPage = lazy(() => import('@/pages/feedback/FeedbackFormEditorPage'));
 const FeedbackAnalyticsPage = lazy(() => import('@/pages/feedback/FeedbackAnalyticsPage'));
 const SystemAdmin = lazy(() => import('@/pages/SystemAdmin'));
-const WaterDeliveryDeveloper = lazy(() => import('@/pages/water-delivery/WaterDeliveryDeveloper'));
 const AutomotiveDeveloper = lazy(() => import('@/pages/automotive/AutomotiveDeveloper'));
-const GunsmithDeveloper = lazy(() => import('@/pages/gunsmith/GunsmithDeveloper'));
 const MarineDeveloper = lazy(() => import('@/pages/marine/MarineDeveloper'));
 const FuelDeliveryDeveloper = lazy(() => import('@/pages/fuel-delivery/FuelDeliveryDeveloper'));
-const PowerWashingDeveloper = lazy(() => import('@/pages/power-washing/PowerWashingDeveloper'));
 const SmsManagement = lazy(() => import('@/pages/SmsManagement'));
 const SmsTemplates = lazy(() => import('@/pages/SmsTemplates'));
 const Timesheet = lazy(() => import('@/pages/Timesheet'));
@@ -278,90 +273,7 @@ const TermsOfService = lazy(() => import('@/pages/legal/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('@/pages/legal/PrivacyPolicy'));
 const ModuleLearnMore = lazy(() => import('@/pages/ModuleLearnMore'));
 
-// Power Washing
-const PowerWashingDashboard = lazy(() => import('@/pages/power-washing/PowerWashingDashboard'));
-const PowerWashingJobsList = lazy(() => import('@/pages/power-washing/PowerWashingJobsList'));
-const PowerWashingJobCreate = lazy(() => import('@/pages/power-washing/PowerWashingJobCreate'));
-const PowerWashingJobDetails = lazy(() => import('@/pages/power-washing/PowerWashingJobDetails'));
-const PowerWashingJobEdit = lazy(() => import('@/pages/power-washing/PowerWashingJobEdit'));
-const PowerWashingEquipment = lazy(() => import('@/pages/power-washing/PowerWashingEquipment'));
-const PowerWashingEquipmentCreate = lazy(() => import('@/pages/power-washing/PowerWashingEquipmentCreate'));
-const PowerWashingEquipmentDetail = lazy(() => import('@/pages/power-washing/PowerWashingEquipmentDetail'));
-const PowerWashingChemicals = lazy(() => import('@/pages/power-washing/PowerWashingChemicals'));
-const PowerWashingChemicalCreate = lazy(() => import('@/pages/power-washing/PowerWashingChemicalCreate'));
-const PowerWashingInventory = lazy(() => import('@/pages/power-washing/PowerWashingInventory'));
-const PowerWashingQuoteForm = lazy(() => import('@/pages/power-washing/PowerWashingQuoteForm'));
-const PowerWashingQuotesList = lazy(() => import('@/pages/power-washing/PowerWashingQuotesList'));
-const PowerWashingFormulas = lazy(() => import('@/pages/power-washing/PowerWashingFormulas'));
-const BleachCalculator = lazy(() => import('@/pages/power-washing/BleachCalculator'));
-const SurfaceMixCalculator = lazy(() => import('@/pages/power-washing/SurfaceMixCalculator'));
-const PowerWashingRecurringSchedules = lazy(() => import('@/pages/power-washing/PowerWashingRecurringSchedules'));
-const PowerWashingInvoices = lazy(() => import('@/pages/power-washing/PowerWashingInvoices'));
-const PowerWashingInvoiceDetail = lazy(() => import('@/pages/power-washing/PowerWashingInvoiceDetail'));
-const PowerWashingReports = lazy(() => import('@/pages/power-washing/PowerWashingReports'));
-const PowerWashingRoutes = lazy(() => import('@/pages/power-washing/PowerWashingRoutes'));
-const PowerWashingRouteDetail = lazy(() => import('@/pages/power-washing/PowerWashingRouteDetail'));
-const PowerWashingReviews = lazy(() => import('@/pages/power-washing/PowerWashingReviews'));
-const PowerWashingNotifications = lazy(() => import('@/pages/power-washing/PowerWashingNotifications'));
-const PowerWashingFieldView = lazy(() => import('@/pages/power-washing/PowerWashingFieldView'));
-const PowerWashingPriceBook = lazy(() => import('@/pages/power-washing/PowerWashingPriceBook'));
-const PowerWashingAnalytics = lazy(() => import('@/pages/power-washing/PowerWashingAnalytics'));
-const PowerWashingWeather = lazy(() => import('@/pages/power-washing/PowerWashingWeather'));
-const PowerWashingPhotos = lazy(() => import('@/pages/power-washing/PowerWashingPhotos'));
-const PowerWashingSubscriptions = lazy(() => import('@/pages/power-washing/PowerWashingSubscriptions'));
-const PowerWashingCustomerPortal = lazy(() => import('@/pages/power-washing/PowerWashingCustomerPortal'));
-const PowerWashingPayments = lazy(() => import('@/pages/power-washing/PowerWashingPayments'));
-const PowerWashingSchedule = lazy(() => import('@/pages/power-washing/PowerWashingSchedule'));
-const PowerWashingLeads = lazy(() => import('@/pages/power-washing/PowerWashingLeads'));
-const PowerWashingFleet = lazy(() => import('@/pages/power-washing/PowerWashingFleet'));
-const PowerWashingStore = lazy(() => import('@/pages/power-washing/PowerWashingStore'));
-const PowerWashingCustomers = lazy(() => import('@/pages/power-washing/PowerWashingCustomers'));
-const PowerWashingCustomerCreate = lazy(() => import('@/pages/power-washing/PowerWashingCustomerCreate'));
-const PowerWashingCustomerDetail = lazy(() => import('@/pages/power-washing/PowerWashingCustomerDetail'));
-const PowerWashingTeam = lazy(() => import('@/pages/power-washing/PowerWashingTeam'));
-const PowerWashingRoles = lazy(() => import('@/pages/power-washing/PowerWashingRoles'));
-const PowerWashingQuoteDetail = lazy(() => import('@/pages/power-washing/PowerWashingQuoteDetail'));
-const PowerWashingSettings = lazy(() => import('@/pages/power-washing/PowerWashingSettings'));
-const PowerWashingPricingFormulas = lazy(() => import('@/pages/power-washing/PowerWashingPricingFormulas'));
-
 // Gunsmith
-const GunsmithDashboard = lazy(() => import('@/pages/gunsmith/GunsmithDashboard'));
-const GunsmithJobs = lazy(() => import('@/pages/gunsmith/GunsmithJobs'));
-const GunsmithCustomers = lazy(() => import('@/pages/gunsmith/GunsmithCustomers'));
-const GunsmithCustomerCreate = lazy(() => import('@/pages/gunsmith/GunsmithCustomerCreate'));
-const GunsmithCustomerDetail = lazy(() => import('@/pages/gunsmith/GunsmithCustomerDetail'));
-const GunsmithFirearms = lazy(() => import('@/pages/gunsmith/GunsmithFirearms'));
-const GunsmithParts = lazy(() => import('@/pages/gunsmith/GunsmithParts'));
-const GunsmithPartsOnOrder = lazy(() => import('@/pages/gunsmith/GunsmithPartsOnOrder'));
-const GunsmithQuotes = lazy(() => import('@/pages/gunsmith/GunsmithQuotes'));
-const GunsmithInvoices = lazy(() => import('@/pages/gunsmith/GunsmithInvoices'));
-const GunsmithPayments = lazy(() => import('@/pages/gunsmith/GunsmithPayments'));
-const GunsmithAppointments = lazy(() => import('@/pages/gunsmith/GunsmithAppointments'));
-const GunsmithCompliance = lazy(() => import('@/pages/gunsmith/GunsmithCompliance'));
-const GunsmithTransfers = lazy(() => import('@/pages/gunsmith/GunsmithTransfers'));
-const GunsmithConsignments = lazy(() => import('@/pages/gunsmith/GunsmithConsignments'));
-const GunsmithJobForm = lazy(() => import('@/pages/gunsmith/GunsmithJobForm'));
-const GunsmithQuoteForm = lazy(() => import('@/pages/gunsmith/GunsmithQuoteForm'));
-const GunsmithJobDetail = lazy(() => import('@/pages/gunsmith/GunsmithJobDetail'));
-const GunsmithQuoteDetail = lazy(() => import('@/pages/gunsmith/GunsmithQuoteDetail'));
-const GunsmithFirearmForm = lazy(() => import('@/pages/gunsmith/GunsmithFirearmForm'));
-const GunsmithPartForm = lazy(() => import('@/pages/gunsmith/GunsmithPartForm'));
-const GunsmithAppointmentForm = lazy(() => import('@/pages/gunsmith/GunsmithAppointmentForm'));
-const GunsmithInvoiceForm = lazy(() => import('@/pages/gunsmith/GunsmithInvoiceForm'));
-const GunsmithTransferForm = lazy(() => import('@/pages/gunsmith/GunsmithTransferForm'));
-const GunsmithConsignmentForm = lazy(() => import('@/pages/gunsmith/GunsmithConsignmentForm'));
-const GunsmithFirearmEdit = lazy(() => import('@/pages/gunsmith/GunsmithFirearmEdit'));
-const GunsmithPartEdit = lazy(() => import('@/pages/gunsmith/GunsmithPartEdit'));
-const GunsmithInventory = lazy(() => import('@/pages/gunsmith/GunsmithInventory'));
-const GunsmithStockAdjust = lazy(() => import('@/pages/gunsmith/GunsmithStockAdjust'));
-const GunsmithPurchaseOrderForm = lazy(() => import('@/pages/gunsmith/GunsmithPurchaseOrderForm'));
-const GunsmithSerializedForm = lazy(() => import('@/pages/gunsmith/GunsmithSerializedForm'));
-const GunsmithUsefulLinks = lazy(() => import('@/pages/gunsmith/GunsmithUsefulLinks'));
-const GunsmithChangeLog = lazy(() => import('@/pages/gunsmith/GunsmithChangeLog'));
-const GunsmithSettings = lazy(() => import('@/pages/gunsmith/GunsmithSettings'));
-const GunsmithTeam = lazy(() => import('@/pages/gunsmith/GunsmithTeam'));
-const GunsmithRoles = lazy(() => import('@/pages/gunsmith/GunsmithRoles'));
-const GunsmithStore = lazy(() => import('@/pages/gunsmith/GunsmithStore'));
 
 // Automotive
 const AutomotiveDashboard = lazy(() => import('@/pages/automotive/AutomotiveDashboard'));
@@ -413,10 +325,6 @@ const FuelDeliveryPortalLocations = lazy(() => import('@/pages/fuel-delivery-por
 const FuelDeliveryPortalAccount = lazy(() => import('@/pages/fuel-delivery-portal/FuelDeliveryPortalAccount'));
 
 // Septic Portal
-const SepticPortalLanding = lazy(() => import('@/pages/septic-portal/SepticPortalLanding'));
-const SepticPortalLogin = lazy(() => import('@/pages/septic-portal/SepticPortalLogin'));
-const SepticPortalRegister = lazy(() => import('@/pages/septic-portal/SepticPortalRegister'));
-const SepticPortalDashboard = lazy(() => import('@/pages/septic-portal/SepticPortalDashboard'));
 
 // Automotive Portal
 const AutomotivePortalLanding = lazy(() => import('@/pages/automotive-portal/AutomotivePortalLanding'));
@@ -425,10 +333,6 @@ const AutomotivePortalRegister = lazy(() => import('@/pages/automotive-portal/Au
 const AutomotivePortalDashboard = lazy(() => import('@/pages/automotive-portal/AutomotivePortalDashboard'));
 
 // Water Delivery Portal
-const WaterDeliveryPortalLanding = lazy(() => import('@/pages/water-delivery-portal/WaterDeliveryPortalLanding'));
-const WaterDeliveryPortalLogin = lazy(() => import('@/pages/water-delivery-portal/WaterDeliveryPortalLogin'));
-const WaterDeliveryPortalRegister = lazy(() => import('@/pages/water-delivery-portal/WaterDeliveryPortalRegister'));
-const WaterDeliveryPortalDashboardPage = lazy(() => import('@/pages/water-delivery-portal/WaterDeliveryPortalDashboard'));
 
 // Marine Portal
 const MarinePortalLanding = lazy(() => import('@/pages/marine-portal/MarinePortalLanding'));
@@ -437,92 +341,10 @@ const MarinePortalRegister = lazy(() => import('@/pages/marine-portal/MarinePort
 const MarinePortalDashboard = lazy(() => import('@/pages/marine-portal/MarinePortalDashboard'));
 
 // Water Delivery
-const WaterDeliveryDashboard = lazy(() => import('@/pages/water-delivery/WaterDeliveryDashboard'));
-const WaterDeliveryOrders = lazy(() => import('@/pages/water-delivery/WaterDeliveryOrders'));
-const WaterDeliveryOrderForm = lazy(() => import('@/pages/water-delivery/WaterDeliveryOrderForm'));
-const WaterDeliveryCustomers = lazy(() => import('@/pages/water-delivery/WaterDeliveryCustomers'));
-const WaterDeliveryCustomerDetails = lazy(() => import('@/pages/water-delivery/WaterDeliveryCustomerDetails'));
-const WaterDeliveryLocations = lazy(() => import('@/pages/water-delivery/WaterDeliveryLocations'));
-const WaterDeliveryProducts = lazy(() => import('@/pages/water-delivery/WaterDeliveryProducts'));
-const WaterDeliveryTrucks = lazy(() => import('@/pages/water-delivery/WaterDeliveryTrucks'));
-const WaterDeliveryDrivers = lazy(() => import('@/pages/water-delivery/WaterDeliveryDrivers'));
-const WaterDeliveryDriverDetail = lazy(() => import('@/pages/water-delivery/WaterDeliveryDriverDetail'));
-const WaterDeliveryRoutes = lazy(() => import('@/pages/water-delivery/WaterDeliveryRoutes'));
-const WaterDeliveryCompletions = lazy(() => import('@/pages/water-delivery/WaterDeliveryCompletions'));
-const WaterDeliveryInventory = lazy(() => import('@/pages/water-delivery/WaterDeliveryPartsInventory'));
-const WaterDeliveryInvoices = lazy(() => import('@/pages/water-delivery/WaterDeliveryInvoices'));
-const WaterDeliveryDriverApp = lazy(() => import('@/pages/water-delivery/WaterDeliveryDriverApp'));
-const WaterDeliveryPricing = lazy(() => import('@/pages/water-delivery/WaterDeliveryPricing'));
-const WaterDeliveryTanks = lazy(() => import('@/pages/water-delivery/WaterDeliveryTanks'));
-const WaterDeliveryTidyTanks = lazy(() => import('@/pages/water-delivery/WaterDeliveryTidyTanks'));
-const WaterDeliveryTankFills = lazy(() => import('@/pages/water-delivery/WaterDeliveryTankFills'));
-const WaterDeliveryEquipment = lazy(() => import('@/pages/water-delivery/WaterDeliveryEquipment'));
-const WaterDeliveryEquipmentFilters = lazy(() => import('@/pages/water-delivery/WaterDeliveryEquipmentFilters'));
-const WaterDeliveryQuotes = lazy(() => import('@/pages/water-delivery/WaterDeliveryQuotes'));
-const WaterDeliveryProfile = lazy(() => import('@/pages/water-delivery/WaterDeliveryProfile'));
-const WaterDeliverySettings = lazy(() => import('@/pages/water-delivery/WaterDeliverySettings'));
-const WaterDeliveryPurchases = lazy(() => import('@/pages/water-delivery/WaterDeliveryPurchases'));
-const WaterDeliveryStaff = lazy(() => import('@/pages/water-delivery/WaterDeliveryStaff'));
-const WaterDeliveryPartsInventory = lazy(() => import('@/pages/water-delivery/WaterDeliveryPartsInventory'));
-const WaterDeliveryStore = lazy(() => import('@/pages/water-delivery/WaterDeliveryStore'));
-const WaterDeliveryLayout = lazy(() => import('@/components/water-delivery').then(m => ({ default: m.WaterDeliveryLayout })));
 
 // Personal Trainer
-const PersonalTrainerDashboard = lazy(() => import('@/pages/personal-trainer/PersonalTrainerDashboard'));
-const PersonalTrainerClients = lazy(() => import('@/pages/personal-trainer/PersonalTrainerClients'));
-const PersonalTrainerClientDetail = lazy(() => import('@/pages/personal-trainer/PersonalTrainerClientDetail'));
-const PersonalTrainerWorkoutBuilder = lazy(() => import('@/pages/personal-trainer/PersonalTrainerWorkoutBuilder'));
-const PersonalTrainerPrograms = lazy(() => import('@/pages/personal-trainer/PersonalTrainerPrograms'));
-const PersonalTrainerExercises = lazy(() => import('@/pages/personal-trainer/PersonalTrainerExercises'));
-const PersonalTrainerSessions = lazy(() => import('@/pages/personal-trainer/PersonalTrainerSessions'));
-const PersonalTrainerMetrics = lazy(() => import('@/pages/personal-trainer/PersonalTrainerMetrics'));
-const PersonalTrainerPackages = lazy(() => import('@/pages/personal-trainer/PersonalTrainerPackages'));
-const PersonalTrainerBilling = lazy(() => import('@/pages/personal-trainer/PersonalTrainerBilling'));
-const PersonalTrainerSettings = lazy(() => import('@/pages/personal-trainer/PersonalTrainerSettings'));
-const PersonalTrainerTrainers = lazy(() => import('@/pages/personal-trainer/PersonalTrainerTrainers'));
-const PersonalTrainerCheckIns = lazy(() => import('@/pages/personal-trainer/PersonalTrainerCheckIns'));
-const PersonalTrainerMessages = lazy(() => import('@/pages/personal-trainer/PersonalTrainerMessages'));
-const PersonalTrainerReports = lazy(() => import('@/pages/personal-trainer/PersonalTrainerReports'));
-const PersonalTrainerCommunity = lazy(() => import('@/pages/personal-trainer/PersonalTrainerCommunity'));
-const PersonalTrainerChallenges = lazy(() => import('@/pages/personal-trainer/PersonalTrainerChallenges'));
-const PersonalTrainerReferrals = lazy(() => import('@/pages/personal-trainer/PersonalTrainerReferrals'));
-const PersonalTrainerBranding = lazy(() => import('@/pages/personal-trainer/PersonalTrainerBranding'));
-const PersonalTrainerNutrition = lazy(() => import('@/pages/personal-trainer/PersonalTrainerNutrition'));
-const PersonalTrainerWearables = lazy(() => import('@/pages/personal-trainer/PersonalTrainerWearables'));
-const PersonalTrainerAutomations = lazy(() => import('@/pages/personal-trainer/PersonalTrainerAutomations'));
-const PersonalTrainerAIChat = lazy(() => import('@/components/personal-trainer/PTAIChatPage'));
-const PersonalTrainerSocialFeed = lazy(() => import('@/pages/personal-trainer/PersonalTrainerSocialFeed'));
-const PersonalTrainerCalendar = lazy(() => import('@/pages/personal-trainer/PersonalTrainerCalendar'));
-const PersonalTrainerGymStaff = lazy(() => import('@/pages/personal-trainer/PersonalTrainerGymStaff'));
-const PersonalTrainerTimeTracking = lazy(() => import('@/pages/personal-trainer/PersonalTrainerTimeTracking'));
-const PersonalTrainerSupplements = lazy(() => import('@/pages/personal-trainer/PersonalTrainerSupplements'));
-const PersonalTrainerAbout = lazy(() => import('@/pages/personal-trainer/PersonalTrainerAbout'));
-const PersonalTrainerLayout = lazy(() => import('@/components/personal-trainer').then(m => ({ default: m.PersonalTrainerLayout })));
 
 // Game Development Module
-const GameDevDashboard = lazy(() => import('@/pages/game-development/GameDevDashboard'));
-const GameDevProjects = lazy(() => import('@/pages/game-development/GameDevProjects'));
-const GameDevCanvas = lazy(() => import('@/pages/game-development/GameDevCanvas'));
-const GameDevCanvasOverview = lazy(() => import('@/pages/game-development/GameDevCanvasOverview'));
-const GameDevDatabase = lazy(() => import('@/pages/game-development/GameDevDatabase'));
-const GameDevGDD = lazy(() => import('@/pages/game-development/GameDevGDD'));
-const GameDevRoadmap = lazy(() => import('@/pages/game-development/GameDevRoadmap'));
-const GameDevStory = lazy(() => import('@/pages/game-development/GameDevStory'));
-const GameDevCharacters = lazy(() => import('@/pages/game-development/GameDevCharacters'));
-const GameDevDialogue = lazy(() => import('@/pages/game-development/GameDevDialogue'));
-const GameDevWiki = lazy(() => import('@/pages/game-development/GameDevWiki'));
-const GameDevQuests = lazy(() => import('@/pages/game-development/GameDevQuests'));
-const GameDevRaids = lazy(() => import('@/pages/game-development/GameDevRaids'));
-const GameDevItems = lazy(() => import('@/pages/game-development/GameDevItems'));
-const GameDevEconomy = lazy(() => import('@/pages/game-development/GameDevEconomy'));
-const GameDevLevels = lazy(() => import('@/pages/game-development/GameDevLevels'));
-const GameDevPlaytesting = lazy(() => import('@/pages/game-development/GameDevPlaytesting'));
-const GameDevAssets = lazy(() => import('@/pages/game-development/GameDevAssets'));
-const GameDevLocalization = lazy(() => import('@/pages/game-development/GameDevLocalization'));
-const GameDevTeam = lazy(() => import('@/pages/game-development/GameDevTeam'));
-const GameDevAnalytics = lazy(() => import('@/pages/game-development/GameDevAnalytics'));
-const GameDevSettings = lazy(() => import('@/pages/game-development/GameDevSettings'));
-const GameDevLayout = lazy(() => import('@/components/game-development').then(m => ({ default: m.GameDevLayout })));
 
 // Welding Module
 const WeldingAdminOverview = lazy(() => import('@/pages/welding/WeldingAdminOverview'));
@@ -542,136 +364,29 @@ const WeldingAdminSettings = lazy(() => import('@/pages/welding/WeldingAdminSett
 const WeldingSettingsProvider = lazy(() => import('@/contexts/WeldingSettingsContext').then(m => ({ default: m.WeldingSettingsProvider })));
 
 // Personal Trainer Portal
-const PTPortalLanding = lazy(() => import('@/pages/pt-portal/PTPortalLanding'));
-const PTPortalLogin = lazy(() => import('@/pages/pt-portal/PTPortalLogin'));
-const PTPortalRegister = lazy(() => import('@/pages/pt-portal/PTPortalRegister'));
-const PTPortalDashboard = lazy(() => import('@/pages/pt-portal/PTPortalDashboard'));
 
 // Septic Services
-const SepticDashboard = lazy(() => import('@/pages/septic/SepticDashboard'));
-const SepticOrders = lazy(() => import('@/pages/septic/SepticOrders'));
-const SepticOrderForm = lazy(() => import('@/pages/septic/SepticOrderForm'));
-const SepticOrderDetail = lazy(() => import('@/pages/septic/SepticOrderDetail'));
-const SepticCustomers = lazy(() => import('@/pages/septic/SepticCustomers'));
-const SepticCustomerDetails = lazy(() => import('@/pages/septic/SepticCustomerDetails'));
-const SepticLocations = lazy(() => import('@/pages/septic/SepticLocations'));
-const SepticProducts = lazy(() => import('@/pages/septic/SepticProducts'));
-const SepticTrucks = lazy(() => import('@/pages/septic/SepticTrucks'));
-const SepticDrivers = lazy(() => import('@/pages/septic/SepticDrivers'));
-const SepticDriverDetail = lazy(() => import('@/pages/septic/SepticDriverDetail'));
-const SepticEmployeeDetail = lazy(() => import('@/pages/septic/SepticEmployeeDetail'));
-const SepticRoutes = lazy(() => import('@/pages/septic/SepticRoutes'));
-const SepticCompletions = lazy(() => import('@/pages/septic/SepticCompletions'));
-const SepticInventory = lazy(() => import('@/pages/septic/SepticInventory'));
-const SepticInvoices = lazy(() => import('@/pages/septic/SepticInvoices'));
-const SepticDriverApp = lazy(() => import('@/pages/septic/SepticDriverApp'));
-const SepticPricing = lazy(() => import('@/pages/septic/SepticPricing'));
-const SepticTanks = lazy(() => import('@/pages/septic/SepticTanks'));
-const SepticTidyTanks = lazy(() => import('@/pages/septic/SepticTidyTanks'));
-const SepticTankFills = lazy(() => import('@/pages/septic/SepticTankFills'));
-const SepticEquipment = lazy(() => import('@/pages/septic/SepticEquipment'));
-const SepticEquipmentFilters = lazy(() => import('@/pages/septic/SepticEquipmentFilters'));
-const SepticQuotes = lazy(() => import('@/pages/septic/SepticQuotes'));
-const SepticProfile = lazy(() => import('@/pages/septic/SepticProfile'));
-const SepticSettings = lazy(() => import('@/pages/septic/SepticSettings'));
-const SepticPurchases = lazy(() => import('@/pages/septic/SepticPurchases'));
-const SepticStaff = lazy(() => import('@/pages/septic/SepticStaff'));
-const SepticStore = lazy(() => import('@/pages/septic/SepticStore'));
-const SepticInspections = lazy(() => import('@/pages/septic/SepticInspections'));
-const SepticInspectionForm = lazy(() => import('@/pages/septic/SepticInspectionForm'));
-const SepticDeveloper = lazy(() => import('@/pages/septic/SepticDeveloper'));
-const SepticLayout = lazy(() => import('@/components/septic').then(m => ({ default: m.SepticLayout })));
 
 // Export Company
-const ExportDashboard = lazy(() => import('@/pages/export/ExportDashboard'));
-const ExportOrders = lazy(() => import('@/pages/export/ExportOrders'));
-const ExportCustomers = lazy(() => import('@/pages/export/ExportCustomers'));
-const ExportProducts = lazy(() => import('@/pages/export/ExportProducts'));
-const ExportVehicles = lazy(() => import('@/pages/export/ExportVehicles'));
-const ExportShipments = lazy(() => import('@/pages/export/ExportShipments'));
-const ExportPackaging = lazy(() => import('@/pages/export/ExportPackaging'));
-const ExportWarehouses = lazy(() => import('@/pages/export/ExportWarehouses'));
-const ExportInventory = lazy(() => import('@/pages/export/ExportInventory'));
-const ExportDocuments = lazy(() => import('@/pages/export/ExportDocuments'));
-const ExportTrucks = lazy(() => import('@/pages/export/ExportTrucks'));
-const ExportDrivers = lazy(() => import('@/pages/export/ExportDrivers'));
-const ExportRoutes = lazy(() => import('@/pages/export/ExportRoutes'));
-const ExportCompletions = lazy(() => import('@/pages/export/ExportCompletions'));
-const ExportInvoices = lazy(() => import('@/pages/export/ExportInvoices'));
-const ExportQuotes = lazy(() => import('@/pages/export/ExportQuotes'));
-const ExportPricing = lazy(() => import('@/pages/export/ExportPricing'));
-const ExportStaff = lazy(() => import('@/pages/export/ExportStaff'));
-const ExportEquipment = lazy(() => import('@/pages/export/ExportEquipment'));
-const ExportDriverApp = lazy(() => import('@/pages/export/ExportDriverApp'));
-const ExportProfile = lazy(() => import('@/pages/export/ExportProfile'));
-const ExportSettings = lazy(() => import('@/pages/export/ExportSettings'));
-const ExportStore = lazy(() => import('@/pages/export/ExportStore'));
-const ExportDeveloper = lazy(() => import('@/pages/export/ExportDeveloper'));
-const ExportRequests = lazy(() => import('@/pages/export/ExportRequests'));
-const ExportSuppliers = lazy(() => import('@/pages/export/ExportSuppliers'));
-const ExportPackingTraceability = lazy(() => import('@/pages/export/ExportPackingTraceability'));
-const ExportReservations = lazy(() => import('@/pages/export/ExportReservations'));
-const ExportPayments = lazy(() => import('@/pages/export/ExportPayments'));
-const ExportCustomsCompliance = lazy(() => import('@/pages/export/ExportCustomsCompliance'));
-const ExportReports = lazy(() => import('@/pages/export/ExportReports'));
-const ExportNotifications = lazy(() => import('@/pages/export/ExportNotifications'));
-const ImportPurchaseOrders = lazy(() => import('@/pages/export/ImportPurchaseOrders'));
-const ImportReceiving = lazy(() => import('@/pages/export/ImportReceiving'));
-const ImportCustomsClearance = lazy(() => import('@/pages/export/ImportCustomsClearance'));
-const ExportContracts = lazy(() => import('@/pages/export/ExportContracts'));
-const ExportCurrencyRates = lazy(() => import('@/pages/export/ExportCurrencyRates'));
-const ImportInvoices = lazy(() => import('@/pages/export/ImportInvoices'));
-const ExportShippingInsurance = lazy(() => import('@/pages/export/ExportShippingInsurance'));
-const ExportActivityLog = lazy(() => import('@/pages/export/ExportActivityLog'));
-const ExportReturns = lazy(() => import('@/pages/export/ExportReturns'));
-const ExportQualityControl = lazy(() => import('@/pages/export/ExportQualityControl'));
-const ExportFreightForwarders = lazy(() => import('@/pages/export/ExportFreightForwarders'));
-const ExportLettersOfCredit = lazy(() => import('@/pages/export/ExportLettersOfCredit'));
-const ExportDutyDrawbacks = lazy(() => import('@/pages/export/ExportDutyDrawbacks'));
-const ExportComplianceCalendar = lazy(() => import('@/pages/export/ExportComplianceCalendar'));
-const ExportSanctionsScreening = lazy(() => import('@/pages/export/ExportSanctionsScreening'));
-const ExportSamples = lazy(() => import('@/pages/export/ExportSamples'));
-const ExportBookings = lazy(() => import('@/pages/export/ExportBookings'));
-const ExportCountryRequirements = lazy(() => import('@/pages/export/ExportCountryRequirements'));
-const ExportAgents = lazy(() => import('@/pages/export/ExportAgents'));
-const ExportBankGuarantees = lazy(() => import('@/pages/export/ExportBankGuarantees'));
-const ExportCreditManagement = lazy(() => import('@/pages/export/ExportCreditManagement'));
-const ExportCertificates = lazy(() => import('@/pages/export/ExportCertificates'));
-const ExportHsCodes = lazy(() => import('@/pages/export/ExportHsCodes'));
-const ExportPorts = lazy(() => import('@/pages/export/ExportPorts'));
-const ExportBondedWarehouses = lazy(() => import('@/pages/export/ExportBondedWarehouses'));
-const ExportIntermodal = lazy(() => import('@/pages/export/ExportIntermodal'));
-const ExportShipmentPL = lazy(() => import('@/pages/export/ExportShipmentPL'));
-const ExportTradeFinanceDashboard = lazy(() => import('@/pages/export/ExportTradeFinanceDashboard'));
-const ExportDocumentTemplates = lazy(() => import('@/pages/export/ExportDocumentTemplates'));
-const ExportCustomsDeclarations = lazy(() => import('@/pages/export/ExportCustomsDeclarations'));
-const ExportTradeAlerts = lazy(() => import('@/pages/export/ExportTradeAlerts'));
-const ExportShipmentTracker = lazy(() => import('@/pages/export/ExportShipmentTracker'));
-const ExportVendorScorecards = lazy(() => import('@/pages/export/ExportVendorScorecards'));
-const ExportDemandForecasting = lazy(() => import('@/pages/export/ExportDemandForecasting'));
-const ExportContainerLoadPlanning = lazy(() => import('@/pages/export/ExportContainerLoadPlanning'));
-const ExportConsolidatedPL = lazy(() => import('@/pages/export/ExportConsolidatedPL'));
-const ExportAgingReports = lazy(() => import('@/pages/export/ExportAgingReports'));
-const ExportLandedCostCalculator = lazy(() => import('@/pages/export/ExportLandedCostCalculator'));
-const ExportMessagingTemplates = lazy(() => import('@/pages/export/ExportMessagingTemplates'));
-const ExportCustomerPortal = lazy(() => import('@/pages/export/ExportCustomerPortal'));
-const ExportEdiHub = lazy(() => import('@/pages/export/ExportEdiHub'));
-const ExportTradeLaneAnalytics = lazy(() => import('@/pages/export/ExportTradeLaneAnalytics'));
-const ExportKpiDashboard = lazy(() => import('@/pages/export/ExportKpiDashboard'));
-const ExportOverviewHub = lazy(() => import('@/pages/export/hubs/ExportOverviewHub'));
-const ExportOrdersHub = lazy(() => import('@/pages/export/hubs/ExportOrdersHub'));
-const ExportCustomersHub = lazy(() => import('@/pages/export/hubs/ExportCustomersHub'));
-const ExportLogisticsHub = lazy(() => import('@/pages/export/hubs/ExportLogisticsHub'));
-const ExportInventoryHub = lazy(() => import('@/pages/export/hubs/ExportInventoryHub'));
-const ExportDocumentsHub = lazy(() => import('@/pages/export/hubs/ExportDocumentsHub'));
-const ExportFinanceHub = lazy(() => import('@/pages/export/hubs/ExportFinanceHub'));
-const ExportAnalyticsHub = lazy(() => import('@/pages/export/hubs/ExportAnalyticsHub'));
-const ExportCommunicationHub = lazy(() => import('@/pages/export/hubs/ExportCommunicationHub'));
-const ExportImportHub = lazy(() => import('@/pages/export/hubs/ExportImportHub'));
-const ExportConfigHub = lazy(() => import('@/pages/export/hubs/ExportConfigHub'));
-const ExportLayout = lazy(() => import('@/components/export').then(m => ({ default: m.ExportLayout })));
 
 function App() {
+  const { pathname } = useLocation();
+  const removedModulePrefixes = [
+    '/power-washing',
+    '/gunsmith',
+    '/water-delivery',
+    '/water-delivery-portal',
+    '/septic',
+    '/septic-portal',
+    '/export',
+    '/personal-trainer',
+    '/pt-portal',
+    '/game-development',
+  ];
+
+  if (removedModulePrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))) {
+    return <Navigate to="/module-hub" replace />;
+  }
 
   return (
     <>
@@ -679,9 +394,9 @@ function App() {
       <Suspense fallback={<PageLoader />}>
       <Routes>
         {/* Public routes - no auth required */}
-        <Route path="/" element={<Index />} />
-        <Route path="/index" element={<Navigate to="/" replace />} />
-        <Route path="/index.html" element={<Navigate to="/" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/index" element={<Navigate to="/login" replace />} />
+        <Route path="/index.html" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/reset-password" element={<ResetPassword />} />
@@ -709,11 +424,6 @@ function App() {
         <Route path="/fuel-delivery-portal/locations" element={<FuelDeliveryPortalLocations />} />
         <Route path="/fuel-delivery-portal/account" element={<FuelDeliveryPortalAccount />} />
         
-        {/* Septic Customer Portal - Public routes */}
-        <Route path="/septic-portal" element={<SepticPortalLanding />} />
-        <Route path="/septic-portal/login" element={<SepticPortalLogin />} />
-        <Route path="/septic-portal/register" element={<SepticPortalRegister />} />
-        <Route path="/septic-portal/dashboard" element={<SepticPortalDashboard />} />
         
         {/* Automotive Customer Portal - Public routes */}
         <Route path="/automotive-portal" element={<AutomotivePortalLanding />} />
@@ -721,11 +431,6 @@ function App() {
         <Route path="/automotive-portal/register" element={<AutomotivePortalRegister />} />
         <Route path="/automotive-portal/dashboard" element={<AutomotivePortalDashboard />} />
         
-        {/* Water Delivery Customer Portal - Public routes */}
-        <Route path="/water-delivery-portal" element={<WaterDeliveryPortalLanding />} />
-        <Route path="/water-delivery-portal/login" element={<WaterDeliveryPortalLogin />} />
-        <Route path="/water-delivery-portal/register" element={<WaterDeliveryPortalRegister />} />
-        <Route path="/water-delivery-portal/dashboard" element={<WaterDeliveryPortalDashboardPage />} />
         
         {/* Marine Customer Portal - Public routes */}
         <Route path="/marine-portal" element={<MarinePortalLanding />} />
@@ -1385,12 +1090,9 @@ function App() {
                   } />
                   
                   {/* Module Developer Pages */}
-                  <Route path="/water-delivery/developer" element={<WaterDeliveryDeveloper />} />
                   <Route path="/automotive/developer" element={<AutomotiveDeveloper />} />
-                  <Route path="/gunsmith/developer" element={<GunsmithDeveloper />} />
                   <Route path="/marine-services/developer" element={<MarineDeveloper />} />
                   <Route path="/fuel-delivery/developer" element={<FuelDeliveryDeveloper />} />
-                  <Route path="/power-washing/developer" element={<PowerWashingDeveloper />} />
                   
                   {/* Advanced Analytics */}
                   <Route path="/advanced-analytics" element={
@@ -1589,93 +1291,6 @@ function App() {
                   {/* Unauthorized */}
                   <Route path="/unauthorized" element={<Unauthorized />} />
                   
-                  {/* Power Washing */}
-                  <Route path="/power-washing" element={<PowerWashingDashboard />} />
-                  <Route path="/power-washing/jobs" element={<PowerWashingJobsList />} />
-                  <Route path="/power-washing/jobs/new" element={<PowerWashingJobCreate />} />
-                  <Route path="/power-washing/jobs/:id" element={<PowerWashingJobDetails />} />
-                  <Route path="/power-washing/jobs/:id/edit" element={<PowerWashingJobEdit />} />
-                  <Route path="/power-washing/quotes" element={<PowerWashingQuotesList />} />
-                  <Route path="/power-washing/quotes/new" element={<PowerWashingQuoteForm />} />
-                  <Route path="/power-washing/quotes/:id" element={<PowerWashingQuoteDetail />} />
-                  <Route path="/power-washing/customers" element={<PowerWashingCustomers />} />
-                  <Route path="/power-washing/customers/new" element={<PowerWashingCustomerCreate />} />
-                  <Route path="/power-washing/customers/:customerId" element={<PowerWashingCustomerDetail />} />
-                  <Route path="/power-washing/equipment" element={<PowerWashingEquipment />} />
-                  <Route path="/power-washing/equipment/new" element={<PowerWashingEquipmentCreate />} />
-                  <Route path="/power-washing/equipment/:id" element={<PowerWashingEquipmentDetail />} />
-                  <Route path="/power-washing/chemicals" element={<PowerWashingChemicals />} />
-                  <Route path="/power-washing/chemicals/new" element={<PowerWashingChemicalCreate />} />
-                  <Route path="/power-washing/inventory" element={<PowerWashingInventory />} />
-                  <Route path="/power-washing/formulas" element={<PowerWashingFormulas />} />
-                  <Route path="/power-washing/pricing-formulas" element={<PowerWashingPricingFormulas />} />
-                  <Route path="/power-washing/bleach-calculator" element={<BleachCalculator />} />
-                  <Route path="/power-washing/surface-calculator" element={<SurfaceMixCalculator />} />
-                  <Route path="/power-washing/recurring" element={<PowerWashingRecurringSchedules />} />
-                  <Route path="/power-washing/invoices" element={<PowerWashingInvoices />} />
-                  <Route path="/power-washing/invoices/:id" element={<PowerWashingInvoiceDetail />} />
-                  <Route path="/power-washing/reports" element={<PowerWashingReports />} />
-                  <Route path="/power-washing/routes" element={<PowerWashingRoutes />} />
-                  <Route path="/power-washing/routes/:id" element={<PowerWashingRouteDetail />} />
-                  <Route path="/power-washing/reviews" element={<PowerWashingReviews />} />
-                  <Route path="/power-washing/notifications" element={<PowerWashingNotifications />} />
-                  <Route path="/power-washing/field" element={<PowerWashingFieldView />} />
-                  <Route path="/power-washing/field-view" element={<PowerWashingFieldView />} />
-                  <Route path="/power-washing/price-book" element={<PowerWashingPriceBook />} />
-                  <Route path="/power-washing/analytics" element={<PowerWashingAnalytics />} />
-                  <Route path="/power-washing/weather" element={<PowerWashingWeather />} />
-                  <Route path="/power-washing/photos" element={<PowerWashingPhotos />} />
-                  <Route path="/power-washing/subscriptions" element={<PowerWashingSubscriptions />} />
-                  <Route path="/power-washing/portal" element={<PowerWashingCustomerPortal />} />
-                  <Route path="/power-washing/payments" element={<PowerWashingPayments />} />
-                  <Route path="/power-washing/schedule" element={<PowerWashingSchedule />} />
-                  <Route path="/power-washing/leads" element={<PowerWashingLeads />} />
-                  <Route path="/power-washing/fleet" element={<PowerWashingFleet />} />
-                  <Route path="/power-washing/store" element={<PowerWashingStore />} />
-                  <Route path="/power-washing/team" element={<PowerWashingTeam />} />
-                  <Route path="/power-washing/roles" element={<PowerWashingRoles />} />
-                  <Route path="/power-washing/settings" element={<PowerWashingSettings />} />
-                  
-                  {/* Gunsmith Routes */}
-                  <Route path="/gunsmith" element={<GunsmithDashboard />} />
-                  <Route path="/gunsmith/jobs" element={<GunsmithJobs />} />
-                  <Route path="/gunsmith/jobs/new" element={<GunsmithJobForm />} />
-                  <Route path="/gunsmith/jobs/:id" element={<GunsmithJobDetail />} />
-                  <Route path="/gunsmith/customers" element={<GunsmithCustomers />} />
-                  <Route path="/gunsmith/customers/new" element={<GunsmithCustomerCreate />} />
-                  <Route path="/gunsmith/customers/:customerId" element={<GunsmithCustomerDetail />} />
-                  <Route path="/gunsmith/quotes" element={<GunsmithQuotes />} />
-                  <Route path="/gunsmith/quotes/new" element={<GunsmithQuoteForm />} />
-                  <Route path="/gunsmith/quotes/:id" element={<GunsmithQuoteDetail />} />
-                  <Route path="/gunsmith/firearms" element={<GunsmithFirearms />} />
-                  <Route path="/gunsmith/firearms/new" element={<GunsmithFirearmForm />} />
-                  <Route path="/gunsmith/firearms/:id" element={<GunsmithFirearmEdit />} />
-                  <Route path="/gunsmith/parts" element={<GunsmithParts />} />
-                  <Route path="/gunsmith/parts/:id" element={<GunsmithPartEdit />} />
-                  <Route path="/gunsmith/parts/new" element={<GunsmithPartForm />} />
-                  <Route path="/gunsmith/parts-on-order" element={<GunsmithPartsOnOrder />} />
-                  <Route path="/gunsmith/invoices" element={<GunsmithInvoices />} />
-                  <Route path="/gunsmith/invoices/new" element={<GunsmithInvoiceForm />} />
-                  <Route path="/gunsmith/payments" element={<GunsmithPayments />} />
-                  <Route path="/gunsmith/appointments" element={<GunsmithAppointments />} />
-                  <Route path="/gunsmith/appointments/new" element={<GunsmithAppointmentForm />} />
-                  <Route path="/gunsmith/compliance" element={<GunsmithCompliance />} />
-                  <Route path="/gunsmith/transfers" element={<GunsmithTransfers />} />
-                  <Route path="/gunsmith/transfers/new" element={<GunsmithTransferForm />} />
-                  <Route path="/gunsmith/consignments" element={<GunsmithConsignments />} />
-                  <Route path="/gunsmith/consignments/new" element={<GunsmithConsignmentForm />} />
-                  <Route path="/gunsmith/inventory" element={<GunsmithInventory />} />
-                  <Route path="/gunsmith/inventory/adjust" element={<GunsmithStockAdjust />} />
-                  <Route path="/gunsmith/inventory/purchase-orders/new" element={<GunsmithPurchaseOrderForm />} />
-                  <Route path="/gunsmith/inventory/serialized/new" element={<GunsmithSerializedForm />} />
-                  <Route path="/gunsmith/resources" element={<GunsmithUsefulLinks />} />
-                  <Route path="/gunsmith/useful-links" element={<Navigate to="/gunsmith/resources" replace />} />
-                  <Route path="/gunsmith/change-log" element={<GunsmithChangeLog />} />
-                  <Route path="/gunsmith/settings" element={<GunsmithSettings />} />
-                  <Route path="/gunsmith/team" element={<GunsmithTeam />} />
-                  <Route path="/gunsmith/roles" element={<GunsmithRoles />} />
-                  <Route path="/gunsmith/store" element={<GunsmithStore />} />
-                  
                   {/* Not Found - Catch all */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
@@ -1727,140 +1342,6 @@ function App() {
           }
         />
         
-        {/* Water Delivery Module - Separate Layout */}
-        <Route
-          path="/water-delivery/*"
-          element={
-            <AuthGate>
-              <AuthenticatedProviders>
-              <WaterDeliveryLayout>
-                <Routes>
-                  <Route path="/" element={<WaterDeliveryDashboard />} />
-                  <Route path="/orders" element={<WaterDeliveryOrders />} />
-                  <Route path="/orders/new" element={<WaterDeliveryOrderForm />} />
-                  <Route path="/orders/:id" element={<WaterDeliveryOrders />} />
-                  <Route path="/customers" element={<WaterDeliveryCustomers />} />
-                  <Route path="/customers/:customerId" element={<WaterDeliveryCustomerDetails />} />
-                  <Route path="/locations" element={<WaterDeliveryLocations />} />
-                  <Route path="/products" element={<WaterDeliveryProducts />} />
-                  <Route path="/trucks" element={<WaterDeliveryTrucks />} />
-                  <Route path="/drivers" element={<WaterDeliveryDrivers />} />
-                  <Route path="/drivers/:id" element={<WaterDeliveryDriverDetail />} />
-                  <Route path="/routes" element={<WaterDeliveryRoutes />} />
-                  <Route path="/routes/new" element={<WaterDeliveryRoutes />} />
-                  <Route path="/deliveries" element={<WaterDeliveryCompletions />} />
-                  <Route path="/inventory" element={<WaterDeliveryInventory />} />
-                  <Route path="/parts-inventory" element={<WaterDeliveryPartsInventory />} />
-                  <Route path="/purchases" element={<WaterDeliveryPurchases />} />
-                  <Route path="/invoices" element={<WaterDeliveryInvoices />} />
-                  <Route path="/invoices/new" element={<WaterDeliveryInvoices />} />
-                  <Route path="/driver-app" element={<WaterDeliveryDriverApp />} />
-                  <Route path="/pricing" element={<WaterDeliveryPricing />} />
-                  <Route path="/tanks" element={<WaterDeliveryTanks />} />
-                  <Route path="/tidy-tanks" element={<WaterDeliveryTidyTanks />} />
-                  <Route path="/tank-fills" element={<WaterDeliveryTankFills />} />
-                  <Route path="/equipment" element={<WaterDeliveryEquipment />} />
-                  <Route path="/equipment-filters" element={<WaterDeliveryEquipmentFilters />} />
-                  <Route path="/quotes" element={<WaterDeliveryQuotes />} />
-                  <Route path="/staff" element={<WaterDeliveryStaff />} />
-                  <Route path="/profile" element={<WaterDeliveryProfile />} />
-                  <Route path="/settings" element={<WaterDeliverySettings />} />
-                  <Route path="/store" element={<WaterDeliveryStore />} />
-                  <Route path="/developer" element={<WaterDeliveryDeveloper />} />
-                </Routes>
-              </WaterDeliveryLayout>
-              </AuthenticatedProviders>
-            </AuthGate>
-          }
-        />
-
-        {/* Personal Trainer Module */}
-        <Route
-          path="/personal-trainer/*"
-          element={
-            <AuthGate>
-              <AuthenticatedProviders>
-              <PersonalTrainerLayout>
-                <Routes>
-                  <Route path="/" element={<PersonalTrainerDashboard />} />
-                  <Route path="/clients" element={<PersonalTrainerClients />} />
-                  <Route path="/clients/:id" element={<PersonalTrainerClientDetail />} />
-                  <Route path="/trainers" element={<PersonalTrainerTrainers />} />
-                  <Route path="/programs" element={<PersonalTrainerPrograms />} />
-                  <Route path="/programs/:programId/builder" element={<PersonalTrainerWorkoutBuilder />} />
-                  <Route path="/exercises" element={<PersonalTrainerExercises />} />
-                  <Route path="/sessions" element={<PersonalTrainerSessions />} />
-                  <Route path="/calendar" element={<PersonalTrainerCalendar />} />
-                  <Route path="/metrics" element={<PersonalTrainerMetrics />} />
-                  <Route path="/check-ins" element={<PersonalTrainerCheckIns />} />
-                  <Route path="/messages" element={<PersonalTrainerMessages />} />
-                  <Route path="/reports" element={<PersonalTrainerReports />} />
-                  <Route path="/packages" element={<PersonalTrainerPackages />} />
-                  <Route path="/billing" element={<PersonalTrainerBilling />} />
-                  <Route path="/settings" element={<PersonalTrainerSettings />} />
-                  <Route path="/community" element={<PersonalTrainerCommunity />} />
-                  <Route path="/challenges" element={<PersonalTrainerChallenges />} />
-                  <Route path="/referrals" element={<PersonalTrainerReferrals />} />
-                  <Route path="/branding" element={<PersonalTrainerBranding />} />
-                  <Route path="/nutrition" element={<PersonalTrainerNutrition />} />
-                  <Route path="/wearables" element={<PersonalTrainerWearables />} />
-                  <Route path="/automations" element={<PersonalTrainerAutomations />} />
-                  <Route path="/ai-chat" element={<PersonalTrainerAIChat />} />
-                  <Route path="/social-feed" element={<PersonalTrainerSocialFeed />} />
-                  <Route path="/staff" element={<PersonalTrainerGymStaff />} />
-                  <Route path="/time-tracking" element={<PersonalTrainerTimeTracking />} />
-                  <Route path="/supplements" element={<PersonalTrainerSupplements />} />
-                  <Route path="/about" element={<PersonalTrainerAbout />} />
-                </Routes>
-              </PersonalTrainerLayout>
-              </AuthenticatedProviders>
-            </AuthGate>
-          }
-        />
-
-        {/* Game Development Module */}
-        <Route
-          path="/game-development/*"
-          element={
-            <AuthGate>
-              <AuthenticatedProviders>
-              <GameDevLayout>
-                <Routes>
-                  <Route path="/" element={<GameDevDashboard />} />
-                  <Route path="/projects" element={<GameDevProjects />} />
-                  <Route path="/canvas" element={<GameDevCanvas />} />
-                  <Route path="/canvas-overview" element={<GameDevCanvasOverview />} />
-                  <Route path="/database" element={<GameDevDatabase />} />
-                  <Route path="/gdd" element={<GameDevGDD />} />
-                  <Route path="/roadmap" element={<GameDevRoadmap />} />
-                  <Route path="/story" element={<GameDevStory />} />
-                  <Route path="/characters" element={<GameDevCharacters />} />
-                  <Route path="/dialogue" element={<GameDevDialogue />} />
-                  <Route path="/wiki" element={<GameDevWiki />} />
-                  <Route path="/quests" element={<GameDevQuests />} />
-                  <Route path="/raids" element={<GameDevRaids />} />
-                  <Route path="/items" element={<GameDevItems />} />
-                  <Route path="/economy" element={<GameDevEconomy />} />
-                  <Route path="/levels" element={<GameDevLevels />} />
-                  <Route path="/playtesting" element={<GameDevPlaytesting />} />
-                  <Route path="/assets" element={<GameDevAssets />} />
-                  <Route path="/localization" element={<GameDevLocalization />} />
-                  <Route path="/team" element={<GameDevTeam />} />
-                  <Route path="/analytics" element={<GameDevAnalytics />} />
-                  <Route path="/settings" element={<GameDevSettings />} />
-                </Routes>
-              </GameDevLayout>
-              </AuthenticatedProviders>
-            </AuthGate>
-          }
-        />
-
-        {/* Personal Trainer Portal - Public routes */}
-        <Route path="/pt-portal" element={<PTPortalLanding />} />
-        <Route path="/pt-portal/login" element={<PTPortalLogin />} />
-        <Route path="/pt-portal/register" element={<PTPortalRegister />} />
-        <Route path="/pt-portal/dashboard" element={<PTPortalDashboard />} />
-
         {/* Welding Module */}
         <Route
           path="/welding/*"
@@ -1885,153 +1366,6 @@ function App() {
                   <Route path="/settings" element={<WeldingAdminSettings />} />
                 </Routes>
               </WeldingSettingsProvider>
-              </AuthenticatedProviders>
-            </AuthGate>
-          }
-        />
-
-        <Route
-          path="/septic/*"
-          element={
-            <AuthGate>
-              <AuthenticatedProviders>
-              <SepticLayout>
-                <Routes>
-                  <Route path="/" element={<SepticDashboard />} />
-                  <Route path="/orders" element={<SepticOrders />} />
-                  <Route path="/orders/new" element={<SepticOrderForm />} />
-                  <Route path="/orders/:orderId" element={<SepticOrderDetail />} />
-                  <Route path="/customers" element={<SepticCustomers />} />
-                  <Route path="/customers/:customerId" element={<SepticCustomerDetails />} />
-                  <Route path="/locations" element={<SepticLocations />} />
-                  <Route path="/products" element={<SepticProducts />} />
-                  <Route path="/trucks" element={<SepticTrucks />} />
-                  <Route path="/drivers" element={<SepticDrivers />} />
-                  <Route path="/drivers/:id" element={<SepticDriverDetail />} />
-                  <Route path="/employees/:id" element={<SepticEmployeeDetail />} />
-                  <Route path="/routes" element={<SepticRoutes />} />
-                  <Route path="/completions" element={<SepticCompletions />} />
-                  <Route path="/inventory" element={<SepticInventory />} />
-                  <Route path="/invoices" element={<SepticInvoices />} />
-                  <Route path="/driver-app" element={<SepticDriverApp />} />
-                  <Route path="/pricing" element={<SepticPricing />} />
-                  <Route path="/tanks" element={<SepticTanks />} />
-                  <Route path="/tidy-tanks" element={<SepticTidyTanks />} />
-                  <Route path="/tank-fills" element={<SepticTankFills />} />
-                  <Route path="/equipment" element={<SepticEquipment />} />
-                  <Route path="/equipment-filters" element={<SepticEquipmentFilters />} />
-                  <Route path="/quotes" element={<SepticQuotes />} />
-                  <Route path="/purchases" element={<SepticPurchases />} />
-                  <Route path="/staff" element={<SepticStaff />} />
-                  <Route path="/inspections" element={<SepticInspections />} />
-                  <Route path="/inspection-form/:templateId" element={<SepticInspectionForm />} />
-                  <Route path="/profile" element={<SepticProfile />} />
-                  <Route path="/settings" element={<SepticSettings />} />
-                  <Route path="/store" element={<SepticStore />} />
-                  <Route path="/developer" element={<SepticDeveloper />} />
-                </Routes>
-              </SepticLayout>
-              </AuthenticatedProviders>
-            </AuthGate>
-          }
-        />
-
-        {/* Export Company Module */}
-        <Route
-          path="/export/*"
-          element={
-            <AuthGate>
-              <AuthenticatedProviders>
-              <ExportLayout>
-                <Routes>
-                  <Route path="/" element={<ExportDashboard />} />
-                  <Route path="/hub/overview" element={<ExportOverviewHub />} />
-                  <Route path="/hub/orders" element={<ExportOrdersHub />} />
-                  <Route path="/hub/customers" element={<ExportCustomersHub />} />
-                  <Route path="/hub/logistics" element={<ExportLogisticsHub />} />
-                  <Route path="/hub/inventory" element={<ExportInventoryHub />} />
-                  <Route path="/hub/documents" element={<ExportDocumentsHub />} />
-                  <Route path="/hub/finance" element={<ExportFinanceHub />} />
-                  <Route path="/hub/analytics" element={<ExportAnalyticsHub />} />
-                  <Route path="/hub/communication" element={<ExportCommunicationHub />} />
-                  <Route path="/hub/import" element={<ExportImportHub />} />
-                  <Route path="/hub/config" element={<ExportConfigHub />} />
-                  <Route path="/orders" element={<ExportOrders />} />
-                  <Route path="/customers" element={<ExportCustomers />} />
-                  <Route path="/products" element={<ExportProducts />} />
-                  <Route path="/vehicles" element={<ExportVehicles />} />
-                  <Route path="/shipments" element={<ExportShipments />} />
-                  <Route path="/packaging" element={<ExportPackaging />} />
-                  <Route path="/warehouses" element={<ExportWarehouses />} />
-                  <Route path="/inventory" element={<ExportInventory />} />
-                  <Route path="/documents" element={<ExportDocuments />} />
-                  <Route path="/trucks" element={<ExportTrucks />} />
-                  <Route path="/drivers" element={<ExportDrivers />} />
-                  <Route path="/routes" element={<ExportRoutes />} />
-                  <Route path="/completions" element={<ExportCompletions />} />
-                  <Route path="/invoices" element={<ExportInvoices />} />
-                  <Route path="/quotes" element={<ExportQuotes />} />
-                  <Route path="/pricing" element={<ExportPricing />} />
-                  <Route path="/staff" element={<ExportStaff />} />
-                  <Route path="/equipment" element={<ExportEquipment />} />
-                  <Route path="/driver-app" element={<ExportDriverApp />} />
-                  <Route path="/profile" element={<ExportProfile />} />
-                  <Route path="/settings" element={<ExportSettings />} />
-                  <Route path="/store" element={<ExportStore />} />
-                  <Route path="/developer" element={<ExportDeveloper />} />
-                  <Route path="/requests" element={<ExportRequests />} />
-                  <Route path="/suppliers" element={<ExportSuppliers />} />
-                  <Route path="/packing" element={<ExportPackingTraceability />} />
-                  <Route path="/reservations" element={<ExportReservations />} />
-                  <Route path="/payments" element={<ExportPayments />} />
-                  <Route path="/customs" element={<ExportCustomsCompliance />} />
-                  <Route path="/reports" element={<ExportReports />} />
-                  <Route path="/notifications" element={<ExportNotifications />} />
-                  <Route path="/import-orders" element={<ImportPurchaseOrders />} />
-                  <Route path="/import-receiving" element={<ImportReceiving />} />
-                  <Route path="/import-customs" element={<ImportCustomsClearance />} />
-                  <Route path="/import-invoices" element={<ImportInvoices />} />
-                  <Route path="/contracts" element={<ExportContracts />} />
-                  <Route path="/currency" element={<ExportCurrencyRates />} />
-                  <Route path="/insurance" element={<ExportShippingInsurance />} />
-                  <Route path="/activity" element={<ExportActivityLog />} />
-                  <Route path="/returns" element={<ExportReturns />} />
-                  <Route path="/quality" element={<ExportQualityControl />} />
-                  <Route path="/forwarders" element={<ExportFreightForwarders />} />
-                  <Route path="/letters-of-credit" element={<ExportLettersOfCredit />} />
-                  <Route path="/duty-drawbacks" element={<ExportDutyDrawbacks />} />
-                  <Route path="/compliance-calendar" element={<ExportComplianceCalendar />} />
-                  <Route path="/sanctions" element={<ExportSanctionsScreening />} />
-                  <Route path="/samples" element={<ExportSamples />} />
-                  <Route path="/bookings" element={<ExportBookings />} />
-                  <Route path="/country-requirements" element={<ExportCountryRequirements />} />
-                  <Route path="/agents" element={<ExportAgents />} />
-                  <Route path="/bank-guarantees" element={<ExportBankGuarantees />} />
-                  <Route path="/credit" element={<ExportCreditManagement />} />
-                  <Route path="/certificates" element={<ExportCertificates />} />
-                  <Route path="/hs-codes" element={<ExportHsCodes />} />
-                  <Route path="/ports" element={<ExportPorts />} />
-                  <Route path="/bonded-warehouses" element={<ExportBondedWarehouses />} />
-                  <Route path="/intermodal" element={<ExportIntermodal />} />
-                  <Route path="/shipment-pl" element={<ExportShipmentPL />} />
-                  <Route path="/trade-finance" element={<ExportTradeFinanceDashboard />} />
-                  <Route path="/doc-templates" element={<ExportDocumentTemplates />} />
-                  <Route path="/declarations" element={<ExportCustomsDeclarations />} />
-                  <Route path="/trade-alerts" element={<ExportTradeAlerts />} />
-                  <Route path="/shipment-tracker" element={<ExportShipmentTracker />} />
-                  <Route path="/vendor-scorecards" element={<ExportVendorScorecards />} />
-                  <Route path="/demand-forecasting" element={<ExportDemandForecasting />} />
-                  <Route path="/container-load-planning" element={<ExportContainerLoadPlanning />} />
-                  <Route path="/consolidated-pl" element={<ExportConsolidatedPL />} />
-                  <Route path="/aging-reports" element={<ExportAgingReports />} />
-                  <Route path="/landed-cost" element={<ExportLandedCostCalculator />} />
-                  <Route path="/messaging-templates" element={<ExportMessagingTemplates />} />
-                  <Route path="/customer-portal" element={<ExportCustomerPortal />} />
-                  <Route path="/edi-hub" element={<ExportEdiHub />} />
-                  <Route path="/trade-lanes" element={<ExportTradeLaneAnalytics />} />
-                  <Route path="/kpi-dashboard" element={<ExportKpiDashboard />} />
-                </Routes>
-              </ExportLayout>
               </AuthenticatedProviders>
             </AuthGate>
           }

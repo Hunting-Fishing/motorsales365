@@ -1922,13 +1922,16 @@ export const MODULE_ROUTES: Record<string, ModuleRouteConfig> = {
 };
 
 export const getModuleRoute = (slug: string): ModuleRouteConfig | undefined => {
-  return MODULE_ROUTES[slug];
+  return getAllModuleRoutes().find((module) => module.slug === slug);
 };
 
 export const getAllModuleRoutes = (): ModuleRouteConfig[] => {
-  return Object.values(MODULE_ROUTES);
+  // This clone intentionally exposes only vehicle and fabrication businesses.
+  // Filtering here also protects the UI if legacy module records remain in DB.
+  const supported = new Set(['automotive', 'marine', 'fuel_delivery', 'welding']);
+  return Object.values(MODULE_ROUTES).filter((module) => supported.has(module.slug));
 };
 
 export const getModuleSections = (slug: string): ModuleSectionItem[] => {
-  return MODULE_ROUTES[slug]?.sections || [];
+  return getModuleRoute(slug)?.sections || [];
 };
