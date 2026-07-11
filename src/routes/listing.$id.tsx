@@ -39,6 +39,7 @@ import { SpecRow } from "@/components/listing/spec-display";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
 import { MobileActionBar } from "@/components/listing/mobile-action-bar";
+import { FloatingMessageWidget } from "@/components/listing/floating-message-widget";
 import { ListingReportsSection } from "@/components/listing/listing-reports-section";
 import { FormFeedbackLink } from "@/components/form-feedback";
 import { ListingWantedBadge } from "@/components/parts-wanted/wanted-badge";
@@ -274,6 +275,7 @@ function ListingDetailPage() {
   const [sending, setSending] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const messageRef = useRef<HTMLTextAreaElement | null>(null);
+  const [msgWidgetOpen, setMsgWidgetOpen] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -313,10 +315,16 @@ function ListingDetailPage() {
       }
 
       // Increment view count via RPC (counts every page load, anon allowed)
-      supabase.rpc("increment_listing_view", {
-        _listing_id: id,
-        _viewer_id: user?.id ?? undefined,
-      });
+      supabase
+        .rpc("increment_listing_view", {
+          _listing_id: id,
+          _viewer_id: user?.id ?? undefined,
+        })
+        .then(({ error }) => {
+          if (error && import.meta.env.DEV) {
+            console.warn("[view-count] rpc failed", error);
+          }
+        });
 
       // Like count (public)
       const { count: likes } = await supabase
@@ -804,11 +812,24 @@ function ListingDetailPage() {
             </SectionCard>
           )}
 
-          {(listing.category_slug === "cars" ||
-            listing.category_slug === "motorcycles" ||
-            listing.category_slug === "trucks") && <BuyerDocumentChecklist />}
-
-
+          {/* Buyer safety checklist — rendered at the very bottom of the main
+              column for all vehicle-type listings. */}
+          {[
+            "cars",
+            "car",
+            "motorcycles",
+            "motorcycle",
+            "trucks",
+            "truck",
+            "boats",
+            "boat",
+            "heavy-equipment",
+            "agri",
+            "agriculture",
+            "atv-utv",
+            "atv",
+            "utv",
+          ].includes(listing.category_slug) && <BuyerDocumentChecklist />}
 
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
@@ -824,6 +845,7 @@ function ListingDetailPage() {
             </Link>
           </div>
         </div>
+
 
         {/* Sidebar */}
         <aside className="space-y-4 pb-20 lg:sticky lg:top-20 lg:self-start lg:pb-0">
@@ -995,45 +1017,30 @@ function ListingDetailPage() {
 
           <AdCarousel placement="listing_sidebar" />
 
-          {listing.allow_messages && (
-            <Collapsible defaultOpen className="rounded-xl border border-border bg-card p-5">
-              <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 text-left">
-                <h3 className="flex items-center gap-2 font-display text-lg font-semibold">
-                  <MessageSquare className="h-4 w-4" /> Send a message
-                </h3>
-                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <Textarea
-                  ref={messageRef}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Hi, is this still available?"
-                  className="mt-3"
-                  rows={4}
-                />
-                <Button
-                  onClick={sendMessage}
-                  disabled={sending || !message.trim()}
-                  className="mt-2 w-full"
-                >
-                  {sending ? "Sending…" : "Send message"}
-                </Button>
-              </CollapsibleContent>
-            </Collapsible>
-          )}
-
         </aside>
       </div>
+
+      {listing.allow_messages && user?.id !== listing.user_id && (
+        <FloatingMessageWidget
+          sellerName={seller?.business_name ?? seller?.full_name ?? null}
+          sellerAvatarUrl={seller?.avatar_url ?? null}
+          listingTitle={listing.title}
+          message={message}
+          setMessage={setMessage}
+          onSend={sendMessage}
+          sending={sending}
+          open={msgWidgetOpen}
+          setOpen={setMsgWidgetOpen}
+        />
+      )}
+
       <MobileActionBar
         phone={listing.contact_phone}
         whatsappMessage={`Hi! I'm interested in your listing "${listing.title}" on 365 Motor Sales: ${siteUrl(typeof window !== "undefined" ? window.location.pathname : "/")}`}
         allowMessages={listing.allow_messages}
-        onMessageClick={() => {
-          messageRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-          messageRef.current?.focus();
-        }}
+        onMessageClick={() => setMsgWidgetOpen(true)}
       />
     </SiteLayout>
   );
 }
+
