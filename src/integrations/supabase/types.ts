@@ -12835,6 +12835,7 @@ export type Database = {
           _notify_poster?: boolean
           _report_id: string
           _reverses_action_id?: string
+          _severity?: string
         }
         Returns: string
       }

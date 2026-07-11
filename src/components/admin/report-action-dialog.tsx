@@ -78,11 +78,22 @@ export function ReportActionDialog({
   const [notify, setNotify] = useState(true);
   const [confirmTitle, setConfirmTitle] = useState("");
   const [busy, setBusy] = useState(false);
+  const [severity, setSeverity] = useState<
+    "none" | "minor" | "moderate" | "standard" | "severe"
+  >("standard");
 
   const applyFn = useServerFn(applyReportAction);
 
-  const totalDelta =
-    cfg.baseDelta + (hide ? -10 : 0) + (del ? -30 : 0);
+  const SEVERITY_DELTA: Record<typeof severity, number> = {
+    none: 0,
+    minor: -5,
+    moderate: -15,
+    standard: -25,
+    severe: -50,
+  };
+
+  const acceptBase = action === "accept" ? SEVERITY_DELTA[severity] : cfg.baseDelta;
+  const totalDelta = acceptBase + (hide ? -10 : 0) + (del ? -30 : 0);
 
   const canSubmit = (() => {
     if (busy) return false;
@@ -103,6 +114,7 @@ export function ReportActionDialog({
           deleteListing: del,
           notifyPoster: notify,
           reversesActionId: reversesActionId ?? null,
+          severity: action === "accept" ? severity : undefined,
         },
       });
       toast.success(`${cfg.title} applied`);
@@ -113,12 +125,14 @@ export function ReportActionDialog({
       setHide(false);
       setDel(false);
       setConfirmTitle("");
+      setSeverity("standard");
     } catch (e: any) {
       toast.error(e?.message ?? "Action failed");
     } finally {
       setBusy(false);
     }
   };
+
 
   const deltaColor =
     totalDelta < 0
@@ -150,8 +164,59 @@ export function ReportActionDialog({
             </span>
           </div>
 
+          {/* Severity picker (only for accept) */}
+          {action === "accept" && (
+            <div className="space-y-2 rounded-md border border-border bg-muted/20 p-3">
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Penalty severity
+              </div>
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-5">
+                {([
+                  { id: "none", label: "No penalty", pts: 0, hint: "Honest mistake" },
+                  { id: "minor", label: "Minor", pts: -5, hint: "Small issue" },
+                  { id: "moderate", label: "Moderate", pts: -15, hint: "Repeat / careless" },
+                  { id: "standard", label: "Standard", pts: -25, hint: "Default" },
+                  { id: "severe", label: "Severe", pts: -50, hint: "Malicious" },
+                ] as const).map((opt) => {
+                  const active = severity === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setSeverity(opt.id)}
+                      className={`rounded-md border px-2 py-1.5 text-left transition ${
+                        active
+                          ? "border-primary bg-primary/10 ring-1 ring-primary"
+                          : "border-border bg-background hover:bg-muted"
+                      }`}
+                    >
+                      <div className="text-xs font-medium leading-tight">{opt.label}</div>
+                      <div
+                        className={`font-mono text-[11px] ${
+                          opt.pts < 0
+                            ? "text-destructive"
+                            : "text-emerald-600 dark:text-emerald-400"
+                        }`}
+                      >
+                        {opt.pts > 0 ? "+" : ""}
+                        {opt.pts} pts
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">{opt.hint}</div>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Use <span className="font-medium">No penalty</span> when the poster clearly made an
+                honest mistake — the report is still recorded, but the poster's trust score is not
+                reduced.
+              </p>
+            </div>
+          )}
+
           {/* Action checkboxes (only for accept) */}
           {action === "accept" && listingId && (
+
             <div className="space-y-2 rounded-md border border-amber-500/30 bg-amber-500/5 p-3">
               <div className="text-[11px] font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
                 Follow-up consequences (optional)

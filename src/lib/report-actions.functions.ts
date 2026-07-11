@@ -21,6 +21,7 @@ export const applyReportAction = createServerFn({ method: "POST" })
       deleteListing?: boolean;
       notifyPoster?: boolean;
       reversesActionId?: string | null;
+      severity?: "none" | "minor" | "moderate" | "standard" | "severe";
     }) =>
       z
         .object({
@@ -31,6 +32,9 @@ export const applyReportAction = createServerFn({ method: "POST" })
           deleteListing: z.boolean().optional(),
           notifyPoster: z.boolean().optional(),
           reversesActionId: z.string().uuid().nullable().optional(),
+          severity: z
+            .enum(["none", "minor", "moderate", "standard", "severe"])
+            .optional(),
         })
         .parse(input),
   )
@@ -43,10 +47,12 @@ export const applyReportAction = createServerFn({ method: "POST" })
       _delete_listing: !!data.deleteListing,
       _notify_poster: !!data.notifyPoster,
       _reverses_action_id: data.reversesActionId ?? null,
+      _severity: data.severity ?? "standard",
     } as never);
     if (error) throw new Error(error.message);
     return { ok: true, actionId: id as unknown as string };
   });
+
 
 export type ReportActionRow = {
   id: string;
