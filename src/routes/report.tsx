@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { AlertTriangle, Shield, Upload, X, CheckCircle2 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
