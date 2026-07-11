@@ -336,6 +336,9 @@ function MessagesPage() {
           subtitle: `Re: ${title}`,
           thumb,
           avatar: profile?.avatar_url ?? null,
+          listing_title: title,
+          listing_price: listing?.price_php ?? null,
+          listing_status: listing?.status ?? null,
           last_body: preview,
           last_at: m.created_at,
           unread: unreadInc,
@@ -348,6 +351,9 @@ function MessagesPage() {
         existing.subtitle = `Re: ${title}`;
         existing.thumb = thumb;
         existing.avatar = profile?.avatar_url ?? null;
+        existing.listing_title = title;
+        existing.listing_price = listing?.price_php ?? null;
+        existing.listing_status = listing?.status ?? null;
       }
     }
     list.push(...Array.from(dmMap.values()));
