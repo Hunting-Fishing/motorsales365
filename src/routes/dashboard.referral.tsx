@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 
 import { supabase } from "@/integrations/supabase/client";
@@ -56,6 +56,8 @@ type Promo = {
 
 const RANGES = { "7": "7 days", "30": "30 days", "90": "90 days", all: "All time" } as const;
 type RangeKey = keyof typeof RANGES;
+const qrActionButtonClass =
+  "w-full min-w-0 justify-center gap-1 px-2 text-xs leading-tight sm:text-sm [&>svg]:shrink-0";
 
 function sinceFor(r: RangeKey): string | null {
   if (r === "all") return null;
@@ -180,7 +182,7 @@ function StaffReferral() {
   if (!staff) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-0">
       <header className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h1 className="font-display text-2xl font-bold">My referral</h1>
@@ -442,12 +444,13 @@ function ReferralQrCard({
 
 
   return (
-    <div className="min-w-0 rounded-xl border border-border bg-card p-3 pb-[max(env(safe-area-inset-bottom),7rem)] sm:p-4 sm:pb-4">
+    <div className="min-w-0 rounded-xl border border-border bg-card p-2.5 sm:p-4">
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
         <div className="group relative block w-full min-w-0 rounded-2xl p-1 text-left">
           <div
             data-referral-qr-card
-            className="relative mx-auto aspect-square w-full min-w-0 max-w-[min(68vw,248px)] overflow-hidden rounded-xl bg-white p-2 ring-1 ring-border transition group-hover:ring-primary sm:max-w-none sm:p-5"
+            className="relative mx-auto aspect-square w-full min-w-0 max-w-[var(--qr-mobile-max)] scroll-mb-[calc(6rem+env(safe-area-inset-bottom))] overflow-hidden rounded-xl bg-white p-2 ring-1 ring-border transition group-hover:ring-primary sm:max-w-none sm:p-5"
+            style={{ "--qr-mobile-max": "min(54vw, 30dvh, 216px)" } as CSSProperties}
           >
             <ZoomableQr
               ariaLabel={`QR code for ${fullName} — pinch or double-tap to zoom`}
@@ -473,7 +476,7 @@ function ReferralQrCard({
             </ZoomableQr>
             <button
               type="button"
-              className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-foreground/80 px-2 py-1 text-[11px] font-medium text-background shadow-sm backdrop-blur transition hover:bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="absolute right-2 top-2 inline-flex min-h-9 items-center gap-1 rounded-full bg-foreground/80 px-2.5 py-1 text-xs font-medium text-background shadow-sm backdrop-blur transition hover:bg-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               onClick={() => setQrOpen(true)}
               aria-label={`Open enlarged QR code for ${fullName}`}
             >
@@ -545,9 +548,9 @@ function ReferralQrCard({
       </Dialog>
 
 
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <Button type="button" size="sm" variant="outline" className="w-full" onClick={() => setQrOpen(true)}>
-          <Maximize2 className="mr-1 h-4 w-4" /> Enlarge
+      <div className="mt-3 grid scroll-mb-[calc(6rem+env(safe-area-inset-bottom))] grid-cols-2 gap-2 sm:grid-cols-3" data-referral-qr-actions>
+        <Button type="button" size="sm" variant="outline" className={qrActionButtonClass} onClick={() => setQrOpen(true)}>
+          <Maximize2 className="h-4 w-4" /> <span className="truncate">Enlarge</span>
         </Button>
         <ResolutionDownload
           onSelect={handleDownload}
@@ -555,11 +558,11 @@ function ReferralQrCard({
           triggerLabel="Download PNG"
           size="sm"
           variant="outline"
-          className="w-full"
+          className={qrActionButtonClass}
         />
         <a href={posterUrl} target="_blank" rel="noreferrer" className="block min-w-0">
-          <Button variant="outline" size="sm" className="w-full">
-            <Printer className="mr-1 h-4 w-4" /> Poster
+          <Button variant="outline" size="sm" className={qrActionButtonClass}>
+            <Printer className="h-4 w-4" /> <span className="truncate">Poster</span>
           </Button>
         </a>
         <ShareQrPageButton
@@ -567,10 +570,10 @@ function ReferralQrCard({
           fullName={fullName}
           size="sm"
           variant="outline"
-          className="w-full"
+          className={qrActionButtonClass}
         />
-        <Button type="button" size="sm" variant="outline" className="w-full" onClick={copyReferralLink}>
-          <LinkIcon className="mr-1 h-4 w-4" /> Copy link
+        <Button type="button" size="sm" variant="outline" className={qrActionButtonClass} onClick={copyReferralLink}>
+          <LinkIcon className="h-4 w-4" /> <span className="truncate">Copy link</span>
         </Button>
         <a
           href={`${siteOrigin()}/r/${referralCode}/qr`}
@@ -578,8 +581,8 @@ function ReferralQrCard({
           rel="noreferrer"
           className="block min-w-0"
         >
-          <Button variant="outline" size="sm" className="w-full">
-            <ExternalLink className="mr-1 h-4 w-4" /> Public QR page
+          <Button variant="outline" size="sm" className={qrActionButtonClass}>
+            <ExternalLink className="h-4 w-4" /> <span className="truncate">Public QR page</span>
           </Button>
         </a>
         <a
@@ -588,29 +591,29 @@ function ReferralQrCard({
           rel="noreferrer"
           className="block min-w-0"
         >
-          <Button variant="outline" size="sm" className="w-full">
-            <MessageCircle className="mr-1 h-4 w-4" /> WhatsApp
+          <Button variant="outline" size="sm" className={qrActionButtonClass}>
+            <MessageCircle className="h-4 w-4" /> <span className="truncate">WhatsApp</span>
           </Button>
         </a>
         <a
           href={`sms:?&body=${encodeURIComponent(`Scan my 365 Motor Sales referral QR: ${siteOrigin()}/r/${referralCode}/qr`)}`}
           className="block min-w-0"
         >
-          <Button variant="outline" size="sm" className="w-full">
-            <Smartphone className="mr-1 h-4 w-4" /> SMS
+          <Button variant="outline" size="sm" className={qrActionButtonClass}>
+            <Smartphone className="h-4 w-4" /> <span className="truncate">SMS</span>
           </Button>
         </a>
         <a
           href={`mailto:?subject=${encodeURIComponent(`${fullName} — 365 Motor Sales referral`)}&body=${encodeURIComponent(`Scan my referral QR or open this link: ${siteOrigin()}/r/${referralCode}/qr`)}`}
           className="block min-w-0"
         >
-          <Button variant="outline" size="sm" className="w-full">
-            <Mail className="mr-1 h-4 w-4" /> Email
+          <Button variant="outline" size="sm" className={qrActionButtonClass}>
+            <Mail className="h-4 w-4" /> <span className="truncate">Email</span>
           </Button>
         </a>
         <Link to="/my-qr" className="block min-w-0 col-span-2 sm:col-span-1">
-          <Button variant="outline" size="sm" className="w-full">
-            <QrCode className="mr-1 h-4 w-4" /> My QR page
+          <Button variant="outline" size="sm" className={qrActionButtonClass}>
+            <QrCode className="h-4 w-4" /> <span className="truncate">My QR page</span>
           </Button>
         </Link>
       </div>
@@ -726,7 +729,7 @@ function ShareQrPageButton({
 
   return (
     <Button type="button" size={size} variant={variant} onClick={onShare} className={className}>
-      <Share2 className="mr-1 h-4 w-4" /> Share QR page
+      <Share2 className="h-4 w-4" /> <span className="truncate">Share QR page</span>
     </Button>
   );
 }

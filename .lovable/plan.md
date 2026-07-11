@@ -1,33 +1,23 @@
-## Goal
-Make the QR area under **My referrals / status** usable on Jocelyn’s phone: the full QR must fit, pinch/enlarge must work, and all QR actions must be visible without being hidden by the bottom nav or cramped off-screen.
-
 ## Plan
-1. **Tighten the mobile QR card**
-   - Reduce the inline QR footprint on phones so the whole QR square fits inside the card instead of being cropped at the right edge.
-   - Keep desktop/tablet sizing unchanged.
-   - Add enough bottom padding so the bottom tab bar and floating help button do not cover PNG / Poster / sharing controls.
 
-2. **Expose all QR options clearly**
-   - Replace the cramped two-button row with a mobile-friendly action grid/stack:
-     - Enlarge / pinch zoom
-     - Download PNG with size choices
-     - Poster / print
-     - Share QR page
-     - Copy referral link
-     - Original admin download when available
-   - Keep the existing linked QR ads / resources cards below the stats.
+1. **Reproduce the mobile state**
+   - Open `/dashboard/referral` at Jocelyn-like mobile widths (360px and 390px).
+   - Check whether the inline QR is clipped, whether all QR actions are reachable above the fixed bottom nav/help button, and whether the dialog opens.
 
-3. **Make zoom discoverable and reliable**
-   - Add a clear visible **Enlarge** control on the QR itself.
-   - Open the existing full-screen zoom dialog from that control.
-   - Keep pinch, double-tap, plus/minus zoom controls inside the dialog.
-   - Avoid nested button/dropdown interactions that can break tap or pinch behavior on mobile Chrome.
+2. **Fix the QR card layout for real phone heights**
+   - Make the QR/action card use a single-column mobile layout with more conservative sizing so the full QR stays visible on narrow phones.
+   - Ensure the action grid can scroll into view and is not hidden behind the mobile tab bar or floating help button.
+   - Keep desktop/tablet layout unchanged.
 
-4. **Improve the “My referrals & status” navigation wording**
-   - Rename the dashboard tab from **My referral & stats** to **My referrals & status** so it matches where users expect to find these QR tools.
-   - Add **QR scan test** to the Promote & Earn navigation so all QR-related tools are accessible from the same dashboard menu.
+3. **Make all QR options visible without relying on a stale row**
+   - Keep every QR action in the mobile grid: Enlarge, Download PNG, Poster, Share QR page, Copy link, Public QR page, WhatsApp, SMS, Email, My QR page, and original admin QR when available.
+   - Tighten labels/icons if needed so buttons do not clip on 360px screens.
 
-5. **Verification**
-   - Use the 360px mobile viewport and confirm `/dashboard/referral` shows the full QR and every QR option above the bottom tab bar.
-   - Confirm tapping Enlarge opens the zoom dialog and the dialog controls remain available.
-   - Confirm no horizontal overflow on the referral page.
+4. **Address stale app/web caching after publish**
+   - Inspect the service worker/update path and add a safer published-site refresh mechanism if needed so PWA/mobile Chrome users get the latest JS after a deploy.
+   - Avoid caching navigations or old app shells that can keep Jocelyn on the previous broken QR screen.
+
+5. **Verify**
+   - Run a mobile browser check at 360px/390px for `/dashboard/referral`.
+   - Confirm no horizontal overflow, QR fully visible, all options reachable, and Enlarge opens the zoom dialog.
+   - If the issue is only from an installed PWA cache, document the expected one-time refresh behavior after the fix.

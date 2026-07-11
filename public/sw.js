@@ -1,48 +1,30 @@
-// 365 MotorSales — minimal offline-fallback service worker.
-// VERSION is derived from the ?v= query string on the registration URL
-// (set in src/components/service-worker-register.tsx using the Vite-injected
-// __BUILD_ID__). When the build id changes, the browser fetches a new SW URL,
-// install fires, and the old cache is dropped on activate.
+// 365 MotorSales — service-worker cleanup.
+//
+// The app only needs home-screen installability, not offline app-shell caching.
+// Returning mobile/PWA users can otherwise stay on an older published bundle,
+// so this replacement worker removes the old app caches and unregisters itself.
 
-const VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
-const OFFLINE_CACHE = `offline-${VERSION}`;
-const OFFLINE_URL = "/offline.html";
+function isAppCache(name) {
+  const ownOfflineCache = name === "offline" || name.startsWith("offline-");
+  const ownWorkboxCache = /(^|-)precache-v\d+-|(^|-)runtime-|(^|-)googleAnalytics-/.test(name);
+  return ownOfflineCache || (ownWorkboxCache && name.endsWith(self.registration.scope));
+}
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    (async () => {
-      const cache = await caches.open(OFFLINE_CACHE);
-      await cache.add(new Request(OFFLINE_URL, { cache: "reload" }));
-    })(),
-  );
+self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
-      const keys = await caches.keys();
-      await Promise.all(keys.filter((k) => k !== OFFLINE_CACHE).map((k) => caches.delete(k)));
-      await self.clients.claim();
-      // eslint-disable-next-line no-console
-      console.info(`[sw] active version: ${VERSION}`);
-    })(),
-  );
-});
-
-self.addEventListener("fetch", (event) => {
-  const req = event.request;
-  if (req.method !== "GET") return;
-  if (req.mode !== "navigate") return;
-
-  event.respondWith(
-    (async () => {
       try {
-        return await fetch(req);
-      } catch {
-        const cache = await caches.open(OFFLINE_CACHE);
-        const cached = await cache.match(OFFLINE_URL);
-        return cached ?? new Response("Offline", { status: 503 });
+        const cacheNames = await caches.keys();
+        await Promise.allSettled(cacheNames.filter(isAppCache).map((name) => caches.delete(name)));
+        await self.clients.claim();
+        const windowClients = await self.clients.matchAll({ type: "window" });
+        await Promise.allSettled(windowClients.map((client) => client.navigate(client.url)));
+      } finally {
+        await self.registration.unregister();
       }
     })(),
   );
