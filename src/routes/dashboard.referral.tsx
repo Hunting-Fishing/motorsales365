@@ -449,7 +449,7 @@ function ReferralQrCard({
         <div className="group relative block w-full min-w-0 rounded-2xl p-1 text-left">
           <div
             data-referral-qr-card
-            className="relative mx-auto aspect-square w-full min-w-0 max-w-[min(58vw,216px)] overflow-hidden rounded-xl bg-white p-2 ring-1 ring-border transition group-hover:ring-primary sm:max-w-none sm:p-5"
+            className="relative mx-auto aspect-square w-full min-w-0 scroll-mb-[calc(6rem+env(safe-area-inset-bottom))] max-w-[min(54vw,30dvh,216px)] overflow-hidden rounded-xl bg-white p-2 ring-1 ring-border transition group-hover:ring-primary sm:max-w-none sm:p-5"
           >
             <ZoomableQr
               ariaLabel={`QR code for ${fullName} — pinch or double-tap to zoom`}
@@ -547,7 +547,7 @@ function ReferralQrCard({
       </Dialog>
 
 
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3" data-referral-qr-actions>
+      <div className="mt-3 grid scroll-mb-[calc(6rem+env(safe-area-inset-bottom))] grid-cols-2 gap-2 sm:grid-cols-3" data-referral-qr-actions>
         <Button type="button" size="sm" variant="outline" className={qrActionButtonClass} onClick={() => setQrOpen(true)}>
           <Maximize2 className="h-4 w-4" /> <span className="truncate">Enlarge</span>
         </Button>
