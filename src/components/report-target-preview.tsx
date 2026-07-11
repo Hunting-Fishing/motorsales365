@@ -41,6 +41,7 @@ type Props = {
   sellerId?: string;
   onResolved?: (p: TargetPreview | null, canonicalUrl: string | null) => void;
   onClear?: () => void;
+  hideClear?: boolean;
 };
 
 export function ReportTargetPreview({
@@ -49,6 +50,7 @@ export function ReportTargetPreview({
   sellerId,
   onResolved,
   onClear,
+  hideClear,
 }: Props) {
   const [preview, setPreview] = useState<TargetPreview | null>(null);
   const [loading, setLoading] = useState(true);
