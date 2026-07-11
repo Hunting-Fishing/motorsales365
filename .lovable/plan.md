@@ -1,39 +1,38 @@
+
 ## Problem
 
-The publish + media uploads fail with:
-- `Photo limit reached for free plan (max 1)`
-- `Video limit reached for free plan (max 0)`
+Screenshot is from `/dashboard/referral` (the `MyQrCard` block in `src/routes/dashboard.referral.tsx`), not `/my-qr`. On a ~360px phone:
 
-Root cause: DB trigger `public.enforce_listing_media_caps` (migration `20260602081428_...`) hardcodes free-plan caps as **1 photo / 0 videos**, but the UI + `FREE_PLAN_LIMITS` promise **12 photos + 1 video**. Every photo after the 1st and every video is rejected by the trigger → the toast "Couldn't attach 9 files…" and submit failure.
+1. The inline QR renders at ~full card width, pushing the name, PNG/Poster buttons and "Download original (admin)" link partly under the fixed bottom tab bar (Home/Browse/Sell/Inbox/Account).
+2. The "Tap anywhere to enlarge" hint chip sits below the QR and gets clipped, so users don't discover the zoom dialog.
+3. Pinch-zoom doesn't work on the inline QR — zoom only exists inside the dialog (`ZoomableQr`). Users try to pinch the visible QR and nothing happens.
+4. The card has no bottom safe-area padding, so the mobile bottom nav overlaps its footer.
 
-Drafts already exist (auto-save to `listing_drafts` on step change, resume banner on load). No missing feature — just needs a small visibility tweak so users can see it's saving.
+## Fix (mobile-only, presentation layer)
 
-## Plan
+Edit only `src/routes/dashboard.referral.tsx` (`MyQrCard`) and, if needed, `src/components/qr/zoomable-qr.tsx` props.
 
-1. **DB migration — align media caps with the actual free plan**
-   Update `public.enforce_listing_media_caps()` so free/`NULL` plan = **12 photos, 1 video** (matches `FREE_PLAN_LIMITS` and the copy in `/sell` and `/start-selling`). Keep standard (5/1) and upgraded (20/3) as-is, or bump upgraded photo cap only if needed — leaving both untouched this turn.
+1. Cap the inline QR on small screens
+   - Wrap the QR square in `max-w-[78vw] sm:max-w-none mx-auto` so it doesn't consume the whole viewport width.
+   - Keep `aspect-square` and existing ring styling.
 
-   ```text
-   free/NULL → 12 photos, 1 video
-   standard  → 5 photos,  1 video     (unchanged)
-   upgraded  → 20 photos, 3 videos    (unchanged)
-   ```
+2. Prevent bottom-nav overlap
+   - Add `pb-[max(env(safe-area-inset-bottom),5rem)] sm:pb-4` to the outer card wrapper so the PNG/Poster row and "Download original (admin)" link clear the fixed bottom tab bar.
 
-2. **sell.tsx — surface auto-save state**
-   Autosave logic already runs on step change (line ~815). Add a tiny "Draft saved · <time>" indicator next to the stepper so users know drafts are automatic (no button needed). Also toast once on first successful autosave.
+3. Make the inline QR pinch-zoomable in place
+   - Wrap the inline `ResponsiveQr` in `ZoomableQr` (same component already used in the dialog) with `enablePan={false}` on mobile so a single pinch scales the QR without hijacking page scroll; the existing `DialogTrigger` button still opens the full-screen view when tapped without a pinch.
+   - Because `ZoomableQr` must live inside a `button` today, split the trigger: render the QR square as a `div` with the zoom gesture handlers, and add a small "Enlarge" button (Maximize2 icon) in the corner that opens the dialog. This removes the nested-interactive-element issue and lets pinch work.
 
-3. **sell.tsx — friendlier error mapping**
-   When `listing_media` insert returns error code `23514` with "limit reached", show a single clear toast ("Upgrade your plan to add more photos/videos") instead of one toast per failed file.
+4. Make the enlarge affordance obvious on mobile
+   - Move the "Tap to enlarge" chip from below the QR to an always-visible pill on top of the QR (top-right, `bg-black/70 text-white`) so it isn't clipped when the card is tall.
+   - Keep the existing chip text below on `sm:` and up.
 
-4. **No changes to** the eager-upload flow, blob URL cache, storage buckets, or draft schema — those are working.
+5. No backend, RLS, data or business-logic changes. `/my-qr` is not touched.
 
-## Files touched
+## Verification
 
-- `supabase/migrations/<new>_fix_free_plan_media_caps.sql` (new)
-- `src/routes/sell.tsx` (autosave indicator + error toast dedupe)
-
-## Out of scope
-
-- Repricing tiers (only fixing the mismatch with what's already promised).
-- Rewriting media upload pipeline.
-- Adding a manual "Save draft" button — autosave already covers this; just making it visible.
+- Set preview viewport to mobile (360×640) and confirm on `/dashboard/referral`:
+  - Full card (QR, name, PNG, Poster, Download original link) is visible above the bottom tab bar without scrolling into it.
+  - Pinch on the inline QR scales it in place; the page doesn't zoom.
+  - Tapping the Enlarge pill (or the QR area) opens the existing full-screen dialog with `ZoomableQr` still working.
+- Desktop (`sm:` and up) layout is unchanged.

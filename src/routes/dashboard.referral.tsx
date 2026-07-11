@@ -433,7 +433,7 @@ function ReferralQrCard({
 
 
   return (
-    <div className="min-w-0 rounded-xl border border-border bg-card p-4">
+    <div className="min-w-0 rounded-xl border border-border bg-card p-4 pb-[max(env(safe-area-inset-bottom),5rem)] sm:pb-4">
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
         <DialogTrigger asChild>
           <button
@@ -441,7 +441,7 @@ function ReferralQrCard({
             className="group relative block w-full min-w-0 rounded-2xl p-1 text-left transition active:scale-[0.99] hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label={`View QR full screen for ${fullName}`}
           >
-            <div className="relative aspect-square w-full min-w-0 overflow-hidden rounded-xl bg-white p-3 sm:p-5 ring-1 ring-border transition group-hover:ring-primary">
+            <div className="relative mx-auto aspect-square w-full min-w-0 max-w-[78vw] overflow-hidden rounded-xl bg-white p-3 sm:max-w-none sm:p-5 ring-1 ring-border transition group-hover:ring-primary">
               <div
                 className="flex h-full w-full min-w-0 items-center justify-center"
                 role="img"
@@ -457,20 +457,18 @@ function ReferralQrCard({
                   />
                 ) : null}
               </div>
-              <span className="pointer-events-none absolute right-2 top-2 rounded-md bg-black/60 p-1 text-white opacity-100 sm:opacity-0 transition group-hover:opacity-100">
-                <Maximize2 className="h-3.5 w-3.5" />
+              <span className="pointer-events-none absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-1 text-[11px] font-medium text-white shadow-sm">
+                <Maximize2 className="h-3 w-3" />
+                Tap to enlarge & pinch zoom
               </span>
             </div>
             <div className="mt-3 text-center">
               <div className="font-display text-lg font-bold">{fullName}</div>
               <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
-              <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
-                <Maximize2 className="h-3 w-3" />
-                Tap anywhere to enlarge
-              </div>
             </div>
           </button>
         </DialogTrigger>
+
         <DialogContent className="w-[95vw] max-w-md sm:max-w-lg p-4 sm:p-6">
           <VisuallyHidden>
             <DialogTitle>QR code for {fullName}</DialogTitle>
