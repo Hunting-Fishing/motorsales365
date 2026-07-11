@@ -48,15 +48,12 @@ export type DossierScore = {
   breakdown: { label: string; delta: number }[];
 };
 
-async function requireMod(supabase: any, userId: string) {
-  const { data: isAdmin } = await supabase.rpc("has_role", {
-    _user_id: userId,
-    _role: "admin",
-  });
-  const { data: isMod } = await supabase.rpc("has_role", {
-    _user_id: userId,
-    _role: "moderator",
-  });
+async function requireMod(_supabase: any, userId: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const [{ data: isAdmin }, { data: isMod }] = await Promise.all([
+    supabaseAdmin.rpc("has_role", { _user_id: userId, _role: "admin" }),
+    supabaseAdmin.rpc("has_role", { _user_id: userId, _role: "moderator" }),
+  ]);
   if (!isAdmin && !isMod) throw new Error("Forbidden");
 }
 

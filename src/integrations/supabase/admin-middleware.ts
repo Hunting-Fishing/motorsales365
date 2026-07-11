@@ -32,6 +32,8 @@ async function userHasAdminRole(userId: string): Promise<boolean> {
 }
 
 async function userHasDomainRole(userId: string, role: DomainRole): Promise<boolean> {
+  // Admins pass every domain gate.
+  if (await userHasAdminRole(userId)) return true;
   const rpc = RPC_BY_ROLE[role];
   const { data, error } = await (supabaseAdmin.rpc as any)(rpc, { _user_id: userId });
   return !error && data === true;
