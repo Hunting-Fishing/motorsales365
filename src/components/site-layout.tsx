@@ -112,7 +112,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <div className="sticky top-0 z-50">
         <SiteHeader />
       </div>
-      <main className={cleanBg ? "flex-1 bg-background" : "brand-watermark flex-1"}>
+      <main ref={mainRef} className={cleanBg ? "flex-1 bg-background" : "brand-watermark flex-1"}>
         {children}
       </main>
       <SiteFooter />
