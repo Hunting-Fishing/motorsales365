@@ -811,11 +811,24 @@ function ListingDetailPage() {
             </SectionCard>
           )}
 
-          {(listing.category_slug === "cars" ||
-            listing.category_slug === "motorcycles" ||
-            listing.category_slug === "trucks") && <BuyerDocumentChecklist />}
-
-
+          {/* Buyer safety checklist — rendered at the very bottom of the main
+              column for all vehicle-type listings. */}
+          {[
+            "cars",
+            "car",
+            "motorcycles",
+            "motorcycle",
+            "trucks",
+            "truck",
+            "boats",
+            "boat",
+            "heavy-equipment",
+            "agri",
+            "agriculture",
+            "atv-utv",
+            "atv",
+            "utv",
+          ].includes(listing.category_slug) && <BuyerDocumentChecklist />}
 
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
@@ -831,6 +844,7 @@ function ListingDetailPage() {
             </Link>
           </div>
         </div>
+
 
         {/* Sidebar */}
         <aside className="space-y-4 pb-20 lg:sticky lg:top-20 lg:self-start lg:pb-0">
