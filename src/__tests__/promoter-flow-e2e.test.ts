@@ -63,9 +63,9 @@ const ROUTES: RouteContract[] = [
   {
     path: "/r/$code",
     files: ["src/routes/r.$code.tsx", "src/components/qr-landing-content.tsx"],
-    // Banner at the top + footer at the bottom of the referral landing.
-    maxDisclosures: 2,
-    personalized: true,
+    // Disclosure removed from the QR landing page per owner request.
+    maxDisclosures: 0,
+    personalized: false,
   },
   {
     path: "/dashboard/partner-program",
