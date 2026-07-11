@@ -317,7 +317,7 @@ function ListingDetailPage() {
       supabase
         .rpc("increment_listing_view", {
           _listing_id: id,
-          _viewer_id: user?.id ?? null,
+          _viewer_id: user?.id ?? undefined,
         })
         .then(({ error }) => {
           if (error && import.meta.env.DEV) {
