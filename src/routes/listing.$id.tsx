@@ -431,8 +431,11 @@ function ListingDetailPage() {
     const { error } = await supabase.from("reports").insert({
       listing_id: id,
       reporter_id: user.id,
+      target_type: "listing",
+      category: reportReason,
       reason: reportReason,
       details: reportDetails || null,
+      reporter_email: user.email ?? null,
     });
     setSubmittingReport(false);
     if (error) {
