@@ -500,6 +500,39 @@ function MessagesPage() {
     }
   };
 
+  const markGroupRead = async (c: ConversationSummary) => {
+    const { error } = await (supabase.rpc as any)("mark_thread_read", {
+      p_thread_id: c.thread_id!,
+    });
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Marked as read");
+      load();
+    }
+  };
+
+  const markGroupUnread = async (c: ConversationSummary) => {
+    const { error } = await (supabase.rpc as any)("mark_thread_unread", {
+      p_thread_id: c.thread_id!,
+    });
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Marked as unread");
+      load();
+    }
+  };
+
+  const toggleRead = (c: ConversationSummary) => {
+    if (c.invited) return;
+    if (c.kind === "dm") {
+      if (c.unread > 0) markDmRead(c);
+      else markDmUnread(c);
+    } else {
+      if (c.unread > 0) markGroupRead(c);
+      else markGroupUnread(c);
+    }
+  };
+
   const acceptInvite = async (threadId: string) => {
     const { error } = await (supabase.rpc as any)("respond_to_thread_invite", {
       p_thread_id: threadId,
