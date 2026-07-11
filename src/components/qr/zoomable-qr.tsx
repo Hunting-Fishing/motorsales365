@@ -281,7 +281,7 @@ export function ZoomableQr({
         aria-label={ariaLabel ?? "Zoomable QR code"}
         aria-describedby={instructionsId}
         aria-roledescription="Zoomable image"
-        className="relative overflow-hidden select-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        className="relative h-full w-full overflow-hidden select-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         style={{ cursor: "grab", touchAction: enablePan ? "none" : "pan-y" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
