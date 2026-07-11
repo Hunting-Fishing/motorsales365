@@ -604,7 +604,16 @@ function ListingDetailPage() {
                   </Badge>
                 )}
               </div>
-              <h1 className="mt-2 font-display text-3xl font-bold md:text-4xl">{listing.title}</h1>
+              <div className="mt-2 flex items-start justify-between gap-2">
+                <h1 className="font-display text-3xl font-bold md:text-4xl">{listing.title}</h1>
+                <ListingActionsMenu
+                  listingId={listing.id}
+                  sellerUserId={listing.user_id ?? null}
+                  sellerName={sellerName ?? null}
+                  variant="inline"
+                  className="shrink-0"
+                />
+              </div>
               <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4" />
                 {[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}
