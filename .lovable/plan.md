@@ -1,86 +1,73 @@
 ## Goal
-Restructure the listing page right rail into a compact "Buyer resource" stack (like the reference screenshot) and back the PH Buyer Checklist with a database + downloadable PDF guides.
 
-## 1. Sidebar restructure — `src/routes/listing.$id.tsx`
-Introduce a new compact sidebar card component `BuyerResourcesCard` rendered directly under the Seller card (and above the map/ads). It groups short entries — each a small icon + label + chevron — that expand inline or link out:
-- LTO / OR-CR verification status (reads existing `vehicle_passport_verifications` / LTO doc verification badges — link to `/verified`)
-- Insurance quote (existing coming-soon row)
-- Pre-purchase inspection (existing coming-soon row)
-- Financing (existing coming-soon row)
-- Parts & Accessories for this car (new link to `/parts?make={make}&model={model}&year={year}` prefilled from `listing.attributes`)
-- More from this seller (link to `/seller/$id`)
-- PH Buyer Document Checklist (opens the interactive checklist in a Dialog/Sheet, sourced from DB — see §3)
-- Safety tips & guides (links to downloadable PDFs — see §4)
+Turn `/dashboard/messages` and the listing `FloatingMessageWidget` into a Facebook-Messenger–style chat: rich conversation list, clear unread state, mark read/unread, image + video attachments, emoji picker, and a Tenor-powered GIF picker. Group chats, video calls, and friend invites are explicitly deferred.
 
-Visual: mirrors the reference — `p-3` card, `text-sm` label rows with `h-8` icon squares, `divide-y` separators, no big headings. Replaces the current large "Need inspection or insurance" `ComingSoonSection` block (delete it from the sidebar).
+## Backend
 
-Move the existing bottom-of-main `<BuyerDocumentChecklist />` mount out of the main column; the sidebar entry becomes the single entry point (dialog).
+**Schema (`messages` table extensions via migration)**
+- Add columns: `attachment_url text`, `attachment_type text` (`image` | `video` | `gif`), `attachment_thumb_url text`, `attachment_meta jsonb` (width/height/duration/mime/size).
+- Keep `body` optional when an attachment is present (app-level rule; no CHECK to avoid time-dependent issues).
+- Backfill unaffected; existing rows keep `attachment_url = null`.
 
-## 2. Component work
-- New `src/components/listing/buyer-resources-card.tsx` — the compact stacked card. Props: `listing`, `seller`. Uses `Collapsible` for inline expansions (Inspection/Insurance/Financing) and `Dialog` for the full checklist.
-- Update `src/components/buyer-document-checklist.tsx`:
-  - Accept optional `items` prop; when omitted, fall back to hard-coded list (keeps current callers safe).
-  - Add checked-state persistence keyed by `listingId` using `localStorage` (guest) or `buyer_checklist_progress` table (auth users, see §3).
-  - Add a "Download PDF" button linking to the guide for the vehicle category.
-- Remove the sidebar "Need inspection or insurance" `Collapsible` block from `src/routes/listing.$id.tsx` (~L1007-1031) — its rows migrate into `BuyerResourcesCard`.
-- Remove the bottom-of-main `<BuyerDocumentChecklist />` render (~L833). Checklist opens from sidebar dialog instead.
+**Storage**
+- Create private bucket `message-media` via `storage_create_bucket`.
+- RLS on `storage.objects` for `message-media`:
+  - INSERT: `auth.uid() = owner` and path starts with `auth.uid()::text || '/'`.
+  - SELECT: sender or recipient of any `messages` row whose `attachment_url` points at this object (matched by path).
+- Client uploads to `message-media/{userId}/{uuid}.{ext}`, then inserts the message row with a signed URL (1-year) or storage path + resolves signed URLs on read.
+- Limits enforced client-side: images ≤10MB (`image/*`), videos ≤50MB and ≤60s (probed via `<video>` metadata before upload); reject otherwise with a toast.
 
-## 3. Database (migration)
-Create tables so checklists and progress are data-driven and admin-editable later:
+**Read/unread**
+- Reuse existing `read_at` column. Add RPC `mark_conversation_unread(p_listing_id uuid, p_other_user_id uuid)` (SECURITY DEFINER, scoped to caller as recipient) that sets `read_at = null` on the last inbound message of that thread — used for the "Mark unread" action.
+- Mark-as-read stays as current bulk `UPDATE ... read_at = now()` when opening a thread.
 
-```sql
--- Master library of checklists (one per vehicle category, plus a default)
-create table public.buyer_checklists (
-  id uuid primary key default gen_random_uuid(),
-  slug text unique not null,                 -- e.g. 'ph-used-car', 'ph-used-motorcycle'
-  title text not null,
-  category_slug text,                        -- nullable → applies to all
-  pdf_url text,                              -- optional downloadable guide
-  is_active boolean not null default true,
-  updated_at timestamptz not null default now()
-);
+**Tenor GIF picker**
+- Request `TENOR_API_KEY` via `add_secret` (Google Tenor v2, free).
+- New server fn `src/lib/tenor.functions.ts` with two handlers: `tenorSearch({ q, pos? })` and `tenorTrending({ pos? })` — both call `https://tenor.googleapis.com/v2/{search|featured}` with the key from `process.env`, return `{ results: [{ id, preview, gif, width, height }], next }`. Keeps the key server-only.
+- Selecting a GIF stores its Tenor MP4/GIF URL in `attachment_url` with `attachment_type='gif'` (no upload to our bucket needed).
 
-create table public.buyer_checklist_items (
-  id uuid primary key default gen_random_uuid(),
-  checklist_id uuid not null references public.buyer_checklists(id) on delete cascade,
-  position int not null default 0,
-  label text not null,
-  hint text
-);
+## Frontend
 
--- Per-user checked state per listing (auth users only; guests keep localStorage)
-create table public.buyer_checklist_progress (
-  user_id uuid not null references auth.users(id) on delete cascade,
-  listing_id uuid not null references public.listings(id) on delete cascade,
-  item_id uuid not null references public.buyer_checklist_items(id) on delete cascade,
-  checked_at timestamptz not null default now(),
-  primary key (user_id, listing_id, item_id)
-);
-```
+**Composer (shared between `/dashboard/messages` and `FloatingMessageWidget`)**
+- New `src/components/messaging/message-composer.tsx` with:
+  - Textarea + send button (existing behavior).
+  - `+` menu → Photo, Video, GIF.
+  - Emoji picker button (use `emoji-picker-react`, lazy-imported).
+  - Attachment preview chip above the textarea with remove button and upload progress bar.
+- New `src/components/messaging/gif-picker.tsx` — trending on open, search on typing, grid of thumbs, click to attach.
+- New `src/components/messaging/attachment-bubble.tsx` — renders image (with lightbox), `<video controls playsInline>` for video, and inline `<img>` for GIFs. Signed-URL resolver hook `useSignedMessageUrl` batches lookups.
 
-GRANTs + RLS:
-- `buyer_checklists`, `buyer_checklist_items`: `GRANT SELECT` to `anon, authenticated`; `ALL` to `service_role`. RLS: public read where `is_active`, admin write via `has_role`.
-- `buyer_checklist_progress`: `GRANT SELECT, INSERT, UPDATE, DELETE` to `authenticated`; RLS scoped to `auth.uid() = user_id`.
+**Inbox redesign (`src/routes/dashboard.messages.tsx`)**
+- Conversation list rows show: other user avatar, name, listing thumbnail (small square from `listing_media`), last message preview (or "📷 Photo" / "🎬 Video" / "GIF" when attachment-only), timestamp, unread pill.
+- Right-click / kebab menu on a row: "Mark as unread", "Mark as read", "Open listing".
+- Thread header: avatar, name, listing thumb + title, link to listing.
+- Message bubbles render text + attachment via `AttachmentBubble`.
+- Composer becomes the new `MessageComposer`.
+- Keep existing realtime subscription; refresh signed-URL cache on new inbound rows.
 
-Seed one default `ph-used-car` checklist matching the current 10 items in `buyer-document-checklist.tsx`, plus stub rows for `ph-used-motorcycle`, `ph-used-truck`.
+**Floating widget**
+- `FloatingMessageWidget` swaps its inline textarea/button for `MessageComposer` (same props: message, setMessage, onSend, sending) so buyers can also send photos/videos/GIFs/emoji from the listing page.
 
-## 4. PDF resources
-- New Supabase Storage bucket `buyer-guides` (public read).
-- Upload initial guides referenced from `buyer_checklists.pdf_url`: `ph-used-car-checklist.pdf`, `or-cr-inspection-guide.pdf`, `test-drive-guide.pdf`. Actual PDF authoring is out of scope for this turn — the plan wires the schema + a "Download guide" button that hides when `pdf_url` is null so we can drop PDFs in later without code changes.
-- Add a `<Link>` list in `BuyerResourcesCard` → "Safety guides (PDF)" that opens a small dialog listing all active guides with `pdf_url`.
+## Dependencies
+- `bun add emoji-picker-react` (client-only, lazy-loaded).
+- No new package for Tenor — plain `fetch` from a server fn.
 
-## 5. Data loading
-In `listing.$id.tsx` loader (or a new server fn `getBuyerChecklist({ categorySlug })`), fetch the matching checklist + items by `category_slug` (fall back to the row with `category_slug is null`). Pass to `BuyerResourcesCard`.
+## Out of scope (deferred)
+- Group chats (needs new participants schema).
+- Video/voice calls (needs paid provider).
+- Invite friends / share-to-social from inbox.
+- Message reactions (can add later on top of same schema — will need `message_reactions` table).
 
-## Out of scope
-- Actually authoring PDF content.
-- Admin UI to edit checklists (schema is ready; UI can follow).
-- Wiring real inspection/insurance/financing partners.
+## Technical notes
+- Signed URLs use 7-day expiry, refreshed client-side on demand; cache in a `Map<messageId, { url, exp }>`.
+- Videos are validated client-side using a hidden `<video>` element to read `duration` before upload; reject if `> 60s` or file size `> 50MB`.
+- `attachment_type='gif'` links to Tenor's CDN — no bucket usage, no signed URL needed.
+- Notification trigger (`trg_notify_message_recipient`) updated to prefer `body`, otherwise "sent you a photo/video/GIF" based on `attachment_type`.
+- Realtime: `messages` already published; no publication change needed. Media bucket doesn't need realtime.
 
 ## Files touched
-- `src/routes/listing.$id.tsx` (remove old sidebar block + bottom checklist mount, add `BuyerResourcesCard`, fetch checklist)
-- `src/components/listing/buyer-resources-card.tsx` (new)
-- `src/components/buyer-document-checklist.tsx` (accept items, persist progress, PDF button)
-- `src/lib/buyer-checklist.functions.ts` (new server fn)
-- New migration: `buyer_checklists`, `buyer_checklist_items`, `buyer_checklist_progress` + seed
-- New storage bucket `buyer-guides`
+- Migration: extend `messages`, add `mark_conversation_unread` RPC, update notify trigger.
+- New: `src/components/messaging/message-composer.tsx`, `gif-picker.tsx`, `attachment-bubble.tsx`, `use-signed-message-url.ts`, `src/lib/tenor.functions.ts`.
+- Updated: `src/routes/dashboard.messages.tsx`, `src/components/listing/floating-message-widget.tsx`.
+- Secret: `TENOR_API_KEY` via `add_secret`.
+- Bucket: `message-media` (private) via `storage_create_bucket` + RLS migration.
