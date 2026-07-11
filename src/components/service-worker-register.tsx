@@ -3,57 +3,67 @@ import { useEffect } from "react";
 declare const __BUILD_ID__: string;
 
 /**
- * Registers /sw.js once the page is interactive. The build id is appended
- * as a query string so each deploy installs a fresh service worker (the
- * SW reads ?v= and uses it as its cache name — see public/sw.js).
+ * Keeps published mobile/PWA users on the newest app build.
  *
- * To guarantee every visitor (signed-in or anonymous) lands on the latest
- * deploy, we:
- *  1. Force the registration to re-check the SW script on every mount
- *     (`registration.update()`), and again every 60s while the tab is open.
- *  2. Auto-reload the page exactly once when a new SW takes control
- *     (`controllerchange`), so users never sit on stale JS/HTML after a
- *     publish.
+ * 365 MotorSales uses manifest-only installability. We intentionally clean up
+ * old app-shell service workers/caches so a returned phone user cannot stay on
+ * a stale QR-code screen after a publish.
  */
 export function ServiceWorkerRegister() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!("serviceWorker" in navigator)) return;
-    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") return;
 
     const buildId = typeof __BUILD_ID__ !== "undefined" ? __BUILD_ID__ : "dev";
-    let reloaded = false;
-    let intervalId: ReturnType<typeof setInterval> | null = null;
+    const buildStorageKey = "365ms:last-build-id";
+    const reloadStorageKey = `365ms:reloaded-for-build:${buildId}`;
 
-    const handleControllerChange = () => {
-      if (reloaded) return;
-      reloaded = true;
-      window.location.reload();
-    };
-
-    const onLoad = async () => {
+    const isAppSw = (reg: ServiceWorkerRegistration) => {
       try {
-        const reg = await navigator.serviceWorker.register(`/sw.js?v=${buildId}`);
-        // Check for an updated SW now and every 60s thereafter.
-        reg.update().catch(() => {});
-        intervalId = setInterval(() => {
-          reg.update().catch(() => {});
-        }, 60_000);
+        const scriptUrl =
+          reg.active?.scriptURL ?? reg.waiting?.scriptURL ?? reg.installing?.scriptURL ?? "";
+        return new URL(scriptUrl).pathname === "/sw.js";
       } catch {
-        // Best-effort; nothing depends on SW success.
+        return false;
       }
     };
 
-    navigator.serviceWorker.addEventListener("controllerchange", handleControllerChange);
+    const isAppCache = (name: string) =>
+      name === "offline" ||
+      name.startsWith("offline-") ||
+      /(^|-)precache-v\d+-|(^|-)runtime-|(^|-)googleAnalytics-/.test(name);
 
-    if (document.readyState === "complete") onLoad();
-    else window.addEventListener("load", onLoad, { once: true });
+    const cleanup = async () => {
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.allSettled(registrations.filter(isAppSw).map((reg) => reg.unregister()));
+      } catch {
+        // Best-effort; the page still works if cleanup is blocked.
+      }
 
-    return () => {
-      navigator.serviceWorker.removeEventListener("controllerchange", handleControllerChange);
-      window.removeEventListener("load", onLoad);
-      if (intervalId) clearInterval(intervalId);
+      try {
+        if ("caches" in window) {
+          const cacheNames = await caches.keys();
+          await Promise.allSettled(cacheNames.filter(isAppCache).map((name) => caches.delete(name)));
+        }
+      } catch {
+        // Best-effort; cache deletion can be unavailable in private mode.
+      }
     };
+
+    void cleanup();
+
+    try {
+      const previousBuildId = window.localStorage.getItem(buildStorageKey);
+      window.localStorage.setItem(buildStorageKey, buildId);
+      if (previousBuildId && previousBuildId !== buildId && !window.sessionStorage.getItem(reloadStorageKey)) {
+        window.sessionStorage.setItem(reloadStorageKey, "1");
+        window.location.reload();
+      }
+    } catch {
+      // Storage can be disabled. Cleanup above is enough in that case.
+    }
+
   }, []);
   return null;
 }

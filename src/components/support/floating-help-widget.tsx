@@ -28,6 +28,7 @@ const HIDDEN_PREFIXES = [
   "/signup",
   "/checkout",
   "/payments/",
+  "/dashboard/referral",
   "/dashboard/messages",
 ];
 
