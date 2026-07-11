@@ -3,7 +3,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { getVisitorId, recordTouch } from "@/lib/referral";
 import { Button } from "@/components/ui/button";
-import { InfluencerDisclosure } from "@/components/influencer-disclosure";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -313,8 +312,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
         vid: typeof window !== "undefined" ? getVisitorId() : undefined,
         src: "qr",
       } as any);
-  const [staffName, setStaffName] = useState<string | null>(null);
-  const [staffEmail, setStaffEmail] = useState<string | null>(null);
   const [active, setActive] = useState<boolean | null>(preview ? true : null);
   const [promos, setPromos] = useState<Promo[]>([]);
   const [loading, setLoading] = useState(!preview);
@@ -356,7 +353,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             const { data, error } = scanResult as { data?: any; error?: any };
             if (!error && data?.ok) {
               scanData = data;
-              setStaffName(data.first_name || data.staff_name || null);
               setActive(Boolean(data.active));
               setCounted(data.active ? Boolean(data.counted) : null);
               if (data.active) {
@@ -389,21 +385,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
         } catch {
           if (!cancelled) setVisitCount(1);
         }
-
-        try {
-          const contactResult = (await withTimeout(
-            (supabase.rpc as any)("get_referrer_contact", { _code: code }),
-            8000,
-          )) as any;
-          const contact = contactResult?.data;
-          const first = Array.isArray(contact) ? contact[0] : contact;
-          if (!cancelled) {
-            if (first?.email) setStaffEmail(first.email);
-            if (first?.full_name && !scanData?.first_name && !scanData?.staff_name) {
-              setStaffName(first.full_name);
-            }
-          }
-        } catch {}
 
         try {
           const sb = supabase as any;
@@ -445,8 +426,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
   return (
     <TooltipProvider delayDuration={150}>
       <div className="container mx-auto max-w-7xl px-4 py-6 sm:py-10">
-        <InfluencerDisclosure className="mb-4" partnerName={staffName ?? undefined} />
-
         {loading ? (
           <p className="text-center text-muted-foreground">Loading…</p>
         ) : active === false ? (
@@ -826,7 +805,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
           </>
         )}
-        <InfluencerDisclosure variant="footer" partnerName={staffName ?? undefined} />
       </div>
     </TooltipProvider>
   );
