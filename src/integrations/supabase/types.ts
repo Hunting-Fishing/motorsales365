@@ -3429,6 +3429,112 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_thread_members: {
+        Row: {
+          invited_by: string | null
+          joined_at: string
+          last_read_at: string | null
+          status: string
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          invited_by?: string | null
+          joined_at?: string
+          last_read_at?: string | null
+          status?: string
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          invited_by?: string | null
+          joined_at?: string
+          last_read_at?: string | null
+          status?: string
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_thread_members_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_thread_messages: {
+        Row: {
+          attachment_meta: Json | null
+          attachment_path: string | null
+          attachment_thumb_url: string | null
+          attachment_type: string | null
+          attachment_url: string | null
+          body: string | null
+          created_at: string
+          id: string
+          sender_id: string
+          thread_id: string
+        }
+        Insert: {
+          attachment_meta?: Json | null
+          attachment_path?: string | null
+          attachment_thumb_url?: string | null
+          attachment_type?: string | null
+          attachment_url?: string | null
+          body?: string | null
+          created_at?: string
+          id?: string
+          sender_id: string
+          thread_id: string
+        }
+        Update: {
+          attachment_meta?: Json | null
+          attachment_path?: string | null
+          attachment_thumb_url?: string | null
+          attachment_type?: string | null
+          attachment_url?: string | null
+          body?: string | null
+          created_at?: string
+          id?: string
+          sender_id?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_thread_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       club_discount_promotions: {
         Row: {
           applies_to: string[]
@@ -12989,6 +13095,10 @@ export type Database = {
       canonical_365_org_id: { Args: never; Returns: string }
       cleanup_unverified_users: { Args: never; Returns: number }
       compute_user_tier: { Args: { _user_id: string }; Returns: string }
+      create_group_chat: {
+        Args: { p_member_ids: string[]; p_title: string }
+        Returns: string
+      }
       current_plan_tier: { Args: { _user_id: string }; Returns: string }
       current_user_owns_email: { Args: { _email: string }; Returns: boolean }
       delete_email: {
@@ -13154,7 +13264,15 @@ export type Database = {
         Args: { _listing_id: string; _viewer_id?: string }
         Returns: undefined
       }
+      invite_to_thread: {
+        Args: { p_thread_id: string; p_user_ids: string[] }
+        Returns: number
+      }
       is_365_staff: { Args: { _user_id: string }; Returns: boolean }
+      is_active_thread_member: {
+        Args: { _thread: string; _user: string }
+        Returns: boolean
+      }
       is_business_account: { Args: { _user_id: string }; Returns: boolean }
       is_business_editor: {
         Args: { _business_id: string; _user_id: string }
@@ -13192,7 +13310,12 @@ export type Database = {
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       is_staff_academy_viewer: { Args: { _user_id: string }; Returns: boolean }
+      is_thread_member: {
+        Args: { _thread: string; _user: string }
+        Returns: boolean
+      }
       is_towing_provider: { Args: { _user_id: string }; Returns: boolean }
+      leave_thread: { Args: { p_thread_id: string }; Returns: undefined }
       link_signup_attribution: {
         Args: {
           _referral_code?: string
@@ -13245,6 +13368,7 @@ export type Database = {
         Args: { p_listing_id: string; p_other_user_id: string }
         Returns: undefined
       }
+      mark_thread_read: { Args: { p_thread_id: string }; Returns: undefined }
       match_listing_to_parts_wanted: {
         Args: { p_listing_id: string }
         Returns: number
@@ -13339,6 +13463,10 @@ export type Database = {
       resolve_report_dispute: {
         Args: { _decision: string; _dispute_id: string; _response: string }
         Returns: string
+      }
+      respond_to_thread_invite: {
+        Args: { p_accept: boolean; p_thread_id: string }
+        Returns: undefined
       }
       review_network_exposure: {
         Args: { _business_id: string; _decision: string; _note?: string }
