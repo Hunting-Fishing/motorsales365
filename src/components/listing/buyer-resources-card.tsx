@@ -281,7 +281,9 @@ export function BuyerResourcesCard({
           </li>
         )}
       </ul>
+      )}
     </div>
+
   );
 }
 
