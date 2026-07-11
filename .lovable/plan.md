@@ -1,23 +1,38 @@
+## What is happening
+
+Jocelyn’s phone is not seeing the newest published app shell. The source code already has the updated dashboard label and QR layout, but the published domain is still serving an older `/sw.js` service worker file. That old worker is an offline/app-shell cache path, so her browser/PWA can keep reusing old navigation and old QR code UI even after refresh or reopening.
+
+## Goal
+
+Make the published website behave like a normal live website: after a publish, users should get the newest navigation and QR layout, not an old cached app bundle.
+
 ## Plan
 
-1. **Reproduce the mobile state**
-   - Open `/dashboard/referral` at Jocelyn-like mobile widths (360px and 390px).
-   - Check whether the inline QR is clipped, whether all QR actions are reachable above the fixed bottom nav/help button, and whether the dialog opens.
+1. **Replace the stale offline service worker path**
+   - Keep installability/home-screen support from the manifest.
+   - Remove offline app-shell caching behavior for the main app.
+   - Serve a same-path `/sw.js` cleanup worker for one release so devices with the old worker are forced to clear old app caches and unregister.
 
-2. **Fix the QR card layout for real phone heights**
-   - Make the QR/action card use a single-column mobile layout with more conservative sizing so the full QR stays visible on narrow phones.
-   - Ensure the action grid can scroll into view and is not hidden behind the mobile tab bar or floating help button.
-   - Keep desktop/tablet layout unchanged.
+2. **Simplify the app update logic**
+   - Remove the current “register a cleanup worker every build” loop from the React app.
+   - Instead, on app load, unregister old `/sw.js` registrations and delete old Workbox/precache/offline caches.
+   - Add a lightweight build-id check that reloads once when a user crosses from an older published build to a newer one.
 
-3. **Make all QR options visible without relying on a stale row**
-   - Keep every QR action in the mobile grid: Enlarge, Download PNG, Poster, Share QR page, Copy link, Public QR page, WhatsApp, SMS, Email, My QR page, and original admin QR when available.
-   - Tighten labels/icons if needed so buttons do not clip on 360px screens.
+3. **Add a visible internal version marker**
+   - Add a tiny non-disruptive build marker in the DOM/data attribute so we can verify on a phone whether the newest bundle loaded.
+   - This helps distinguish “published build not updated yet” from “device cache still serving old code.”
 
-4. **Address stale app/web caching after publish**
-   - Inspect the service worker/update path and add a safer published-site refresh mechanism if needed so PWA/mobile Chrome users get the latest JS after a deploy.
-   - Avoid caching navigations or old app shells that can keep Jocelyn on the previous broken QR screen.
+4. **Verify the actual QR/navigation state**
+   - Check the current dashboard route source and mobile QR layout at phone size.
+   - Confirm the current source shows `My referrals & status` and the constrained QR/actions layout.
+   - After implementation, verify the published `/sw.js` response matches the cleanup worker once republished.
 
-5. **Verify**
-   - Run a mobile browser check at 360px/390px for `/dashboard/referral`.
-   - Confirm no horizontal overflow, QR fully visible, all options reachable, and Enlarge opens the zoom dialog.
-   - If the issue is only from an installed PWA cache, document the expected one-time refresh behavior after the fix.
+5. **User-facing guidance after publish**
+   - Tell affected users to open the website once, wait for the automatic refresh, then reopen the PWA/app icon if they use it.
+   - If an installed app was pinned while the old offline worker existed, one reinstall may still be needed on some phones, but the website should stop serving the old app shell after the cleanup release.
+
+## Technical notes
+
+- The published `/sw.js` currently differs from the repository file, so the last publish either did not include the latest cleanup file or the published app is still on an older release.
+- The app should not use offline navigation caching unless offline support is explicitly required.
+- The cleanup worker should delete only app-shell cache buckets and unregister itself, leaving normal browser HTTP caching to the host’s no-cache headers.
