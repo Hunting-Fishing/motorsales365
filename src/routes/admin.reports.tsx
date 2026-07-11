@@ -87,7 +87,7 @@ function AdminReports() {
     if (reporterIds.length) {
       try {
         const res = await countsFn({ data: { reporterIds } });
-        setCounts(res.counts);
+        setCounts(res?.counts ?? {});
       } catch {
         setCounts({});
       }
