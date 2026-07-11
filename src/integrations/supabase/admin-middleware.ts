@@ -37,15 +37,23 @@ async function userHasAdminRole(userId: string): Promise<boolean> {
 async function userHasDomainRole(userId: string, role: DomainRole): Promise<boolean> {
   // Admins pass every domain gate.
   if (await userHasAdminRole(userId)) return true;
-  const { data, error } = await supabaseAdmin
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .eq("role", role)
-    .limit(1);
-  if (error) console.error("[userHasDomainRole] query failed", error);
-  return !error && !!data && data.length > 0;
+  // moderator/support map to real app_role enum values — check directly.
+  if (role === "moderator" || role === "support") {
+    const { data, error } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", role)
+      .limit(1);
+    if (error) console.error("[userHasDomainRole] query failed", error);
+    return !error && !!data && data.length > 0;
+  }
+  // shop_manager / ads_manager rely on their can_* RPCs.
+  const rpc = RPC_BY_ROLE[role];
+  const { data, error } = await (supabaseAdmin.rpc as any)(rpc, { _user_id: userId });
+  return !error && data === true;
 }
+
 
 
 function makeAdminGate(label: string) {
