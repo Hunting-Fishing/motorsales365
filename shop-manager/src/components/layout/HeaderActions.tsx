@@ -50,13 +50,12 @@ export function HeaderActions() {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   // Auto-detect module from current path
-  const getDefaultModule = (): 'gunsmith' | 'power_washing' | 'automotive' | 'marine' | 'fuel_delivery' | 'general' => {
+  const getDefaultModule = (): 'automotive' | 'marine' | 'fuel_delivery' | 'welding' | 'general' => {
     const path = location.pathname;
-    if (path.startsWith('/gunsmith')) return 'gunsmith';
-    if (path.startsWith('/power-washing')) return 'power_washing';
     if (path.startsWith('/automotive')) return 'automotive';
     if (path.startsWith('/marine')) return 'marine';
     if (path.startsWith('/fuel-delivery')) return 'fuel_delivery';
+    if (path.startsWith('/welding')) return 'welding';
     return 'general';
   };
 
@@ -156,8 +155,6 @@ export function HeaderActions() {
   // Detect module from current path - check module prefix first
   const getModuleFromPath = () => {
     const path = location.pathname;
-    if (path.startsWith('/gunsmith')) return 'gunsmith';
-    if (path.startsWith('/power-washing')) return 'power_washing';
     if (path.startsWith('/automotive')) return 'automotive';
     if (path.startsWith('/marine')) return 'marine';
     if (path.startsWith('/fuel-delivery')) return 'fuel_delivery';

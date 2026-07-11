@@ -8,7 +8,7 @@ export interface FeatureRequest {
   reason_for_change?: string; // Why the user wants the change
   
   // Categorization
-  module: 'gunsmith' | 'power_washing' | 'pos' | 'payroll' | 'automotive' | 'marine' | 'fuel_delivery' | 'export_company' | 'personal_trainer' | 'welding' | 'game_development' | 'general';
+  module: 'pos' | 'payroll' | 'automotive' | 'marine' | 'fuel_delivery' | 'welding' | 'general';
   category: 'ui_ux' | 'functionality' | 'integration' | 'performance' | 'security' | 'other';
   priority: 'low' | 'medium' | 'high' | 'critical';
   status: 'submitted' | 'under_review' | 'approved' | 'in_development' | 'testing' | 'completed' | 'rejected' | 'on_hold';
@@ -105,17 +105,12 @@ export interface CreateFeatureRequestPayload {
 export type ModuleType = FeatureRequest['module'];
 
 export const MODULE_OPTIONS: { value: ModuleType; label: string }[] = [
-  { value: 'gunsmith', label: 'Gunsmith' },
-  { value: 'power_washing', label: 'Power Washing' },
   { value: 'automotive', label: 'Automotive' },
   { value: 'marine', label: 'Marine' },
   { value: 'fuel_delivery', label: 'Fuel Delivery' },
-  { value: 'export_company', label: 'Export Company' },
-  { value: 'personal_trainer', label: 'Personal Trainer' },
   { value: 'pos', label: 'Point of Sale' },
   { value: 'payroll', label: 'Payroll' },
   { value: 'welding', label: 'Welding' },
-  { value: 'game_development', label: 'Game Development' },
   { value: 'general', label: 'General' },
 ];
 

@@ -13,7 +13,7 @@ export const usePageTitle = (pageTitle: string, includeCompanyName = true) => {
     }
 
     return () => {
-      document.title = companyName || 'All Business 365';
+      document.title = companyName || '365 Motor Sales';
     };
   }, [pageTitle, companyName, includeCompanyName]);
 };

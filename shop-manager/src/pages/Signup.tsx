@@ -158,7 +158,7 @@ export default function Signup() {
             <Card className="modern-card-elevated backdrop-blur-sm bg-card/95 border-border/50 shadow-glow">
               <CardHeader className="text-center pb-8">
                 <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
-                  <img src={ab365Logo} alt="All Business 365" className="w-16 h-16 object-contain" />
+                  <img src={ab365Logo} alt="365 Motor Sales" className="w-16 h-16 object-contain" />
                 </div>
                 
                 <CardTitle className="text-3xl font-heading gradient-text mb-2">
@@ -213,14 +213,14 @@ export default function Signup() {
             <CardHeader className="text-center pb-8">
               {/* Brand Icon */}
               <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
-                <img src={ab365Logo} alt="All Business 365" className="w-16 h-16 object-contain" />
+                <img src={ab365Logo} alt="365 Motor Sales" className="w-16 h-16 object-contain" />
               </div>
               
               <CardTitle className="text-3xl font-heading gradient-text mb-2">
                 Create Account
               </CardTitle>
               <p className="text-muted-foreground font-body">
-                Join All Business 365 today
+                Join 365 Motor Sales Shop Manager today
               </p>
             </CardHeader>
             

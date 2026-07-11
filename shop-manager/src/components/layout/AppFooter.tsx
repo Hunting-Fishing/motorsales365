@@ -9,13 +9,12 @@ export function AppFooter() {
   const location = useLocation();
 
   // Auto-detect module from current path
-  const getDefaultModule = (): 'gunsmith' | 'power_washing' | 'automotive' | 'marine' | 'fuel_delivery' | 'general' => {
+  const getDefaultModule = (): 'automotive' | 'marine' | 'fuel_delivery' | 'welding' | 'general' => {
     const path = location.pathname;
-    if (path.startsWith('/gunsmith')) return 'gunsmith';
-    if (path.startsWith('/power-washing')) return 'power_washing';
     if (path.startsWith('/automotive')) return 'automotive';
     if (path.startsWith('/marine')) return 'marine';
     if (path.startsWith('/fuel-delivery')) return 'fuel_delivery';
+    if (path.startsWith('/welding')) return 'welding';
     return 'general';
   };
 
@@ -25,7 +24,7 @@ export function AppFooter() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-3 max-w-7xl mx-auto">
           {/* Left: Copyright */}
           <span className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} All Business 365. All rights reserved.
+            © {new Date().getFullYear()} 365 Motor Sales. All rights reserved.
           </span>
           
           {/* Right: Links */}

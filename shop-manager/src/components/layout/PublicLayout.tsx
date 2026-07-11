@@ -34,8 +34,8 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({ children, activeLink
       <header className="relative z-10 border-b border-border/50 bg-card/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <img src={ab365Logo} alt="All Business 365" className="h-10 w-auto object-contain" />
-            <span className="text-xl font-heading font-bold text-foreground">All Business 365</span>
+            <img src={ab365Logo} alt="365 Motor Sales" className="h-10 w-auto object-contain" />
+            <span className="text-xl font-heading font-bold text-foreground">365 Motor Sales</span>
           </Link>
           
           <nav className="hidden sm:flex items-center gap-6">
@@ -71,8 +71,8 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({ children, activeLink
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <img src={ab365Logo} alt="All Business 365" className="h-6 w-auto object-contain" />
-              <span className="text-sm font-medium text-foreground">All Business 365</span>
+              <img src={ab365Logo} alt="365 Motor Sales" className="h-6 w-auto object-contain" />
+              <span className="text-sm font-medium text-foreground">365 Motor Sales</span>
             </div>
             
             <nav className="flex items-center gap-6">
@@ -91,7 +91,7 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({ children, activeLink
             </nav>
             
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} All Business 365. All rights reserved.
+              © {new Date().getFullYear()} 365 Motor Sales. All rights reserved.
             </p>
           </div>
         </div>

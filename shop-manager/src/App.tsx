@@ -49,7 +49,7 @@ class ChunkErrorBoundary extends Component<{ children: ReactNode }, ChunkErrorBo
       return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
           <div className="max-w-sm w-full text-center space-y-4">
-            <img src={ab365Logo} alt="All Business 365" className="h-12 mx-auto" />
+            <img src={ab365Logo} alt="365 Motor Sales" className="h-12 mx-auto" />
             <h2 className="text-lg font-semibold text-foreground">Page failed to load</h2>
             <p className="text-sm text-muted-foreground">
               A new version may be available. Please reload to continue.
@@ -104,7 +104,6 @@ const PageLoader = () => {
 // Core Pages
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const ModuleHub = lazy(() => import('@/pages/ModuleHub'));
-const UpcomingModules = lazy(() => import('@/pages/UpcomingModules'));
 const Shopping = lazy(() => import('@/pages/Shopping'));
 const ProductDetail = lazy(() => import('@/pages/ProductDetail'));
 const CustomerPortal = lazy(() => import('@/pages/CustomerPortal'));
@@ -271,7 +270,6 @@ const VehicleDetails = lazy(() => import('@/pages/VehicleDetails'));
 const VehicleInspectionForm = lazy(() => import('@/pages/VehicleInspectionForm'));
 const TermsOfService = lazy(() => import('@/pages/legal/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('@/pages/legal/PrivacyPolicy'));
-const ModuleLearnMore = lazy(() => import('@/pages/ModuleLearnMore'));
 
 // Gunsmith
 
@@ -408,7 +406,6 @@ function App() {
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/shop-setup" element={<ShopSetup />} />
         <Route path="/affiliate-verify" element={<AffiliateVerification />} />
-        <Route path="/modules/:slug" element={<ModuleLearnMore />} />
         <Route path="/customer-portal-login" element={<CustomerPortalLoginOld />} />
         <Route path="/customer-portal" element={<CustomerPortalLanding />} />
         <Route path="/customer-portal/login" element={<CustomerPortalAuthLogin />} />
@@ -451,7 +448,6 @@ function App() {
               <Layout>
                 <Routes>
                   <Route path="/module-hub" element={<ModuleHub />} />
-                  <Route path="/upcoming-modules" element={<UpcomingModules />} />
                   <Route path="/dashboard" element={<Navigate to="/module-hub" replace />} />
                   <Route path="/repair-shop-dashboard" element={<Dashboard />} />
                   {/* Automotive Module */}

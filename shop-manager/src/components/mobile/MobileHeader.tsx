@@ -57,13 +57,12 @@ export function MobileHeader({
   const { slug: activeModuleSlug, config: activeModuleConfig, isInModule } = useActiveModuleNavigation();
 
   // Auto-detect module from current path
-  const getDefaultModule = (): 'gunsmith' | 'power_washing' | 'automotive' | 'marine' | 'fuel_delivery' | 'general' => {
+  const getDefaultModule = (): 'automotive' | 'marine' | 'fuel_delivery' | 'welding' | 'general' => {
     const path = location.pathname;
-    if (path.startsWith('/gunsmith')) return 'gunsmith';
-    if (path.startsWith('/power-washing')) return 'power_washing';
     if (path.startsWith('/automotive')) return 'automotive';
     if (path.startsWith('/marine')) return 'marine';
     if (path.startsWith('/fuel-delivery')) return 'fuel_delivery';
+    if (path.startsWith('/welding')) return 'welding';
     return 'general';
   };
 
@@ -99,7 +98,7 @@ export function MobileHeader({
     if (path.startsWith('/scheduling')) return 'Staff Scheduling';
     if (path.startsWith('/shopping')) return 'Shop';
     if (path.startsWith('/ai')) return 'AI Hub';
-    return 'All Business 365';
+    return '365 Motor Sales';
   };
 
   const handleBack = () => {
@@ -270,7 +269,7 @@ export function MobileHeader({
                           {user?.email || 'User'}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          All Business 365
+                          365 Motor Sales
                         </p>
                       </div>
                     </div>

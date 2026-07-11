@@ -107,46 +107,6 @@ export const MODULE_CONFIGS: Record<string, ModuleConfig> = {
       },
     },
   },
-  power_washing: {
-    slug: 'power_washing',
-    name: 'Power Washing',
-    description: 'Residential and commercial pressure washing services',
-    icon: 'Droplets',
-    tiers: {
-      starter: {
-        productId: 'prod_TkHcOEGODLugmr',
-        priceId: 'price_1Smn3dGapOfsltWtSI0LXoE0',
-      },
-      pro: {
-        productId: 'prod_TkHd4ad9qrOr4F',
-        priceId: 'price_1Smn49GapOfsltWtzG1afcxw',
-      },
-      business: {
-        productId: 'prod_TkHeGx5u9HzVKa',
-        priceId: 'price_1Smn4oGapOfsltWtCKcxRUj3',
-      },
-    },
-  },
-  gunsmith: {
-    slug: 'gunsmith',
-    name: 'Gunsmith',
-    description: 'Firearm repair, customization, cleaning, and maintenance',
-    icon: 'Target',
-    tiers: {
-      starter: {
-        productId: 'prod_TkHe0kPKdXohND',
-        priceId: 'price_1Smn5aGapOfsltWtrYrNRTJR',
-      },
-      pro: {
-        productId: 'prod_TkHfY1ts1YgObv',
-        priceId: 'price_1Smn69GapOfsltWteVPwCh0S',
-      },
-      business: {
-        productId: 'prod_TkHfPTROuIdUkb',
-        priceId: 'price_1Smn6MGapOfsltWtdphAaFJB',
-      },
-    },
-  },
   marine: {
     slug: 'marine',
     name: 'Marine Services',
@@ -167,23 +127,23 @@ export const MODULE_CONFIGS: Record<string, ModuleConfig> = {
       },
     },
   },
-  personal_trainer: {
-    slug: 'personal_trainer',
-    name: 'Personal Trainer & Gym',
-    description: 'Client management, workout programming, and session scheduling',
-    icon: 'Dumbbell',
+  fuel_delivery: {
+    slug: 'fuel_delivery',
+    name: 'Fuel Delivery',
+    description: 'Fleet fueling, tank management, and mobile delivery operations',
+    icon: 'Fuel',
     tiers: {
       starter: {
-        productId: 'prod_UHsg77qIjpMHVZ',
-        priceId: 'price_1TJIvCGapOfsltWtzaQL2IJq',
+        productId: 'prod_Tp1qFFafyqiR0A',
+        priceId: 'price_1SrNmjGapOfsltWt3fqBNwi7',
       },
       pro: {
-        productId: 'prod_UHshmXoJxiK9SA',
-        priceId: 'price_1TJIvmGapOfsltWtuHGJIBAD',
+        productId: 'prod_Tp1rcYd07x0rG3',
+        priceId: 'price_1SrNnNGapOfsltWteieDKKaq',
       },
       business: {
-        productId: 'prod_UHshaenuZYMf27',
-        priceId: 'price_1TJIwKGapOfsltWtWFfu9XFl',
+        productId: 'prod_Tp1sjesmCwG75A',
+        priceId: 'price_1SrNoYGapOfsltWtOOLw0ca7',
       },
     },
   },
@@ -204,26 +164,6 @@ export const MODULE_CONFIGS: Record<string, ModuleConfig> = {
       business: {
         productId: 'prod_UHsjyUgrCnhurI',
         priceId: 'price_1TJIxeGapOfsltWtgnm3WZxT',
-      },
-    },
-  },
-  game_development: {
-    slug: 'game_development',
-    name: 'Game Development',
-    description: 'Complete game design planning and production management',
-    icon: 'Gamepad2',
-    tiers: {
-      starter: {
-        productId: 'prod_game_dev_starter',
-        priceId: 'price_game_dev_starter',
-      },
-      pro: {
-        productId: 'prod_game_dev_pro',
-        priceId: 'price_game_dev_pro',
-      },
-      business: {
-        productId: 'prod_game_dev_business',
-        priceId: 'price_game_dev_business',
       },
     },
   },

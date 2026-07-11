@@ -5,16 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
  */
 const MODULE_ROUTES: Record<string, string> = {
   'automotive': '/automotive',
-  'water-delivery': '/water-delivery',
   'marine': '/marine-services',
-  'gunsmith': '/gunsmith',
-  'power-washing': '/power-washing',
   'fuel-delivery': '/fuel-delivery',
-  'septic': '/septic',
-  'export-company': '/export',
-  'personal-trainer': '/personal-trainer',
   'welding': '/welding',
-  'game-development': '/game-development',
 };
 
 /**
