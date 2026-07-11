@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import { colorForType } from "./google-maps-loader";
+import { colorForType } from "./map-utils";
 
 
 export type GMapBusiness = {
@@ -83,7 +83,7 @@ function pinDivIcon(
 
 export type MapViewport = { lat: number; lng: number; zoom: number };
 
-export function GoogleBusinessMapInner({
+export function BusinessesMapInner({
   businesses,
   height = 520,
   center,
