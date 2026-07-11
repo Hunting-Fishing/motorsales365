@@ -100,8 +100,18 @@ function ReportPage() {
   const search = Route.useSearch();
   const initialCategory =
     search.category && CATEGORIES.includes(search.category) ? search.category : CATEGORIES[0];
+  // Determine initial target_type from any id passed in
+  const initialTargetType =
+    search.target_type ??
+    (search.listing_id
+      ? "listing"
+      : search.business_id
+        ? "business"
+        : search.seller_id
+          ? "seller"
+          : "listing");
   const [targetType, setTargetType] = useState<(typeof TARGET_TYPES)[number]["value"]>(
-    search.target_type ?? "listing",
+    initialTargetType,
   );
   const [category, setCategory] = useState(initialCategory);
   const [targetUrl, setTargetUrl] = useState(search.target_url ?? "");
@@ -112,7 +122,19 @@ function ReportPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<string | null>(null);
-  const listingId = search.listing_id;
+  const [listingId, setListingId] = useState<string | undefined>(search.listing_id);
+  const [businessId, setBusinessId] = useState<string | undefined>(search.business_id);
+  const [sellerId, setSellerId] = useState<string | undefined>(search.seller_id);
+  const [resolvedTargetName, setResolvedTargetName] = useState<string | null>(null);
+  const hasKnownTarget = !!(listingId || businessId || sellerId);
+
+  const clearTarget = () => {
+    setListingId(undefined);
+    setBusinessId(undefined);
+    setSellerId(undefined);
+    setResolvedTargetName(null);
+    setTargetUrl("");
+  };
 
   const handleFiles = (incoming: FileList | null) => {
     if (!incoming) return;
