@@ -78,11 +78,22 @@ export function ReportActionDialog({
   const [notify, setNotify] = useState(true);
   const [confirmTitle, setConfirmTitle] = useState("");
   const [busy, setBusy] = useState(false);
+  const [severity, setSeverity] = useState<
+    "none" | "minor" | "moderate" | "standard" | "severe"
+  >("standard");
 
   const applyFn = useServerFn(applyReportAction);
 
-  const totalDelta =
-    cfg.baseDelta + (hide ? -10 : 0) + (del ? -30 : 0);
+  const SEVERITY_DELTA: Record<typeof severity, number> = {
+    none: 0,
+    minor: -5,
+    moderate: -15,
+    standard: -25,
+    severe: -50,
+  };
+
+  const acceptBase = action === "accept" ? SEVERITY_DELTA[severity] : cfg.baseDelta;
+  const totalDelta = acceptBase + (hide ? -10 : 0) + (del ? -30 : 0);
 
   const canSubmit = (() => {
     if (busy) return false;
@@ -103,6 +114,7 @@ export function ReportActionDialog({
           deleteListing: del,
           notifyPoster: notify,
           reversesActionId: reversesActionId ?? null,
+          severity: action === "accept" ? severity : undefined,
         },
       });
       toast.success(`${cfg.title} applied`);
@@ -113,12 +125,14 @@ export function ReportActionDialog({
       setHide(false);
       setDel(false);
       setConfirmTitle("");
+      setSeverity("standard");
     } catch (e: any) {
       toast.error(e?.message ?? "Action failed");
     } finally {
       setBusy(false);
     }
   };
+
 
   const deltaColor =
     totalDelta < 0
