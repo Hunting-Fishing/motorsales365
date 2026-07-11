@@ -19,6 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { ReportTargetPreview } from "@/components/report-target-preview";
 
 const searchSchema = z.object({
   target_type: z.enum(["listing", "business", "seller", "other"]).optional(),
