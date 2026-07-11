@@ -41,6 +41,7 @@ type Props = {
   sellerId?: string;
   onResolved?: (p: TargetPreview | null, canonicalUrl: string | null) => void;
   onClear?: () => void;
+  hideClear?: boolean;
 };
 
 export function ReportTargetPreview({
@@ -49,6 +50,7 @@ export function ReportTargetPreview({
   sellerId,
   onResolved,
   onClear,
+  hideClear,
 }: Props) {
   const [preview, setPreview] = useState<TargetPreview | null>(null);
   const [loading, setLoading] = useState(true);
@@ -244,7 +246,7 @@ export function ReportTargetPreview({
           <Icon className="h-3.5 w-3.5" />
           You're reporting this {preview.kind}
         </div>
-        {onClear && (
+        {onClear && !hideClear && (
           <button
             type="button"
             onClick={onClear}

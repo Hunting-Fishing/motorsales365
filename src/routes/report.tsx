@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { AlertTriangle, Shield, Upload, X, CheckCircle2 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
@@ -116,16 +116,39 @@ function ReportPage() {
   const [category, setCategory] = useState(initialCategory);
   const [targetUrl, setTargetUrl] = useState(search.target_url ?? "");
   const [details, setDetails] = useState(search.details ?? "");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const [listingId, setListingId] = useState<string | undefined>(search.listing_id);
   const [businessId, setBusinessId] = useState<string | undefined>(search.business_id);
   const [sellerId, setSellerId] = useState<string | undefined>(search.seller_id);
+  const [reporterName, setReporterName] = useState<string | null>(null);
+  const [reporterPhone, setReporterPhone] = useState<string | null>(null);
   const hasKnownTarget = !!(listingId || businessId || sellerId);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name, first_name, last_name, business_name, phone_e164, phone")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (cancelled || !data) return;
+      const p = data as any;
+      setReporterName(
+        p.full_name ||
+          [p.first_name, p.last_name].filter(Boolean).join(" ") ||
+          p.business_name ||
+          null,
+      );
+      setReporterPhone(p.phone_e164 || p.phone || null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   const clearTarget = () => {
     setListingId(undefined);
@@ -161,9 +184,9 @@ function ReportPage() {
       category,
       target_url: targetUrl,
       details,
-      reporter_name: name,
-      reporter_email: email,
-      reporter_phone: phone,
+      reporter_name: reporterName ?? "",
+      reporter_email: user?.email ?? "",
+      reporter_phone: reporterPhone ?? "",
     });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message ?? "Please review the form");
@@ -192,9 +215,9 @@ function ReportPage() {
         target_url: targetUrl || null,
         evidence_urls,
         reporter_id: user?.id ?? null,
-        reporter_name: name || null,
-        reporter_email: email || user?.email || null,
-        reporter_phone: phone || null,
+        reporter_name: reporterName || null,
+        reporter_email: user?.email ?? null,
+        reporter_phone: reporterPhone || null,
         listing_id: listingId ?? null,
         business_id: businessId ?? null,
       } as any);
@@ -264,11 +287,23 @@ function ReportPage() {
                       if (url) setTargetUrl(url);
                     }}
                     onClear={clearTarget}
+                    hideClear
                   />
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <Label htmlFor="target_type">What are you reporting?</Label>
+                      <div className="flex items-center justify-between gap-2">
+                        <Label htmlFor="target_type">What are you reporting?</Label>
+                        {hasKnownTarget && (
+                          <button
+                            type="button"
+                            onClick={clearTarget}
+                            className="text-[11px] text-muted-foreground underline hover:text-foreground"
+                          >
+                            Not the right item?
+                          </button>
+                        )}
+                      </div>
                       <Select
                         value={targetType}
                         onValueChange={(v) => setTargetType(v as any)}
@@ -285,11 +320,6 @@ function ReportPage() {
                           ))}
                         </SelectContent>
                       </Select>
-                      {hasKnownTarget && (
-                        <p className="mt-1 text-[11px] text-muted-foreground">
-                          Locked to the item above. Use "Not the right item?" to change.
-                        </p>
-                      )}
                     </div>
                     <div>
                       <Label htmlFor="category">Reason</Label>
@@ -388,54 +418,17 @@ function ReportPage() {
                     )}
                   </div>
 
-                  <div className="rounded-md border border-border bg-secondary/30 p-4">
-                    <p className="mb-3 text-sm font-medium">
-                      Your contact details{" "}
-                      <span className="text-xs font-normal text-muted-foreground">
-                        — optional, but lets us follow up
-                      </span>
+                  {user ? (
+                    <p className="text-xs text-muted-foreground">
+                      We'll follow up at <span className="font-medium text-foreground">{user.email}</span> if needed.
                     </p>
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      <div>
-                        <Label htmlFor="name" className="text-xs">
-                          Name
-                        </Label>
-                        <Input
-                          id="name"
-                          className="mt-1"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          maxLength={120}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="email" className="text-xs">
-                          Email
-                        </Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          className="mt-1"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder={user?.email ?? ""}
-                          maxLength={255}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="phone" className="text-xs">
-                          Phone / Viber
-                        </Label>
-                        <Input
-                          id="phone"
-                          className="mt-1"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          maxLength={40}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      <Link to="/auth" className="underline">Sign in</Link> so our team can follow up with you.
+                    </p>
+                  )}
+
+
 
                   <FormFeedbackLink formId="report-listing-page" className="mb-2" />
                   <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
