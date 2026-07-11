@@ -449,7 +449,7 @@ function ReferralQrCard({
         <div className="group relative block w-full min-w-0 rounded-2xl p-1 text-left">
           <div
             data-referral-qr-card
-            className="relative mx-auto aspect-square w-full min-w-0 max-w-[min(64vw,232px)] overflow-hidden rounded-xl bg-white p-2 ring-1 ring-border transition group-hover:ring-primary sm:max-w-none sm:p-5"
+            className="relative mx-auto aspect-square w-full min-w-0 max-w-[min(58vw,216px)] overflow-hidden rounded-xl bg-white p-2 ring-1 ring-border transition group-hover:ring-primary sm:max-w-none sm:p-5"
           >
             <ZoomableQr
               ariaLabel={`QR code for ${fullName} — pinch or double-tap to zoom`}
