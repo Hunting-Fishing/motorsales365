@@ -990,7 +990,7 @@ function ListingDetailPage() {
 
           {/* Services around this vehicle — coming soon.
               Revenue: lead-gen for finance/insurance/OR-CR partners (not yet wired). */}
-          <Collapsible defaultOpen asChild>
+          <Collapsible asChild>
             <ComingSoonSection
               title="Need inspection or insurance for this car?"
               subtitle="Sweet! These will be Awesome Future Services!"
