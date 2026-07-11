@@ -24,6 +24,8 @@ export function ZoomableQr({
   className = "",
   ariaLabel,
   resetSignal,
+  enablePan = true,
+  showControls = true,
 }: {
   children: ReactNode;
   className?: string;
@@ -34,6 +36,13 @@ export function ZoomableQr({
    * `open` boolean, a route param, or any changing key.
    */
   resetSignal?: unknown;
+  /**
+   * Disable one-finger drag/pan for inline mobile uses, while keeping
+   * two-finger pinch zoom and double-tap zoom available.
+   */
+  enablePan?: boolean;
+  /** Hide explicit +/-/reset controls for compact inline QR renders. */
+  showControls?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
@@ -142,10 +151,12 @@ export function ZoomableQr({
       } else {
         lastTapRef.current = { t: now, x: e.clientX, y: e.clientY };
       }
-      panStartRef.current = {
-        pointer: { x: e.clientX, y: e.clientY },
-        translate,
-      };
+      panStartRef.current = enablePan
+        ? {
+            pointer: { x: e.clientX, y: e.clientY },
+            translate,
+          }
+        : null;
     }
   };
 
@@ -164,7 +175,7 @@ export function ZoomableQr({
       return;
     }
 
-    if (panStartRef.current && pointersRef.current.size === 1) {
+    if (enablePan && panStartRef.current && pointersRef.current.size === 1) {
       const start = panStartRef.current;
       const nextT: Point = {
         x: start.translate.x + (e.clientX - start.pointer.x),
@@ -270,8 +281,9 @@ export function ZoomableQr({
         aria-label={ariaLabel ?? "Zoomable QR code"}
         aria-describedby={instructionsId}
         aria-roledescription="Zoomable image"
-        className="relative touch-none overflow-hidden select-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        className="relative overflow-hidden select-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         style={{ cursor: "grab" }}
+        style={{ cursor: "grab", touchAction: enablePan ? "none" : "pan-y" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -295,53 +307,55 @@ export function ZoomableQr({
         Zoom {zoomPct} percent
       </div>
 
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center"
-        role="toolbar"
-        aria-label="QR zoom controls"
-      >
-        <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-background/95 px-1.5 py-1 shadow-sm ring-1 ring-border backdrop-blur">
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className="min-h-11 min-w-11 sm:min-h-9 sm:min-w-9"
-            aria-label={`Zoom out. Current zoom ${zoomPct}%`}
-            onClick={() => zoomFromCenter(-0.5)}
-            disabled={!canZoomOut}
-          >
-            <Minus className="h-4 w-4" aria-hidden="true" />
-          </Button>
-          <span
-            className="w-12 text-center text-xs font-medium tabular-nums text-foreground"
-            aria-hidden="true"
-          >
-            {zoomPct}%
-          </span>
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className="min-h-11 min-w-11 sm:min-h-9 sm:min-w-9"
-            aria-label={`Zoom in. Current zoom ${zoomPct}%`}
-            onClick={() => zoomFromCenter(0.5)}
-            disabled={!canZoomIn}
-          >
-            <Plus className="h-4 w-4" aria-hidden="true" />
-          </Button>
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className="min-h-11 min-w-11 sm:min-h-9 sm:min-w-9"
-            aria-label="Reset zoom and center the QR"
-            onClick={reset}
-            disabled={!canReset}
-          >
-            <RotateCcw className="h-4 w-4" aria-hidden="true" />
-          </Button>
+      {showControls ? (
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center"
+          role="toolbar"
+          aria-label="QR zoom controls"
+        >
+          <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-background/95 px-1.5 py-1 shadow-sm ring-1 ring-border backdrop-blur">
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="min-h-11 min-w-11 sm:min-h-9 sm:min-w-9"
+              aria-label={`Zoom out. Current zoom ${zoomPct}%`}
+              onClick={() => zoomFromCenter(-0.5)}
+              disabled={!canZoomOut}
+            >
+              <Minus className="h-4 w-4" aria-hidden="true" />
+            </Button>
+            <span
+              className="w-12 text-center text-xs font-medium tabular-nums text-foreground"
+              aria-hidden="true"
+            >
+              {zoomPct}%
+            </span>
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="min-h-11 min-w-11 sm:min-h-9 sm:min-w-9"
+              aria-label={`Zoom in. Current zoom ${zoomPct}%`}
+              onClick={() => zoomFromCenter(0.5)}
+              disabled={!canZoomIn}
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="min-h-11 min-w-11 sm:min-h-9 sm:min-w-9"
+              aria-label="Reset zoom and center the QR"
+              onClick={reset}
+              disabled={!canReset}
+            >
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
