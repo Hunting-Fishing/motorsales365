@@ -297,6 +297,3 @@ function ComingSoonRow({ icon, label }: { icon: React.ReactNode; label: string }
     </li>
   );
 }
-
-// avoid unused-import warning; used in effect-less environment
-export { useEffect };
