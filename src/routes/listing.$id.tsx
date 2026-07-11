@@ -985,7 +985,7 @@ function ListingDetailPage() {
             listingUserId={listing.user_id}
             categorySlug={listing.category_slug ?? null}
             attributes={(listing.attributes as any) ?? null}
-            ltoVerified={!!listing.vehicles?.vehicle_passport_verifications?.some(
+            ltoVerified={!!(listing as any).vehicles?.vehicle_passport_verifications?.some(
               (v: any) => v.status === "approved",
             )}
           />
