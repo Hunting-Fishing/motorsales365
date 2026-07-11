@@ -428,7 +428,7 @@ function ListingDetailPage() {
       attachment_type: attachment?.type ?? null,
       attachment_thumb_url: attachment?.thumbUrl ?? null,
       attachment_path: attachment?.path ?? null,
-      attachment_meta: attachment?.meta ?? null,
+      attachment_meta: (attachment?.meta ?? null) as any,
     });
     setSending(false);
     if (error) {
