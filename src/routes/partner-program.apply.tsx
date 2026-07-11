@@ -111,14 +111,14 @@ function ApplyPage() {
       <div className="container mx-auto max-w-2xl px-4 py-10">
         <h1 className="font-display text-3xl font-bold">Apply to the 365 Partner Program</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Independent partners only. Read the{" "}
+          Read the{" "}
           <Link to="/partner-program/terms" className="text-primary underline">
             Partner Terms
           </Link>{" "}
           before applying.
         </p>
 
-        <InfluencerDisclosure className="mt-4" />
+
 
 
 
@@ -253,7 +253,7 @@ function ApplyPage() {
                   onCheckedChange={(v) => setForm({ ...form, agreed_not_employee: !!v })}
                 />
                 <span>
-                  I understand I am an independent partner and{" "}
+                  I understand I am{" "}
                   <strong>not a 365 Motor Sales employee, agent, or representative</strong>.
                 </span>
               </label>

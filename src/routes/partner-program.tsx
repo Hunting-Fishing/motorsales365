@@ -72,10 +72,8 @@ function PartnerProgramPage() {
         <div className="pointer-events-none absolute -bottom-32 -left-16 h-[320px] w-[320px] rounded-full bg-amber-500/20 blur-[110px]" />
         <div className="container relative mx-auto px-4 py-14 md:py-24">
           <div className="max-w-3xl">
-            <InfluencerDisclosure className="mb-8" analyticsSurface="partner_program" />
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white/80 backdrop-blur">
-
-              Independent partners · Philippines
+              365 Partner Program · Philippines
             </span>
             <h1 className="font-display mt-5 text-4xl font-bold leading-[1.05] md:text-6xl">
               Grow your influence.{" "}
@@ -104,10 +102,6 @@ function PartnerProgramPage() {
                 <Link to="/partner-program/terms" aria-label="Read the Partner Program terms" onClick={() => trackCta("terms", { meta: { location: "hero" } })}>Read the Partner Terms</Link>
               </Button>
             </div>
-            <p className="mt-4 text-xs text-white/75">
-              This is a referral program for independent partners — not an employment offer.
-            </p>
-
           </div>
         </div>
       </section>
