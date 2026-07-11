@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
@@ -37,6 +37,33 @@ const HOTSPOTS: Hotspot[] = [
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const hash = useRouterState({ select: (s) => s.location.hash });
+  const mainRef = useRef<HTMLElement | null>(null);
+  const prevPathRef = useRef<string | null>(null);
+
+  // On real route changes (not initial mount, not hash-only jumps), scroll so
+  // the sticky header aligns to the top of the viewport — content lands right
+  // under the banner/header instead of jumping to random restored offsets or
+  // deep into the footer.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (prevPathRef.current === null) {
+      prevPathRef.current = pathname;
+      return;
+    }
+    if (prevPathRef.current === pathname) return;
+    prevPathRef.current = pathname;
+    if (hash) return; // let in-page anchors handle themselves
+
+    const el = mainRef.current;
+    if (!el) {
+      window.scrollTo({ top: 0, behavior: "auto" });
+      return;
+    }
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: Math.max(0, top - 4), behavior: "auto" });
+  }, [pathname, hash]);
+
   // Pages that need a clean, solid background (watermark would bleed through content).
   const cleanBg =
     pathname.startsWith("/shop") || /\/checkout(\/|$)/.test(pathname);
@@ -85,7 +112,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <div className="sticky top-0 z-50">
         <SiteHeader />
       </div>
-      <main className={cleanBg ? "flex-1 bg-background" : "brand-watermark flex-1"}>
+      <main ref={mainRef} className={cleanBg ? "flex-1 bg-background" : "brand-watermark flex-1"}>
         {children}
       </main>
       <SiteFooter />
