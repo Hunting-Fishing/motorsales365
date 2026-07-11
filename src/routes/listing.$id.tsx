@@ -272,10 +272,6 @@ function ListingDetailPage() {
   const [likeCount, setLikeCount] = useState(0);
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
-  const [reportOpen, setReportOpen] = useState(false);
-  const [reportReason, setReportReason] = useState(REPORT_REASONS[0]);
-  const [reportDetails, setReportDetails] = useState("");
-  const [submittingReport, setSubmittingReport] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const messageRef = useRef<HTMLTextAreaElement | null>(null);
 
