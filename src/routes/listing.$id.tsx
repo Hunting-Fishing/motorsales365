@@ -813,24 +813,9 @@ function ListingDetailPage() {
             </SectionCard>
           )}
 
-          {/* Buyer safety checklist — rendered at the very bottom of the main
-              column for all vehicle-type listings. */}
-          {[
-            "cars",
-            "car",
-            "motorcycles",
-            "motorcycle",
-            "trucks",
-            "truck",
-            "boats",
-            "boat",
-            "heavy-equipment",
-            "agri",
-            "agriculture",
-            "atv-utv",
-            "atv",
-            "utv",
-          ].includes(listing.category_slug) && <BuyerDocumentChecklist />}
+          {/* Buyer checklist now lives in the sidebar Buyer resources card. */}
+
+
 
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
