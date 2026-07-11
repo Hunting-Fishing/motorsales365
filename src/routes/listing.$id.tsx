@@ -610,13 +610,16 @@ function ListingDetailPage() {
               <div className="mt-2 flex items-start justify-between gap-2">
                 <h1 className="font-display text-3xl font-bold md:text-4xl">{listing.title}</h1>
                 <div className="flex shrink-0 items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setReportOpen(true)}
-                    className="gap-1"
-                  >
-                    <Flag className="h-4 w-4" /> Report
+                  <Button asChild variant="outline" size="sm" className="gap-1">
+                    <Link
+                      to="/report"
+                      search={{
+                        target_type: "listing",
+                        listing_id: listing.id,
+                      }}
+                    >
+                      <Flag className="h-4 w-4" /> Report
+                    </Link>
                   </Button>
                   <ListingActionsMenu
                     listingId={listing.id}
