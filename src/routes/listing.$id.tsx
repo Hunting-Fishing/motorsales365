@@ -1016,45 +1016,30 @@ function ListingDetailPage() {
 
           <AdCarousel placement="listing_sidebar" />
 
-          {listing.allow_messages && (
-            <Collapsible defaultOpen className="rounded-xl border border-border bg-card p-5">
-              <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 text-left">
-                <h3 className="flex items-center gap-2 font-display text-lg font-semibold">
-                  <MessageSquare className="h-4 w-4" /> Send a message
-                </h3>
-                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <Textarea
-                  ref={messageRef}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Hi, is this still available?"
-                  className="mt-3"
-                  rows={4}
-                />
-                <Button
-                  onClick={sendMessage}
-                  disabled={sending || !message.trim()}
-                  className="mt-2 w-full"
-                >
-                  {sending ? "Sending…" : "Send message"}
-                </Button>
-              </CollapsibleContent>
-            </Collapsible>
-          )}
-
         </aside>
       </div>
+
+      {listing.allow_messages && user?.id !== listing.user_id && (
+        <FloatingMessageWidget
+          sellerName={seller?.business_name ?? seller?.full_name ?? null}
+          sellerAvatarUrl={seller?.avatar_url ?? null}
+          listingTitle={listing.title}
+          message={message}
+          setMessage={setMessage}
+          onSend={sendMessage}
+          sending={sending}
+          open={msgWidgetOpen}
+          setOpen={setMsgWidgetOpen}
+        />
+      )}
+
       <MobileActionBar
         phone={listing.contact_phone}
         whatsappMessage={`Hi! I'm interested in your listing "${listing.title}" on 365 Motor Sales: ${siteUrl(typeof window !== "undefined" ? window.location.pathname : "/")}`}
         allowMessages={listing.allow_messages}
-        onMessageClick={() => {
-          messageRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-          messageRef.current?.focus();
-        }}
+        onMessageClick={() => setMsgWidgetOpen(true)}
       />
     </SiteLayout>
   );
 }
+
