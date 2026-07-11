@@ -17,6 +17,18 @@ export function ServiceWorkerRegister() {
     const buildId = typeof __BUILD_ID__ !== "undefined" ? __BUILD_ID__ : "dev";
     const buildStorageKey = "365ms:last-build-id";
     const reloadStorageKey = `365ms:reloaded-for-build:${buildId}`;
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
+    const isPreviewHost =
+      hostname.startsWith("id-preview--") ||
+      hostname.startsWith("preview--") ||
+      hostname === "lovableproject.com" ||
+      hostname.endsWith(".lovableproject.com") ||
+      hostname === "lovableproject-dev.com" ||
+      hostname.endsWith(".lovableproject-dev.com") ||
+      hostname === "beta.lovable.dev" ||
+      hostname.endsWith(".beta.lovable.dev");
+    const shouldAutoReloadForNewBuild = !isLocalhost && !isPreviewHost;
 
     const isAppSw = (reg: ServiceWorkerRegistration) => {
       try {
@@ -52,6 +64,8 @@ export function ServiceWorkerRegister() {
     };
 
     void cleanup();
+
+    if (!shouldAutoReloadForNewBuild) return;
 
     try {
       const previousBuildId = window.localStorage.getItem(buildStorageKey);
