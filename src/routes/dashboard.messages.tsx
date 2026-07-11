@@ -131,7 +131,16 @@ function MessagesPage() {
   const [myMemberships, setMyMemberships] = useState<Record<string, MyMembership>>({});
 
   const [listingsById, setListingsById] = useState<
-    Record<string, { title: string; user_id: string; thumb: string | null }>
+    Record<
+      string,
+      {
+        title: string;
+        user_id: string;
+        thumb: string | null;
+        price_php: number | null;
+        status: string | null;
+      }
+    >
   >({});
   const [profilesById, setProfilesById] = useState<
     Record<
