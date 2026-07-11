@@ -125,7 +125,6 @@ function ReportPage() {
   const [listingId, setListingId] = useState<string | undefined>(search.listing_id);
   const [businessId, setBusinessId] = useState<string | undefined>(search.business_id);
   const [sellerId, setSellerId] = useState<string | undefined>(search.seller_id);
-  const [resolvedTargetName, setResolvedTargetName] = useState<string | null>(null);
   const hasKnownTarget = !!(listingId || businessId || sellerId);
 
   const clearTarget = () => {
