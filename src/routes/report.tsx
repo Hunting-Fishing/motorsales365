@@ -287,11 +287,23 @@ function ReportPage() {
                       if (url) setTargetUrl(url);
                     }}
                     onClear={clearTarget}
+                    hideClear
                   />
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <Label htmlFor="target_type">What are you reporting?</Label>
+                      <div className="flex items-center justify-between gap-2">
+                        <Label htmlFor="target_type">What are you reporting?</Label>
+                        {hasKnownTarget && (
+                          <button
+                            type="button"
+                            onClick={clearTarget}
+                            className="text-[11px] text-muted-foreground underline hover:text-foreground"
+                          >
+                            Not the right item?
+                          </button>
+                        )}
+                      </div>
                       <Select
                         value={targetType}
                         onValueChange={(v) => setTargetType(v as any)}
@@ -308,11 +320,6 @@ function ReportPage() {
                           ))}
                         </SelectContent>
                       </Select>
-                      {hasKnownTarget && (
-                        <p className="mt-1 text-[11px] text-muted-foreground">
-                          Locked to the item above. Use "Not the right item?" to change.
-                        </p>
-                      )}
                     </div>
                     <div>
                       <Label htmlFor="category">Reason</Label>
