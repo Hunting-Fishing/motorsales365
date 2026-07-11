@@ -977,12 +977,13 @@ function ListingDetailPage() {
                 </Button>
               )}
             </div>
-            <button
-              onClick={() => setReportOpen(true)}
+            <Link
+              to="/report"
+              search={{ target_type: "listing", listing_id: listing.id }}
               className="mt-3 inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive"
             >
               <Flag className="h-3 w-3" /> Report this listing
-            </button>
+            </Link>
           </div>
 
           <ListingReportsSection listingId={listing.id} />
