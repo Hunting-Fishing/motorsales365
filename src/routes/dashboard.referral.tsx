@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2, ScanLine, ChevronDown, Share2 } from "lucide-react";
+import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone, Maximize2, ScanLine, ChevronDown, Share2, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import { siteOrigin } from "@/lib/site-config";
 import { ZoomableQr } from "@/components/qr/zoomable-qr";
@@ -431,33 +431,266 @@ function ReferralQrCard({
     }
   };
 
+  const copyReferralLink = async () => {
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Referral link copied");
+    } catch {
+      toast.error("Could not copy link.");
+    }
+  };
+
 
   return (
-    <div className="min-w-0 rounded-xl border border-border bg-card p-4 pb-[max(env(safe-area-inset-bottom),5rem)] sm:pb-4">
+    <div className="min-w-0 rounded-xl border border-border bg-card p-3 pb-[max(env(safe-area-inset-bottom),7rem)] sm:p-4 sm:pb-4">
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
-        <DialogTrigger asChild>
-          <button
-            type="button"
-            className="group relative block w-full min-w-0 rounded-2xl p-1 text-left transition active:scale-[0.99] hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            aria-label={`View QR full screen for ${fullName}`}
+        <div className="group relative block w-full min-w-0 rounded-2xl p-1 text-left">
+          <div
+            className="relative mx-auto aspect-square w-full min-w-0 max-w-[min(68vw,248px)] overflow-hidden rounded-xl bg-white p-2 ring-1 ring-border transition group-hover:ring-primary sm:max-w-none sm:p-5"
+            role="button"
+            tabIndex={0}
+            aria-label={`Open enlarged QR code for ${fullName}`}
+            onClick={() => setQrOpen(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setQrOpen(true);
+              }
+            }}
           >
-            <div className="relative mx-auto aspect-square w-full min-w-0 max-w-[78vw] overflow-hidden rounded-xl bg-white p-3 sm:max-w-none sm:p-5 ring-1 ring-border transition group-hover:ring-primary">
-              <div
-                className="flex h-full w-full min-w-0 items-center justify-center"
-                role="img"
-                aria-label={`QR code for ${fullName}`}
+            <div
+              className="flex h-full w-full min-w-0 items-center justify-center"
+              role="img"
+              aria-label={`QR code for ${fullName}`}
+            >
+              {link ? (
+                <ResponsiveQr
+                  value={link}
+                  level="H"
+                  maxPx={512}
+                  minPx={128}
+                  data-qr={referralCode}
+                />
+              ) : null}
+            </div>
+            <span className="pointer-events-none absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/75 px-2 py-1 text-[11px] font-medium text-white shadow-sm">
+              <Maximize2 className="h-3 w-3" />
+              Enlarge
+            </span>
+          </div>
+          <div className="mt-2 text-center sm:mt-3">
+            <div className="font-display text-base font-bold sm:text-lg">{fullName}</div>
+            <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
+          </div>
+        </div>
+        <DialogTrigger asChild>
+          <Button type="button" size="sm" variant="outline" className="mt-3 w-full sm:hidden">
+            <Maximize2 className="mr-1 h-4 w-4" /> Enlarge / pinch zoom
+          </Button>
+        </DialogTrigger>
+
+        <DialogContent className="w-[95vw] max-w-md p-4 sm:max-w-lg sm:p-6">
+          <VisuallyHidden>
+            <DialogTitle>QR code for {fullName}</DialogTitle>
+          </VisuallyHidden>
+          <div className="flex flex-col items-center gap-4">
+            <div
+              className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-border sm:p-8"
+              role="img"
+              aria-label={`QR code for ${fullName}`}
+            >
+              <ZoomableQr
+                ariaLabel={`QR code for ${fullName} — pinch or double-tap to zoom`}
+                className="mx-auto"
+                resetSignal={qrOpen}
               >
-                {link ? (
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: "min(72vw, 420px)",
+                    height: "min(72vw, 420px)",
+                  }}
+                >
                   <ResponsiveQr
                     value={link}
                     level="H"
-                    maxPx={512}
-                    minPx={128}
+                    maxPx={1024}
+                    minPx={192}
                     data-qr={referralCode}
                   />
+                </div>
+              </ZoomableQr>
+            </div>
+            <div className="text-center">
+              <div className="font-display text-lg font-bold sm:text-xl">{fullName}</div>
+              <div className="font-mono text-xs text-muted-foreground">{referralCode}</div>
+              <div className="mt-1 break-all text-xs text-muted-foreground">{link}</div>
+            </div>
+            <p className="max-w-xs text-center text-xs text-muted-foreground">
+              Pinch, double-tap or use the +/− buttons to zoom (50%–400%). Drag to reposition so
+              the QR sits perfectly under the scanner.
+            </p>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+              <ResolutionDownload
+                onSelect={handleDownload}
+                options={DOWNLOAD_RESOLUTIONS}
+                triggerLabel="Download PNG"
+                className="w-full sm:w-auto"
+              />
+              <ShareQrPageButton
+                referralCode={referralCode}
+                fullName={fullName}
+                className="w-full sm:w-auto"
+              />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+
+      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <Button type="button" size="sm" variant="outline" className="w-full" onClick={() => setQrOpen(true)}>
+          <Maximize2 className="mr-1 h-4 w-4" /> Enlarge / pinch zoom
+        </Button>
+        <ResolutionDownload
+          onSelect={handleDownload}
+          options={DOWNLOAD_RESOLUTIONS}
+          triggerLabel="Download PNG"
+          size="sm"
+          variant="outline"
+          className="w-full"
+        />
+        <a href={posterUrl} target="_blank" rel="noreferrer" className="block min-w-0">
+          <Button variant="outline" size="sm" className="w-full">
+            <Printer className="mr-1 h-4 w-4" /> Poster / print
+          </Button>
+        </a>
+        <ShareQrPageButton
+          referralCode={referralCode}
+          fullName={fullName}
+          size="sm"
+          variant="outline"
+          className="w-full"
+        />
+        <Button type="button" size="sm" variant="outline" className="w-full sm:col-span-2" onClick={copyReferralLink}>
+          <LinkIcon className="mr-1 h-4 w-4" /> Copy referral link
+        </Button>
+      </div>
+
+      {storedQrUrl ? (
+        <a
+          href={storedQrUrl}
+          download={`${referralCode}-original.png`}
+          className="mt-3 block rounded-lg border border-border px-3 py-2 text-center text-xs text-muted-foreground underline-offset-2 hover:bg-secondary hover:underline"
+        >
+          Download original admin QR
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
+type ResolutionOption = { px: number; label: string; hint: string; recommended?: boolean };
+
+function ResolutionDownload({
+  onSelect,
+  options,
+  triggerLabel,
+  size = "default",
+  variant = "default",
+  className,
+}: {
+  onSelect: (px: number) => void | Promise<void>;
+  options: ResolutionOption[];
+  triggerLabel: string;
+  size?: "default" | "sm";
+  variant?: "default" | "outline";
+  className?: string;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size={size} variant={variant} className={className}>
+          <Download className="mr-1 h-4 w-4" />
+          {triggerLabel}
+          <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-70" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-72">
+        <DropdownMenuLabel className="text-xs">Choose resolution</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {options.map((o) => (
+          <DropdownMenuItem
+            key={o.px}
+            onSelect={(e) => {
+              e.preventDefault();
+              void onSelect(o.px);
+            }}
+            className="flex flex-col items-start gap-0.5 py-2"
+          >
+            <div className="flex w-full items-center justify-between">
+              <span className="text-sm font-medium">
+                {o.label}
+                {o.recommended ? (
+                  <span className="ml-1.5 rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                    Recommended
+                  </span>
                 ) : null}
-              </div>
-              <span className="pointer-events-none absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-1 text-[11px] font-medium text-white shadow-sm">
+              </span>
+            </div>
+            <span className="text-[11px] leading-tight text-muted-foreground">{o.hint}</span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function ShareQrPageButton({
+  referralCode,
+  fullName,
+  className,
+  size = "default",
+  variant = "outline",
+}: {
+  referralCode: string;
+  fullName: string;
+  className?: string;
+  size?: "default" | "sm";
+  variant?: "default" | "outline";
+}) {
+  const shareUrl = `${siteOrigin()}/r/${referralCode}/qr`;
+
+  const onShare = async () => {
+    const shareData = {
+      title: `${fullName} — 365 Motor Sales`,
+      text: `Scan or open my 365 Motor Sales referral QR:`,
+      url: shareUrl,
+    };
+    if (typeof navigator !== "undefined" && (navigator as any).share) {
+      try {
+        await (navigator as any).share(shareData);
+        return;
+      } catch (err: any) {
+        // User cancelled — nothing to do.
+        if (err?.name === "AbortError") return;
+        // Fall through to clipboard on any other share failure.
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("QR page link copied — paste it in chat to share.");
+    } catch {
+      toast.error("Could not copy link.");
+    }
+  };
+
+  return (
+    <Button type="button" size={size} variant={variant} onClick={onShare} className={className}>
+      <Share2 className="mr-1 h-4 w-4" /> Share QR page
+    </Button>
+  );
+}
                 <Maximize2 className="h-3 w-3" />
                 Tap to enlarge & pinch zoom
               </span>
