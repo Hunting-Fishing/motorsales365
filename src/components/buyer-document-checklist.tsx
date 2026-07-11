@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ClipboardCheck, ChevronDown, ChevronUp, ShieldAlert } from "lucide-react";
+import { ClipboardCheck, ChevronDown, ChevronUp, ShieldAlert, Download } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
-type Item = { id: string; label: string; hint?: string };
+type Item = { id: string; label: string; hint?: string | null };
 
-const ITEMS: Item[] = [
+const DEFAULT_ITEMS: Item[] = [
   {
     id: "orcr",
     label: "Original OR and CR are present",
@@ -16,35 +19,17 @@ const ITEMS: Item[] = [
     label: "Registered owner matches the seller's valid ID",
     hint: "If not, ask for the open Deed of Sale chain and previous owner's ID.",
   },
-  {
-    id: "deed_of_sale",
-    label: "Deed of Sale is ready (notarised)",
-  },
-  {
-    id: "valid_id",
-    label: "Seller can show 2 valid government IDs",
-  },
-  {
-    id: "chassis_match",
-    label: "Chassis number matches the CR and the unit",
-  },
-  {
-    id: "engine_match",
-    label: "Engine number matches the CR and the unit",
-  },
-  {
-    id: "plate_match",
-    label: "Plate / conduction sticker matches the CR",
-  },
+  { id: "deed_of_sale", label: "Deed of Sale is ready (notarised)" },
+  { id: "valid_id", label: "Seller can show 2 valid government IDs" },
+  { id: "chassis_match", label: "Chassis number matches the CR and the unit" },
+  { id: "engine_match", label: "Engine number matches the CR and the unit" },
+  { id: "plate_match", label: "Plate / conduction sticker matches the CR" },
   {
     id: "no_encumbrance",
     label: "No encumbrance / chattel mortgage on the CR",
     hint: "If marked 'Encumbered,' ask for the bank's release of mortgage.",
   },
-  {
-    id: "history_disclosed",
-    label: "Flood, accident, and rebuild history disclosed in writing",
-  },
+  { id: "history_disclosed", label: "Flood, accident, and rebuild history disclosed in writing" },
   {
     id: "hpg_clearance",
     label: "HPG / PNP clearance done (recommended for high-value units)",
@@ -52,10 +37,148 @@ const ITEMS: Item[] = [
   },
 ];
 
-export function BuyerDocumentChecklist() {
+type Props = {
+  listingId?: string;
+  items?: Item[];
+  pdfUrl?: string | null;
+  /** When true, render without the outer wrapper/header (for use inside a Dialog). */
+  embedded?: boolean;
+};
+
+export function BuyerDocumentChecklist({ listingId, items, pdfUrl, embedded }: Props) {
+  const { user } = useAuth();
+  const list = items && items.length > 0 ? items : DEFAULT_ITEMS;
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const storageKey = listingId ? `bdc:${listingId}` : "bdc:default";
+
+  // Load persisted progress
+  useEffect(() => {
+    // localStorage first for immediacy
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) setChecked(JSON.parse(raw));
+    } catch {
+      /* ignore */
+    }
+    // If signed-in and listingId present, sync from DB
+    if (user?.id && listingId && items && items.length > 0) {
+      (async () => {
+        const { data } = await supabase
+          .from("buyer_checklist_progress")
+          .select("item_id")
+          .eq("user_id", user.id)
+          .eq("listing_id", listingId);
+        if (data) {
+          const dbState: Record<string, boolean> = {};
+          for (const row of data as any[]) dbState[row.item_id] = true;
+          setChecked((prev) => ({ ...prev, ...dbState }));
+        }
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, listingId, storageKey]);
+
+  const toggle = async (itemId: string, on: boolean) => {
+    setChecked((prev) => {
+      const next = { ...prev, [itemId]: on };
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+    // Persist to DB only when we have a DB-backed item id (uuid) and auth user
+    if (user?.id && listingId && items?.some((i) => i.id === itemId)) {
+      if (on) {
+        await supabase
+          .from("buyer_checklist_progress")
+          .upsert({ user_id: user.id, listing_id: listingId, item_id: itemId });
+      } else {
+        await supabase
+          .from("buyer_checklist_progress")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("listing_id", listingId)
+          .eq("item_id", itemId);
+      }
+    }
+  };
+
   const done = Object.values(checked).filter(Boolean).length;
+
+  const body = (
+    <>
+      <ul className={embedded ? "space-y-3" : "mt-4 space-y-3"}>
+        {list.map((item) => {
+          const isOn = !!checked[item.id];
+          return (
+            <li key={item.id} className="flex items-start gap-3">
+              <Checkbox
+                id={`bdc-${item.id}`}
+                checked={isOn}
+                onCheckedChange={(v) => toggle(item.id, v === true)}
+                className="mt-0.5"
+              />
+              <div className="min-w-0 flex-1">
+                <label
+                  htmlFor={`bdc-${item.id}`}
+                  className={`block text-sm font-medium leading-snug ${
+                    isOn ? "text-muted-foreground line-through" : ""
+                  }`}
+                >
+                  {item.label}
+                </label>
+                {item.hint && (
+                  <p className="mt-0.5 text-xs text-muted-foreground">{item.hint}</p>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {pdfUrl && (
+        <div className="mt-4">
+          <Button asChild size="sm" variant="outline" className="w-full">
+            <a href={pdfUrl} target="_blank" rel="noreferrer">
+              <Download className="mr-2 h-4 w-4" /> Download printable PDF
+            </a>
+          </Button>
+        </div>
+      )}
+
+      <div className="mt-4 flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-foreground/90">
+        <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+        <p>
+          Never pay before you see the original documents and the unit in person. 365
+          MotorSales is a marketplace — we do not hold funds or guarantee any unit's
+          condition. See{" "}
+          <Link to="/verified" className="font-medium text-primary hover:underline">
+            365 Verified explained
+          </Link>{" "}
+          and our{" "}
+          <Link to="/guidelines" className="font-medium text-primary hover:underline">
+            community guidelines
+          </Link>
+          .
+        </p>
+      </div>
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div>
+        <p className="mb-3 text-xs text-muted-foreground">
+          {done}/{list.length} done
+          {user?.id && listingId ? " · progress saved to your account" : " · saved on this device"}
+        </p>
+        {body}
+      </div>
+    );
+  }
 
   return (
     <section className="mt-6 rounded-xl border border-border bg-card p-5">
@@ -74,7 +197,7 @@ export function BuyerDocumentChecklist() {
               PH buyer document checklist
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Tick these before you hand over any payment. {done}/{ITEMS.length} done.
+              Tick these before you hand over any payment. {done}/{list.length} done.
             </p>
           </div>
         </div>
@@ -84,58 +207,7 @@ export function BuyerDocumentChecklist() {
           <ChevronDown className="mt-2 h-4 w-4 shrink-0 text-muted-foreground" />
         )}
       </button>
-
-      {open && (
-        <>
-          <ul className="mt-4 space-y-3">
-            {ITEMS.map((item) => {
-              const isOn = !!checked[item.id];
-              return (
-                <li key={item.id} className="flex items-start gap-3">
-                  <Checkbox
-                    id={`bdc-${item.id}`}
-                    checked={isOn}
-                    onCheckedChange={(v) =>
-                      setChecked((prev) => ({ ...prev, [item.id]: v === true }))
-                    }
-                    className="mt-0.5"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <label
-                      htmlFor={`bdc-${item.id}`}
-                      className={`block text-sm font-medium leading-snug ${
-                        isOn ? "text-muted-foreground line-through" : ""
-                      }`}
-                    >
-                      {item.label}
-                    </label>
-                    {item.hint && (
-                      <p className="mt-0.5 text-xs text-muted-foreground">{item.hint}</p>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-
-          <div className="mt-4 flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-foreground/90">
-            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-            <p>
-              Never pay before you see the original documents and the unit in person. 365
-              MotorSales is a marketplace — we do not hold funds or guarantee any unit's
-              condition. See{" "}
-              <Link to="/verified" className="font-medium text-primary hover:underline">
-                365 Verified explained
-              </Link>{" "}
-              and our{" "}
-              <Link to="/guidelines" className="font-medium text-primary hover:underline">
-                community guidelines
-              </Link>
-              .
-            </p>
-          </div>
-        </>
-      )}
+      {open && body}
     </section>
   );
 }
