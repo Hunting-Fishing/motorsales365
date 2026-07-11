@@ -116,16 +116,39 @@ function ReportPage() {
   const [category, setCategory] = useState(initialCategory);
   const [targetUrl, setTargetUrl] = useState(search.target_url ?? "");
   const [details, setDetails] = useState(search.details ?? "");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const [listingId, setListingId] = useState<string | undefined>(search.listing_id);
   const [businessId, setBusinessId] = useState<string | undefined>(search.business_id);
   const [sellerId, setSellerId] = useState<string | undefined>(search.seller_id);
+  const [reporterName, setReporterName] = useState<string | null>(null);
+  const [reporterPhone, setReporterPhone] = useState<string | null>(null);
   const hasKnownTarget = !!(listingId || businessId || sellerId);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name, first_name, last_name, business_name, phone_e164, phone")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (cancelled || !data) return;
+      const p = data as any;
+      setReporterName(
+        p.full_name ||
+          [p.first_name, p.last_name].filter(Boolean).join(" ") ||
+          p.business_name ||
+          null,
+      );
+      setReporterPhone(p.phone_e164 || p.phone || null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   const clearTarget = () => {
     setListingId(undefined);
