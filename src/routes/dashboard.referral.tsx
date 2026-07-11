@@ -545,9 +545,9 @@ function ReferralQrCard({
       </Dialog>
 
 
-      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Button type="button" size="sm" variant="outline" className="w-full" onClick={() => setQrOpen(true)}>
-          <Maximize2 className="mr-1 h-4 w-4" /> Enlarge / pinch zoom
+          <Maximize2 className="mr-1 h-4 w-4" /> Enlarge
         </Button>
         <ResolutionDownload
           onSelect={handleDownload}
@@ -559,7 +559,7 @@ function ReferralQrCard({
         />
         <a href={posterUrl} target="_blank" rel="noreferrer" className="block min-w-0">
           <Button variant="outline" size="sm" className="w-full">
-            <Printer className="mr-1 h-4 w-4" /> Poster / print
+            <Printer className="mr-1 h-4 w-4" /> Poster
           </Button>
         </a>
         <ShareQrPageButton
@@ -569,9 +569,50 @@ function ReferralQrCard({
           variant="outline"
           className="w-full"
         />
-        <Button type="button" size="sm" variant="outline" className="w-full sm:col-span-2" onClick={copyReferralLink}>
-          <LinkIcon className="mr-1 h-4 w-4" /> Copy referral link
+        <Button type="button" size="sm" variant="outline" className="w-full" onClick={copyReferralLink}>
+          <LinkIcon className="mr-1 h-4 w-4" /> Copy link
         </Button>
+        <a
+          href={`${siteOrigin()}/r/${referralCode}/qr`}
+          target="_blank"
+          rel="noreferrer"
+          className="block min-w-0"
+        >
+          <Button variant="outline" size="sm" className="w-full">
+            <ExternalLink className="mr-1 h-4 w-4" /> Public QR page
+          </Button>
+        </a>
+        <a
+          href={`https://wa.me/?text=${encodeURIComponent(`Scan my 365 Motor Sales referral QR: ${siteOrigin()}/r/${referralCode}/qr`)}`}
+          target="_blank"
+          rel="noreferrer"
+          className="block min-w-0"
+        >
+          <Button variant="outline" size="sm" className="w-full">
+            <MessageCircle className="mr-1 h-4 w-4" /> WhatsApp
+          </Button>
+        </a>
+        <a
+          href={`sms:?&body=${encodeURIComponent(`Scan my 365 Motor Sales referral QR: ${siteOrigin()}/r/${referralCode}/qr`)}`}
+          className="block min-w-0"
+        >
+          <Button variant="outline" size="sm" className="w-full">
+            <Smartphone className="mr-1 h-4 w-4" /> SMS
+          </Button>
+        </a>
+        <a
+          href={`mailto:?subject=${encodeURIComponent(`${fullName} — 365 Motor Sales referral`)}&body=${encodeURIComponent(`Scan my referral QR or open this link: ${siteOrigin()}/r/${referralCode}/qr`)}`}
+          className="block min-w-0"
+        >
+          <Button variant="outline" size="sm" className="w-full">
+            <Mail className="mr-1 h-4 w-4" /> Email
+          </Button>
+        </a>
+        <Link to="/my-qr" className="block min-w-0 col-span-2 sm:col-span-1">
+          <Button variant="outline" size="sm" className="w-full">
+            <QrCode className="mr-1 h-4 w-4" /> My QR page
+          </Button>
+        </Link>
       </div>
 
       {storedQrUrl ? (
@@ -580,9 +621,10 @@ function ReferralQrCard({
           download={`${referralCode}-original.png`}
           className="mt-3 block rounded-lg border border-border px-3 py-2 text-center text-xs text-muted-foreground underline-offset-2 hover:bg-secondary hover:underline"
         >
-          Download original admin QR
+          <Download className="mr-1 inline h-3.5 w-3.5" /> Download original admin QR
         </a>
       ) : null}
+
     </div>
   );
 }
