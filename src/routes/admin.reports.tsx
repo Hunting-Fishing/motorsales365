@@ -169,7 +169,7 @@ function AdminReports() {
               <ReportCard
                 key={r.id}
                 report={r}
-                reporterCounts={r.reporter_id ? counts[r.reporter_id] : undefined}
+                reporterCounts={r.reporter_id ? counts?.[r.reporter_id] : undefined}
                 currentUserId={user?.id ?? null}
                 onChanged={load}
                 onFilterReporter={(id) => setReporter(id)}
