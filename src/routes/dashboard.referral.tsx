@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 
 import { supabase } from "@/integrations/supabase/client";
@@ -450,7 +450,7 @@ function ReferralQrCard({
           <div
             data-referral-qr-card
             className="relative mx-auto aspect-square w-full min-w-0 max-w-[var(--qr-mobile-max)] scroll-mb-[calc(6rem+env(safe-area-inset-bottom))] overflow-hidden rounded-xl bg-white p-2 ring-1 ring-border transition group-hover:ring-primary sm:max-w-none sm:p-5"
-            style={{ "--qr-mobile-max": "min(54vw, 30dvh, 216px)" } as React.CSSProperties}
+            style={{ "--qr-mobile-max": "min(54vw, 30dvh, 216px)" } as CSSProperties}
           >
             <ZoomableQr
               ariaLabel={`QR code for ${fullName} — pinch or double-tap to zoom`}
