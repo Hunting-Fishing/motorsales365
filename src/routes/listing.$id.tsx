@@ -314,10 +314,16 @@ function ListingDetailPage() {
       }
 
       // Increment view count via RPC (counts every page load, anon allowed)
-      supabase.rpc("increment_listing_view", {
-        _listing_id: id,
-        _viewer_id: user?.id ?? undefined,
-      });
+      supabase
+        .rpc("increment_listing_view", {
+          _listing_id: id,
+          _viewer_id: user?.id ?? null,
+        })
+        .then(({ error }) => {
+          if (error && import.meta.env.DEV) {
+            console.warn("[view-count] rpc failed", error);
+          }
+        });
 
       // Like count (public)
       const { count: likes } = await supabase
