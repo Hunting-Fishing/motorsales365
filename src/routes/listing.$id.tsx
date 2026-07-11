@@ -843,58 +843,13 @@ function ListingDetailPage() {
             <span>·</span>
             <span>{(listing.view_count ?? 0).toLocaleString()} views</span>
             <span>·</span>
-            <Dialog open={reportOpen} onOpenChange={setReportOpen}>
-              <DialogTrigger asChild>
-                <button className="inline-flex items-center gap-1 hover:text-destructive">
-                  <Flag className="h-3 w-3" /> Report listing
-                </button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Report this listing</DialogTitle>
-                  <DialogDescription>
-                    Help us keep 365 MotorSales Philippines safe. Our team will review your report.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-3">
-                  <div>
-                    <Label>Reason</Label>
-                    <Select value={reportReason} onValueChange={setReportReason}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {REPORT_REASONS.map((r) => (
-                          <SelectItem key={r} value={r}>
-                            {r}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Additional details (optional)</Label>
-                    <Textarea
-                      rows={3}
-                      value={reportDetails}
-                      onChange={(e) => setReportDetails(e.target.value)}
-                      placeholder="Tell us more…"
-                    />
-                  </div>
-                </div>
-                <div className="mt-3 border-t border-border pt-3">
-                  <FormFeedbackLink formId="report-listing" />
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setReportOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={submitReport} disabled={submittingReport}>
-                    {submittingReport ? "Submitting…" : "Submit report"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Link
+              to="/report"
+              search={{ target_type: "listing", listing_id: listing.id }}
+              className="inline-flex items-center gap-1 hover:text-destructive"
+            >
+              <Flag className="h-3 w-3" /> Report listing
+            </Link>
           </div>
         </div>
 
