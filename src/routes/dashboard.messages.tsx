@@ -92,10 +92,26 @@ interface ConversationSummary {
   subtitle: string;
   thumb: string | null;
   avatar: string | null;
+  listing_title: string | null;
+  listing_price: number | null;
+  listing_status: string | null;
   last_body: string;
   last_at: string;
   unread: number;
   invited?: boolean;
+}
+
+function formatPricePHP(n: number | null): string {
+  if (n == null) return "";
+  try {
+    return new Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
+      maximumFractionDigits: 0,
+    }).format(n);
+  } catch {
+    return `₱${Math.round(n).toLocaleString()}`;
+  }
 }
 
 function attachmentPreview(body: string | null, type: AttachType): string {
