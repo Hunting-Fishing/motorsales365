@@ -103,7 +103,7 @@ function MessagesPage() {
           .from("listing_media")
           .select("listing_id,url,type,sort_order")
           .in("listing_id", listingIds)
-          .eq("type", "image")
+          .eq("type", "photo")
           .order("sort_order", { ascending: true }),
       ]);
       const thumbMap: Record<string, string> = {};
