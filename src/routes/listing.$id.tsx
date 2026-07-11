@@ -980,43 +980,25 @@ function ListingDetailPage() {
               />
             )}
 
-          <ListingReportsSection listingId={listing.id} />
+          <BuyerResourcesCard
+            listingId={listing.id}
+            listingUserId={listing.user_id}
+            categorySlug={listing.category_slug ?? null}
+            attributes={(listing.attributes as any) ?? null}
+            ltoVerified={!!listing.vehicles?.vehicle_passport_verifications?.some(
+              (v: any) => v.status === "approved",
+            )}
+          />
 
+          <ListingReportsSection listingId={listing.id} />
 
           <div className="mt-2">
             <ListingWantedBadge listingId={listing.id} />
           </div>
 
-
-
-          {/* Services around this vehicle — coming soon.
-              Revenue: lead-gen for finance/insurance/OR-CR partners (not yet wired). */}
-          <Collapsible asChild>
-            <ComingSoonSection
-              title="Need inspection or insurance for this car?"
-              subtitle="Sweet! These will be Awesome Future Services!"
-            >
-              <CollapsibleTrigger className="group flex w-full items-start justify-between gap-3 text-left">
-                <div className="min-w-0 flex-1" />
-                <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-amber-700 transition-transform group-data-[state=open]:rotate-180 dark:text-amber-300" />
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  <ComingSoonRow icon={Wrench} label="Request a pre-purchase inspection" span />
-                  <ComingSoonRow icon={Shield} label="Get insurance quote" />
-                  <ComingSoonRow icon={Banknote} label="Get financing" />
-                  <ComingSoonRow icon={FileText} label="OR/CR renewal help" />
-                  <ComingSoonRow icon={ClipboardCheck} label="Title transfer help" />
-                </div>
-                <p className="mt-3 text-[11px] text-amber-900/70 dark:text-amber-200/70">
-                  Partner network launching shortly. We'll notify you when quotes go live.
-                </p>
-              </CollapsibleContent>
-            </ComingSoonSection>
-          </Collapsible>
-
-
           <AdCarousel placement="listing_sidebar" />
+
+
 
         </aside>
       </div>
