@@ -246,7 +246,7 @@ export function ReportTargetPreview({
           <Icon className="h-3.5 w-3.5" />
           You're reporting this {preview.kind}
         </div>
-        {onClear && (
+        {onClear && !hideClear && (
           <button
             type="button"
             onClick={onClear}
