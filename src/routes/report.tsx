@@ -131,7 +131,7 @@ function ReportPage() {
     setListingId(undefined);
     setBusinessId(undefined);
     setSellerId(undefined);
-    setResolvedTargetName(null);
+    setTargetType("other");
     setTargetUrl("");
   };
 
