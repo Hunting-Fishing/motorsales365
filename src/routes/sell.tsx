@@ -343,6 +343,7 @@ function SellPage() {
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
   const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
   const [categoryAttrs, setCategoryAttrs] = useState<Record<string, any>>({});
+  const [showMapPin, setShowMapPin] = useState<boolean>(false);
   type VinState =
     | { kind: "idle" }
     | { kind: "checking" }
@@ -1201,6 +1202,7 @@ function SellPage() {
         }
         // Unified service tags (works for any service category, including parts/carwash)
         if (serviceTags.length) attributes.tags = serviceTags;
+        if (showMapPin && lat != null && lng != null) attributes.show_map_pin = true;
         if (
           SERVICE_CATEGORIES.has(category) ||
           category === "repair" ||
@@ -2484,21 +2486,36 @@ function SellPage() {
                 }}
               />
               {lat != null && lng != null && (
-                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                  <span>
-                    Pinned: {lat.toFixed(5)}, {lng.toFixed(5)}
-                  </span>
-                  <button
-                    type="button"
-                    className="underline hover:text-foreground"
-                    onClick={() => {
-                      setLat(null);
-                      setLng(null);
-                    }}
-                  >
-                    Clear pin
-                  </button>
-                </div>
+                <>
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                    <span>
+                      Pinned: {lat.toFixed(5)}, {lng.toFixed(5)}
+                    </span>
+                    <button
+                      type="button"
+                      className="underline hover:text-foreground"
+                      onClick={() => {
+                        setLat(null);
+                        setLng(null);
+                        setShowMapPin(false);
+                      }}
+                    >
+                      Clear pin
+                    </button>
+                  </div>
+                  <label className="mt-1 flex items-start gap-2 rounded-md border border-border bg-muted/40 p-2 text-[12px]">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5"
+                      checked={showMapPin}
+                      onChange={(e) => setShowMapPin(e.target.checked)}
+                    />
+                    <span>
+                      Show an approximate-location map on my listing (a ~400m circle,
+                      not your exact address). Similar to Facebook Marketplace.
+                    </span>
+                  </label>
+                </>
               )}
             </div>
             <div className="grid gap-2 sm:grid-cols-2 pt-1">

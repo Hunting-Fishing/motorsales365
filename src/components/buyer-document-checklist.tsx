@@ -53,7 +53,7 @@ const ITEMS: Item[] = [
 ];
 
 export function BuyerDocumentChecklist() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const done = Object.values(checked).filter(Boolean).length;
 

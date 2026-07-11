@@ -87,6 +87,7 @@ import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
 import { PriceTrendBadge } from "@/components/listings/price-trend-badge";
 import { PromoBadge } from "@/components/listings/promo-badge";
 import { PriceHistoryDisclosure } from "@/components/listing/price-history-disclosure";
+import { ListingLocationMap } from "@/components/listing/listing-location-map";
 import { useListingPriceTrend } from "@/hooks/use-listing-price-trend";
 import { useListingPromo } from "@/hooks/use-listing-promo";
 
@@ -848,14 +849,14 @@ function ListingDetailPage() {
 
 
         {/* Sidebar */}
-        <aside className="space-y-4 pb-20 lg:sticky lg:top-20 lg:self-start lg:pb-0">
-          <div className="overflow-hidden rounded-xl border border-border bg-card p-4">
+        <aside className="space-y-3 pb-20 lg:sticky lg:top-20 lg:self-start lg:pb-0">
+          <div className="overflow-hidden rounded-xl border border-border bg-card p-3">
             <div
               aria-hidden
-              className="-mx-4 -mt-4 mb-3 h-1 bg-gradient-to-r from-[#0038A8] via-[#FCD116] to-[#CE1126]"
+              className="-mx-3 -mt-3 mb-2 h-0.5 bg-gradient-to-r from-[#0038A8] via-[#FCD116] to-[#CE1126]"
             />
             <div className="flex items-start justify-between gap-2">
-              <h3 className="font-display text-base font-semibold sm:text-lg">Seller</h3>
+              <h3 className="font-display text-sm font-semibold">Seller</h3>
               <ListingActionsMenu
                 listingId={listing.id}
                 sellerUserId={listing.user_id}
@@ -863,8 +864,8 @@ function ListingDetailPage() {
                 variant="inline"
               />
             </div>
-            <div className="mt-2 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary font-semibold">
+            <div className="mt-2 flex items-center gap-2">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold">
                 {(seller?.business_name ?? seller?.full_name ?? "?").slice(0, 1).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
@@ -872,7 +873,7 @@ function ListingDetailPage() {
                   <Link
                     to="/seller/$id"
                     params={{ id: listing.user_id }}
-                    className="truncate font-medium hover:text-primary"
+                    className="truncate text-sm font-medium hover:text-primary"
                   >
                     {seller?.business_name ?? seller?.full_name ?? "Seller"}
                   </Link>
@@ -880,7 +881,7 @@ function ListingDetailPage() {
                     <VerifiedBadge size="sm" showLabel />
                   )}
                 </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                   <span>{listing.seller_type === "business" ? "Business" : "Private"} seller</span>
                   {listing.seller_type === "business" && sellerDealerPlan && (
                     <DealerSubscriptionBadge
@@ -893,7 +894,7 @@ function ListingDetailPage() {
                   )}
                 </div>
                 <SellerReputationBadges
-                  className="mt-2"
+                  className="mt-1.5"
                   size="sm"
                   profile={{
                     verification_status: seller?.verification_status,
@@ -908,45 +909,48 @@ function ListingDetailPage() {
               </div>
             </div>
 
-            <div className="mt-4 space-y-2">
+            <div className="mt-3 space-y-1.5">
               {listing.contact_phone && (
                 <a href={`tel:${listing.contact_phone}`}>
-                  <Button className="w-full" variant="default">
-                    <Phone className="mr-2 h-4 w-4" />
+                  <Button className="w-full" size="sm" variant="default">
+                    <Phone className="mr-1.5 h-3.5 w-3.5" />
                     Call seller
                   </Button>
                 </a>
               )}
-              {listing.contact_phone && waMeUrl(listing.contact_phone) && (
-                <a
-                  href={
-                    waMeUrl(
-                      listing.contact_phone,
-                      `Hi! I'm interested in your listing "${listing.title}" on 365 Motor Sales: ${siteUrl(typeof window !== "undefined" ? window.location.pathname : "/")}`,
-                    )!
-                  }
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <Button className="w-full bg-[#25D366] text-white hover:bg-[#1ebe5d]">
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    WhatsApp seller
+              <div className="grid grid-cols-2 gap-1.5">
+                {listing.contact_phone && waMeUrl(listing.contact_phone) && (
+                  <a
+                    href={
+                      waMeUrl(
+                        listing.contact_phone,
+                        `Hi! I'm interested in your listing "${listing.title}" on 365 Motor Sales: ${siteUrl(typeof window !== "undefined" ? window.location.pathname : "/")}`,
+                      )!
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <Button size="sm" className="w-full bg-[#25D366] text-white hover:bg-[#1ebe5d]">
+                      <MessageCircle className="mr-1 h-3.5 w-3.5" />
+                      WhatsApp
+                    </Button>
+                  </a>
+                )}
+                {listing.allow_messages && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      messageRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                      messageRef.current?.focus();
+                    }}
+                  >
+                    <MessageSquare className="mr-1 h-3.5 w-3.5" /> Message
                   </Button>
-                </a>
-              )}
-              {listing.allow_messages && (
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    messageRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-                    messageRef.current?.focus();
-                  }}
-                >
-                  <MessageSquare className="mr-2 h-4 w-4" /> Message seller
-                </Button>
-              )}
-              <div className="grid grid-cols-2 gap-2">
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
                 <ListingQr
                   listingId={listing.id}
                   title={listing.title}
@@ -958,15 +962,15 @@ function ListingDetailPage() {
                 {listing.category_slug !== "towing" && (
                   <Button asChild variant="outline" size="sm" className="w-full">
                     <Link to="/tow" search={{ listing: listing.id }}>
-                      <Truck className="mr-1.5 h-4 w-4" /> Tow it
+                      <Truck className="mr-1 h-3.5 w-3.5" /> Tow it
                     </Link>
                   </Button>
                 )}
               </div>
               {listing.category_slug === "towing" && (
-                <Button asChild className="w-full">
+                <Button asChild size="sm" className="w-full">
                   <Link to="/tow" search={{ provider: listing.id }}>
-                    <Truck className="mr-2 h-4 w-4" /> Request a tow from this provider
+                    <Truck className="mr-1.5 h-3.5 w-3.5" /> Request a tow
                   </Link>
                 </Button>
               )}
@@ -974,13 +978,25 @@ function ListingDetailPage() {
             <Link
               to="/report"
               search={{ target_type: "listing", listing_id: listing.id }}
-              className="mt-3 inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive"
+              className="mt-2 inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive"
             >
               <Flag className="h-3 w-3" /> Report this listing
             </Link>
           </div>
 
+          {(listing as any).lat != null &&
+            (listing as any).lng != null &&
+            (listing.attributes as any)?.show_map_pin === true && (
+              <ListingLocationMap
+                lat={Number((listing as any).lat)}
+                lng={Number((listing as any).lng)}
+                city={listing.city}
+                region={listing.region}
+              />
+            )}
+
           <ListingReportsSection listingId={listing.id} />
+
 
           <div className="mt-2">
             <ListingWantedBadge listingId={listing.id} />
@@ -990,7 +1006,7 @@ function ListingDetailPage() {
 
           {/* Services around this vehicle — coming soon.
               Revenue: lead-gen for finance/insurance/OR-CR partners (not yet wired). */}
-          <Collapsible defaultOpen asChild>
+          <Collapsible asChild>
             <ComingSoonSection
               title="Need inspection or insurance for this car?"
               subtitle="Sweet! These will be Awesome Future Services!"
