@@ -16,9 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/google-business-map";
+import { BusinessesMap, type GMapBusiness } from "@/components/businesses/businesses-map";
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
-import { haversineKm } from "@/components/businesses/google-maps-loader";
+import { haversineKm } from "@/components/businesses/map-utils";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 import { PremiumSponsorsRail } from "@/components/businesses/premium-sponsors-rail";
 import { getVerifiedOwnerIds } from "@/lib/business-directory.functions";
@@ -514,7 +514,7 @@ function BusinessesIndex() {
                 onChangeRadius={setRadiusKm}
               />
             </Card>
-            <GoogleBusinessMap
+            <BusinessesMap
               height={520}
               businesses={mapBusinesses}
               center={center ? { lat: center.lat, lng: center.lng } : null}
