@@ -200,6 +200,15 @@ export function ListingCard({
   const openReports = reportSummary?.open_count ?? 0;
   const effectivePromo = listing.promotion ?? promo ?? null;
   const effectiveTrend = listing.price_trend ?? priceTrend ?? null;
+  const accent = pickCardAccent({
+    openReports,
+    status: listing.status,
+    trend: effectiveTrend,
+    promo: effectivePromo,
+    boosted: !!boosted,
+    publishedAt: listing.published_at,
+    updatedAt: listing.updated_at,
+  });
   return (
     <div
       className={cn(
@@ -207,8 +216,8 @@ export function ListingCard({
         compact
           ? "rounded-lg shadow-sm hover:shadow-md"
           : "rounded-xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elegant)]",
-        tier.ringClass,
-        tier.glowClass,
+        accent ? accent.ring : tier.ringClass,
+        accent ? accent.glow : tier.glowClass,
       )}
     >
       <div className="absolute right-2 top-2 z-10">
