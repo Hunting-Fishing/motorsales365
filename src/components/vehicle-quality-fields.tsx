@@ -27,7 +27,6 @@ export type VehicleQuality = {
   vin_chassis?: string;
   financing_available?: boolean;
   trade_accepted?: boolean;
-  price_negotiable?: boolean;
 };
 
 export const VEHICLE_QUALITY_KEYS: (keyof VehicleQuality)[] = [
@@ -43,7 +42,6 @@ export const VEHICLE_QUALITY_KEYS: (keyof VehicleQuality)[] = [
   "vin_chassis",
   "financing_available",
   "trade_accepted",
-  "price_negotiable",
 ];
 
 
