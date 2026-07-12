@@ -18,7 +18,7 @@ function snapsForViewport(): Record<Snap, number> {
 /**
  * Mobile-only draggable bottom sheet.
  * Three snap points: peek (header only), half (~50dvh), full (~85dvh).
- * Renders nothing on lg+ — parent should hide it via `lg:hidden`.
+ * Renders only on phones — parent/sidebar takes over from md+.
  */
 export type MapBottomSheetHandle = {
   scrollToTop: () => void;
@@ -119,7 +119,7 @@ export const MapBottomSheet = forwardRef<MapBottomSheetHandle, { header: ReactNo
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-30 flex flex-col rounded-t-2xl border-t border-border bg-card shadow-2xl lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 flex flex-col rounded-t-2xl border-t border-border bg-card shadow-2xl md:hidden"
       style={{
         height,
         transition: dragging ? "none" : "height 220ms cubic-bezier(0.32, 0.72, 0, 1)",
