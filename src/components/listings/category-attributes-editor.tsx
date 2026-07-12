@@ -225,9 +225,11 @@ export function CategoryAttributesEditor({ category, value, onChange }: Props) {
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           <Sel label="Body type" field="body_type" opts={BODY_TYPES} value={value} onChange={onChange} />
           <Sel label="Drivetrain" field="drivetrain" opts={DRIVETRAINS} value={value} onChange={onChange} />
+          <Sel label="Owner status" field="owner_status" opts={OWNER_STATUS} value={value} onChange={onChange} />
+          <Sel label="OR / CR status" field="or_cr_status" opts={OR_CR_STATUS} value={value} onChange={onChange} />
         </div>
-        {/* Owner status, OR/CR status, Flood & Accident history are captured in
-            VehicleQualityFields (Vehicle details & documents) — do not duplicate here.
+        {/* Flood & Accident history live in VehicleQualityFields (Vehicle details
+            & documents) — do not duplicate here.
             Financing available / Trade-in accepted are surfaced as pills inside
             VehicleQualityFields so they don't duplicate here. */}
         <TrustBlock value={value} onChange={onChange} />
@@ -240,15 +242,17 @@ export function CategoryAttributesEditor({ category, value, onChange }: Props) {
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           <Sel label="Type" field="moto_type" opts={MOTO_TYPES} value={value} onChange={onChange} />
           <Text label="Engine displacement (cc)" field="engine_cc" type="number" placeholder="e.g. 155" value={value} onChange={onChange} />
+          <Sel label="OR / CR status" field="or_cr_status" opts={OR_CR_STATUS} value={value} onChange={onChange} />
           <Sel label="Plate status" field="plate_status" opts={PLATE_STATUS} value={value} onChange={onChange} />
+          <Sel label="Owner status" field="owner_status" opts={OWNER_STATUS} value={value} onChange={onChange} />
           <Sel label="Condition" field="moto_condition" opts={MOTO_CONDITION} value={value} onChange={onChange} />
         </div>
-        {/* Owner status and OR/CR live in VehicleQualityFields — do not duplicate. */}
         <Bool label="Delivery available" field="delivery_available" value={value} onChange={onChange} />
         <TrustBlock value={value} onChange={onChange} />
       </div>
     );
   }
+
 
 
   if (category === "equipment") {
