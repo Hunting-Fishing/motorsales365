@@ -23,7 +23,17 @@ const ON_IMAGE_BADGES: { swatch: React.ReactNode; label: string; desc: string }[
       </Badge>
     ),
     label: "New",
-    desc: "Listed within the last 48 hours. The newest deals appear first.",
+    desc: "Listed within the last 72 hours. Sellers can buy a Boost to stay highlighted after that window.",
+  },
+  {
+    swatch: (
+      <Badge className="bg-fuchsia-500 px-1.5 py-0.5 text-[10px] text-white hover:bg-fuchsia-500">
+        <RotateCcw className="mr-1 h-3 w-3" />
+        Re-listed
+      </Badge>
+    ),
+    label: "Re-listed",
+    desc: "Previously expired listing that the seller brought back to the marketplace.",
   },
   {
     swatch: (
