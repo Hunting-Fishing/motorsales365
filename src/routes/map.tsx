@@ -2,8 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import ogMap from "@/assets/og/map.jpg";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
-import { Star, Store as StoreIcon, MapPin, Locate, Loader2 } from "lucide-react";
+import { Star, Store as StoreIcon, MapPin, Locate, Loader2, Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 import { SiteLayout } from "@/components/site-layout";
@@ -24,7 +25,13 @@ const searchSchema = z.object({
   r: z.coerce.number().min(1).max(500).optional(),
   type: z.string().max(64).optional(),
   q: z.string().max(200).optional(),
+  name: z.string().max(120).optional(),
+  featured: z.coerce.boolean().optional(),
+  verified: z.coerce.boolean().optional(),
+  rated: z.coerce.boolean().optional(),
+  minRating: z.coerce.number().min(0).max(5).optional(),
 });
+
 
 export const Route = createFileRoute("/map")({
   validateSearch: searchSchema,
@@ -120,6 +127,16 @@ function MapPage() {
     stored?.viewport ?? null,
   );
 
+  // Additional filters
+  const [nameQuery, setNameQuery] = useState<string>(search.name ?? "");
+  const [featuredOnly, setFeaturedOnly] = useState<boolean>(!!search.featured);
+  const [verifiedOnly, setVerifiedOnly] = useState<boolean>(!!search.verified);
+  const [ratedOnly, setRatedOnly] = useState<boolean>(!!search.rated);
+  const [minRating, setMinRating] = useState<number>(search.minRating ?? 0);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+
+
+
   const [locating, setLocating] = useState(false);
 
   const useMyLocation = () => {
@@ -161,6 +178,11 @@ function MapPage() {
         ...(center && radiusKm ? { r: radiusKm } : {}),
         ...(typeSlug ? { type: typeSlug } : {}),
         ...(center?.label ? { q: center.label } : {}),
+        ...(nameQuery ? { name: nameQuery } : {}),
+        ...(featuredOnly ? { featured: true } : {}),
+        ...(verifiedOnly ? { verified: true } : {}),
+        ...(ratedOnly ? { rated: true } : {}),
+        ...(minRating > 0 ? { minRating } : {}),
       },
       replace: true,
     });
@@ -198,7 +220,7 @@ function MapPage() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [center, radiusKm, typeSlug, viewport, selectedSlug]);
+  }, [center, radiusKm, typeSlug, viewport, selectedSlug, nameQuery, featuredOnly, verifiedOnly, ratedOnly, minRating]);
 
   useEffect(() => {
     setTypes(
@@ -234,9 +256,24 @@ function MapPage() {
     return (s: string) => m.get(s) ?? s;
   }, [types]);
 
+  const filtered = useMemo(() => {
+    const nq = nameQuery.trim().toLowerCase();
+    return items.filter((b) => {
+      if (featuredOnly && !b.featured) return false;
+      if (verifiedOnly && b.claim_state !== "owned") return false;
+      if (ratedOnly && !(b.rating_count > 0)) return false;
+      if (minRating > 0 && Number(b.rating_avg) < minRating) return false;
+      if (nq) {
+        const hay = `${b.name ?? ""} ${b.city ?? ""} ${b.barangay ?? ""} ${b.province ?? ""}`.toLowerCase();
+        if (!hay.includes(nq)) return false;
+      }
+      return true;
+    });
+  }, [items, nameQuery, featuredOnly, verifiedOnly, ratedOnly, minRating]);
+
   const inRadius = useMemo(() => {
-    if (!center || !radiusKm) return items;
-    return items.filter(
+    if (!center || !radiusKm) return filtered;
+    return filtered.filter(
       (b) =>
         b.lat != null &&
         b.lng != null &&
@@ -245,7 +282,7 @@ function MapPage() {
           { lat: Number(b.lat), lng: Number(b.lng) },
         ) <= radiusKm,
     );
-  }, [items, center, radiusKm]);
+  }, [filtered, center, radiusKm]);
 
   const sorted = useMemo(() => {
     if (!center) return inRadius;
@@ -416,6 +453,38 @@ function MapPage() {
               )}
               Use my location
             </Button>
+            <Button
+              type="button"
+              variant={showFilters ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowFilters((v) => !v)}
+              aria-expanded={showFilters}
+              aria-controls="map-filters-panel"
+            >
+              <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
+              Filters
+              {(featuredOnly || verifiedOnly || ratedOnly || minRating > 0 || nameQuery) && (
+                <Badge variant="secondary" className="ml-1.5 h-4 px-1 text-[10px]">
+                  {[featuredOnly, verifiedOnly, ratedOnly, minRating > 0, !!nameQuery].filter(Boolean).length}
+                </Badge>
+              )}
+            </Button>
+            {(featuredOnly || verifiedOnly || ratedOnly || minRating > 0 || nameQuery) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setFeaturedOnly(false);
+                  setVerifiedOnly(false);
+                  setRatedOnly(false);
+                  setMinRating(0);
+                  setNameQuery("");
+                }}
+              >
+                <X className="mr-1 h-3.5 w-3.5" /> Clear filters
+              </Button>
+            )}
             {selectedSlug && (
               <Button
                 type="button"
@@ -432,7 +501,84 @@ function MapPage() {
               </Button>
             )}
           </div>
+
+          {showFilters && (
+            <div
+              id="map-filters-panel"
+              className="mt-3 grid gap-3 rounded-lg border border-border bg-secondary/30 p-3 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              <div className="sm:col-span-2 lg:col-span-2">
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                  Search name / city
+                </label>
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={nameQuery}
+                    onChange={(e) => setNameQuery(e.target.value)}
+                    placeholder="e.g. Toyota, Cebu, Ortigas"
+                    className="h-9 pl-8"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                  Minimum rating
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[0, 3, 4, 4.5].map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => setMinRating(r)}
+                      aria-pressed={minRating === r}
+                      className={`inline-flex h-8 items-center gap-1 rounded-full border px-2.5 text-xs font-medium transition ${
+                        minRating === r
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-card hover:bg-secondary"
+                      }`}
+                    >
+                      {r === 0 ? "Any" : (
+                        <>
+                          <Star className="h-3 w-3 fill-current" />
+                          {r}+
+                        </>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                  Quick filters
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { key: "featured", label: "Featured", value: featuredOnly, set: setFeaturedOnly },
+                    { key: "verified", label: "Owner-verified", value: verifiedOnly, set: setVerifiedOnly },
+                    { key: "rated", label: "Has reviews", value: ratedOnly, set: setRatedOnly },
+                  ].map((f) => (
+                    <button
+                      key={f.key}
+                      type="button"
+                      onClick={() => f.set(!f.value)}
+                      aria-pressed={f.value}
+                      className={`inline-flex h-8 items-center rounded-full border px-2.5 text-xs font-medium transition ${
+                        f.value
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-card hover:bg-secondary"
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </Card>
+
+
 
 
         {/* Mobile: full-bleed map + bottom sheet. Desktop: side-by-side grid. */}
