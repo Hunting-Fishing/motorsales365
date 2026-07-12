@@ -1069,10 +1069,43 @@ function MessagesPage() {
                           </DropdownMenuItem>
                         </>
                       )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "starred")}
+                      >
+                        <Star className={`mr-2 h-4 w-4 ${st.starred ? "fill-primary text-primary" : ""}`} />
+                        {st.starred ? "Unstar" : "Star"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "muted")}
+                      >
+                        {st.muted ? (
+                          <><Bell className="mr-2 h-4 w-4" /> Unmute</>
+                        ) : (
+                          <><BellOff className="mr-2 h-4 w-4" /> Mute</>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "archived")}
+                      >
+                        {st.archived ? (
+                          <><ArchiveRestore className="mr-2 h-4 w-4" /> Unarchive</>
+                        ) : (
+                          <><Archive className="mr-2 h-4 w-4" /> Archive</>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "spam")}
+                      >
+                        <ShieldAlert className="mr-2 h-4 w-4" />
+                        {st.spam ? "Not spam" : "Mark as spam"}
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              ))}
+                );
+              })}
+
             </div>
           </div>
 
