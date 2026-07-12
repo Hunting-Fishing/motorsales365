@@ -13387,6 +13387,14 @@ export type Database = {
         Args: { p_listing_id: string; p_other_user_id: string }
         Returns: undefined
       }
+      mark_message_notifications_read: {
+        Args: { p_message_ids: string[] }
+        Returns: undefined
+      }
+      mark_message_notifications_unread: {
+        Args: { p_message_ids: string[] }
+        Returns: undefined
+      }
       mark_thread_read: { Args: { p_thread_id: string }; Returns: undefined }
       mark_thread_unread: { Args: { p_thread_id: string }; Returns: undefined }
       match_listing_to_parts_wanted: {

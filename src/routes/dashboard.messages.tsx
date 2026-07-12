@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   MessageSquare,
   ArrowLeft,
@@ -28,6 +29,7 @@ import { MessageComposer, type MessagePayload } from "@/components/messaging/mes
 import { AttachmentBubble } from "@/components/messaging/attachment-bubble";
 import { NewGroupChatDialog } from "@/components/messaging/new-group-chat-dialog";
 import { InviteToThreadDialog } from "@/components/messaging/invite-to-thread-dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/dashboard/messages")({
   component: MessagesPage,
@@ -124,6 +126,8 @@ function attachmentPreview(body: string | null, type: AttachType): string {
 
 function MessagesPage() {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
+  const queryClient = useQueryClient();
   const [dms, setDms] = useState<DmRow[]>([]);
   const [groupMsgs, setGroupMsgs] = useState<GroupMsg[]>([]);
   const [groupThreads, setGroupThreads] = useState<Record<string, GroupThread>>({});
@@ -154,7 +158,7 @@ function MessagesPage() {
   const [showInvite, setShowInvite] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!user) return;
 
     const [dmRes, myMemRes] = await Promise.all([
@@ -272,12 +276,11 @@ function MessagesPage() {
       );
       setProfilesById(map);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [load]);
 
   useEffect(() => {
     if (!user) return;
@@ -298,8 +301,7 @@ function MessagesPage() {
     return () => {
       supabase.removeChannel(ch);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, load]);
 
   // Auto-open thread from ?thread= query
   useEffect(() => {
@@ -408,8 +410,12 @@ function MessagesPage() {
   }, [dms, groupMsgs, groupThreads, groupMembers, myMemberships, listingsById, profilesById, user]);
 
   useEffect(() => {
-    if (!activeKey && conversations.length) setActiveKey(conversations[0].key);
-  }, [conversations, activeKey]);
+    if (activeKey && !conversations.some((c) => c.key === activeKey)) {
+      setActiveKey(isMobile ? null : (conversations[0]?.key ?? null));
+      return;
+    }
+    if (!isMobile && !activeKey && conversations.length) setActiveKey(conversations[0].key);
+  }, [conversations, activeKey, isMobile]);
 
   const activeConvo = conversations.find((c) => c.key === activeKey);
 
@@ -448,13 +454,16 @@ function MessagesPage() {
       .update({ read_at: new Date().toISOString() })
       .in("id", unreadIds)
       .then(() => {
+        (supabase.rpc as any)("mark_message_notifications_read", { p_message_ids: unreadIds }).then(
+          () => queryClient.invalidateQueries({ queryKey: ["user-notifications"] }),
+        );
         setDms((prev) =>
           prev.map((m) =>
             unreadIds.includes(m.id) ? { ...m, read_at: new Date().toISOString() } : m,
           ),
         );
       });
-  }, [dmThread, user, activeConvo]);
+  }, [dmThread, user, activeConvo, queryClient]);
 
   // Mark group thread read
   useEffect(() => {
@@ -479,6 +488,20 @@ function MessagesPage() {
     });
     if (error) toast.error(error.message);
     else {
+      const latestInboundId = dms
+        .filter(
+          (m) =>
+            m.listing_id === c.listing_id &&
+            m.recipient_id === user?.id &&
+            m.sender_id === c.other_user_id,
+        )
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+        ?.id;
+      if (latestInboundId) {
+        (supabase.rpc as any)("mark_message_notifications_unread", {
+          p_message_ids: [latestInboundId],
+        }).then(() => queryClient.invalidateQueries({ queryKey: ["user-notifications"] }));
+      }
       toast.success("Marked as unread");
       load();
     }
@@ -495,6 +518,20 @@ function MessagesPage() {
       .is("read_at", null);
     if (error) toast.error(error.message);
     else {
+      const readMessageIds = dms
+        .filter(
+          (m) =>
+            m.listing_id === c.listing_id &&
+            m.recipient_id === user.id &&
+            m.sender_id === c.other_user_id &&
+            !m.read_at,
+        )
+        .map((m) => m.id);
+      if (readMessageIds.length > 0) {
+        (supabase.rpc as any)("mark_message_notifications_read", {
+          p_message_ids: readMessageIds,
+        }).then(() => queryClient.invalidateQueries({ queryKey: ["user-notifications"] }));
+      }
       toast.success("Marked as read");
       load();
     }
@@ -575,28 +612,49 @@ function MessagesPage() {
     setSending(true);
     let error;
     if (activeConvo.kind === "dm") {
-      ({ error } = await supabase.from("messages").insert({
-        listing_id: activeConvo.listing_id!,
-        sender_id: user.id,
-        recipient_id: activeConvo.other_user_id!,
-        body: payload.body.trim() || null,
-        attachment_url: payload.attachment?.url ?? null,
-        attachment_type: payload.attachment?.type ?? null,
-        attachment_thumb_url: payload.attachment?.thumbUrl ?? null,
-        attachment_path: payload.attachment?.path ?? null,
-        attachment_meta: (payload.attachment?.meta ?? null) as any,
-      }));
+      const { data, error: insertError } = await supabase
+        .from("messages")
+        .insert({
+          listing_id: activeConvo.listing_id!,
+          sender_id: user.id,
+          recipient_id: activeConvo.other_user_id!,
+          body: payload.body.trim() || null,
+          attachment_url: payload.attachment?.url ?? null,
+          attachment_type: payload.attachment?.type ?? null,
+          attachment_thumb_url: payload.attachment?.thumbUrl ?? null,
+          attachment_path: payload.attachment?.path ?? null,
+          attachment_meta: (payload.attachment?.meta ?? null) as any,
+        })
+        .select(
+          "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta",
+        )
+        .maybeSingle();
+      error = insertError;
+      if (data) {
+        setDms((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data as DmRow]));
+      }
     } else {
-      ({ error } = await (supabase.from("chat_thread_messages" as any) as any).insert({
-        thread_id: activeConvo.thread_id!,
-        sender_id: user.id,
-        body: payload.body.trim() || null,
-        attachment_url: payload.attachment?.url ?? null,
-        attachment_type: payload.attachment?.type ?? null,
-        attachment_thumb_url: payload.attachment?.thumbUrl ?? null,
-        attachment_path: payload.attachment?.path ?? null,
-        attachment_meta: payload.attachment?.meta ?? null,
-      }));
+      const { data, error: insertError } = await (supabase.from("chat_thread_messages" as any) as any)
+        .insert({
+          thread_id: activeConvo.thread_id!,
+          sender_id: user.id,
+          body: payload.body.trim() || null,
+          attachment_url: payload.attachment?.url ?? null,
+          attachment_type: payload.attachment?.type ?? null,
+          attachment_thumb_url: payload.attachment?.thumbUrl ?? null,
+          attachment_path: payload.attachment?.path ?? null,
+          attachment_meta: payload.attachment?.meta ?? null,
+        })
+        .select(
+          "id,thread_id,sender_id,body,created_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta",
+        )
+        .maybeSingle();
+      error = insertError;
+      if (data) {
+        setGroupMsgs((prev) =>
+          prev.some((m) => m.id === data.id) ? prev : [...prev, data as GroupMsg],
+        );
+      }
     }
     setSending(false);
     if (error) {

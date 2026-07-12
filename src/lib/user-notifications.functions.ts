@@ -4,11 +4,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const listMyNotifications = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { limit?: number; unreadOnly?: boolean }) =>
+  .inputValidator((d: { limit?: number; unreadOnly?: boolean; category?: string }) =>
     z
       .object({
         limit: z.number().int().min(1).max(100).optional(),
         unreadOnly: z.boolean().optional(),
+        category: z.string().min(1).max(64).optional(),
       })
       .parse(d ?? {}),
   )
@@ -21,14 +22,17 @@ export const listMyNotifications = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(data.limit ?? 20);
     if (data.unreadOnly) q = q.is("read_at", null);
+    if (data.category) q = q.eq("category", data.category);
     const { data: items, error } = await q;
     if (error) throw new Error(error.message);
 
-    const { count: unreadCount } = await supabase
+    let unreadCountQuery = supabase
       .from("user_notifications")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
       .is("read_at", null);
+    if (data.category) unreadCountQuery = unreadCountQuery.eq("category", data.category);
+    const { count: unreadCount } = await unreadCountQuery;
 
     return { items: items ?? [], unreadCount: unreadCount ?? 0 };
   });

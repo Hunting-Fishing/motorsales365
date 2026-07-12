@@ -35,6 +35,7 @@ import { useAuth, type SellerType, type AppRole } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserNotifications } from "@/hooks/use-user-notifications";
 
 import {
   DropdownMenu,
@@ -107,6 +108,12 @@ export function SiteHeader() {
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { data: messageNotifications } = useUserNotifications({
+    limit: 1,
+    category: "messages",
+    enabled: !!user && !loading,
+  });
+  const unreadMessages = messageNotifications?.unreadCount ?? 0;
 
   const personaActive = !!(simulatedRoles && simulatedRoles.length > 0) || !!simulatedSellerType;
 
@@ -528,7 +535,12 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard/messages">
                     <MessageSquare className="mr-2 h-4 w-4" />
-                    Messages
+                    <span className="flex-1">Messages</span>
+                    {unreadMessages > 0 && (
+                      <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
+                        {unreadMessages > 99 ? "99+" : unreadMessages}
+                      </span>
+                    )}
                   </Link>
                 </DropdownMenuItem>
                 {isStaff && (
