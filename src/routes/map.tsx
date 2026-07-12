@@ -148,7 +148,49 @@ function mapSearchMatches(a: MapSearchState, b: MapSearchState) {
   );
 }
 
+function useHydrated() {
+  const [h, setH] = useState(false);
+  useEffect(() => setH(true), []);
+  return h;
+}
+
+function MapPageSkeleton() {
+  return (
+    <SiteLayout>
+      <div className="container mx-auto px-3 py-3 sm:px-4 sm:py-4">
+        <div className="mb-3 lg:block">
+          <h1 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
+            Business Map
+          </h1>
+          <p className="text-xs text-muted-foreground sm:text-sm">
+            Search a radius around any location. Tap a pin for details.
+          </p>
+        </div>
+        <Card className="mb-3 p-3">
+          <Skeleton className="h-10 w-full" />
+        </Card>
+        <div className="md:grid md:grid-cols-[320px_minmax(0,1fr)] md:gap-4 xl:grid-cols-[380px_minmax(0,1fr)]">
+          <div className="relative order-1 h-[calc(100dvh-280px)] min-h-[360px] overflow-hidden rounded-lg md:order-2 md:h-[min(650px,calc(100dvh-235px))] md:min-h-[520px]">
+            <Skeleton className="h-full w-full" />
+          </div>
+          <div className="hidden md:order-1 md:block md:max-h-[min(650px,calc(100dvh-235px))] md:space-y-2">
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+          </div>
+        </div>
+      </div>
+    </SiteLayout>
+  );
+}
+
 function MapPage() {
+  const hydrated = useHydrated();
+  if (!hydrated) return <MapPageSkeleton />;
+  return <MapPageInner />;
+}
+
+function MapPageInner() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const [types, setTypes] = useState<BusinessType[]>([]);
