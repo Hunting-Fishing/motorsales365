@@ -62,11 +62,46 @@ export function MapLegend() {
             <ul className="space-y-1.5">
               {Object.entries(TYPE_COLORS).map(([slug, color]) => (
                 <li key={slug} className="flex items-center gap-2">
-                  <span
-                    className="inline-block h-3 w-3 shrink-0 rounded-full border border-white shadow"
-                    style={{ background: color }}
-                    aria-hidden
-                  />
+                  {slug === "fuel_station" ? (
+                    <span
+                      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white shadow"
+                      style={{ background: color }}
+                      aria-hidden
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#ffffff"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="3" y1="22" x2="15" y2="22" />
+                        <line x1="4" y1="9" x2="14" y2="9" />
+                        <path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18" />
+                        <path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5" />
+                      </svg>
+                    </span>
+                  ) : (
+                    <svg
+                      className="shrink-0"
+                      width="12"
+                      height="17"
+                      viewBox="0 0 24 34"
+                      aria-hidden
+                    >
+                      <path
+                        d="M12 0C5.4 0 0 5.4 0 12c0 9 12 22 12 22s12-13 12-22C24 5.4 18.6 0 12 0z"
+                        fill={color}
+                        stroke="#ffffff"
+                        strokeWidth="2"
+                      />
+                      <circle cx="12" cy="12" r="4" fill="#ffffff" opacity="0.95" />
+                    </svg>
+                  )}
                   <span className="truncate">{LABELS[slug] ?? slug}</span>
                 </li>
               ))}
