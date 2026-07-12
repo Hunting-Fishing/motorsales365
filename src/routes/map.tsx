@@ -220,7 +220,7 @@ function MapPage() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [center, radiusKm, typeSlug, viewport, selectedSlug]);
+  }, [center, radiusKm, typeSlug, viewport, selectedSlug, nameQuery, featuredOnly, verifiedOnly, ratedOnly, minRating]);
 
   useEffect(() => {
     setTypes(
