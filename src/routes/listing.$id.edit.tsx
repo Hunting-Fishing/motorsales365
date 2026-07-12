@@ -715,45 +715,9 @@ function EditListingPage() {
                     />
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-4 text-xs">
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={negotiable}
-                      onChange={(e) => setNegotiable(e.target.checked)}
-                    />
-                    Negotiable
-                  </label>
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={priceHidden}
-                      onChange={(e) => setPriceHidden(e.target.checked)}
-                    />
-                    Hide price — buyers must message me
-                  </label>
-                </div>
-                {(category === "car" || category === "motorcycle" || category === "truck") && (
-                  <div>
-                    <Label className="text-xs">Registration</Label>
-                    <Select
-                      value={registrationStatus}
-                      onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
-                    >
-                      <SelectTrigger className="mt-1 h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="registered">Registered (OR/CR current)</SelectItem>
-                        <SelectItem value="unregistered">Unregistered / expired</SelectItem>
-                        <SelectItem value="for_transfer">For transfer of ownership</SelectItem>
-                        <SelectItem value="unknown">Not specified</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                {/* Negotiable / Hide price / Financing / Trade-in are surfaced as pills
+                    inside VehicleQualityFields below to avoid duplicates. Registration status
+                    is captured via OR/CR under Vehicle details & filters. */}
               </div>
               <div>
                 <Label>Contact phone</Label>
