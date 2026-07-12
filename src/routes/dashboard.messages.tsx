@@ -488,6 +488,20 @@ function MessagesPage() {
     });
     if (error) toast.error(error.message);
     else {
+      const latestInboundId = dms
+        .filter(
+          (m) =>
+            m.listing_id === c.listing_id &&
+            m.recipient_id === user?.id &&
+            m.sender_id === c.other_user_id,
+        )
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+        ?.id;
+      if (latestInboundId) {
+        (supabase.rpc as any)("mark_message_notifications_unread", {
+          p_message_ids: [latestInboundId],
+        }).then(() => queryClient.invalidateQueries({ queryKey: ["user-notifications"] }));
+      }
       toast.success("Marked as unread");
       load();
     }
