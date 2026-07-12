@@ -44,6 +44,9 @@ import {
 } from "@/components/listings/category-attributes-editor";
 import { isAttrCategory, isValidDrivetrain } from "@/lib/category-attributes";
 import { NeededPartsEditor } from "@/components/listings/needed-parts-editor";
+import { FloatingSaveWidget } from "@/components/listings/floating-save-widget";
+import { Wrench } from "lucide-react";
+
 import { PhoneInput } from "@/components/phone-input";
 import { parseE164, buildE164 } from "@/data/country-codes";
 import {
