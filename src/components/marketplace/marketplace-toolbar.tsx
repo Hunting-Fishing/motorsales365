@@ -1,5 +1,6 @@
 import { LayoutGrid, Map as MapIcon, Rows3, Rows2, Grid2x2, Grid3x3 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ListingLegend } from "@/components/marketplace/listing-legend";
 import type { GridDensity } from "@/hooks/use-grid-density";
 
 export type ViewMode = "grid" | "map";
@@ -40,6 +41,9 @@ export function MarketplaceToolbar({
 
         <div className="ml-auto flex items-center gap-2">
           {right}
+
+          <ListingLegend />
+
 
           {/* Density toggle — desktop only, decides cards per row */}
           <div className="hidden items-center rounded-md border border-border bg-card p-0.5 md:flex">
