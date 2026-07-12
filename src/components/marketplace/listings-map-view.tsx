@@ -33,13 +33,23 @@ type Pin =
   | { kind: "exact"; lat: number; lng: number; listing: ListingCardData }
   | { kind: "region"; lat: number; lng: number; region: string; listings: ListingCardData[] };
 
-function buildPins(listings: ListingCardData[]): { pins: Pin[]; unmapped: number } {
+function buildPins(
+  listings: ListingCardData[],
+  cityCoords: Record<string, { lat: number; lng: number }>,
+): { pins: Pin[]; unmapped: number } {
   const pins: Pin[] = [];
   const byRegion = new Map<string, ListingCardData[]>();
   let unmapped = 0;
   for (const l of listings) {
     if (l.lat != null && l.lng != null && Number.isFinite(l.lat) && Number.isFinite(l.lng)) {
       pins.push({ kind: "exact", lat: Number(l.lat), lng: Number(l.lng), listing: l });
+      continue;
+    }
+    // Try city-level geocode cache (much more accurate than region centroid)
+    const cityKey = l.city && l.region ? `${l.city}|${l.region}` : null;
+    if (cityKey && cityCoords[cityKey]) {
+      const c = cityCoords[cityKey];
+      pins.push({ kind: "exact", lat: c.lat, lng: c.lng, listing: l });
       continue;
     }
     if (l.region && CENTROIDS[l.region]) {
@@ -60,6 +70,43 @@ function buildPins(listings: ListingCardData[]): { pins: Pin[]; unmapped: number
     });
   }
   return { pins, unmapped };
+}
+
+const CITY_CACHE_KEY = "ph-city-geocode-v1";
+function loadCityCache(): Record<string, { lat: number; lng: number }> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(CITY_CACHE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+function saveCityCache(c: Record<string, { lat: number; lng: number }>) {
+  try {
+    localStorage.setItem(CITY_CACHE_KEY, JSON.stringify(c));
+  } catch {
+    /* ignore quota */
+  }
+}
+async function geocodeCity(city: string, region: string): Promise<{ lat: number; lng: number } | null> {
+  // Strip "Region X — " prefix for a friendlier query
+  const regionName = region.split("—").pop()?.trim() || region;
+  const q = `${city}, ${regionName}, Philippines`;
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ph&q=${encodeURIComponent(q)}`,
+      { headers: { Accept: "application/json" } },
+    );
+    if (!res.ok) return null;
+    const arr = (await res.json()) as Array<{ lat: string; lon: string }>;
+    if (!arr?.length) return null;
+    const lat = Number(arr[0].lat);
+    const lng = Number(arr[0].lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    return { lat, lng };
+  } catch {
+    return null;
+  }
 }
 
 function regionBadgeIcon(count: number): L.DivIcon {
