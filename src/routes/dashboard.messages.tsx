@@ -859,6 +859,18 @@ function MessagesPage() {
       </div>
 
 
+      <FolderTabs active={folder} counts={folderCounts} onChange={setFolder} />
+
+      <div className="relative mb-3">
+        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search your messages…"
+          className="pl-8"
+        />
+      </div>
+
       {conversations.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
           <MessageSquare className="mx-auto mb-3 h-8 w-8" />
@@ -870,7 +882,16 @@ function MessagesPage() {
             className={`overflow-hidden rounded-xl border border-border bg-card ${activeKey ? "hidden lg:block" : "block"}`}
           >
             <div className="max-h-[70dvh] divide-y divide-border overflow-y-auto">
-              {conversations.map((c) => (
+              {filteredConversations.length === 0 && (
+                <div className="p-6 text-center text-xs text-muted-foreground">
+                  Nothing in this folder{search ? " that matches your search" : ""}.
+                </div>
+              )}
+              {filteredConversations.map((c) => {
+                const sKey = stateKeyOf(c);
+                const st = threadStates.get(sKey.scope, sKey.key);
+                return (
+
                 <div
                   key={c.key}
                   className={`group relative flex w-full items-start gap-3 p-3 transition-colors ${
