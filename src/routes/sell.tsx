@@ -3009,7 +3009,14 @@ function SellPage() {
           })()}
 
         </form>
+        <FloatingSaveWidget
+          formId="sell-listing-form"
+          busy={submitting}
+          label="Publish listing"
+          busyLabel="Publishing…"
+        />
       </div>
     </SiteLayout>
+
   );
 }
