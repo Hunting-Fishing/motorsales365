@@ -252,61 +252,96 @@ export function ListingCard({
             loading="lazy"
           />
           <ListingQuickActions listingId={listing.id} title={listing.title} />
-          <div className="absolute left-2 top-2 flex flex-wrap gap-1">
-            {openReports > 0 && (
-              <ListingReportBadge listingId={listing.id} openCount={openReports} />
+          {/*
+            Badge stack — consistent stacking rules so multiple states never
+            overlap or get clipped:
+             - Constrained to ~70% of card width so the actions menu (top-right)
+               is never covered, even at the smallest card size.
+             - Uses `flex flex-wrap` with a uniform `gap-1.5` so rows/columns
+               align cleanly when 2+ badges are shown.
+             - Each child pill is rendered in a `shrink-0` wrapper so long
+               labels wrap onto a new row instead of getting truncated.
+             - Rendered in strict priority order (most important first) so the
+               top-left badge is always the most urgent signal.
+          */}
+          <div
+            className={cn(
+              "pointer-events-none absolute left-2 top-2 z-[1] flex max-w-[calc(100%-3rem)] flex-wrap items-start gap-1.5",
+              // Cap total height so an unusually chatty listing never eats the
+              // whole photo; overflow badges are hidden rather than clipped
+              // mid-pill.
+              "max-h-[60%] overflow-hidden",
             )}
-            {boosted && (
-              <Badge className="bg-accent text-accent-foreground">
-                <Star className="mr-1 h-3 w-3" />
-                Featured
-              </Badge>
-            )}
-            {!boosted && <NewBadge publishedAt={listing.published_at} />}
-            {!compact && !boosted && doubled && (
-              <Badge className="bg-sky-500 text-white hover:bg-sky-500">
-                <Star className="mr-1 h-3 w-3" />
-                Renewed
-              </Badge>
-            )}
-            {!compact && !boosted && !doubled && (
-              <RenewedBadge
-                updatedAt={listing.updated_at}
-                publishedAt={listing.published_at}
-              />
-            )}
-            <PromoBadge promo={effectivePromo} />
-            {matchBadge && (
-              <Badge
-                className={cn(
-                  matchBadge.tone === "exact" && "bg-emerald-600 text-white",
-                  matchBadge.tone === "good" && "bg-primary text-primary-foreground",
-                  matchBadge.tone === "loose" && "bg-muted text-foreground",
-                )}
-              >
-                {matchBadge.label}
-              </Badge>
-            )}
-            {!compact && catMeta && (
-              <Badge className="bg-primary text-primary-foreground">
-                <catMeta.Icon className="mr-1 h-3 w-3" />
-                {catMeta.label}
-              </Badge>
-            )}
-            {!compact && listing.seller_type === "business" && listing.seller_dealer_plan && (
-              <DealerSubscriptionBadge
-                planName={listing.seller_dealer_plan}
-                currentPeriodEnd={listing.seller_dealer_period_end ?? null}
-                cancelAtPeriodEnd={Boolean(listing.seller_dealer_cancel_at_period_end)}
-                size="sm"
-                showRenewal
-              />
-            )}
-            {listing.status === "pending_sale" && (
-              <Badge className="bg-warning text-warning-foreground">Pending Sale</Badge>
-            )}
-            <PriceTrendBadge trend={effectiveTrend} />
-
+          >
+            {(() => {
+              const items: React.ReactNode[] = [];
+              if (openReports > 0)
+                items.push(<ListingReportBadge listingId={listing.id} openCount={openReports} />);
+              if (listing.status === "pending_sale")
+                items.push(
+                  <Badge className="bg-warning text-warning-foreground">Pending Sale</Badge>,
+                );
+              if (boosted)
+                items.push(
+                  <Badge className="bg-accent text-accent-foreground">
+                    <Star className="mr-1 h-3 w-3" />
+                    Featured
+                  </Badge>,
+                );
+              if (!boosted) items.push(<NewBadge publishedAt={listing.published_at} />);
+              if (!compact && !boosted && doubled)
+                items.push(
+                  <Badge className="bg-sky-500 text-white hover:bg-sky-500">
+                    <Star className="mr-1 h-3 w-3" />
+                    Renewed
+                  </Badge>,
+                );
+              if (!compact && !boosted && !doubled)
+                items.push(
+                  <RenewedBadge
+                    updatedAt={listing.updated_at}
+                    publishedAt={listing.published_at}
+                  />,
+                );
+              items.push(<PromoBadge promo={effectivePromo} />);
+              items.push(<PriceTrendBadge trend={effectiveTrend} />);
+              if (matchBadge)
+                items.push(
+                  <Badge
+                    className={cn(
+                      matchBadge.tone === "exact" && "bg-emerald-600 text-white",
+                      matchBadge.tone === "good" && "bg-primary text-primary-foreground",
+                      matchBadge.tone === "loose" && "bg-muted text-foreground",
+                    )}
+                  >
+                    {matchBadge.label}
+                  </Badge>,
+                );
+              if (!compact && catMeta)
+                items.push(
+                  <Badge className="bg-primary text-primary-foreground">
+                    <catMeta.Icon className="mr-1 h-3 w-3" />
+                    {catMeta.label}
+                  </Badge>,
+                );
+              if (!compact && listing.seller_type === "business" && listing.seller_dealer_plan)
+                items.push(
+                  <DealerSubscriptionBadge
+                    planName={listing.seller_dealer_plan}
+                    currentPeriodEnd={listing.seller_dealer_period_end ?? null}
+                    cancelAtPeriodEnd={Boolean(listing.seller_dealer_cancel_at_period_end)}
+                    size="sm"
+                    showRenewal
+                  />,
+                );
+              return items
+                .filter((n): n is React.ReactElement => !!n)
+                .map((node, i) => (
+                  <span key={i} className="pointer-events-auto inline-flex shrink-0">
+                    {node}
+                  </span>
+                ));
+            })()}
           </div>
           <div className="absolute bottom-2 right-2 flex items-center gap-2 rounded-md bg-black/55 px-2 py-1 text-[11px] font-medium text-white">
             <span className="flex items-center gap-1">
