@@ -20,9 +20,9 @@ const MAP_ENTRIES: { swatch: React.ReactNode; label: string; desc: string }[] = 
     desc: "Exact location shared by the seller.",
   },
   {
-    swatch: <PinSwatch fill="#0ea5e9" />,
+    swatch: <PinSwatch fill="#14b8a6" />,
     label: "Region group",
-    desc: "Multiple listings without exact coords — grouped at region centroid.",
+    desc: "Teal — multiple listings without exact coords, grouped at region centroid.",
   },
   {
     swatch: (
