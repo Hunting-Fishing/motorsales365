@@ -29,7 +29,7 @@ import { MessageComposer, type MessagePayload } from "@/components/messaging/mes
 import { AttachmentBubble } from "@/components/messaging/attachment-bubble";
 import { NewGroupChatDialog } from "@/components/messaging/new-group-chat-dialog";
 import { InviteToThreadDialog } from "@/components/messaging/invite-to-thread-dialog";
-import { useIsMobile } from "@/hooks/use-mobile";
+
 
 export const Route = createFileRoute("/dashboard/messages")({
   component: MessagesPage,
