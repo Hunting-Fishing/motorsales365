@@ -227,9 +227,23 @@ type Props = {
   onChange: (next: VehicleQuality) => void;
   /** Show per-field errors after a failed submit. Pass the issues array from validateVehicleQuality. */
   issues?: VehicleQualityIssue[];
+  /** Top-level price flags — surfaced here as pills so they don't duplicate in the Price section. */
+  negotiable?: boolean;
+  onNegotiableChange?: (v: boolean) => void;
+  priceHidden?: boolean;
+  onPriceHiddenChange?: (v: boolean) => void;
 };
 
-export function VehicleQualityFields({ category, value, onChange, issues = [] }: Props) {
+export function VehicleQualityFields({
+  category,
+  value,
+  onChange,
+  issues = [],
+  negotiable,
+  onNegotiableChange,
+  priceHidden,
+  onPriceHiddenChange,
+}: Props) {
   const set = <K extends keyof VehicleQuality>(k: K, v: VehicleQuality[K]) =>
     onChange({ ...value, [k]: v });
 
