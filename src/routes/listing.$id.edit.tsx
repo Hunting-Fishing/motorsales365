@@ -1157,13 +1157,7 @@ function EditListingPage() {
               </div>
             )}
             {isAttrCategory(category) && (
-              <div className="mt-4 rounded-md border border-border/60 bg-background/40 p-4">
-                <h3 className="mb-1 font-display text-sm font-semibold">
-                  More details & buyer filters
-                </h3>
-                <p className="mb-3 text-xs text-muted-foreground">
-                  These fields power the {category} browse page filters so the right buyers find you.
-                </p>
+              <div className="mt-2">
                 <CategoryAttributesEditor
                   category={category}
                   value={categoryAttrs}
@@ -1172,16 +1166,21 @@ function EditListingPage() {
               </div>
             )}
             {(category === "car" || category === "motorcycle") && (
-              <details className="mt-4 rounded-md border border-border/60 bg-background/40 open:bg-background">
+              <details className="mt-4 rounded-md border-l-4 border-primary/70 border-y border-r border-border/60 bg-background/40 open:bg-background">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3">
-                  <div>
-                    <h3 className="font-display text-sm font-semibold">
-                      Parts needed / known issues{" "}
-                      <span className="text-xs font-normal text-muted-foreground">(optional)</span>
-                    </h3>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">
-                      Flag anything this car needs — brakes, tires, battery, etc.
-                    </p>
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
+                      <Wrench className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <h3 className="font-display text-sm font-semibold">
+                        Parts needed / known issues{" "}
+                        <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                      </h3>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">
+                        Flag anything this car needs — brakes, tires, battery, etc.
+                      </p>
+                    </div>
                   </div>
                   <span className="flex items-center gap-2 text-xs text-muted-foreground">
                     {neededParts.length > 0 && (
@@ -1207,6 +1206,7 @@ function EditListingPage() {
               </details>
             )}
           </section>
+
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Location & contact</h2>
