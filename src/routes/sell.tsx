@@ -54,6 +54,8 @@ import {
   CategoryAttributesEditor,
   CATEGORY_ATTR_KEYS,
 } from "@/components/listings/category-attributes-editor";
+import { FloatingSaveWidget } from "@/components/listings/floating-save-widget";
+
 import { isAttrCategory, isValidDrivetrain } from "@/lib/category-attributes";
 import {
   FitmentEditor,
