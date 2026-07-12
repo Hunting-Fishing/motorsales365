@@ -1511,7 +1511,7 @@ function SellPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-3 space-y-2">
+        <form id="sell-listing-form" onSubmit={handleSubmit} className="mt-3 space-y-2">
           {(() => {
             const TABS = [
               { key: "details", label: "Details" },
