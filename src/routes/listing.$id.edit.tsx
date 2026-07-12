@@ -1441,7 +1441,9 @@ function EditListingPage() {
             </Button>
           </div>
         </form>
+        <FloatingSaveWidget formId="edit-listing-form" busy={saving} label="Save changes" />
       </div>
     </SiteLayout>
+
   );
 }
