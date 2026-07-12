@@ -452,13 +452,7 @@ function MessagesPage() {
       .update({ read_at: new Date().toISOString() })
       .in("id", unreadIds)
       .then(() => {
-        supabase
-          .from("user_notifications")
-          .update({ read_at: new Date().toISOString() })
-          .eq("user_id", user.id)
-          .eq("category", "messages")
-          .eq("entity_type", "message")
-          .in("entity_id", unreadIds);
+        (supabase.rpc as any)("mark_message_notifications_read", { p_message_ids: unreadIds });
         setDms((prev) =>
           prev.map((m) =>
             unreadIds.includes(m.id) ? { ...m, read_at: new Date().toISOString() } : m,
@@ -516,13 +510,9 @@ function MessagesPage() {
         )
         .map((m) => m.id);
       if (readMessageIds.length > 0) {
-        supabase
-          .from("user_notifications")
-          .update({ read_at: new Date().toISOString() })
-          .eq("user_id", user.id)
-          .eq("category", "messages")
-          .eq("entity_type", "message")
-          .in("entity_id", readMessageIds);
+        (supabase.rpc as any)("mark_message_notifications_read", {
+          p_message_ids: readMessageIds,
+        });
       }
       toast.success("Marked as read");
       load();
