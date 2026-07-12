@@ -27,7 +27,6 @@ export type VehicleQuality = {
   vin_chassis?: string;
   financing_available?: boolean;
   trade_accepted?: boolean;
-  price_negotiable?: boolean;
 };
 
 export const VEHICLE_QUALITY_KEYS: (keyof VehicleQuality)[] = [
@@ -43,7 +42,6 @@ export const VEHICLE_QUALITY_KEYS: (keyof VehicleQuality)[] = [
   "vin_chassis",
   "financing_available",
   "trade_accepted",
-  "price_negotiable",
 ];
 
 
@@ -112,7 +110,6 @@ export const VehicleQualitySchema = z
       ),
     financing_available: z.boolean().optional(),
     trade_accepted: z.boolean().optional(),
-    price_negotiable: z.boolean().optional(),
   })
   .refine(
     (v) =>
@@ -171,7 +168,6 @@ const FIELD_LABELS: Record<keyof VehicleQuality, string> = {
   vin_chassis: "VIN / chassis",
   financing_available: "Financing available",
   trade_accepted: "Trade-in accepted",
-  price_negotiable: "Price negotiable",
 };
 
 
@@ -231,9 +227,23 @@ type Props = {
   onChange: (next: VehicleQuality) => void;
   /** Show per-field errors after a failed submit. Pass the issues array from validateVehicleQuality. */
   issues?: VehicleQualityIssue[];
+  /** Top-level price flags — surfaced here as pills so they don't duplicate in the Price section. */
+  negotiable?: boolean;
+  onNegotiableChange?: (v: boolean) => void;
+  priceHidden?: boolean;
+  onPriceHiddenChange?: (v: boolean) => void;
 };
 
-export function VehicleQualityFields({ category, value, onChange, issues = [] }: Props) {
+export function VehicleQualityFields({
+  category,
+  value,
+  onChange,
+  issues = [],
+  negotiable,
+  onNegotiableChange,
+  priceHidden,
+  onPriceHiddenChange,
+}: Props) {
   const set = <K extends keyof VehicleQuality>(k: K, v: VehicleQuality[K]) =>
     onChange({ ...value, [k]: v });
 
@@ -390,30 +400,62 @@ export function VehicleQualityFields({ category, value, onChange, issues = [] }:
 
       </div>
 
-      <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1">
-        <label className="flex items-center gap-2 text-sm">
-          <Checkbox
-            checked={!!value.price_negotiable}
-            onCheckedChange={(v) => set("price_negotiable", v === true)}
+      <div className="flex flex-wrap gap-2 pt-1">
+        {onNegotiableChange && (
+          <PillCheckbox
+            checked={!!negotiable}
+            onChange={onNegotiableChange}
+            label="Price is negotiable"
           />
-          Price is negotiable
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <Checkbox
-            checked={!!value.financing_available}
-            onCheckedChange={(v) => set("financing_available", v === true)}
+        )}
+        {onPriceHiddenChange && (
+          <PillCheckbox
+            checked={!!priceHidden}
+            onChange={onPriceHiddenChange}
+            label="Hide price — buyers must message me"
           />
-          Financing available
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <Checkbox
-            checked={!!value.trade_accepted}
-            onCheckedChange={(v) => set("trade_accepted", v === true)}
-          />
-          Trade-in accepted
-        </label>
+        )}
+        <PillCheckbox
+          checked={!!value.financing_available}
+          onChange={(v) => set("financing_available", v)}
+          label="Financing available"
+        />
+        <PillCheckbox
+          checked={!!value.trade_accepted}
+          onChange={(v) => set("trade_accepted", v)}
+          label="Trade-in accepted"
+        />
       </div>
     </div>
+  );
+}
+
+function PillCheckbox({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      aria-pressed={checked}
+      className={
+        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition " +
+        (checked
+          ? "border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-950/40 dark:text-blue-200"
+          : "border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground")
+      }
+    >
+      <CheckCircle2
+        className={"h-3.5 w-3.5 " + (checked ? "text-blue-600 dark:text-blue-300" : "text-muted-foreground/50")}
+      />
+      {label}
+    </button>
   );
 }
 

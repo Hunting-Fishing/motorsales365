@@ -1793,25 +1793,8 @@ function SellPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                {(category === "car" || category === "motorcycle" || category === "truck") ? (
-                  <div>
-                    <Label className="text-[11px]">Registration</Label>
-                    <Select
-                      value={registrationStatus}
-                      onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
-                    >
-                      <SelectTrigger className="h-8 w-full text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="registered">Registered</SelectItem>
-                        <SelectItem value="unregistered">Unregistered</SelectItem>
-                        <SelectItem value="for_transfer">For transfer</SelectItem>
-                        <SelectItem value="unknown">Not specified</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ) : null}
+                {/* Registration status is captured via OR/CR under the vehicle
+                    details filters below to avoid duplicate OR/CR fields. */}
                 <div>
                   <Label className="text-[11px]">Seller</Label>
                   <div
@@ -1935,26 +1918,32 @@ function SellPage() {
                   />
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs pb-1">
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={negotiable}
-                      onChange={(e) => setNegotiable(e.target.checked)}
-                    />
-                    Negotiable
-                  </label>
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={priceHidden}
-                      onChange={(e) => setPriceHidden(e.target.checked)}
-                    />
-                    Hide price — buyers must message me
-                  </label>
+                  {!(category === "car" || category === "motorcycle") && (
+                    <>
+                      <label className="inline-flex items-center gap-1.5">
+                        <input
+                          type="checkbox"
+                          className="h-3.5 w-3.5 accent-primary"
+                          checked={negotiable}
+                          onChange={(e) => setNegotiable(e.target.checked)}
+                        />
+                        Negotiable
+                      </label>
+                      <label className="inline-flex items-center gap-1.5">
+                        <input
+                          type="checkbox"
+                          className="h-3.5 w-3.5 accent-primary"
+                          checked={priceHidden}
+                          onChange={(e) => setPriceHidden(e.target.checked)}
+                        />
+                        Hide price — buyers must message me
+                      </label>
+                    </>
+                  )}
                   <span className="text-[11px] text-muted-foreground basis-full">
-                    Real prices only — placeholders (₱1, ₱2…) lower your seller score.
+                    {category === "car" || category === "motorcycle"
+                      ? "Negotiable / Hide price options are in the vehicle details section below."
+                      : "Real prices only — placeholders (₱1, ₱2…) lower your seller score."}
                   </span>
                 </div>
               </div>
@@ -2432,6 +2421,10 @@ function SellPage() {
                   value={vehicleQuality}
                   onChange={setVehicleQuality}
                   issues={vehicleQualityIssues}
+                  negotiable={negotiable}
+                  onNegotiableChange={setNegotiable}
+                  priceHidden={priceHidden}
+                  onPriceHiddenChange={setPriceHidden}
                 />
               </SellGroup>
             )}

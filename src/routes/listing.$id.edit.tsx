@@ -715,45 +715,9 @@ function EditListingPage() {
                     />
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-4 text-xs">
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={negotiable}
-                      onChange={(e) => setNegotiable(e.target.checked)}
-                    />
-                    Negotiable
-                  </label>
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={priceHidden}
-                      onChange={(e) => setPriceHidden(e.target.checked)}
-                    />
-                    Hide price — buyers must message me
-                  </label>
-                </div>
-                {(category === "car" || category === "motorcycle" || category === "truck") && (
-                  <div>
-                    <Label className="text-xs">Registration</Label>
-                    <Select
-                      value={registrationStatus}
-                      onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
-                    >
-                      <SelectTrigger className="mt-1 h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="registered">Registered (OR/CR current)</SelectItem>
-                        <SelectItem value="unregistered">Unregistered / expired</SelectItem>
-                        <SelectItem value="for_transfer">For transfer of ownership</SelectItem>
-                        <SelectItem value="unknown">Not specified</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                {/* Negotiable / Hide price / Financing / Trade-in are surfaced as pills
+                    inside VehicleQualityFields below to avoid duplicates. Registration status
+                    is captured via OR/CR under Vehicle details & filters. */}
               </div>
               <div>
                 <Label>Contact phone</Label>
@@ -1154,6 +1118,10 @@ function EditListingPage() {
                   value={vehicleQuality}
                   onChange={setVehicleQuality}
                   issues={vehicleQualityIssues}
+                  negotiable={negotiable}
+                  onNegotiableChange={setNegotiable}
+                  priceHidden={priceHidden}
+                  onPriceHiddenChange={setPriceHidden}
                 />
               </div>
             ) : (
@@ -1174,10 +1142,11 @@ function EditListingPage() {
             )}
             {isAttrCategory(category) && (
               <div className="mt-4 rounded-md border border-border/60 bg-background/40 p-4">
-                <h3 className="mb-3 font-display text-sm font-semibold">Buyer filters</h3>
+                <h3 className="mb-1 font-display text-sm font-semibold">
+                  More details & buyer filters
+                </h3>
                 <p className="mb-3 text-xs text-muted-foreground">
-                  These fields show up as filters on the {category} browse page. Fill them in so
-                  your listing gets matched.
+                  These fields power the {category} browse page filters so the right buyers find you.
                 </p>
                 <CategoryAttributesEditor
                   category={category}
