@@ -139,9 +139,53 @@ function FitToPins({ pins }: { pins: Pin[] }) {
 
 export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
   const [selected, setSelected] = useState<Selection | null>(null);
-  const { pins, unmapped } = useMemo(() => buildPins(listings), [listings]);
+  const [cityCoords, setCityCoords] = useState<Record<string, { lat: number; lng: number }>>(
+    () => loadCityCache(),
+  );
+  const { pins, unmapped } = useMemo(
+    () => buildPins(listings, cityCoords),
+    [listings, cityCoords],
+  );
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  // Resolve city-level coordinates for listings missing lat/lng but with city+region.
+  const pendingRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const missing: Array<{ key: string; city: string; region: string }> = [];
+    for (const l of listings) {
+      if (l.lat != null && l.lng != null) continue;
+      if (!l.city || !l.region) continue;
+      const key = `${l.city}|${l.region}`;
+      if (cityCoords[key] || pendingRef.current.has(key)) continue;
+      pendingRef.current.add(key);
+      missing.push({ key, city: l.city, region: l.region });
+    }
+    if (missing.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const next = { ...cityCoords };
+      let changed = false;
+      // Serialize with a small delay to respect Nominatim usage policy (~1 req/sec).
+      for (const m of missing) {
+        if (cancelled) return;
+        const c = await geocodeCity(m.city, m.region);
+        if (c) {
+          next[m.key] = c;
+          changed = true;
+        }
+        await new Promise((r) => setTimeout(r, 1100));
+      }
+      if (!cancelled && changed) {
+        saveCityCache(next);
+        setCityCoords(next);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [listings, cityCoords]);
+
 
   const selectionList: ListingCardData[] =
     selected?.kind === "exact"
