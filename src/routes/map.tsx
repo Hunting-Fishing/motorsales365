@@ -256,9 +256,24 @@ function MapPage() {
     return (s: string) => m.get(s) ?? s;
   }, [types]);
 
+  const filtered = useMemo(() => {
+    const nq = nameQuery.trim().toLowerCase();
+    return items.filter((b) => {
+      if (featuredOnly && !b.featured) return false;
+      if (verifiedOnly && b.claim_state !== "owned") return false;
+      if (ratedOnly && !(b.rating_count > 0)) return false;
+      if (minRating > 0 && Number(b.rating_avg) < minRating) return false;
+      if (nq) {
+        const hay = `${b.name ?? ""} ${b.city ?? ""} ${b.barangay ?? ""} ${b.province ?? ""}`.toLowerCase();
+        if (!hay.includes(nq)) return false;
+      }
+      return true;
+    });
+  }, [items, nameQuery, featuredOnly, verifiedOnly, ratedOnly, minRating]);
+
   const inRadius = useMemo(() => {
-    if (!center || !radiusKm) return items;
-    return items.filter(
+    if (!center || !radiusKm) return filtered;
+    return filtered.filter(
       (b) =>
         b.lat != null &&
         b.lng != null &&
@@ -267,7 +282,7 @@ function MapPage() {
           { lat: Number(b.lat), lng: Number(b.lng) },
         ) <= radiusKm,
     );
-  }, [items, center, radiusKm]);
+  }, [filtered, center, radiusKm]);
 
   const sorted = useMemo(() => {
     if (!center) return inRadius;
