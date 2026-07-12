@@ -1,0 +1,1 @@
+UPDATE public.businesses SET status = 'active', updated_at = now() WHERE id = '9edc71f5-940b-457d-916b-aaaf34e864de' AND status = 'archived';
