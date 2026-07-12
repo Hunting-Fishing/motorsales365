@@ -40,6 +40,11 @@ interface Props {
   placeholder?: string;
   compact?: boolean;
   disabled?: boolean;
+  /** When this value changes, textarea is set to `prefillText`. */
+  prefillKey?: string | number | null;
+  prefillText?: string;
+  /** Optional slot rendered inside the toolbar row (e.g. Quick Replies, Make Offer). */
+  extraActions?: React.ReactNode;
 }
 
 async function probeVideo(file: File): Promise<{ duration: number; width: number; height: number }> {
