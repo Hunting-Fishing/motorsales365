@@ -12874,6 +12874,25 @@ export type Database = {
         }
         Relationships: []
       }
+      public_listing_verification_status: {
+        Row: {
+          created_at: string | null
+          listing_id: string | null
+          status:
+            | Database["public"]["Enums"]["listing_verification_status"]
+            | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_verifications_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: true
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_profiles: {
         Row: {
           avatar_url: string | null
