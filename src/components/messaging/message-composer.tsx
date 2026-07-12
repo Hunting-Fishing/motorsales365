@@ -376,6 +376,9 @@ export function MessageComposer({
           </PopoverContent>
         </Popover>
 
+        {extraActions}
+
+
         <Textarea
           ref={textareaRef}
           value={text}
