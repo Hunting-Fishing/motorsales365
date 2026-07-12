@@ -263,7 +263,13 @@ export function ListingCard({
               </Badge>
             )}
             {!boosted && <NewBadge publishedAt={listing.published_at} />}
-            {!compact && !boosted && (
+            {!compact && !boosted && doubled && (
+              <Badge className="bg-sky-500 text-white hover:bg-sky-500">
+                <Star className="mr-1 h-3 w-3" />
+                Renewed
+              </Badge>
+            )}
+            {!compact && !boosted && !doubled && (
               <RenewedBadge
                 updatedAt={listing.updated_at}
                 publishedAt={listing.published_at}
