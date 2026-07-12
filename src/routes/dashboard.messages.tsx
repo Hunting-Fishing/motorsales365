@@ -339,7 +339,9 @@ function MessagesPage() {
       const title = listing?.title ?? "Listing";
       const thumb = listing?.thumb ?? null;
       const unreadInc = m.recipient_id === user.id && !m.read_at ? 1 : 0;
-      const preview = attachmentPreview(m.body, m.attachment_type);
+      const rawPreview = attachmentPreview(m.body, m.attachment_type);
+      const mine = m.sender_id === user.id;
+      const preview = rawPreview ? `${mine ? "You: " : `${(name.split(" ")[0] || name)}: `}${rawPreview}` : rawPreview;
       if (!existing) {
         dmMap.set(key, {
           key,
@@ -357,11 +359,17 @@ function MessagesPage() {
           last_body: preview,
           last_at: m.created_at,
           unread: unreadInc,
+          total: 1,
+          last_from_me: mine,
+          last_read_by_other: mine ? !!m.read_at : false,
         });
       } else {
         existing.last_body = preview;
         existing.last_at = m.created_at;
         existing.unread += unreadInc;
+        existing.total += 1;
+        existing.last_from_me = mine;
+        existing.last_read_by_other = mine ? !!m.read_at : false;
         existing.title = name;
         existing.subtitle = `Re: ${title}`;
         existing.thumb = thumb;
@@ -370,6 +378,7 @@ function MessagesPage() {
         existing.listing_price = listing?.price_php ?? null;
         existing.listing_status = listing?.status ?? null;
       }
+
     }
     list.push(...Array.from(dmMap.values()));
 
