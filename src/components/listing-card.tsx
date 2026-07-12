@@ -207,6 +207,11 @@ export function ListingCard({
   const openReports = reportSummary?.open_count ?? 0;
   const effectivePromo = listing.promotion ?? promo ?? null;
   const effectiveTrend = listing.price_trend ?? priceTrend ?? null;
+  const relisted = isRelistedAfterExpiry({
+    status: listing.status,
+    publishedAt: listing.published_at,
+    updatedAt: listing.updated_at,
+  });
   const accent = pickCardAccent({
     openReports,
     status: listing.status,
@@ -215,6 +220,7 @@ export function ListingCard({
     boosted: !!boosted,
     publishedAt: listing.published_at,
     updatedAt: listing.updated_at,
+    relisted,
   });
   // Doubled outline when a card is both freshly published (<48h) AND
   // has been meaningfully updated since (updated_at at least ~5min after
