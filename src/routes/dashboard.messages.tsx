@@ -839,11 +839,29 @@ function MessagesPage() {
                         <div className="truncate text-xs text-muted-foreground">{c.subtitle}</div>
                       )}
                       <div className="mt-1 flex items-center gap-2">
+                        {c.last_from_me && (
+                          <span
+                            title={c.last_read_by_other ? "Seen" : "Sent"}
+                            className={`shrink-0 ${c.last_read_by_other ? "text-primary" : "text-muted-foreground"}`}
+                          >
+                            <CheckCheck className="h-3.5 w-3.5" />
+                          </span>
+                        )}
                         <div
                           className={`line-clamp-1 flex-1 text-xs ${c.unread > 0 ? "font-semibold text-foreground" : "text-foreground/70"}`}
                         >
                           {c.last_body}
                         </div>
+                        {c.total > 0 && (
+                          <span
+                            title={`${c.total} message${c.total === 1 ? "" : "s"} total`}
+                            className="inline-flex items-center gap-0.5 rounded-full bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
+                          >
+                            <MessageSquare className="h-3 w-3" />
+                            {c.total}
+                          </span>
+                        )}
+
                         {c.unread > 0 && (
                           <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
                             {c.unread}
