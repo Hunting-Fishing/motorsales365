@@ -191,7 +191,7 @@ export function ListingLegend() {
           </p>
           <div className="flex items-center gap-2">
             <span
-              className="inline-block h-6 w-6 rounded-md ring-2 ring-fuchsia-500/80 outline outline-2 outline-offset-[3px] outline-sky-400/80"
+              className="inline-block h-6 w-6 rounded-md ring-2 ring-blue-600/80 outline outline-2 outline-offset-[3px] outline-sky-400/80"
               aria-hidden
             />
             <span className="text-xs text-muted-foreground">New listing + recently touched</span>
