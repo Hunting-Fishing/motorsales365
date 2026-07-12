@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { MapPin } from "lucide-react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
@@ -266,6 +266,11 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
     setFlyTarget({ lat: row.lat, lng: row.lng, zoom: 14 });
   };
 
+  const onViewportChange = useCallback((b: L.LatLngBounds, c: L.LatLng) => {
+    setBounds((prev) => (prev && prev.equals(b) ? prev : b));
+    setCenter((prev) => (prev && prev.lat === c.lat && prev.lng === c.lng ? prev : c));
+  }, []);
+
   // Scroll hovered card into view when a pin is hovered.
   useEffect(() => {
     if (!hoveredId) return;
@@ -368,12 +373,7 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
               maxZoom={19}
             />
             <FitToPins pins={pins} />
-            <ViewportSync
-              onChange={(b, c) => {
-                setBounds(b);
-                setCenter(c);
-              }}
-            />
+            <ViewportSync onChange={onViewportChange} />
             <FlyTo target={flyTarget} />
             {pins.map((pin, i) => {
               if (pin.kind === "region") {
