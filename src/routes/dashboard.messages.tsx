@@ -127,6 +127,16 @@ function attachmentPreview(body: string | null, type: AttachType): string {
 function MessagesPage() {
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  // Match the back button's `lg:hidden` breakpoint (1024px) so auto-select
+  // doesn't fight the back button on tablet/small-desktop widths.
+  const [isNarrow, setIsNarrow] = useState<boolean>(false);
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 1023px)");
+    const update = () => setIsNarrow(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
   const queryClient = useQueryClient();
   const [dms, setDms] = useState<DmRow[]>([]);
   const [groupMsgs, setGroupMsgs] = useState<GroupMsg[]>([]);
