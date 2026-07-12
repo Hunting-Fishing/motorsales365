@@ -128,8 +128,9 @@ function pickCardAccent(args: {
   boosted: boolean;
   publishedAt?: string | null;
   updatedAt?: string | null;
+  relisted: boolean;
 }): { ring: string; glow: string } | null {
-  const { openReports, status, trend, promo, boosted, publishedAt, updatedAt } = args;
+  const { openReports, status, trend, promo, boosted, publishedAt, updatedAt, relisted } = args;
   if (openReports > 0)
     return {
       ring: "ring-2 ring-red-600/80 ring-offset-1 ring-offset-background",
@@ -140,6 +141,19 @@ function pickCardAccent(args: {
       ring: "ring-2 ring-orange-500/80 ring-offset-1 ring-offset-background",
       glow: "shadow-[0_0_0_1px_rgba(249,115,22,0.25),0_10px_30px_-12px_rgba(249,115,22,0.55)]",
     };
+  if (relisted)
+    return {
+      ring: "ring-2 ring-fuchsia-500/80 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(217,70,239,0.25),0_10px_30px_-12px_rgba(217,70,239,0.55)]",
+    };
+  if (publishedAt) {
+    const age = Date.now() - new Date(publishedAt).getTime();
+    if (age >= 0 && age <= 72 * 60 * 60 * 1000)
+      return {
+        ring: "ring-2 ring-blue-600/80 ring-offset-1 ring-offset-background",
+        glow: "shadow-[0_0_0_1px_rgba(37,99,235,0.25),0_10px_30px_-12px_rgba(37,99,235,0.55)]",
+      };
+  }
   if (trend?.direction === "down")
     return {
       ring: "ring-2 ring-emerald-500/80 ring-offset-1 ring-offset-background",
@@ -160,14 +174,6 @@ function pickCardAccent(args: {
       ring: "ring-2 ring-violet-500/80 ring-offset-1 ring-offset-background",
       glow: "shadow-[0_0_0_1px_rgba(139,92,246,0.3),0_0_24px_rgba(217,70,239,0.35),0_10px_30px_-10px_rgba(139,92,246,0.6)]",
     };
-  if (publishedAt) {
-    const age = Date.now() - new Date(publishedAt).getTime();
-    if (age >= 0 && age <= 48 * 60 * 60 * 1000)
-      return {
-        ring: "ring-2 ring-fuchsia-500/80 ring-offset-1 ring-offset-background",
-        glow: "shadow-[0_0_0_1px_rgba(217,70,239,0.25),0_10px_30px_-12px_rgba(217,70,239,0.55)]",
-      };
-  }
   if (updatedAt) {
     const age = Date.now() - new Date(updatedAt).getTime();
     if (age >= 0 && age <= 24 * 60 * 60 * 1000)
