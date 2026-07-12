@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   MessageSquare,
@@ -126,6 +127,7 @@ function attachmentPreview(body: string | null, type: AttachType): string {
 function MessagesPage() {
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const queryClient = useQueryClient();
   const [dms, setDms] = useState<DmRow[]>([]);
   const [groupMsgs, setGroupMsgs] = useState<GroupMsg[]>([]);
   const [groupThreads, setGroupThreads] = useState<Record<string, GroupThread>>({});
@@ -452,14 +454,16 @@ function MessagesPage() {
       .update({ read_at: new Date().toISOString() })
       .in("id", unreadIds)
       .then(() => {
-        (supabase.rpc as any)("mark_message_notifications_read", { p_message_ids: unreadIds });
+        (supabase.rpc as any)("mark_message_notifications_read", { p_message_ids: unreadIds }).then(
+          () => queryClient.invalidateQueries({ queryKey: ["user-notifications"] }),
+        );
         setDms((prev) =>
           prev.map((m) =>
             unreadIds.includes(m.id) ? { ...m, read_at: new Date().toISOString() } : m,
           ),
         );
       });
-  }, [dmThread, user, activeConvo]);
+  }, [dmThread, user, activeConvo, queryClient]);
 
   // Mark group thread read
   useEffect(() => {
@@ -512,7 +516,7 @@ function MessagesPage() {
       if (readMessageIds.length > 0) {
         (supabase.rpc as any)("mark_message_notifications_read", {
           p_message_ids: readMessageIds,
-        });
+        }).then(() => queryClient.invalidateQueries({ queryKey: ["user-notifications"] }));
       }
       toast.success("Marked as read");
       load();
