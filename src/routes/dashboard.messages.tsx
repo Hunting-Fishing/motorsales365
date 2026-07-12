@@ -29,7 +29,7 @@ import { MessageComposer, type MessagePayload } from "@/components/messaging/mes
 import { AttachmentBubble } from "@/components/messaging/attachment-bubble";
 import { NewGroupChatDialog } from "@/components/messaging/new-group-chat-dialog";
 import { InviteToThreadDialog } from "@/components/messaging/invite-to-thread-dialog";
-import { useIsMobile } from "@/hooks/use-mobile";
+
 
 export const Route = createFileRoute("/dashboard/messages")({
   component: MessagesPage,
@@ -126,7 +126,16 @@ function attachmentPreview(body: string | null, type: AttachType): string {
 
 function MessagesPage() {
   const { user } = useAuth();
-  const isMobile = useIsMobile();
+  // Match the back button's `lg:hidden` breakpoint (1024px) so auto-select
+  // doesn't fight the back button on tablet/small-desktop widths.
+  const [isNarrow, setIsNarrow] = useState<boolean>(false);
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 1023px)");
+    const update = () => setIsNarrow(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
   const queryClient = useQueryClient();
   const [dms, setDms] = useState<DmRow[]>([]);
   const [groupMsgs, setGroupMsgs] = useState<GroupMsg[]>([]);
@@ -411,11 +420,11 @@ function MessagesPage() {
 
   useEffect(() => {
     if (activeKey && !conversations.some((c) => c.key === activeKey)) {
-      setActiveKey(isMobile ? null : (conversations[0]?.key ?? null));
+      setActiveKey(isNarrow ? null : (conversations[0]?.key ?? null));
       return;
     }
-    if (!isMobile && !activeKey && conversations.length) setActiveKey(conversations[0].key);
-  }, [conversations, activeKey, isMobile]);
+    if (!isNarrow && !activeKey && conversations.length) setActiveKey(conversations[0].key);
+  }, [conversations, activeKey, isNarrow]);
 
   const activeConvo = conversations.find((c) => c.key === activeKey);
 
