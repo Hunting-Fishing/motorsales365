@@ -178,6 +178,11 @@ function MapPage() {
         ...(center && radiusKm ? { r: radiusKm } : {}),
         ...(typeSlug ? { type: typeSlug } : {}),
         ...(center?.label ? { q: center.label } : {}),
+        ...(nameQuery ? { name: nameQuery } : {}),
+        ...(featuredOnly ? { featured: true } : {}),
+        ...(verifiedOnly ? { verified: true } : {}),
+        ...(ratedOnly ? { rated: true } : {}),
+        ...(minRating > 0 ? { minRating } : {}),
       },
       replace: true,
     });
