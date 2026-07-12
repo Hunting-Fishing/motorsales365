@@ -1113,8 +1113,13 @@ function EditListingPage() {
                 />
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <Label>Mileage (km)</Label>
-                    <Input value={mileage} onChange={(e) => setMileage(e.target.value)} />
+                    <Label>Mileage (km) <span className="text-orange-500">*</span></Label>
+                    <NumericInput
+                      value={mileage}
+                      onChange={setMileage}
+                      placeholder="e.g. 135,000"
+                      className={mandatoryFieldClass(mileage.trim().length > 0)}
+                    />
                   </div>
                   <div>
                     <Label>Transmission</Label>
