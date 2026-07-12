@@ -134,16 +134,18 @@ export function MessageComposer({
     setUploading(true);
     const ext = file.name.split(".").pop() || (kind === "image" ? "jpg" : "mp4");
     const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+    const localPreviewUrl = URL.createObjectURL(file);
     const { error } = await supabase.storage.from("message-media").upload(path, file, {
       contentType: file.type,
       upsert: false,
     });
     setUploading(false);
     if (error) {
+      URL.revokeObjectURL(localPreviewUrl);
       toast.error(error.message);
       return;
     }
-    setAttachment({ type: kind, url: "", path, meta });
+    setAttachment({ type: kind, url: "", path, meta, localPreviewUrl });
   };
 
   const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
