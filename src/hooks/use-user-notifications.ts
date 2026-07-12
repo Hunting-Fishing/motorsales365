@@ -8,11 +8,11 @@ import {
 
 const KEY = ["user-notifications"];
 
-export function useUserNotifications(options?: { limit?: number; enabled?: boolean }) {
+export function useUserNotifications(options?: { limit?: number; enabled?: boolean; category?: string }) {
   const fetcher = useServerFn(listMyNotifications);
   return useQuery({
-    queryKey: [...KEY, options?.limit ?? 20],
-    queryFn: () => fetcher({ data: { limit: options?.limit ?? 20 } }),
+    queryKey: [...KEY, options?.category ?? "all", options?.limit ?? 20],
+    queryFn: () => fetcher({ data: { limit: options?.limit ?? 20, category: options?.category } }),
     enabled: options?.enabled ?? true,
     staleTime: 30_000,
     refetchInterval: 60_000,

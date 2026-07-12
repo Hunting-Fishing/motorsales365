@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Home, LayoutGrid, Plus, MessageSquare, User as UserIcon } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { useUserNotifications } from "@/hooks/use-user-notifications";
 
 const TABS = [
   { to: "/", label: "Home", Icon: Home, exact: true },
@@ -10,6 +12,14 @@ const TABS = [
 ] as const;
 
 export function MobileTabBar() {
+  const { user, loading } = useAuth();
+  const { data: messageNotifications } = useUserNotifications({
+    limit: 1,
+    category: "messages",
+    enabled: !!user && !loading,
+  });
+  const unreadMessages = messageNotifications?.unreadCount ?? 0;
+
   return (
     <nav
       aria-label="Primary mobile navigation"
@@ -33,12 +43,17 @@ export function MobileTabBar() {
                 <span
                   className={
                     primary
-                      ? "inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm"
-                      : "inline-flex h-6 w-6 items-center justify-center"
+                      ? "relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm"
+                      : "relative inline-flex h-6 w-6 items-center justify-center"
                   }
                   aria-hidden="true"
                 >
                   <Icon className={primary ? "h-5 w-5" : "h-5 w-5"} />
+                  {to === "/dashboard/messages" && unreadMessages > 0 && (
+                    <span className="absolute -right-2 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground ring-2 ring-background">
+                      {unreadMessages > 99 ? "99+" : unreadMessages}
+                    </span>
+                  )}
                 </span>
                 <span>{label}</span>
               </Link>
