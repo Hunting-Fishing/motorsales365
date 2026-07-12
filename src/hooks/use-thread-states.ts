@@ -81,5 +81,13 @@ export function useThreadStates() {
     [user, states],
   );
 
-  return { get, patch, reload: load };
+  const toggle = useCallback(
+    (scope: ThreadScope, key: string, field: "starred" | "archived" | "muted" | "spam") => {
+      const current = states[`${scope}:${key}`] ?? { ...EMPTY, scope, key };
+      return patch(scope, key, { [field]: !current[field] } as Partial<ThreadState>);
+    },
+    [patch, states],
+  );
+
+  return { get, patch, toggle, reload: load };
 }
