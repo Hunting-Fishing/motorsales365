@@ -1865,11 +1865,14 @@ function SellPage() {
                       />
                     </div>
                     <div>
-                      <Label className="text-[11px]">Mileage (km)</Label>
-                      <Input
-                        className="h-8 text-sm"
+                      <Label className="text-[11px]">
+                        Mileage (km) <span className="text-orange-500">*</span>
+                      </Label>
+                      <NumericInput
+                        className={`h-8 text-sm ${mandatoryFieldClass(mileage.trim().length > 0)}`}
                         value={mileage}
-                        onChange={(e) => setMileage(e.target.value)}
+                        onChange={setMileage}
+                        placeholder="e.g. 135,000"
                       />
                     </div>
                     <div>
