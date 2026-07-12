@@ -1232,6 +1232,24 @@ function MessagesPage() {
                       {activeConvo.kind === "dm"
                         ? dmThread.map((m) => {
                             const mine = m.sender_id === user?.id;
+                            if (m.system_kind) {
+                              return <SystemBubble key={m.id} kind={m.system_kind} body={m.body} createdAt={m.created_at} />;
+                            }
+                            if (m.is_offer) {
+                              return (
+                                <OfferBubble
+                                  key={m.id}
+                                  mine={mine}
+                                  amount={m.offer_amount ?? 0}
+                                  currency={m.offer_currency ?? "PHP"}
+                                  status={(m.offer_status as any) ?? "pending"}
+                                  note={m.body}
+                                  createdAt={m.created_at}
+                                  onAccept={() => respondToOffer(m.id, "accepted")}
+                                  onDecline={() => respondToOffer(m.id, "declined")}
+                                />
+                              );
+                            }
                             const hasAttachment = !!m.attachment_type;
                             return (
                               <div
@@ -1271,6 +1289,7 @@ function MessagesPage() {
                               </div>
                             );
                           })
+
                         : groupThread.map((m) => {
                             const mine = m.sender_id === user?.id;
                             const hasAttachment = !!m.attachment_type;
