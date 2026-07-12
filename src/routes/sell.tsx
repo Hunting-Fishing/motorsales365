@@ -1923,15 +1923,15 @@ function SellPage() {
             <SellGroup id="price" title="Price" defaultOpen>
               <div className="grid gap-2 sm:grid-cols-[200px_1fr] items-end">
                 <div>
-                  <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
-                  <Input
+                  <Label htmlFor="price" className="text-xs">
+                    Asking price (₱) <span className="text-orange-500">*</span>
+                  </Label>
+                  <NumericInput
                     id="price"
-                    type="number"
-                    min="0"
-                    className="h-9 text-sm"
+                    className={`h-9 text-sm ${mandatoryFieldClass(price.trim().length > 0)}`}
                     value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="e.g. 450000"
+                    onChange={setPrice}
+                    placeholder="e.g. 2,250,000"
                   />
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs pb-1">
