@@ -2,14 +2,14 @@ import { Info } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const CARD_ENTRIES: { color: string; label: string; desc: string }[] = [
-  { color: "ring-cyan-500/70", label: "New (48h)", desc: "Freshly posted in the last 48 hours." },
-  { color: "ring-sky-500/70", label: "Just updated", desc: "Seller updated details in the last 24h." },
-  { color: "ring-emerald-500/70", label: "Price drop", desc: "Asking price went down recently." },
-  { color: "ring-rose-500/70", label: "Price up", desc: "Asking price went up recently." },
-  { color: "ring-orange-500/70", label: "Pending sale", desc: "Seller marked it reserved/pending." },
-  { color: "ring-orange-400/70", label: "Promo", desc: "Seller is running a limited promo." },
-  { color: "ring-violet-500/70", label: "Boosted", desc: "Paid boost — higher visibility." },
-  { color: "ring-amber-500/70", label: "Reported", desc: "Under community review. Buy with extra caution." },
+  { color: "ring-fuchsia-500/80", label: "New (48h)", desc: "Hot pink — freshly posted in the last 48 hours." },
+  { color: "ring-teal-400/80", label: "Just updated", desc: "Teal — seller updated details in the last 24h." },
+  { color: "ring-emerald-500/80", label: "Price drop", desc: "Green — asking price went down recently." },
+  { color: "ring-rose-500/80", label: "Price up", desc: "Rose — asking price went up recently." },
+  { color: "ring-orange-500/80", label: "Pending sale", desc: "Safety orange — seller marked it reserved/pending." },
+  { color: "ring-yellow-400/90", label: "Promo", desc: "Safety yellow — seller is running a limited promo." },
+  { color: "ring-violet-500/80", label: "Boosted", desc: "Violet sparkle glow — paid boost, higher visibility." },
+  { color: "ring-red-600/80", label: "Reported", desc: "Red alarm — under community review. Buy with extra caution." },
 ];
 
 // Marker legend for the Map view of the marketplace.
