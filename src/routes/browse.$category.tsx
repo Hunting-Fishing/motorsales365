@@ -17,7 +17,7 @@ import { AdCarousel } from "@/components/ads/ad-carousel";
 import { SponsoredCategorySlot } from "@/components/ads/sponsored-category-slot";
 import { MarketplaceToolbar, type ViewMode } from "@/components/marketplace/marketplace-toolbar";
 import { ListingCardSkeletonGrid } from "@/components/marketplace/listing-card-skeleton";
-import { ListingsMapView } from "@/components/marketplace/listings-map-view";
+import { ListingsMapView } from "@/components/marketplace/listings-map-view.lazy";
 import { useGridDensity, densityGridClass } from "@/hooks/use-grid-density";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
