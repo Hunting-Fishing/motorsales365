@@ -1918,26 +1918,32 @@ function SellPage() {
                   />
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs pb-1">
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={negotiable}
-                      onChange={(e) => setNegotiable(e.target.checked)}
-                    />
-                    Negotiable
-                  </label>
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={priceHidden}
-                      onChange={(e) => setPriceHidden(e.target.checked)}
-                    />
-                    Hide price — buyers must message me
-                  </label>
+                  {!(category === "car" || category === "motorcycle") && (
+                    <>
+                      <label className="inline-flex items-center gap-1.5">
+                        <input
+                          type="checkbox"
+                          className="h-3.5 w-3.5 accent-primary"
+                          checked={negotiable}
+                          onChange={(e) => setNegotiable(e.target.checked)}
+                        />
+                        Negotiable
+                      </label>
+                      <label className="inline-flex items-center gap-1.5">
+                        <input
+                          type="checkbox"
+                          className="h-3.5 w-3.5 accent-primary"
+                          checked={priceHidden}
+                          onChange={(e) => setPriceHidden(e.target.checked)}
+                        />
+                        Hide price — buyers must message me
+                      </label>
+                    </>
+                  )}
                   <span className="text-[11px] text-muted-foreground basis-full">
-                    Real prices only — placeholders (₱1, ₱2…) lower your seller score.
+                    {category === "car" || category === "motorcycle"
+                      ? "Negotiable / Hide price options are in the vehicle details section below."
+                      : "Real prices only — placeholders (₱1, ₱2…) lower your seller score."}
                   </span>
                 </div>
               </div>
