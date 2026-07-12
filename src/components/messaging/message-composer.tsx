@@ -223,30 +223,46 @@ export function MessageComposer({
       />
 
       {attachment && (
-        <div className="mb-2 flex items-center gap-2 rounded-lg border border-border bg-secondary/40 p-2">
-          {attachment.type === "gif" ? (
-            <img src={attachment.url} alt="" className="h-14 w-14 rounded object-cover" />
-          ) : attachment.type === "image" ? (
-            <div className="flex h-14 w-14 items-center justify-center rounded bg-muted">
-              <ImageIcon className="h-5 w-5 text-muted-foreground" />
+        <div className="mb-2 rounded-lg border border-border bg-secondary/40 p-2">
+          <div className="flex items-start gap-2">
+            {attachment.type === "video" ? (
+              <video
+                src={attachment.localPreviewUrl ?? undefined}
+                controls
+                playsInline
+                preload="metadata"
+                className="max-h-40 w-full max-w-[220px] rounded-md bg-black"
+              />
+            ) : attachment.type === "gif" ? (
+              <img
+                src={attachment.url}
+                alt="GIF preview"
+                className="max-h-40 rounded-md object-cover"
+              />
+            ) : (
+              <img
+                src={attachment.localPreviewUrl ?? attachment.url}
+                alt="Image preview"
+                className="max-h-40 rounded-md object-cover"
+              />
+            )}
+            <div className="flex-1 text-xs">
+              <div className="font-medium capitalize">{attachment.type} attached</div>
+              <div className="text-muted-foreground">
+                {attachment.type === "video" && attachment.meta && typeof (attachment.meta as any).duration === "number"
+                  ? `${Math.round((attachment.meta as any).duration)}s • ready to send`
+                  : "Ready to send"}
+              </div>
             </div>
-          ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded bg-muted">
-              <Video className="h-5 w-5 text-muted-foreground" />
-            </div>
-          )}
-          <div className="flex-1 text-xs">
-            <div className="font-medium capitalize">{attachment.type} attached</div>
-            <div className="text-muted-foreground">Ready to send</div>
+            <button
+              type="button"
+              onClick={clearAttachment}
+              className="rounded-full p-1 hover:bg-secondary"
+              aria-label="Remove attachment"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => setAttachment(null)}
-            className="rounded-full p-1 hover:bg-secondary"
-            aria-label="Remove attachment"
-          >
-            <X className="h-4 w-4" />
-          </button>
         </div>
       )}
 
