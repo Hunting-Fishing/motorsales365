@@ -137,8 +137,47 @@ function FitToPins({ pins }: { pins: Pin[] }) {
   return null;
 }
 
+function highlightIcon(): L.DivIcon {
+  return L.divIcon({
+    className: "",
+    html: `<div style="width:34px;height:44px;transform:translate(-1px,-2px);filter:drop-shadow(0 4px 6px rgba(0,0,0,.35));"><svg viewBox="0 0 24 32" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.4 0 0 5.4 0 12c0 8.4 12 20 12 20s12-11.6 12-20C24 5.4 18.6 0 12 0z" fill="#ef4444"/><circle cx="12" cy="12" r="4.5" fill="white"/></svg></div>`,
+    iconSize: [34, 44],
+    iconAnchor: [17, 42],
+    popupAnchor: [0, -36],
+  });
+}
+
+function ViewportSync({
+  onChange,
+}: {
+  onChange: (bounds: L.LatLngBounds, center: L.LatLng) => void;
+}) {
+  const map = useMap();
+  useEffect(() => {
+    const emit = () => onChange(map.getBounds(), map.getCenter());
+    emit();
+    map.on("moveend", emit);
+    map.on("zoomend", emit);
+    return () => {
+      map.off("moveend", emit);
+      map.off("zoomend", emit);
+    };
+  }, [map, onChange]);
+  return null;
+}
+
+function FlyTo({ target }: { target: { lat: number; lng: number; zoom?: number } | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!target) return;
+    map.flyTo([target.lat, target.lng], target.zoom ?? Math.max(map.getZoom(), 13), {
+      duration: 0.6,
+    });
+  }, [target, map]);
+  return null;
+}
+
 export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
-  const [selected, setSelected] = useState<Selection | null>(null);
   const [cityCoords, setCityCoords] = useState<Record<string, { lat: number; lng: number }>>(
     () => loadCityCache(),
   );
@@ -148,6 +187,13 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
   );
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [flyTarget, setFlyTarget] = useState<{ lat: number; lng: number; zoom?: number } | null>(null);
+  const [bounds, setBounds] = useState<L.LatLngBounds | null>(null);
+  const [center, setCenter] = useState<L.LatLng | null>(null);
+  const cardRefs = useRef(new Map<string, HTMLLIElement>());
 
   // Resolve city-level coordinates for listings missing lat/lng but with city+region.
   const pendingRef = useRef<Set<string>>(new Set());
@@ -166,7 +212,6 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
     (async () => {
       const next = { ...cityCoords };
       let changed = false;
-      // Serialize with a small delay to respect Nominatim usage policy (~1 req/sec).
       for (const m of missing) {
         if (cancelled) return;
         const c = await geocodeCity(m.city, m.region);
@@ -186,23 +231,133 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
     };
   }, [listings, cityCoords]);
 
+  // Flatten pins into per-listing rows with a resolved lat/lng, for the side list.
+  type ListRow = { listing: ListingCardData; lat: number; lng: number; region?: string };
+  const rows: ListRow[] = useMemo(() => {
+    const out: ListRow[] = [];
+    for (const pin of pins) {
+      if (pin.kind === "exact") {
+        out.push({ listing: pin.listing, lat: pin.lat, lng: pin.lng });
+      } else {
+        for (const l of pin.listings) {
+          out.push({ listing: l, lat: pin.lat, lng: pin.lng, region: pin.region });
+        }
+      }
+    }
+    return out;
+  }, [pins]);
 
-  const selectionList: ListingCardData[] =
-    selected?.kind === "exact"
-      ? [selected.listing]
-      : selected?.kind === "region"
-        ? selected.listings
-        : [];
-  const selectionTitle =
-    selected?.kind === "exact"
-      ? selected.listing.city ?? selected.listing.region ?? "Listing"
-      : selected?.kind === "region"
-        ? selected.region
-        : "Tap a pin";
+  const visibleRows = useMemo(() => {
+    if (!bounds) return rows;
+    return rows.filter((r) => bounds.contains([r.lat, r.lng]));
+  }, [rows, bounds]);
+
+  const sortedRows = useMemo(() => {
+    if (!center) return visibleRows;
+    const cLat = center.lat;
+    const cLng = center.lng;
+    const dist = (a: ListRow) => {
+      const dx = a.lat - cLat;
+      const dy = a.lng - cLng;
+      return dx * dx + dy * dy;
+    };
+    return [...visibleRows].sort((a, b) => dist(a) - dist(b));
+  }, [visibleRows, center]);
+
+  const onCardClick = (row: ListRow) => {
+    setSelectedId(row.listing.id);
+    setFlyTarget({ lat: row.lat, lng: row.lng, zoom: 14 });
+  };
+
+  // Scroll hovered card into view when a pin is hovered.
+  useEffect(() => {
+    if (!hoveredId) return;
+    const el = cardRefs.current.get(hoveredId);
+    if (el) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [hoveredId]);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-      <div className="relative h-[60vh] min-h-[420px] w-full overflow-hidden rounded-xl border border-border bg-muted">
+    <div className="grid gap-3 lg:grid-cols-[380px_1fr]">
+      {/* Side panel */}
+      <aside className="order-2 flex flex-col rounded-xl border border-border bg-card lg:order-1 lg:h-[min(75vh,720px)]">
+        <div className="flex items-center justify-between border-b border-border px-3 py-2">
+          <p className="text-xs font-semibold">
+            {sortedRows.length} result{sortedRows.length === 1 ? "" : "s"} in view
+          </p>
+          {unmapped > 0 && (
+            <p className="text-[11px] text-muted-foreground">
+              {unmapped} without location
+            </p>
+          )}
+        </div>
+        {sortedRows.length === 0 ? (
+          <p className="p-4 text-xs text-muted-foreground">
+            Pan or zoom out to see listings.
+          </p>
+        ) : (
+          <ul className="max-h-[55vh] flex-1 space-y-1.5 overflow-y-auto p-2 lg:max-h-none">
+            {sortedRows.map((r) => {
+              const l = r.listing;
+              const active = selectedId === l.id || hoveredId === l.id;
+              return (
+                <li
+                  key={l.id}
+                  ref={(el) => {
+                    if (el) cardRefs.current.set(l.id, el);
+                    else cardRefs.current.delete(l.id);
+                  }}
+                  onMouseEnter={() => setHoveredId(l.id)}
+                  onMouseLeave={() => setHoveredId((h) => (h === l.id ? null : h))}
+                  onClick={() => onCardClick(r)}
+                  className={`cursor-pointer rounded-md border bg-background p-2 transition-all ${
+                    active
+                      ? "border-primary ring-2 ring-primary/40"
+                      : "border-border hover:bg-secondary"
+                  }`}
+                >
+                  <div className="flex gap-2">
+                    <div className="h-16 w-16 shrink-0 overflow-hidden rounded bg-muted">
+                      {l.cover_url ? (
+                        <img
+                          src={l.cover_url}
+                          alt={l.title}
+                          loading="lazy"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : null}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-2 text-xs font-medium leading-tight">
+                        {l.title}
+                      </p>
+                      <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                        <MapPin className="h-3 w-3" />
+                        {l.city ?? l.region ?? r.region ?? "—"}
+                      </p>
+                      <div className="mt-0.5 flex items-center justify-between gap-2">
+                        <p className="text-xs font-bold text-primary">
+                          {l.price_hidden ? "Inquire" : formatPHP(Number(l.price_php ?? 0))}
+                        </p>
+                        <Link
+                          to="/listing/$id"
+                          params={{ id: l.id }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[11px] font-medium text-primary hover:underline"
+                        >
+                          View →
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </aside>
+
+      {/* Map */}
+      <div className="order-1 relative h-[55vh] min-h-[420px] w-full overflow-hidden rounded-xl border border-border bg-muted lg:order-2 lg:h-[min(75vh,720px)]">
         {mounted ? (
           <MapContainer
             center={[PH_CENTER.lat, PH_CENTER.lng]}
@@ -216,26 +371,45 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
               maxZoom={19}
             />
             <FitToPins pins={pins} />
-            {pins.map((pin, i) => (
-              <Marker
-                key={pin.kind === "exact" ? `x-${pin.listing.id}` : `r-${pin.region}-${i}`}
-                position={[pin.lat, pin.lng]}
-                icon={pin.kind === "region" ? regionBadgeIcon(pin.listings.length) : DefaultIcon}
-                eventHandlers={{
-                  click: () => {
-                    if (pin.kind === "exact") {
-                      setSelected({ kind: "exact", listing: pin.listing });
-                    } else {
-                      setSelected({
-                        kind: "region",
-                        region: pin.region,
-                        listings: pin.listings,
-                      });
-                    }
-                  },
-                }}
-              />
-            ))}
+            <ViewportSync
+              onChange={(b, c) => {
+                setBounds(b);
+                setCenter(c);
+              }}
+            />
+            <FlyTo target={flyTarget} />
+            {pins.map((pin, i) => {
+              if (pin.kind === "region") {
+                return (
+                  <Marker
+                    key={`r-${pin.region}-${i}`}
+                    position={[pin.lat, pin.lng]}
+                    icon={regionBadgeIcon(pin.listings.length)}
+                    eventHandlers={{
+                      click: (e) => {
+                        const map = e.target._map as L.Map;
+                        map.flyTo([pin.lat, pin.lng], Math.max(map.getZoom() + 2, 9));
+                      },
+                    }}
+                  />
+                );
+              }
+              const active =
+                hoveredId === pin.listing.id || selectedId === pin.listing.id;
+              return (
+                <Marker
+                  key={`x-${pin.listing.id}`}
+                  position={[pin.lat, pin.lng]}
+                  icon={active ? highlightIcon() : DefaultIcon}
+                  eventHandlers={{
+                    click: () => setSelectedId(pin.listing.id),
+                    mouseover: () => setHoveredId(pin.listing.id),
+                    mouseout: () =>
+                      setHoveredId((h) => (h === pin.listing.id ? null : h)),
+                  }}
+                />
+              );
+            })}
           </MapContainer>
         ) : null}
         {pins.length === 0 && mounted && (
@@ -245,55 +419,11 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
         )}
         {unmapped > 0 && pins.length > 0 && (
           <div className="pointer-events-none absolute right-3 top-3 z-[400] rounded-full bg-background/90 px-3 py-1 text-xs text-muted-foreground shadow">
-            {unmapped} listing{unmapped === 1 ? "" : "s"} without a location
+            {unmapped} without location
           </div>
         )}
       </div>
-
-      <aside className="rounded-xl border border-border bg-card p-3">
-        <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold">
-          <MapPin className="h-4 w-4 text-primary" />
-          {selectionTitle}
-        </h3>
-        {selected ? (
-          <ul className="max-h-[55vh] space-y-2 overflow-y-auto pr-1">
-            {selectionList.map((l) => (
-              <li key={l.id}>
-                <Link
-                  to="/listing/$id"
-                  params={{ id: l.id }}
-                  className="flex gap-2 rounded-md border border-border bg-background p-2 transition-colors hover:bg-secondary"
-                >
-                  <div className="h-14 w-14 shrink-0 overflow-hidden rounded bg-muted">
-                    {l.cover_url ? (
-                      <img
-                        src={l.cover_url}
-                        alt={l.title}
-                        loading="lazy"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : null}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium">{l.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {l.city ?? l.region ?? "—"}
-                    </p>
-                    <p className="text-xs font-bold text-primary">
-                      {l.price_hidden ? "Inquire" : formatPHP(Number(l.price_php ?? 0))}
-                    </p>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-xs text-muted-foreground">
-            Tap any pin on the map to see the listing.
-            {pins.length > 0 ? ` ${pins.length} pin${pins.length === 1 ? "" : "s"} shown.` : ""}
-          </p>
-        )}
-      </aside>
     </div>
   );
 }
+
