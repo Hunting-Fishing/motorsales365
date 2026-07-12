@@ -47,8 +47,10 @@ export function FloatingMessageWidget({
         aria-label={open ? "Close message widget" : "Message the seller"}
         onClick={() => setOpen(!open)}
         className={cn(
-          "fixed right-4 z-50 grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-xl transition-transform hover:scale-105 active:scale-95",
-          "bottom-20 lg:bottom-6",
+          "fixed right-4 z-[60] grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-xl transition-transform hover:scale-105 active:scale-95",
+          // Mobile: sits above the MobileActionBar (which is ~64px tall + safe-area).
+          // Desktop: sits near the bottom-right corner.
+          "bottom-[calc(4.5rem+env(safe-area-inset-bottom))] lg:bottom-6",
           open && "rotate-90",
         )}
       >
@@ -63,8 +65,8 @@ export function FloatingMessageWidget({
           role="dialog"
           aria-label="Send a message"
           className={cn(
-            "fixed right-4 z-50 w-[min(360px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-border bg-card shadow-2xl",
-            "bottom-[8.5rem] lg:bottom-24",
+            "fixed right-4 z-[60] w-[min(360px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-border bg-card shadow-2xl",
+            "bottom-[calc(9rem+env(safe-area-inset-bottom))] lg:bottom-24",
             "animate-in slide-in-from-bottom-4 fade-in duration-200",
           )}
         >
