@@ -222,7 +222,7 @@ export function ListingCard({
     updatedAt: listing.updated_at,
     relisted,
   });
-  // Doubled outline when a card is both freshly published (<48h) AND
+  // Doubled outline when a card is both freshly published (<72h) AND
   // has been meaningfully updated since (updated_at at least ~5min after
   // published_at and within the last 24h). Signals "new + recently touched".
   const doubled = (() => {
@@ -230,7 +230,7 @@ export function ListingCard({
     const pubMs = new Date(listing.published_at).getTime();
     const updMs = new Date(listing.updated_at).getTime();
     const now = Date.now();
-    const isNew = now - pubMs <= 48 * 60 * 60 * 1000;
+    const isNew = now - pubMs <= 72 * 60 * 60 * 1000;
     const wasUpdated = updMs - pubMs > 5 * 60 * 1000 && now - updMs <= 24 * 60 * 60 * 1000;
     return isNew && wasUpdated;
   })();
