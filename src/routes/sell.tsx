@@ -17,6 +17,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
+import { NumericInput, mandatoryFieldClass } from "@/components/ui/numeric-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
@@ -1572,11 +1573,13 @@ function SellPage() {
             {/* LISTING */}
             <SellGroup id="listing" title="Listing" defaultOpen>
               <div>
-                <Label htmlFor="title" className="text-[11px]">Title</Label>
+                <Label htmlFor="title" className="text-[11px]">
+                  Title <span className="text-orange-500">*</span>
+                </Label>
                 <Input
                   id="title"
                   required
-                  className="h-8 text-sm"
+                  className={`h-8 text-sm ${mandatoryFieldClass(title.trim().length > 0)}`}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="2019 Toyota Vios 1.3 E AT"
@@ -1862,11 +1865,14 @@ function SellPage() {
                       />
                     </div>
                     <div>
-                      <Label className="text-[11px]">Mileage (km)</Label>
-                      <Input
-                        className="h-8 text-sm"
+                      <Label className="text-[11px]">
+                        Mileage (km) <span className="text-orange-500">*</span>
+                      </Label>
+                      <NumericInput
+                        className={`h-8 text-sm ${mandatoryFieldClass(mileage.trim().length > 0)}`}
                         value={mileage}
-                        onChange={(e) => setMileage(e.target.value)}
+                        onChange={setMileage}
+                        placeholder="e.g. 135,000"
                       />
                     </div>
                     <div>
@@ -1917,15 +1923,15 @@ function SellPage() {
             <SellGroup id="price" title="Price" defaultOpen>
               <div className="grid gap-2 sm:grid-cols-[200px_1fr] items-end">
                 <div>
-                  <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
-                  <Input
+                  <Label htmlFor="price" className="text-xs">
+                    Asking price (₱) <span className="text-orange-500">*</span>
+                  </Label>
+                  <NumericInput
                     id="price"
-                    type="number"
-                    min="0"
-                    className="h-9 text-sm"
+                    className={`h-9 text-sm ${mandatoryFieldClass(price.trim().length > 0)}`}
                     value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="e.g. 450000"
+                    onChange={setPrice}
+                    placeholder="e.g. 2,250,000"
                   />
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs pb-1">

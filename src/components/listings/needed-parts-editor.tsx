@@ -226,32 +226,55 @@ export function NeededPartsEditor({
         </div>
       )}
 
-      {NEEDED_PARTS_GROUPS.map((g) => (
-        <div key={g.key}>
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {g.label}
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {g.items.map((opt) => {
-              const active = !!value.find((v) => v.key === opt.key);
-              return (
-                <button
-                  key={opt.key}
-                  type="button"
-                  onClick={() => toggle(opt.key)}
-                  className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                    active
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
+      <div className="space-y-2">
+        <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Browse by system — tap to expand
         </div>
-      ))}
+        {NEEDED_PARTS_GROUPS.map((g) => {
+          const selectedInGroup = g.items.filter((it) => value.find((v) => v.key === it.key)).length;
+          return (
+            <details
+              key={g.key}
+              className="group rounded-md border border-border bg-background/40 open:bg-background"
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-2 rounded-md px-3 py-2 text-xs font-medium hover:bg-accent">
+                <span className="flex items-center gap-2">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/50 transition-colors group-open:bg-primary" />
+                  {g.label}
+                </span>
+                <span className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                  {selectedInGroup > 0 && (
+                    <span className="rounded-full bg-primary/15 px-1.5 py-0.5 font-semibold text-primary">
+                      {selectedInGroup}
+                    </span>
+                  )}
+                  <span className="text-muted-foreground/70 group-open:hidden">▸</span>
+                  <span className="hidden text-muted-foreground/70 group-open:inline">▾</span>
+                </span>
+              </summary>
+              <div className="flex flex-wrap gap-1.5 border-t border-border/60 px-3 py-3">
+                {g.items.map((opt) => {
+                  const active = !!value.find((v) => v.key === opt.key);
+                  return (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => toggle(opt.key)}
+                      className={`rounded-full border px-2.5 py-1 text-[11px] transition-colors ${
+                        active
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </details>
+          );
+        })}
+      </div>
 
       <div>
         <label className="mb-1 block text-xs font-medium">Add custom item</label>

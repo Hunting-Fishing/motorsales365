@@ -18,6 +18,8 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
+import { NumericInput, mandatoryFieldClass } from "@/components/ui/numeric-input";
+import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
@@ -664,12 +666,19 @@ function EditListingPage() {
                 </Select>
               </div>
               <div className="sm:col-span-2">
-                <Label>Title</Label>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
+                <Label>Title <span className="text-orange-500">*</span></Label>
+                <Input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  className={mandatoryFieldClass(title.trim().length > 0)}
+                />
               </div>
               <div className="sm:col-span-2 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
                 <div>
-                  <Label className="text-sm font-semibold">Pricing — fill any that apply</Label>
+                  <Label className="text-sm font-semibold">
+                    Pricing — fill any that apply <span className="text-orange-500">*</span>
+                  </Label>
                   <p className="mt-0.5 text-[11px] text-muted-foreground">
                     Real numbers only. Placeholder prices (₱1, ₱2…) are rejected.
                   </p>
@@ -677,35 +686,32 @@ function EditListingPage() {
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div>
                     <Label className="text-xs">Asking price (₱)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      className="mt-1"
+                    <NumericInput
+                      className={cn(
+                        "mt-1",
+                        mandatoryFieldClass(!!(price || monthly || downPayment)),
+                      )}
                       value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      placeholder="e.g. 450000"
+                      onChange={setPrice}
+                      placeholder="e.g. 2,250,000"
                     />
                   </div>
                   <div>
                     <Label className="text-xs">Monthly (₱/mo)</Label>
-                    <Input
-                      type="number"
-                      min="0"
+                    <NumericInput
                       className="mt-1"
                       value={monthly}
-                      onChange={(e) => setMonthly(e.target.value)}
-                      placeholder="e.g. 12000"
+                      onChange={setMonthly}
+                      placeholder="e.g. 12,000"
                     />
                   </div>
                   <div>
                     <Label className="text-xs">Down payment (₱)</Label>
-                    <Input
-                      type="number"
-                      min="0"
+                    <NumericInput
                       className="mt-1"
                       value={downPayment}
-                      onChange={(e) => setDownPayment(e.target.value)}
-                      placeholder="e.g. 80000"
+                      onChange={setDownPayment}
+                      placeholder="e.g. 80,000"
                     />
                   </div>
                 </div>
@@ -1107,8 +1113,13 @@ function EditListingPage() {
                 />
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <Label>Mileage (km)</Label>
-                    <Input value={mileage} onChange={(e) => setMileage(e.target.value)} />
+                    <Label>Mileage (km) <span className="text-orange-500">*</span></Label>
+                    <NumericInput
+                      value={mileage}
+                      onChange={setMileage}
+                      placeholder="e.g. 135,000"
+                      className={mandatoryFieldClass(mileage.trim().length > 0)}
+                    />
                   </div>
                   <div>
                     <Label>Transmission</Label>
@@ -1176,25 +1187,39 @@ function EditListingPage() {
               </div>
             )}
             {(category === "car" || category === "motorcycle") && (
-              <div className="mt-4 rounded-md border border-border/60 bg-background/40 p-4">
-                <h3 className="mb-1 font-display text-sm font-semibold">
-                  Parts needed / known issues (optional)
-                </h3>
-                <p className="mb-3 text-xs text-muted-foreground">
-                  Flag anything this car needs (brakes, tires, battery, etc.). Buyers will see
-                  these on the listing and can request a parts quote from us.
-                </p>
-                <NeededPartsEditor
-                  value={neededParts}
-                  onChange={setNeededParts}
-                  tireSize={tireSizeConfirmed}
-                  onTireSizeChange={setTireSizeConfirmed}
-                  make={make}
-                  model={model}
-                  year={year ? Number(year) : undefined}
-                  engine={engine || undefined}
-                />
-              </div>
+              <details className="mt-4 rounded-md border border-border/60 bg-background/40 open:bg-background">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3">
+                  <div>
+                    <h3 className="font-display text-sm font-semibold">
+                      Parts needed / known issues{" "}
+                      <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                    </h3>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
+                      Flag anything this car needs — brakes, tires, battery, etc.
+                    </p>
+                  </div>
+                  <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                    {neededParts.length > 0 && (
+                      <span className="rounded-full bg-primary/15 px-2 py-0.5 font-semibold text-primary">
+                        {neededParts.length} flagged
+                      </span>
+                    )}
+                    <span className="text-base leading-none">▾</span>
+                  </span>
+                </summary>
+                <div className="border-t border-border/60 px-4 py-4">
+                  <NeededPartsEditor
+                    value={neededParts}
+                    onChange={setNeededParts}
+                    tireSize={tireSizeConfirmed}
+                    onTireSizeChange={setTireSizeConfirmed}
+                    make={make}
+                    model={model}
+                    year={year ? Number(year) : undefined}
+                    engine={engine || undefined}
+                  />
+                </div>
+              </details>
             )}
           </section>
 
