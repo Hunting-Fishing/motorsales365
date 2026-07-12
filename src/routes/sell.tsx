@@ -1793,25 +1793,8 @@ function SellPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                {(category === "car" || category === "motorcycle" || category === "truck") ? (
-                  <div>
-                    <Label className="text-[11px]">Registration</Label>
-                    <Select
-                      value={registrationStatus}
-                      onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
-                    >
-                      <SelectTrigger className="h-8 w-full text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="registered">Registered</SelectItem>
-                        <SelectItem value="unregistered">Unregistered</SelectItem>
-                        <SelectItem value="for_transfer">For transfer</SelectItem>
-                        <SelectItem value="unknown">Not specified</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ) : null}
+                {/* Registration status is captured via OR/CR under the vehicle
+                    details filters below to avoid duplicate OR/CR fields. */}
                 <div>
                   <Label className="text-[11px]">Seller</Label>
                   <div
