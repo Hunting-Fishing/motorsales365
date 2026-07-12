@@ -1,5 +1,6 @@
 import { LayoutGrid, Map as MapIcon, Rows3, Rows2, Grid2x2, Grid3x3 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ListingLegend } from "@/components/marketplace/listing-legend";
 import type { GridDensity } from "@/hooks/use-grid-density";
 
 export type ViewMode = "grid" | "map";
