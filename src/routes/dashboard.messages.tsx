@@ -794,6 +794,47 @@ function MessagesPage() {
     load();
   };
 
+  const sendOffer = async (amount: number, note: string) => {
+    if (!user || !activeConvo || activeConvo.kind !== "dm") return;
+    setSending(true);
+    const { data, error } = await supabase
+      .from("messages")
+      .insert({
+        listing_id: activeConvo.listing_id!,
+        sender_id: user.id,
+        recipient_id: activeConvo.other_user_id!,
+        body: note.trim() || null,
+        is_offer: true,
+        offer_amount: amount,
+        offer_currency: "PHP",
+        offer_status: "pending",
+      } as any)
+      .select(
+        "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta,is_offer,offer_amount,offer_currency,offer_status,system_kind",
+      )
+      .maybeSingle();
+    setSending(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (data) setDms((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data as DmRow]));
+    load();
+  };
+
+  const respondToOffer = async (messageId: string, status: "accepted" | "declined") => {
+    const { error } = await (supabase.from("messages") as any)
+      .update({ offer_status: status })
+      .eq("id", messageId);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setDms((prev) => prev.map((m) => (m.id === messageId ? { ...m, offer_status: status } : m)));
+    toast.success(status === "accepted" ? "Offer accepted" : "Offer declined");
+  };
+
+
   const Avatar = ({ url, name, size = 40 }: { url: string | null; name: string; size?: number }) => {
     const initial = name.trim().charAt(0).toUpperCase() || "?";
     return url ? (
