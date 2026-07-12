@@ -119,9 +119,6 @@ function regionBadgeIcon(count: number): L.DivIcon {
   });
 }
 
-type Selection =
-  | { kind: "exact"; listing: ListingCardData }
-  | { kind: "region"; region: string; listings: ListingCardData[] };
 
 function FitToPins({ pins }: { pins: Pin[] }) {
   const map = useMap();
