@@ -198,7 +198,7 @@ function MessagesPage() {
       supabase
         .from("messages")
         .select(
-          "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta",
+          "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta,is_offer,offer_amount,offer_currency,offer_status,system_kind",
         )
         .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
         .order("created_at", { ascending: false })
@@ -676,7 +676,7 @@ function MessagesPage() {
           attachment_meta: (payload.attachment?.meta ?? null) as any,
         })
         .select(
-          "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta",
+          "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta,is_offer,offer_amount,offer_currency,offer_status,system_kind",
         )
         .maybeSingle();
       error = insertError;
