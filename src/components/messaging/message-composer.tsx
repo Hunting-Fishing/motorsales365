@@ -86,6 +86,9 @@ export function MessageComposer({
   placeholder = "Write a message…",
   compact = false,
   disabled = false,
+  prefillKey = null,
+  prefillText = "",
+  extraActions,
 }: Props) {
   const { user } = useAuth();
   const [text, setText] = useState("");
@@ -97,6 +100,12 @@ export function MessageComposer({
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [gifOpen, setGifOpen] = useState(false);
   const [plusOpen, setPlusOpen] = useState(false);
+
+  useEffect(() => {
+    if (prefillKey == null) return;
+    setText(prefillText);
+    textareaRef.current?.focus();
+  }, [prefillKey, prefillText]);
 
   useEffect(() => {
     if (!sending) textareaRef.current?.focus();
