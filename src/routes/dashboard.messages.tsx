@@ -1358,8 +1358,24 @@ function MessagesPage() {
                         placeholder={
                           activeConvo.kind === "group" ? "Message the group…" : "Write a reply…"
                         }
+                        prefillKey={prefill.key}
+                        prefillText={prefill.text}
+                        extraActions={
+                          <>
+                            <QuickRepliesButton
+                              onPick={(text) => setPrefill({ key: Date.now(), text })}
+                            />
+                            {activeConvo.kind === "dm" && (
+                              <MakeOfferButton
+                                listingPrice={activeConvo.listing_price ?? null}
+                                onSubmit={(amount, note) => sendOffer(amount, note)}
+                              />
+                            )}
+                          </>
+                        }
                       />
                     </div>
+
                   </>
                 )}
               </>
