@@ -428,8 +428,12 @@ function MessagesPage() {
         last_body: preview,
         last_at: lastAt,
         unread: mem.status === "invited" ? Math.max(unread, 1) : unread,
+        total: tMsgs.length,
+        last_from_me: last?.sender_id === user.id,
+        last_read_by_other: false,
         invited: mem.status === "invited",
       });
+
     }
 
     return list.sort((a, b) => (a.last_at < b.last_at ? 1 : -1));
