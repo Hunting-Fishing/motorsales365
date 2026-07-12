@@ -421,11 +421,11 @@ function MessagesPage() {
 
   useEffect(() => {
     if (activeKey && !conversations.some((c) => c.key === activeKey)) {
-      setActiveKey(isMobile ? null : (conversations[0]?.key ?? null));
+      setActiveKey(isNarrow ? null : (conversations[0]?.key ?? null));
       return;
     }
-    if (!isMobile && !activeKey && conversations.length) setActiveKey(conversations[0].key);
-  }, [conversations, activeKey, isMobile]);
+    if (!isNarrow && !activeKey && conversations.length) setActiveKey(conversations[0].key);
+  }, [conversations, activeKey, isNarrow]);
 
   const activeConvo = conversations.find((c) => c.key === activeKey);
 
