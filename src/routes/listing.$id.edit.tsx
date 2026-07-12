@@ -1118,6 +1118,10 @@ function EditListingPage() {
                   value={vehicleQuality}
                   onChange={setVehicleQuality}
                   issues={vehicleQualityIssues}
+                  negotiable={negotiable}
+                  onNegotiableChange={setNegotiable}
+                  priceHidden={priceHidden}
+                  onPriceHiddenChange={setPriceHidden}
                 />
               </div>
             ) : (
@@ -1138,10 +1142,11 @@ function EditListingPage() {
             )}
             {isAttrCategory(category) && (
               <div className="mt-4 rounded-md border border-border/60 bg-background/40 p-4">
-                <h3 className="mb-3 font-display text-sm font-semibold">Buyer filters</h3>
+                <h3 className="mb-1 font-display text-sm font-semibold">
+                  More details & buyer filters
+                </h3>
                 <p className="mb-3 text-xs text-muted-foreground">
-                  These fields show up as filters on the {category} browse page. Fill them in so
-                  your listing gets matched.
+                  These fields power the {category} browse page filters so the right buyers find you.
                 </p>
                 <CategoryAttributesEditor
                   category={category}
