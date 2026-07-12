@@ -13,6 +13,8 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import { z } from "zod";
 import { vinChecksumValid } from "@/components/vin-scan-dialog";
+import { mandatoryFieldClass } from "@/components/ui/numeric-input";
+
 
 export type VehicleQuality = {
   variant?: string;
