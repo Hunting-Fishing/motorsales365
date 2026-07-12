@@ -666,12 +666,19 @@ function EditListingPage() {
                 </Select>
               </div>
               <div className="sm:col-span-2">
-                <Label>Title</Label>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
+                <Label>Title <span className="text-orange-500">*</span></Label>
+                <Input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  className={mandatoryFieldClass(title.trim().length > 0)}
+                />
               </div>
               <div className="sm:col-span-2 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
                 <div>
-                  <Label className="text-sm font-semibold">Pricing — fill any that apply</Label>
+                  <Label className="text-sm font-semibold">
+                    Pricing — fill any that apply <span className="text-orange-500">*</span>
+                  </Label>
                   <p className="mt-0.5 text-[11px] text-muted-foreground">
                     Real numbers only. Placeholder prices (₱1, ₱2…) are rejected.
                   </p>
@@ -679,35 +686,32 @@ function EditListingPage() {
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div>
                     <Label className="text-xs">Asking price (₱)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      className="mt-1"
+                    <NumericInput
+                      className={cn(
+                        "mt-1",
+                        mandatoryFieldClass(!!(price || monthly || downPayment)),
+                      )}
                       value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      placeholder="e.g. 450000"
+                      onChange={setPrice}
+                      placeholder="e.g. 2,250,000"
                     />
                   </div>
                   <div>
                     <Label className="text-xs">Monthly (₱/mo)</Label>
-                    <Input
-                      type="number"
-                      min="0"
+                    <NumericInput
                       className="mt-1"
                       value={monthly}
-                      onChange={(e) => setMonthly(e.target.value)}
-                      placeholder="e.g. 12000"
+                      onChange={setMonthly}
+                      placeholder="e.g. 12,000"
                     />
                   </div>
                   <div>
                     <Label className="text-xs">Down payment (₱)</Label>
-                    <Input
-                      type="number"
-                      min="0"
+                    <NumericInput
                       className="mt-1"
                       value={downPayment}
-                      onChange={(e) => setDownPayment(e.target.value)}
-                      placeholder="e.g. 80000"
+                      onChange={setDownPayment}
+                      placeholder="e.g. 80,000"
                     />
                   </div>
                 </div>
