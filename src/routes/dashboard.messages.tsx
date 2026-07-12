@@ -364,12 +364,15 @@ function MessagesPage() {
           last_read_by_other: mine ? !!m.read_at : false,
         });
       } else {
-        existing.last_body = preview;
-        existing.last_at = m.created_at;
+        const isNewer = new Date(m.created_at).getTime() > new Date(existing.last_at).getTime();
+        if (isNewer) {
+          existing.last_body = preview;
+          existing.last_at = m.created_at;
+          existing.last_from_me = mine;
+          existing.last_read_by_other = mine ? !!m.read_at : false;
+        }
         existing.unread += unreadInc;
         existing.total += 1;
-        existing.last_from_me = mine;
-        existing.last_read_by_other = mine ? !!m.read_at : false;
         existing.title = name;
         existing.subtitle = `Re: ${title}`;
         existing.thumb = thumb;
@@ -378,6 +381,7 @@ function MessagesPage() {
         existing.listing_price = listing?.price_php ?? null;
         existing.listing_status = listing?.status ?? null;
       }
+
 
     }
     list.push(...Array.from(dmMap.values()));
