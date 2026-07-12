@@ -373,12 +373,7 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
               maxZoom={19}
             />
             <FitToPins pins={pins} />
-            <ViewportSync
-              onChange={(b, c) => {
-                setBounds(b);
-                setCenter(c);
-              }}
-            />
+            <ViewportSync onChange={onViewportChange} />
             <FlyTo target={flyTarget} />
             {pins.map((pin, i) => {
               if (pin.kind === "region") {
