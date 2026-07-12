@@ -65,6 +65,11 @@ interface DmRow {
   attachment_thumb_url: string | null;
   attachment_path: string | null;
   attachment_meta: Record<string, unknown> | null;
+  is_offer?: boolean;
+  offer_amount?: number | null;
+  offer_currency?: string | null;
+  offer_status?: string | null;
+  system_kind?: string | null;
 }
 
 interface GroupMsg {
