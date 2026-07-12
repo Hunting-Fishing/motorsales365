@@ -26,6 +26,7 @@ import { ListingReportBadge } from "@/components/listings/listing-report-badge";
 import { PricingWidget } from "@/components/listings/pricing-widget";
 import { NewBadge } from "@/components/listings/new-badge";
 import { RenewedBadge } from "@/components/listings/renewed-badge";
+import { RelistedBadge, isRelistedAfterExpiry } from "@/components/listings/relisted-badge";
 import { PromoBadge, type ListingPromo } from "@/components/listings/promo-badge";
 import { PriceTrendBadge, type PriceTrend } from "@/components/listings/price-trend-badge";
 import { useListingReportSummary } from "@/hooks/use-listing-report-summary";
