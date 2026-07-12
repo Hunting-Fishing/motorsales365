@@ -281,7 +281,7 @@ function MapPageInner() {
       minRating,
     });
     if (!mapSearchMatches(search, nextSearch)) {
-      navigate({ to: "/map", search: nextSearch, replace: true });
+      navigate({ to: "/map", search: nextSearch, replace: true, resetScroll: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [center, radiusKm, typeSlug, nameQuery, featuredOnly, verifiedOnly, ratedOnly, minRating]);
