@@ -91,6 +91,7 @@ import { Route as PartnersPartsRouteImport } from './routes/partners.parts'
 import { Route as PartnerProgramTermsRouteImport } from './routes/partner-program.terms'
 import { Route as PartnerProgramApplyRouteImport } from './routes/partner-program.apply'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
+import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnMechanicsRouteImport } from './routes/learn.mechanics'
 import { Route as LearnFlashcardsRouteImport } from './routes/learn.flashcards'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
@@ -721,6 +722,11 @@ const ListingCheckoutRoute = ListingCheckoutRouteImport.update({
   path: '/listing/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ListingIdRoute = ListingIdRouteImport.update({
+  id: '/listing/$id',
+  path: '/listing/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LearnMechanicsRoute = LearnMechanicsRouteImport.update({
   id: '/learn/mechanics',
   path: '/learn/mechanics',
@@ -1238,9 +1244,9 @@ const Char91DotmcpChar93ListToolsRoute =
     getParentRoute: () => rootRouteImport,
   } as any)
 const ListingIdIndexRoute = ListingIdIndexRouteImport.update({
-  id: '/listing/$id/',
-  path: '/listing/$id/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => ListingIdRoute,
 } as any)
 const DashboardTeamIndexRoute = DashboardTeamIndexRouteImport.update({
   id: '/',
@@ -1309,9 +1315,9 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingIdEditRoute = ListingIdEditRouteImport.update({
-  id: '/listing/$id/edit',
-  path: '/listing/$id/edit',
-  getParentRoute: () => rootRouteImport,
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => ListingIdRoute,
 } as any)
 const DashboardTeamPerformanceRoute =
   DashboardTeamPerformanceRouteImport.update({
@@ -2044,6 +2050,7 @@ export interface FileRoutesByFullPath {
   '/learn/$slug': typeof LearnSlugRoute
   '/learn/flashcards': typeof LearnFlashcardsRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
+  '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
@@ -2644,6 +2651,7 @@ export interface FileRoutesById {
   '/learn/$slug': typeof LearnSlugRoute
   '/learn/flashcards': typeof LearnFlashcardsRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
+  '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
@@ -2949,6 +2957,7 @@ export interface FileRouteTypes {
     | '/learn/$slug'
     | '/learn/flashcards'
     | '/learn/mechanics'
+    | '/listing/$id'
     | '/listing/checkout'
     | '/partner-program/apply'
     | '/partner-program/terms'
@@ -3548,6 +3557,7 @@ export interface FileRouteTypes {
     | '/learn/$slug'
     | '/learn/flashcards'
     | '/learn/mechanics'
+    | '/listing/$id'
     | '/listing/checkout'
     | '/partner-program/apply'
     | '/partner-program/terms'
@@ -3774,6 +3784,7 @@ export interface RootRouteChildren {
   LearnSlugRoute: typeof LearnSlugRoute
   LearnFlashcardsRoute: typeof LearnFlashcardsRoute
   LearnMechanicsRoute: typeof LearnMechanicsRoute
+  ListingIdRoute: typeof ListingIdRouteWithChildren
   ListingCheckoutRoute: typeof ListingCheckoutRoute
   PartnersPartsRoute: typeof PartnersPartsRouteWithChildren
   PassportPremiumCheckoutRoute: typeof PassportPremiumCheckoutRoute
@@ -3812,12 +3823,10 @@ export interface RootRouteChildren {
   ApiPublicIpLocationRoute: typeof ApiPublicIpLocationRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   ApiPublicReverseGeocodeRoute: typeof ApiPublicReverseGeocodeRoute
-  ListingIdEditRoute: typeof ListingIdEditRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ShopBrandSlugRoute: typeof ShopBrandSlugRoute
   ShopDepartmentSlugRoute: typeof ShopDepartmentSlugRoute
   ShopPSlugRoute: typeof ShopPSlugRoute
-  ListingIdIndexRoute: typeof ListingIdIndexRoute
   ApiPublicAuthSignupRoute: typeof ApiPublicAuthSignupRoute
   ApiPublicAuthSignupFailureLogRoute: typeof ApiPublicAuthSignupFailureLogRoute
   ApiPublicFlashcardsContentRoute: typeof ApiPublicFlashcardsContentRoute
@@ -4423,6 +4432,13 @@ declare module '@tanstack/react-router' {
       path: '/listing/checkout'
       fullPath: '/listing/checkout'
       preLoaderRoute: typeof ListingCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/listing/$id': {
+      id: '/listing/$id'
+      path: '/listing/$id'
+      fullPath: '/listing/$id'
+      preLoaderRoute: typeof ListingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn/mechanics': {
@@ -5141,10 +5157,10 @@ declare module '@tanstack/react-router' {
     }
     '/listing/$id/': {
       id: '/listing/$id/'
-      path: '/listing/$id'
+      path: '/'
       fullPath: '/listing/$id/'
       preLoaderRoute: typeof ListingIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ListingIdRoute
     }
     '/dashboard/team/': {
       id: '/dashboard/team/'
@@ -5239,10 +5255,10 @@ declare module '@tanstack/react-router' {
     }
     '/listing/$id/edit': {
       id: '/listing/$id/edit'
-      path: '/listing/$id/edit'
+      path: '/edit'
       fullPath: '/listing/$id/edit'
       preLoaderRoute: typeof ListingIdEditRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ListingIdRoute
     }
     '/dashboard/team/performance': {
       id: '/dashboard/team/performance'
@@ -6516,6 +6532,20 @@ const ClubsApplyRouteWithChildren = ClubsApplyRoute._addFileChildren(
   ClubsApplyRouteChildren,
 )
 
+interface ListingIdRouteChildren {
+  ListingIdEditRoute: typeof ListingIdEditRoute
+  ListingIdIndexRoute: typeof ListingIdIndexRoute
+}
+
+const ListingIdRouteChildren: ListingIdRouteChildren = {
+  ListingIdEditRoute: ListingIdEditRoute,
+  ListingIdIndexRoute: ListingIdIndexRoute,
+}
+
+const ListingIdRouteWithChildren = ListingIdRoute._addFileChildren(
+  ListingIdRouteChildren,
+)
+
 interface PartnersPartsRouteChildren {
   PartnersPartsOnboardingRoute: typeof PartnersPartsOnboardingRoute
 }
@@ -6609,6 +6639,7 @@ const rootRouteChildren: RootRouteChildren = {
   LearnSlugRoute: LearnSlugRoute,
   LearnFlashcardsRoute: LearnFlashcardsRoute,
   LearnMechanicsRoute: LearnMechanicsRoute,
+  ListingIdRoute: ListingIdRouteWithChildren,
   ListingCheckoutRoute: ListingCheckoutRoute,
   PartnersPartsRoute: PartnersPartsRouteWithChildren,
   PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
@@ -6647,12 +6678,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicIpLocationRoute: ApiPublicIpLocationRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   ApiPublicReverseGeocodeRoute: ApiPublicReverseGeocodeRoute,
-  ListingIdEditRoute: ListingIdEditRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ShopBrandSlugRoute: ShopBrandSlugRoute,
   ShopDepartmentSlugRoute: ShopDepartmentSlugRoute,
   ShopPSlugRoute: ShopPSlugRoute,
-  ListingIdIndexRoute: ListingIdIndexRoute,
   ApiPublicAuthSignupRoute: ApiPublicAuthSignupRoute,
   ApiPublicAuthSignupFailureLogRoute: ApiPublicAuthSignupFailureLogRoute,
   ApiPublicFlashcardsContentRoute: ApiPublicFlashcardsContentRoute,
