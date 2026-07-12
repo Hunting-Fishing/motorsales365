@@ -1,7 +1,8 @@
-import { Info } from "lucide-react";
+import { Info, Sparkles, RefreshCw, Tag, ArrowDown, ArrowUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-const CARD_ENTRIES: { color: string; label: string; desc: string }[] = [
+const CARD_RING_ENTRIES: { color: string; label: string; desc: string }[] = [
   { color: "ring-fuchsia-500/80", label: "New (48h)", desc: "Hot pink — freshly posted in the last 48 hours." },
   { color: "ring-teal-400/80", label: "Just updated", desc: "Teal — seller updated details in the last 24h." },
   { color: "ring-emerald-500/80", label: "Price drop", desc: "Green — asking price went down recently." },
@@ -10,6 +11,66 @@ const CARD_ENTRIES: { color: string; label: string; desc: string }[] = [
   { color: "ring-yellow-400/90", label: "Promo", desc: "Safety yellow — seller is running a limited promo." },
   { color: "ring-violet-500/80", label: "Boosted", desc: "Violet sparkle glow — paid boost, higher visibility." },
   { color: "ring-red-600/80", label: "Reported", desc: "Red alarm — under community review. Buy with extra caution." },
+];
+
+const ON_IMAGE_BADGES: { swatch: React.ReactNode; label: string; desc: string }[] = [
+  {
+    swatch: (
+      <Badge className="bg-emerald-600 px-1.5 py-0.5 text-[10px] text-white hover:bg-emerald-600">
+        <Sparkles className="mr-1 h-3 w-3" />
+        NEW
+      </Badge>
+    ),
+    label: "New",
+    desc: "Listed within the last 48 hours. The newest deals appear first.",
+  },
+  {
+    swatch: (
+      <Badge className="bg-sky-500 px-1.5 py-0.5 text-[10px] text-white hover:bg-sky-500">
+        <RefreshCw className="mr-1 h-3 w-3" />
+        Renewed
+      </Badge>
+    ),
+    label: "Renewed",
+    desc: "Seller bumped or refreshed the listing within the last 24 hours.",
+  },
+  {
+    swatch: (
+      <Badge className="bg-orange-500 px-1.5 py-0.5 text-[10px] text-white hover:bg-orange-500">
+        <Tag className="mr-1 h-3 w-3" />
+        10% OFF
+      </Badge>
+    ),
+    label: "Promo",
+    desc: "Seller is running a limited-time discount or special offer.",
+  },
+  {
+    swatch: (
+      <Badge className="bg-warning px-1.5 py-0.5 text-[10px] text-warning-foreground hover:bg-warning">
+        Pending Sale
+      </Badge>
+    ),
+    label: "Pending sale",
+    desc: "The seller has marked this item as reserved or has a buyer in progress.",
+  },
+  {
+    swatch: (
+      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-600 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
+        <ArrowDown className="h-3 w-3" />5% Price Drop
+      </span>
+    ),
+    label: "Price drop",
+    desc: "The asking price was recently reduced. Green arrow = savings.",
+  },
+  {
+    swatch: (
+      <span className="inline-flex items-center gap-1 rounded-md bg-rose-600 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
+        <ArrowUp className="h-3 w-3" />5% Price Up
+      </span>
+    ),
+    label: "Price up",
+    desc: "The asking price was recently increased. Red arrow = check the latest price.",
+  },
 ];
 
 // Marker legend for the Map view of the marketplace.
@@ -55,8 +116,9 @@ function PinSwatch({ fill, ring }: { fill: string; ring?: boolean }) {
 }
 
 /**
- * Popover explaining both the colored ring around each listing card AND
- * the map marker legend for the Map view. Presentational only.
+ * Popover explaining the colored rings around listing cards, the on-image
+ * badges (New, Renewed, Promo, etc.), the double-outline signal, and the map
+ * marker legend. Presentational only.
  */
 export function ListingLegend() {
   return (
@@ -64,22 +126,40 @@ export function ListingLegend() {
       <PopoverTrigger asChild>
         <button
           type="button"
-          aria-label="Card colors, map markers and viewing tips"
+          aria-label="Badge and card color guide"
           className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-card px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <Info className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">Legend</span>
         </button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="max-h-[70vh] w-80 overflow-y-auto p-3">
+      <PopoverContent align="end" className="max-h-[80vh] w-[22rem] overflow-y-auto p-3">
         <div className="mb-2">
-          <p className="text-sm font-semibold">Card colors</p>
+          <p className="text-sm font-semibold">On-image badges</p>
           <p className="text-[11px] text-muted-foreground">
-            The ring around a card tells you its status at a glance.
+            Pills shown directly on the listing photo tell you why a post stands out.
           </p>
         </div>
-        <ul className="space-y-1.5">
-          {CARD_ENTRIES.map((e) => (
+        <ul className="space-y-2">
+          {ON_IMAGE_BADGES.map((e) => (
+            <li key={e.label} className="flex items-start gap-2">
+              <span className="mt-0.5 shrink-0">{e.swatch}</span>
+              <div className="min-w-0 text-xs">
+                <span className="font-medium">{e.label}</span>
+                <span className="text-muted-foreground"> — {e.desc}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-3 border-t border-border pt-2">
+          <p className="text-sm font-semibold">Card ring colors</p>
+          <p className="text-[11px] text-muted-foreground">
+            The colored ring around each card mirrors the same status as the on-image badge.
+          </p>
+        </div>
+        <ul className="mt-1.5 space-y-1.5">
+          {CARD_RING_ENTRIES.map((e) => (
             <li key={e.label} className="flex items-start gap-2">
               <span
                 className={`mt-0.5 inline-block h-4 w-4 shrink-0 rounded-md ring-2 ${e.color}`}
@@ -92,6 +172,20 @@ export function ListingLegend() {
             </li>
           ))}
         </ul>
+
+        <div className="mt-3 border-t border-border pt-2">
+          <p className="text-sm font-semibold">Double outline</p>
+          <p className="mb-1.5 text-[11px] text-muted-foreground">
+            A second sky-blue outline around a card means it is both brand new AND was recently updated by the seller.
+          </p>
+          <div className="flex items-center gap-2">
+            <span
+              className="inline-block h-6 w-6 rounded-md ring-2 ring-fuchsia-500/80 outline outline-2 outline-offset-[3px] outline-sky-400/80"
+              aria-hidden
+            />
+            <span className="text-xs text-muted-foreground">New listing + recently touched</span>
+          </div>
+        </div>
 
         <div className="mt-3 border-t border-border pt-2">
           <p className="text-sm font-semibold">Map markers</p>
