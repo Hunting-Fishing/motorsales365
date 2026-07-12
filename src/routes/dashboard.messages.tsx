@@ -13,22 +13,37 @@ import {
   UserPlus,
   LogOut,
   Tag,
+  Star,
+  Archive,
+  BellOff,
+  Bell,
+  ShieldAlert,
+  Search,
+  ArchiveRestore,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { MessageComposer, type MessagePayload } from "@/components/messaging/message-composer";
 import { AttachmentBubble } from "@/components/messaging/attachment-bubble";
 import { NewGroupChatDialog } from "@/components/messaging/new-group-chat-dialog";
 import { InviteToThreadDialog } from "@/components/messaging/invite-to-thread-dialog";
+import { FolderTabs, type FolderKey } from "@/components/messaging/folder-tabs";
+import { QuickRepliesButton } from "@/components/messaging/quick-replies-popover";
+import { MakeOfferButton } from "@/components/messaging/make-offer-button";
+import { OfferBubble } from "@/components/messaging/offer-bubble";
+import { SystemBubble } from "@/components/messaging/system-bubble";
+import { useThreadStates, dmKey } from "@/hooks/use-thread-states";
 
 
 export const Route = createFileRoute("/dashboard/messages")({
