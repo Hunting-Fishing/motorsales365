@@ -100,8 +100,12 @@ interface ConversationSummary {
   last_body: string;
   last_at: string;
   unread: number;
+  total: number;
+  last_from_me: boolean;
+  last_read_by_other: boolean;
   invited?: boolean;
 }
+
 
 function formatPricePHP(n: number | null): string {
   if (n == null) return "";
