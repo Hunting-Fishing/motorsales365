@@ -38,10 +38,6 @@ export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
   car: [
     "body_type",
     "drivetrain",
-    "owner_status",
-    "or_cr_status",
-    "flood_history",
-    "accident_history",
     "financing_available",
     "trade_accepted",
     "registered_owner",
@@ -51,15 +47,14 @@ export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
   motorcycle: [
     "moto_type",
     "engine_cc",
-    "or_cr_status",
     "plate_status",
-    "owner_status",
     "moto_condition",
     "delivery_available",
     "registered_owner",
     "deed_chain_available",
     "inspection_available",
   ],
+
   equipment: [
     "equipment_type",
     "brand",
