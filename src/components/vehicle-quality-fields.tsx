@@ -110,7 +110,6 @@ export const VehicleQualitySchema = z
       ),
     financing_available: z.boolean().optional(),
     trade_accepted: z.boolean().optional(),
-    price_negotiable: z.boolean().optional(),
   })
   .refine(
     (v) =>
