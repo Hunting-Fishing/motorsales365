@@ -25,7 +25,13 @@ const searchSchema = z.object({
   r: z.coerce.number().min(1).max(500).optional(),
   type: z.string().max(64).optional(),
   q: z.string().max(200).optional(),
+  name: z.string().max(120).optional(),
+  featured: z.coerce.boolean().optional(),
+  verified: z.coerce.boolean().optional(),
+  rated: z.coerce.boolean().optional(),
+  minRating: z.coerce.number().min(0).max(5).optional(),
 });
+
 
 export const Route = createFileRoute("/map")({
   validateSearch: searchSchema,
