@@ -438,7 +438,7 @@ function MapPage() {
         {/* Mobile: full-bleed map + bottom sheet. Desktop: side-by-side grid. */}
         <div className="lg:grid lg:grid-cols-[360px_1fr] lg:gap-4">
           {/* Map */}
-          <div className="order-1 h-[calc(100dvh-280px)] min-h-[360px] overflow-hidden rounded-lg lg:order-2 lg:h-[640px]">
+          <div className="relative order-1 h-[calc(100dvh-280px)] min-h-[360px] overflow-hidden rounded-lg lg:order-2 lg:h-[640px]">
             <BusinessesMap
               height="100%"
               businesses={mapBusinesses}
