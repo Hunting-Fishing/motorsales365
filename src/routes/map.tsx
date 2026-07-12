@@ -242,14 +242,28 @@ function MapPage() {
         )
         .eq("status", "active")
         .not("lat", "is", null)
-        .not("lng", "is", null)
-        .limit(2000);
+        .not("lng", "is", null);
       if (typeSlug) query = query.eq("type_slug", typeSlug);
+      // Server-side bounding box when a center + radius is set — huge speed win
+      // for the common "search around a location" case.
+      if (center && radiusKm && radiusKm > 0) {
+        const latDelta = radiusKm / 111;
+        const lngDelta = radiusKm / (111 * Math.max(0.2, Math.cos((center.lat * Math.PI) / 180)));
+        query = query
+          .gte("lat", center.lat - latDelta)
+          .lte("lat", center.lat + latDelta)
+          .gte("lng", center.lng - lngDelta)
+          .lte("lng", center.lng + lngDelta)
+          .limit(1000);
+      } else {
+        query = query.limit(2000);
+      }
       const { data } = await query;
       setItems(data ?? []);
       setLoading(false);
     })();
-  }, [typeSlug]);
+  }, [typeSlug, center?.lat, center?.lng, radiusKm]);
+
 
   const typeLabel = useMemo(() => {
     const m = new Map(types.map((t) => [t.slug, t.label]));
