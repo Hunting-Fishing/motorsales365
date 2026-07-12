@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import ogMap from "@/assets/og/map.jpg";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { Star, Store as StoreIcon, MapPin, Locate, Loader2, Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -86,6 +86,8 @@ type StoredSearch = {
   selectedSlug?: string | null;
 };
 
+type MapSearchState = z.infer<typeof searchSchema>;
+
 function readStoredSearch(): StoredSearch | null {
   if (typeof window === "undefined") return null;
   try {
@@ -99,6 +101,53 @@ function readStoredSearch(): StoredSearch | null {
   }
 }
 
+function buildMapSearch({
+  center,
+  radiusKm,
+  typeSlug,
+  nameQuery,
+  featuredOnly,
+  verifiedOnly,
+  ratedOnly,
+  minRating,
+}: {
+  center: CenterPoint;
+  radiusKm: number | null;
+  typeSlug: string | null;
+  nameQuery: string;
+  featuredOnly: boolean;
+  verifiedOnly: boolean;
+  ratedOnly: boolean;
+  minRating: number;
+}): MapSearchState {
+  return {
+    ...(center ? { lat: Number(center.lat.toFixed(5)), lng: Number(center.lng.toFixed(5)) } : {}),
+    ...(center && radiusKm ? { r: radiusKm } : {}),
+    ...(typeSlug ? { type: typeSlug } : {}),
+    ...(center?.label ? { q: center.label } : {}),
+    ...(nameQuery ? { name: nameQuery } : {}),
+    ...(featuredOnly ? { featured: true } : {}),
+    ...(verifiedOnly ? { verified: true } : {}),
+    ...(ratedOnly ? { rated: true } : {}),
+    ...(minRating > 0 ? { minRating } : {}),
+  };
+}
+
+function mapSearchMatches(a: MapSearchState, b: MapSearchState) {
+  return (
+    (a.lat ?? undefined) === (b.lat ?? undefined) &&
+    (a.lng ?? undefined) === (b.lng ?? undefined) &&
+    (a.r ?? undefined) === (b.r ?? undefined) &&
+    (a.type ?? undefined) === (b.type ?? undefined) &&
+    (a.q ?? undefined) === (b.q ?? undefined) &&
+    (a.name ?? undefined) === (b.name ?? undefined) &&
+    !!a.featured === !!b.featured &&
+    !!a.verified === !!b.verified &&
+    !!a.rated === !!b.rated &&
+    (a.minRating ?? undefined) === (b.minRating ?? undefined)
+  );
+}
+
 function MapPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
@@ -107,25 +156,22 @@ function MapPage() {
   const [loading, setLoading] = useState(true);
   const desktopListRef = useRef<HTMLDivElement | null>(null);
   const bottomSheetRef = useRef<MapBottomSheetHandle | null>(null);
+  const restoredStoredSearchRef = useRef(false);
 
-  // URL wins for lat/lng; pull selection + viewport from localStorage regardless.
-  const stored = readStoredSearch();
+  // URL wins for lat/lng. localStorage is restored after hydration only so SSR
+  // and the first client render match exactly.
   const urlHasCenter = search.lat != null && search.lng != null;
 
   const [typeSlug, setTypeSlug] = useState<string | null>(search.type ?? null);
   const [center, setCenter] = useState<CenterPoint>(
     urlHasCenter
       ? { lat: search.lat!, lng: search.lng!, label: search.q }
-      : stored
-        ? { lat: stored.lat, lng: stored.lng, label: stored.label }
         : null,
   );
-  const [radiusKm, setRadiusKm] = useState<number | null>(search.r ?? stored?.radiusKm ?? null);
+  const [radiusKm, setRadiusKm] = useState<number | null>(search.r ?? null);
   const [hoverId, setHoverId] = useState<string | null>(null);
-  const [selectedSlug, setSelectedSlug] = useState<string | null>(stored?.selectedSlug ?? null);
-  const [viewport, setViewport] = useState<{ lat: number; lng: number; zoom: number } | null>(
-    stored?.viewport ?? null,
-  );
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+  const [viewport, setViewport] = useState<{ lat: number; lng: number; zoom: number } | null>(null);
 
   // Additional filters
   const [nameQuery, setNameQuery] = useState<string>(search.name ?? "");
@@ -138,6 +184,20 @@ function MapPage() {
 
 
   const [locating, setLocating] = useState(false);
+
+  useEffect(() => {
+    if (restoredStoredSearchRef.current) return;
+    restoredStoredSearchRef.current = true;
+    const stored = readStoredSearch();
+    if (!stored) return;
+
+    if (!urlHasCenter) {
+      setCenter({ lat: stored.lat, lng: stored.lng, label: stored.label });
+      setRadiusKm(stored.radiusKm ?? null);
+    }
+    setViewport(stored.viewport ?? null);
+    setSelectedSlug(stored.selectedSlug ?? null);
+  }, [urlHasCenter]);
 
   const useMyLocation = () => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
@@ -168,25 +228,23 @@ function MapPage() {
   };
 
   useEffect(() => {
-
-    navigate({
-      to: "/map",
-      search: {
-        ...(center
-          ? { lat: Number(center.lat.toFixed(5)), lng: Number(center.lng.toFixed(5)) }
-          : {}),
-        ...(center && radiusKm ? { r: radiusKm } : {}),
-        ...(typeSlug ? { type: typeSlug } : {}),
-        ...(center?.label ? { q: center.label } : {}),
-        ...(nameQuery ? { name: nameQuery } : {}),
-        ...(featuredOnly ? { featured: true } : {}),
-        ...(verifiedOnly ? { verified: true } : {}),
-        ...(ratedOnly ? { rated: true } : {}),
-        ...(minRating > 0 ? { minRating } : {}),
-      },
-      replace: true,
+    const nextSearch = buildMapSearch({
+      center,
+      radiusKm,
+      typeSlug,
+      nameQuery,
+      featuredOnly,
+      verifiedOnly,
+      ratedOnly,
+      minRating,
     });
+    if (!mapSearchMatches(search, nextSearch)) {
+      navigate({ to: "/map", search: nextSearch, replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [center, radiusKm, typeSlug, nameQuery, featuredOnly, verifiedOnly, ratedOnly, minRating]);
 
+  useEffect(() => {
     if (typeof window !== "undefined") {
       try {
         if (center) {
@@ -219,8 +277,7 @@ function MapPage() {
         // ignore quota / private-mode errors
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [center, radiusKm, typeSlug, viewport, selectedSlug, nameQuery, featuredOnly, verifiedOnly, ratedOnly, minRating]);
+  }, [center, radiusKm, viewport, selectedSlug]);
 
   useEffect(() => {
     setTypes(
@@ -234,6 +291,7 @@ function MapPage() {
 
   useEffect(() => {
     setLoading(true);
+    const controller = new AbortController();
     (async () => {
       let query = (supabase as any)
         .from("businesses")
@@ -242,8 +300,19 @@ function MapPage() {
         )
         .eq("status", "active")
         .not("lat", "is", null)
-        .not("lng", "is", null);
+        .not("lng", "is", null)
+        .order("featured", { ascending: false })
+        .order("name", { ascending: true });
       if (typeSlug) query = query.eq("type_slug", typeSlug);
+      if (featuredOnly) query = query.eq("featured", true);
+      if (verifiedOnly) query = query.eq("claim_state", "owned");
+      if (ratedOnly) query = query.gt("rating_count", 0);
+      if (minRating > 0) query = query.gte("rating_avg", minRating);
+      const trimmedName = nameQuery.trim();
+      if (trimmedName) {
+        const safe = trimmedName.replaceAll("%", "\\%").replaceAll("_", "\\_");
+        query = query.or(`name.ilike.%${safe}%,city.ilike.%${safe}%,barangay.ilike.%${safe}%,province.ilike.%${safe}%`);
+      }
       // Server-side bounding box when a center + radius is set — huge speed win
       // for the common "search around a location" case.
       if (center && radiusKm && radiusKm > 0) {
@@ -258,11 +327,21 @@ function MapPage() {
       } else {
         query = query.limit(2000);
       }
-      const { data } = await query;
+      if (typeof query.abortSignal === "function") query = query.abortSignal(controller.signal);
+      const { data, error } = await query;
+      if (controller.signal.aborted) return;
+      if (error) {
+        console.error(error);
+        toast.error("Map results could not load.");
+        setItems([]);
+        setLoading(false);
+        return;
+      }
       setItems(data ?? []);
       setLoading(false);
     })();
-  }, [typeSlug, center?.lat, center?.lng, radiusKm]);
+    return () => controller.abort();
+  }, [typeSlug, center?.lat, center?.lng, radiusKm, nameQuery, featuredOnly, verifiedOnly, ratedOnly, minRating]);
 
 
   const typeLabel = useMemo(() => {
@@ -313,21 +392,37 @@ function MapPage() {
     });
   }, [inRadius, center]);
 
-  const mapBusinesses: GMapBusiness[] = sorted.map((b) => ({
-    id: b.id,
-    slug: b.slug,
-    name: b.name,
-    type_slug: b.type_slug,
-    type_label: typeLabel(b.type_slug),
-    lat: b.lat ? Number(b.lat) : null,
-    lng: b.lng ? Number(b.lng) : null,
-    rating_avg: Number(b.rating_avg),
-    rating_count: b.rating_count,
-    city: b.city,
-    featured: b.featured,
-    price_label: b.price_label,
-    highlighted: hoverId === b.id,
-  }));
+  const mapBusinesses: GMapBusiness[] = useMemo(
+    () =>
+      sorted.map((b) => ({
+        id: b.id,
+        slug: b.slug,
+        name: b.name,
+        type_slug: b.type_slug,
+        type_label: typeLabel(b.type_slug),
+        lat: b.lat ? Number(b.lat) : null,
+        lng: b.lng ? Number(b.lng) : null,
+        rating_avg: Number(b.rating_avg),
+        rating_count: b.rating_count,
+        city: b.city,
+        featured: b.featured,
+        price_label: b.price_label,
+        highlighted: hoverId === b.id,
+      })),
+    [sorted, typeLabel, hoverId],
+  );
+
+  const handlePinClick = useCallback((slug: string) => {
+    setSelectedSlug(slug);
+    setHoverId(null);
+    // Desktop/tablet: scroll the matching card into view in the sidebar.
+    const desktopEl = desktopListRef.current?.querySelector<HTMLElement>(
+      `[data-slug="${CSS.escape(slug)}"]`,
+    );
+    desktopEl?.scrollIntoView({ behavior: "smooth", block: "center" });
+    // Mobile: expand the bottom sheet and scroll the matching card.
+    bottomSheetRef.current?.scrollToSlug(slug);
+  }, []);
 
   const countLabel = loading
     ? "Loading nearby businesses…"
@@ -595,10 +690,10 @@ function MapPage() {
 
 
 
-        {/* Mobile: full-bleed map + bottom sheet. Desktop: side-by-side grid. */}
-        <div className="lg:grid lg:grid-cols-[360px_1fr] lg:gap-4">
+        {/* Mobile: full-bleed map + bottom sheet. Tablet/desktop: side-by-side grid. */}
+        <div className="md:grid md:grid-cols-[320px_minmax(0,1fr)] md:gap-4 xl:grid-cols-[380px_minmax(0,1fr)]">
           {/* Map */}
-          <div className="relative order-1 h-[calc(100dvh-280px)] min-h-[360px] overflow-hidden rounded-lg lg:order-2 lg:h-[640px]">
+          <div className="relative order-1 h-[calc(100dvh-280px)] min-h-[360px] overflow-hidden rounded-lg md:order-2 md:h-[min(650px,calc(100dvh-235px))] md:min-h-[520px]">
             <BusinessesMap
               height="100%"
               businesses={mapBusinesses}
@@ -607,25 +702,15 @@ function MapPage() {
               initialViewport={viewport}
               onViewportChange={setViewport}
               highlightedSlug={selectedSlug}
-              onPinClick={(slug: string) => {
-                setSelectedSlug(slug);
-                setHoverId(null);
-                // Desktop: scroll the matching card into view in the sidebar.
-                const desktopEl = desktopListRef.current?.querySelector<HTMLElement>(
-                  `[data-slug="${CSS.escape(slug)}"]`,
-                );
-                desktopEl?.scrollIntoView({ behavior: "smooth", block: "center" });
-                // Mobile: expand the bottom sheet and scroll the matching card.
-                bottomSheetRef.current?.scrollToSlug(slug);
-              }}
+              onPinClick={handlePinClick}
             />
             <MapLegend />
           </div>
 
-          {/* Desktop list (sidebar) */}
+          {/* Tablet/desktop list (sidebar) */}
           <div
             ref={desktopListRef}
-            className="hidden lg:order-1 lg:block lg:max-h-[calc(100dvh-260px)] lg:overflow-y-auto lg:pr-1"
+            className="hidden md:order-1 md:block md:max-h-[min(650px,calc(100dvh-235px))] md:overflow-y-auto md:pr-1"
           >
             <div className="mb-2 text-xs text-muted-foreground">{countLabel}</div>
             {resultsList}
@@ -634,7 +719,7 @@ function MapPage() {
       </div>
 
       {/* Spacer so peek sheet doesn't cover footer content on mobile */}
-      <div className="h-24 lg:hidden" aria-hidden />
+      <div className="h-24 md:hidden" aria-hidden />
 
       {/* Mobile draggable bottom sheet */}
       <MapBottomSheet
