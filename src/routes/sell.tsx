@@ -1573,11 +1573,13 @@ function SellPage() {
             {/* LISTING */}
             <SellGroup id="listing" title="Listing" defaultOpen>
               <div>
-                <Label htmlFor="title" className="text-[11px]">Title</Label>
+                <Label htmlFor="title" className="text-[11px]">
+                  Title <span className="text-orange-500">*</span>
+                </Label>
                 <Input
                   id="title"
                   required
-                  className="h-8 text-sm"
+                  className={`h-8 text-sm ${mandatoryFieldClass(title.trim().length > 0)}`}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="2019 Toyota Vios 1.3 E AT"
