@@ -54,6 +54,8 @@ import {
   CategoryAttributesEditor,
   CATEGORY_ATTR_KEYS,
 } from "@/components/listings/category-attributes-editor";
+import { FloatingSaveWidget } from "@/components/listings/floating-save-widget";
+
 import { isAttrCategory, isValidDrivetrain } from "@/lib/category-attributes";
 import {
   FitmentEditor,
@@ -1116,6 +1118,18 @@ function SellPage() {
     }
 
     if (category === "car" || category === "motorcycle") {
+      if (!vehicleQuality.flood_history || !vehicleQuality.accident_history) {
+        toast.error("Please answer Flood history and Accident history.");
+        setVehicleQualityIssues([
+          ...(!vehicleQuality.flood_history
+            ? [{ field: "flood_history" as const, message: "Required" }]
+            : []),
+          ...(!vehicleQuality.accident_history
+            ? [{ field: "accident_history" as const, message: "Required" }]
+            : []),
+        ]);
+        return;
+      }
       const vqCheck = validateVehicleQuality(vehicleQuality);
       if (!vqCheck.ok) {
         setVehicleQualityIssues(vqCheck.issues);
@@ -1124,6 +1138,7 @@ function SellPage() {
       }
       setVehicleQualityIssues([]);
     }
+
 
     if (category === "car" && !isValidDrivetrain(categoryAttrs.drivetrain)) {
       toast.error("Please select a valid drivetrain (FWD, RWD, AWD, 4x4, or 4x2).");
@@ -1498,7 +1513,7 @@ function SellPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-3 space-y-2">
+        <form id="sell-listing-form" onSubmit={handleSubmit} className="mt-3 space-y-2">
           {(() => {
             const TABS = [
               { key: "details", label: "Details" },
@@ -2996,7 +3011,14 @@ function SellPage() {
           })()}
 
         </form>
+        <FloatingSaveWidget
+          formId="sell-listing-form"
+          busy={submitting}
+          label="Publish listing"
+          busyLabel="Publishing…"
+        />
       </div>
     </SiteLayout>
+
   );
 }

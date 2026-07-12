@@ -13,6 +13,8 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import { z } from "zod";
 import { vinChecksumValid } from "@/components/vin-scan-dialog";
+import { mandatoryFieldClass } from "@/components/ui/numeric-input";
+
 
 export type VehicleQuality = {
   variant?: string;
@@ -349,12 +351,12 @@ export function VehicleQualityFields({
           </FieldShell>
         ) : null}
 
-        <FieldShell label="Flood history" error={errFor("flood_history")}>
+        <FieldShell label="Flood history *" error={errFor("flood_history")}>
           <Select
             value={value.flood_history ?? ""}
             onValueChange={(v) => set("flood_history", v)}
           >
-            <SelectTrigger>
+            <SelectTrigger className={mandatoryFieldClass(!!value.flood_history)}>
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
@@ -366,12 +368,12 @@ export function VehicleQualityFields({
             </SelectContent>
           </Select>
         </FieldShell>
-        <FieldShell label="Accident history" error={errFor("accident_history")}>
+        <FieldShell label="Accident history *" error={errFor("accident_history")}>
           <Select
             value={value.accident_history ?? ""}
             onValueChange={(v) => set("accident_history", v)}
           >
-            <SelectTrigger>
+            <SelectTrigger className={mandatoryFieldClass(!!value.accident_history)}>
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
@@ -383,6 +385,7 @@ export function VehicleQualityFields({
             </SelectContent>
           </Select>
         </FieldShell>
+
 
         {category === "motorcycle" && (
           <div className="sm:col-span-3">

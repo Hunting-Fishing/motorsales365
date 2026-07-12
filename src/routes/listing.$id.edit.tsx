@@ -44,6 +44,9 @@ import {
 } from "@/components/listings/category-attributes-editor";
 import { isAttrCategory, isValidDrivetrain } from "@/lib/category-attributes";
 import { NeededPartsEditor } from "@/components/listings/needed-parts-editor";
+import { FloatingSaveWidget } from "@/components/listings/floating-save-widget";
+import { Wrench } from "lucide-react";
+
 import { PhoneInput } from "@/components/phone-input";
 import { parseE164, buildE164 } from "@/data/country-codes";
 import {
@@ -350,6 +353,18 @@ function EditListingPage() {
     e.preventDefault();
     if (!user || !listing) return;
     if (category === "car" || category === "motorcycle") {
+      if (!vehicleQuality.flood_history || !vehicleQuality.accident_history) {
+        toast.error("Please answer Flood history and Accident history.");
+        setVehicleQualityIssues([
+          ...(!vehicleQuality.flood_history
+            ? [{ field: "flood_history" as const, message: "Required" }]
+            : []),
+          ...(!vehicleQuality.accident_history
+            ? [{ field: "accident_history" as const, message: "Required" }]
+            : []),
+        ]);
+        return;
+      }
       const vqCheck = validateVehicleQuality(vehicleQuality);
       if (!vqCheck.ok) {
         setVehicleQualityIssues(vqCheck.issues);
@@ -362,6 +377,7 @@ function EditListingPage() {
       toast.error("Please select a valid drivetrain (FWD, RWD, AWD, 4x4, or 4x2).");
       return;
     }
+
     setSaving(true);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -633,7 +649,7 @@ function EditListingPage() {
         <h1 className="font-display text-3xl font-bold">Edit listing</h1>
         <p className="text-muted-foreground">Update details for "{listing.title}".</p>
 
-        <form onSubmit={save} className="mt-8 space-y-6">
+        <form id="edit-listing-form" onSubmit={save} className="mt-8 space-y-6">
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Category & basics</h2>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -1141,13 +1157,7 @@ function EditListingPage() {
               </div>
             )}
             {isAttrCategory(category) && (
-              <div className="mt-4 rounded-md border border-border/60 bg-background/40 p-4">
-                <h3 className="mb-1 font-display text-sm font-semibold">
-                  More details & buyer filters
-                </h3>
-                <p className="mb-3 text-xs text-muted-foreground">
-                  These fields power the {category} browse page filters so the right buyers find you.
-                </p>
+              <div className="mt-2">
                 <CategoryAttributesEditor
                   category={category}
                   value={categoryAttrs}
@@ -1156,16 +1166,21 @@ function EditListingPage() {
               </div>
             )}
             {(category === "car" || category === "motorcycle") && (
-              <details className="mt-4 rounded-md border border-border/60 bg-background/40 open:bg-background">
+              <details className="mt-4 rounded-md border-l-4 border-primary/70 border-y border-r border-border/60 bg-background/40 open:bg-background">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3">
-                  <div>
-                    <h3 className="font-display text-sm font-semibold">
-                      Parts needed / known issues{" "}
-                      <span className="text-xs font-normal text-muted-foreground">(optional)</span>
-                    </h3>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">
-                      Flag anything this car needs — brakes, tires, battery, etc.
-                    </p>
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
+                      <Wrench className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <h3 className="font-display text-sm font-semibold">
+                        Parts needed / known issues{" "}
+                        <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                      </h3>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">
+                        Flag anything this car needs — brakes, tires, battery, etc.
+                      </p>
+                    </div>
                   </div>
                   <span className="flex items-center gap-2 text-xs text-muted-foreground">
                     {neededParts.length > 0 && (
@@ -1191,6 +1206,7 @@ function EditListingPage() {
               </details>
             )}
           </section>
+
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Location & contact</h2>
@@ -1425,7 +1441,9 @@ function EditListingPage() {
             </Button>
           </div>
         </form>
+        <FloatingSaveWidget formId="edit-listing-form" busy={saving} label="Save changes" />
       </div>
     </SiteLayout>
+
   );
 }
