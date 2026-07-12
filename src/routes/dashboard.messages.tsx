@@ -463,15 +463,91 @@ function MessagesPage() {
     return list.sort((a, b) => (a.last_at < b.last_at ? 1 : -1));
   }, [dms, groupMsgs, groupThreads, groupMembers, myMemberships, listingsById, profilesById, user]);
 
+  // Per-conversation state (star/mute/archive/spam) + folder classification.
+  const stateKeyOf = useCallback(
+    (c: ConversationSummary): { scope: "dm" | "group"; key: string } =>
+      c.kind === "dm"
+        ? { scope: "dm", key: dmKey(c.listing_id!, c.other_user_id!) }
+        : { scope: "group", key: c.thread_id! },
+    [],
+  );
+
+  const foldersForConvo = useCallback(
+    (c: ConversationSummary): FolderKey[] => {
+      const { scope, key } = stateKeyOf(c);
+      const s = threadStates.get(scope, key);
+      const out: FolderKey[] = ["all"];
+      if (s.spam) return ["spam"]; // spam pulls out of everything
+      if (s.archived) out.push("archived");
+      if (s.starred) out.push("starred");
+      if (c.unread > 0) out.push("unread");
+      if (c.kind === "dm" && user) {
+        const listingOwner = listingsById[c.listing_id!]?.user_id;
+        if (listingOwner === user.id) out.push("selling");
+        else out.push("buying");
+        if (c.listing_status === "sold") out.push("sold");
+      }
+      return out;
+    },
+    [threadStates, stateKeyOf, listingsById, user],
+  );
+
+  const folderCounts = useMemo(() => {
+    const c: Record<FolderKey, number> = {
+      all: 0,
+      unread: 0,
+      buying: 0,
+      selling: 0,
+      sold: 0,
+      starred: 0,
+      archived: 0,
+      spam: 0,
+    };
+    for (const convo of conversations) {
+      const fs = foldersForConvo(convo);
+      // "All" should exclude archived + spam so it behaves like an inbox
+      if (!fs.includes("archived") && !fs.includes("spam")) c.all += 1;
+      if (fs.includes("unread") && !fs.includes("archived") && !fs.includes("spam")) c.unread += 1;
+      for (const f of fs) {
+        if (f === "all") continue;
+        c[f] += 1;
+      }
+    }
+    return c;
+  }, [conversations, foldersForConvo]);
+
+  const filteredConversations = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return conversations.filter((c) => {
+      const fs = foldersForConvo(c);
+      if (folder === "all") {
+        if (fs.includes("archived") || fs.includes("spam")) return false;
+      } else if (folder === "unread") {
+        if (!fs.includes("unread") || fs.includes("archived") || fs.includes("spam")) return false;
+      } else if (!fs.includes(folder)) {
+        return false;
+      }
+      if (term) {
+        const hay = `${c.title} ${c.last_body} ${c.listing_title ?? ""}`.toLowerCase();
+        if (!hay.includes(term)) return false;
+      }
+      return true;
+    });
+  }, [conversations, folder, search, foldersForConvo]);
+
   useEffect(() => {
-    if (activeKey && !conversations.some((c) => c.key === activeKey)) {
-      setActiveKey(isNarrow ? null : (conversations[0]?.key ?? null));
+    if (activeKey && !filteredConversations.some((c) => c.key === activeKey)) {
+      setActiveKey(isNarrow ? null : (filteredConversations[0]?.key ?? null));
       return;
     }
-    if (!isNarrow && !activeKey && conversations.length) setActiveKey(conversations[0].key);
-  }, [conversations, activeKey, isNarrow]);
+    if (!isNarrow && !activeKey && filteredConversations.length)
+      setActiveKey(filteredConversations[0].key);
+  }, [filteredConversations, activeKey, isNarrow]);
 
   const activeConvo = conversations.find((c) => c.key === activeKey);
+  const activeState = activeConvo
+    ? threadStates.get(stateKeyOf(activeConvo).scope, stateKeyOf(activeConvo).key)
+    : null;
 
   const dmThread = useMemo(() => {
     if (!activeConvo || activeConvo.kind !== "dm" || !user) return [];
