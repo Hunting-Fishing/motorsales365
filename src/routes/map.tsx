@@ -453,6 +453,38 @@ function MapPage() {
               )}
               Use my location
             </Button>
+            <Button
+              type="button"
+              variant={showFilters ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowFilters((v) => !v)}
+              aria-expanded={showFilters}
+              aria-controls="map-filters-panel"
+            >
+              <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
+              Filters
+              {(featuredOnly || verifiedOnly || ratedOnly || minRating > 0 || nameQuery) && (
+                <Badge variant="secondary" className="ml-1.5 h-4 px-1 text-[10px]">
+                  {[featuredOnly, verifiedOnly, ratedOnly, minRating > 0, !!nameQuery].filter(Boolean).length}
+                </Badge>
+              )}
+            </Button>
+            {(featuredOnly || verifiedOnly || ratedOnly || minRating > 0 || nameQuery) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setFeaturedOnly(false);
+                  setVerifiedOnly(false);
+                  setRatedOnly(false);
+                  setMinRating(0);
+                  setNameQuery("");
+                }}
+              >
+                <X className="mr-1 h-3.5 w-3.5" /> Clear filters
+              </Button>
+            )}
             {selectedSlug && (
               <Button
                 type="button"
@@ -469,7 +501,84 @@ function MapPage() {
               </Button>
             )}
           </div>
+
+          {showFilters && (
+            <div
+              id="map-filters-panel"
+              className="mt-3 grid gap-3 rounded-lg border border-border bg-secondary/30 p-3 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              <div className="sm:col-span-2 lg:col-span-2">
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                  Search name / city
+                </label>
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={nameQuery}
+                    onChange={(e) => setNameQuery(e.target.value)}
+                    placeholder="e.g. Toyota, Cebu, Ortigas"
+                    className="h-9 pl-8"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                  Minimum rating
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[0, 3, 4, 4.5].map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => setMinRating(r)}
+                      aria-pressed={minRating === r}
+                      className={`inline-flex h-8 items-center gap-1 rounded-full border px-2.5 text-xs font-medium transition ${
+                        minRating === r
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-card hover:bg-secondary"
+                      }`}
+                    >
+                      {r === 0 ? "Any" : (
+                        <>
+                          <Star className="h-3 w-3 fill-current" />
+                          {r}+
+                        </>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                  Quick filters
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { key: "featured", label: "Featured", value: featuredOnly, set: setFeaturedOnly },
+                    { key: "verified", label: "Owner-verified", value: verifiedOnly, set: setVerifiedOnly },
+                    { key: "rated", label: "Has reviews", value: ratedOnly, set: setRatedOnly },
+                  ].map((f) => (
+                    <button
+                      key={f.key}
+                      type="button"
+                      onClick={() => f.set(!f.value)}
+                      aria-pressed={f.value}
+                      className={`inline-flex h-8 items-center rounded-full border px-2.5 text-xs font-medium transition ${
+                        f.value
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-card hover:bg-secondary"
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </Card>
+
+
 
 
         {/* Mobile: full-bleed map + bottom sheet. Desktop: side-by-side grid. */}
