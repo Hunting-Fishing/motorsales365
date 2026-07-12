@@ -1368,8 +1368,9 @@ function MessagesPage() {
                             {activeConvo.kind === "dm" && (
                               <MakeOfferButton
                                 listingPrice={activeConvo.listing_price ?? null}
-                                onSubmit={(amount, note) => sendOffer(amount, note)}
+                                onSend={({ amount, note }) => sendOffer(amount, note)}
                               />
+
                             )}
                           </>
                         }
