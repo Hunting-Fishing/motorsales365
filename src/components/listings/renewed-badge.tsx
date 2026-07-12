@@ -20,7 +20,7 @@ export function RenewedBadge({
     if (pubAge < 48 * 60 * 60 * 1000) return null; // NEW takes priority
   }
   return (
-    <Badge variant="outline" className="border-sky-500/50 bg-sky-500/10 text-sky-700 dark:text-sky-300">
+    <Badge className="bg-sky-500 text-white hover:bg-sky-500">
       <RefreshCw className="mr-1 h-3 w-3" />
       Renewed
     </Badge>
