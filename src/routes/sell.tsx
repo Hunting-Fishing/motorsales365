@@ -2421,6 +2421,10 @@ function SellPage() {
                   value={vehicleQuality}
                   onChange={setVehicleQuality}
                   issues={vehicleQualityIssues}
+                  negotiable={negotiable}
+                  onNegotiableChange={setNegotiable}
+                  priceHidden={priceHidden}
+                  onPriceHiddenChange={setPriceHidden}
                 />
               </SellGroup>
             )}
