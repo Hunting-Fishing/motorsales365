@@ -100,8 +100,12 @@ interface ConversationSummary {
   last_body: string;
   last_at: string;
   unread: number;
+  total: number;
+  last_from_me: boolean;
+  last_read_by_other: boolean;
   invited?: boolean;
 }
+
 
 function formatPricePHP(n: number | null): string {
   if (n == null) return "";
@@ -335,7 +339,9 @@ function MessagesPage() {
       const title = listing?.title ?? "Listing";
       const thumb = listing?.thumb ?? null;
       const unreadInc = m.recipient_id === user.id && !m.read_at ? 1 : 0;
-      const preview = attachmentPreview(m.body, m.attachment_type);
+      const rawPreview = attachmentPreview(m.body, m.attachment_type);
+      const mine = m.sender_id === user.id;
+      const preview = rawPreview ? `${mine ? "You: " : `${(name.split(" ")[0] || name)}: `}${rawPreview}` : rawPreview;
       if (!existing) {
         dmMap.set(key, {
           key,
@@ -353,11 +359,20 @@ function MessagesPage() {
           last_body: preview,
           last_at: m.created_at,
           unread: unreadInc,
+          total: 1,
+          last_from_me: mine,
+          last_read_by_other: mine ? !!m.read_at : false,
         });
       } else {
-        existing.last_body = preview;
-        existing.last_at = m.created_at;
+        const isNewer = new Date(m.created_at).getTime() > new Date(existing.last_at).getTime();
+        if (isNewer) {
+          existing.last_body = preview;
+          existing.last_at = m.created_at;
+          existing.last_from_me = mine;
+          existing.last_read_by_other = mine ? !!m.read_at : false;
+        }
         existing.unread += unreadInc;
+        existing.total += 1;
         existing.title = name;
         existing.subtitle = `Re: ${title}`;
         existing.thumb = thumb;
@@ -366,6 +381,8 @@ function MessagesPage() {
         existing.listing_price = listing?.price_php ?? null;
         existing.listing_status = listing?.status ?? null;
       }
+
+
     }
     list.push(...Array.from(dmMap.values()));
 
@@ -411,8 +428,12 @@ function MessagesPage() {
         last_body: preview,
         last_at: lastAt,
         unread: mem.status === "invited" ? Math.max(unread, 1) : unread,
+        total: tMsgs.length,
+        last_from_me: last?.sender_id === user.id,
+        last_read_by_other: false,
         invited: mem.status === "invited",
       });
+
     }
 
     return list.sort((a, b) => (a.last_at < b.last_at ? 1 : -1));
@@ -818,11 +839,29 @@ function MessagesPage() {
                         <div className="truncate text-xs text-muted-foreground">{c.subtitle}</div>
                       )}
                       <div className="mt-1 flex items-center gap-2">
+                        {c.last_from_me && (
+                          <span
+                            title={c.last_read_by_other ? "Seen" : "Sent"}
+                            className={`shrink-0 ${c.last_read_by_other ? "text-primary" : "text-muted-foreground"}`}
+                          >
+                            <CheckCheck className="h-3.5 w-3.5" />
+                          </span>
+                        )}
                         <div
                           className={`line-clamp-1 flex-1 text-xs ${c.unread > 0 ? "font-semibold text-foreground" : "text-foreground/70"}`}
                         >
                           {c.last_body}
                         </div>
+                        {c.total > 0 && (
+                          <span
+                            title={`${c.total} message${c.total === 1 ? "" : "s"} total`}
+                            className="inline-flex items-center gap-0.5 rounded-full bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
+                          >
+                            <MessageSquare className="h-3 w-3" />
+                            {c.total}
+                          </span>
+                        )}
+
                         {c.unread > 0 && (
                           <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
                             {c.unread}

@@ -1017,17 +1017,16 @@ function ListingDetailPage() {
 
       {listing.allow_messages && user?.id !== listing.user_id && (
         <FloatingMessageWidget
+          listingId={listing.id}
+          sellerId={listing.user_id}
           sellerName={seller?.business_name ?? seller?.full_name ?? null}
           sellerAvatarUrl={seller?.avatar_url ?? null}
           listingTitle={listing.title}
-          message={message}
-          setMessage={setMessage}
-          onSend={sendMessage}
-          sending={sending}
           open={msgWidgetOpen}
           setOpen={setMsgWidgetOpen}
         />
       )}
+
 
       <MobileActionBar
         phone={listing.contact_phone}
