@@ -136,7 +136,7 @@ function SectionCard({
 }
 
 
-export const Route = createFileRoute("/listing/$id")({
+export const Route = createFileRoute("/listing/$id/")({
   loader: async ({ params }) => {
     try {
       const { data: l } = await supabase
