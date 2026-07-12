@@ -25,6 +25,8 @@ export type MessageAttachment = {
   thumbUrl?: string | null;
   path?: string | null;
   meta?: Record<string, unknown> | null;
+  /** Local blob URL used only for pre-send preview; not persisted */
+  localPreviewUrl?: string | null;
 };
 
 export type MessagePayload = {
