@@ -131,47 +131,47 @@ function pickCardAccent(args: {
   const { openReports, status, trend, promo, boosted, publishedAt, updatedAt } = args;
   if (openReports > 0)
     return {
-      ring: "ring-2 ring-amber-500/70 ring-offset-1 ring-offset-background",
-      glow: "shadow-[0_0_0_1px_rgba(245,158,11,0.25),0_10px_30px_-12px_rgba(245,158,11,0.55)]",
+      ring: "ring-2 ring-red-600/80 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(220,38,38,0.3),0_10px_30px_-12px_rgba(220,38,38,0.65)]",
     };
   if (status === "pending_sale")
     return {
-      ring: "ring-2 ring-orange-500/70 ring-offset-1 ring-offset-background",
-      glow: "",
+      ring: "ring-2 ring-orange-500/80 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(249,115,22,0.25),0_10px_30px_-12px_rgba(249,115,22,0.55)]",
     };
   if (trend?.direction === "down")
     return {
-      ring: "ring-2 ring-emerald-500/70 ring-offset-1 ring-offset-background",
+      ring: "ring-2 ring-emerald-500/80 ring-offset-1 ring-offset-background",
       glow: "shadow-[0_0_0_1px_rgba(16,185,129,0.2),0_10px_30px_-12px_rgba(16,185,129,0.5)]",
     };
   if (trend?.direction === "up")
     return {
-      ring: "ring-2 ring-rose-500/70 ring-offset-1 ring-offset-background",
-      glow: "",
+      ring: "ring-2 ring-rose-500/80 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(244,63,94,0.2),0_10px_30px_-12px_rgba(244,63,94,0.5)]",
     };
   if (promo)
     return {
-      ring: "ring-2 ring-orange-400/70 ring-offset-1 ring-offset-background",
-      glow: "shadow-[0_0_0_1px_rgba(251,146,60,0.2),0_10px_30px_-12px_rgba(251,146,60,0.5)]",
+      ring: "ring-2 ring-yellow-400/90 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(250,204,21,0.35),0_10px_30px_-10px_rgba(250,204,21,0.65)]",
     };
   if (boosted)
     return {
-      ring: "ring-2 ring-violet-500/70 ring-offset-1 ring-offset-background",
-      glow: "shadow-[0_0_0_1px_rgba(139,92,246,0.2),0_10px_30px_-12px_rgba(139,92,246,0.5)]",
+      ring: "ring-2 ring-violet-500/80 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(139,92,246,0.3),0_0_24px_rgba(217,70,239,0.35),0_10px_30px_-10px_rgba(139,92,246,0.6)]",
     };
   if (publishedAt) {
     const age = Date.now() - new Date(publishedAt).getTime();
     if (age >= 0 && age <= 48 * 60 * 60 * 1000)
       return {
-        ring: "ring-2 ring-cyan-500/70 ring-offset-1 ring-offset-background",
-        glow: "",
+        ring: "ring-2 ring-fuchsia-500/80 ring-offset-1 ring-offset-background",
+        glow: "shadow-[0_0_0_1px_rgba(217,70,239,0.25),0_10px_30px_-12px_rgba(217,70,239,0.55)]",
       };
   }
   if (updatedAt) {
     const age = Date.now() - new Date(updatedAt).getTime();
     if (age >= 0 && age <= 24 * 60 * 60 * 1000)
       return {
-        ring: "ring-2 ring-sky-500/70 ring-offset-1 ring-offset-background",
+        ring: "ring-2 ring-teal-400/80 ring-offset-1 ring-offset-background",
         glow: "",
       };
   }

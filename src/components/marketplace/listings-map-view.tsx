@@ -112,7 +112,7 @@ async function geocodeCity(city: string, region: string): Promise<{ lat: number;
 function regionBadgeIcon(count: number): L.DivIcon {
   return L.divIcon({
     className: "",
-    html: `<div style="background:#0EA5E9;color:white;font-weight:700;border-radius:9999px;min-width:28px;height:28px;padding:0 8px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.35);border:2px solid white;font-size:12px;">${count}</div>`,
+    html: `<div style="background:#14B8A6;color:white;font-weight:700;border-radius:9999px;min-width:28px;height:28px;padding:0 8px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.35);border:2px solid white;font-size:12px;">${count}</div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14],
     popupAnchor: [0, -14],
