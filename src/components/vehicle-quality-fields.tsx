@@ -168,7 +168,6 @@ const FIELD_LABELS: Record<keyof VehicleQuality, string> = {
   vin_chassis: "VIN / chassis",
   financing_available: "Financing available",
   trade_accepted: "Trade-in accepted",
-  price_negotiable: "Price negotiable",
 };
 
 
