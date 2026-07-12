@@ -230,10 +230,8 @@ export function CategoryAttributesEditor({ category, value, onChange }: Props) {
           <Sel label="Flood history" field="flood_history" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
           <Sel label="Accident history" field="accident_history" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
         </div>
-        <div className="grid gap-2 sm:grid-cols-2">
-          <Bool label="Financing available" field="financing_available" value={value} onChange={onChange} />
-          <Bool label="Trade-in accepted" field="trade_accepted" value={value} onChange={onChange} />
-        </div>
+        {/* Financing available / Trade-in accepted are surfaced as pills inside
+            VehicleQualityFields so they don't duplicate here. */}
         <TrustBlock value={value} onChange={onChange} />
       </div>
     );
