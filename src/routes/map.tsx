@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BusinessesMap, type GMapBusiness } from "@/components/businesses/businesses-map";
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
 import { MapBottomSheet, type MapBottomSheetHandle } from "@/components/businesses/map-bottom-sheet";
+import { MapLegend } from "@/components/businesses/map-legend";
 import { haversineKm } from "@/components/businesses/map-utils";
 import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
