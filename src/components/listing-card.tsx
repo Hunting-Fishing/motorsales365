@@ -209,6 +209,18 @@ export function ListingCard({
     publishedAt: listing.published_at,
     updatedAt: listing.updated_at,
   });
+  // Doubled outline when a card is both freshly published (<48h) AND
+  // has been meaningfully updated since (updated_at at least ~5min after
+  // published_at and within the last 24h). Signals "new + recently touched".
+  const doubled = (() => {
+    if (!listing.published_at || !listing.updated_at) return false;
+    const pubMs = new Date(listing.published_at).getTime();
+    const updMs = new Date(listing.updated_at).getTime();
+    const now = Date.now();
+    const isNew = now - pubMs <= 48 * 60 * 60 * 1000;
+    const wasUpdated = updMs - pubMs > 5 * 60 * 1000 && now - updMs <= 24 * 60 * 60 * 1000;
+    return isNew && wasUpdated;
+  })();
   return (
     <div
       className={cn(
@@ -218,8 +230,11 @@ export function ListingCard({
           : "rounded-xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elegant)]",
         accent ? accent.ring : tier.ringClass,
         accent ? accent.glow : tier.glowClass,
+        doubled &&
+          "outline outline-2 outline-offset-[5px] outline-sky-400/80",
       )}
     >
+
       <div className="absolute right-2 top-2 z-10">
         <ListingActionsMenu
           listingId={listing.id}
