@@ -127,6 +127,16 @@ function MapPage() {
     stored?.viewport ?? null,
   );
 
+  // Additional filters
+  const [nameQuery, setNameQuery] = useState<string>(search.name ?? "");
+  const [featuredOnly, setFeaturedOnly] = useState<boolean>(!!search.featured);
+  const [verifiedOnly, setVerifiedOnly] = useState<boolean>(!!search.verified);
+  const [ratedOnly, setRatedOnly] = useState<boolean>(!!search.rated);
+  const [minRating, setMinRating] = useState<number>(search.minRating ?? 0);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+
+
+
   const [locating, setLocating] = useState(false);
 
   const useMyLocation = () => {
