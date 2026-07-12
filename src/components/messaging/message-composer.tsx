@@ -176,13 +176,28 @@ export function MessageComposer({
     });
   };
 
+  useEffect(() => {
+    return () => {
+      if (attachment?.localPreviewUrl) URL.revokeObjectURL(attachment.localPreviewUrl);
+    };
+  }, [attachment?.localPreviewUrl]);
+
+  const clearAttachment = () => {
+    if (attachment?.localPreviewUrl) URL.revokeObjectURL(attachment.localPreviewUrl);
+    setAttachment(null);
+  };
+
   const submit = async () => {
     if (!canSend) return;
     try {
+      const outgoing = attachment
+        ? { type: attachment.type, url: attachment.url, thumbUrl: attachment.thumbUrl, path: attachment.path, meta: attachment.meta }
+        : undefined;
       await onSend({
         body: text.trim(),
-        attachment: attachment ?? undefined,
+        attachment: outgoing,
       });
+      if (attachment?.localPreviewUrl) URL.revokeObjectURL(attachment.localPreviewUrl);
       setText("");
       setAttachment(null);
     } catch (err: any) {
