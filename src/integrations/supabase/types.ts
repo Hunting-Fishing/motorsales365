@@ -6533,6 +6533,45 @@ export type Database = {
         }
         Relationships: []
       }
+      message_thread_state: {
+        Row: {
+          archived: boolean
+          color_label: string | null
+          key: string
+          last_read_at: string | null
+          muted: boolean
+          scope: string
+          spam: boolean
+          starred: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archived?: boolean
+          color_label?: string | null
+          key: string
+          last_read_at?: string | null
+          muted?: boolean
+          scope: string
+          spam?: boolean
+          starred?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archived?: boolean
+          color_label?: string | null
+          key?: string
+          last_read_at?: string | null
+          muted?: boolean
+          scope?: string
+          spam?: boolean
+          starred?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           attachment_meta: Json | null
@@ -6543,10 +6582,16 @@ export type Database = {
           body: string | null
           created_at: string
           id: string
+          is_offer: boolean
           listing_id: string
+          offer_amount: number | null
+          offer_currency: string | null
+          offer_status: string | null
           read_at: string | null
           recipient_id: string
           sender_id: string
+          starred_by: string[]
+          system_kind: string | null
         }
         Insert: {
           attachment_meta?: Json | null
@@ -6557,10 +6602,16 @@ export type Database = {
           body?: string | null
           created_at?: string
           id?: string
+          is_offer?: boolean
           listing_id: string
+          offer_amount?: number | null
+          offer_currency?: string | null
+          offer_status?: string | null
           read_at?: string | null
           recipient_id: string
           sender_id: string
+          starred_by?: string[]
+          system_kind?: string | null
         }
         Update: {
           attachment_meta?: Json | null
@@ -6571,10 +6622,16 @@ export type Database = {
           body?: string | null
           created_at?: string
           id?: string
+          is_offer?: boolean
           listing_id?: string
+          offer_amount?: number | null
+          offer_currency?: string | null
+          offer_status?: string | null
           read_at?: string | null
           recipient_id?: string
           sender_id?: string
+          starred_by?: string[]
+          system_kind?: string | null
         }
         Relationships: [
           {
@@ -9158,6 +9215,36 @@ export type Database = {
           scanned_at?: string
           user_id?: string | null
           visitor_id?: string | null
+        }
+        Relationships: []
+      }
+      quick_replies: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

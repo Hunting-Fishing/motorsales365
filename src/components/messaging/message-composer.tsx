@@ -40,6 +40,11 @@ interface Props {
   placeholder?: string;
   compact?: boolean;
   disabled?: boolean;
+  /** When this value changes, textarea is set to `prefillText`. */
+  prefillKey?: string | number | null;
+  prefillText?: string;
+  /** Optional slot rendered inside the toolbar row (e.g. Quick Replies, Make Offer). */
+  extraActions?: React.ReactNode;
 }
 
 async function probeVideo(file: File): Promise<{ duration: number; width: number; height: number }> {
@@ -81,6 +86,9 @@ export function MessageComposer({
   placeholder = "Write a message…",
   compact = false,
   disabled = false,
+  prefillKey = null,
+  prefillText = "",
+  extraActions,
 }: Props) {
   const { user } = useAuth();
   const [text, setText] = useState("");
@@ -92,6 +100,12 @@ export function MessageComposer({
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [gifOpen, setGifOpen] = useState(false);
   const [plusOpen, setPlusOpen] = useState(false);
+
+  useEffect(() => {
+    if (prefillKey == null) return;
+    setText(prefillText);
+    textareaRef.current?.focus();
+  }, [prefillKey, prefillText]);
 
   useEffect(() => {
     if (!sending) textareaRef.current?.focus();
@@ -361,6 +375,9 @@ export function MessageComposer({
             </Suspense>
           </PopoverContent>
         </Popover>
+
+        {extraActions}
+
 
         <Textarea
           ref={textareaRef}

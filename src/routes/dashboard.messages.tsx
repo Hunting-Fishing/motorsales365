@@ -13,22 +13,37 @@ import {
   UserPlus,
   LogOut,
   Tag,
+  Star,
+  Archive,
+  BellOff,
+  Bell,
+  ShieldAlert,
+  Search,
+  ArchiveRestore,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { MessageComposer, type MessagePayload } from "@/components/messaging/message-composer";
 import { AttachmentBubble } from "@/components/messaging/attachment-bubble";
 import { NewGroupChatDialog } from "@/components/messaging/new-group-chat-dialog";
 import { InviteToThreadDialog } from "@/components/messaging/invite-to-thread-dialog";
+import { FolderTabs, type FolderKey } from "@/components/messaging/folder-tabs";
+import { QuickRepliesButton } from "@/components/messaging/quick-replies-popover";
+import { MakeOfferButton } from "@/components/messaging/make-offer-button";
+import { OfferBubble } from "@/components/messaging/offer-bubble";
+import { SystemBubble } from "@/components/messaging/system-bubble";
+import { useThreadStates, dmKey } from "@/hooks/use-thread-states";
 
 
 export const Route = createFileRoute("/dashboard/messages")({
@@ -50,6 +65,11 @@ interface DmRow {
   attachment_thumb_url: string | null;
   attachment_path: string | null;
   attachment_meta: Record<string, unknown> | null;
+  is_offer?: boolean;
+  offer_amount?: number | null;
+  offer_currency?: string | null;
+  offer_status?: string | null;
+  system_kind?: string | null;
 }
 
 interface GroupMsg {
@@ -170,6 +190,10 @@ function MessagesPage() {
   const [showNewGroup, setShowNewGroup] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [folder, setFolder] = useState<FolderKey>("all");
+  const [search, setSearch] = useState("");
+  const [prefill, setPrefill] = useState<{ key: number; text: string }>({ key: 0, text: "" });
+  const threadStates = useThreadStates();
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -178,7 +202,7 @@ function MessagesPage() {
       supabase
         .from("messages")
         .select(
-          "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta",
+          "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta,is_offer,offer_amount,offer_currency,offer_status,system_kind",
         )
         .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
         .order("created_at", { ascending: false })
@@ -439,15 +463,91 @@ function MessagesPage() {
     return list.sort((a, b) => (a.last_at < b.last_at ? 1 : -1));
   }, [dms, groupMsgs, groupThreads, groupMembers, myMemberships, listingsById, profilesById, user]);
 
+  // Per-conversation state (star/mute/archive/spam) + folder classification.
+  const stateKeyOf = useCallback(
+    (c: ConversationSummary): { scope: "dm" | "group"; key: string } =>
+      c.kind === "dm"
+        ? { scope: "dm", key: dmKey(c.listing_id!, c.other_user_id!) }
+        : { scope: "group", key: c.thread_id! },
+    [],
+  );
+
+  const foldersForConvo = useCallback(
+    (c: ConversationSummary): FolderKey[] => {
+      const { scope, key } = stateKeyOf(c);
+      const s = threadStates.get(scope, key);
+      const out: FolderKey[] = ["all"];
+      if (s.spam) return ["spam"]; // spam pulls out of everything
+      if (s.archived) out.push("archived");
+      if (s.starred) out.push("starred");
+      if (c.unread > 0) out.push("unread");
+      if (c.kind === "dm" && user) {
+        const listingOwner = listingsById[c.listing_id!]?.user_id;
+        if (listingOwner === user.id) out.push("selling");
+        else out.push("buying");
+        if (c.listing_status === "sold") out.push("sold");
+      }
+      return out;
+    },
+    [threadStates, stateKeyOf, listingsById, user],
+  );
+
+  const folderCounts = useMemo(() => {
+    const c: Record<FolderKey, number> = {
+      all: 0,
+      unread: 0,
+      buying: 0,
+      selling: 0,
+      sold: 0,
+      starred: 0,
+      archived: 0,
+      spam: 0,
+    };
+    for (const convo of conversations) {
+      const fs = foldersForConvo(convo);
+      // "All" should exclude archived + spam so it behaves like an inbox
+      if (!fs.includes("archived") && !fs.includes("spam")) c.all += 1;
+      if (fs.includes("unread") && !fs.includes("archived") && !fs.includes("spam")) c.unread += 1;
+      for (const f of fs) {
+        if (f === "all") continue;
+        c[f] += 1;
+      }
+    }
+    return c;
+  }, [conversations, foldersForConvo]);
+
+  const filteredConversations = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return conversations.filter((c) => {
+      const fs = foldersForConvo(c);
+      if (folder === "all") {
+        if (fs.includes("archived") || fs.includes("spam")) return false;
+      } else if (folder === "unread") {
+        if (!fs.includes("unread") || fs.includes("archived") || fs.includes("spam")) return false;
+      } else if (!fs.includes(folder)) {
+        return false;
+      }
+      if (term) {
+        const hay = `${c.title} ${c.last_body} ${c.listing_title ?? ""}`.toLowerCase();
+        if (!hay.includes(term)) return false;
+      }
+      return true;
+    });
+  }, [conversations, folder, search, foldersForConvo]);
+
   useEffect(() => {
-    if (activeKey && !conversations.some((c) => c.key === activeKey)) {
-      setActiveKey(isNarrow ? null : (conversations[0]?.key ?? null));
+    if (activeKey && !filteredConversations.some((c) => c.key === activeKey)) {
+      setActiveKey(isNarrow ? null : (filteredConversations[0]?.key ?? null));
       return;
     }
-    if (!isNarrow && !activeKey && conversations.length) setActiveKey(conversations[0].key);
-  }, [conversations, activeKey, isNarrow]);
+    if (!isNarrow && !activeKey && filteredConversations.length)
+      setActiveKey(filteredConversations[0].key);
+  }, [filteredConversations, activeKey, isNarrow]);
 
   const activeConvo = conversations.find((c) => c.key === activeKey);
+  const activeState = activeConvo
+    ? threadStates.get(stateKeyOf(activeConvo).scope, stateKeyOf(activeConvo).key)
+    : null;
 
   const dmThread = useMemo(() => {
     if (!activeConvo || activeConvo.kind !== "dm" || !user) return [];
@@ -656,7 +756,7 @@ function MessagesPage() {
           attachment_meta: (payload.attachment?.meta ?? null) as any,
         })
         .select(
-          "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta",
+          "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta,is_offer,offer_amount,offer_currency,offer_status,system_kind",
         )
         .maybeSingle();
       error = insertError;
@@ -693,6 +793,47 @@ function MessagesPage() {
     }
     load();
   };
+
+  const sendOffer = async (amount: number, note: string) => {
+    if (!user || !activeConvo || activeConvo.kind !== "dm") return;
+    setSending(true);
+    const { data, error } = await supabase
+      .from("messages")
+      .insert({
+        listing_id: activeConvo.listing_id!,
+        sender_id: user.id,
+        recipient_id: activeConvo.other_user_id!,
+        body: note.trim() || null,
+        is_offer: true,
+        offer_amount: amount,
+        offer_currency: "PHP",
+        offer_status: "pending",
+      } as any)
+      .select(
+        "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta,is_offer,offer_amount,offer_currency,offer_status,system_kind",
+      )
+      .maybeSingle();
+    setSending(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (data) setDms((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data as DmRow]));
+    load();
+  };
+
+  const respondToOffer = async (messageId: string, status: "accepted" | "declined") => {
+    const { error } = await (supabase.from("messages") as any)
+      .update({ offer_status: status })
+      .eq("id", messageId);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setDms((prev) => prev.map((m) => (m.id === messageId ? { ...m, offer_status: status } : m)));
+    toast.success(status === "accepted" ? "Offer accepted" : "Offer declined");
+  };
+
 
   const Avatar = ({ url, name, size = 40 }: { url: string | null; name: string; size?: number }) => {
     const initial = name.trim().charAt(0).toUpperCase() || "?";
@@ -759,6 +900,18 @@ function MessagesPage() {
       </div>
 
 
+      <FolderTabs active={folder} counts={folderCounts} onChange={setFolder} />
+
+      <div className="relative mb-3">
+        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search your messages…"
+          className="pl-8"
+        />
+      </div>
+
       {conversations.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
           <MessageSquare className="mx-auto mb-3 h-8 w-8" />
@@ -770,7 +923,16 @@ function MessagesPage() {
             className={`overflow-hidden rounded-xl border border-border bg-card ${activeKey ? "hidden lg:block" : "block"}`}
           >
             <div className="max-h-[70dvh] divide-y divide-border overflow-y-auto">
-              {conversations.map((c) => (
+              {filteredConversations.length === 0 && (
+                <div className="p-6 text-center text-xs text-muted-foreground">
+                  Nothing in this folder{search ? " that matches your search" : ""}.
+                </div>
+              )}
+              {filteredConversations.map((c) => {
+                const sKey = stateKeyOf(c);
+                const st = threadStates.get(sKey.scope, sKey.key);
+                return (
+
                 <div
                   key={c.key}
                   className={`group relative flex w-full items-start gap-3 p-3 transition-colors ${
@@ -948,10 +1110,43 @@ function MessagesPage() {
                           </DropdownMenuItem>
                         </>
                       )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "starred")}
+                      >
+                        <Star className={`mr-2 h-4 w-4 ${st.starred ? "fill-primary text-primary" : ""}`} />
+                        {st.starred ? "Unstar" : "Star"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "muted")}
+                      >
+                        {st.muted ? (
+                          <><Bell className="mr-2 h-4 w-4" /> Unmute</>
+                        ) : (
+                          <><BellOff className="mr-2 h-4 w-4" /> Mute</>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "archived")}
+                      >
+                        {st.archived ? (
+                          <><ArchiveRestore className="mr-2 h-4 w-4" /> Unarchive</>
+                        ) : (
+                          <><Archive className="mr-2 h-4 w-4" /> Archive</>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "spam")}
+                      >
+                        <ShieldAlert className="mr-2 h-4 w-4" />
+                        {st.spam ? "Not spam" : "Mark as spam"}
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              ))}
+                );
+              })}
+
             </div>
           </div>
 
@@ -1037,6 +1232,30 @@ function MessagesPage() {
                       {activeConvo.kind === "dm"
                         ? dmThread.map((m) => {
                             const mine = m.sender_id === user?.id;
+                            if (m.system_kind) {
+                              return <SystemBubble key={m.id} kind={m.system_kind} body={m.body} />;
+                            }
+                            if (m.is_offer) {
+                              return (
+                                <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                                  <OfferBubble
+                                    mine={mine}
+                                    messageId={m.id}
+                                    amount={m.offer_amount ?? null}
+                                    currency={m.offer_currency ?? "PHP"}
+                                    status={m.offer_status ?? "pending"}
+                                    note={m.body}
+                                    canRespond={!mine}
+                                    onUpdated={({ offer_status }) =>
+                                      setDms((prev) =>
+                                        prev.map((x) => (x.id === m.id ? { ...x, offer_status } : x)),
+                                      )
+                                    }
+                                  />
+                                </div>
+                              );
+                            }
+
                             const hasAttachment = !!m.attachment_type;
                             return (
                               <div
@@ -1076,6 +1295,7 @@ function MessagesPage() {
                               </div>
                             );
                           })
+
                         : groupThread.map((m) => {
                             const mine = m.sender_id === user?.id;
                             const hasAttachment = !!m.attachment_type;
@@ -1138,8 +1358,25 @@ function MessagesPage() {
                         placeholder={
                           activeConvo.kind === "group" ? "Message the group…" : "Write a reply…"
                         }
+                        prefillKey={prefill.key}
+                        prefillText={prefill.text}
+                        extraActions={
+                          <>
+                            <QuickRepliesButton
+                              onPick={(text) => setPrefill({ key: Date.now(), text })}
+                            />
+                            {activeConvo.kind === "dm" && (
+                              <MakeOfferButton
+                                listingPrice={activeConvo.listing_price ?? null}
+                                onSend={({ amount, note }) => sendOffer(amount, note)}
+                              />
+
+                            )}
+                          </>
+                        }
                       />
                     </div>
+
                   </>
                 )}
               </>
