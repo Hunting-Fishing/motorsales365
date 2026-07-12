@@ -126,7 +126,6 @@ function attachmentPreview(body: string | null, type: AttachType): string {
 
 function MessagesPage() {
   const { user } = useAuth();
-  const isMobile = useIsMobile();
   // Match the back button's `lg:hidden` breakpoint (1024px) so auto-select
   // doesn't fight the back button on tablet/small-desktop widths.
   const [isNarrow, setIsNarrow] = useState<boolean>(false);
