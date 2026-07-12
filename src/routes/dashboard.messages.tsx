@@ -190,6 +190,10 @@ function MessagesPage() {
   const [showNewGroup, setShowNewGroup] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [folder, setFolder] = useState<FolderKey>("all");
+  const [search, setSearch] = useState("");
+  const [prefill, setPrefill] = useState<{ key: number; text: string }>({ key: 0, text: "" });
+  const threadStates = useThreadStates();
 
   const load = useCallback(async () => {
     if (!user) return;
