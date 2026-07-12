@@ -294,6 +294,14 @@ export function ListingCard({
                 items.push(
                   <Badge className="bg-warning text-warning-foreground">Pending Sale</Badge>,
                 );
+              if (relisted)
+                items.push(
+                  <RelistedBadge
+                    status={listing.status}
+                    publishedAt={listing.published_at}
+                    updatedAt={listing.updated_at}
+                  />,
+                );
               if (boosted)
                 items.push(
                   <Badge className="bg-accent text-accent-foreground">
@@ -301,15 +309,15 @@ export function ListingCard({
                     Featured
                   </Badge>,
                 );
-              if (!boosted) items.push(<NewBadge publishedAt={listing.published_at} />);
-              if (!compact && !boosted && doubled)
+              if (!boosted && !relisted) items.push(<NewBadge publishedAt={listing.published_at} />);
+              if (!compact && !boosted && !relisted && doubled)
                 items.push(
                   <Badge className="bg-sky-500 text-white hover:bg-sky-500">
                     <Star className="mr-1 h-3 w-3" />
                     Renewed
                   </Badge>,
                 );
-              if (!compact && !boosted && !doubled)
+              if (!compact && !boosted && !relisted && !doubled)
                 items.push(
                   <RenewedBadge
                     updatedAt={listing.updated_at}
