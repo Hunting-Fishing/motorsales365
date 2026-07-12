@@ -156,14 +156,14 @@ function pickCardAccent(args: {
     };
   if (boosted)
     return {
-      ring: "ring-2 ring-accent/70 ring-offset-1 ring-offset-background",
-      glow: "shadow-[0_0_0_1px_rgba(245,158,11,0.2),0_10px_30px_-12px_rgba(245,158,11,0.5)]",
+      ring: "ring-2 ring-violet-500/70 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(139,92,246,0.2),0_10px_30px_-12px_rgba(139,92,246,0.5)]",
     };
   if (publishedAt) {
     const age = Date.now() - new Date(publishedAt).getTime();
     if (age >= 0 && age <= 48 * 60 * 60 * 1000)
       return {
-        ring: "ring-2 ring-emerald-500/60 ring-offset-1 ring-offset-background",
+        ring: "ring-2 ring-cyan-500/70 ring-offset-1 ring-offset-background",
         glow: "",
       };
   }
@@ -171,7 +171,7 @@ function pickCardAccent(args: {
     const age = Date.now() - new Date(updatedAt).getTime();
     if (age >= 0 && age <= 24 * 60 * 60 * 1000)
       return {
-        ring: "ring-2 ring-sky-500/60 ring-offset-1 ring-offset-background",
+        ring: "ring-2 ring-sky-500/70 ring-offset-1 ring-offset-background",
         glow: "",
       };
   }
