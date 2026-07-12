@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { MapPin } from "lucide-react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
