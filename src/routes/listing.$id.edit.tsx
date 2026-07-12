@@ -649,7 +649,7 @@ function EditListingPage() {
         <h1 className="font-display text-3xl font-bold">Edit listing</h1>
         <p className="text-muted-foreground">Update details for "{listing.title}".</p>
 
-        <form onSubmit={save} className="mt-8 space-y-6">
+        <form id="edit-listing-form" onSubmit={save} className="mt-8 space-y-6">
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Category & basics</h2>
             <div className="grid gap-4 sm:grid-cols-2">
