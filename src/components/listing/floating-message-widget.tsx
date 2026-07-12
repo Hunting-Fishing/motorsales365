@@ -65,8 +65,8 @@ export function FloatingMessageWidget({
           role="dialog"
           aria-label="Send a message"
           className={cn(
-            "fixed right-4 z-50 w-[min(360px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-border bg-card shadow-2xl",
-            "bottom-[8.5rem] lg:bottom-24",
+            "fixed right-4 z-[60] w-[min(360px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-border bg-card shadow-2xl",
+            "bottom-[calc(9rem+env(safe-area-inset-bottom))] lg:bottom-24",
             "animate-in slide-in-from-bottom-4 fade-in duration-200",
           )}
         >
