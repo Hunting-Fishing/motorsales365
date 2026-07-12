@@ -26,6 +26,7 @@ import { ListingReportBadge } from "@/components/listings/listing-report-badge";
 import { PricingWidget } from "@/components/listings/pricing-widget";
 import { NewBadge } from "@/components/listings/new-badge";
 import { RenewedBadge } from "@/components/listings/renewed-badge";
+import { RelistedBadge, isRelistedAfterExpiry } from "@/components/listings/relisted-badge";
 import { PromoBadge, type ListingPromo } from "@/components/listings/promo-badge";
 import { PriceTrendBadge, type PriceTrend } from "@/components/listings/price-trend-badge";
 import { useListingReportSummary } from "@/hooks/use-listing-report-summary";
@@ -127,8 +128,9 @@ function pickCardAccent(args: {
   boosted: boolean;
   publishedAt?: string | null;
   updatedAt?: string | null;
+  relisted: boolean;
 }): { ring: string; glow: string } | null {
-  const { openReports, status, trend, promo, boosted, publishedAt, updatedAt } = args;
+  const { openReports, status, trend, promo, boosted, publishedAt, updatedAt, relisted } = args;
   if (openReports > 0)
     return {
       ring: "ring-2 ring-red-600/80 ring-offset-1 ring-offset-background",
@@ -139,6 +141,19 @@ function pickCardAccent(args: {
       ring: "ring-2 ring-orange-500/80 ring-offset-1 ring-offset-background",
       glow: "shadow-[0_0_0_1px_rgba(249,115,22,0.25),0_10px_30px_-12px_rgba(249,115,22,0.55)]",
     };
+  if (relisted)
+    return {
+      ring: "ring-2 ring-fuchsia-500/80 ring-offset-1 ring-offset-background",
+      glow: "shadow-[0_0_0_1px_rgba(217,70,239,0.25),0_10px_30px_-12px_rgba(217,70,239,0.55)]",
+    };
+  if (publishedAt) {
+    const age = Date.now() - new Date(publishedAt).getTime();
+    if (age >= 0 && age <= 72 * 60 * 60 * 1000)
+      return {
+        ring: "ring-2 ring-blue-600/80 ring-offset-1 ring-offset-background",
+        glow: "shadow-[0_0_0_1px_rgba(37,99,235,0.25),0_10px_30px_-12px_rgba(37,99,235,0.55)]",
+      };
+  }
   if (trend?.direction === "down")
     return {
       ring: "ring-2 ring-emerald-500/80 ring-offset-1 ring-offset-background",
@@ -159,14 +174,6 @@ function pickCardAccent(args: {
       ring: "ring-2 ring-violet-500/80 ring-offset-1 ring-offset-background",
       glow: "shadow-[0_0_0_1px_rgba(139,92,246,0.3),0_0_24px_rgba(217,70,239,0.35),0_10px_30px_-10px_rgba(139,92,246,0.6)]",
     };
-  if (publishedAt) {
-    const age = Date.now() - new Date(publishedAt).getTime();
-    if (age >= 0 && age <= 48 * 60 * 60 * 1000)
-      return {
-        ring: "ring-2 ring-fuchsia-500/80 ring-offset-1 ring-offset-background",
-        glow: "shadow-[0_0_0_1px_rgba(217,70,239,0.25),0_10px_30px_-12px_rgba(217,70,239,0.55)]",
-      };
-  }
   if (updatedAt) {
     const age = Date.now() - new Date(updatedAt).getTime();
     if (age >= 0 && age <= 24 * 60 * 60 * 1000)
@@ -200,6 +207,11 @@ export function ListingCard({
   const openReports = reportSummary?.open_count ?? 0;
   const effectivePromo = listing.promotion ?? promo ?? null;
   const effectiveTrend = listing.price_trend ?? priceTrend ?? null;
+  const relisted = isRelistedAfterExpiry({
+    status: listing.status,
+    publishedAt: listing.published_at,
+    updatedAt: listing.updated_at,
+  });
   const accent = pickCardAccent({
     openReports,
     status: listing.status,
@@ -208,8 +220,9 @@ export function ListingCard({
     boosted: !!boosted,
     publishedAt: listing.published_at,
     updatedAt: listing.updated_at,
+    relisted,
   });
-  // Doubled outline when a card is both freshly published (<48h) AND
+  // Doubled outline when a card is both freshly published (<72h) AND
   // has been meaningfully updated since (updated_at at least ~5min after
   // published_at and within the last 24h). Signals "new + recently touched".
   const doubled = (() => {
@@ -217,7 +230,7 @@ export function ListingCard({
     const pubMs = new Date(listing.published_at).getTime();
     const updMs = new Date(listing.updated_at).getTime();
     const now = Date.now();
-    const isNew = now - pubMs <= 48 * 60 * 60 * 1000;
+    const isNew = now - pubMs <= 72 * 60 * 60 * 1000;
     const wasUpdated = updMs - pubMs > 5 * 60 * 1000 && now - updMs <= 24 * 60 * 60 * 1000;
     return isNew && wasUpdated;
   })();
@@ -281,6 +294,14 @@ export function ListingCard({
                 items.push(
                   <Badge className="bg-warning text-warning-foreground">Pending Sale</Badge>,
                 );
+              if (relisted)
+                items.push(
+                  <RelistedBadge
+                    status={listing.status}
+                    publishedAt={listing.published_at}
+                    updatedAt={listing.updated_at}
+                  />,
+                );
               if (boosted)
                 items.push(
                   <Badge className="bg-accent text-accent-foreground">
@@ -288,15 +309,15 @@ export function ListingCard({
                     Featured
                   </Badge>,
                 );
-              if (!boosted) items.push(<NewBadge publishedAt={listing.published_at} />);
-              if (!compact && !boosted && doubled)
+              if (!boosted && !relisted) items.push(<NewBadge publishedAt={listing.published_at} />);
+              if (!compact && !boosted && !relisted && doubled)
                 items.push(
                   <Badge className="bg-sky-500 text-white hover:bg-sky-500">
                     <Star className="mr-1 h-3 w-3" />
                     Renewed
                   </Badge>,
                 );
-              if (!compact && !boosted && !doubled)
+              if (!compact && !boosted && !relisted && !doubled)
                 items.push(
                   <RenewedBadge
                     updatedAt={listing.updated_at}

@@ -1,9 +1,10 @@
-import { Info, Sparkles, RefreshCw, Tag, ArrowDown, ArrowUp } from "lucide-react";
+import { Info, Sparkles, RefreshCw, RotateCcw, Tag, ArrowDown, ArrowUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const CARD_RING_ENTRIES: { color: string; label: string; desc: string }[] = [
-  { color: "ring-fuchsia-500/80", label: "New (48h)", desc: "Hot pink — freshly posted in the last 48 hours." },
+  { color: "ring-blue-600/80", label: "New (72h)", desc: "Royal blue — freshly posted in the last 72 hours. Sellers can buy a Boost to keep visibility after that." },
+  { color: "ring-fuchsia-500/80", label: "Re-listed", desc: "Hot pink — previously expired listing that the seller just brought back." },
   { color: "ring-teal-400/80", label: "Just updated", desc: "Teal — seller updated details in the last 24h." },
   { color: "ring-emerald-500/80", label: "Price drop", desc: "Green — asking price went down recently." },
   { color: "ring-rose-500/80", label: "Price up", desc: "Rose — asking price went up recently." },
@@ -22,7 +23,17 @@ const ON_IMAGE_BADGES: { swatch: React.ReactNode; label: string; desc: string }[
       </Badge>
     ),
     label: "New",
-    desc: "Listed within the last 48 hours. The newest deals appear first.",
+    desc: "Listed within the last 72 hours. Sellers can buy a Boost to stay highlighted after that window.",
+  },
+  {
+    swatch: (
+      <Badge className="bg-fuchsia-500 px-1.5 py-0.5 text-[10px] text-white hover:bg-fuchsia-500">
+        <RotateCcw className="mr-1 h-3 w-3" />
+        Re-listed
+      </Badge>
+    ),
+    label: "Re-listed",
+    desc: "Previously expired listing that the seller brought back to the marketplace.",
   },
   {
     swatch: (
@@ -180,7 +191,7 @@ export function ListingLegend() {
           </p>
           <div className="flex items-center gap-2">
             <span
-              className="inline-block h-6 w-6 rounded-md ring-2 ring-fuchsia-500/80 outline outline-2 outline-offset-[3px] outline-sky-400/80"
+              className="inline-block h-6 w-6 rounded-md ring-2 ring-blue-600/80 outline outline-2 outline-offset-[3px] outline-sky-400/80"
               aria-hidden
             />
             <span className="text-xs text-muted-foreground">New listing + recently touched</span>
