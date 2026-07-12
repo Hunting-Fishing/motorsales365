@@ -151,7 +151,7 @@ export const Route = createFileRoute("/listing/$id")({
         .select("url,type")
         .eq("listing_id", params.id)
         .eq("type", "photo")
-        .order("position", { ascending: true })
+        .order("sort_order", { ascending: true })
         .limit(1);
       return {
         seo: {
