@@ -459,6 +459,7 @@ function MapPage() {
                 bottomSheetRef.current?.scrollToSlug(slug);
               }}
             />
+            <MapLegend />
           </div>
 
           {/* Desktop list (sidebar) */}
