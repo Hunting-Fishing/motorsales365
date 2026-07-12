@@ -452,6 +452,13 @@ function MessagesPage() {
       .update({ read_at: new Date().toISOString() })
       .in("id", unreadIds)
       .then(() => {
+        supabase
+          .from("user_notifications")
+          .update({ read_at: new Date().toISOString() })
+          .eq("user_id", user.id)
+          .eq("category", "messages")
+          .eq("entity_type", "message")
+          .in("entity_id", unreadIds);
         setDms((prev) =>
           prev.map((m) =>
             unreadIds.includes(m.id) ? { ...m, read_at: new Date().toISOString() } : m,
@@ -499,6 +506,24 @@ function MessagesPage() {
       .is("read_at", null);
     if (error) toast.error(error.message);
     else {
+      const readMessageIds = dms
+        .filter(
+          (m) =>
+            m.listing_id === c.listing_id &&
+            m.recipient_id === user.id &&
+            m.sender_id === c.other_user_id &&
+            !m.read_at,
+        )
+        .map((m) => m.id);
+      if (readMessageIds.length > 0) {
+        supabase
+          .from("user_notifications")
+          .update({ read_at: new Date().toISOString() })
+          .eq("user_id", user.id)
+          .eq("category", "messages")
+          .eq("entity_type", "message")
+          .in("entity_id", readMessageIds);
+      }
       toast.success("Marked as read");
       load();
     }
