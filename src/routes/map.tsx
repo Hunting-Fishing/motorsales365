@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BusinessesMap, type GMapBusiness } from "@/components/businesses/businesses-map";
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
 import { MapBottomSheet, type MapBottomSheetHandle } from "@/components/businesses/map-bottom-sheet";
+import { MapLegend } from "@/components/businesses/map-legend";
 import { haversineKm } from "@/components/businesses/map-utils";
 import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
@@ -437,7 +438,7 @@ function MapPage() {
         {/* Mobile: full-bleed map + bottom sheet. Desktop: side-by-side grid. */}
         <div className="lg:grid lg:grid-cols-[360px_1fr] lg:gap-4">
           {/* Map */}
-          <div className="order-1 h-[calc(100dvh-280px)] min-h-[360px] overflow-hidden rounded-lg lg:order-2 lg:h-[640px]">
+          <div className="relative order-1 h-[calc(100dvh-280px)] min-h-[360px] overflow-hidden rounded-lg lg:order-2 lg:h-[640px]">
             <BusinessesMap
               height="100%"
               businesses={mapBusinesses}
@@ -458,6 +459,7 @@ function MapPage() {
                 bottomSheetRef.current?.scrollToSlug(slug);
               }}
             />
+            <MapLegend />
           </div>
 
           {/* Desktop list (sidebar) */}
