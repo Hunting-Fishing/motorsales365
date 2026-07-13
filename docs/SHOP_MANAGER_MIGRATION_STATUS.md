@@ -101,13 +101,17 @@ See `docs/shop-manager-legacy/route-audit.md` for the full inventory.
 - ✅ Schema-scoped client helper: `src/lib/shop-manager/db.ts` exports
   `smSupabase` — the only supported way to query `shop_manager.*` from
   native TanStack routes.
-- ✅ First native route ported: `/shop/work-orders`
-  (`src/routes/_authenticated/shop.work-orders.tsx`) — read-only list wired
-  through `smSupabase`, links from the `/shop` portal.
+- ✅ First native routes ported:
+  - `/shop/work-orders` — list (`shop.work-orders.tsx`).
+  - `/shop/work-orders/$id` — read-only detail (`shop.work-orders.$id.tsx`)
+    with customer, vehicle, complaint/scope, schedule, and totals blocks.
+  - `/shop/customers` — searchable customer directory
+    (`shop.customers.tsx`).
+  All three route through `smSupabase` against `shop_manager.*`.
 
 ### Next up
-1. `/shop/work-orders/new` — native form (map `WorkOrderCreate.tsx`).
-2. `/shop/work-orders/$id` — detail + edit.
-3. `/shop/customers` — list + detail.
+1. `/shop/work-orders/new` — native create form (map `WorkOrderCreate.tsx`).
+2. `/shop/work-orders/$id/edit` — inline status + notes editor.
+3. `/shop/customers/$id` — detail with vehicles + work-order history.
 4. Add policies for `work_order_line_items`, `work_order_notes`,
    `payments`, `payment_allocations` when detail views port.
