@@ -87,3 +87,27 @@ See `docs/shop-manager-legacy/route-audit.md` for the full inventory.
   translation surface.
 - Auditing `shop_manager.*` tables against existing app tables and dropping
   duplicates (customers vs `profiles`, etc.).
+
+## Phase 2 progress — 2026-07-13
+
+- ✅ Shop-scoped RLS policies applied to the Phase 2 core tables:
+  `profiles`, `shops`, `user_roles`, `customers`, `vehicles`, `work_orders`,
+  `invoices`, `invoice_items`, `quotes`, `quote_items`, `appointments`,
+  `inventory_items`. All other `shop_manager.*` tables remain locked to
+  `service_role` and receive policies as their page ports.
+- ✅ Auto-provisioning function `shop_manager.ensure_profile_for(uuid)` seeds
+  a shop_manager profile from the user's first `public.businesses` row so
+  `get_current_user_shop_id()` resolves without a manual setup step.
+- ✅ Schema-scoped client helper: `src/lib/shop-manager/db.ts` exports
+  `smSupabase` — the only supported way to query `shop_manager.*` from
+  native TanStack routes.
+- ✅ First native route ported: `/shop/work-orders`
+  (`src/routes/_authenticated/shop.work-orders.tsx`) — read-only list wired
+  through `smSupabase`, links from the `/shop` portal.
+
+### Next up
+1. `/shop/work-orders/new` — native form (map `WorkOrderCreate.tsx`).
+2. `/shop/work-orders/$id` — detail + edit.
+3. `/shop/customers` — list + detail.
+4. Add policies for `work_order_line_items`, `work_order_notes`,
+   `payments`, `payment_allocations` when detail views port.
