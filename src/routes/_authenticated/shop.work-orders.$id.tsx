@@ -206,11 +206,17 @@ function WorkOrderDetailPage() {
                   <CardTitle className="text-base">Vehicle</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm">
-                  {data.vehicles ? (
+                  {data.vehicles && data.vehicle_id ? (
                     <>
                       <div className="font-medium">
-                        {`${data.vehicles.year ?? ""} ${data.vehicles.make ?? ""} ${data.vehicles.model ?? ""}`.trim() ||
-                          "—"}
+                        <Link
+                          to="/shop/vehicles/$id"
+                          params={{ id: data.vehicle_id }}
+                          className="text-primary hover:underline"
+                        >
+                          {`${data.vehicles.year ?? ""} ${data.vehicles.make ?? ""} ${data.vehicles.model ?? ""}`.trim() ||
+                            "Vehicle"}
+                        </Link>
                       </div>
                       <div className="text-muted-foreground">
                         Plate: {data.vehicles.license_plate ?? "—"}
