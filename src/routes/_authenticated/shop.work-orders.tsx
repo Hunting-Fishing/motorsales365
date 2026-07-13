@@ -17,10 +17,10 @@ import { smSupabase } from "@/lib/shop-manager/db";
 
 type WorkOrderRow = {
   id: string;
-  wo_number: string | null;
+  work_order_number: string | null;
   status: string | null;
   created_at: string | null;
-  total_amount: number | null;
+  total_cost: number | null;
   customer_id: string | null;
   customers?: { first_name: string | null; last_name: string | null } | null;
   vehicles?: { year: number | null; make: string | null; model: string | null } | null;
@@ -30,7 +30,7 @@ async function fetchWorkOrders(): Promise<WorkOrderRow[]> {
   const { data, error } = await (smSupabase as any)
     .from("work_orders")
     .select(
-      "id, wo_number, status, created_at, total_amount, customer_id, customers(first_name,last_name), vehicles(year,make,model)",
+      "id, work_order_number, status, created_at, total_cost, customer_id, customers(first_name,last_name), vehicles(year,make,model)",
     )
     .order("created_at", { ascending: false })
     .limit(100);
@@ -106,7 +106,7 @@ function WorkOrdersList() {
             </div>
           </div>
           <Button asChild>
-            <Link to="/shop">
+            <Link to="/shop/work-orders/new">
               <Plus className="mr-2 h-4 w-4" /> New Work Order
             </Link>
           </Button>
@@ -149,7 +149,7 @@ function WorkOrdersList() {
                           params={{ id: w.id }}
                           className="hover:underline"
                         >
-                          {w.wo_number ?? w.id.slice(0, 8)}
+                          {w.work_order_number ?? w.id.slice(0, 8)}
                         </Link>
                       </TableCell>
                       <TableCell>
@@ -168,8 +168,8 @@ function WorkOrdersList() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {typeof w.total_amount === "number"
-                          ? `₱${w.total_amount.toLocaleString()}`
+                        {typeof w.total_cost === "number"
+                          ? `₱${w.total_cost.toLocaleString()}`
                           : "—"}
                       </TableCell>
                       <TableCell>
