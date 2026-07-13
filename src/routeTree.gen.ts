@@ -261,6 +261,7 @@ import { Route as AdminAdvertisementsAnalyticsRouteImport } from './routes/admin
 import { Route as AdminAccountsBackfillRouteImport } from './routes/admin.accounts.backfill'
 import { Route as AuthenticatedStaffAcademyRouteImport } from './routes/_authenticated/staff.academy'
 import { Route as AuthenticatedShopWorkOrdersRouteImport } from './routes/_authenticated/shop.work-orders'
+import { Route as AuthenticatedShopCustomersRouteImport } from './routes/_authenticated/shop.customers'
 import { Route as AuthenticatedPartsMyRequestsRouteImport } from './routes/_authenticated/parts.my-requests'
 import { Route as AuthenticatedFranchiseStatusRouteImport } from './routes/_authenticated/franchise.status'
 import { Route as AuthenticatedFranchiseDashboardRouteImport } from './routes/_authenticated/franchise.dashboard'
@@ -1614,6 +1615,12 @@ const AuthenticatedShopWorkOrdersRoute =
     path: '/work-orders',
     getParentRoute: () => AuthenticatedShopRoute,
   } as any)
+const AuthenticatedShopCustomersRoute =
+  AuthenticatedShopCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
 const AuthenticatedPartsMyRequestsRoute =
   AuthenticatedPartsMyRequestsRouteImport.update({
     id: '/parts/my-requests',
@@ -2171,6 +2178,7 @@ export interface FileRoutesByFullPath {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
+  '/shop/customers': typeof AuthenticatedShopCustomersRoute
   '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
@@ -2475,6 +2483,7 @@ export interface FileRoutesByTo {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
+  '/shop/customers': typeof AuthenticatedShopCustomersRoute
   '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
@@ -2790,6 +2799,7 @@ export interface FileRoutesById {
   '/_authenticated/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/_authenticated/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/_authenticated/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
+  '/_authenticated/shop/customers': typeof AuthenticatedShopCustomersRoute
   '/_authenticated/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/_authenticated/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
@@ -3106,6 +3116,7 @@ export interface FileRouteTypes {
     | '/franchise/dashboard'
     | '/franchise/status'
     | '/parts/my-requests'
+    | '/shop/customers'
     | '/shop/work-orders'
     | '/staff/academy'
     | '/admin/accounts/backfill'
@@ -3410,6 +3421,7 @@ export interface FileRouteTypes {
     | '/franchise/dashboard'
     | '/franchise/status'
     | '/parts/my-requests'
+    | '/shop/customers'
     | '/shop/work-orders'
     | '/staff/academy'
     | '/admin/accounts/backfill'
@@ -3724,6 +3736,7 @@ export interface FileRouteTypes {
     | '/_authenticated/franchise/dashboard'
     | '/_authenticated/franchise/status'
     | '/_authenticated/parts/my-requests'
+    | '/_authenticated/shop/customers'
     | '/_authenticated/shop/work-orders'
     | '/_authenticated/staff/academy'
     | '/admin/accounts/backfill'
@@ -5746,6 +5759,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopWorkOrdersRouteImport
       parentRoute: typeof AuthenticatedShopRoute
     }
+    '/_authenticated/shop/customers': {
+      id: '/_authenticated/shop/customers'
+      path: '/customers'
+      fullPath: '/shop/customers'
+      preLoaderRoute: typeof AuthenticatedShopCustomersRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
     '/_authenticated/parts/my-requests': {
       id: '/_authenticated/parts/my-requests'
       path: '/parts/my-requests'
@@ -6191,10 +6211,12 @@ const AuthenticatedShopWorkOrdersRouteWithChildren =
   )
 
 interface AuthenticatedShopRouteChildren {
+  AuthenticatedShopCustomersRoute: typeof AuthenticatedShopCustomersRoute
   AuthenticatedShopWorkOrdersRoute: typeof AuthenticatedShopWorkOrdersRouteWithChildren
 }
 
 const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
+  AuthenticatedShopCustomersRoute: AuthenticatedShopCustomersRoute,
   AuthenticatedShopWorkOrdersRoute:
     AuthenticatedShopWorkOrdersRouteWithChildren,
 }
