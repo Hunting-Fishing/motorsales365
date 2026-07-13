@@ -42,8 +42,8 @@ export const Route = createFileRoute("/document-check/$country/quick-guide")({
 
 function QuickGuidePage() {
   const { country, sections, documents } = Route.useLoaderData();
-  const quick = sections.find((s) => s.kind === "quick_guide");
-  const buying = sections.find((s) => s.kind === "buying");
+  const quick = sections.find((s: DocCheckSection) => s.kind === "quick_guide");
+  const buying = sections.find((s: DocCheckSection) => s.kind === "buying");
 
   useEffect(() => {
     // Auto-open print dialog after initial render, but only client-side and once.
