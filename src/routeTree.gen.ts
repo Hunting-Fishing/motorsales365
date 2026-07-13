@@ -319,6 +319,7 @@ import { Route as ApiPublicAuthSignupFailureLogRouteImport } from './routes/api/
 import { Route as ApiPublicAuthSignupRouteImport } from './routes/api/public/auth/signup'
 import { Route as AdminAdvertisementsAnalyticsCodeRouteImport } from './routes/admin.advertisements.analytics.$code'
 import { Route as AuthenticatedStaffAcademySlugRouteImport } from './routes/_authenticated/staff.academy.$slug'
+import { Route as AuthenticatedShopWorkOrdersIdRouteImport } from './routes/_authenticated/shop.work-orders.$id'
 import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
@@ -1947,6 +1948,12 @@ const AuthenticatedStaffAcademySlugRoute =
     path: '/$slug',
     getParentRoute: () => AuthenticatedStaffAcademyRoute,
   } as any)
+const AuthenticatedShopWorkOrdersIdRoute =
+  AuthenticatedShopWorkOrdersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedShopWorkOrdersRoute,
+  } as any)
 const AuthenticatedDashboardClubsIdRoute =
   AuthenticatedDashboardClubsIdRouteImport.update({
     id: '/dashboard/clubs_/$id',
@@ -2164,7 +2171,7 @@ export interface FileRoutesByFullPath {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRoute
+  '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -2227,6 +2234,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/listing/$id/': typeof ListingIdIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
@@ -2467,7 +2475,7 @@ export interface FileRoutesByTo {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRoute
+  '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -2529,6 +2537,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/listing/$id': typeof ListingIdIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
@@ -2781,7 +2790,7 @@ export interface FileRoutesById {
   '/_authenticated/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/_authenticated/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/_authenticated/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/_authenticated/shop/work-orders': typeof AuthenticatedShopWorkOrdersRoute
+  '/_authenticated/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/_authenticated/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -2844,6 +2853,7 @@ export interface FileRoutesById {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/listing/$id/': typeof ListingIdIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/_authenticated/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/_authenticated/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
@@ -3159,6 +3169,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/listing/$id/'
     | '/dashboard/clubs/$id'
+    | '/shop/work-orders/$id'
     | '/staff/academy/$slug'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
@@ -3461,6 +3472,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/listing/$id'
     | '/dashboard/clubs/$id'
+    | '/shop/work-orders/$id'
     | '/staff/academy/$slug'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
@@ -3775,6 +3787,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/listing/$id/'
     | '/_authenticated/dashboard/clubs_/$id'
+    | '/_authenticated/shop/work-orders/$id'
     | '/_authenticated/staff/academy/$slug'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
@@ -6139,6 +6152,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStaffAcademySlugRouteImport
       parentRoute: typeof AuthenticatedStaffAcademyRoute
     }
+    '/_authenticated/shop/work-orders/$id': {
+      id: '/_authenticated/shop/work-orders/$id'
+      path: '/$id'
+      fullPath: '/shop/work-orders/$id'
+      preLoaderRoute: typeof AuthenticatedShopWorkOrdersIdRouteImport
+      parentRoute: typeof AuthenticatedShopWorkOrdersRoute
+    }
     '/_authenticated/dashboard/clubs_/$id': {
       id: '/_authenticated/dashboard/clubs_/$id'
       path: '/dashboard/clubs/$id'
@@ -6156,12 +6176,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedShopWorkOrdersRouteChildren {
+  AuthenticatedShopWorkOrdersIdRoute: typeof AuthenticatedShopWorkOrdersIdRoute
+}
+
+const AuthenticatedShopWorkOrdersRouteChildren: AuthenticatedShopWorkOrdersRouteChildren =
+  {
+    AuthenticatedShopWorkOrdersIdRoute: AuthenticatedShopWorkOrdersIdRoute,
+  }
+
+const AuthenticatedShopWorkOrdersRouteWithChildren =
+  AuthenticatedShopWorkOrdersRoute._addFileChildren(
+    AuthenticatedShopWorkOrdersRouteChildren,
+  )
+
 interface AuthenticatedShopRouteChildren {
-  AuthenticatedShopWorkOrdersRoute: typeof AuthenticatedShopWorkOrdersRoute
+  AuthenticatedShopWorkOrdersRoute: typeof AuthenticatedShopWorkOrdersRouteWithChildren
 }
 
 const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
-  AuthenticatedShopWorkOrdersRoute: AuthenticatedShopWorkOrdersRoute,
+  AuthenticatedShopWorkOrdersRoute:
+    AuthenticatedShopWorkOrdersRouteWithChildren,
 }
 
 const AuthenticatedShopRouteWithChildren =
