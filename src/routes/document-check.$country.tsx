@@ -255,13 +255,8 @@ function DocumentsPanel({ documents }: { documents: DocCheckDocument[] }) {
   );
 }
 
-function SectionLinks({
-  kind,
-  links,
-}: {
-  kind: string;
-  links: ReturnType<typeof Route.useLoaderData>["links"];
-}) {
+function SectionLinks({ kind, links }: { kind: string; links: DocCheckLink[] }) {
+
   const relevant = links.filter(
     (l) => l.section_kind === kind || l.section_kind === null,
   );
