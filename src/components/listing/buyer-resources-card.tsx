@@ -27,6 +27,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { BuyerDocumentChecklist } from "@/components/buyer-document-checklist";
+import { QuickGuideModal } from "@/components/document-check/quick-guide-modal";
 
 type ChecklistItem = { id: string; label: string; hint: string | null };
 type Checklist = {
