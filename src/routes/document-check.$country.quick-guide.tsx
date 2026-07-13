@@ -3,7 +3,12 @@ import { useEffect } from "react";
 import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SimpleMarkdown } from "@/components/simple-markdown";
-import { getDocCheckCountry } from "@/lib/document-check.functions";
+import {
+  getDocCheckCountry,
+  type DocCheckSection,
+  type DocCheckDocument,
+} from "@/lib/document-check.functions";
+
 
 export const Route = createFileRoute("/document-check/$country/quick-guide")({
   loader: async ({ params }) => {
