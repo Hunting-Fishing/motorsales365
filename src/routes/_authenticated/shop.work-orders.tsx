@@ -141,7 +141,7 @@ function WorkOrdersList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.map((w) => (
+                  {data.map((w: WorkOrderRow) => (
                     <TableRow key={w.id}>
                       <TableCell className="font-mono">
                         {w.wo_number ?? w.id.slice(0, 8)}
