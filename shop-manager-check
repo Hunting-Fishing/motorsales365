@@ -1,0 +1,143 @@
+The Shop Manager has a surprisingly broad foundation, but it is not yet a finished production repair-shop system. Many screens and components exist; the biggest gap is that they are not all connected into one tested end-to-end workflow.
+What already exists:
+Customers and vehicles
+Work orders and service board
+Quotes and invoices
+Payments
+Inventory, suppliers, purchase orders, and parts tracking
+Scheduling, bookings, calendar, and planner
+Technician portal, timesheets, payroll, and team roles
+Service packages, labor rates, repair plans, and reminders
+Customer communications and customer portal
+Reports and analytics
+Vehicle damage diagrams
+Inspection components and three routed inspection prototypes
+Tire, fleet, equipment, warranty, and maintenance sections
+Automotive, marine, fuel-delivery, and welding modules
+The most important missing or incomplete areas are:
+Production digital inspections
+The three new inspection forms currently run as HTML prototypes and save locally in the browser. They are not yet connected to:
+Supabase
+Customer and vehicle records
+Work orders
+Technician accounts
+Image storage
+Customer approval
+Inspection history
+Estimate recommendations
+This should be the highest priority.
+One reliable repair-order workflow
+We need to verify and standardize the complete process:
+Appointment
+→ Customer and vehicle
+→ Check-in and damage recording
+→ Digital inspection
+→ Technician diagnosis
+→ Estimate
+→ Customer authorization
+→ Parts and labor
+→ Work in progress
+→ Quality control
+→ Invoice and payment
+→ Vehicle release
+→ Follow-up reminder
+Individual pieces exist, but the entire chain needs integration testing and cleanup.
+Estimate authorization
+A professional shop system needs:
+Approve or decline individual jobs
+Customer signature
+Date, time, and IP/audit record
+SMS/email approval link
+Revised estimate authorization
+Declined-work history
+Deposit request
+Authorization limits for fleet accounts
+Technician workflow
+The technician-facing experience needs to be confirmed or completed:
+Assigned job queue
+Clock in/out per labor operation
+Pause reasons
+Parts requests
+Inspection completion
+Photos and technician notes
+Job completion submission
+Comeback identification
+Productivity and efficiency calculations
+Parts-to-work-order integration
+Inventory functionality exists, but it must operate reliably with repair orders:
+Reserve parts for a work order
+Issue and return parts
+Special-order parts
+Core charges and core returns
+Purchase-order receiving
+Partial deliveries
+Superseded part numbers
+Pricing matrices and markup
+Low-stock ordering
+Lost, damaged, and adjusted inventory
+Serialized parts and warranty tracking
+Checkout and vehicle release
+A focused front-counter checkout is needed:
+Final invoice review
+Inspection/quality-control confirmation
+Payment or partial payment
+Multiple payment methods
+Outstanding balance
+Customer signature
+Vehicle release authorization
+Receipt delivery
+Keys returned
+Final mileage and fuel level
+Shop-specific accounting controls
+Accounting components exist, but shop operations need:
+Cash drawer and daily close
+Tax handling by location
+Deposits and refunds
+Accounts receivable
+Fleet statement billing
+Vendor bills
+Parts, labor, sublet, fees, and shop-supply accounting
+Sales and payment reconciliation
+QuickBooks/Xero export or integration
+Warranty and comeback management
+The system should track:
+Parts warranty
+Labor warranty
+Supplier warranty claims
+Customer complaints
+Comeback work orders
+Original technician and repair
+No-charge warranty labor and parts
+Root cause and management review
+Sublet work
+Repair shops frequently outsource machining, alignment, towing, glass, upholstery, programming, and specialty work. It needs:
+Sublet vendor
+Purchase cost
+Customer selling price
+Expected return date
+Vendor purchase order
+Attachment to the repair order
+Data safety and deployment readiness
+Before relying on it commercially, it needs:
+A separate production database
+Development/staging database
+Verified tenant isolation between shops
+Row-level security testing
+Storage policies for inspection photos and documents
+Automated backups
+Restore testing
+Error monitoring
+Audit logs
+Permission testing
+Automated tests for critical workflows
+There is also still inherited general-business code—shopping, affiliate tools, AI demonstrations, enterprise features, generic equipment/safety systems, and developer tooling. Some may be useful later, but they increase complexity. The cleaner approach is to hide or remove anything that does not serve the primary repair-order workflow.
+My recommended build order is:
+Finish the shared digital-inspection system.
+Connect inspections to customers, vehicles, technicians, and work orders.
+Complete estimates and customer authorization.
+Test the full repair-order lifecycle.
+Complete parts issuing, ordering, receiving, and returns.
+Finish checkout, payment, and vehicle release.
+Add warranty, comeback, and sublet workflows.
+Harden permissions, database isolation, backups, and tests.
+Remove remaining inherited features that are not needed.
