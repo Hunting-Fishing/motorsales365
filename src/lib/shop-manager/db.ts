@@ -9,5 +9,9 @@
 // ported.
 import { supabase } from "@/integrations/supabase/client";
 
-export const smSupabase = supabase.schema("shop_manager");
+// The generated Database type only registers `public`; cast so we can bind
+// to the shop_manager schema without polluting the generated types file.
+export const smSupabase = (supabase as any).schema("shop_manager") as ReturnType<
+  typeof supabase.schema
+>;
 export { supabase };
