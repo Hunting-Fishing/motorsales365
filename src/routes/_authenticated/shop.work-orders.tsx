@@ -87,7 +87,10 @@ function statusVariant(status: string | null) {
 }
 
 function WorkOrdersList() {
-  const { data } = useSuspenseQuery(workOrdersQuery);
+  const { data = [], isLoading } = useQuery({
+    queryKey: ["shop-manager", "work-orders", "list"],
+    queryFn: fetchWorkOrders,
+  });
 
   return (
     <SiteLayout>
