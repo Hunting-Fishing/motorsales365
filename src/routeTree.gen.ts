@@ -195,6 +195,7 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as AdminAdvertisementsRouteImport } from './routes/admin.advertisements'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
+import { Route as AuthenticatedShopRouteImport } from './routes/_authenticated/shop'
 import { Route as AuthenticatedCompleteProfileRouteImport } from './routes/_authenticated/complete-profile'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -1252,6 +1253,11 @@ const AdminAccountsRoute = AdminAccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => AdminRoute,
 } as any)
+const AuthenticatedShopRoute = AuthenticatedShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCompleteProfileRoute =
   AuthenticatedCompleteProfileRouteImport.update({
     id: '/complete-profile',
@@ -1995,6 +2001,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/complete-profile': typeof AuthenticatedCompleteProfileRoute
+  '/shop': typeof AuthenticatedShopRoute
   '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
@@ -2301,6 +2308,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/complete-profile': typeof AuthenticatedCompleteProfileRoute
+  '/shop': typeof ShopIndexRoute
   '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -2435,7 +2443,6 @@ export interface FileRoutesByTo {
   '/games': typeof GamesIndexRoute
   '/learn': typeof LearnIndexRoute
   '/rides': typeof RidesIndexRoute
-  '/shop': typeof ShopIndexRoute
   '/wanted-parts': typeof WantedPartsIndexRoute
   '/wanted': typeof WantedIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -2609,6 +2616,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/complete-profile': typeof AuthenticatedCompleteProfileRoute
+  '/_authenticated/shop': typeof AuthenticatedShopRoute
   '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
@@ -2922,6 +2930,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/complete-profile'
+    | '/shop'
     | '/admin/accounts'
     | '/admin/advertisements'
     | '/admin/alerts'
@@ -3228,6 +3237,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/complete-profile'
+    | '/shop'
     | '/admin/accounts'
     | '/admin/alerts'
     | '/admin/analytics'
@@ -3362,7 +3372,6 @@ export interface FileRouteTypes {
     | '/games'
     | '/learn'
     | '/rides'
-    | '/shop'
     | '/wanted-parts'
     | '/wanted'
     | '/.lovable/oauth/consent'
@@ -3535,6 +3544,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/complete-profile'
+    | '/_authenticated/shop'
     | '/admin/accounts'
     | '/admin/advertisements'
     | '/admin/alerts'
@@ -5248,6 +5258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAccountsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_authenticated/shop': {
+      id: '/_authenticated/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof AuthenticatedShopRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/complete-profile': {
       id: '/_authenticated/complete-profile'
       path: '/complete-profile'
@@ -6135,6 +6152,7 @@ const AuthenticatedStaffAcademyRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCompleteProfileRoute: typeof AuthenticatedCompleteProfileRoute
+  AuthenticatedShopRoute: typeof AuthenticatedShopRoute
   AuthenticatedAccountDisputesRoute: typeof AuthenticatedAccountDisputesRoute
   AuthenticatedAccountRewardsRoute: typeof AuthenticatedAccountRewardsRoute
   AuthenticatedAccountTrustScoreRoute: typeof AuthenticatedAccountTrustScoreRoute
@@ -6153,6 +6171,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCompleteProfileRoute: AuthenticatedCompleteProfileRoute,
+  AuthenticatedShopRoute: AuthenticatedShopRoute,
   AuthenticatedAccountDisputesRoute: AuthenticatedAccountDisputesRoute,
   AuthenticatedAccountRewardsRoute: AuthenticatedAccountRewardsRoute,
   AuthenticatedAccountTrustScoreRoute: AuthenticatedAccountTrustScoreRoute,
