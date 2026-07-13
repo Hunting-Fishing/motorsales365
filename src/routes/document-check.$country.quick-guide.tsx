@@ -116,7 +116,7 @@ function QuickGuidePage() {
           <section className="mt-6">
             <h2 className="text-xl font-semibold">Documents you'll encounter</h2>
             <ul className="mt-2 space-y-3">
-              {documents.map((d) => (
+              {documents.map((d: DocCheckDocument) => (
                 <li key={d.id} className="border-l-2 border-black/20 pl-3">
                   <div className="font-semibold">{d.name}</div>
                   <div className="text-xs text-black/60">
