@@ -3513,27 +3513,41 @@ export type Database = {
       }
       chat_threads: {
         Row: {
+          business_id: string | null
           created_at: string
           created_by: string
           id: string
+          kind: string
           title: string
           updated_at: string
         }
         Insert: {
+          business_id?: string | null
           created_at?: string
           created_by: string
           id?: string
+          kind?: string
           title: string
           updated_at?: string
         }
         Update: {
+          business_id?: string | null
           created_at?: string
           created_by?: string
           id?: string
+          kind?: string
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "chat_threads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       club_discount_promotions: {
         Row: {
@@ -13440,6 +13454,10 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      ensure_business_team_thread: {
+        Args: { _business_id: string }
+        Returns: string
+      }
       expire_stale_pending_sales: { Args: never; Returns: number }
       gen_referral_code: { Args: { _name: string }; Returns: string }
       generate_invoice_number: { Args: never; Returns: string }
@@ -13706,6 +13724,19 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      notify_user: {
+        Args: {
+          _body: string
+          _category: string
+          _entity_id: string
+          _entity_type: string
+          _link: string
+          _metadata?: Json
+          _title: string
+          _user_id: string
+        }
+        Returns: undefined
       }
       org_max_seats: { Args: { _org_id: string }; Returns: number }
       org_role: { Args: { _org_id: string; _user_id: string }; Returns: string }
