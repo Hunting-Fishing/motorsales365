@@ -701,11 +701,43 @@ function AdminReferrals() {
             <RefreshCw className="mr-2 h-4 w-4" /> Sync staff
           </Button>
           <Button
+            variant="outline"
+            onClick={async () => {
+              const ok = await confirm({
+                title: "Regenerate every QR PNG?",
+                description:
+                  "Re-renders every staff QR image using the canonical www.365motorsales.com link. Use this after a domain change or if printed QRs point at a preview URL.",
+                confirmText: "Regenerate all",
+              });
+              if (!ok) return;
+              const { data: all } = await sb
+                .from("staff_referrals")
+                .select(
+                  "id,referral_code,qr_storage_path,full_name,email,phone,active,notes,staff_user_id",
+                );
+              const list = (all as StaffRow[]) || [];
+              let done = 0;
+              for (const r of list) {
+                try {
+                  await generateQrFor(r);
+                  done += 1;
+                } catch (e) {
+                  console.error("[regen qr]", r.referral_code, e);
+                }
+              }
+              toast.success(`Regenerated ${done}/${list.length} QR codes`);
+              load();
+            }}
+          >
+            <QrCode className="mr-2 h-4 w-4" /> Regenerate all QRs
+          </Button>
+          <Button
             variant={showAudit ? "default" : "outline"}
             onClick={() => setShowAudit((v) => !v)}
           >
             <History className="mr-2 h-4 w-4" /> Audit log
           </Button>
+
           <Button onClick={() => setNewOpen(true)}>
             <Plus className="mr-2 h-4 w-4" /> New staff QR
           </Button>
