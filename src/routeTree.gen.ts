@@ -289,6 +289,8 @@ import { Route as DashboardBusinessBusinessIdBillingRouteImport } from './routes
 import { Route as ApiSellerStaffResetPasswordRouteImport } from './routes/api/seller/staff/reset-password'
 import { Route as ApiSellerStaffDeactivateRouteImport } from './routes/api/seller/staff/deactivate'
 import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/staff/create'
+import { Route as ApiPublicQrRescueLogRouteImport } from './routes/api/public/qr-rescue.log'
+import { Route as ApiPublicQrRescueCodeRouteImport } from './routes/api/public/qr-rescue.$code'
 import { Route as ApiPublicPostbackNetworkRouteImport } from './routes/api/public/postback.$network'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksSyncPartsFeedsRouteImport } from './routes/api/public/hooks/sync-parts-feeds'
@@ -1769,6 +1771,16 @@ const ApiSellerStaffCreateRoute = ApiSellerStaffCreateRouteImport.update({
   path: '/api/seller/staff/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicQrRescueLogRoute = ApiPublicQrRescueLogRouteImport.update({
+  id: '/api/public/qr-rescue/log',
+  path: '/api/public/qr-rescue/log',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicQrRescueCodeRoute = ApiPublicQrRescueCodeRouteImport.update({
+  id: '/api/public/qr-rescue/$code',
+  path: '/api/public/qr-rescue/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPostbackNetworkRoute =
   ApiPublicPostbackNetworkRouteImport.update({
     id: '/api/public/postback/$network',
@@ -2185,6 +2197,8 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
+  '/api/public/qr-rescue/$code': typeof ApiPublicQrRescueCodeRoute
+  '/api/public/qr-rescue/log': typeof ApiPublicQrRescueLogRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
@@ -2480,6 +2494,8 @@ export interface FileRoutesByTo {
   '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
+  '/api/public/qr-rescue/$code': typeof ApiPublicQrRescueCodeRoute
+  '/api/public/qr-rescue/log': typeof ApiPublicQrRescueLogRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
@@ -2786,6 +2802,8 @@ export interface FileRoutesById {
   '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/postback/$network': typeof ApiPublicPostbackNetworkRoute
+  '/api/public/qr-rescue/$code': typeof ApiPublicQrRescueCodeRoute
+  '/api/public/qr-rescue/log': typeof ApiPublicQrRescueLogRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
@@ -3092,6 +3110,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
     | '/api/public/postback/$network'
+    | '/api/public/qr-rescue/$code'
+    | '/api/public/qr-rescue/log'
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
@@ -3387,6 +3407,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
     | '/api/public/postback/$network'
+    | '/api/public/qr-rescue/$code'
+    | '/api/public/qr-rescue/log'
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
@@ -3692,6 +3714,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
     | '/api/public/postback/$network'
+    | '/api/public/qr-rescue/$code'
+    | '/api/public/qr-rescue/log'
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
@@ -3846,6 +3870,8 @@ export interface RootRouteChildren {
   ApiPublicHooksSyncPartsFeedsRoute: typeof ApiPublicHooksSyncPartsFeedsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicPostbackNetworkRoute: typeof ApiPublicPostbackNetworkRoute
+  ApiPublicQrRescueCodeRoute: typeof ApiPublicQrRescueCodeRoute
+  ApiPublicQrRescueLogRoute: typeof ApiPublicQrRescueLogRoute
   ApiSellerStaffCreateRoute: typeof ApiSellerStaffCreateRoute
   ApiSellerStaffDeactivateRoute: typeof ApiSellerStaffDeactivateRoute
   ApiSellerStaffResetPasswordRoute: typeof ApiSellerStaffResetPasswordRoute
@@ -5820,6 +5846,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSellerStaffCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/qr-rescue/log': {
+      id: '/api/public/qr-rescue/log'
+      path: '/api/public/qr-rescue/log'
+      fullPath: '/api/public/qr-rescue/log'
+      preLoaderRoute: typeof ApiPublicQrRescueLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/qr-rescue/$code': {
+      id: '/api/public/qr-rescue/$code'
+      path: '/api/public/qr-rescue/$code'
+      fullPath: '/api/public/qr-rescue/$code'
+      preLoaderRoute: typeof ApiPublicQrRescueCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/postback/$network': {
       id: '/api/public/postback/$network'
       path: '/api/public/postback/$network'
@@ -6702,6 +6742,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksSyncPartsFeedsRoute: ApiPublicHooksSyncPartsFeedsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicPostbackNetworkRoute: ApiPublicPostbackNetworkRoute,
+  ApiPublicQrRescueCodeRoute: ApiPublicQrRescueCodeRoute,
+  ApiPublicQrRescueLogRoute: ApiPublicQrRescueLogRoute,
   ApiSellerStaffCreateRoute: ApiSellerStaffCreateRoute,
   ApiSellerStaffDeactivateRoute: ApiSellerStaffDeactivateRoute,
   ApiSellerStaffResetPasswordRoute: ApiSellerStaffResetPasswordRoute,
