@@ -323,6 +323,7 @@ import { Route as AuthenticatedStaffAcademySlugRouteImport } from './routes/_aut
 import { Route as AuthenticatedShopWorkOrdersNewRouteImport } from './routes/_authenticated/shop.work-orders.new'
 import { Route as AuthenticatedShopWorkOrdersIdRouteImport } from './routes/_authenticated/shop.work-orders.$id'
 import { Route as AuthenticatedShopCustomersNewRouteImport } from './routes/_authenticated/shop.customers.new'
+import { Route as AuthenticatedShopCustomersIdRouteImport } from './routes/_authenticated/shop.customers.$id'
 import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
@@ -1975,6 +1976,12 @@ const AuthenticatedShopCustomersNewRoute =
     path: '/new',
     getParentRoute: () => AuthenticatedShopCustomersRoute,
   } as any)
+const AuthenticatedShopCustomersIdRoute =
+  AuthenticatedShopCustomersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedShopCustomersRoute,
+  } as any)
 const AuthenticatedDashboardClubsIdRoute =
   AuthenticatedDashboardClubsIdRouteImport.update({
     id: '/dashboard/clubs_/$id',
@@ -2256,6 +2263,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/listing/$id/': typeof ListingIdIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
@@ -2562,6 +2570,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/listing/$id': typeof ListingIdIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
@@ -2881,6 +2890,7 @@ export interface FileRoutesById {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/listing/$id/': typeof ListingIdIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/_authenticated/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/_authenticated/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/_authenticated/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/_authenticated/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
@@ -3200,6 +3210,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/listing/$id/'
     | '/dashboard/clubs/$id'
+    | '/shop/customers/$id'
     | '/shop/customers/new'
     | '/shop/work-orders/$id'
     | '/shop/work-orders/new'
@@ -3506,6 +3517,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/listing/$id'
     | '/dashboard/clubs/$id'
+    | '/shop/customers/$id'
     | '/shop/customers/new'
     | '/shop/work-orders/$id'
     | '/shop/work-orders/new'
@@ -3824,6 +3836,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/listing/$id/'
     | '/_authenticated/dashboard/clubs_/$id'
+    | '/_authenticated/shop/customers/$id'
     | '/_authenticated/shop/customers/new'
     | '/_authenticated/shop/work-orders/$id'
     | '/_authenticated/shop/work-orders/new'
@@ -6219,6 +6232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopCustomersNewRouteImport
       parentRoute: typeof AuthenticatedShopCustomersRoute
     }
+    '/_authenticated/shop/customers/$id': {
+      id: '/_authenticated/shop/customers/$id'
+      path: '/$id'
+      fullPath: '/shop/customers/$id'
+      preLoaderRoute: typeof AuthenticatedShopCustomersIdRouteImport
+      parentRoute: typeof AuthenticatedShopCustomersRoute
+    }
     '/_authenticated/dashboard/clubs_/$id': {
       id: '/_authenticated/dashboard/clubs_/$id'
       path: '/dashboard/clubs/$id'
@@ -6237,11 +6257,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedShopCustomersRouteChildren {
+  AuthenticatedShopCustomersIdRoute: typeof AuthenticatedShopCustomersIdRoute
   AuthenticatedShopCustomersNewRoute: typeof AuthenticatedShopCustomersNewRoute
 }
 
 const AuthenticatedShopCustomersRouteChildren: AuthenticatedShopCustomersRouteChildren =
   {
+    AuthenticatedShopCustomersIdRoute: AuthenticatedShopCustomersIdRoute,
     AuthenticatedShopCustomersNewRoute: AuthenticatedShopCustomersNewRoute,
   }
 
