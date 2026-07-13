@@ -1,5 +1,6 @@
 {
   "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "eslint.config.js"],
+  "exclude": ["src/shop-manager/**"],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
@@ -21,7 +22,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@sm/*": ["./src/shop-manager/*"]
     }
   }
 }

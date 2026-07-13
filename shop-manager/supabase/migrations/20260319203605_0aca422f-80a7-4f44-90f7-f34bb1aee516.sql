@@ -1,1 +1,0 @@
-ALTER TABLE pt_client_medical_conditions ADD COLUMN IF NOT EXISTS trainer_ai_notes text;
