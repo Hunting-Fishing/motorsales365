@@ -149,7 +149,7 @@ function WorkOrdersList() {
                           params={{ id: w.id }}
                           className="hover:underline"
                         >
-                          {w.wo_number ?? w.id.slice(0, 8)}
+                          {w.work_order_number ?? w.id.slice(0, 8)}
                         </Link>
                       </TableCell>
                       <TableCell>
