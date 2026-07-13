@@ -41,6 +41,7 @@ import { Route as GameRouteImport } from './routes/game'
 import { Route as FranchiseRouteImport } from './routes/franchise'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExportRouteImport } from './routes/export'
+import { Route as DocumentCheckRouteImport } from './routes/document-check'
 import { Route as DispatchRouteImport } from './routes/dispatch'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -60,6 +61,7 @@ import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
 import { Route as FranchiseIndexRouteImport } from './routes/franchise.index'
+import { Route as DocumentCheckIndexRouteImport } from './routes/document-check.index'
 import { Route as DispatchIndexRouteImport } from './routes/dispatch.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ClubsIndexRouteImport } from './routes/clubs.index'
@@ -104,6 +106,7 @@ import { Route as FranchisePartnersRouteImport } from './routes/franchise.partne
 import { Route as FranchiseApplyRouteImport } from './routes/franchise.apply'
 import { Route as ExportTrustRouteImport } from './routes/export.trust'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as DocumentCheckCountryRouteImport } from './routes/document-check.$country'
 import { Route as DispatchJoinRouteImport } from './routes/dispatch.join'
 import { Route as DispatchCheckoutRouteImport } from './routes/dispatch.checkout'
 import { Route as DashboardWantedRouteImport } from './routes/dashboard.wanted'
@@ -177,6 +180,7 @@ import { Route as AdminFranchiseRouteImport } from './routes/admin.franchise'
 import { Route as AdminFlashcardsRouteImport } from './routes/admin.flashcards'
 import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-flags'
 import { Route as AdminEducationRouteImport } from './routes/admin.education'
+import { Route as AdminDocumentCheckRouteImport } from './routes/admin.document-check'
 import { Route as AdminDispatchRouteImport } from './routes/admin.dispatch'
 import { Route as AdminDiscoverBusinessesRouteImport } from './routes/admin.discover-businesses'
 import { Route as AdminDiscountAuditsRouteImport } from './routes/admin.discount-audits'
@@ -209,6 +213,7 @@ import { Route as PartsCSlugRouteImport } from './routes/parts.c.$slug'
 import { Route as PartnersPartsOnboardingRouteImport } from './routes/partners.parts.onboarding'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
+import { Route as DocumentCheckCountryQuickGuideRouteImport } from './routes/document-check.$country.quick-guide'
 import { Route as DashboardTeamPerformanceRouteImport } from './routes/dashboard.team.performance'
 import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.team.members'
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
@@ -475,6 +480,11 @@ const ExportRoute = ExportRouteImport.update({
   path: '/export',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocumentCheckRoute = DocumentCheckRouteImport.update({
+  id: '/document-check',
+  path: '/document-check',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DispatchRoute = DispatchRouteImport.update({
   id: '/dispatch',
   path: '/dispatch',
@@ -568,6 +578,11 @@ const FranchiseIndexRoute = FranchiseIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => FranchiseRoute,
+} as any)
+const DocumentCheckIndexRoute = DocumentCheckIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DocumentCheckRoute,
 } as any)
 const DispatchIndexRoute = DispatchIndexRouteImport.update({
   id: '/',
@@ -788,6 +803,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DocumentCheckCountryRoute = DocumentCheckCountryRouteImport.update({
+  id: '/$country',
+  path: '/$country',
+  getParentRoute: () => DocumentCheckRoute,
 } as any)
 const DispatchJoinRoute = DispatchJoinRouteImport.update({
   id: '/join',
@@ -1157,6 +1177,11 @@ const AdminEducationRoute = AdminEducationRouteImport.update({
   path: '/education',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDocumentCheckRoute = AdminDocumentCheckRouteImport.update({
+  id: '/document-check',
+  path: '/document-check',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDispatchRoute = AdminDispatchRouteImport.update({
   id: '/dispatch',
   path: '/dispatch',
@@ -1321,6 +1346,12 @@ const ListingIdEditRoute = ListingIdEditRouteImport.update({
   path: '/edit',
   getParentRoute: () => ListingIdRoute,
 } as any)
+const DocumentCheckCountryQuickGuideRoute =
+  DocumentCheckCountryQuickGuideRouteImport.update({
+    id: '/quick-guide',
+    path: '/quick-guide',
+    getParentRoute: () => DocumentCheckCountryRoute,
+  } as any)
 const DashboardTeamPerformanceRoute =
   DashboardTeamPerformanceRouteImport.update({
     id: '/performance',
@@ -1928,6 +1959,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/dispatch': typeof DispatchRouteWithChildren
+  '/document-check': typeof DocumentCheckRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/franchise': typeof FranchiseRouteWithChildren
@@ -1977,6 +2009,7 @@ export interface FileRoutesByFullPath {
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/dispatch': typeof AdminDispatchRoute
+  '/admin/document-check': typeof AdminDocumentCheckRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/flashcards': typeof AdminFlashcardsRoute
@@ -2050,6 +2083,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/dispatch/join': typeof DispatchJoinRoute
+  '/document-check/$country': typeof DocumentCheckCountryRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
@@ -2094,6 +2128,7 @@ export interface FileRoutesByFullPath {
   '/clubs/': typeof ClubsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
+  '/document-check/': typeof DocumentCheckIndexRoute
   '/franchise/': typeof FranchiseIndexRoute
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
@@ -2160,6 +2195,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
+  '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
@@ -2278,6 +2314,7 @@ export interface FileRoutesByTo {
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/dispatch': typeof AdminDispatchRoute
+  '/admin/document-check': typeof AdminDocumentCheckRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/flashcards': typeof AdminFlashcardsRoute
@@ -2349,6 +2386,7 @@ export interface FileRoutesByTo {
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/dispatch/join': typeof DispatchJoinRoute
+  '/document-check/$country': typeof DocumentCheckCountryRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
@@ -2392,6 +2430,7 @@ export interface FileRoutesByTo {
   '/clubs': typeof ClubsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dispatch': typeof DispatchIndexRoute
+  '/document-check': typeof DocumentCheckIndexRoute
   '/franchise': typeof FranchiseIndexRoute
   '/games': typeof GamesIndexRoute
   '/learn': typeof LearnIndexRoute
@@ -2457,6 +2496,7 @@ export interface FileRoutesByTo {
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
+  '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
@@ -2533,6 +2573,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/dispatch': typeof DispatchRouteWithChildren
+  '/document-check': typeof DocumentCheckRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/franchise': typeof FranchiseRouteWithChildren
@@ -2582,6 +2623,7 @@ export interface FileRoutesById {
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/dispatch': typeof AdminDispatchRoute
+  '/admin/document-check': typeof AdminDocumentCheckRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/flashcards': typeof AdminFlashcardsRoute
@@ -2655,6 +2697,7 @@ export interface FileRoutesById {
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/dispatch/join': typeof DispatchJoinRoute
+  '/document-check/$country': typeof DocumentCheckCountryRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
@@ -2699,6 +2742,7 @@ export interface FileRoutesById {
   '/clubs/': typeof ClubsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
+  '/document-check/': typeof DocumentCheckIndexRoute
   '/franchise/': typeof FranchiseIndexRoute
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
@@ -2765,6 +2809,7 @@ export interface FileRoutesById {
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
+  '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
@@ -2841,6 +2886,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/dispatch'
+    | '/document-check'
     | '/export'
     | '/forgot-password'
     | '/franchise'
@@ -2890,6 +2936,7 @@ export interface FileRouteTypes {
     | '/admin/discount-audits'
     | '/admin/discover-businesses'
     | '/admin/dispatch'
+    | '/admin/document-check'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/flashcards'
@@ -2963,6 +3010,7 @@ export interface FileRouteTypes {
     | '/dashboard/wanted'
     | '/dispatch/checkout'
     | '/dispatch/join'
+    | '/document-check/$country'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/franchise/apply'
@@ -3007,6 +3055,7 @@ export interface FileRouteTypes {
     | '/clubs/'
     | '/dashboard/'
     | '/dispatch/'
+    | '/document-check/'
     | '/franchise/'
     | '/games/'
     | '/learn/'
@@ -3073,6 +3122,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
     | '/dashboard/team/performance'
+    | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
@@ -3191,6 +3241,7 @@ export interface FileRouteTypes {
     | '/admin/discount-audits'
     | '/admin/discover-businesses'
     | '/admin/dispatch'
+    | '/admin/document-check'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/flashcards'
@@ -3262,6 +3313,7 @@ export interface FileRouteTypes {
     | '/dashboard/wanted'
     | '/dispatch/checkout'
     | '/dispatch/join'
+    | '/document-check/$country'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/franchise/apply'
@@ -3305,6 +3357,7 @@ export interface FileRouteTypes {
     | '/clubs'
     | '/dashboard'
     | '/dispatch'
+    | '/document-check'
     | '/franchise'
     | '/games'
     | '/learn'
@@ -3370,6 +3423,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
     | '/dashboard/team/performance'
+    | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
@@ -3445,6 +3499,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/dispatch'
+    | '/document-check'
     | '/export'
     | '/forgot-password'
     | '/franchise'
@@ -3494,6 +3549,7 @@ export interface FileRouteTypes {
     | '/admin/discount-audits'
     | '/admin/discover-businesses'
     | '/admin/dispatch'
+    | '/admin/document-check'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/flashcards'
@@ -3567,6 +3623,7 @@ export interface FileRouteTypes {
     | '/dashboard/wanted'
     | '/dispatch/checkout'
     | '/dispatch/join'
+    | '/document-check/$country'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/franchise/apply'
@@ -3611,6 +3668,7 @@ export interface FileRouteTypes {
     | '/clubs/'
     | '/dashboard/'
     | '/dispatch/'
+    | '/document-check/'
     | '/franchise/'
     | '/games/'
     | '/learn/'
@@ -3677,6 +3735,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
     | '/dashboard/team/performance'
+    | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
@@ -3753,6 +3812,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DispatchRoute: typeof DispatchRouteWithChildren
+  DocumentCheckRoute: typeof DocumentCheckRouteWithChildren
   ExportRoute: typeof ExportRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   FranchiseRoute: typeof FranchiseRouteWithChildren
@@ -4110,6 +4170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/document-check': {
+      id: '/document-check'
+      path: '/document-check'
+      fullPath: '/document-check'
+      preLoaderRoute: typeof DocumentCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dispatch': {
       id: '/dispatch'
       path: '/dispatch'
@@ -4242,6 +4309,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/franchise/'
       preLoaderRoute: typeof FranchiseIndexRouteImport
       parentRoute: typeof FranchiseRoute
+    }
+    '/document-check/': {
+      id: '/document-check/'
+      path: '/'
+      fullPath: '/document-check/'
+      preLoaderRoute: typeof DocumentCheckIndexRouteImport
+      parentRoute: typeof DocumentCheckRoute
     }
     '/dispatch/': {
       id: '/dispatch/'
@@ -4550,6 +4624,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/document-check/$country': {
+      id: '/document-check/$country'
+      path: '/$country'
+      fullPath: '/document-check/$country'
+      preLoaderRoute: typeof DocumentCheckCountryRouteImport
+      parentRoute: typeof DocumentCheckRoute
     }
     '/dispatch/join': {
       id: '/dispatch/join'
@@ -5062,6 +5143,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEducationRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/document-check': {
+      id: '/admin/document-check'
+      path: '/document-check'
+      fullPath: '/admin/document-check'
+      preLoaderRoute: typeof AdminDocumentCheckRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/dispatch': {
       id: '/admin/dispatch'
       path: '/dispatch'
@@ -5285,6 +5373,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/listing/$id/edit'
       preLoaderRoute: typeof ListingIdEditRouteImport
       parentRoute: typeof ListingIdRoute
+    }
+    '/document-check/$country/quick-guide': {
+      id: '/document-check/$country/quick-guide'
+      path: '/quick-guide'
+      fullPath: '/document-check/$country/quick-guide'
+      preLoaderRoute: typeof DocumentCheckCountryQuickGuideRouteImport
+      parentRoute: typeof DocumentCheckCountryRoute
     }
     '/dashboard/team/performance': {
       id: '/dashboard/team/performance'
@@ -6186,6 +6281,7 @@ interface AdminRouteChildren {
   AdminDiscountAuditsRoute: typeof AdminDiscountAuditsRoute
   AdminDiscoverBusinessesRoute: typeof AdminDiscoverBusinessesRoute
   AdminDispatchRoute: typeof AdminDispatchRoute
+  AdminDocumentCheckRoute: typeof AdminDocumentCheckRoute
   AdminEducationRoute: typeof AdminEducationRoute
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
   AdminFlashcardsRoute: typeof AdminFlashcardsRoute
@@ -6240,6 +6336,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDiscountAuditsRoute: AdminDiscountAuditsRoute,
   AdminDiscoverBusinessesRoute: AdminDiscoverBusinessesRoute,
   AdminDispatchRoute: AdminDispatchRoute,
+  AdminDocumentCheckRoute: AdminDocumentCheckRoute,
   AdminEducationRoute: AdminEducationRoute,
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
   AdminFlashcardsRoute: AdminFlashcardsRoute,
@@ -6477,6 +6574,31 @@ const DispatchRouteWithChildren = DispatchRoute._addFileChildren(
   DispatchRouteChildren,
 )
 
+interface DocumentCheckCountryRouteChildren {
+  DocumentCheckCountryQuickGuideRoute: typeof DocumentCheckCountryQuickGuideRoute
+}
+
+const DocumentCheckCountryRouteChildren: DocumentCheckCountryRouteChildren = {
+  DocumentCheckCountryQuickGuideRoute: DocumentCheckCountryQuickGuideRoute,
+}
+
+const DocumentCheckCountryRouteWithChildren =
+  DocumentCheckCountryRoute._addFileChildren(DocumentCheckCountryRouteChildren)
+
+interface DocumentCheckRouteChildren {
+  DocumentCheckCountryRoute: typeof DocumentCheckCountryRouteWithChildren
+  DocumentCheckIndexRoute: typeof DocumentCheckIndexRoute
+}
+
+const DocumentCheckRouteChildren: DocumentCheckRouteChildren = {
+  DocumentCheckCountryRoute: DocumentCheckCountryRouteWithChildren,
+  DocumentCheckIndexRoute: DocumentCheckIndexRoute,
+}
+
+const DocumentCheckRouteWithChildren = DocumentCheckRoute._addFileChildren(
+  DocumentCheckRouteChildren,
+)
+
 interface ExportRouteChildren {
   ExportTrustRoute: typeof ExportTrustRoute
 }
@@ -6623,6 +6745,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DispatchRoute: DispatchRouteWithChildren,
+  DocumentCheckRoute: DocumentCheckRouteWithChildren,
   ExportRoute: ExportRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   FranchiseRoute: FranchiseRouteWithChildren,

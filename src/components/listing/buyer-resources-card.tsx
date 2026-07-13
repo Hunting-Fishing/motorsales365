@@ -27,6 +27,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { BuyerDocumentChecklist } from "@/components/buyer-document-checklist";
+import { QuickGuideModal } from "@/components/document-check/quick-guide-modal";
 
 type ChecklistItem = { id: string; label: string; hint: string | null };
 type Checklist = {
@@ -132,23 +133,28 @@ export function BuyerResourcesCard({
       {!collapsed && (
       <ul className="divide-y divide-border text-sm">
 
-        {/* LTO / Verification status */}
+        {/* LTO / Document check → country Quick Guide modal */}
         <li>
-          <Link
-            to="/verified"
-            className="flex items-center gap-2.5 px-3 py-2 hover:bg-muted/50"
-          >
-            <IconBox className={ltoVerified ? "bg-emerald-500/10 text-emerald-600" : ""}>
-              <ShieldCheck className="h-3.5 w-3.5" />
-            </IconBox>
-            <span className="min-w-0 flex-1">
-              <span className="block font-medium">LTO &amp; document check</span>
-              <span className="block text-[11px] text-muted-foreground">
-                {ltoVerified ? "OR/CR reviewed by 365" : "How we verify listings"}
-              </span>
-            </span>
-            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-          </Link>
+          <QuickGuideModal
+            countryCode={String(attributes?.country ?? "ph").toLowerCase()}
+            trigger={
+              <button
+                type="button"
+                className="flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-muted/50"
+              >
+                <IconBox className={ltoVerified ? "bg-emerald-500/10 text-emerald-600" : ""}>
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                </IconBox>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium">LTO &amp; document check</span>
+                  <span className="block text-[11px] text-muted-foreground">
+                    {ltoVerified ? "OR/CR reviewed by 365" : "Quick guide + full country laws"}
+                  </span>
+                </span>
+                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            }
+          />
         </li>
 
         {/* Buyer checklist */}

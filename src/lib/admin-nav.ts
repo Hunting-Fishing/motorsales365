@@ -86,6 +86,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { to: "/admin/dispatch", label: "365 Dispatch", Icon: Truck, roles: ["admin", "support"], info: "Dispatch subscriptions, live tow-job queue, provider performance.", section: "Operations" },
   { to: "/admin/education", label: "Education", Icon: GraduationCap, roles: ["admin", "moderator"], info: "Courses, modules, lessons, quizzes and Partner Training schools.", section: "Operations" },
   { to: "/admin/flashcards", label: "Flashcards content", Icon: Sparkles, roles: ["admin", "moderator"], info: "Pull the latest 365 Flashcards decks from the upstream GitHub repo.", section: "Operations" },
+  { to: "/admin/document-check", label: "Document Check", Icon: Globe, roles: ["admin"], info: "Per-country vehicle transfer, import/export, insurance and document reference.", section: "Operations" },
   { to: "/admin/staff-academy", label: "Staff Academy", Icon: GraduationCap, roles: ["admin"], info: "Create, edit, reorder and publish internal staff training articles.", section: "Operations" },
   { to: "/admin/staff-academy/assets", label: "Academy Assets", Icon: GraduationCap, roles: ["admin"], info: "Upload infographics, scripts, images and videos for the Staff Academy.", section: "Operations" },
 

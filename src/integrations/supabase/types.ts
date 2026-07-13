@@ -4583,6 +4583,216 @@ export type Database = {
         }
         Relationships: []
       }
+      doc_check_agency_links: {
+        Row: {
+          country_code: string
+          created_at: string
+          id: string
+          label: string
+          section_kind: string | null
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          country_code: string
+          created_at?: string
+          id?: string
+          label: string
+          section_kind?: string | null
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          id?: string
+          label?: string
+          section_kind?: string | null
+          sort_order?: number
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_check_agency_links_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "doc_check_countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      doc_check_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          country_code: string | null
+          created_at: string
+          details: Json
+          entity: string
+          entity_id: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          country_code?: string | null
+          created_at?: string
+          details?: Json
+          entity: string
+          entity_id?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          country_code?: string | null
+          created_at?: string
+          details?: Json
+          entity?: string
+          entity_id?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      doc_check_countries: {
+        Row: {
+          code: string
+          created_at: string
+          currency: string | null
+          drives_on: string | null
+          flag_emoji: string
+          is_published: boolean
+          name: string
+          region: string
+          slug: string
+          sort_order: number
+          summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          currency?: string | null
+          drives_on?: string | null
+          flag_emoji: string
+          is_published?: boolean
+          name: string
+          region: string
+          slug: string
+          sort_order?: number
+          summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          currency?: string | null
+          drives_on?: string | null
+          flag_emoji?: string
+          is_published?: boolean
+          name?: string
+          region?: string
+          slug?: string
+          sort_order?: number
+          summary?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      doc_check_documents: {
+        Row: {
+          code: string
+          country_code: string
+          created_at: string
+          description_md: string
+          id: string
+          name: string
+          sort_order: number
+          typical_cost: string | null
+          updated_at: string
+          validity: string | null
+          who_issues: string | null
+        }
+        Insert: {
+          code: string
+          country_code: string
+          created_at?: string
+          description_md?: string
+          id?: string
+          name: string
+          sort_order?: number
+          typical_cost?: string | null
+          updated_at?: string
+          validity?: string | null
+          who_issues?: string | null
+        }
+        Update: {
+          code?: string
+          country_code?: string
+          created_at?: string
+          description_md?: string
+          id?: string
+          name?: string
+          sort_order?: number
+          typical_cost?: string | null
+          updated_at?: string
+          validity?: string | null
+          who_issues?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_check_documents_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "doc_check_countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      doc_check_sections: {
+        Row: {
+          body_md: string
+          country_code: string
+          created_at: string
+          id: string
+          is_published: boolean
+          kind: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body_md?: string
+          country_code: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          kind: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body_md?: string
+          country_code?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          kind?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_check_sections_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "doc_check_countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       email_routes: {
         Row: {
           active: boolean

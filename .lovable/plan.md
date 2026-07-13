@@ -1,31 +1,100 @@
-## Fix listing form: floating Save, remove duplicates, mandatory history, cleaner sections
+## Goal
 
-### 1. Floating "Save" widget (edit + sell)
-- Create `src/components/listings/floating-save-widget.tsx` — a fixed bottom-right pill button matching `FloatingHelpWidget` style (offset above it, e.g. `bottom-20 right-4`). It renders a "Save changes" / "Publish" button that dispatches a `requestSubmit()` on the form via a passed ref (or a shared `formId`).
-- Wire it into `src/routes/listing.$id.edit.tsx` and `src/routes/sell.tsx`. Show a compact status: idle / "Saving…" / disabled while invalid, with the same busy flag currently on the inline Save button.
-- Keep the inline footer Save button too (desktop users expect it), but the floating widget guarantees Save is always reachable on long mobile forms.
+Build a global, admin-editable **Document Check** hub at `/document-check` covering vehicle import/export, transfer, insurance, and document requirements per country. Philippines ships with full content; ~15 other markets ship as flag stubs. Buyer Resources' "LTO & document check" link opens a per-country Quick Guide modal, with links to the full page and a downloadable PDF.
 
-### 2. Remove duplicates in vehicle details
-Duplicates today (car category):
-- `flood_history` and `accident_history` live in **both** `VehicleQualityFields` and `CategoryAttributesEditor` ("More details & buyer filters").
-- `or_cr_status` and `owner_status` also appear in both places for car (VQF has plate/OR-related fields near CategoryAttrs' OR/CR).
+## Countries at launch
 
-Fix in `src/components/listings/category-attributes-editor.tsx`:
-- Car branch: drop `flood_history`, `accident_history`, `or_cr_status`, `owner_status` selects and their entries in `CATEGORY_ATTR_KEYS.car`. Keep body_type, drivetrain, TrustBlock.
-- Motorcycle branch: drop `or_cr_status`, `owner_status` if surfaced in VQF; keep type/engine_cc/plate_status/condition/delivery + TrustBlock.
+**Full content:** Philippines (LTO, DTI-FTEB, BOC, Insurance Commission).
+**Stubs (flag + name + placeholder page + "Contribute" CTA):**
+- ASEAN: Singapore, Malaysia, Thailand, Vietnam, Indonesia
+- North America: United States, Canada
+- Europe: UK, Germany, France, Netherlands, Spain, Italy (EU umbrella note)
+- Asia-Pacific: Japan, South Korea, Australia, New Zealand
 
-### 3. Merge "More details & buyer filters" into "Vehicle details & documents"
-- In `listing.$id.edit.tsx` and `sell.tsx`: delete the separate "More details & buyer filters" wrapper block. Render `CategoryAttributesEditor` inline directly beneath the existing vehicle details grid, under the same section header — no second card/heading.
+## Routes
 
-### 4. Mandatory flood/accident history (VQF)
-- In `src/components/vehicle-quality-fields.tsx`: mark `flood_history` and `accident_history` as required for car/motorcycle. Apply `mandatoryFieldClass` (orange when empty, green when set) to their Select triggers, same pattern as Title/Price/Mileage.
-- Add pre-submit validation in `listing.$id.edit.tsx` and `sell.tsx` so a missing flood/accident value blocks save with a toast pointing to the field (same style as the existing `validateVehicleQuality` path).
-- Ensure save path already persists them: VQF writes `vehicleQualityToAttributes` first, then `CATEGORY_ATTR_KEYS` loop no longer touches these keys (since we removed them from the list), so values will actually round-trip. Verify hydration on reload still uses `hydrateVehicleQuality(a)` — no change needed there.
+```
+src/routes/
+  document-check.tsx              -> /document-check (hub layout, <Outlet />)
+  document-check.index.tsx        -> world grid of country flags
+  document-check.$country.tsx     -> per-country page (dynamic from DB)
+  document-check.$country.quick-guide.pdf.tsx  -> PDF download endpoint
+```
 
-### 5. Icon on "Parts needed / known issues"
-- In both routes' `<details><summary>` header, prepend a `Wrench` (lucide) icon in a small primary-tinted circle, matching the visual weight of other section icons. Add a subtle left border-accent so the collapsed row is scannable and users don't skim past it.
+Per-country page is organized into five clearly-separated tabs/sections:
+1. **Quick Guide** (collapsible summary — the buyer handbook)
+2. **Buying & Transfer** (title/registration, ID, notarization, fees)
+3. **Selling & Deregistration** (release of ownership, plate return)
+4. **Import Laws** (age caps, homologation, duties, restricted vehicles)
+5. **Export Laws** (clearance, customs, shipping docs)
+6. **Insurance** (mandatory coverage, CTPL/TPL equivalents, providers)
+7. **Document Reference** (OR/CR, deed of sale, PNP clearance, etc. — each with description + sample where allowed)
 
-### Technical notes
-- No DB or schema changes. All fixes are frontend + validation.
-- `CATEGORY_ATTR_KEYS` edit is the single source that also drives the load-side hydrate loop, so removing keys there prevents both duplicate render and duplicate write.
-- Floating widget uses `document.getElementById(formId)?.requestSubmit()` to avoid ref plumbing across the large form tree.
+Every section has an "Agency links" list (official gov sources).
+
+## Data model (Supabase, admin-editable)
+
+New tables, all with narrow public `TO anon` SELECT on published rows, admin write via `has_role`:
+
+- **`doc_check_countries`** — `code` (ISO-2, PK), `name`, `flag_emoji`, `region`, `slug`, `is_published`, `summary`, `currency`, `drives_on`, `sort_order`
+- **`doc_check_sections`** — `country_code` FK, `kind` (`quick_guide`|`buying`|`selling`|`import`|`export`|`insurance`|`documents`), `title`, `body_md`, `sort_order`, `is_published`. Unique(country, kind, sort_order).
+- **`doc_check_documents`** — `country_code`, `code` (e.g. `or_cr`), `name`, `description_md`, `who_issues`, `typical_cost`, `validity`, `sort_order`
+- **`doc_check_agency_links`** — `country_code`, `section_kind`, `label`, `url`, `sort_order`
+- **`doc_check_audit_log`** — who edited what, when
+
+RLS: anon SELECT only where `is_published = true`; admin (`has_role(uid,'admin')`) full CRUD. GRANTs per policy: `SELECT` to `anon` and `authenticated` on published rows; `ALL` to `service_role`; admin writes gated by policy.
+
+## Admin surface
+
+New page `/admin/document-check` (admin-only) — country list, per-country editor with markdown fields for each section, document reference editor, agency links editor, publish toggle. Reuses existing admin shell and `has_role` gate.
+
+## Quick Guide delivery (all three, as chosen)
+
+1. **In-page collapsible** at the top of `/document-check/$country`.
+2. **PDF download** — `/document-check/$country/quick-guide.pdf` server route renders the Quick Guide + Buying + Documents sections to PDF using `@react-pdf/renderer` (Worker-compatible, pure JS).
+3. **Modal from Buyer Resources** — update `src/components/support/buyer-resources.tsx` (or wherever "LTO & document check" is linked in the listing sidebar) so the row opens a `QuickGuideModal` that fetches the Quick Guide for the listing's country (defaulting to PH). Modal has two CTAs: "Read full guide" → country page, "Download PDF" → PDF route.
+
+## Philippines content (seeded via migration insert)
+
+Seeded from existing knowledge in the codebase (`LTOVerificationForm`, `refund-policy`, `guidelines`) plus PH gov sources:
+- Quick Guide: 10-step buyer checklist (verify OR/CR match, chassis/engine numbers, PNP-HPG clearance, deed of sale notarization, LTO transfer within 30 days, CTPL, etc.)
+- Buying & Transfer: full LTO transfer flow with fees
+- Selling: deed of sale template pointer, release of liability
+- Import: age caps (5 years for used vehicles), BOC duties overview, homologation
+- Export: BOC export declaration, ATA carnet notes
+- Insurance: CTPL mandatory, comprehensive optional, PH providers list
+- Documents: OR, CR, deed of sale, PNP-HPG clearance, macro-etching, valid IDs, TIN
+- Agency links: lto.gov.ph, customs.gov.ph, insurance.gov.ph, dti.gov.ph
+
+## Buyer Resources integration
+
+Rewire the "LTO & document check" row so it:
+- Detects the listing's country from `listings.region` / `attributes.country` (default `ph`).
+- Opens `<QuickGuideModal country="ph" />` with the summary + top-10 checklist inline.
+- Modal footer links to `/document-check/ph` and the PDF.
+
+## Navigation & SEO
+
+- Footer link: "Document Check" under Resources.
+- Each country page has route-specific `head()` — title/description/OG mentioning the country and vehicle-law scope.
+- Hub `/document-check` gets its own head() and a JSON-LD `ItemList` of countries.
+- Sitemap includes hub + all published country pages.
+
+## Terms & memory
+
+- Update `/terms` "Last updated" note briefly ("Added country-specific Document Check reference pages").
+- Add `mem://features/document-check` memory: scope, data model, PH-first rollout, admin-editable, Quick Guide is the buyer-resources handbook.
+
+## Technical notes
+
+- Content fetches: public read-only via server publishable client (server fn `getCountry`, `listCountries`, `getQuickGuide`), narrow anon SELECT policies.
+- Markdown: render with existing markdown component (or `react-markdown` if not present) — no raw HTML injection.
+- PDF: `@react-pdf/renderer` in a `/api/public/document-check/$country/quick-guide.pdf.ts` server route, streams `application/pdf`. Content pulled server-side via publishable client.
+- No changes to existing LTO verification workflow — this is reference/education content, not verification.
+- All new tables follow the standard GRANT-then-RLS structure; anon SELECT only where `is_published`.
+
+## Out of scope for this pass
+
+- Full content for non-PH countries (structure + stubs only; admin can fill later).
+- Localization/translation (English only at launch).
+- Country auto-detection by IP (default PH; user picks from the hub).
