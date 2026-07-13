@@ -113,6 +113,7 @@ See `docs/shop-manager-legacy/route-audit.md` for the full inventory.
 1. ✅ `/shop/work-orders/new` — native create form.
 2. `/shop/work-orders/$id/edit` — inline status + notes editor.
 3. ✅ `/shop/customers/$id` — detail with vehicles + work-order history.
-4. `/shop/vehicles/$id` — vehicle detail with full service history.
-5. Add policies for `work_order_line_items`, `work_order_notes`,
+4. ✅ `/shop/vehicles/$id` — vehicle detail with full service history.
+5. `/shop/inventory` — inventory list + item detail.
+6. Add policies for `work_order_line_items`, `work_order_notes`,
    `payments`, `payment_allocations` when detail views port.
