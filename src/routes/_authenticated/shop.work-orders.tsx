@@ -168,8 +168,8 @@ function WorkOrdersList() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {typeof w.total_amount === "number"
-                          ? `₱${w.total_amount.toLocaleString()}`
+                        {typeof w.total_cost === "number"
+                          ? `₱${w.total_cost.toLocaleString()}`
                           : "—"}
                       </TableCell>
                       <TableCell>
