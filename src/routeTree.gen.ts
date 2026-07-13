@@ -41,6 +41,7 @@ import { Route as GameRouteImport } from './routes/game'
 import { Route as FranchiseRouteImport } from './routes/franchise'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExportRouteImport } from './routes/export'
+import { Route as DocumentCheckRouteImport } from './routes/document-check'
 import { Route as DispatchRouteImport } from './routes/dispatch'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -473,6 +474,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const ExportRoute = ExportRouteImport.update({
   id: '/export',
   path: '/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocumentCheckRoute = DocumentCheckRouteImport.update({
+  id: '/document-check',
+  path: '/document-check',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DispatchRoute = DispatchRouteImport.update({
@@ -1928,6 +1934,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/dispatch': typeof DispatchRouteWithChildren
+  '/document-check': typeof DocumentCheckRoute
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/franchise': typeof FranchiseRouteWithChildren
@@ -2231,6 +2238,7 @@ export interface FileRoutesByTo {
   '/bundles': typeof BundlesRoute
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
+  '/document-check': typeof DocumentCheckRoute
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/game': typeof GameRoute
@@ -2533,6 +2541,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/dispatch': typeof DispatchRouteWithChildren
+  '/document-check': typeof DocumentCheckRoute
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/franchise': typeof FranchiseRouteWithChildren
@@ -2841,6 +2850,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/dispatch'
+    | '/document-check'
     | '/export'
     | '/forgot-password'
     | '/franchise'
@@ -3144,6 +3154,7 @@ export interface FileRouteTypes {
     | '/bundles'
     | '/company'
     | '/contact'
+    | '/document-check'
     | '/export'
     | '/forgot-password'
     | '/game'
@@ -3445,6 +3456,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/dispatch'
+    | '/document-check'
     | '/export'
     | '/forgot-password'
     | '/franchise'
@@ -3753,6 +3765,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DispatchRoute: typeof DispatchRouteWithChildren
+  DocumentCheckRoute: typeof DocumentCheckRoute
   ExportRoute: typeof ExportRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   FranchiseRoute: typeof FranchiseRouteWithChildren
@@ -4108,6 +4121,13 @@ declare module '@tanstack/react-router' {
       path: '/export'
       fullPath: '/export'
       preLoaderRoute: typeof ExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/document-check': {
+      id: '/document-check'
+      path: '/document-check'
+      fullPath: '/document-check'
+      preLoaderRoute: typeof DocumentCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dispatch': {
@@ -6623,6 +6643,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DispatchRoute: DispatchRouteWithChildren,
+  DocumentCheckRoute: DocumentCheckRoute,
   ExportRoute: ExportRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   FranchiseRoute: FranchiseRouteWithChildren,
