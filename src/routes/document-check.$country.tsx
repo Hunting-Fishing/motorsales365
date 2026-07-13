@@ -10,7 +10,10 @@ import { SimpleMarkdown } from "@/components/simple-markdown";
 import {
   getDocCheckCountry,
   type DocCheckSection,
+  type DocCheckDocument,
+  type DocCheckLink,
 } from "@/lib/document-check.functions";
+
 
 const SECTION_ORDER: DocCheckSection["kind"][] = [
   "quick_guide",
