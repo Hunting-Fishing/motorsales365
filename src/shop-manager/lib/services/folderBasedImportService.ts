@@ -1,7 +1,7 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { processExcelFileFromStorage } from './excelProcessor';
-import { SectorFiles, ImportProgress, ImportResult, ImportStats } from '@/types/service';
+import { SectorFiles, ImportProgress, ImportResult, ImportStats } from '@sm/types/service';
 import { getAllSectorFiles } from './storageUtils';
 import { clearAllServiceData } from './databaseOperations';
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Switch } from '@sm/components/ui/switch';
 import { Clock, Save, Loader2, Copy } from 'lucide-react';
-import { useFuelDeliveryHours, FuelDeliveryHour } from '@/hooks/fuel-delivery/useFuelDeliveryHours';
+import { useFuelDeliveryHours, FuelDeliveryHour } from '@sm/hooks/fuel-delivery/useFuelDeliveryHours';
 
 interface BusinessHoursTabProps {
   shopId: string | null;

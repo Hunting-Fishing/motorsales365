@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Form } from '@/components/ui/form';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@sm/components/ui/form';
+import { Form } from '@sm/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { CustomerVehicle } from '@/types/customer';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
+import { CustomerVehicle } from '@sm/types/customer';
 import { Car, Plus, Save } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { VinDecoderField } from '@/components/work-orders/fields/VinDecoderField';
-import { VinDecodeResult } from '@/types/vehicle';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { VinDecoderField } from '@sm/components/work-orders/fields/VinDecoderField';
+import { VinDecodeResult } from '@sm/types/vehicle';
 
 const vehicleSchema = z.object({
   vehicleMake: z.string().min(1, 'Make is required'),

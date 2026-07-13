@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
 import { 
   Fuel, Truck, MapPin, Clock, Plus, LogOut, 
   User, FileText, Settings, ChevronRight, Loader2 
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { usePortalBusinessInfo } from '@/hooks/usePortalBusinessInfo';
+import { usePortalBusinessInfo } from '@sm/hooks/usePortalBusinessInfo';
 
 interface CustomerData {
   id: string;

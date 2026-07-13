@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Customer, CustomerVehicle } from '@/types/customer';
+import { Customer, CustomerVehicle } from '@sm/types/customer';
 import { Car, Plus, Pencil, AlertTriangle, Wrench } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { toast } from "@/hooks/use-toast";
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@sm/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Badge } from '@sm/components/ui/badge';
+import { Card } from '@sm/components/ui/card';
+import { toast } from "@sm/hooks/use-toast";
+import { Alert, AlertTitle, AlertDescription } from '@sm/components/ui/alert';
 
 interface CustomerVehiclesTabProps {
   customer: Customer;

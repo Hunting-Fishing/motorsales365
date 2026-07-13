@@ -1,11 +1,11 @@
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Download, Printer, FileText, LogOut } from "lucide-react";
-import { printElement } from "@/utils/printUtils";
+import { printElement } from "@sm/utils/printUtils";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@sm/hooks/use-toast";
 
 interface CustomerPortalHeaderProps {
   customerName: string;

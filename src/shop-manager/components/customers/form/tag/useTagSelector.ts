@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
 
 export const useTagSelector = (selectedTags: string[], onChange: (tags: string[]) => void) => {
   const [availableTags, setAvailableTags] = useState<string[]>([]);

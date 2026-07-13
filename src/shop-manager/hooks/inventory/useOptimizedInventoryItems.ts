@@ -1,8 +1,8 @@
 
 import { useCallback } from 'react';
 import { useInventoryData } from './useInventoryData';
-import { updateInventoryItem } from '@/services/inventory/crudService';
-import { InventoryItemExtended } from '@/types/inventory';
+import { updateInventoryItem } from '@sm/services/inventory/crudService';
+import { InventoryItemExtended } from '@sm/types/inventory';
 import { useQueryClient } from '@tanstack/react-query';
 
 /**

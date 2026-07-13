@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Search, X } from 'lucide-react';
-import { ServiceJob } from '@/types/service';
-import { Card, CardContent } from '@/components/ui/card';
+import { ServiceJob } from '@sm/types/service';
+import { Card, CardContent } from '@sm/components/ui/card';
 
 interface SearchResult {
   service: ServiceJob;

@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { GrantManagementTab } from "@/components/settings/GrantManagementTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { GrantManagementTab } from "@sm/components/settings/GrantManagementTab";
 
 export const GrantSettings = () => {
   return (

@@ -2,14 +2,14 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Label } from '@sm/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { CalendarDays, DollarSign, Ticket } from 'lucide-react';
-import { CreateRaffleData, UpdateRaffleData, Raffle } from '@/types/raffle';
+import { CreateRaffleData, UpdateRaffleData, Raffle } from '@sm/types/raffle';
 
 const raffleSchema = z.object({
   title: z.string().min(1, 'Title is required'),

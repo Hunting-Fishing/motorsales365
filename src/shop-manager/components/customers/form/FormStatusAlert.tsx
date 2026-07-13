@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertTitle, AlertDescription } from "@sm/components/ui/alert";
 import { Check } from "lucide-react";
 
 export const FormStatusAlert: React.FC = () => {

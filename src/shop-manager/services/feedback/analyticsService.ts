@@ -1,5 +1,5 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 import { FeedbackAnalytics } from "./types";
 
 // Calculate feedback analytics for a specific form

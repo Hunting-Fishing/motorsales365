@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ServiceMainCategory } from '@/types/service';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Progress } from '@sm/components/ui/progress';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@sm/components/ui/collapsible';
+import { ServiceMainCategory } from '@sm/types/service';
 import { ChevronDown, Info, AlertTriangle, CheckCircle, Database } from 'lucide-react';
 
 interface ServiceDebugInfoProps {

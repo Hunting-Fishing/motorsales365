@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
+import { Progress } from "@sm/components/ui/progress";
+import { Badge } from "@sm/components/ui/badge";
 
 interface FormProgressIndicatorProps {
   currentStep: number;

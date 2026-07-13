@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
 import { 
   Clock, 
   User, 
@@ -16,7 +16,7 @@ import {
   Filter,
   RefreshCw
 } from 'lucide-react';
-import { useWorkOrderActivities } from '@/hooks/work-orders/useWorkOrderActivities';
+import { useWorkOrderActivities } from '@sm/hooks/work-orders/useWorkOrderActivities';
 
 const getActivityConfig = (action: string) => {
   switch (action.toLowerCase()) {

@@ -1,17 +1,17 @@
 
 import React from "react";
-import { InvoiceHeader } from "@/components/invoices/InvoiceHeader";
-import { InvoiceLeftColumn } from "@/components/invoices/layout/InvoiceLeftColumn";
-import { InvoiceRightColumn } from "@/components/invoices/layout/InvoiceRightColumn";
+import { InvoiceHeader } from "@sm/components/invoices/InvoiceHeader";
+import { InvoiceLeftColumn } from "@sm/components/invoices/layout/InvoiceLeftColumn";
+import { InvoiceRightColumn } from "@sm/components/invoices/layout/InvoiceRightColumn";
 import { 
   Invoice, 
   StaffMember, 
   InvoiceItem, 
   InvoiceTemplate,
   createInvoiceUpdater
-} from "@/types/invoice";
-import { WorkOrder } from "@/types/workOrder";
-import { InventoryItem } from "@/types/inventory";
+} from "@sm/types/invoice";
+import { WorkOrder } from "@sm/types/workOrder";
+import { InventoryItem } from "@sm/types/inventory";
 
 interface InvoiceCreateLayoutProps {
   invoice: Invoice;

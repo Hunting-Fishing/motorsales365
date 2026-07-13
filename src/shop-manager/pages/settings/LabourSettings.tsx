@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { LabourRatesTab } from "@/components/settings/LabourRatesTab";
-import { DIYBayRatesTab } from "@/components/settings/DIYBayRatesTab";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useLabourRates } from "@/hooks/useLabourRates";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { LabourRatesTab } from "@sm/components/settings/LabourRatesTab";
+import { DIYBayRatesTab } from "@sm/components/settings/DIYBayRatesTab";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { useLabourRates } from "@sm/hooks/useLabourRates";
 
 export const LabourSettings = () => {
   const [activeTab, setActiveTab] = useState("standard-rates");

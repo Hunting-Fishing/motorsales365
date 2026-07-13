@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Label } from '@sm/components/ui/label';
+import { Checkbox } from '@sm/components/ui/checkbox';
 
 interface InventoryFilterProps {
   searchQuery: string;

@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@sm/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { UseFormReturn } from 'react-hook-form';
-import { WorkOrderPartFormValues } from '@/types/workOrderPart';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { WorkOrderPartFormValues } from '@sm/types/workOrderPart';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 
 interface JobLineSelectorProps {
   form: UseFormReturn<WorkOrderPartFormValues>;

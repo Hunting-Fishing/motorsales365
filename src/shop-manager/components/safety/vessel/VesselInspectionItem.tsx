@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Badge } from '@sm/components/ui/badge';
 import { CheckCircle2, AlertTriangle, XCircle, MinusCircle, ChevronDown, ChevronUp } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { cn } from '@sm/lib/utils';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@sm/components/ui/collapsible';
 import { InspectionPhotoUpload } from '../shared/InspectionPhotoUpload';
 
 type ItemStatus = 'good' | 'attention' | 'bad' | 'na' | null;

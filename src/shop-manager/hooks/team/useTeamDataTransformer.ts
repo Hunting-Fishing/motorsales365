@@ -1,7 +1,7 @@
 
-import { TeamMember } from "@/types/team";
-import { Customer } from "@/types/customer";
-import { Vehicle } from "@/types/vehicle";
+import { TeamMember } from "@sm/types/team";
+import { Customer } from "@sm/types/customer";
+import { Vehicle } from "@sm/types/vehicle";
 
 export function useTeamDataTransformer() {
   const transformData = (profiles: any[], userRoles: any[], workOrderData: any[]) => {

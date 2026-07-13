@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Loader2, ChefHat, ShoppingCart, Sparkles, Clock, UtensilsCrossed, BookOpen } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useMealPlans, useGenerateMealPlan, useWorkoutDayTypes } from '@/hooks/useNutrition';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { useMealPlans, useGenerateMealPlan, useWorkoutDayTypes } from '@sm/hooks/useNutrition';
 import RecipeSearch from './RecipeSearch';
 
 interface Props {

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Copy, ExternalLink, BookOpen, Code, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 

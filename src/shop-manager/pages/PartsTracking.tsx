@@ -1,15 +1,15 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { PartsAnalyticsDashboard } from '@/components/parts-tracking/PartsAnalyticsDashboard';
-import { PartsInventoryOverview } from '@/components/parts-tracking/PartsInventoryOverview';
-import { PartsRevenueAnalysis } from '@/components/parts-tracking/PartsRevenueAnalysis';
-import { PartsTechnicianEfficiency } from '@/components/parts-tracking/PartsTechnicianEfficiency';
-import { PartsWarrantyTracking } from '@/components/parts-tracking/PartsWarrantyTracking';
-import { PartsSupplierAnalysis } from '@/components/parts-tracking/PartsSupplierAnalysis';
-import { PartsSearchAndFilter } from '@/components/parts-tracking/PartsSearchAndFilter';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Badge } from '@sm/components/ui/badge';
+import { PartsAnalyticsDashboard } from '@sm/components/parts-tracking/PartsAnalyticsDashboard';
+import { PartsInventoryOverview } from '@sm/components/parts-tracking/PartsInventoryOverview';
+import { PartsRevenueAnalysis } from '@sm/components/parts-tracking/PartsRevenueAnalysis';
+import { PartsTechnicianEfficiency } from '@sm/components/parts-tracking/PartsTechnicianEfficiency';
+import { PartsWarrantyTracking } from '@sm/components/parts-tracking/PartsWarrantyTracking';
+import { PartsSupplierAnalysis } from '@sm/components/parts-tracking/PartsSupplierAnalysis';
+import { PartsSearchAndFilter } from '@sm/components/parts-tracking/PartsSearchAndFilter';
 import { Package, TrendingUp, Users, Shield, Building, Search } from 'lucide-react';
 
 export default function PartsTracking() {

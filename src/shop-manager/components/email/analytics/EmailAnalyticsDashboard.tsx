@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
   Legend, ResponsiveContainer, LineChart, Line
@@ -8,8 +8,8 @@ import {
 import { 
   Briefcase, Calendar, Mail, Timer, Users 
 } from "lucide-react";
-import { supabase } from '@/lib/supabase';
-import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@sm/lib/supabase';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { SegmentPerformanceCard } from './SegmentPerformanceCard';
 import { CampaignsList } from './CampaignsList';
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { useGeolocation } from './useGeolocation';
 
 // Default fallback: Center of continental US

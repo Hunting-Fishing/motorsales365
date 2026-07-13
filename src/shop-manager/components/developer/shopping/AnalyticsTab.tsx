@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { getProductAnalytics } from '@/services/admin/productAdminService';
-import { fetchProductSubmissions } from '@/services/products/productService';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getProductAnalytics } from '@sm/services/admin/productAdminService';
+import { fetchProductSubmissions } from '@sm/services/products/productService';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Package, Star, Trophy, Clock } from 'lucide-react';
 

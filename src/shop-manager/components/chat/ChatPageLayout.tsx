@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { ChatSidebar } from './ChatSidebar';
 import { ChatWindow } from './ChatWindow';
-import { ChatRoom, ChatMessage } from '@/types/chat';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { ChatRoom, ChatMessage } from '@sm/types/chat';
+import { useIsMobile } from '@sm/hooks/use-mobile';
 
 interface ChatPageLayoutProps {
   chatRooms: ChatRoom[];

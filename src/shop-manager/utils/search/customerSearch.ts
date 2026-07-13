@@ -1,5 +1,5 @@
 
-import { Customer } from "@/types/customer";
+import { Customer } from "@sm/types/customer";
 
 interface DateRange {
   from?: Date;

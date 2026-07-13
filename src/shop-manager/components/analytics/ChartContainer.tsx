@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { ReactNode } from "react";
 
 interface ChartContainerProps {

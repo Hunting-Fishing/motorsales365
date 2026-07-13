@@ -1,4 +1,4 @@
-import RolePermissionsSettings from '@/pages/settings/RolePermissionsSettings';
+import RolePermissionsSettings from '@sm/pages/settings/RolePermissionsSettings';
 
 /**
  * Wrapper component for Role Permissions Settings to be used in Settings tabs

@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { TeamTab } from "@/components/settings/TeamTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { TeamTab } from "@sm/components/settings/TeamTab";
 
 export const TeamSettings = () => {
   return (

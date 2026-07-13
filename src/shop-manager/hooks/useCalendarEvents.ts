@@ -1,12 +1,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { CalendarEvent } from '@/types/calendar';
-import { getCalendarEvents, getWorkOrderEvents, getOverdueWorkOrders } from '@/services/calendar/calendarEventService';
-import { getShiftChats } from '@/services/calendar/shiftChatService';
-import { getMaintenanceRequestEvents } from '@/services/calendar/maintenanceRequestService';
-import { ChatRoom } from '@/types/chat';
+import { CalendarEvent } from '@sm/types/calendar';
+import { getCalendarEvents, getWorkOrderEvents, getOverdueWorkOrders } from '@sm/services/calendar/calendarEventService';
+import { getShiftChats } from '@sm/services/calendar/shiftChatService';
+import { getMaintenanceRequestEvents } from '@sm/services/calendar/maintenanceRequestService';
+import { ChatRoom } from '@sm/types/chat';
 import { format, startOfMonth, endOfMonth, addMonths, startOfWeek, endOfWeek } from 'date-fns';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 export function useCalendarEvents(currentDate: Date, view: 'month' | 'week' | 'day') {
   const [events, setEvents] = useState<CalendarEvent[]>([]);

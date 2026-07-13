@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Award, ChevronRight, AlertCircle, Clock } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
 import { useNavigate } from 'react-router-dom';
 
 interface CertificateAlert {

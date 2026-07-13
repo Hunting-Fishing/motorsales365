@@ -1,27 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { AuthService } from '@/lib/services/AuthService';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { getPostLoginDestination } from '@/lib/auth/getPostLoginDestination';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { AuthService } from '@sm/lib/services/AuthService';
+import { useToast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { getPostLoginDestination } from '@sm/lib/auth/getPostLoginDestination';
 import { Mail, Lock, LogIn, ArrowRight, Info, Phone, HelpCircle, LogOut, Sparkles } from 'lucide-react';
-import ab365Logo from '@/assets/ab365-logo.png';
+import ab365Logo from '@sm/assets/ab365-logo.png';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { PublicLayout } from '@/components/layout/PublicLayout';
+} from '@sm/components/ui/dialog';
+import { PublicLayout } from '@sm/components/layout/PublicLayout';
 
 // Mobile background
-import mobileBgLogin from '@/assets/mobile-bg-login.jpg';
+import mobileBgLogin from '@sm/assets/mobile-bg-login.jpg';
 
 export default function Login() {
   const navigate = useNavigate();

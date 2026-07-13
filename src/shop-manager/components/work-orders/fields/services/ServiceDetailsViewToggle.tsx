@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { LayoutList, LayoutGrid } from 'lucide-react';
 
 interface ServiceDetailsViewToggleProps {

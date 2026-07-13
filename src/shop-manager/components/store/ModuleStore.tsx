@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { SubmitProductForm } from '@/components/affiliate/SubmitProductForm';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Card, CardContent, CardFooter } from '@sm/components/ui/card';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { SubmitProductForm } from '@sm/components/affiliate/SubmitProductForm';
 import { 
   Search, 
   Star, 
@@ -19,12 +19,12 @@ import {
   LucideIcon,
   ShoppingBag
 } from 'lucide-react';
-import { formatCurrency, cn } from '@/lib/utils';
-import { FadeIn, SlideIn } from '@/components/layout/AnimatedPage';
-import { AnimatedGrid } from '@/components/ui/animated-list';
+import { formatCurrency, cn } from '@sm/lib/utils';
+import { FadeIn, SlideIn } from '@sm/components/layout/AnimatedPage';
+import { AnimatedGrid } from '@sm/components/ui/animated-list';
 import { motion } from 'framer-motion';
-import { useWishlist } from '@/hooks/shopping/useWishlist';
-import { useAffiliateTracking } from '@/hooks/useAffiliateTracking';
+import { useWishlist } from '@sm/hooks/shopping/useWishlist';
+import { useAffiliateTracking } from '@sm/hooks/useAffiliateTracking';
 interface Product {
   id: string;
   title: string;

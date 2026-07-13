@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Car, Plus, Settings, Wrench, Ship, Truck } from 'lucide-react';
-import { FleetList } from '@/components/fleet/FleetList';
-import { AddEquipmentDialog } from '@/components/equipment/AddEquipmentDialog';
-import { useEquipmentByAssetClass } from '@/hooks/useEquipmentByAssetClass';
+import { FleetList } from '@sm/components/fleet/FleetList';
+import { AddEquipmentDialog } from '@sm/components/equipment/AddEquipmentDialog';
+import { useEquipmentByAssetClass } from '@sm/hooks/useEquipmentByAssetClass';
 
 export default function FleetManagement() {
   // Filter to only show fleet assets (vehicles, vessels, heavy equipment)

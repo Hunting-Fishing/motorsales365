@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useToast } from '@sm/components/ui/use-toast';
 import { FileText, Download, CheckCircle, XCircle, Clock, Search, Wand2 } from 'lucide-react';
 import { format } from 'date-fns';
 

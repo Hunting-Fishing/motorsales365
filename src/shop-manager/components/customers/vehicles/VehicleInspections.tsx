@@ -1,16 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { FileText, Camera, AlertTriangle, CheckCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Label } from "@sm/components/ui/label";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Badge } from "@sm/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@sm/components/ui/dialog";
+import { useToast } from "@sm/hooks/use-toast";
 import VehicleInteractivePanel from './VehicleInteractivePanel';
-import { VehicleBodyStyle } from '@/types/vehicleBodyStyles';
+import { VehicleBodyStyle } from '@sm/types/vehicleBodyStyles';
 
 interface DamageArea {
   id: string;

@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { AutoReorderSettings } from "@/types/inventory";
+import { supabase } from "@sm/lib/supabase";
+import { AutoReorderSettings } from "@sm/types/inventory";
 
 // Get auto-reorder settings for all items
 export async function getAutoReorderSettings(): Promise<Record<string, AutoReorderSettings>> {

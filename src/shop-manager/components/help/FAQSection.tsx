@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
-import { useFAQ, useFAQCategories, useTrackFAQView, useSubmitFAQFeedback } from '@/hooks/useFAQ';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useFAQ, useFAQCategories, useTrackFAQView, useSubmitFAQFeedback } from '@sm/hooks/useFAQ';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { toast } from 'sonner';
 
 export const FAQSection: React.FC = () => {

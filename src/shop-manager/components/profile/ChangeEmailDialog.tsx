@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -8,10 +8,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
 import { Loader2, Mail } from 'lucide-react';
 
 interface ChangeEmailDialogProps {

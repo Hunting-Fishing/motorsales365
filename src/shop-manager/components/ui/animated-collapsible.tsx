@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@sm/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { ChevronDown } from "lucide-react";

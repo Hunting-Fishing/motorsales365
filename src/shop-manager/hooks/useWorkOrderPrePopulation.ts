@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { Customer } from '@/types/customer';
-import { supabase } from '@/integrations/supabase/client';
+import { Customer } from '@sm/types/customer';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface PrePopulatedData {
   customerId?: string;

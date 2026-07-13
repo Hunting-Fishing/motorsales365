@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { format, addMonths, startOfYear, endOfYear, eachMonthOfInterval, differenceInDays, isSameMonth, isWithinInterval, parseISO } from 'date-fns';
-import { useProjectsTimeline } from '@/hooks/useProjectResources';
-import { Button } from '@/components/ui/button';
+import { useProjectsTimeline } from '@sm/hooks/useProjectResources';
+import { Button } from '@sm/components/ui/button';
 import { ChevronLeft, ChevronRight, Plus, Milestone, FolderOpen, Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
-import type { ProjectBudget, ProjectPhase } from '@/types/projectBudget';
+import { cn } from '@sm/lib/utils';
+import { ScrollArea, ScrollBar } from '@sm/components/ui/scroll-area';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@sm/components/ui/tooltip';
+import { Badge } from '@sm/components/ui/badge';
+import type { ProjectBudget, ProjectPhase } from '@sm/types/projectBudget';
 
 interface MultiYearTimelineProps {
   onProjectSelect?: (projectId: string) => void;

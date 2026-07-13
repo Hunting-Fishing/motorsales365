@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { toolService, Tool, ToolReview } from '@/services/toolService';
+import { toolService, Tool, ToolReview } from '@sm/services/toolService';
 
 export function useTool(toolId: string) {
   const [tool, setTool] = useState<Tool | null>(null);

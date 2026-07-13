@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 import { 
   getFormDraft, 
   saveFormDraft, 
   deleteFormDraftByTemplate,
   FormDraft 
-} from '@/services/formDraftService';
-import { supabase } from '@/integrations/supabase/client';
+} from '@sm/services/formDraftService';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface UseFormDraftOptions {
   templateId: string;

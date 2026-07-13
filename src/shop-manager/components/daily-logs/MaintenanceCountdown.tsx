@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
 import { AlertTriangle, Clock, Droplets, Filter, Wrench, Package } from 'lucide-react';
-import { MaintenanceInterval, useMaintenanceIntervalTracking } from '@/hooks/useMaintenanceIntervalTracking';
-import { cn } from '@/lib/utils';
+import { MaintenanceInterval, useMaintenanceIntervalTracking } from '@sm/hooks/useMaintenanceIntervalTracking';
+import { cn } from '@sm/lib/utils';
 
 interface MaintenanceCountdownProps {
   equipmentId: string;

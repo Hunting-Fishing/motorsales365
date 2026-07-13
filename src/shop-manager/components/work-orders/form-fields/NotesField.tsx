@@ -7,9 +7,9 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
+} from "@sm/components/ui/form";
+import { Textarea } from "@sm/components/ui/textarea";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
 import { FileText, Lightbulb } from "lucide-react";
 
 interface NotesFieldProps {

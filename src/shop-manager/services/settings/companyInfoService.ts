@@ -1,7 +1,7 @@
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@sm/lib/supabase";
 import { CompanyInfo } from "./companyService";
-import { cleanPhoneNumber, formatPhoneNumber } from "@/utils/formatters";
+import { cleanPhoneNumber, formatPhoneNumber } from "@sm/utils/formatters";
 
 async function uploadLogo(shopId: string, file: File) {
   try {

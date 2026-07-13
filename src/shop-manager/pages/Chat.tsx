@@ -1,11 +1,11 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { MessageSquare, Users, Clock, Send } from 'lucide-react';
-import { ChatInterfaceConnected } from '@/components/chat/ChatInterfaceConnected';
-import { useChatStats } from '@/hooks/useChatStats';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { Skeleton } from '@/components/ui/skeleton';
+import { ChatInterfaceConnected } from '@sm/components/chat/ChatInterfaceConnected';
+import { useChatStats } from '@sm/hooks/useChatStats';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 export default function Chat() {
   const { userId } = useAuthUser();

@@ -1,4 +1,4 @@
-import { SecurityAuditDashboard } from '@/components/admin/SecurityAuditDashboard';
+import { SecurityAuditDashboard } from '@sm/components/admin/SecurityAuditDashboard';
 import { Helmet } from 'react-helmet-async';
 
 export default function SecurityAudit() {

@@ -1,6 +1,6 @@
 
 import { AlertTriangle } from "lucide-react";
-import { Equipment } from "@/types/equipment";
+import { Equipment } from "@sm/types/equipment";
 
 interface EquipmentAlertsProps {
   equipmentItem: Equipment;

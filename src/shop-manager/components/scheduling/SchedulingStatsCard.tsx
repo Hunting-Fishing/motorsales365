@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Users, Clock, AlertTriangle, TrendingUp } from 'lucide-react';
-import { useSchedulingStats } from '@/hooks/useSchedulingStats';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useSchedulingStats } from '@sm/hooks/useSchedulingStats';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface SchedulingStatsCardProps {
   date: Date;

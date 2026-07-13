@@ -4,14 +4,14 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { useInspectionTemplate } from '@/hooks/useInspectionTemplates';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ASSET_TYPE_LABELS, ITEM_TYPE_LABELS } from '@/types/inspectionTemplate';
-import { GYRSelectorWithDeficiency, GYRStatus, DeficiencyData } from '@/components/equipment/GYRSelectorWithDeficiency';
+} from '@sm/components/ui/dialog';
+import { Badge } from '@sm/components/ui/badge';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@sm/components/ui/accordion';
+import { useInspectionTemplate } from '@sm/hooks/useInspectionTemplates';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { ASSET_TYPE_LABELS, ITEM_TYPE_LABELS } from '@sm/types/inspectionTemplate';
+import { GYRSelectorWithDeficiency, GYRStatus, DeficiencyData } from '@sm/components/equipment/GYRSelectorWithDeficiency';
 import { 
   Circle, 
   ToggleLeft, 

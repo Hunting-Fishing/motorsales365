@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Plus, Trash2, Package, Search } from 'lucide-react';
-import { QuoteItemFormValues, QUOTE_ITEM_TYPES } from '@/types/quote';
-import { formatCurrency } from '@/utils/formatters';
-import { useInventoryItems } from '@/hooks/inventory/useInventoryItems';
+import { QuoteItemFormValues, QUOTE_ITEM_TYPES } from '@sm/types/quote';
+import { formatCurrency } from '@sm/utils/formatters';
+import { useInventoryItems } from '@sm/hooks/inventory/useInventoryItems';
 
 interface QuotePartsSelectorProps {
   selectedParts: QuoteItemFormValues[];

@@ -1,15 +1,15 @@
 
 import React from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
+import { Button } from "@sm/components/ui/button";
+import { Calendar } from "@sm/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn } from "@sm/lib/utils";
 import { UseFormReturn } from "react-hook-form";
-import { RepairPlanFormValues } from "@/types/repairPlan";
+import { RepairPlanFormValues } from "@sm/types/repairPlan";
 
 interface RepairPlanStatusFieldsProps {
   form: UseFormReturn<RepairPlanFormValues>;

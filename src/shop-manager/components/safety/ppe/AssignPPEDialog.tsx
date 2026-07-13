@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { UserPlus } from 'lucide-react';
-import { usePPEManagement } from '@/hooks/usePPEManagement';
-import { useTeamMembers } from '@/hooks/useTeamMembers';
+import { usePPEManagement } from '@sm/hooks/usePPEManagement';
+import { useTeamMembers } from '@sm/hooks/useTeamMembers';
 
 interface AssignPPEDialogProps {
   trigger?: React.ReactNode;

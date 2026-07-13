@@ -1,22 +1,22 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { 
   AlertCircle, Wrench, Calendar, User, ArrowRight, Eye, Image, Video, 
   Package, DollarSign, Clock, Plus, Loader2, Search, Filter,
   CheckCircle2, AlertTriangle, Settings
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
-import { useShopId } from '@/hooks/useShopId';
-import { CreateMaintenanceRequestDialog } from '@/components/equipment-details/CreateMaintenanceRequestDialog';
-import { ConvertToWorkOrderDialog } from '@/components/equipment-details/ConvertToWorkOrderDialog';
-import { ViewMaintenanceRequestDialog } from '@/components/equipment-details/ViewMaintenanceRequestDialog';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useShopId } from '@sm/hooks/useShopId';
+import { CreateMaintenanceRequestDialog } from '@sm/components/equipment-details/CreateMaintenanceRequestDialog';
+import { ConvertToWorkOrderDialog } from '@sm/components/equipment-details/ConvertToWorkOrderDialog';
+import { ViewMaintenanceRequestDialog } from '@sm/components/equipment-details/ViewMaintenanceRequestDialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@sm/components/ui/dialog';
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-500/10 text-yellow-500',

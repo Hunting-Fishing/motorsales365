@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { TimeEntry } from '@/types/workOrder';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { WorkOrder } from '@sm/types/workOrder';
+import { TimeEntry } from '@sm/types/workOrder';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Clock, Calendar, Timer, TrendingUp } from 'lucide-react';
 
 interface WorkOrderTimeCardProps {

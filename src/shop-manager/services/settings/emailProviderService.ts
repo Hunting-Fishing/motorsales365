@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { EmailProviderSettings } from "@/types/settings";
+import { supabase } from "@sm/lib/supabase";
+import { EmailProviderSettings } from "@sm/types/settings";
 
 export const emailProviderService = {
   async getEmailProviderSettings(shopId: string): Promise<EmailProviderSettings | null> {

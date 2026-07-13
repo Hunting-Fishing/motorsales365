@@ -7,11 +7,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+} from '@sm/components/ui/table';
+import { Card } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Progress } from '@sm/components/ui/progress';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,11 +21,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useProjectDetails } from '@/hooks/useProjectBudgets';
-import { formatCurrency } from '@/lib/utils';
-import type { ProjectCostItem, ProjectPhase } from '@/types/projectBudget';
-import { COST_CATEGORIES } from '@/types/projectBudget';
+} from '@sm/components/ui/alert-dialog';
+import { useProjectDetails } from '@sm/hooks/useProjectBudgets';
+import { formatCurrency } from '@sm/lib/utils';
+import type { ProjectCostItem, ProjectPhase } from '@sm/types/projectBudget';
+import { COST_CATEGORIES } from '@sm/types/projectBudget';
 
 interface CostItemListProps {
   costItems: ProjectCostItem[];

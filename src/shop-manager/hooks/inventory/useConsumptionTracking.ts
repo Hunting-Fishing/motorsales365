@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ConsumptionHistory, ConsumptionRate } from '@/types/inventory/predictive';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
-import { updateInventoryQuantity } from '@/services/inventory/crudService';
+import { ConsumptionHistory, ConsumptionRate } from '@sm/types/inventory/predictive';
+import { supabase } from '@sm/integrations/supabase/client';
+import { toast } from '@sm/hooks/use-toast';
+import { updateInventoryQuantity } from '@sm/services/inventory/crudService';
 
 interface RecordConsumptionParams {
   inventory_item_id: string;

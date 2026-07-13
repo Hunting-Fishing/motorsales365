@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 
 interface WorkOrderFinancialSummaryProps {
   jobLines: WorkOrderJobLine[];

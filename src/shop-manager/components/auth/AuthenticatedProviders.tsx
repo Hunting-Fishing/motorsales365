@@ -1,7 +1,7 @@
 import React from 'react';
-import { ImpersonationProvider } from '@/contexts/ImpersonationContext';
-import { NotificationsProvider } from '@/context/notifications';
-import { CompanyProvider } from '@/contexts/CompanyContext';
+import { ImpersonationProvider } from '@sm/contexts/ImpersonationContext';
+import { NotificationsProvider } from '@sm/context/notifications';
+import { CompanyProvider } from '@sm/contexts/CompanyContext';
 
 interface Props {
   children: React.ReactNode;

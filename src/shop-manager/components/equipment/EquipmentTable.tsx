@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { EquipmentStatusBadge } from "./EquipmentStatusBadge";
 import { WarrantyStatusBadge } from "./WarrantyStatusBadge";
 import { CogIcon, Loader2 } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import type { EquipmentWithMaintenance } from "@/services/equipmentService";
-import type { EquipmentStatus } from "@/types/equipment";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
+import type { EquipmentWithMaintenance } from "@sm/services/equipmentService";
+import type { EquipmentStatus } from "@sm/types/equipment";
 
 interface EquipmentTableProps {
   equipment: EquipmentWithMaintenance[];

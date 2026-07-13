@@ -6,11 +6,11 @@ import {
   SheetTitle,
   SheetDescription,
   SheetTrigger
-} from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
+} from '@sm/components/ui/sheet';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 import { 
   Cloud, 
   CloudOff, 
@@ -27,9 +27,9 @@ import {
   useTechnicianOfflineStorage, 
   type OfflineQueueItem,
   type OfflineDataType 
-} from '@/hooks/useTechnicianOfflineStorage';
-import { usePWA } from '@/hooks/usePWA';
-import { cn } from '@/lib/utils';
+} from '@sm/hooks/useTechnicianOfflineStorage';
+import { usePWA } from '@sm/hooks/usePWA';
+import { cn } from '@sm/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import {
   AlertDialog,
@@ -40,7 +40,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@sm/components/ui/alert-dialog";
 
 interface SyncQueuePanelProps {
   trigger?: React.ReactNode;

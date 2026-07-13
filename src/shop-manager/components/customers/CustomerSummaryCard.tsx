@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { History, ChevronLeft } from "lucide-react";
-import { Customer, CustomerNote } from "@/types/customer";
-import { CustomerInteraction } from "@/types/interaction";
-import { getCustomerNotes } from "@/services/customers";
+import { Customer, CustomerNote } from "@sm/types/customer";
+import { CustomerInteraction } from "@sm/types/interaction";
+import { getCustomerNotes } from "@sm/services/customers";
 
 interface CustomerSummaryCardProps {
   customer: Customer & { name?: string, lastServiceDate?: string, notes?: string };

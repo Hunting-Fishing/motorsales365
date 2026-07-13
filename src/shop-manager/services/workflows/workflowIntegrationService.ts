@@ -80,13 +80,13 @@ export const triggerManualWorkflow = WorkflowIntegrationService.triggerManualWor
 To integrate workflows with existing services, add these calls:
 
 1. In Work Order Service (when creating a work order):
-   import { notifyWorkOrderCreated } from '@/services/workflows/workflowIntegrationService';
+   import { notifyWorkOrderCreated } from '@sm/services/workflows/workflowIntegrationService';
    
    // After creating work order
    await notifyWorkOrderCreated(workOrderData);
 
 2. In Work Order Service (when updating status):
-   import { notifyWorkOrderStatusChanged } from '@/services/workflows/workflowIntegrationService';
+   import { notifyWorkOrderStatusChanged } from '@sm/services/workflows/workflowIntegrationService';
    
    // When updating work order status
    const oldStatus = existingWorkOrder.status;
@@ -94,13 +94,13 @@ To integrate workflows with existing services, add these calls:
    await notifyWorkOrderStatusChanged(updatedWorkOrder, oldStatus);
 
 3. In Customer Service (when creating customer):
-   import { notifyCustomerCreated } from '@/services/workflows/workflowIntegrationService';
+   import { notifyCustomerCreated } from '@sm/services/workflows/workflowIntegrationService';
    
    // After creating customer
    await notifyCustomerCreated(customerData);
 
 4. In Payment Service (when processing payment):
-   import { notifyPaymentReceived } from '@/services/workflows/workflowIntegrationService';
+   import { notifyPaymentReceived } from '@sm/services/workflows/workflowIntegrationService';
    
    // After processing payment
    await notifyPaymentReceived(paymentData);

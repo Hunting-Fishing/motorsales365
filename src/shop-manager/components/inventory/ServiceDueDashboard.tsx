@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Calendar, Wrench, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 

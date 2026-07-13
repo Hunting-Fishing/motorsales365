@@ -1,6 +1,6 @@
 
-import { FormField, FormItem, FormLabel, FormDescription, FormControl } from "@/components/ui/form";
-import { Switch } from "@/components/ui/switch";
+import { FormField, FormItem, FormLabel, FormDescription, FormControl } from "@sm/components/ui/form";
+import { Switch } from "@sm/components/ui/switch";
 import { Control } from "react-hook-form";
 import { TeamMemberFormValues } from "./formValidation";
 

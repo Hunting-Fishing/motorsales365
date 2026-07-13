@@ -1,10 +1,10 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { MessageSquare, Star, ThumbsUp, Users, Loader2 } from 'lucide-react';
-import { FeedbackManager } from '@/components/feedback/FeedbackManager';
+import { FeedbackManager } from '@sm/components/feedback/FeedbackManager';
 import { useQuery } from '@tanstack/react-query';
-import { calculateFeedbackStats } from '@/services/feedback/feedbackManagerService';
+import { calculateFeedbackStats } from '@sm/services/feedback/feedbackManagerService';
 
 export default function Feedback() {
   const { data: stats, isLoading } = useQuery({

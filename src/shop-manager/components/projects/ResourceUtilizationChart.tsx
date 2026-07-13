@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
 import { Users, Wrench, AlertTriangle } from 'lucide-react';
-import { useAllProjectResources } from '@/hooks/useProjectResources';
+import { useAllProjectResources } from '@sm/hooks/useProjectResources';
 import { differenceInDays, isWithinInterval, parseISO, startOfMonth, endOfMonth, format, addMonths } from 'date-fns';
 
 interface ResourceUtilizationData {

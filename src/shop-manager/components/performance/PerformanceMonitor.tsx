@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Progress } from '@sm/components/ui/progress';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { 
   Activity, 
   Zap, 
@@ -20,7 +20,7 @@ import {
   Download
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { getSystemMetrics, getSystemHealth, optimizationSuggestions, type PerformanceMetric, type SystemHealth } from '@/services/performance/performanceService';
+import { getSystemMetrics, getSystemHealth, optimizationSuggestions, type PerformanceMetric, type SystemHealth } from '@sm/services/performance/performanceService';
 
 // Removed mock data - now using live data from service
 

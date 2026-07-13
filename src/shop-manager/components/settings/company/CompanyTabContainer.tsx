@@ -1,15 +1,15 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardHeader, CardContent, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
 import { Building, CircleDollarSign, Clock, Save } from "lucide-react";
 import { BasicInfoSection } from "./BasicInfoSection";
 import { BusinessInfoSection } from "../BusinessInfoSection";
 import { BusinessHoursSection } from "./BusinessHoursSection";
-import { useCompanyInfo } from "@/hooks/useCompanyInfo";
+import { useCompanyInfo } from "@sm/hooks/useCompanyInfo";
 import { CompanyTabSkeleton } from "./CompanyTabSkeleton";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@sm/hooks/use-toast";
 
 export function CompanyTabContainer() {
   const [activeTab, setActiveTab] = useState("basic");

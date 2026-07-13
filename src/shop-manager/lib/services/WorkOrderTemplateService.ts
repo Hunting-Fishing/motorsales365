@@ -1,5 +1,5 @@
 
-import { WorkOrderTemplateRepository, WorkOrderTemplate, CreateWorkOrderTemplateInput, UpdateWorkOrderTemplateInput } from '@/lib/database/repositories/WorkOrderTemplateRepository';
+import { WorkOrderTemplateRepository, WorkOrderTemplate, CreateWorkOrderTemplateInput, UpdateWorkOrderTemplateInput } from '@sm/lib/database/repositories/WorkOrderTemplateRepository';
 
 export class WorkOrderTemplateService {
   private repository: WorkOrderTemplateRepository;

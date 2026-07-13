@@ -1,18 +1,18 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { useSidebar } from '@/hooks/use-sidebar';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useUserRoles } from '@/hooks/useUserRoles';
-import { useAllUserRoles } from '@/hooks/useAllUserRoles';
-import { useModulePermissions } from '@/hooks/useModulePermissions';
-import { hasRoutePermission } from '@/utils/routeGuards';
-import { getSectionColorScheme } from '@/utils/sectionColors';
+import { cn } from '@sm/lib/utils';
+import { useSidebar } from '@sm/hooks/use-sidebar';
+import { useIsMobile } from '@sm/hooks/use-mobile';
+import { useUserRoles } from '@sm/hooks/useUserRoles';
+import { useAllUserRoles } from '@sm/hooks/useAllUserRoles';
+import { useModulePermissions } from '@sm/hooks/useModulePermissions';
+import { hasRoutePermission } from '@sm/utils/routeGuards';
+import { getSectionColorScheme } from '@sm/utils/sectionColors';
 import { SidebarLogo } from './SidebarLogo';
 import { ModuleIndicator } from './ModuleIndicator';
 import { ModuleSections } from './ModuleSections';
 import { navigation, NavigationItem } from './navigation';
-import { useSidebarVisibility } from '@/hooks/useSidebarVisibility';
+import { useSidebarVisibility } from '@sm/hooks/useSidebarVisibility';
 import { LayoutGrid, Code } from 'lucide-react';
 
 export function SidebarContent() {

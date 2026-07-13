@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Plus, Package, Edit, Trash2 } from 'lucide-react';
-import { ServicePackage } from '@/types/inventory/predictive';
-import { getServicePackages, deleteServicePackage } from '@/services/inventory/predictiveService';
+import { ServicePackage } from '@sm/types/inventory/predictive';
+import { getServicePackages, deleteServicePackage } from '@sm/services/inventory/predictiveService';
 import { ServicePackageDialog } from './ServicePackageDialog';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@sm/hooks/use-toast';
 import {
   Table,
   TableBody,
@@ -13,8 +13,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+} from '@sm/components/ui/table';
+import { Badge } from '@sm/components/ui/badge';
 
 export function ServicePackageManager() {
   const [packages, setPackages] = useState<ServicePackage[]>([]);

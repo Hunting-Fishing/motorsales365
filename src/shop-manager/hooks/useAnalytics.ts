@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { AnalyticsData } from '@/types/analytics';
+import { supabase } from '@sm/integrations/supabase/client';
+import { AnalyticsData } from '@sm/types/analytics';
 import { subDays, format } from 'date-fns';
 
 export function useAnalytics(timeRange: string) {

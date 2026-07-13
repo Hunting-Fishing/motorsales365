@@ -7,8 +7,8 @@ import {
   FormControl, 
   FormMessage,
   FormDescription
-} from "@/components/ui/form";
-import { Switch } from "@/components/ui/switch";
+} from "@sm/components/ui/form";
+import { Switch } from "@sm/components/ui/switch";
 import { 
   HelpCircle, 
   ChevronDown, 
@@ -17,10 +17,10 @@ import {
   FileText,
   BadgeDollarSign
 } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@sm/components/ui/tooltip";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@sm/components/ui/collapsible";
 import { CustomerFormValues } from '../schemas/customerSchema';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { paymentMethods } from "./businessConstants";
 
 interface PaymentBillingSectionProps {

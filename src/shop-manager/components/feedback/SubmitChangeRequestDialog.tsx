@@ -8,30 +8,30 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
-import { useFeatureRequests } from '@/hooks/useFeatureRequests';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useFeatureRequests } from '@sm/hooks/useFeatureRequests';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
 import {
   MODULE_OPTIONS,
   CATEGORY_OPTIONS,
   PRIORITY_OPTIONS,
   type ModuleType,
   type FeatureRequest,
-} from '@/types/feature-requests';
+} from '@sm/types/feature-requests';
 
 interface SubmitChangeRequestDialogProps {
   open: boolean;

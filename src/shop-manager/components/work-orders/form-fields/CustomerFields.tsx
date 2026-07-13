@@ -1,18 +1,18 @@
 
 import React, { useState, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
 import { User, Car, Plus } from "lucide-react";
 import { CustomerSelect } from "../customer-select/CustomerSelect";
 import { VehicleSelect } from "../customer-select/VehicleSelect";
 import { QuickAddVehicleDialog } from "../vehicle/QuickAddVehicleDialog";
 import { VehicleInfoDisplay } from "./VehicleInfoDisplay";
-import { Customer, CustomerVehicle } from "@/types/customer";
+import { Customer, CustomerVehicle } from "@sm/types/customer";
 import { useSearchParams } from "react-router-dom";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
 
 interface CustomerFieldsProps {
   form: UseFormReturn<WorkOrderFormSchemaValues>;

@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Badge } from "@sm/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -10,28 +10,28 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@sm/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@sm/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@sm/components/ui/select";
 import { 
   Search, MoreHorizontal, Edit, Trash2, Eye, 
   FileText, Download, Ship, Truck 
 } from "lucide-react";
-import { InsurancePolicy, INSURANCE_TYPES } from "@/types/insurance";
-import { useInsurancePolicies } from "@/hooks/useInsurancePolicies";
+import { InsurancePolicy, INSURANCE_TYPES } from "@sm/types/insurance";
+import { useInsurancePolicies } from "@sm/hooks/useInsurancePolicies";
 import { format, parseISO, differenceInDays } from "date-fns";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@sm/lib/utils";
 
 interface InsurancePolicyListProps {
   policies: InsurancePolicy[];

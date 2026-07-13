@@ -5,12 +5,12 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription
-} from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+} from '@sm/components/ui/sheet';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Label } from '@sm/components/ui/label';
+import { Separator } from '@sm/components/ui/separator';
 import { 
   Play, 
   CheckCircle2, 
@@ -24,8 +24,8 @@ import {
   X,
   Loader2
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { TechnicianTask } from '@/hooks/useTechnicianTasks';
+import { cn } from '@sm/lib/utils';
+import type { TechnicianTask } from '@sm/hooks/useTechnicianTasks';
 import { format } from 'date-fns';
 
 interface TaskDetailsSheetProps {

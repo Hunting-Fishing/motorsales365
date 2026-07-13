@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { ServiceMainCategory, ServiceJob } from '@/types/service';
-import { SelectedService } from '@/types/selectedService';
+import { ServiceMainCategory, ServiceJob } from '@sm/types/service';
+import { SelectedService } from '@sm/types/selectedService';
 import { IntegratedServiceSelector } from './IntegratedServiceSelector';
 
 // Adapter component to convert old categories prop to new sectors prop

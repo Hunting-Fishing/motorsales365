@@ -1,9 +1,9 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { 
   ZoomIn, 
   ZoomOut, 
@@ -20,20 +20,20 @@ import {
   Square,
   AlertTriangle
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import vehicleFrontView from '@/assets/vehicle-front-view.jpg';
-import vehicleBackView from '@/assets/vehicle-back-view.jpg';
-import vehicleTopView from '@/assets/vehicle-top-view.jpg';
-import vehicleSideView from '@/assets/vehicle-side-view.jpg';
-import vehicleSuvFrontView from '@/assets/vehicle-suv-front-view.jpg';
-import vehicleSuvBackView from '@/assets/vehicle-suv-back-view.jpg';
-import vehicleSuvTopView from '@/assets/vehicle-suv-top-view.jpg';
-import vehicleSuvSideView from '@/assets/vehicle-suv-side-view.jpg';
-import vehiclePickupFrontView from '@/assets/vehicle-pickup-front-view.jpg';
-import vehiclePickupBackView from '@/assets/vehicle-pickup-back-view.jpg';
-import vehiclePickupTopView from '@/assets/vehicle-pickup-top-view.jpg';
-import vehiclePickupSideView from '@/assets/vehicle-pickup-side-view.jpg';
-import { getVehicleBodyStyle, getVehicleImages, type VehicleBodyStyle } from '@/utils/vehicle/bodyStyleMapping';
+import { useToast } from '@sm/hooks/use-toast';
+import vehicleFrontView from '@sm/assets/vehicle-front-view.jpg';
+import vehicleBackView from '@sm/assets/vehicle-back-view.jpg';
+import vehicleTopView from '@sm/assets/vehicle-top-view.jpg';
+import vehicleSideView from '@sm/assets/vehicle-side-view.jpg';
+import vehicleSuvFrontView from '@sm/assets/vehicle-suv-front-view.jpg';
+import vehicleSuvBackView from '@sm/assets/vehicle-suv-back-view.jpg';
+import vehicleSuvTopView from '@sm/assets/vehicle-suv-top-view.jpg';
+import vehicleSuvSideView from '@sm/assets/vehicle-suv-side-view.jpg';
+import vehiclePickupFrontView from '@sm/assets/vehicle-pickup-front-view.jpg';
+import vehiclePickupBackView from '@sm/assets/vehicle-pickup-back-view.jpg';
+import vehiclePickupTopView from '@sm/assets/vehicle-pickup-top-view.jpg';
+import vehiclePickupSideView from '@sm/assets/vehicle-pickup-side-view.jpg';
+import { getVehicleBodyStyle, getVehicleImages, type VehicleBodyStyle } from '@sm/utils/vehicle/bodyStyleMapping';
 import { DamageTypeFloatingToolbar } from './DamageTypeSelector';
 import { DamageContextMenu } from './DamageContextMenu';
 import { DamageDetailsPanel } from './DamageDetailsPanel';

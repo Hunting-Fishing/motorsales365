@@ -1,6 +1,6 @@
 
-import { supabase } from '@/lib/supabase';
-import { toast } from '@/hooks/use-toast';
+import { supabase } from '@sm/lib/supabase';
+import { toast } from '@sm/hooks/use-toast';
 
 export const initializeStorage = async () => {
   try {

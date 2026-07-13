@@ -1,11 +1,11 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Button } from '@sm/components/ui/button';
 import { Ship, FileText, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { VesselInspectionForm } from '@/components/safety/vessel/VesselInspectionForm';
-import { VesselInspectionHistory } from '@/components/safety/vessel/VesselInspectionHistory';
+import { VesselInspectionForm } from '@sm/components/safety/vessel/VesselInspectionForm';
+import { VesselInspectionHistory } from '@sm/components/safety/vessel/VesselInspectionHistory';
 
 export default function VesselInspection() {
   const navigate = useNavigate();

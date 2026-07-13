@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
+import { Checkbox } from '@sm/components/ui/checkbox';
 import { Package, Plus, Minus, Star, ShoppingCart } from 'lucide-react';
-import { ProductBundle, BundleItem, BundleCalculation } from '@/types/advanced-product';
-import { formatCurrency } from '@/lib/utils';
+import { ProductBundle, BundleItem, BundleCalculation } from '@sm/types/advanced-product';
+import { formatCurrency } from '@sm/lib/utils';
 
 interface BundleSelectorProps {
   bundles: ProductBundle[];

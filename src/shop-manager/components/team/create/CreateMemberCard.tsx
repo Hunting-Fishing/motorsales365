@@ -1,8 +1,8 @@
 
 import { useNavigate } from "react-router-dom";
 import { PlusCircle } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
 
 export function CreateMemberCard() {
   const navigate = useNavigate();

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
+import { useToast } from '@sm/hooks/use-toast';
 import { 
   DollarSign, 
   User,
@@ -14,7 +14,7 @@ import {
   Save,
   X
 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 export function EmployeeRatesPanel() {
   const { shopId } = useShopId();

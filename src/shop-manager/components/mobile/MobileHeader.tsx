@@ -16,17 +16,17 @@ import {
   MessageSquarePlus,
   LucideIcon
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useNotifications } from '@/hooks/useNotifications';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { useUserRoles } from '@/hooks/useUserRoles';
-import { hasRoutePermission } from '@/utils/routeGuards';
-import { supabase } from '@/integrations/supabase/client';
-import { cn } from '@/lib/utils';
-import { useActiveModuleNavigation, getModuleGroupedSections } from '@/hooks/useActiveModuleNavigation';
-import { SubmitChangeRequestDialog } from '@/components/feedback/SubmitChangeRequestDialog';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Sheet, SheetContent, SheetTrigger } from '@sm/components/ui/sheet';
+import { useNotifications } from '@sm/hooks/useNotifications';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { useUserRoles } from '@sm/hooks/useUserRoles';
+import { hasRoutePermission } from '@sm/utils/routeGuards';
+import { supabase } from '@sm/integrations/supabase/client';
+import { cn } from '@sm/lib/utils';
+import { useActiveModuleNavigation, getModuleGroupedSections } from '@sm/hooks/useActiveModuleNavigation';
+import { SubmitChangeRequestDialog } from '@sm/components/feedback/SubmitChangeRequestDialog';
 
 interface MobileHeaderProps {
   title?: string;

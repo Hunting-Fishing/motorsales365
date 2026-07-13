@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@sm/components/ui/card";
 import { Disc2 } from "lucide-react";
 import { RotorCondition } from './RotorCondition';
 

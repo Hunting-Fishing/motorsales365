@@ -6,9 +6,9 @@ import {
   createVendor,
   updateVendor,
   deleteVendor 
-} from "@/services/inventory/vendorService";
-import { InventoryVendor, CreateInventoryVendorDto } from "@/types/inventory/vendors";
-import { toast } from "@/hooks/use-toast";
+} from "@sm/services/inventory/vendorService";
+import { InventoryVendor, CreateInventoryVendorDto } from "@sm/types/inventory/vendors";
+import { toast } from "@sm/hooks/use-toast";
 
 export function useInventoryVendors() {
   const [loading, setLoading] = useState(false);

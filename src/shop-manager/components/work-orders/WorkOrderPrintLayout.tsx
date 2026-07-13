@@ -1,10 +1,10 @@
 import React from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { Customer } from '@/types/customer';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { TimeEntry } from '@/types/workOrder';
-import { useWorkOrderTaxCalculations } from '@/hooks/useWorkOrderTaxCalculations';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Customer } from '@sm/types/customer';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { TimeEntry } from '@sm/types/workOrder';
+import { useWorkOrderTaxCalculations } from '@sm/hooks/useWorkOrderTaxCalculations';
 
 interface WorkOrderPrintLayoutProps {
   workOrder: WorkOrder;

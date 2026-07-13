@@ -1,5 +1,5 @@
 
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardContent, CardTitle } from "@sm/components/ui/card";
 import { ColorSelector } from "../ColorSelector";
 import { ColorPreview } from "./ColorPreview";
 

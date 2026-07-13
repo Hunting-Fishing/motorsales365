@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { ChevronLeft, ChevronRight, Package } from 'lucide-react';
-import { AffiliateProduct } from '@/types/affiliate';
-import { useProductsManager } from '@/hooks/affiliate/useProductsManager';
-import { formatCurrency } from '@/lib/utils';
-import { ProductRating } from '@/components/affiliate/ProductRating';
+import { AffiliateProduct } from '@sm/types/affiliate';
+import { useProductsManager } from '@sm/hooks/affiliate/useProductsManager';
+import { formatCurrency } from '@sm/lib/utils';
+import { ProductRating } from '@sm/components/affiliate/ProductRating';
 import { useNavigate } from 'react-router-dom';
 
 interface RelatedProductsProps {

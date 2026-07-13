@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Building2, MapPin, Loader2, Check } from 'lucide-react';
-import { useBusinessLocation } from '@/hooks/fuel-delivery/useBusinessLocation';
+import { useBusinessLocation } from '@sm/hooks/fuel-delivery/useBusinessLocation';
 import { LocationPickerMap } from './LocationPickerMap';
 
 interface BusinessLocationCardProps {

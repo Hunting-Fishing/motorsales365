@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { useShopId } from './useShopId';
 import { useToast } from './use-toast';
-import type { ScheduleForecast } from '@/types/phase5';
+import type { ScheduleForecast } from '@sm/types/phase5';
 
 export function useScheduleForecasts(forecastType?: string) {
   const { shopId } = useShopId();

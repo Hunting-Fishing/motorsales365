@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import { ChatRoom, ChatMessage, ChatParticipant } from '@/types/chat';
+import { supabase } from '@sm/integrations/supabase/client';
+import { ChatRoom, ChatMessage, ChatParticipant } from '@sm/types/chat';
 
 export async function getChatRooms(currentUserId?: string): Promise<ChatRoom[]> {
   const { data, error } = await supabase

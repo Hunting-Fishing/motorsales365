@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCorners, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { usePlannerColumns, usePlannerItems, useStaffForPlanner, usePlannerMutations, useWorkOrdersForPlanner } from '@/hooks/usePlannerData';
+import { usePlannerColumns, usePlannerItems, useStaffForPlanner, usePlannerMutations, useWorkOrdersForPlanner } from '@sm/hooks/usePlannerData';
 import { KanbanColumn } from './KanbanColumn';
 import { KanbanCard } from './KanbanCard';
 import { KanbanFilters } from './KanbanFilters';
-import { PlannerBoardItem, SwimlaneResourceType } from '@/types/planner';
+import { PlannerBoardItem, SwimlaneResourceType } from '@sm/types/planner';
 import { Loader2, Users, Ship, Wrench } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Button } from '@sm/components/ui/button';
+import { cn } from '@sm/lib/utils';
 
 export function PlannerKanbanBoard() {
   const [swimlaneMode, setSwimlaneMode] = useState<SwimlaneResourceType | 'none'>('none');

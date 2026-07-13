@@ -1,16 +1,16 @@
 
 import { useState, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from "@/components/ui/select";
+} from "@sm/components/ui/select";
 import { ReminderFormValues } from "../schemas/reminderFormSchema";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 
 interface TeamMember {
   id: string;

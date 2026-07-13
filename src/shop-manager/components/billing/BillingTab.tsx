@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { 
   CreditCard, 
   RefreshCw, 
@@ -13,9 +13,9 @@ import {
   Loader2,
   Calendar
 } from 'lucide-react';
-import { useSubscription } from '@/hooks/useSubscription';
+import { useSubscription } from '@sm/hooks/useSubscription';
 import { SubscriptionPlans } from './SubscriptionPlans';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 import { useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 

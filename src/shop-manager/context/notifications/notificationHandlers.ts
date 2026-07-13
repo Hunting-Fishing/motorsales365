@@ -1,8 +1,8 @@
 
-import { Notification, NotificationPreferences } from '@/types/notification';
+import { Notification, NotificationPreferences } from '@sm/types/notification';
 import { v4 as uuidv4 } from 'uuid';
-import { toast } from '@/hooks/use-toast';
-import { playNotificationSound } from '@/utils/notificationSounds';
+import { toast } from '@sm/hooks/use-toast';
+import { playNotificationSound } from '@sm/utils/notificationSounds';
 
 export const createAddNotificationHandler = (
   setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>,

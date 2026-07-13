@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Check, Wifi, WifiOff, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 
 interface NotificationsDropdownHeaderProps {
   unreadCount: number;

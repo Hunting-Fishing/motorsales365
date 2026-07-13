@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { ShieldX, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

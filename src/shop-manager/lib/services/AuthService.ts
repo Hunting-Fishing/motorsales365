@@ -1,6 +1,6 @@
-import { supabase } from '@/integrations/supabase/client';
-import { cleanupAuthState } from '@/utils/authCleanup';
-import { AuthSecurityService } from '@/services/security/authSecurity';
+import { supabase } from '@sm/integrations/supabase/client';
+import { cleanupAuthState } from '@sm/utils/authCleanup';
+import { AuthSecurityService } from '@sm/services/security/authSecurity';
 
 export interface SignUpData {
   firstName: string;

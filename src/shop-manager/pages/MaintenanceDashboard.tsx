@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetchEquipment, getOverdueMaintenanceEquipment } from "@/services/equipmentService";
-import type { EquipmentWithMaintenance } from "@/services/equipmentService";
-import { getUpcomingMaintenanceSchedules } from "@/utils/maintenanceScheduler";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { fetchEquipment, getOverdueMaintenanceEquipment } from "@sm/services/equipmentService";
+import type { EquipmentWithMaintenance } from "@sm/services/equipmentService";
+import { getUpcomingMaintenanceSchedules } from "@sm/utils/maintenanceScheduler";
 import { 
   MaintenanceHeader, 
   MaintenanceAlerts, 
@@ -11,7 +11,7 @@ import {
   UpcomingMaintenanceTable,
   MaintenanceHistoryTable,
   MaintenanceScheduler 
-} from "@/components/maintenance";
+} from "@sm/components/maintenance";
 
 export default function MaintenanceDashboard() {
   const [timeframe, setTimeframe] = useState<"upcoming" | "all">("upcoming");

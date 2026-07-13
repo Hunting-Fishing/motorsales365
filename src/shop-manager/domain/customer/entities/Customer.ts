@@ -1,5 +1,5 @@
 
-import { CustomerVehicle } from '@/types/customer';
+import { CustomerVehicle } from '@sm/types/customer';
 
 export interface CustomerEntity {
   id: string;

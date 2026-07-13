@@ -1,6 +1,6 @@
 import React from 'react';
 import { IMaskInput } from 'react-imask';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface MaskedInputProps {
   mask: string;

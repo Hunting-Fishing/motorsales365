@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useJobSafetyAnalyses, JobSafetyAnalysis } from '@/hooks/useJobSafetyAnalysis';
-import { JSACard } from '@/components/safety/jsa/JSACard';
-import { CreateJSADialog } from '@/components/safety/jsa/CreateJSADialog';
-import { JSADetailsSheet } from '@/components/safety/jsa/JSADetailsSheet';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useJobSafetyAnalyses, JobSafetyAnalysis } from '@sm/hooks/useJobSafetyAnalysis';
+import { JSACard } from '@sm/components/safety/jsa/JSACard';
+import { CreateJSADialog } from '@sm/components/safety/jsa/CreateJSADialog';
+import { JSADetailsSheet } from '@sm/components/safety/jsa/JSADetailsSheet';
 import { Plus, Search, FileText, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 
 export default function SafetyJSA() {
   const { jsaList, isLoading } = useJobSafetyAnalyses();

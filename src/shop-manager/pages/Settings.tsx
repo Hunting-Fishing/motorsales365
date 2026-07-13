@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { usePageTitle } from '@/hooks/usePageTitle';
-import { SettingsLayout } from '@/components/settings/SettingsLayout';
+import { usePageTitle } from '@sm/hooks/usePageTitle';
+import { SettingsLayout } from '@sm/components/settings/SettingsLayout';
 import { lazy, Suspense } from 'react';
 
 // Lazy load settings pages - Account & Profile
@@ -16,7 +16,7 @@ const TeamSettings = lazy(() => import('./settings/TeamSettings'));
 const BrandingSettings = lazy(() => import('./settings/BrandingSettings'));
 const NotificationSettings = lazy(() => import('./settings/NotificationSettings'));
 const SecuritySettings = lazy(() => import('./settings/SecuritySettings'));
-const NavigationSettings = lazy(() => import('@/components/settings/NavigationSettingsTab').then(m => ({ default: m.NavigationSettingsTab })));
+const NavigationSettings = lazy(() => import('@sm/components/settings/NavigationSettingsTab').then(m => ({ default: m.NavigationSettingsTab })));
 const BusinessModulesSettings = lazy(() => import('./settings/BusinessModulesSettings'));
 
 // Lazy load settings pages - Operations

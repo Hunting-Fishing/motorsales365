@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { WorkOrderPart, WorkOrderPartFormValues, partStatusMap } from '@/types/workOrderPart';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { WorkOrderPart, WorkOrderPartFormValues, partStatusMap } from '@sm/types/workOrderPart';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Edit, Trash2, Package, Plus, GripVertical } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { EditPartDialog } from './EditPartDialog';
 import { AddPartDialog } from './AddPartDialog';
 import { StatusBadge } from '../shared/StatusBadge';
@@ -17,7 +17,7 @@ import {
   AlertDialogFooter, 
   AlertDialogHeader, 
   AlertDialogTitle 
-} from '@/components/ui/alert-dialog';
+} from '@sm/components/ui/alert-dialog';
 import {
   DndContext,
   closestCenter,

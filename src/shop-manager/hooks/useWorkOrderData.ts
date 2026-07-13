@@ -1,15 +1,15 @@
 
 import { useState, useEffect } from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { TimeEntry } from '@/types/workOrder';
-import { Customer } from '@/types/customer';
-import { getWorkOrderById } from '@/services/workOrder';
-import { getCustomerById } from '@/services/customer';
-import { getWorkOrderJobLines } from '@/services/workOrder/jobLinesService';
-import { getWorkOrderParts } from '@/services/workOrder/workOrderPartsService';
-import { getWorkOrderTimeEntries } from '@/services/workOrder/workOrderQueryService';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { TimeEntry } from '@sm/types/workOrder';
+import { Customer } from '@sm/types/customer';
+import { getWorkOrderById } from '@sm/services/workOrder';
+import { getCustomerById } from '@sm/services/customer';
+import { getWorkOrderJobLines } from '@sm/services/workOrder/jobLinesService';
+import { getWorkOrderParts } from '@sm/services/workOrder/workOrderPartsService';
+import { getWorkOrderTimeEntries } from '@sm/services/workOrder/workOrderQueryService';
 
 export function useWorkOrderData(workOrderId: string) {
   const [workOrder, setWorkOrder] = useState<WorkOrder | null>(null);

@@ -1,6 +1,6 @@
-import { TeamMember } from "@/types/team";
+import { TeamMember } from "@sm/types/team";
 import { TeamMemberCard } from "./TeamMemberCard";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 

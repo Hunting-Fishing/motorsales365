@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { ErrorHandler } from '@/utils/errorHandler';
-import { OnboardingError, ErrorType, ErrorSeverity } from '@/utils/errorTypes';
+import { supabase } from '@sm/lib/supabase';
+import { ErrorHandler } from '@sm/utils/errorHandler';
+import { OnboardingError, ErrorType, ErrorSeverity } from '@sm/utils/errorTypes';
 
 const DRAFT_STORAGE_KEY = 'onboarding_draft';
 

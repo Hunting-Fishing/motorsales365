@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Search, Filter, Clock, FileText, User, Package, Calendar } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@sm/integrations/supabase/client';
+import { toast } from '@sm/hooks/use-toast';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface SearchResult {
   id: string;

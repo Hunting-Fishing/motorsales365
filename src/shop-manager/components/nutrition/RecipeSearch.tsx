@@ -1,14 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Loader2, Search, BookOpen } from 'lucide-react';
-import { useDebounce } from '@/hooks/useDebounce';
-import { useRecipeSearch, useRecipeDetails } from '@/hooks/useNutrition';
+import { useDebounce } from '@sm/hooks/useDebounce';
+import { useRecipeSearch, useRecipeDetails } from '@sm/hooks/useNutrition';
 import RecipeCard, { type RecipeResult } from './RecipeCard';
 import RecipeDetailDialog, { type RecipeDetail } from './RecipeDetailDialog';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 
 const DIETS = [
   { value: '', label: 'Any Diet' },

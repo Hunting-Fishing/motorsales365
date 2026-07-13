@@ -1,10 +1,10 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { FormField, FormItem, FormLabel, FormControl } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Textarea } from "@sm/components/ui/textarea";
 import { ClipboardList } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 

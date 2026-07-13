@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/empty-state";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { EmptyState } from "@sm/components/ui/empty-state";
 import { Calendar, Clock, Users, Wrench } from "lucide-react";
-import { getTodaySchedule, TodayScheduleItem } from "@/services/dashboard/calendarService";
+import { getTodaySchedule, TodayScheduleItem } from "@sm/services/dashboard/calendarService";
 import { format } from "date-fns";
 
 export function TodaySchedule() {

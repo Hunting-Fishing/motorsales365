@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Switch } from '@sm/components/ui/switch';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@sm/components/ui/accordion';
+import { Badge } from '@sm/components/ui/badge';
 import { Ship, Anchor, Flame, Settings, Clock, Save, Loader2, User, PenTool, History } from 'lucide-react';
 import { VesselSelector } from './VesselSelector';
 import { VesselEquipmentTree } from './VesselEquipmentTree';
 import { VesselInspectionItem } from './VesselInspectionItem';
 import { EquipmentServiceIntervals } from './EquipmentServiceIntervals';
-import { CompactSignaturePad } from '@/components/signature/CompactSignaturePad';
-import { useVesselInspection, InspectionItemStatus, VesselEquipment } from '@/hooks/useVesselInspection';
-import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { CompactSignaturePad } from '@sm/components/signature/CompactSignaturePad';
+import { useVesselInspection, InspectionItemStatus, VesselEquipment } from '@sm/hooks/useVesselInspection';
+import { toast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
 
 const EQUIPMENT_ICONS: Record<string, React.ReactNode> = {
   vessel: <Ship className="h-5 w-5" />,

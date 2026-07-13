@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
 import { DollarSign, TrendingUp, FileText, Building, Calendar, AlertTriangle, Loader2 } from "lucide-react";
-import { useFinancialDashboard } from "@/hooks/useFinancialDashboard";
+import { useFinancialDashboard } from "@sm/hooks/useFinancialDashboard";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
 

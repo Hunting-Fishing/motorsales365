@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { MonthlyRevenueData } from "@/types/dashboard";
+import { supabase } from "@sm/lib/supabase";
+import { MonthlyRevenueData } from "@sm/types/dashboard";
 import { subDays, format } from "date-fns";
 
 export const getRevenueData = async (): Promise<MonthlyRevenueData[]> => {

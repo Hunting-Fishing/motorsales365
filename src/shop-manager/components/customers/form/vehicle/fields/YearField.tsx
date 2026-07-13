@@ -1,9 +1,9 @@
 
 import React from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { HelpCircle } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@sm/components/ui/tooltip";
 import { BaseFieldProps } from "./BaseFieldTypes";
 
 export const YearField: React.FC<BaseFieldProps & { 

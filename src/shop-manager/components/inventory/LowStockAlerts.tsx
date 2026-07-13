@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { AlertTriangle, Package, Bell } from 'lucide-react';
-import { useLowStockAlerts } from '@/hooks/inventory/useLowStockAlerts';
+import { useLowStockAlerts } from '@sm/hooks/inventory/useLowStockAlerts';
 import { useNavigate } from 'react-router-dom';
 
 export function LowStockAlerts() {

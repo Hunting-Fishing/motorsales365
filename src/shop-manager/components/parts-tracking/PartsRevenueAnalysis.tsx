@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getPartsRevenueBreakdown, PartsRevenueBreakdown } from '@/services/parts/partsAnalyticsService';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { getPartsRevenueBreakdown, PartsRevenueBreakdown } from '@sm/services/parts/partsAnalyticsService';
 
 export function PartsRevenueAnalysis() {
   const [breakdown, setBreakdown] = useState<PartsRevenueBreakdown | null>(null);

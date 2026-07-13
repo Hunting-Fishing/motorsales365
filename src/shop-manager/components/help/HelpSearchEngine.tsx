@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Search, Clock, BookOpen, MessageSquare, Video, FileText } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface SearchResult {
   id: string;

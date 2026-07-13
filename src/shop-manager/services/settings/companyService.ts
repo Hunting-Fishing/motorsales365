@@ -1,8 +1,8 @@
 
 import { companyInfoService } from "./companyInfoService";
 import { businessHoursService } from "./businessHoursService";
-import { businessConstantsService } from '@/services/unified/businessConstantsService';
-import { unifiedSettingsService } from '@/services/unified/unifiedSettingsService';
+import { businessConstantsService } from '@sm/services/unified/businessConstantsService';
+import { unifiedSettingsService } from '@sm/services/unified/unifiedSettingsService';
 
 export interface CompanyInfo {
   name: string;

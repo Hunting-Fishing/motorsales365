@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, User, Clock, CheckCircle, AlertCircle, Filter, FileText, MapPin } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/hooks/use-toast';
-import { nonprofitApi } from '@/lib/services/nonprofitApi';
-import { Volunteer, CreateVolunteerData } from '@/types/nonprofit';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { useToast } from '@sm/hooks/use-toast';
+import { nonprofitApi } from '@sm/lib/services/nonprofitApi';
+import { Volunteer, CreateVolunteerData } from '@sm/types/nonprofit';
 
 export const VolunteerManagementTab = () => {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);

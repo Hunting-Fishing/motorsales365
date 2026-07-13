@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Clock, Flame, Beef } from 'lucide-react';
 
 export interface RecipeResult {

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 
 export function MaintenanceCostTrends() {

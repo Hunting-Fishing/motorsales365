@@ -1,4 +1,4 @@
-import { ModuleStore, StoreCategory } from '@/components/store/ModuleStore';
+import { ModuleStore, StoreCategory } from '@sm/components/store/ModuleStore';
 import { Fuel, Package, Wrench, Gauge, Truck, Shield } from 'lucide-react';
 
 const FUEL_DELIVERY_CATEGORIES: StoreCategory[] = [

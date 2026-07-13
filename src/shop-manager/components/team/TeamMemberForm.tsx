@@ -3,18 +3,18 @@ import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { TeamMemberFormValues, teamMemberFormSchema } from './form/formValidation';
-import { Form } from '@/components/ui/form';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Form } from '@sm/components/ui/form';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import { useDepartments } from '@/hooks/team/useDepartments';
-import { useRoles } from '@/hooks/team/useRoles';
+import { useDepartments } from '@sm/hooks/team/useDepartments';
+import { useRoles } from '@sm/hooks/team/useRoles';
 import { JobInfoFields } from './form/JobInfoFields';
 import { PersonalInfoFields } from './form/PersonalInfoFields';
 import { StatusToggleField } from './form/StatusToggleField';
 import { NotesField } from './form/NotesField';
 import { FormActions } from './form/FormActions';
-import { detectRoleFromJobTitle } from '@/utils/roleUtils';
-import { Skeleton } from '@/components/ui/skeleton';
+import { detectRoleFromJobTitle } from '@sm/utils/roleUtils';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface TeamMemberFormProps {
   onSubmit: (data: TeamMemberFormValues) => void;

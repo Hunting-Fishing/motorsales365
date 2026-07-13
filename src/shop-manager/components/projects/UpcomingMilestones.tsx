@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { Calendar, AlertTriangle, Clock, CheckCircle, ExternalLink } from 'lucide-react';
-import { useMilestoneNotifications, UpcomingMilestone } from '@/hooks/useMilestoneNotifications';
+import { useMilestoneNotifications, UpcomingMilestone } from '@sm/hooks/useMilestoneNotifications';
 import { format, formatDistanceToNow } from 'date-fns';
 
 const statusConfig: Record<UpcomingMilestone['status'], { label: string; color: string; icon: any }> = {

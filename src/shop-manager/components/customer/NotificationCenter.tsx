@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Bell, Check, CheckCheck, Settings, Package, Heart, AlertTriangle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { customerNotificationService, CustomerNotification, NotificationPreferences } from '@/services/customer/notificationService';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { Switch } from '@sm/components/ui/switch';
+import { Label } from '@sm/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { customerNotificationService, CustomerNotification, NotificationPreferences } from '@sm/services/customer/notificationService';
+import { useToast } from '@sm/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface NotificationCenterProps {
   userId: string;

@@ -1,15 +1,15 @@
 
 import React, { useState } from 'react';
 import { Bell, Settings, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useNotifications } from '@/context/notifications';
+} from '@sm/components/ui/dropdown-menu';
+import { useNotifications } from '@sm/context/notifications';
 import { NotificationItem } from './NotificationItem';
 import { NotificationsEmptyState } from './NotificationsEmptyState';
 import { NotificationsDropdownHeader } from './NotificationsDropdownHeader';

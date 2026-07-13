@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
 import { Plus, Search, Filter, FileText, ArrowLeft, ArrowRight, Trash2 } from 'lucide-react';
-import { useFuelDeliveryQuotes, useCreateFuelDeliveryQuote, useFuelDeliveryCustomers, useFuelDeliveryProducts, useConvertQuoteToOrder } from '@/hooks/useFuelDelivery';
+import { useFuelDeliveryQuotes, useCreateFuelDeliveryQuote, useFuelDeliveryCustomers, useFuelDeliveryProducts, useConvertQuoteToOrder } from '@sm/hooks/useFuelDelivery';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
-import { useShopId } from '@/hooks/useShopId';
-import { useModuleDisplayInfo } from '@/hooks/useModuleDisplayInfo';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { useToast } from '@sm/hooks/use-toast';
+import { useShopId } from '@sm/hooks/useShopId';
+import { useModuleDisplayInfo } from '@sm/hooks/useModuleDisplayInfo';
 
 interface QuoteLine {
   product_id: string;

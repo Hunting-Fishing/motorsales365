@@ -1,7 +1,7 @@
 
 import { InvoiceTemplateDialog } from "./InvoiceTemplateDialog";
 import { SaveTemplateDialog } from "./SaveTemplateDialog";
-import { Invoice, InvoiceTemplate } from "@/types/invoice";
+import { Invoice, InvoiceTemplate } from "@sm/types/invoice";
 
 interface InvoiceTemplateActionsProps {
   invoice: Invoice;

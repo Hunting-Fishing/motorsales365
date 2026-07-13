@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getInventoryItems, updateInventoryItem } from '@/services/inventoryService';
-import { InventoryItemExtended } from '@/types/inventory';
+import { getInventoryItems, updateInventoryItem } from '@sm/services/inventoryService';
+import { InventoryItemExtended } from '@sm/types/inventory';
 
 export function useInventoryItems() {
   const {

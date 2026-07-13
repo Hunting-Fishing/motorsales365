@@ -1,5 +1,5 @@
 import React from 'react';
-import { ModuleDeveloperPage } from '@/components/developer/ModuleDeveloperPage';
+import { ModuleDeveloperPage } from '@sm/components/developer/ModuleDeveloperPage';
 import { Car } from 'lucide-react';
 
 export default function AutomotiveDeveloper() {

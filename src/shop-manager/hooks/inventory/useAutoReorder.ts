@@ -4,10 +4,10 @@ import {
   getAutoReorderSettings, 
   enableAutoReorder as enableAutoReorderService,
   disableAutoReorder as disableAutoReorderService
-} from "@/services/inventory/autoReorderService";
-import { getInventoryItemById } from "@/services/inventory/crudService";
-import { useNotifications } from "@/context/notifications";
-import { toast } from "@/hooks/use-toast";
+} from "@sm/services/inventory/autoReorderService";
+import { getInventoryItemById } from "@sm/services/inventory/crudService";
+import { useNotifications } from "@sm/context/notifications";
+import { toast } from "@sm/hooks/use-toast";
 
 export interface AutoReorderSettings {
   enabled: boolean;

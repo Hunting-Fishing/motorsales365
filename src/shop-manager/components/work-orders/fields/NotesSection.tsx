@@ -1,7 +1,7 @@
 
 import React from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Textarea } from "@sm/components/ui/textarea";
 
 interface NotesSectionProps {
   form: any;

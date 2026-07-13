@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import {
   Form,
   FormField,
-} from '@/components/ui/form';
+} from '@sm/components/ui/form';
 import { 
   Dialog, 
   DialogContent, 
@@ -13,13 +13,13 @@ import {
   DialogHeader, 
   DialogTitle, 
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@sm/components/ui/dialog';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
+} from '@sm/components/ui/accordion';
 import { 
   Tag, 
   GanttChart, 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AssetUsageManager } from '@/components/inventory/assets/AssetUsageManager';
+import { AssetUsageManager } from '@sm/components/inventory/assets/AssetUsageManager';
 
 export default function AssetUsageTracking() {
   return (

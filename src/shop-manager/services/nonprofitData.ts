@@ -1,6 +1,6 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@sm/hooks/use-toast";
 import type {
   Program,
   Volunteer,
@@ -15,7 +15,7 @@ import type {
   CreateParticipantData,
   CreateImpactMeasurementData,
   CreateVolunteerAssignmentData
-} from "@/types/nonprofit";
+} from "@sm/types/nonprofit";
 
 // Programs
 export const usePrograms = () => {

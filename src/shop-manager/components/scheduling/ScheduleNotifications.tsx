@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Bell, Check, Trash2, CheckCheck } from 'lucide-react';
-import { useScheduleNotifications } from '@/hooks/useScheduleNotifications';
+import { useScheduleNotifications } from '@sm/hooks/useScheduleNotifications';
 import { formatDistanceToNow } from 'date-fns';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 
 export function ScheduleNotifications() {
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, loading } = 

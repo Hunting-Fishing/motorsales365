@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { WifiOff, Wifi, CloudOff, RefreshCw } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useOfflineStorage } from '@/hooks/useOfflineStorage';
-import { usePWA } from '@/hooks/usePWA';
-import { cn } from '@/lib/utils';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { useOfflineStorage } from '@sm/hooks/useOfflineStorage';
+import { usePWA } from '@sm/hooks/usePWA';
+import { cn } from '@sm/lib/utils';
 
 interface OfflineManagerProps {
   className?: string;

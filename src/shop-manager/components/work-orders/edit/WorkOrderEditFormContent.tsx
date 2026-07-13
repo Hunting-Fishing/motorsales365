@@ -1,19 +1,19 @@
 
 import React, { useState, useEffect } from "react";
-import { Form } from "@/components/ui/form";
-import { Card } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Form } from "@sm/components/ui/form";
+import { Card } from "@sm/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@sm/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { Customer, adaptCustomerForUI } from "@/types/customer";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Customer, adaptCustomerForUI } from "@sm/types/customer";
 
 // Import standardized form field components
-import { CustomerInfoSection } from "@/components/work-orders/CustomerInfoSection";
-import { StatusFields } from "@/components/work-orders/form-fields/StatusFields";
-import { AssignmentFields } from "@/components/work-orders/form-fields/AssignmentFields";
-import { NotesField } from "@/components/work-orders/form-fields/NotesField";
-import { WorkOrderInventoryField } from "@/components/work-orders/inventory/WorkOrderInventoryField";
-import { EditFormActions } from "@/components/work-orders/edit/EditFormActions";
+import { CustomerInfoSection } from "@sm/components/work-orders/CustomerInfoSection";
+import { StatusFields } from "@sm/components/work-orders/form-fields/StatusFields";
+import { AssignmentFields } from "@sm/components/work-orders/form-fields/AssignmentFields";
+import { NotesField } from "@sm/components/work-orders/form-fields/NotesField";
+import { WorkOrderInventoryField } from "@sm/components/work-orders/inventory/WorkOrderInventoryField";
+import { EditFormActions } from "@sm/components/work-orders/edit/EditFormActions";
 
 interface Technician {
   id: string;

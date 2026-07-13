@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronLeft, ThumbsUp, ThumbsDown, Star, Clock, User, Tag } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { SafeHTML } from '@/components/ui/SafeHTML';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Label } from '@sm/components/ui/label';
+import { SafeHTML } from '@sm/components/ui/SafeHTML';
+import { useToast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface Article {
   id: string;

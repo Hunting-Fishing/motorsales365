@@ -1,9 +1,9 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
 import { History } from 'lucide-react';
 

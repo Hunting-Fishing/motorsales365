@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { useToast } from './use-toast';
-import type { ScheduleNotification } from '@/types/employee-availability';
+import type { ScheduleNotification } from '@sm/types/employee-availability';
 
 export function useScheduleNotifications() {
   const { toast } = useToast();

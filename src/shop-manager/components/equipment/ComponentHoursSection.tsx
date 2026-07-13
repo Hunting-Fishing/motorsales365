@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Badge } from '@sm/components/ui/badge';
 import { Gauge, Clock, AlertCircle } from 'lucide-react';
-import { useComponentHours, ComponentWithHours } from '@/hooks/useComponentHours';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useComponentHours, ComponentWithHours } from '@sm/hooks/useComponentHours';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface ComponentHoursSectionProps {
   parentEquipmentId: string;

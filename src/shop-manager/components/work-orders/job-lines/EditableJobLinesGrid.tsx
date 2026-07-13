@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart, WorkOrderPartFormValues } from '@/types/workOrderPart';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart, WorkOrderPartFormValues } from '@sm/types/workOrderPart';
 import { WorkOrderLineItems } from './WorkOrderLineItems';
-import { useWorkOrderJobLineOperations } from '@/hooks/useWorkOrderJobLineOperations';
+import { useWorkOrderJobLineOperations } from '@sm/hooks/useWorkOrderJobLineOperations';
 
 interface EditableJobLinesGridProps {
   workOrderId: string;

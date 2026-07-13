@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { useSidebar } from '@/hooks/use-sidebar';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
+import { useSidebar } from '@sm/hooks/use-sidebar';
+import { useIsMobile } from '@sm/hooks/use-mobile';
+import { cn } from '@sm/lib/utils';
 import { SidebarContent } from './sidebar/SidebarContent';
 
 export function AppSidebar() {

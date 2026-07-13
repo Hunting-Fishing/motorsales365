@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabase';
-import { Invoice } from '@/types/invoice';
+import { supabase } from '@sm/lib/supabase';
+import { Invoice } from '@sm/types/invoice';
 
 export interface InvoiceDetails extends Omit<Invoice, 'customer'> {
   customer: {

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { useShopId } from './useShopId';
 import { useToast } from './use-toast';
-import type { EmployeeAvailability } from '@/types/employee-availability';
+import type { EmployeeAvailability } from '@sm/types/employee-availability';
 
 export function useEmployeeAvailability(employeeId?: string) {
   const { shopId } = useShopId();

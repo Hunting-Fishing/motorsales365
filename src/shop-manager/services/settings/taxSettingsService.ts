@@ -1,4 +1,4 @@
-import { unifiedSettingsService } from '@/services/unified/unifiedSettingsService';
+import { unifiedSettingsService } from '@sm/services/unified/unifiedSettingsService';
 
 export interface TaxSettings {
   labor_tax_rate: number;

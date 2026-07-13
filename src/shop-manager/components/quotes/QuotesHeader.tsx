@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Plus, FileText } from 'lucide-react';
-import { Quote } from '@/types/quote';
+import { Quote } from '@sm/types/quote';
 import { EnhancedCreateQuoteDialog } from './EnhancedCreateQuoteDialog';
 
 interface QuotesHeaderProps {

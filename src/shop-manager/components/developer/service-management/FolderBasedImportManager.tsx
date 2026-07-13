@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { FreshServiceImport } from './FreshServiceImport';
 import { ServiceImportProgress } from './ServiceImportProgress';
 import { LiveBucketViewer } from './LiveBucketViewer';
 import { Database, FolderOpen, RefreshCw } from 'lucide-react';
-import { useServiceManagement } from '@/hooks/useServiceManagement';
+import { useServiceManagement } from '@sm/hooks/useServiceManagement';
 
 export function FolderBasedImportManager() {
   const {

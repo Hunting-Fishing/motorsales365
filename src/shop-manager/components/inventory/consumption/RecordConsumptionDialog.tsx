@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useConsumptionTracking } from '@/hooks/inventory/useConsumptionTracking';
-import { useInventoryData } from '@/hooks/inventory/useInventoryData';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useConsumptionTracking } from '@sm/hooks/inventory/useConsumptionTracking';
+import { useInventoryData } from '@sm/hooks/inventory/useInventoryData';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { USAGE_METRICS } from '@/types/inventory/predictive';
+import { supabase } from '@sm/integrations/supabase/client';
+import { USAGE_METRICS } from '@sm/types/inventory/predictive';
 import { useForm } from 'react-hook-form';
 
 interface RecordConsumptionDialogProps {

@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
-import { Customer } from "@/types/customer";
-import { CustomerReferralView } from "@/types/referral";
+import { Card } from "@sm/components/ui/card";
+import { Customer } from "@sm/types/customer";
+import { CustomerReferralView } from "@sm/types/referral";
 import { 
   UserCheck, 
   Clock, 

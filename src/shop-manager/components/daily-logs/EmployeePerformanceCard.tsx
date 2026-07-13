@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Progress } from '@sm/components/ui/progress';
 import { Users, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
-import { EmployeePerformance } from '@/hooks/useMaintenanceTrends';
+import { EmployeePerformance } from '@sm/hooks/useMaintenanceTrends';
 
 interface EmployeePerformanceCardProps {
   employees: EmployeePerformance[];

@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Button } from '@sm/components/ui/button';
+import { Label } from '@sm/components/ui/label';
 import { Eraser, Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface SignaturePadProps {
   onSignatureChange: (signature: string | null) => void;

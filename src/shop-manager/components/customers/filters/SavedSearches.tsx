@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@sm/components/ui/dialog";
 import { Plus, Star, Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { SavedSearch } from "@/types/document";
-import { deleteSavedSearch, getSavedSearches, saveSavedSearch } from "@/services/searchService";
+import { useToast } from "@sm/hooks/use-toast";
+import { SavedSearch } from "@sm/types/document";
+import { deleteSavedSearch, getSavedSearches, saveSavedSearch } from "@sm/services/searchService";
 
 interface SavedSearchesProps {
   currentFilters: Record<string, any>;

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 import {
   Table,
   TableBody,
@@ -11,18 +11,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@sm/components/ui/table';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import { History, Search, Download, Gauge, Clock, Filter } from 'lucide-react';
-import { useEquipmentHourHistory, useAllComponentsHourHistory } from '@/hooks/useComponentHours';
+import { useEquipmentHourHistory, useAllComponentsHourHistory } from '@sm/hooks/useComponentHours';
 import { format, subDays, isAfter, parseISO } from 'date-fns';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface EquipmentHourHistoryProps {
   equipmentId?: string;

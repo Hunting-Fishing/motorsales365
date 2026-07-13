@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { FeedbackResponse } from '@/types/feedback';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { FeedbackResponse } from '@sm/types/feedback';
 import { Star } from './Star';
 
 interface ResponsesTableProps {

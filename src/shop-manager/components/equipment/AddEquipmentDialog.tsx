@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { decodeVin, getVinValidationError } from '@/services/vinDecoderService';
-import { uploadEquipmentProfileImage } from '@/services/equipment/equipmentImageService';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Badge } from '@sm/components/ui/badge';
+import { useToast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { decodeVin, getVinValidationError } from '@sm/services/vinDecoderService';
+import { uploadEquipmentProfileImage } from '@sm/services/equipment/equipmentImageService';
 import { EquipmentImageUpload } from './EquipmentImageUpload';
 import { EquipmentCategorySelector } from './EquipmentCategorySelector';
-import { getAssetClassForType } from '@/types/equipmentCategory';
+import { getAssetClassForType } from '@sm/types/equipmentCategory';
 import { Loader2, Search, Car, CheckCircle2 } from 'lucide-react';
 
 interface AddEquipmentDialogProps {

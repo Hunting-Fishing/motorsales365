@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { LayoutGrid, List, Table, Grid3X3, Sheet } from 'lucide-react';
-import { useInventoryView, ViewMode } from '@/contexts/InventoryViewContext';
+import { useInventoryView, ViewMode } from '@sm/contexts/InventoryViewContext';
 
 const viewModes = [
   { mode: 'cards' as ViewMode, icon: LayoutGrid, label: 'Cards' },

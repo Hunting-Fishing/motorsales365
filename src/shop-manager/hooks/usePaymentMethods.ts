@@ -1,14 +1,14 @@
 
 import { useState, useEffect } from 'react';
-import { PaymentMethod } from '@/types/payment';
+import { PaymentMethod } from '@sm/types/payment';
 import { 
   getCustomerPaymentMethods, 
   addPaymentMethod, 
   updatePaymentMethod, 
   deletePaymentMethod, 
   setDefaultPaymentMethod 
-} from '@/services/payment/paymentService';
-import { toast } from '@/hooks/use-toast';
+} from '@sm/services/payment/paymentService';
+import { toast } from '@sm/hooks/use-toast';
 
 export function usePaymentMethods(customerId?: string) {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);

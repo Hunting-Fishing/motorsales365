@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { InsurancePolicy, InsurancePremiumTrend, InsuranceByType } from '@/types/insurance';
+import { InsurancePolicy, InsurancePremiumTrend, InsuranceByType } from '@sm/types/insurance';
 import { format, parseISO, startOfMonth, eachMonthOfInterval, subMonths, addMonths } from 'date-fns';
 
 export function useInsuranceAnalytics(policies: InsurancePolicy[]) {

@@ -5,10 +5,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
 import { Plus, GitBranch } from 'lucide-react';
-import { ConditionalRule, FormBuilderField } from '@/types/formBuilder';
+import { ConditionalRule, FormBuilderField } from '@sm/types/formBuilder';
 import { ConditionalRuleRow } from './ConditionalRuleRow';
 import { v4 as uuidv4 } from 'uuid';
 

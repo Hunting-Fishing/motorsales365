@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { TimeEntry } from "@/types/workOrder";
+import { TimeEntry } from "@sm/types/workOrder";
 import { differenceInMinutes, parse } from "date-fns";
 
 interface UseTimeEntryFormProps {

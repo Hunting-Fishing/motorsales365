@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { CheckCircle, XCircle, Clock, FileText } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Textarea } from '@sm/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -11,11 +11,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { useProjectDetails } from '@/hooks/useProjectBudgets';
-import { formatCurrency } from '@/lib/utils';
+} from '@sm/components/ui/dialog';
+import { useProjectDetails } from '@sm/hooks/useProjectBudgets';
+import { formatCurrency } from '@sm/lib/utils';
 import { format } from 'date-fns';
-import type { ProjectChangeOrder } from '@/types/projectBudget';
+import type { ProjectChangeOrder } from '@sm/types/projectBudget';
 
 interface ChangeOrderListProps {
   changeOrders: ProjectChangeOrder[];

@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useShopId } from '@/hooks/useShopId';
-import { recordMaintenanceActivity } from '@/services/maintenance/maintenanceActivityService';
-import { saveScheduleVersion } from '@/services/maintenance/versionService';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Textarea } from '@sm/components/ui/textarea';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
+import { useShopId } from '@sm/hooks/useShopId';
+import { recordMaintenanceActivity } from '@sm/services/maintenance/maintenanceActivityService';
+import { saveScheduleVersion } from '@sm/services/maintenance/versionService';
 
 interface EditScheduleDialogProps {
   open: boolean;

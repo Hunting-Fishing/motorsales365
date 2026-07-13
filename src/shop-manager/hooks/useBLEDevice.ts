@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 
 // Standard Bluetooth GATT Service UUIDs
 const HEART_RATE_SERVICE = 'heart_rate';

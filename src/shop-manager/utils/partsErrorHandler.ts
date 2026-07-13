@@ -1,6 +1,6 @@
 
 import { toast } from 'sonner';
-import { WorkOrderPartFormValues } from '@/types/workOrderPart';
+import { WorkOrderPartFormValues } from '@sm/types/workOrderPart';
 
 export class PartsFormValidator {
   static validatePartData(data: Partial<WorkOrderPartFormValues>): string[] {

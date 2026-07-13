@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { ShieldX, Home, LogIn } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
-import { useShopName } from "@/hooks/useShopName";
-import { CompanyContactEnhanced } from "@/components/common/CompanyContactEnhanced";
-import { useCompany } from "@/contexts/CompanyContext";
+import { useShopName } from "@sm/hooks/useShopName";
+import { CompanyContactEnhanced } from "@sm/components/common/CompanyContactEnhanced";
+import { useCompany } from "@sm/contexts/CompanyContext";
 
 export default function Unauthorized() {
   const { shopName } = useShopName();

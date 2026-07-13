@@ -1,8 +1,8 @@
 
-import { supabase } from "@/lib/supabase";
-import { Bay, RateSettings, calculateRates } from "@/services/diybay/diybayService";
-import { useToast } from "@/hooks/use-toast";
-import { useShopId } from "@/hooks/useShopId";
+import { supabase } from "@sm/lib/supabase";
+import { Bay, RateSettings, calculateRates } from "@sm/services/diybay/diybayService";
+import { useToast } from "@sm/hooks/use-toast";
+import { useShopId } from "@sm/hooks/useShopId";
 
 export function useRateSettings(
   settings: RateSettings,

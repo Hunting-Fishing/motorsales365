@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 import { Package, AlertTriangle } from 'lucide-react';
 
 interface ImageWithFallbackProps extends React.ImgHTMLAttributes<HTMLImageElement> {

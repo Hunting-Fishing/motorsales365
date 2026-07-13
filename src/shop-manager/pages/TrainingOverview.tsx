@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
-import { useAllTeamTraining } from '@/hooks/team/useAllTeamTraining';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAllTeamTraining } from '@sm/hooks/team/useAllTeamTraining';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Search, Filter, Calendar, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 

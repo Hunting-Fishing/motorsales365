@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { getAvailableTimeSlots, createBookingRequest, TimeSlot } from "@/services/calendar/bookingService";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@sm/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Button } from "@sm/components/ui/button";
+import { Textarea } from "@sm/components/ui/textarea";
+import { getAvailableTimeSlots, createBookingRequest, TimeSlot } from "@sm/services/calendar/bookingService";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";

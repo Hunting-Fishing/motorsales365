@@ -1,8 +1,8 @@
 
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card } from "@/components/ui/card";
-import { Customer } from "@/types/customer";
-import { CustomerFilterControls, CustomerFilters } from "@/components/customers/filters/CustomerFilterControls";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
+import { Card } from "@sm/components/ui/card";
+import { Customer } from "@sm/types/customer";
+import { CustomerFilterControls, CustomerFilters } from "@sm/components/customers/filters/CustomerFilterControls";
 import { CustomerTable } from "./CustomerTable";
 import { Loader2, Users, AlertCircle } from "lucide-react";
 

@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Settings, ShieldCheck, CheckCircle, ArrowRight } from "lucide-react";
-import { EquipmentRecommendation, getRecommendationTypeColor } from "@/utils/equipment/recommendations";
-import { Button } from "@/components/ui/button";
+import { EquipmentRecommendation, getRecommendationTypeColor } from "@sm/utils/equipment/recommendations";
+import { Button } from "@sm/components/ui/button";
 
 interface EquipmentRecommendationsCardProps {
   recommendations: EquipmentRecommendation[];

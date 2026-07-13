@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { getWorkOrderJobLines } from '@/services/workOrder/jobLinesService';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { getWorkOrderJobLines } from '@sm/services/workOrder/jobLinesService';
 
 export function useWorkOrderJobLines(workOrderId: string) {
   const [jobLines, setJobLines] = useState<WorkOrderJobLine[]>([]);

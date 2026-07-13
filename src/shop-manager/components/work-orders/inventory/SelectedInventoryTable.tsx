@@ -1,11 +1,11 @@
 
 import React from "react";
-import { WorkOrderInventoryItem } from "@/types/workOrder";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { WorkOrderInventoryItem } from "@sm/types/workOrder";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
 import { Trash } from "lucide-react";
-import { formatCurrency } from "@/utils/formatters";
+import { formatCurrency } from "@sm/utils/formatters";
 
 export interface SelectedInventoryTableProps {
   items: WorkOrderInventoryItem[];

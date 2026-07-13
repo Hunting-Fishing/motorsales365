@@ -1,9 +1,9 @@
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Separator } from "@sm/components/ui/separator";
 import { FileText, Wrench, Clock, CheckCircle2, AlertCircle } from "lucide-react";
-import { useTeamMemberWorkOrders } from "@/hooks/team/useTeamMemberWorkOrders";
+import { useTeamMemberWorkOrders } from "@sm/hooks/team/useTeamMemberWorkOrders";
 import { format } from "date-fns";
 
 interface WorkOrdersTabProps {

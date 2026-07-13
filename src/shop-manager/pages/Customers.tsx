@@ -1,7 +1,7 @@
  
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { CustomersPage as RefactoredCustomersPage } from '@/components/customers/CustomersPage';
+import { CustomersPage as RefactoredCustomersPage } from '@sm/components/customers/CustomersPage';
 import CustomerDetails from './CustomerDetails';
 import CustomerEdit from './CustomerEdit';
 import CreateCustomer from './CreateCustomer';

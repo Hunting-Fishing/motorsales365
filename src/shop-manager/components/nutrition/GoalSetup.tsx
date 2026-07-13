@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Save, Loader2, Target } from 'lucide-react';
-import { useNutritionGoals, useSaveNutritionGoals } from '@/hooks/useNutrition';
+import { useNutritionGoals, useSaveNutritionGoals } from '@sm/hooks/useNutrition';
 
 const GOAL_TYPES = [
   { value: 'fat_loss', label: 'Fat Loss' },

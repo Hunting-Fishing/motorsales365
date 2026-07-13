@@ -1,11 +1,11 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { CalendarEvent } from "@/types/calendar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Button } from "@sm/components/ui/button";
+import { CalendarEvent } from "@sm/types/calendar";
 import { format } from "date-fns";
 import { CalendarIcon, Clock, MapPin, User, AlertCircle, Plus, CheckSquare } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { priorityMap } from "@/utils/workOrders";
+import { cn } from "@sm/lib/utils";
+import { priorityMap } from "@sm/utils/workOrders";
 
 interface CalendarDayDetailDialogProps {
   date: Date | null;

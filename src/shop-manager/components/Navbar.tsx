@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Bell, ChevronDown, Search, Settings, User, LogOut } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { useUserRole } from '@/hooks/useUserRole';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { useUserRole } from '@sm/hooks/useUserRole';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -13,9 +13,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { toast } from '@/hooks/use-toast';
-import { AuthService } from '@/lib/services/AuthService';
+} from '@sm/components/ui/dropdown-menu';
+import { toast } from '@sm/hooks/use-toast';
+import { AuthService } from '@sm/lib/services/AuthService';
 
 const Navbar: React.FC = () => {
   const { user } = useAuthUser();

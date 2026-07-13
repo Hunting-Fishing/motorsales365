@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@sm/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -17,24 +17,24 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+} from '@sm/components/ui/form';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Textarea } from '@sm/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Badge } from '@/components/ui/badge';
-import { useProjectBudgets } from '@/hooks/useProjectBudgets';
-import { PROJECT_TYPES } from '@/types/projectBudget';
+} from '@sm/components/ui/select';
+import { Switch } from '@sm/components/ui/switch';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@sm/components/ui/sheet';
+import { Badge } from '@sm/components/ui/badge';
+import { useProjectBudgets } from '@sm/hooks/useProjectBudgets';
+import { PROJECT_TYPES } from '@sm/types/projectBudget';
 import { ProjectTemplateSelector } from './ProjectTemplateSelector';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { toast } from 'sonner';
 import { FileText, X } from 'lucide-react';
 

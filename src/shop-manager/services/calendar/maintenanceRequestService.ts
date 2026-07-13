@@ -1,6 +1,6 @@
-import { supabase } from "@/lib/supabase";
-import { CalendarEvent } from "@/types/calendar/events";
-import { handleApiError } from "@/utils/errorHandling";
+import { supabase } from "@sm/lib/supabase";
+import { CalendarEvent } from "@sm/types/calendar/events";
+import { handleApiError } from "@sm/utils/errorHandling";
 
 /**
  * Fetch maintenance requests and convert them to calendar events

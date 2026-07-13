@@ -1,5 +1,5 @@
 
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@sm/components/ui/separator";
 
 interface LogoPreviewProps {
   logoPreview: string | null;

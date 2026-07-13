@@ -12,7 +12,7 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 
 ChartJS.register(
   CategoryScale,

@@ -10,11 +10,11 @@ import {
   isSameDay,
   format
 } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { StaffScheduleEvent } from '@/types/staffScheduleCalendar';
+import { cn } from '@sm/lib/utils';
+import { StaffScheduleEvent } from '@sm/types/staffScheduleCalendar';
 import { StaffCalendarEvent } from './StaffCalendarEvent';
 import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 
 interface StaffCalendarMonthViewProps {
   currentDate: Date;

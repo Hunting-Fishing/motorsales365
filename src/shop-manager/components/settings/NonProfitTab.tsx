@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Switch } from "@sm/components/ui/switch";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Badge } from "@sm/components/ui/badge";
+import { supabase } from "@sm/integrations/supabase/client";
+import { useToast } from "@sm/hooks/use-toast";
 import { HandHeart, BadgeDollarSign, Users, BookUser, Book, BarChart3, FileText } from "lucide-react";
 import { HybridModelTab } from "./HybridModelTab";
 import { ReportingComplianceTab } from "./ReportingComplianceTab";
-import { DonationManagement } from "@/components/nonprofit/DonationManagement";
-import { MemberManagement } from "@/components/nonprofit/MemberManagement";
-import { VolunteerHourTracking } from "@/components/nonprofit/VolunteerHourTracking";
-import { GrantFundingManagement } from "@/components/nonprofit/GrantFundingManagement";
+import { DonationManagement } from "@sm/components/nonprofit/DonationManagement";
+import { MemberManagement } from "@sm/components/nonprofit/MemberManagement";
+import { VolunteerHourTracking } from "@sm/components/nonprofit/VolunteerHourTracking";
+import { GrantFundingManagement } from "@sm/components/nonprofit/GrantFundingManagement";
 
 interface TaxExemptStatus {
   is_tax_exempt: boolean;

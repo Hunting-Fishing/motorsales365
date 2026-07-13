@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { ArrowLeft, Settings, Calendar, AlertTriangle, CheckCircle, Wrench, ClipboardList, ShieldCheck, BookOpen, FileText, MapPin, Gauge, Hash, Truck, ListTodo, ShoppingCart, FolderOpen, RefreshCw, Clock } from 'lucide-react';
 import { toast } from 'sonner';
-import { getEquipmentById, updateEquipmentStatus, type EquipmentDetails } from '@/services/equipment/equipmentService';
-import { MaintenanceIntervals } from '@/components/equipment/MaintenanceIntervals';
-import { EquipmentWorkRequests } from '@/components/equipment-details/EquipmentWorkRequests';
-import { EquipmentConfigDialog } from '@/components/equipment/EquipmentConfigDialog';
-import { SafetyEquipmentList } from '@/components/equipment/SafetyEquipmentList';
-import { EquipmentManuals } from '@/components/equipment/EquipmentManuals';
-import { EquipmentTasks } from '@/components/equipment-details/EquipmentTasks';
-import { EquipmentSupplyOrders } from '@/components/equipment-details/EquipmentSupplyOrders';
-import { EquipmentDocuments } from '@/components/equipment-details/EquipmentDocuments';
-import { RecurringTasksPanel } from '@/components/equipment-details/RecurringTasksPanel';
-import { EquipmentHourHistory } from '@/components/equipment/EquipmentHourHistory';
+import { getEquipmentById, updateEquipmentStatus, type EquipmentDetails } from '@sm/services/equipment/equipmentService';
+import { MaintenanceIntervals } from '@sm/components/equipment/MaintenanceIntervals';
+import { EquipmentWorkRequests } from '@sm/components/equipment-details/EquipmentWorkRequests';
+import { EquipmentConfigDialog } from '@sm/components/equipment/EquipmentConfigDialog';
+import { SafetyEquipmentList } from '@sm/components/equipment/SafetyEquipmentList';
+import { EquipmentManuals } from '@sm/components/equipment/EquipmentManuals';
+import { EquipmentTasks } from '@sm/components/equipment-details/EquipmentTasks';
+import { EquipmentSupplyOrders } from '@sm/components/equipment-details/EquipmentSupplyOrders';
+import { EquipmentDocuments } from '@sm/components/equipment-details/EquipmentDocuments';
+import { RecurringTasksPanel } from '@sm/components/equipment-details/RecurringTasksPanel';
+import { EquipmentHourHistory } from '@sm/components/equipment/EquipmentHourHistory';
 
 // Helper to check if equipment is a vehicle type
 const isVehicleType = (type?: string): boolean => {

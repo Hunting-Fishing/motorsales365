@@ -7,12 +7,12 @@ import {
   TableHead, 
   TableHeader, 
   TableRow 
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+} from "@sm/components/ui/table";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
 import { Pencil, Loader2 } from "lucide-react";
-import { CustomerReferralView } from "@/types/referral";
-import { formatDate } from "@/utils/dateUtils";
+import { CustomerReferralView } from "@sm/types/referral";
+import { formatDate } from "@sm/utils/dateUtils";
 
 interface ReferralsTableProps {
   referrals: CustomerReferralView[];

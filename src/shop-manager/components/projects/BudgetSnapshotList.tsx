@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { Camera, Download, Eye, Calendar, History } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { formatCurrency } from '@/lib/utils';
+} from '@sm/components/ui/dialog';
+import { formatCurrency } from '@sm/lib/utils';
 import { format } from 'date-fns';
-import type { ProjectBudgetSnapshot } from '@/types/projectBudget';
+import type { ProjectBudgetSnapshot } from '@sm/types/projectBudget';
 
 interface BudgetSnapshotListProps {
   snapshots: ProjectBudgetSnapshot[];

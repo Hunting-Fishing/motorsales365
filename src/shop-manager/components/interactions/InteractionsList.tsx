@@ -1,12 +1,12 @@
 
 import React, { useState } from "react";
-import { CustomerInteraction, InteractionType } from "@/types/interaction";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CustomerInteraction, InteractionType } from "@sm/types/interaction";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { InteractionTypeBadge } from "./InteractionTypeBadge";
 import { InteractionStatusBadge } from "./InteractionStatusBadge";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@sm/components/ui/badge";
 import { 
   CalendarIcon, 
   ChevronRight, 
@@ -21,10 +21,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@sm/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
-import { completeFollowUp } from "@/services/customer/customerInteractionsService";
-import { useToast } from "@/hooks/use-toast";
+import { completeFollowUp } from "@sm/services/customer/customerInteractionsService";
+import { useToast } from "@sm/hooks/use-toast";
 
 interface InteractionsListProps {
   interactions: CustomerInteraction[];

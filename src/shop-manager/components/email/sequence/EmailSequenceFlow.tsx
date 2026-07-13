@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { EmailSequence, EmailSequenceStep } from '@/types/email';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { EmailSequence, EmailSequenceStep } from '@sm/types/email';
+import { Card, CardContent, CardHeader } from '@sm/components/ui/card';
 import { Mail, Clock, ArrowDown, GitBranch, AlertTriangle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Badge } from '@sm/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@sm/components/ui/tooltip';
 
 interface EmailSequenceFlowProps {
   sequence: EmailSequence;

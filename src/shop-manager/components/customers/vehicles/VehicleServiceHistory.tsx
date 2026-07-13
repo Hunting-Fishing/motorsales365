@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Card } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Card } from '@sm/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
 import { Wrench } from 'lucide-react';
 
 interface ServiceRecord {

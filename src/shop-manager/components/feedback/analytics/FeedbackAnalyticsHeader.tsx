@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FeedbackForm, FeedbackResponse } from '@/types/feedback';
+import { FeedbackForm, FeedbackResponse } from '@sm/types/feedback';
 import { BackButton } from './BackButton';
 import { ExportButton } from './ExportButton';
 

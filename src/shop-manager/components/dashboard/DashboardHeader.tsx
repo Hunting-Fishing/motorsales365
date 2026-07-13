@@ -1,5 +1,5 @@
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Calendar, Download, FileSpreadsheet, BarChart3, RefreshCw } from "lucide-react";
 
 export function DashboardHeader() {

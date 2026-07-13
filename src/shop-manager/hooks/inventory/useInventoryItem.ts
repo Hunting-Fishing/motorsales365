@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { InventoryItemExtended } from '@/types/inventory';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { InventoryItemExtended } from '@sm/types/inventory';
+import { useToast } from '@sm/hooks/use-toast';
 
 export function useInventoryItem(itemId: string) {
   const { toast } = useToast();

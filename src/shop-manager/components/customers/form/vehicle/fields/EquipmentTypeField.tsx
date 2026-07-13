@@ -6,14 +6,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@sm/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@sm/components/ui/select";
 
 interface EquipmentTypeFieldProps {
   form: UseFormReturn<any>;

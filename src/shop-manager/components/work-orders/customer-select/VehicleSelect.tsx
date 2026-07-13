@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { Loader2, Car } from "lucide-react";
-import { CustomerVehicle } from "@/types/customer";
+import { CustomerVehicle } from "@sm/types/customer";
 
 interface VehicleSelectProps {
   customerId: string | null;

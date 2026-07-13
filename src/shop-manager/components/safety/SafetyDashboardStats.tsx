@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@sm/components/ui/card';
 import { 
   AlertTriangle, 
   Shield, 
@@ -10,7 +10,7 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
-import type { SafetyDashboardStats as Stats } from '@/types/safety';
+import type { SafetyDashboardStats as Stats } from '@sm/types/safety';
 
 interface SafetyDashboardStatsProps {
   stats: Stats;

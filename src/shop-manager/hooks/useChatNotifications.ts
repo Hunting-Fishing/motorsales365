@@ -1,8 +1,8 @@
 
 import { useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { toast } from './use-toast';
-import { useNotifications } from '@/context/notifications';
+import { useNotifications } from '@sm/context/notifications';
 
 interface UseChatNotificationsProps {
   userId: string;

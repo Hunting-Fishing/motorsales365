@@ -1,13 +1,13 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { Ship, Forklift, Truck, ClipboardCheck, ExternalLink, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { format } from 'date-fns';
-import { WorkOrder } from '@/types/workOrder';
+import { WorkOrder } from '@sm/types/workOrder';
 
 interface WorkOrderInspectionsTabProps {
   workOrder: WorkOrder;

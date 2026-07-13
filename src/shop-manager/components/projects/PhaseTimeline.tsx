@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { format, differenceInDays, parseISO, addDays } from 'date-fns';
 import { ArrowRight, AlertTriangle, Flag } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { formatCurrency } from '@/lib/utils';
-import type { ProjectPhase } from '@/types/projectBudget';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@sm/components/ui/tooltip';
+import { formatCurrency } from '@sm/lib/utils';
+import type { ProjectPhase } from '@sm/types/projectBudget';
 
 interface PhaseTimelineProps {
   phases: ProjectPhase[];

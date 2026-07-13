@@ -5,8 +5,8 @@ import {
   ProductViewTracker, 
   useProductAnalytics,
   ProductInteractionType 
-} from '@/components/developer/shopping/analytics/AnalyticsTracker';
-import { AffiliateProduct } from '@/types/affiliate';
+} from '@sm/components/developer/shopping/analytics/AnalyticsTracker';
+import { AffiliateProduct } from '@sm/types/affiliate';
 
 interface ProductCardWithAnalyticsProps {
   product: AffiliateProduct;

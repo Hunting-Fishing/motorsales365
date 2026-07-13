@@ -1,5 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Progress } from "@sm/components/ui/progress";
 import {
   DollarSign,
   Wrench,

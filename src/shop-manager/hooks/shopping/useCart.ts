@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import * as cartService from '@/services/cartService';
-import { calculateDynamicPrice, getBulkPricingTier } from '@/services/shopping/cartVariantService';
+import { supabase } from '@sm/integrations/supabase/client';
+import * as cartService from '@sm/services/cartService';
+import { calculateDynamicPrice, getBulkPricingTier } from '@sm/services/shopping/cartVariantService';
 
 export interface CartItem {
   id: string;

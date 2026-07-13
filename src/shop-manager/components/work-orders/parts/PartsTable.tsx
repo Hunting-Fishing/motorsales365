@@ -1,7 +1,7 @@
 import React from 'react';
-import { WorkOrderPart } from '@/types/workOrderPart';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
 import { EnhancedPartRow } from './EnhancedPartRow';
-import { deleteWorkOrderPart } from '@/services/workOrder/workOrderPartsService';
+import { deleteWorkOrderPart } from '@sm/services/workOrder/workOrderPartsService';
 import { toast } from 'sonner';
 
 interface PartsTableProps {

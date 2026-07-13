@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { WorkOrderManagementTab } from "@/components/settings/WorkOrderManagementTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { WorkOrderManagementTab } from "@sm/components/settings/WorkOrderManagementTab";
 
 export const WorkOrdersSettings = () => {
   return (

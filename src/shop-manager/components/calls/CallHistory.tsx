@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getCallHistory } from '@/services/calls/callService';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { getCallHistory } from '@sm/services/calls/callService';
 import { formatDistanceToNow } from 'date-fns';
 
 interface CallHistoryProps {

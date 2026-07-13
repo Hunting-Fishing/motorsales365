@@ -1,6 +1,6 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { 
   MessageSquare, 
   Phone, 
@@ -12,10 +12,10 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react";
-import { Customer, CustomerNote } from "@/types/customer";
-import { WorkOrder } from "@/types/workOrder";
-import { CustomerInteraction } from "@/types/interaction";
-import { CustomerCommunication } from "@/types/customer/notes";
+import { Customer, CustomerNote } from "@sm/types/customer";
+import { WorkOrder } from "@sm/types/workOrder";
+import { CustomerInteraction } from "@sm/types/interaction";
+import { CustomerCommunication } from "@sm/types/customer/notes";
 
 interface ActivityTimelineProps {
   customer: Customer;

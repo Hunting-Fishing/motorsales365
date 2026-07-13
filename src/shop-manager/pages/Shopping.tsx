@@ -1,37 +1,37 @@
 
 import React, { useState, useMemo } from 'react';
 import { Container } from 'semantic-ui-react';
-import CategoryGrid from '@/components/affiliate/CategoryGrid';
-import HeroSection from '@/components/affiliate/HeroSection';
-import SearchBar from '@/components/affiliate/SearchBar';
-import FeaturedTools from '@/components/affiliate/FeaturedTools';
-import BestSellingTools from '@/components/affiliate/BestSellingTools';
-import ManufacturersGrid from '@/components/affiliate/ManufacturersGrid';
-import { VariantAwareProductCard } from '@/components/shopping/VariantAwareProductCard';
-import PopularProducts from '@/components/shopping/PopularProducts';
-import RecentlyViewed from '@/components/shopping/RecentlyViewed';
-import ShoppingCartComponent from '@/components/shopping/ShoppingCart';
-import ProductQuickView from '@/components/shopping/ProductQuickView';
-import ProductFilters, { FilterState } from '@/components/shopping/ProductFilters';
-import ProductComparison from '@/components/shopping/ProductComparison';
-import ShoppingErrorBoundary from '@/components/error/ShoppingErrorBoundary';
-import LoadingSkeleton from '@/components/shopping/LoadingSkeleton';
-import OfflineIndicator from '@/components/shopping/OfflineIndicator';
-import SearchAnalytics, { useSearchAnalytics } from '@/components/shopping/SearchAnalytics';
-import ProductCard from '@/components/shopping/ProductCard';
+import CategoryGrid from '@sm/components/affiliate/CategoryGrid';
+import HeroSection from '@sm/components/affiliate/HeroSection';
+import SearchBar from '@sm/components/affiliate/SearchBar';
+import FeaturedTools from '@sm/components/affiliate/FeaturedTools';
+import BestSellingTools from '@sm/components/affiliate/BestSellingTools';
+import ManufacturersGrid from '@sm/components/affiliate/ManufacturersGrid';
+import { VariantAwareProductCard } from '@sm/components/shopping/VariantAwareProductCard';
+import PopularProducts from '@sm/components/shopping/PopularProducts';
+import RecentlyViewed from '@sm/components/shopping/RecentlyViewed';
+import ShoppingCartComponent from '@sm/components/shopping/ShoppingCart';
+import ProductQuickView from '@sm/components/shopping/ProductQuickView';
+import ProductFilters, { FilterState } from '@sm/components/shopping/ProductFilters';
+import ProductComparison from '@sm/components/shopping/ProductComparison';
+import ShoppingErrorBoundary from '@sm/components/error/ShoppingErrorBoundary';
+import LoadingSkeleton from '@sm/components/shopping/LoadingSkeleton';
+import OfflineIndicator from '@sm/components/shopping/OfflineIndicator';
+import SearchAnalytics, { useSearchAnalytics } from '@sm/components/shopping/SearchAnalytics';
+import ProductCard from '@sm/components/shopping/ProductCard';
 
-import RecentlyViewedProducts from '@/components/shopping/RecentlyViewedProducts';
-import ProductBundles from '@/components/shopping/product/ProductBundles';
-import InventoryAlerts from '@/components/shopping/product/InventoryAlerts';
-import { useProductsManager } from '@/hooks/affiliate/useProductsManager';
-import { useCart } from '@/hooks/shopping/useCart';
-import { useProductComparison } from '@/hooks/shopping/useProductComparison';
-import { categories } from '@/data/toolCategories';
-import { manufacturers } from '@/data/manufacturers';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import RecentlyViewedProducts from '@sm/components/shopping/RecentlyViewedProducts';
+import ProductBundles from '@sm/components/shopping/product/ProductBundles';
+import InventoryAlerts from '@sm/components/shopping/product/InventoryAlerts';
+import { useProductsManager } from '@sm/hooks/affiliate/useProductsManager';
+import { useCart } from '@sm/hooks/shopping/useCart';
+import { useProductComparison } from '@sm/hooks/shopping/useProductComparison';
+import { categories } from '@sm/data/toolCategories';
+import { manufacturers } from '@sm/data/manufacturers';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { 
   Database, 
   Filter, 
@@ -41,7 +41,7 @@ import {
   Eye,
   Loader2 
 } from 'lucide-react';
-import { AffiliateTool, AffiliateProduct } from '@/types/affiliate';
+import { AffiliateTool, AffiliateProduct } from '@sm/types/affiliate';
 
 // Convert the categories dictionary to an array format for display
 const categoryList = Object.keys(categories).map((name, id) => ({
@@ -450,7 +450,7 @@ export default function Shopping() {
               onAddToCart={handleAddToCart}
               onAddToWishlist={async (product) => {
                 // Wishlist integration completed
-                const { useWishlist } = await import('@/hooks/shopping/useWishlist');
+                const { useWishlist } = await import('@sm/hooks/shopping/useWishlist');
                 const wishlist = useWishlist();
                 await wishlist.addToWishlist({
                   productId: product.id,

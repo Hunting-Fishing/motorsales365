@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Progress } from '@/components/ui/progress';
-import { getPerformanceMetrics, PerformanceMetric } from '@/services/analytics/performanceService';
+import { Progress } from '@sm/components/ui/progress';
+import { getPerformanceMetrics, PerformanceMetric } from '@sm/services/analytics/performanceService';
 
 interface PerformanceMetricsProps {
   data?: any;

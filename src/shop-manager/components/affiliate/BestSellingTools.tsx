@@ -1,12 +1,12 @@
 
 import React from 'react';
 import { Segment, Header } from 'semantic-ui-react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
 import { Star, TrendingUp, ShoppingCart, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { AffiliateProduct } from '@/types/affiliate';
+import { AffiliateProduct } from '@sm/types/affiliate';
 
 interface BestSellingToolsProps {
   tools?: AffiliateProduct[];

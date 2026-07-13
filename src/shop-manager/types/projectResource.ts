@@ -1,5 +1,5 @@
 // Project Resource Assignment Types
-import type { Json } from '@/integrations/supabase/types';
+import type { Json } from '@sm/integrations/supabase/types';
 
 export type ResourceType = 'employee' | 'equipment' | 'vessel' | 'vehicle';
 export type ResourceAssignmentStatus = 'planned' | 'active' | 'completed' | 'cancelled';

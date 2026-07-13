@@ -1,8 +1,8 @@
 
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Label } from "@sm/components/ui/label";
 
 export function AdditionalNotesTab() {
   const [notes, setNotes] = useState('');

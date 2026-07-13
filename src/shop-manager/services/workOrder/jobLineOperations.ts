@@ -1,4 +1,4 @@
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 import { createJobLine, updateJobLine, deleteJobLine } from './jobLinesService';
 
 /**

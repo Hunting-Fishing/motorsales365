@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { ShoppingCart, Trash2, Plus, Minus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 
 export default function ShoppingCartPage() {
   return (

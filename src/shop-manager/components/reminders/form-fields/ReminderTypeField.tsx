@@ -7,14 +7,14 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
+} from "@sm/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@sm/components/ui/select";
 import { ReminderFormValues } from "../schemas/reminderFormSchema";
 
 interface ReminderTypeFieldProps {

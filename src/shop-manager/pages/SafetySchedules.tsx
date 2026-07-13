@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Switch } from '@sm/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { 
   Dialog,
   DialogContent,
@@ -12,18 +12,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useSafetyReminders } from '@/hooks/useSafetyReminders';
-import { useSafetySchedules, CreateScheduleData } from '@/hooks/useSafetySchedules';
-import { useInspectionAssignments } from '@/hooks/useInspectionAssignments';
-import { AssignInspectionDialog } from '@/components/safety/AssignInspectionDialog';
-import { CreateVehicleScheduleDialog } from '@/components/safety/CreateVehicleScheduleDialog';
-import { QRCodeScanner } from '@/components/safety/qr/QRCodeScanner';
-import { AutoWorkOrderRulesPanel } from '@/components/safety/workorder/AutoWorkOrderRulesPanel';
-import { OfflineStatusBar } from '@/components/safety/offline/OfflineStatusBar';
+} from '@sm/components/ui/dialog';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useSafetyReminders } from '@sm/hooks/useSafetyReminders';
+import { useSafetySchedules, CreateScheduleData } from '@sm/hooks/useSafetySchedules';
+import { useInspectionAssignments } from '@sm/hooks/useInspectionAssignments';
+import { AssignInspectionDialog } from '@sm/components/safety/AssignInspectionDialog';
+import { CreateVehicleScheduleDialog } from '@sm/components/safety/CreateVehicleScheduleDialog';
+import { QRCodeScanner } from '@sm/components/safety/qr/QRCodeScanner';
+import { AutoWorkOrderRulesPanel } from '@sm/components/safety/workorder/AutoWorkOrderRulesPanel';
+import { OfflineStatusBar } from '@sm/components/safety/offline/OfflineStatusBar';
 import { 
   CalendarClock, 
   Bell, 
@@ -44,7 +44,7 @@ import {
   QrCode,
   Settings
 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { format, differenceInDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 

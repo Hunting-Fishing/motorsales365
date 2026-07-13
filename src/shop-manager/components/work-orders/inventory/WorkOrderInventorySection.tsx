@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { WorkOrderInventoryItem } from '@/types/workOrder';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { WorkOrderInventoryItem } from '@sm/types/workOrder';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Plus, Package } from 'lucide-react';
 import { WorkOrderInventoryTable } from './WorkOrderInventoryTable';
 

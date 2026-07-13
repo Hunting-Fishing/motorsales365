@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Loader2, Users, ArrowUpDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { format, subDays } from 'date-fns';
 import { useState } from 'react';
 

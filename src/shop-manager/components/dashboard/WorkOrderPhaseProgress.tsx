@@ -1,7 +1,7 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { PhaseProgressItem } from "@/types/dashboard";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Progress } from "@sm/components/ui/progress";
+import { PhaseProgressItem } from "@sm/types/dashboard";
 import { Loader2, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 

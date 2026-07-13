@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "./schemas/customerSchema";
-import { checkDuplicateCustomers } from "@/services/customers";
-import { CustomerCreate } from "@/types/customer";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { checkDuplicateCustomers } from "@sm/services/customers";
+import { CustomerCreate } from "@sm/types/customer";
+import { Alert, AlertTitle, AlertDescription } from "@sm/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useDebounce } from "@/hooks/useDebounce";
+import { Button } from "@sm/components/ui/button";
+import { useDebounce } from "@sm/hooks/useDebounce";
 
 interface DuplicateCustomerAlertProps {
   form: UseFormReturn<CustomerFormValues>;

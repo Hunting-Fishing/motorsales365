@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader, CardTitle, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Switch } from '@sm/components/ui/switch';
+import { Label } from '@sm/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Badge } from '@sm/components/ui/badge';
 import { AlertCircle, CheckCircle, Send, Bell, Webhook } from 'lucide-react';
 import { toast } from 'sonner';
-import { FeatureRequestNotificationService } from '@/services/notifications/FeatureRequestNotificationService';
+import { FeatureRequestNotificationService } from '@sm/services/notifications/FeatureRequestNotificationService';
 
 export function NotificationSettings() {
   const [emailNotifications, setEmailNotifications] = useState(true);

@@ -6,13 +6,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useAutomotiveRegion } from '@/hooks/useAutomotiveRegion';
+} from '@sm/components/ui/select';
+import { useAutomotiveRegion } from '@sm/hooks/useAutomotiveRegion';
 import {
   AUTOMOTIVE_REGIONS,
   AutomotiveRegion,
   REGION_META,
-} from '@/lib/regions/automotive';
+} from '@sm/lib/regions/automotive';
 
 interface Props {
   className?: string;

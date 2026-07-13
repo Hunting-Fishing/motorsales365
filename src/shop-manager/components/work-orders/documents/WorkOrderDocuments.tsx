@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { FileText, Upload, Download, Eye, Trash2, Plus, File } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
-import { useAuthUser } from '@/hooks/useAuthUser';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
 
 interface WorkOrderDocument {
   id: string;

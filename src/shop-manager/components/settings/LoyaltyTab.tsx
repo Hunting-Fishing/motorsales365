@@ -1,20 +1,20 @@
 
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Switch } from "@sm/components/ui/switch";
+import { Label } from "@sm/components/ui/label";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@sm/components/ui/alert";
 import { AlertCircle, Plus } from "lucide-react";
 import { LoyaltyTierCard } from "./loyalty/LoyaltyTierCard";
 import { LoyaltyTierForm } from "./loyalty/LoyaltyTierForm";
-import { getLoyaltySettings, updateLoyaltySettings, toggleLoyaltyProgramEnabled } from "@/services/loyalty";
-import { getShopTiers } from "@/services/loyalty/tierService";
-import { LoyaltySettings, LoyaltyTier } from "@/types/loyalty";
-import { useShopId } from "@/hooks/useShopId";
-import { supabase } from "@/lib/supabase";
+import { getLoyaltySettings, updateLoyaltySettings, toggleLoyaltyProgramEnabled } from "@sm/services/loyalty";
+import { getShopTiers } from "@sm/services/loyalty/tierService";
+import { LoyaltySettings, LoyaltyTier } from "@sm/types/loyalty";
+import { useShopId } from "@sm/hooks/useShopId";
+import { supabase } from "@sm/lib/supabase";
 import { toast } from "sonner";
 
 export function LoyaltyTab() {

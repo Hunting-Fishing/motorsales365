@@ -1,6 +1,6 @@
 
 import { useState, useMemo, useCallback } from 'react';
-import { InventoryItemExtended } from '@/types/inventory';
+import { InventoryItemExtended } from '@sm/types/inventory';
 import { useInventoryData } from './useInventoryData';
 
 interface FilterState {

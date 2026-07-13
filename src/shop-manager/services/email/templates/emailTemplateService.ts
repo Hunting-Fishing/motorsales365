@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabase';
-import { EmailTemplate, EmailTemplateVariable, EmailCategory } from '@/types/email';
+import { supabase } from '@sm/lib/supabase';
+import { EmailTemplate, EmailTemplateVariable, EmailCategory } from '@sm/types/email';
 import { GenericResponse, parseJsonField } from '../utils/supabaseHelper';
 
 // Helper function to convert database template to typed EmailTemplate

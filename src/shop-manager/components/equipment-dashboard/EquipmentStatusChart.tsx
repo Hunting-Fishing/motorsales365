@@ -1,9 +1,9 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 const STATUS_COLORS: Record<string, string> = {
   operational: '#22c55e',

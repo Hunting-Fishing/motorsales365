@@ -1,34 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Switch } from '@sm/components/ui/switch';
 import { Plus, Search, Users, ArrowLeft, MapPin, Pencil, Trash2, Fuel } from 'lucide-react';
-import { useFuelDeliveryCustomers, useCreateFuelDeliveryCustomer, useUpdateFuelDeliveryCustomer, useFuelDeliveryLocations, FuelDeliveryCustomer } from '@/hooks/useFuelDelivery';
+import { useFuelDeliveryCustomers, useCreateFuelDeliveryCustomer, useUpdateFuelDeliveryCustomer, useFuelDeliveryLocations, FuelDeliveryCustomer } from '@sm/hooks/useFuelDelivery';
 import { useNavigate } from 'react-router-dom';
-import { Skeleton } from '@/components/ui/skeleton';
-import { AddressAutocomplete, AddressResult } from '@/components/fuel-delivery/AddressAutocomplete';
-import { FuelTypeSelect, CustomerVehicleForm, VehicleFormData } from '@/components/fuel-delivery';
-import { supabase } from '@/integrations/supabase/client';
-import { geocodeAddress } from '@/utils/geocoding';
-import { toast } from '@/hooks/use-toast';
-import { useShopId } from '@/hooks/useShopId';
-import { useModuleDisplayInfo } from '@/hooks/useModuleDisplayInfo';
-import { RouteUpdateConfirmDialog } from '@/components/fuel-delivery/RouteUpdateConfirmDialog';
-import { useFuelUnits } from '@/hooks/fuel-delivery/useFuelUnits';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { AddressAutocomplete, AddressResult } from '@sm/components/fuel-delivery/AddressAutocomplete';
+import { FuelTypeSelect, CustomerVehicleForm, VehicleFormData } from '@sm/components/fuel-delivery';
+import { supabase } from '@sm/integrations/supabase/client';
+import { geocodeAddress } from '@sm/utils/geocoding';
+import { toast } from '@sm/hooks/use-toast';
+import { useShopId } from '@sm/hooks/useShopId';
+import { useModuleDisplayInfo } from '@sm/hooks/useModuleDisplayInfo';
+import { RouteUpdateConfirmDialog } from '@sm/components/fuel-delivery/RouteUpdateConfirmDialog';
+import { useFuelUnits } from '@sm/hooks/fuel-delivery/useFuelUnits';
 import { 
   analyzeRouteChanges, 
   regenerateRoutesForCustomer, 
   syncLocationSchedulesWithCustomer,
   deliveryDaysChanged,
   RouteUpdateSummary 
-} from '@/services/fuelDelivery/RouteScheduleService';
+} from '@sm/services/fuelDelivery/RouteScheduleService';
 
 export default function FuelDeliveryCustomers() {
   const navigate = useNavigate();

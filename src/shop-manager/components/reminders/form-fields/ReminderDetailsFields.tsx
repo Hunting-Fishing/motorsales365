@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
 import { ReminderFormValues } from "../schemas/reminderFormSchema";
 import { 
   Select, 
@@ -11,15 +11,15 @@ import {
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+} from "@sm/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
+import { Button } from "@sm/components/ui/button";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@sm/components/ui/command";
 import { Check, ChevronsUpDown, Tag } from "lucide-react";
-import { ReminderTag } from "@/types/reminder";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { getReminderTags } from "@/services/reminders/reminderQueries";
+import { ReminderTag } from "@sm/types/reminder";
+import { cn } from "@sm/lib/utils";
+import { Badge } from "@sm/components/ui/badge";
+import { getReminderTags } from "@sm/services/reminders/reminderQueries";
 
 interface ReminderDetailsFieldsProps {
   form: UseFormReturn<ReminderFormValues>;

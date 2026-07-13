@@ -1,5 +1,5 @@
 
-import { PermissionSet } from "@/types/permissions";
+import { PermissionSet } from "@sm/types/permissions";
 
 // Default permissions structure
 export const defaultPermissions: PermissionSet = {

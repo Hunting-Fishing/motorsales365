@@ -1,12 +1,12 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useTimeCards } from '@/hooks/useTimeCards';
-import { usePayPeriods } from '@/hooks/usePayPeriods';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { useTimeCards } from '@sm/hooks/useTimeCards';
+import { usePayPeriods } from '@sm/hooks/usePayPeriods';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
 import { format, differenceInHours, startOfWeek, endOfWeek } from 'date-fns';
 import { 
   DollarSign, 
@@ -19,7 +19,7 @@ import {
   PauseCircle,
   Calendar
 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 export function PayrollDashboard() {
   const { shopId } = useShopId();

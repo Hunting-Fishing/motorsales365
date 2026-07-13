@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useStaffForPlanner, useEquipmentForPlanner, useWorkOrdersForPlanner } from '@/hooks/usePlannerData';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useStaffForPlanner, useEquipmentForPlanner, useWorkOrdersForPlanner } from '@sm/hooks/usePlannerData';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@sm/components/ui/avatar';
 import { Users, Wrench, FileText, Search, X, GripVertical } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { Badge } from '@sm/components/ui/badge';
+import { cn } from '@sm/lib/utils';
 
 interface PlannerResourceSidebarProps {
   onClose: () => void;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
 import {
   FileSearch,
   Search,
@@ -13,11 +13,11 @@ import {
   Car,
   Loader2,
 } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { supabase } from '@/integrations/supabase/client';
-import { useAutomotiveRegion } from '@/hooks/useAutomotiveRegion';
-import { REGION_META } from '@/lib/regions/automotive';
-import { RegionSwitcher } from '@/components/automotive/RegionSwitcher';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useAutomotiveRegion } from '@sm/hooks/useAutomotiveRegion';
+import { REGION_META } from '@sm/lib/regions/automotive';
+import { RegionSwitcher } from '@sm/components/automotive/RegionSwitcher';
 import { toast } from 'sonner';
 
 interface Recall {

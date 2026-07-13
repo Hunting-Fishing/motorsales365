@@ -1,6 +1,6 @@
-import { supabase } from '@/integrations/supabase/client';
-import { ProductVariant } from '@/types/advanced-product';
-import { pricingService } from '@/services/advanced-product/pricingService';
+import { supabase } from '@sm/integrations/supabase/client';
+import { ProductVariant } from '@sm/types/advanced-product';
+import { pricingService } from '@sm/services/advanced-product/pricingService';
 
 export interface CartItemWithVariant {
   id: string;

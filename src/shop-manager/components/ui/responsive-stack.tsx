@@ -1,6 +1,6 @@
 
 import * as React from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "@sm/lib/utils"
 
 interface ResponsiveStackProps {
   children: React.ReactNode;

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { ServiceSector, ServiceJob } from '@/types/service';
-import { SelectedService } from '@/types/selectedService';
+import { ServiceSector, ServiceJob } from '@sm/types/service';
+import { SelectedService } from '@sm/types/selectedService';
 import { SmartServiceSelector } from './SmartServiceSelector';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 interface IntegratedServiceSelectorProps {
   sectors: ServiceSector[];
   onServiceSelect: (service: ServiceJob, categoryName: string, subcategoryName: string) => void;

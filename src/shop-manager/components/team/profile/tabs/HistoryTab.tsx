@@ -1,12 +1,12 @@
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TeamMember } from "@/types/team";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { TeamMember } from "@sm/types/team";
 import { 
   TeamMemberHistoryRecord, 
   fetchTeamMemberHistory, 
   formatHistoryRecord 
-} from "@/utils/team/history";
+} from "@sm/utils/team/history";
 import { Loader2 } from "lucide-react";
 
 interface HistoryTabProps {

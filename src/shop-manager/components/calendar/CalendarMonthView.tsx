@@ -11,8 +11,8 @@ import {
   isSameDay
 } from "date-fns";
 import { CalendarDay } from "./CalendarDay";
-import { CalendarEvent } from "@/types/calendar";
-import { ChatRoom } from "@/types/chat";
+import { CalendarEvent } from "@sm/types/calendar";
+import { ChatRoom } from "@sm/types/chat";
 
 interface BusinessHour {
   day_of_week: number;

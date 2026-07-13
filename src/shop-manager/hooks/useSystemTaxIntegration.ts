@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { useTaxSettings } from '@/hooks/useTaxSettings';
-import { validateTaxSettings, createTaxAuditEntry } from '@/utils/taxValidation';
-import { TaxSettings } from '@/services/settings/taxSettingsService';
+import { useTaxSettings } from '@sm/hooks/useTaxSettings';
+import { validateTaxSettings, createTaxAuditEntry } from '@sm/utils/taxValidation';
+import { TaxSettings } from '@sm/services/settings/taxSettingsService';
 
 interface UseSystemTaxIntegrationProps {
   shopId?: string;

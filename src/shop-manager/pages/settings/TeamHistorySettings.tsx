@@ -1,7 +1,7 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { TeamHistoryTab } from "@/components/settings/TeamHistoryTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { TeamHistoryTab } from "@sm/components/settings/TeamHistoryTab";
 
 export const TeamHistorySettings = () => {
   return (

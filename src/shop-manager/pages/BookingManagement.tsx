@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Calendar, Clock, Users, Settings, List, Plus, AlertCircle } from 'lucide-react';
 import { format, startOfDay, endOfDay, addDays } from 'date-fns';
-import { useBookingAppointments, useBookingWaitlist, useBookableServices, useBookingSettings } from '@/hooks/useBookingSystem';
-import { BookingCalendarView } from '@/components/booking/BookingCalendarView';
-import { BookingServiceMenu } from '@/components/booking/BookingServiceMenu';
-import { BookingWaitlistView } from '@/components/booking/BookingWaitlistView';
-import { BookingSettingsPanel } from '@/components/booking/BookingSettingsPanel';
-import { CreateBookingDialog } from '@/components/booking/CreateBookingDialog';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useBookingAppointments, useBookingWaitlist, useBookableServices, useBookingSettings } from '@sm/hooks/useBookingSystem';
+import { BookingCalendarView } from '@sm/components/booking/BookingCalendarView';
+import { BookingServiceMenu } from '@sm/components/booking/BookingServiceMenu';
+import { BookingWaitlistView } from '@sm/components/booking/BookingWaitlistView';
+import { BookingSettingsPanel } from '@sm/components/booking/BookingSettingsPanel';
+import { CreateBookingDialog } from '@sm/components/booking/CreateBookingDialog';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 export default function BookingManagement() {
   const [activeTab, setActiveTab] = useState('calendar');

@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { ServiceMainCategory, ServiceJob } from '@/types/service';
-import { SelectedService } from '@/types/selectedService';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { ServiceMainCategory, ServiceJob } from '@sm/types/service';
+import { SelectedService } from '@sm/types/selectedService';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
 
 interface ServiceCategoryListProps {

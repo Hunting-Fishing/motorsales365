@@ -1,8 +1,8 @@
 import React from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { Card, CardContent } from '@/components/ui/card';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { Card, CardContent } from '@sm/components/ui/card';
 import { 
   DollarSign, 
   Clock, 

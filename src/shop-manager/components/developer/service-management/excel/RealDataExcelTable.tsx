@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
 import { Search, Download, Save } from 'lucide-react';
 
 interface ExcelServiceData {

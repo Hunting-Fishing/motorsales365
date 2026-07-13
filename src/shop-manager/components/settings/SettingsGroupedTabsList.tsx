@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { SettingsSection } from '@/types/settingsConfig';
-import { cn } from '@/lib/utils';
+import { SettingsSection } from '@sm/types/settingsConfig';
+import { cn } from '@sm/lib/utils';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
+} from '@sm/components/ui/accordion';
 
 interface SettingsGroupedTabsListProps {
   sections: SettingsSection[];

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Link } from "react-router-dom";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { 
   Edit, 
   Trash2, 
@@ -19,13 +19,13 @@ import {
 } from "lucide-react";
 import { toast } from 'sonner';
 import ProductsManagement from './ProductsManagement';
-import ProductBundles from '@/components/shopping/product/ProductBundles';
-import ProductVariants from '@/components/shopping/product/ProductVariants';
-import InventoryAlerts from '@/components/shopping/product/InventoryAlerts';
-import { bundleService } from '@/services/advanced-product/bundleService';
-import { pricingService } from '@/services/advanced-product/pricingService';
-import { variantService } from '@/services/advanced-product/variantService';
-import { inventoryAlertService } from '@/services/advanced-product/inventoryAlertService';
+import ProductBundles from '@sm/components/shopping/product/ProductBundles';
+import ProductVariants from '@sm/components/shopping/product/ProductVariants';
+import InventoryAlerts from '@sm/components/shopping/product/InventoryAlerts';
+import { bundleService } from '@sm/services/advanced-product/bundleService';
+import { pricingService } from '@sm/services/advanced-product/pricingService';
+import { variantService } from '@sm/services/advanced-product/variantService';
+import { inventoryAlertService } from '@sm/services/advanced-product/inventoryAlertService';
 
 export default function ProductsManagementAdvanced() {
   const [activeTab, setActiveTab] = useState("products");

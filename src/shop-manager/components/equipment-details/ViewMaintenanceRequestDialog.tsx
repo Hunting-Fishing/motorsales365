@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Calendar, User, Clock, FileText, Package, Wrench, Plus, DollarSign, Edit, History, Image as ImageIcon, Video } from 'lucide-react';
 import { format } from 'date-fns';
-import { PartsRequestManager } from '@/components/maintenance/PartsRequestManager';
-import { MaintenanceRequestActivityFeed } from '@/components/maintenance/MaintenanceRequestActivityFeed';
-import { AddUpdateDialog } from '@/components/maintenance/AddUpdateDialog';
+import { PartsRequestManager } from '@sm/components/maintenance/PartsRequestManager';
+import { MaintenanceRequestActivityFeed } from '@sm/components/maintenance/MaintenanceRequestActivityFeed';
+import { AddUpdateDialog } from '@sm/components/maintenance/AddUpdateDialog';
 import { EditMaintenanceRequestDialog } from './EditMaintenanceRequestDialog';
 import { MaintenanceRequestHistoryDialog } from './MaintenanceRequestHistoryDialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 const statusColors = {
   pending: 'bg-yellow-500/10 text-yellow-500',

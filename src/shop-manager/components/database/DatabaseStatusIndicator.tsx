@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle, Clock, RefreshCw } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { databaseHealthMonitor } from '@/services/database/DatabaseHealthMonitor';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { databaseHealthMonitor } from '@sm/services/database/DatabaseHealthMonitor';
 
 export function DatabaseStatusIndicator() {
   const [healthStatus, setHealthStatus] = useState<any>(null);

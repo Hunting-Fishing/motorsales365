@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AssetUsageConfig } from '@/types/inventory/predictive';
-import { getAssetUsageConfig, createOrUpdateAssetUsage } from '@/services/inventory/predictiveService';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { AssetUsageConfig } from '@sm/types/inventory/predictive';
+import { getAssetUsageConfig, createOrUpdateAssetUsage } from '@sm/services/inventory/predictiveService';
+import { supabase } from '@sm/integrations/supabase/client';
+import { toast } from '@sm/hooks/use-toast';
 
 export function useAssetUsage() {
   const queryClient = useQueryClient();

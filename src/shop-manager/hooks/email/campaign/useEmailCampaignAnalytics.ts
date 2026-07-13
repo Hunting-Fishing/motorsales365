@@ -1,12 +1,12 @@
 
 import { useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { 
   EmailCampaignAnalytics, 
   EmailCampaign,
   EmailCampaignTimelinePoint
-} from '@/types/email';
-import { useToast } from '@/hooks/use-toast';
+} from '@sm/types/email';
+import { useToast } from '@sm/hooks/use-toast';
 import { validateCampaignStatus, parseJsonField, parseABTest } from './utils/emailCampaignUtils';
 
 // Interface for email event data structure

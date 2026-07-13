@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { cleanupAuthState } from '@/utils/authCleanup';
+import { supabase } from '@sm/integrations/supabase/client';
+import { cleanupAuthState } from '@sm/utils/authCleanup';
 
 export interface SessionRecoveryOptions {
   maxRetries?: number;

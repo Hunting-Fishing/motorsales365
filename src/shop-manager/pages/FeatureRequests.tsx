@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useFeatureRequests } from '@/hooks/useFeatureRequests';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { useFeatureRequests } from '@sm/hooks/useFeatureRequests';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Plus, ThumbsUp, MessageSquare } from 'lucide-react';
-import { AddFeatureRequestDialog } from '@/components/feature-requests/AddFeatureRequestDialog';
+import { AddFeatureRequestDialog } from '@sm/components/feature-requests/AddFeatureRequestDialog';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function FeatureRequests() {

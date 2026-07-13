@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { Ship, Clock, MapPin, Radio, AlertTriangle, FileText, CheckCircle } from 'lucide-react';
-import { VoyageLog, VOYAGE_TYPE_LABELS } from '@/types/voyage';
+import { VoyageLog, VOYAGE_TYPE_LABELS } from '@sm/types/voyage';
 import { formatDistanceToNow, format } from 'date-fns';
 import { CommunicationsLog } from './CommunicationsLog';
 import { ActivityLog } from './ActivityLog';

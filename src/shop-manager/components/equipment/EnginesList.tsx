@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { supabase } from '@/integrations/supabase/client';
-import { Engine } from '@/types/engine';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Engine } from '@sm/types/engine';
 import { Plus, Search, Edit, Trash2, Fuel, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { AddEngineDialog } from './AddEngineDialog';
-import { useEquipmentFilterOptions, formatEquipmentType } from '@/hooks/useEquipmentFilterOptions';
+import { useEquipmentFilterOptions, formatEquipmentType } from '@sm/hooks/useEquipmentFilterOptions';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +19,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@sm/components/ui/alert-dialog";
 
 export function EnginesList() {
   const [engines, setEngines] = useState<Engine[]>([]);

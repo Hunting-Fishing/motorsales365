@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { Shield, Check, X, AlertCircle } from "lucide-react";
-import { rolePermissionDefaults, type AccessLevel } from "@/data/rolePermissionDefaults";
+import { rolePermissionDefaults, type AccessLevel } from "@sm/data/rolePermissionDefaults";
 
 interface RolePermissionsSummaryProps {
   roleId: string;

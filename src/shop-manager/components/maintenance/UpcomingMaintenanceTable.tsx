@@ -1,12 +1,12 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { EquipmentWithMaintenance } from "@/services/equipmentService";
-import { formatDate } from "@/utils/workOrders";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@sm/components/ui/table";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import type { EquipmentWithMaintenance } from "@sm/services/equipmentService";
+import { formatDate } from "@sm/utils/workOrders";
 import { AlertTriangle, Calendar, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { EmptyMaintenanceState } from "./EmptyMaintenanceState";

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@sm/components/ui/dialog';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Switch } from '@sm/components/ui/switch';
 import { Plus, Edit, Trash2, Clock, DollarSign, GripVertical } from 'lucide-react';
-import { BookableService, useCreateBookableService, useUpdateBookableService, useDeleteBookableService } from '@/hooks/useBookingSystem';
+import { BookableService, useCreateBookableService, useUpdateBookableService, useDeleteBookableService } from '@sm/hooks/useBookingSystem';
 import { toast } from 'sonner';
 
 interface BookingServiceMenuProps {

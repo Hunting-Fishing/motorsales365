@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { ArrowLeft, Car, PenLine, HistoryIcon, FileClock } from 'lucide-react';
-import { getVehicleById } from '@/utils/vehicleUtils';
+import { getVehicleById } from '@sm/utils/vehicleUtils';
 import { VehicleDetailCard } from './VehicleDetailCard';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@sm/components/ui/alert';
 
 export function VehicleDetailsPage() {
   const { customerId, vehicleId } = useParams();

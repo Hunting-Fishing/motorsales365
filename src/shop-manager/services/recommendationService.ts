@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
-import { ProductRecommendation, RecommendationType } from "@/types/phase3";
+import { supabase } from "@sm/integrations/supabase/client";
+import { ProductRecommendation, RecommendationType } from "@sm/types/phase3";
 
 export const getPersonalizedRecommendations = async (
   userId: string,

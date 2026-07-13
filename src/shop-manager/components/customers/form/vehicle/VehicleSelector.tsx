@@ -1,8 +1,8 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent } from "@sm/components/ui/card";
 import { X } from "lucide-react";
 import { 
   VinField, 

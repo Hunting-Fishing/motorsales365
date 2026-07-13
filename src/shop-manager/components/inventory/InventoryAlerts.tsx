@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useInventoryManager } from '@/hooks/inventory/useInventoryManager';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { useInventoryManager } from '@sm/hooks/inventory/useInventoryManager';
 import { AlertTriangle, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Link } from 'react-router-dom';
 
 export function InventoryAlerts() {

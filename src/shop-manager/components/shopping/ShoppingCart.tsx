@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
 import { ShoppingCart, Plus, Minus, Trash2, Loader2, CreditCard } from 'lucide-react';
-import { useCart } from '@/hooks/shopping/useCart';
+import { useCart } from '@sm/hooks/shopping/useCart';
 import { useNavigate } from 'react-router-dom';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@sm/lib/utils';
 
 interface ShoppingCartProps {
   isOpen?: boolean;

@@ -1,7 +1,7 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 import { FeedbackResponse } from "./types";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@sm/hooks/use-toast";
 
 // Submit feedback response
 export const submitFeedbackResponse = async (response: Omit<FeedbackResponse, 'id' | 'submitted_at' | 'created_at'>): Promise<FeedbackResponse | null> => {

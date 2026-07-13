@@ -6,17 +6,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+} from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Label } from "@sm/components/ui/label";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
+import { useToast } from "@sm/hooks/use-toast";
 import { Loader2, UserPlus } from "lucide-react";
-import { Customer } from "@/types/customer";
-import { CustomerReferralView } from "@/types/referral";
-import { createCustomerReferral } from "@/services/referral/referralService";
-import { CustomerSearchInput } from "@/components/customers/CustomerSearchInput";
+import { Customer } from "@sm/types/customer";
+import { CustomerReferralView } from "@sm/types/referral";
+import { createCustomerReferral } from "@sm/services/referral/referralService";
+import { CustomerSearchInput } from "@sm/components/customers/CustomerSearchInput";
 
 interface AddReferralDialogProps {
   open: boolean;

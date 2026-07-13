@@ -1,11 +1,11 @@
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { PlannerBoardColumn, PlannerBoardItem } from '@/types/planner';
+import { PlannerBoardColumn, PlannerBoardItem } from '@sm/types/planner';
 import { KanbanCard } from './KanbanCard';
 import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@sm/components/ui/button';
+import { cn } from '@sm/lib/utils';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 
 interface KanbanColumnProps {
   column: PlannerBoardColumn;

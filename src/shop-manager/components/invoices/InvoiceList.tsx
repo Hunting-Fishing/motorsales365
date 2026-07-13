@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
 import { Plus, Filter, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { InvoiceListTable } from "./InvoiceListTable";
 import { InvoiceFiltersDropdown } from "./InvoiceFiltersDropdown";
 import { InvoiceListExportMenu } from "./InvoiceListExportMenu";
-import { Invoice, InvoiceFilters } from "@/types/invoice";
+import { Invoice, InvoiceFilters } from "@sm/types/invoice";
 
 interface InvoiceListProps {
   invoices: Invoice[];

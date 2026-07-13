@@ -4,11 +4,11 @@ import {
   getCustomerShops, 
   unregisterFromShop, 
   ShopDirectoryItem 
-} from "@/services/shopDirectory/shopDirectoryService";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@sm/services/shopDirectory/shopDirectoryService";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { useToast } from "@sm/hooks/use-toast";
+import { Skeleton } from "@sm/components/ui/skeleton";
 import { ExternalLink, MapPin, Phone, Mail, MinusCircle } from "lucide-react";
 
 interface CustomerShopsProps {

@@ -1,15 +1,15 @@
 
 import React from "react";
-import { TableRow, TableCell } from "@/components/ui/table";
-import { Bay } from "@/services/diybay/diybayService";
+import { TableRow, TableCell } from "@sm/components/ui/table";
+import { Bay } from "@sm/services/diybay/diybayService";
 import { GripVertical, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { EditableCell } from "@/components/settings/diybay/EditableCell";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
+import { Switch } from "@sm/components/ui/switch";
+import { EditableCell } from "@sm/components/settings/diybay/EditableCell";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { formatCurrency } from "@/lib/formatters";
+import { formatCurrency } from "@sm/lib/formatters";
 
 interface DraggableBayRowProps {
   bay: Bay;

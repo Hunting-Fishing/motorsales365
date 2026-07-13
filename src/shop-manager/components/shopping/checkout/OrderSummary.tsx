@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Separator } from '@sm/components/ui/separator';
+import { Badge } from '@sm/components/ui/badge';
 import { Truck, Package, Tag, Percent } from 'lucide-react';
-import { CartItem } from '@/hooks/shopping/useCart';
-import { useTaxSettings } from '@/hooks/useTaxSettings';
-import { useShopId } from '@/hooks/useShopId';
+import { CartItem } from '@sm/hooks/shopping/useCart';
+import { useTaxSettings } from '@sm/hooks/useTaxSettings';
+import { useShopId } from '@sm/hooks/useShopId';
 
 interface OrderSummaryProps {
   items: CartItem[];

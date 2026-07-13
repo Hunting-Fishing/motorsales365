@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { useQuotes } from '@/hooks/useQuotes';
+import { useQuotes } from '@sm/hooks/useQuotes';
 import { QuotesHeader } from './QuotesHeader';
 import { QuotesTable } from './QuotesTable';
-import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { Database, Loader2 } from 'lucide-react';
 
 export default function QuotesPage() {

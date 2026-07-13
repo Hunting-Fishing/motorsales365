@@ -1,10 +1,10 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardHeader } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { ChevronDown, ChevronUp, Users } from "lucide-react";
-import { PermissionSet } from "@/types/permissions";
+import { PermissionSet } from "@sm/types/permissions";
 import { RoleCardHeader } from "./RoleCardHeader";
 import { RoleCardBadges } from "./RoleCardBadges";
 import { RoleCardPermissions } from "./RoleCardPermissions";

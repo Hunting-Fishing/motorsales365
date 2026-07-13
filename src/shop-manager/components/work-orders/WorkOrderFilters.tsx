@@ -1,11 +1,11 @@
 
 import { useState } from "react";
 import { Search, X, Filter } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { statusMap } from "@/types/workOrder";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { statusMap } from "@sm/types/workOrder";
 
 interface WorkOrderFiltersProps {
   searchQuery: string;

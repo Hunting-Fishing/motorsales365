@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ServiceMainCategory } from '@/types/service';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { ServiceMainCategory } from '@sm/types/service';
 import { AlertTriangle, Merge, Trash2, Edit } from 'lucide-react';
 
 interface DuplicateResolutionDialogProps {

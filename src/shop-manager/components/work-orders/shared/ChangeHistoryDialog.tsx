@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
 import { History, Clock, User } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface HistoryEntry {
   id: string;

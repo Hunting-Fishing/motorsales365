@@ -1,8 +1,8 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useOnboardingStatus } from '@sm/hooks/useOnboardingStatus';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface OnboardingRedirectGateProps {
   children: React.ReactNode;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { Package, Star, Users, TrendingUp } from "lucide-react";
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 
 interface StatsData {
   totalProducts: number;

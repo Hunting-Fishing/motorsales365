@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { BookOpen, GraduationCap, MessageSquare, Star, TrendingUp, Download, Settings, Lightbulb } from 'lucide-react';
 import { FAQSection } from './FAQSection';
 import { LearningPathViewer } from './LearningPathViewer';

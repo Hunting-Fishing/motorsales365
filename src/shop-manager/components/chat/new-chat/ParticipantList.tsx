@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@sm/components/ui/avatar';
+import { Button } from '@sm/components/ui/button';
 import { X } from 'lucide-react';
-import { TeamMember } from '@/types/team';
+import { TeamMember } from '@sm/types/team';
 
 export interface ParticipantListProps {
   participants: string[];

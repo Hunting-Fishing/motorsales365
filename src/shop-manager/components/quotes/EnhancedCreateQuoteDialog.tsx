@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { Plus, Loader2, Save, Package, Wrench, Calculator } from 'lucide-react';
-import { useCustomers } from '@/hooks/useCustomers';
-import { useVehicles } from '@/hooks/useVehicles';
-import { useServiceData } from '@/hooks/useServiceData';
-import { createQuote } from '@/services/quote/quoteService';
-import { createQuoteItems } from '@/services/quote/quoteItemService';
-import { QuoteItemFormValues, QuoteItemType } from '@/types/quote';
+import { useCustomers } from '@sm/hooks/useCustomers';
+import { useVehicles } from '@sm/hooks/useVehicles';
+import { useServiceData } from '@sm/hooks/useServiceData';
+import { createQuote } from '@sm/services/quote/quoteService';
+import { createQuoteItems } from '@sm/services/quote/quoteItemService';
+import { QuoteItemFormValues, QuoteItemType } from '@sm/types/quote';
 
 // Enhanced part type to match work order parts
 interface ComprehensiveQuotePart {
@@ -55,13 +55,13 @@ interface ComprehensiveQuotePart {
   notes?: string;
   notesInternal?: string;
 }
-import { SelectedService } from '@/types/selectedService';
-import { formatCurrency } from '@/utils/formatters';
-import { toast } from '@/hooks/use-toast';
-import { IntegratedServiceSelector } from '@/components/work-orders/fields/services/IntegratedServiceSelector';
+import { SelectedService } from '@sm/types/selectedService';
+import { formatCurrency } from '@sm/utils/formatters';
+import { toast } from '@sm/hooks/use-toast';
+import { IntegratedServiceSelector } from '@sm/components/work-orders/fields/services/IntegratedServiceSelector';
 import { ComprehensiveQuotePartsSelector } from './ComprehensiveQuotePartsSelector';
-import { useQuoteTaxCalculations } from '@/hooks/useQuoteTaxCalculations';
-import { useShopId } from '@/hooks/useShopId';
+import { useQuoteTaxCalculations } from '@sm/hooks/useQuoteTaxCalculations';
+import { useShopId } from '@sm/hooks/useShopId';
 
 interface EnhancedCreateQuoteDialogProps {
   children: React.ReactNode;

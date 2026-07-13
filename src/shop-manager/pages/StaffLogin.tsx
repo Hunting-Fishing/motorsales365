@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { 
   Wrench, 
   ArrowLeft, 
@@ -18,11 +18,11 @@ import {
   LogOut,
   ArrowRight
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { AuthService } from '@/lib/services/AuthService';
-import { getPostLoginDestination } from '@/lib/auth/getPostLoginDestination';
-import staffLoginBg from '@/assets/staff-login-bg.jpg';
+import { supabase } from '@sm/lib/supabase';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { AuthService } from '@sm/lib/services/AuthService';
+import { getPostLoginDestination } from '@sm/lib/auth/getPostLoginDestination';
+import staffLoginBg from '@sm/assets/staff-login-bg.jpg';
 
 export default function StaffLogin() {
   const navigate = useNavigate();

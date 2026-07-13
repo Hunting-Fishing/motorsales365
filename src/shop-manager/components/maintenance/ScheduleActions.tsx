@@ -1,11 +1,11 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@sm/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,19 +15,19 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@sm/components/ui/alert-dialog';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@sm/components/ui/dialog';
 import { MoreVertical, Edit, Trash2, CheckCircle, History } from 'lucide-react';
 import { VersionHistory } from './VersionHistory';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useShopId } from '@/hooks/useShopId';
-import { recordMaintenanceActivity } from '@/services/maintenance/maintenanceActivityService';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
+import { useShopId } from '@sm/hooks/useShopId';
+import { recordMaintenanceActivity } from '@sm/services/maintenance/maintenanceActivityService';
 
 interface ScheduleActionsProps {
   schedule: any;

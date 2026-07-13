@@ -1,14 +1,14 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { ArrowLeft, Ship, CheckCircle, AlertTriangle, XCircle, Clock, User, FileText } from 'lucide-react';
 import { format } from 'date-fns';
-import { InspectionPdfExport } from '@/components/safety/shared/InspectionPdfExport';
+import { InspectionPdfExport } from '@sm/components/safety/shared/InspectionPdfExport';
 
 export default function VesselInspectionHistoryPage() {
   const { vesselId } = useParams<{ vesselId: string }>();

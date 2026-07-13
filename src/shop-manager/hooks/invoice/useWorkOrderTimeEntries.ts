@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { TimeEntry } from '@/types/workOrder';
-import { supabase } from '@/integrations/supabase/client';
+import { TimeEntry } from '@sm/types/workOrder';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface UseWorkOrderTimeEntriesProps {
   workOrderId: string;

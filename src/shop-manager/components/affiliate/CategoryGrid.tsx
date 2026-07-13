@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Card } from "@/components/ui/card";
+import { Card } from "@sm/components/ui/card";
 import { Segment, Header, Grid } from "semantic-ui-react";
-import { ToolCategory } from "@/types/affiliate";
+import { ToolCategory } from "@sm/types/affiliate";
 import { Wrench, Hammer, Cog, Gauge, Zap, Flame, Snowflake, Settings, Cloud, Droplet, Car } from "lucide-react";
 import { Link } from "react-router-dom";
 

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
 
 export default function ServiceSubcategory() {
   const { categoryId, subcategoryId } = useParams();

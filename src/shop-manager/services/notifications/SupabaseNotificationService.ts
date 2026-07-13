@@ -1,7 +1,7 @@
 
-import { Notification } from '@/types/notification';
+import { Notification } from '@sm/types/notification';
 import { INotificationService } from './types';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 
 export class SupabaseNotificationService implements INotificationService {
   private userId: string | null = null;

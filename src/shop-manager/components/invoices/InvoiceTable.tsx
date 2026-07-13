@@ -1,13 +1,13 @@
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
 import { Eye, FileEdit, Printer, MoreHorizontal } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Invoice } from "@/types/invoice";
-import { formatCurrency } from "@/utils/formatters";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Invoice } from "@sm/types/invoice";
+import { formatCurrency } from "@sm/utils/formatters";
+import { Skeleton } from "@sm/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@sm/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
 export interface InvoiceTableProps {

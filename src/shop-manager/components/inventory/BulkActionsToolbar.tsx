@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Trash2, 
   Edit, 
@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@sm/components/ui/dropdown-menu';
 
 interface BulkActionsToolbarProps {
   selectedCount: number;

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { EquipmentManual } from '@/types/manual';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { EquipmentManual } from '@sm/types/manual';
+import { Button } from '@sm/components/ui/button';
+import { Card } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { useToast } from '@sm/hooks/use-toast';
 import { FileText, Download, Trash2, Plus, Search } from 'lucide-react';
 import { UploadManualDialog } from './UploadManualDialog';
 

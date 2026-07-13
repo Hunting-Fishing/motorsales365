@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { ServiceHierarchyTreeView } from '@/components/developer/service-management/ServiceHierarchyTreeView';
-import { useServiceSectors } from '@/hooks/useServiceCategories';
+import { ServiceHierarchyTreeView } from '@sm/components/developer/service-management/ServiceHierarchyTreeView';
+import { useServiceSectors } from '@sm/hooks/useServiceCategories';
 
 export function ServiceTreeViewPage() {
   const { sectors } = useServiceSectors();

@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { TableRow, TableCell } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { TableRow, TableCell } from '@sm/components/ui/table';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { ChevronDown, ChevronRight, Edit, Trash2 } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { jobLineStatusMap } from '@/types/jobLine';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@sm/components/ui/collapsible';
+import { jobLineStatusMap } from '@sm/types/jobLine';
 
 interface JobLineRowProps {
   jobLine: WorkOrderJobLine;

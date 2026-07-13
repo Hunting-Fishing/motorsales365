@@ -1,9 +1,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { getAllShops, getDefaultShop } from "@/services/shops/shopService";
+import { useToast } from "@sm/hooks/use-toast";
+import { supabase } from "@sm/integrations/supabase/client";
+import { getAllShops, getDefaultShop } from "@sm/services/shops/shopService";
 
 export const useShopData = () => {
   const [isLoading, setIsLoading] = useState(true);

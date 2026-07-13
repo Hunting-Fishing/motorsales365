@@ -5,25 +5,25 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Badge } from '@sm/components/ui/badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import { Fuel, Clock, Droplets, TruckIcon } from 'lucide-react';
-import { useTruckCompartments, TruckCompartment } from '@/hooks/useTruckCompartments';
-import { useAddFuelToCompartment } from '@/hooks/fuel-delivery/useAddFuelToCompartment';
-import { useFuelUnits } from '@/hooks/fuel-delivery/useFuelUnits';
-import { useFuelProducts } from '@/hooks/useFuelProducts';
-import { FuelDeliveryTruck } from '@/hooks/useFuelDelivery';
-import { cn } from '@/lib/utils';
+import { useTruckCompartments, TruckCompartment } from '@sm/hooks/useTruckCompartments';
+import { useAddFuelToCompartment } from '@sm/hooks/fuel-delivery/useAddFuelToCompartment';
+import { useFuelUnits } from '@sm/hooks/fuel-delivery/useFuelUnits';
+import { useFuelProducts } from '@sm/hooks/useFuelProducts';
+import { FuelDeliveryTruck } from '@sm/hooks/useFuelDelivery';
+import { cn } from '@sm/lib/utils';
 
 interface QuickFillDialogProps {
   open: boolean;

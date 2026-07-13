@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import { PermissionSet } from "@/types/permissions";
-import { useRoles, DatabaseRole } from "@/hooks/roles/useRoles";
-import { useRoleAssignments } from "@/hooks/roles/useRoleAssignments";
-import { toast } from "@/hooks/use-toast";
+import { PermissionSet } from "@sm/types/permissions";
+import { useRoles, DatabaseRole } from "@sm/hooks/roles/useRoles";
+import { useRoleAssignments } from "@sm/hooks/roles/useRoleAssignments";
+import { toast } from "@sm/hooks/use-toast";
 
 // Transform database role to UI role format
 const transformDatabaseRoleToUIRole = (dbRole: DatabaseRole) => ({

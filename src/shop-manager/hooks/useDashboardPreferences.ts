@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { dashboardSettingsService } from '@/services/settings/dashboardSettingsService';
-import { useToast } from '@/hooks/use-toast';
-import type { DashboardWidget, DashboardPreferences } from '@/services/settings/dashboardSettingsService';
+import { dashboardSettingsService } from '@sm/services/settings/dashboardSettingsService';
+import { useToast } from '@sm/hooks/use-toast';
+import type { DashboardWidget, DashboardPreferences } from '@sm/services/settings/dashboardSettingsService';
 
 // Re-export types for backward compatibility
 export type { DashboardWidget, DashboardPreferences };

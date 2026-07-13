@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Switch } from "@sm/components/ui/switch";
 import { Settings, Save, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useShopId } from "@/hooks/useShopId";
-import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@sm/hooks/use-toast";
+import { useShopId } from "@sm/hooks/useShopId";
+import { supabase } from "@sm/integrations/supabase/client";
 
 interface SchedulerConfig {
   auto_schedule_enabled: boolean;

@@ -2,10 +2,10 @@
 import * as React from "react";
 import { CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@sm/lib/utils";
+import { Button } from "@sm/components/ui/button";
+import { Calendar } from "@sm/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
 import { format } from "date-fns";
 
 interface DatePickerWithRangeProps {

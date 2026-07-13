@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { supabase } from '@/lib/supabase';
-import { useShopId } from '@/hooks/useShopId';
-import { toast } from '@/hooks/use-toast';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Switch } from '@sm/components/ui/switch';
+import { Label } from '@sm/components/ui/label';
+import { Input } from '@sm/components/ui/input';
+import { supabase } from '@sm/lib/supabase';
+import { useShopId } from '@sm/hooks/useShopId';
+import { toast } from '@sm/hooks/use-toast';
 
 interface BusinessSettingsStepProps {
   onNext: () => void;

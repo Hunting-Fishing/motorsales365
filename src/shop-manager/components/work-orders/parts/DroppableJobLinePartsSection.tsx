@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { DraggablePartCard } from './DraggablePartCard';
-import { WorkOrderPart } from '@/types/workOrderPart';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
 
 interface DroppableJobLinePartsSectionProps {
   jobLineId: string;

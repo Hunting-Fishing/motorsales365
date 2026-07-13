@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { InventoryItemExtended } from "@/types/inventory";
-import { formatCurrency } from "@/utils/formatters";
-import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
+import { Button } from "@sm/components/ui/button";
+import { InventoryItemExtended } from "@sm/types/inventory";
+import { formatCurrency } from "@sm/utils/formatters";
+import { Badge } from "@sm/components/ui/badge";
 import { Edit, Info } from "lucide-react";
 import { EditInventoryDialog } from "./EditInventoryDialog";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@sm/components/ui/tooltip";
 
 export interface InventoryTableProps {
   items: InventoryItemExtended[];

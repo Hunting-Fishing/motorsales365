@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { 
   LineChart, 
   Line, 
@@ -10,7 +10,7 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@sm/components/ui/skeleton";
 
 interface FinancialsTabContentProps {
   salesData: any[];

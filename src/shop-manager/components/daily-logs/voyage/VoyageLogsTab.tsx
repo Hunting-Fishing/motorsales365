@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Button } from '@sm/components/ui/button';
 import { Ship, Plus, History, Loader2 } from 'lucide-react';
-import { useVoyageLogs } from '@/hooks/useVoyageLogs';
+import { useVoyageLogs } from '@sm/hooks/useVoyageLogs';
 import { StartVoyageForm } from './StartVoyageForm';
 import { ActiveVoyagePanel } from './ActiveVoyagePanel';
 import { VoyageHistoryList } from './VoyageHistoryList';

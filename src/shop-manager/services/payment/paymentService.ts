@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { Payment, PaymentMethod, PaymentType, PaymentStatus } from "@/types/payment";
+import { supabase } from "@sm/lib/supabase";
+import { Payment, PaymentMethod, PaymentType, PaymentStatus } from "@sm/types/payment";
 
 /**
  * Fetch all payment methods for a customer

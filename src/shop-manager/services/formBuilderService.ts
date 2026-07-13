@@ -1,6 +1,6 @@
 
-import { supabase } from '@/lib/supabase';
-import { FormBuilderTemplate, FormBuilderSection, FormBuilderField } from '@/types/formBuilder';
+import { supabase } from '@sm/lib/supabase';
+import { FormBuilderTemplate, FormBuilderSection, FormBuilderField } from '@sm/types/formBuilder';
 import { v4 as uuidv4 } from 'uuid';
 
 // Type assertion utility to help with TypeScript

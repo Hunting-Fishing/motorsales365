@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import { format, addMonths, subMonths, addWeeks, subWeeks, addDays, subDays } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { ChevronLeft, ChevronRight, Calendar, CalendarDays, CalendarRange, RefreshCw, Plus } from 'lucide-react';
-import { useStaffScheduleCalendar } from '@/hooks/useStaffScheduleCalendar';
+import { useStaffScheduleCalendar } from '@sm/hooks/useStaffScheduleCalendar';
 import { StaffCalendarFilters } from './StaffCalendarFilters';
 import { StaffCalendarMonthView } from './StaffCalendarMonthView';
 import { StaffCalendarWeekView } from './StaffCalendarWeekView';
 import { StaffCalendarDayView } from './StaffCalendarDayView';
-import { StaffScheduleEvent, StaffCalendarViewType } from '@/types/staffScheduleCalendar';
+import { StaffScheduleEvent, StaffCalendarViewType } from '@sm/types/staffScheduleCalendar';
 import { AddAssetAssignmentDialog } from './AddAssetAssignmentDialog';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
+} from '@sm/components/ui/dialog';
+import { Badge } from '@sm/components/ui/badge';
 import { Ship, Wrench, Truck, Clock, User } from 'lucide-react';
 
 export function StaffSchedulingCalendar() {

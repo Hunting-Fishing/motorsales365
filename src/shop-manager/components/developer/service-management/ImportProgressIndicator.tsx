@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Progress } from '@sm/components/ui/progress';
 import { CheckCircle, XCircle, Clock, Database } from 'lucide-react';
 
 interface ImportProgressIndicatorProps {

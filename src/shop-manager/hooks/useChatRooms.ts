@@ -1,9 +1,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChatRoom } from '@/types/chat';
-import { getUserChatRooms, pinChatRoom, archiveChatRoom, deleteChatRoom } from '@/services/chat';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { ChatRoom } from '@sm/types/chat';
+import { getUserChatRooms, pinChatRoom, archiveChatRoom, deleteChatRoom } from '@sm/services/chat';
+import { supabase } from '@sm/integrations/supabase/client';
+import { toast } from '@sm/hooks/use-toast';
 
 interface UseChatRoomsProps {
   userId: string;

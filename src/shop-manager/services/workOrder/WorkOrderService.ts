@@ -1,8 +1,8 @@
 
 import { WorkOrderRepository } from './WorkOrderRepository';
-import { WorkOrder, WorkOrderFormValues } from '@/types/workOrder';
-import { supabase } from '@/lib/supabase';
-import { triggerWorkflowOnWorkOrderCreate, triggerWorkflowOnWorkOrderStatusUpdate, triggerWorkflowOnWorkOrderComplete } from '@/services/workflows/workflowEventService';
+import { WorkOrder, WorkOrderFormValues } from '@sm/types/workOrder';
+import { supabase } from '@sm/lib/supabase';
+import { triggerWorkflowOnWorkOrderCreate, triggerWorkflowOnWorkOrderStatusUpdate, triggerWorkflowOnWorkOrderComplete } from '@sm/services/workflows/workflowEventService';
 export class WorkOrderService {
   private repository: WorkOrderRepository;
 

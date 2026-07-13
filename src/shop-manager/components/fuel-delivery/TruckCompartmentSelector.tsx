@@ -1,8 +1,8 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 import { Fuel, Droplet } from 'lucide-react';
-import { TruckCompartment } from '@/hooks/useTruckCompartments';
-import { useFuelUnits } from '@/hooks/fuel-delivery/useFuelUnits';
+import { TruckCompartment } from '@sm/hooks/useTruckCompartments';
+import { useFuelUnits } from '@sm/hooks/fuel-delivery/useFuelUnits';
 
 interface TruckCompartmentSelectorProps {
   compartments: TruckCompartment[];

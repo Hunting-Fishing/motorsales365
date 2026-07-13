@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { AssetTrackingTab } from "@/components/settings/AssetTrackingTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { AssetTrackingTab } from "@sm/components/settings/AssetTrackingTab";
 
 export const AssetSettings = () => {
   return (

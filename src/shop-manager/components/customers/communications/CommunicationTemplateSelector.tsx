@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Label } from "@sm/components/ui/label";
+import { supabase } from "@sm/integrations/supabase/client";
 
 interface Template {
   id: string;

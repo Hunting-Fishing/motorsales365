@@ -1,8 +1,8 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { SecurityAdvancedTab } from "@/components/settings/SecurityAdvancedTab";
-import { useShopId } from "@/hooks/useShopId";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { SecurityAdvancedTab } from "@sm/components/settings/SecurityAdvancedTab";
+import { useShopId } from "@sm/hooks/useShopId";
 
 export const SecurityAdvancedSettings = () => {
   const { shopId } = useShopId();

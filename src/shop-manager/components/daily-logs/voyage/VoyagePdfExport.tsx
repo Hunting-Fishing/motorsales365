@@ -1,9 +1,9 @@
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { FileDown } from "lucide-react";
-import { VoyageLog, VoyageCommunicationLog, VOYAGE_TYPE_LABELS, CALL_TYPE_LABELS, ACTIVITY_TYPE_LABELS, INCIDENT_TYPE_LABELS } from "@/types/voyage";
-import { supabase } from "@/integrations/supabase/client";
+import { VoyageLog, VoyageCommunicationLog, VOYAGE_TYPE_LABELS, CALL_TYPE_LABELS, ACTIVITY_TYPE_LABELS, INCIDENT_TYPE_LABELS } from "@sm/types/voyage";
+import { supabase } from "@sm/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 

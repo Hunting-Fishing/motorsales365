@@ -1,6 +1,6 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { Customer, adaptCustomerForUI } from "@/types/customer";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Customer, adaptCustomerForUI } from "@sm/types/customer";
 
 export const searchCustomers = async (query: string, limit: number = 50): Promise<Customer[]> => {
   try {

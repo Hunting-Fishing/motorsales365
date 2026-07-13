@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderService } from '@/services/workOrder/WorkOrderService';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderService } from '@sm/services/workOrder/WorkOrderService';
 
 export interface UseWorkOrderServiceResult {
   workOrders: WorkOrder[];

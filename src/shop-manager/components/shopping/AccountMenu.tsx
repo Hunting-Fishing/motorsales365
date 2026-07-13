@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { User, Settings, LogOut } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@sm/hooks/useAuth';
 
 export const AccountMenu = () => {
   const { user, signOut } = useAuth();

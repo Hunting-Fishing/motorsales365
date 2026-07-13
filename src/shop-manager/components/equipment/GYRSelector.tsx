@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 
 export type GYRStatus = 1 | 2 | 3; // 1=Red, 2=Yellow, 3=Green

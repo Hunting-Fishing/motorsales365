@@ -1,24 +1,24 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Button } from "@sm/components/ui/button";
 import { ArrowLeft, FileText, MessageSquare, Calendar, Wrench, List, Info, FileSpreadsheet, BarChart3, ClipboardList, AlertTriangle } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-import { CustomerVehicle } from "@/types/customer/vehicle";
-import { VehicleDetailHeader } from "@/components/customers/vehicles/VehicleDetailHeader";
-import { VehicleServiceHistory } from "@/components/customers/vehicles/VehicleServiceHistory";
-import { VehicleInteractions } from "@/components/customers/vehicles/VehicleInteractions";
-import { VehicleNotes } from "@/components/customers/vehicles/VehicleNotes";
-import { VehicleCommunications } from "@/components/customers/vehicles/VehicleCommunications";
-import { VehicleWorkOrders } from "@/components/customers/vehicles/VehicleWorkOrders";
-import { VehicleInspections } from "@/components/customers/vehicles/VehicleInspections";
-import { VehicleInvoices } from "@/components/customers/vehicles/VehicleInvoices";
-import { VehicleRecommendations } from "@/components/customers/vehicles/VehicleRecommendations";
-import { VehicleReports } from "@/components/customers/vehicles/VehicleReports";
-import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { handleApiError } from "@/utils/errorHandling";
+import { supabase } from "@sm/lib/supabase";
+import { CustomerVehicle } from "@sm/types/customer/vehicle";
+import { VehicleDetailHeader } from "@sm/components/customers/vehicles/VehicleDetailHeader";
+import { VehicleServiceHistory } from "@sm/components/customers/vehicles/VehicleServiceHistory";
+import { VehicleInteractions } from "@sm/components/customers/vehicles/VehicleInteractions";
+import { VehicleNotes } from "@sm/components/customers/vehicles/VehicleNotes";
+import { VehicleCommunications } from "@sm/components/customers/vehicles/VehicleCommunications";
+import { VehicleWorkOrders } from "@sm/components/customers/vehicles/VehicleWorkOrders";
+import { VehicleInspections } from "@sm/components/customers/vehicles/VehicleInspections";
+import { VehicleInvoices } from "@sm/components/customers/vehicles/VehicleInvoices";
+import { VehicleRecommendations } from "@sm/components/customers/vehicles/VehicleRecommendations";
+import { VehicleReports } from "@sm/components/customers/vehicles/VehicleReports";
+import { useToast } from "@sm/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@sm/components/ui/alert";
+import { handleApiError } from "@sm/utils/errorHandling";
 
 export default function VehicleDetails() {
   const { customerId, vehicleId } = useParams<{ customerId: string, vehicleId: string }>();

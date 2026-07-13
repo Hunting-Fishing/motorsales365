@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
-import { WorkOrderPart, WorkOrderPartFormValues } from '@/types/workOrderPart';
+import { WorkOrderPart, WorkOrderPartFormValues } from '@sm/types/workOrderPart';
 import { 
   createWorkOrderPart, 
   updateWorkOrderPart, 
   deleteWorkOrderPart 
-} from '@/services/workOrder/workOrderPartsService';
+} from '@sm/services/workOrder/workOrderPartsService';
 import { toast } from 'sonner';
 
 interface UseWorkOrderPartsOperationsProps {

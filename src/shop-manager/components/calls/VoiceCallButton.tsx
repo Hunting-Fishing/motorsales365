@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Phone } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { initiateVoiceCall, VoiceCallType } from '@/services/calls/callService';
-import { recordCallActivity } from '@/utils/activity/communicationActivity';
+import { toast } from '@sm/hooks/use-toast';
+import { initiateVoiceCall, VoiceCallType } from '@sm/services/calls/callService';
+import { recordCallActivity } from '@sm/utils/activity/communicationActivity';
 
 interface VoiceCallButtonProps {
   phoneNumber: string;

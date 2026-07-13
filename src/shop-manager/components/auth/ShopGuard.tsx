@@ -1,10 +1,10 @@
 import { ReactNode } from 'react';
-import { useShopId } from '@/hooks/useShopId';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useShopId } from '@sm/hooks/useShopId';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Building2, Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface ShopGuardProps {
   children: ReactNode;

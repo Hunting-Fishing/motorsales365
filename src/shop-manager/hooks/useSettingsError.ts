@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 
 interface UseSettingsErrorOptions {
   onError?: (error: Error) => void;

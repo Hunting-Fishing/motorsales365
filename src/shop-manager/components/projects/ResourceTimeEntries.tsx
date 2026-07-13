@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { supabase } from "@sm/integrations/supabase/client";
 import { toast } from "sonner";
 import { Trash2, Edit2, Check, X } from "lucide-react";
 import { format, isToday, isThisWeek } from "date-fns";
-import type { TimeEntry } from "@/types/projectResource";
-import type { Json } from "@/integrations/supabase/types";
+import type { TimeEntry } from "@sm/types/projectResource";
+import type { Json } from "@sm/integrations/supabase/types";
 
 interface ResourceTimeEntriesProps {
   assignmentId: string;

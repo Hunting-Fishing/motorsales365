@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Switch } from '@sm/components/ui/switch';
+import { Badge } from '@sm/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { useToast } from '@sm/hooks/use-toast';
 import { Plus, Edit, Trash2, MapPin } from 'lucide-react';
 import { 
   getCustomerAddresses, 
   createCustomerAddress, 
   updateCustomerAddress, 
   deleteCustomerAddress 
-} from '@/services/customerProfileService';
-import { CustomerAddress } from '@/types/phase3';
+} from '@sm/services/customerProfileService';
+import { CustomerAddress } from '@sm/types/phase3';
 
 interface AddressTabProps {
   userId: string;

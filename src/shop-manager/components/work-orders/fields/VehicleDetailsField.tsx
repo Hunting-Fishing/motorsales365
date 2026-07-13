@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { useSearchParams } from "react-router-dom";
-import { VinDecodeResult } from "@/types/vehicle";
+import { VinDecodeResult } from "@sm/types/vehicle";
 import { Car } from "lucide-react";
 
 // Import refactored components

@@ -1,9 +1,9 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Separator } from "@sm/components/ui/separator";
 import { Car, Gauge, Fuel, Settings, Palette, Calendar } from "lucide-react";
-import { CustomerVehicle } from "@/types/customer";
+import { CustomerVehicle } from "@sm/types/customer";
 
 interface VehicleInfoDisplayProps {
   vehicle: CustomerVehicle;

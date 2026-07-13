@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useNutritionProfile, useNutritionGoals, useFoodLogs, useHydrationLogs } from '@/hooks/useNutrition';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Avatar, AvatarFallback } from '@sm/components/ui/avatar';
+import { useNutritionProfile, useNutritionGoals, useFoodLogs, useHydrationLogs } from '@sm/hooks/useNutrition';
 import { Flame, Target, Scale, TrendingUp, Award, Droplets, Activity } from 'lucide-react';
 
 interface Props {

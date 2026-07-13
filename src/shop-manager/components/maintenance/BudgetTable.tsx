@@ -6,19 +6,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Checkbox } from "@/components/ui/checkbox";
+} from "@sm/components/ui/table";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { Progress } from "@sm/components/ui/progress";
+import { Checkbox } from "@sm/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@sm/components/ui/dropdown-menu";
 import { MoreHorizontal, Pencil, Trash2, Eye, Download } from "lucide-react";
-import { MaintenanceBudget } from "@/hooks/useBudgetFilters";
+import { MaintenanceBudget } from "@sm/hooks/useBudgetFilters";
 import { format } from "date-fns";
 
 interface BudgetTableProps {

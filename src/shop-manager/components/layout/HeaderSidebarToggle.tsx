@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Menu } from 'lucide-react';
-import { useSidebar } from '@/hooks/use-sidebar';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useSidebar } from '@sm/hooks/use-sidebar';
+import { useIsMobile } from '@sm/hooks/use-mobile';
 
 export function HeaderSidebarToggle() {
   const { toggle } = useSidebar();

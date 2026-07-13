@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@sm/components/ui/button";
+import { Checkbox } from "@sm/components/ui/checkbox";
 import { toast } from "sonner";
-import { Column } from "@/components/inventory/table/SortableColumnHeader";
+import { Column } from "@sm/components/inventory/table/SortableColumnHeader";
 
 export const InventoryTableColumnsManager = () => {
   const initialColumns: Column[] = [

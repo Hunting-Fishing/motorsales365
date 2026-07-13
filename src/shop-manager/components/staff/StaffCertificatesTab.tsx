@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Plus, AlertCircle, Award, Calendar, FileText } from 'lucide-react';
-import { useStaffCertificates } from '@/hooks/useStaffCertificates';
+import { useStaffCertificates } from '@sm/hooks/useStaffCertificates';
 import { AddCertificateDialog } from './certificates/AddCertificateDialog';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@sm/components/ui/alert';
 import { format } from 'date-fns';
 
 interface StaffCertificatesTabProps {

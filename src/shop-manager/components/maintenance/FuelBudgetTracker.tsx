@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Progress } from "@sm/components/ui/progress";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
 import { Fuel, TrendingUp, TrendingDown, AlertTriangle, Plus, Droplet } from "lucide-react";
-import { useFuelEntries } from "@/hooks/useFuelEntries";
-import { formatCurrency } from "@/lib/utils";
+import { useFuelEntries } from "@sm/hooks/useFuelEntries";
+import { formatCurrency } from "@sm/lib/utils";
 import { FuelEntryForm } from "./FuelEntryForm";
 import { useState } from "react";
 import {

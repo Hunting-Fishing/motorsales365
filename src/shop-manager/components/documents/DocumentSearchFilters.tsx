@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { X } from 'lucide-react';
-import { useDocumentCategories } from '@/hooks/useDocumentCategories';
-import { DocumentSearchParams } from '@/types/document';
+import { useDocumentCategories } from '@sm/hooks/useDocumentCategories';
+import { DocumentSearchParams } from '@sm/types/document';
 
 interface DocumentSearchFiltersProps {
   onFilterChange: (filters: Partial<DocumentSearchParams>) => void;

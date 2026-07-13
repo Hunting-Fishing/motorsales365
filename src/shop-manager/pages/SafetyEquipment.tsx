@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Shield, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
-import { EquipmentList } from '@/components/equipment/EquipmentList';
-import { AddEquipmentDialog } from '@/components/equipment/AddEquipmentDialog';
-import { useEquipmentByAssetClass } from '@/hooks/useEquipmentByAssetClass';
-import { useEquipmentCategories } from '@/hooks/useEquipmentCategories';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { EquipmentList } from '@sm/components/equipment/EquipmentList';
+import { AddEquipmentDialog } from '@sm/components/equipment/AddEquipmentDialog';
+import { useEquipmentByAssetClass } from '@sm/hooks/useEquipmentByAssetClass';
+import { useEquipmentCategories } from '@sm/hooks/useEquipmentCategories';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 
 export default function SafetyEquipment() {
   const [dialogOpen, setDialogOpen] = useState(false);

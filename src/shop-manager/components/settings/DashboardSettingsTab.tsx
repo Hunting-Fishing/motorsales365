@@ -1,5 +1,5 @@
 import React from 'react';
-import { DashboardCustomization } from '@/components/dashboard/DashboardCustomization';
+import { DashboardCustomization } from '@sm/components/dashboard/DashboardCustomization';
 
 export const DashboardSettingsTab: React.FC = () => {
   return (

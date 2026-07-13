@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Package, 
   DollarSign, 
@@ -11,7 +11,7 @@ import {
   Plus,
   Search
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@sm/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
 interface InventoryStats {

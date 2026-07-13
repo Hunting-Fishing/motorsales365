@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { format, addDays, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, addWeeks, subWeeks, isWithinInterval } from 'date-fns';
-import { useStaffForPlanner, useWorkOrdersForPlanner, useEquipmentForPlanner } from '@/hooks/usePlannerData';
-import { Button } from '@/components/ui/button';
+import { useStaffForPlanner, useWorkOrdersForPlanner, useEquipmentForPlanner } from '@sm/hooks/usePlannerData';
+import { Button } from '@sm/components/ui/button';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Users, Ship, Wrench, Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { SwimlaneResourceType } from '@/types/planner';
+import { cn } from '@sm/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@sm/components/ui/avatar';
+import { ScrollArea, ScrollBar } from '@sm/components/ui/scroll-area';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@sm/components/ui/tooltip';
+import { SwimlaneResourceType } from '@sm/types/planner';
 
 type ZoomLevel = 'day' | 'week' | 'month';
 

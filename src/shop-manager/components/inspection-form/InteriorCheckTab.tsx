@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Label } from "@sm/components/ui/label";
+import { Button } from "@sm/components/ui/button";
 import { Camera, CarFront, ThumbsUp, ThumbsDown, AlertTriangle, Upload } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@sm/components/ui/checkbox";
+import { Textarea } from "@sm/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@sm/components/ui/radio-group";
 import InspectionItem from "./shared/InspectionItem";
 import ImageUploadButton from './shared/ImageUploadButton';
 

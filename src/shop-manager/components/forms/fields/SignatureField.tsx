@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Label } from '@sm/components/ui/label';
 import { Eraser, Check, RotateCcw } from 'lucide-react';
 
 interface SignatureFieldProps {

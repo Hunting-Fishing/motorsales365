@@ -1,5 +1,5 @@
 
-import { WorkOrder } from "@/types/workOrder";
+import { WorkOrder } from "@sm/types/workOrder";
 import { WorkOrderStatus } from './constants';
 
 /**

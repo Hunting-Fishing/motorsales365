@@ -1,7 +1,7 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { SecurityTab } from "@/components/settings/SecurityTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { SecurityTab } from "@sm/components/settings/SecurityTab";
 
 export const SecuritySettings = () => {
   return (

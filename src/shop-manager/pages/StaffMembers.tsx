@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { UserCog, Users, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { useStaffManagement } from '@/hooks/useStaffManagement';
-import { AddStaffMemberDialog } from '@/components/staff/AddStaffMemberDialog';
-import { StaffMembersList } from '@/components/staff/StaffMembersList';
+import { useStaffManagement } from '@sm/hooks/useStaffManagement';
+import { AddStaffMemberDialog } from '@sm/components/staff/AddStaffMemberDialog';
+import { StaffMembersList } from '@sm/components/staff/StaffMembersList';
 
 export default function StaffMembers() {
   const { staff, stats, isLoading, fetchStaff, removeStaffMember } = useStaffManagement();

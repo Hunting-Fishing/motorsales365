@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader } from '@sm/components/ui/card';
 import { Check, Sparkles, Wrench, Droplets, Target, Anchor, Star, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PRICING_TIERS, MODULES, TierKey } from '@/config/pricing';
-import { MODULE_STRIPE_PRICING, ModuleId } from '@/config/stripePricing';
-import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
+import { PRICING_TIERS, MODULES, TierKey } from '@sm/config/pricing';
+import { MODULE_STRIPE_PRICING, ModuleId } from '@sm/config/stripePricing';
+import { cn } from '@sm/lib/utils';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
+import { useAuth } from '@sm/hooks/useAuth';
 
 const iconMap = {
   Wrench,

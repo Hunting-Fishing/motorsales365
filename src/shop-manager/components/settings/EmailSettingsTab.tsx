@@ -1,16 +1,16 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { emailProviderService } from "@/services/settings/emailProviderService";
-import { EmailProviderSettings } from "@/types/settings";
-import { useToast } from "@/components/ui/use-toast";
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Switch } from "@sm/components/ui/switch";
+import { emailProviderService } from "@sm/services/settings/emailProviderService";
+import { EmailProviderSettings } from "@sm/types/settings";
+import { useToast } from "@sm/components/ui/use-toast";
 import { Mail, Send, Server, Key } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@sm/components/ui/separator";
 
 export function EmailSettingsTab({ shopId }: { shopId?: string }) {
   const [settings, setSettings] = useState<EmailProviderSettings | null>(null);

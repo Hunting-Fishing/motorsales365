@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Trash2, Percent, DollarSign } from 'lucide-react';
-import { JobLineDiscount, PartDiscount, WorkOrderDiscount } from '@/types/discount';
+import { JobLineDiscount, PartDiscount, WorkOrderDiscount } from '@sm/types/discount';
 
 interface DiscountDisplayProps {
   discounts: (JobLineDiscount | PartDiscount | WorkOrderDiscount)[];

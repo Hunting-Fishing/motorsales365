@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from "react";
-import { Label } from "@/components/ui/label";
-import { FormField } from "@/components/ui/form-field";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BusinessConstant } from "@/hooks/useBusinessConstants";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Label } from "@sm/components/ui/label";
+import { FormField } from "@sm/components/ui/form-field";
+import { Input } from "@sm/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { BusinessConstant } from "@sm/hooks/useBusinessConstants";
+import { Alert, AlertDescription } from "@sm/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
 interface BusinessInfoSectionProps {

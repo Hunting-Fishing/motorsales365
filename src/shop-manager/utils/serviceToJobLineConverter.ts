@@ -1,6 +1,6 @@
-import { SelectedService } from '@/types/selectedService';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { createJobLine, getWorkOrderJobLines, deleteWorkOrderJobLine } from '@/services/workOrder/jobLinesService';
+import { SelectedService } from '@sm/types/selectedService';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { createJobLine, getWorkOrderJobLines, deleteWorkOrderJobLine } from '@sm/services/workOrder/jobLinesService';
 
 /**
  * Converts selected services to work order job lines

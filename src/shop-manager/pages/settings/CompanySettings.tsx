@@ -1,9 +1,9 @@
 
 import React from "react";
-import { CompanyTab } from "@/components/settings/CompanyTab";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CompanyTab } from "@sm/components/settings/CompanyTab";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { Building2, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 export const CompanySettings = () => {

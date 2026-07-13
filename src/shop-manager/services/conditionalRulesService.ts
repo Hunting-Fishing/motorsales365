@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import { ConditionalRule, ConditionOperator, ConditionType } from '@/types/formBuilder';
+import { supabase } from '@sm/integrations/supabase/client';
+import { ConditionalRule, ConditionOperator, ConditionType } from '@sm/types/formBuilder';
 
 interface DbConditionalRule {
   id: string;

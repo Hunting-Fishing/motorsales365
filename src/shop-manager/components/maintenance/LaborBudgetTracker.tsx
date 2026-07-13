@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Progress } from "@sm/components/ui/progress";
+import { Badge } from "@sm/components/ui/badge";
 import { Users, Clock, AlertTriangle, TrendingUp, DollarSign } from "lucide-react";
-import { useLaborAnalytics } from "@/hooks/useLaborAnalytics";
-import { formatCurrency } from "@/lib/utils";
+import { useLaborAnalytics } from "@sm/hooks/useLaborAnalytics";
+import { formatCurrency } from "@sm/lib/utils";
 import {
   BarChart,
   Bar,

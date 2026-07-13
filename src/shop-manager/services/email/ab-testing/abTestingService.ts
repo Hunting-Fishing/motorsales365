@@ -1,7 +1,7 @@
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { GenericResponse } from '../utils/supabaseHelper';
-import { EmailABTest } from '@/types/email';
+import { EmailABTest } from '@sm/types/email';
 
 export interface ABTestWinnerResult {
   winnerId: string;

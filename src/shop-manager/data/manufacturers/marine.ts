@@ -1,5 +1,5 @@
 
-import { Manufacturer } from '@/types/affiliate';
+import { Manufacturer } from '@sm/types/affiliate';
 
 /**
  * Marine manufacturers data

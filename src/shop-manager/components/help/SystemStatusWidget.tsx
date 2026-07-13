@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Settings, AlertTriangle, Clock } from 'lucide-react';
-import { useSystemStatusSummary, useSystemStatus, useSystemIncidents } from '@/hooks/useSystemStatus';
+import { useSystemStatusSummary, useSystemStatus, useSystemIncidents } from '@sm/hooks/useSystemStatus';
 
 const getStatusColor = (status: string) => {
   switch (status) {

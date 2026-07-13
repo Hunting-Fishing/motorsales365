@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { WorkOrderPartFormValues, PART_TYPES, WORK_ORDER_PART_STATUSES } from '@/types/workOrderPart';
-import { PartsFormValidator } from '@/utils/partsErrorHandler';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Switch } from '@sm/components/ui/switch';
+import { WorkOrderPartFormValues, PART_TYPES, WORK_ORDER_PART_STATUSES } from '@sm/types/workOrderPart';
+import { PartsFormValidator } from '@sm/utils/partsErrorHandler';
 
 interface AddPartFormProps {
   onSubmit: (formData: WorkOrderPartFormValues) => Promise<void>;

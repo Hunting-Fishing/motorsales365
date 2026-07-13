@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Clock, 
   UserPlus, 
@@ -10,7 +10,7 @@ import {
   Trash2,
   UserMinus
 } from 'lucide-react';
-import { useTeamHistory } from '@/hooks/useTeamHistory';
+import { useTeamHistory } from '@sm/hooks/useTeamHistory';
 
 const getActivityIcon = (actionType: string) => {
   switch (actionType) {

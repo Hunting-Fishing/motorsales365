@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { CustomerDocument } from '@/types/document';
-import { uploadDocumentVersion } from '@/services/documentService';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { useToast } from '@sm/hooks/use-toast';
+import { CustomerDocument } from '@sm/types/document';
+import { uploadDocumentVersion } from '@sm/services/documentService';
 
 interface DocumentVersionDialogProps {
   document: CustomerDocument;

@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 import { History, Search, Filter } from 'lucide-react';
 import { format } from 'date-fns';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
 
 interface AuditEntry {
   id: string;

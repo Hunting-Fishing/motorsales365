@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@sm/components/ui/input";
 import { MapPin } from "lucide-react";
 
 interface AddressSuggestion {

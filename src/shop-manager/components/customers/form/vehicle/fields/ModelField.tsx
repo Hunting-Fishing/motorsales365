@@ -1,13 +1,13 @@
 
 import React from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Input } from "@sm/components/ui/input";
 import { HelpCircle, Car } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@sm/components/ui/tooltip";
+import { Badge } from "@sm/components/ui/badge";
 import { BaseFieldProps } from "./BaseFieldTypes";
-import { CarModel } from "@/types/vehicle";
+import { CarModel } from "@sm/types/vehicle";
 
 interface ModelFieldProps extends BaseFieldProps {
   models: CarModel[];

@@ -3,7 +3,7 @@
  * Automatically generates delivery routes based on customer/location delivery schedules
  */
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { format, addDays, getDay, startOfDay, endOfDay } from 'date-fns';
 
 interface ScheduledStop {

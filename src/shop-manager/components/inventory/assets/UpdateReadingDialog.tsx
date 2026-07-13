@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useAssetUsage } from '@/hooks/inventory/useAssetUsage';
-import { AssetUsageConfig } from '@/types/inventory/predictive';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { useAssetUsage } from '@sm/hooks/inventory/useAssetUsage';
+import { AssetUsageConfig } from '@sm/types/inventory/predictive';
 import { useForm } from 'react-hook-form';
 import { Gauge, TrendingUp } from 'lucide-react';
 

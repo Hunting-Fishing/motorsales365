@@ -6,25 +6,25 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Badge } from '@/components/ui/badge';
+} from '@sm/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@sm/components/ui/radio-group';
+import { Badge } from '@sm/components/ui/badge';
 import { Percent, DollarSign, Tag } from 'lucide-react';
-import { DiscountType, ApplyDiscountRequest } from '@/types/discount';
-import { getDiscountTypesByCategory } from '@/services/discountService';
+import { DiscountType, ApplyDiscountRequest } from '@sm/types/discount';
+import { getDiscountTypesByCategory } from '@sm/services/discountService';
 import { toast } from 'sonner';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUserProfile } from '@sm/hooks/useUserProfile';
 
 interface ApplyDiscountDialogProps {
   children: React.ReactNode;

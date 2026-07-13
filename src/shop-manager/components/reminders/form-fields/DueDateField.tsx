@@ -8,12 +8,12 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+} from "@sm/components/ui/form";
+import { Button } from "@sm/components/ui/button";
+import { Calendar } from "@sm/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@sm/lib/utils";
 import { ReminderFormValues } from "../schemas/reminderFormSchema";
 
 interface DueDateFieldProps {

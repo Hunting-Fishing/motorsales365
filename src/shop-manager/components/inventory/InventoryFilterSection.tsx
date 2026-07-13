@@ -1,6 +1,6 @@
 
 import React from "react";
-import { InventoryFilters } from "@/components/inventory/InventoryFilters";
+import { InventoryFilters } from "@sm/components/inventory/InventoryFilters";
 
 interface InventoryFilterSectionProps {
   categories: string[];

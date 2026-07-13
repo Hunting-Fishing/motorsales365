@@ -1,20 +1,20 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { ToggleGroup, ToggleGroupItem } from '@sm/components/ui/toggle-group';
 import { Users, AlertTriangle, Calendar, Filter, Sun, Moon } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
-import { cn } from '@/lib/utils';
-import { FuelDeliveryLocation, FuelDeliveryCustomer } from '@/hooks/useFuelDelivery';
-import { useMapboxPublicToken } from '@/hooks/useMapboxPublicToken';
-import { validateMapboxPublicToken } from '@/lib/mapbox/validateMapboxPublicToken';
+import { Switch } from '@sm/components/ui/switch';
+import { cn } from '@sm/lib/utils';
+import { FuelDeliveryLocation, FuelDeliveryCustomer } from '@sm/hooks/useFuelDelivery';
+import { useMapboxPublicToken } from '@sm/hooks/useMapboxPublicToken';
+import { validateMapboxPublicToken } from '@sm/lib/mapbox/validateMapboxPublicToken';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 const DAYS_OF_WEEK = [
   { value: 0, label: 'Sun', short: 'S' },

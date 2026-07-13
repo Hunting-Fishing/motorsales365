@@ -1,13 +1,13 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Bell, Mail, AlertCircle, CheckCircle, Loader2, Trash2, Check, ExternalLink } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuthUser } from '@/hooks/useAuthUser';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
 import { formatDistanceToNow } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 

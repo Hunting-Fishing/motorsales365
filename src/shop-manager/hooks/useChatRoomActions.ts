@@ -1,10 +1,10 @@
 
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChatRoom } from '@/types/chat';
-import { createChatRoom, getWorkOrderChatRoom, getShiftChatRoom } from '@/services/chat';
-import { toast } from '@/hooks/use-toast';
-import { CreateRoomParams } from '@/services/chat/room/types';
+import { ChatRoom } from '@sm/types/chat';
+import { createChatRoom, getWorkOrderChatRoom, getShiftChatRoom } from '@sm/services/chat';
+import { toast } from '@sm/hooks/use-toast';
+import { CreateRoomParams } from '@sm/services/chat/room/types';
 
 export const useChatRoomActions = (
   userId: string | undefined,

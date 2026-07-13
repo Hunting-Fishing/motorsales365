@@ -1,8 +1,8 @@
 import React from 'react';
 import { TrendingUp, Users, BookOpen, MessageSquare, Clock, Star } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useHelpMetrics, usePopularArticles, useSearchTrends, useFeedbackStats } from '@/hooks/useHelpAnalytics';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { useHelpMetrics, usePopularArticles, useSearchTrends, useFeedbackStats } from '@sm/hooks/useHelpAnalytics';
 
 interface HelpMetric {
   id: string;

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 import { Settings, Clock, Sparkles, Boxes, Zap, Rocket } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
-import { getAllModuleRoutes, UPCOMING_MODULES } from '@/config/moduleRoutes';
-import { BentoStatCard } from '@/components/module-dashboard/bento/BentoStatCard';
-import { ShimmerButton } from '@/components/ui/magicui/shimmer-button';
+import { getAllModuleRoutes, UPCOMING_MODULES } from '@sm/config/moduleRoutes';
+import { BentoStatCard } from '@sm/components/module-dashboard/bento/BentoStatCard';
+import { ShimmerButton } from '@sm/components/ui/magicui/shimmer-button';
 
 interface ModuleHubHeaderProps {
   userName?: string;

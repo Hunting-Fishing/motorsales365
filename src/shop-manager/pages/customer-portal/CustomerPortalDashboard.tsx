@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { supabase } from '@sm/lib/supabase';
+import { useToast } from '@sm/hooks/use-toast';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Badge } from '@sm/components/ui/badge';
 import { Loader2, LogOut, User, Crosshair, Wrench, FileText, Phone, Mail, MapPin } from 'lucide-react';
-import { useCompany } from '@/contexts/CompanyContext';
+import { useCompany } from '@sm/contexts/CompanyContext';
 
 interface CustomerData {
   id: string;

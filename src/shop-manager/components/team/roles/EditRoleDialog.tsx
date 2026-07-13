@@ -1,13 +1,13 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { TeamPermissions } from "@/components/team/TeamPermissions";
-import { Role } from "@/types/team";
-import { PermissionSet } from "@/types/permissions";
+import { Button } from "@sm/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Textarea } from "@sm/components/ui/textarea";
+import { TeamPermissions } from "@sm/components/team/TeamPermissions";
+import { Role } from "@sm/types/team";
+import { PermissionSet } from "@sm/types/permissions";
 
 interface EditRoleDialogProps {
   open: boolean;

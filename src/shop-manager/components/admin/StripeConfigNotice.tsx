@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Button } from '@sm/components/ui/button';
 import { ExternalLink, CreditCard, Settings } from 'lucide-react';
 
 export const StripeConfigNotice = () => {

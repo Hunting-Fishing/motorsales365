@@ -1,21 +1,21 @@
 
 import React, { useState } from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart, WorkOrderPartFormValues } from '@/types/workOrderPart';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart, WorkOrderPartFormValues } from '@sm/types/workOrderPart';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Edit2, Trash2, Wrench, Package, Settings, FileText, GripVertical, Edit } from 'lucide-react';
-import { jobLineStatusMap } from '@/types/jobLine';
+import { jobLineStatusMap } from '@sm/types/jobLine';
 import { JobLineStatusSelector } from './JobLineStatusSelector';
 import { SimpleJobLineEditDialog } from './SimpleJobLineEditDialog';
 import { DetailFormButton } from './DetailFormButton';
-import { generateTempJobLineId } from '@/services/jobLineParserEnhanced';
-import { useWorkOrderJobLineOperations } from '@/hooks/useWorkOrderJobLineOperations';
+import { generateTempJobLineId } from '@sm/services/jobLineParserEnhanced';
+import { useWorkOrderJobLineOperations } from '@sm/hooks/useWorkOrderJobLineOperations';
 import { QuickAddDropdown } from '../details/QuickAddDropdown';
 import { ServiceBasedJobLineForm } from './ServiceBasedJobLineForm';
 import { UltimateAddPartDialog } from '../parts/UltimateAddPartDialog';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
 import { JobLinePartsDisplay } from '../parts/JobLinePartsDisplay';
 import {
   DndContext,

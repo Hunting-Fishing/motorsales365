@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
-import ProductCard from '@/components/affiliate/ProductCard';
+import { supabase } from '@sm/lib/supabase';
+import ProductCard from '@sm/components/affiliate/ProductCard';
 
 // Define interface that matches the actual database schema
 interface DatabaseProduct {

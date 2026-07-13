@@ -3,8 +3,8 @@ import React from "react";
 import { 
   Table, 
   TableBody,
-} from "@/components/ui/table";
-import { Bay } from "@/services/diybay/diybayService";
+} from "@sm/components/ui/table";
+import { Bay } from "@sm/services/diybay/diybayService";
 import { DraggableBayRow } from "./DraggableBayRow";
 import { BaysTableHeader } from "./BaysTableHeader";
 import { BaysEmptyState } from "./BaysEmptyState";

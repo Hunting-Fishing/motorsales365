@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, parseISO } from 'date-fns';
-import { useWorkOrdersForPlanner } from '@/hooks/usePlannerData';
-import { Button } from '@/components/ui/button';
+import { useWorkOrdersForPlanner } from '@sm/hooks/usePlannerData';
+import { Button } from '@sm/components/ui/button';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
+import { cn } from '@sm/lib/utils';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { Badge } from '@sm/components/ui/badge';
 
 export function PlannerCalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());

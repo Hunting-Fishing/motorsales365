@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Checkbox } from "@sm/components/ui/checkbox";
 import { Plus, Check, Building2, Globe, Phone } from "lucide-react";
-import { AUTOMOTIVE_SUPPLIERS, SUPPLIER_CATEGORIES, type AutomotiveSupplier } from "@/data/automotiveSuppliers";
-import { addInventorySupplier } from "@/services/inventory/supplierService";
-import { toast } from "@/hooks/use-toast";
+import { AUTOMOTIVE_SUPPLIERS, SUPPLIER_CATEGORIES, type AutomotiveSupplier } from "@sm/data/automotiveSuppliers";
+import { addInventorySupplier } from "@sm/services/inventory/supplierService";
+import { toast } from "@sm/hooks/use-toast";
 
 interface AutomotiveSuppliersSetupProps {
   existingSuppliers: string[];

@@ -1,9 +1,9 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { Users, Car, Building, UserPlus } from "lucide-react";
-import { Customer } from "@/types/customer";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Customer } from "@sm/types/customer";
+import { Skeleton } from "@sm/components/ui/skeleton";
 
 interface CustomerStatsCardsProps {
   customers: Customer[];

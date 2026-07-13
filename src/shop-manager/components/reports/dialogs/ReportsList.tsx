@@ -1,8 +1,8 @@
 
-import { SavedReport } from "@/types/reports";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label";
+import { SavedReport } from "@sm/types/reports";
+import { Button } from "@sm/components/ui/button";
+import { ScrollArea } from "@sm/components/ui/scroll-area";
+import { Label } from "@sm/components/ui/label";
 
 interface ReportsListProps {
   savedReports: SavedReport[];

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { 
   TrendingUp, 
   Heart, 
@@ -15,7 +15,7 @@ import {
   CheckCircle,
   TrendingDown
 } from 'lucide-react';
-import { nonprofitAnalyticsService, AnalyticsDashboard } from '@/services/nonprofitAnalytics';
+import { nonprofitAnalyticsService, AnalyticsDashboard } from '@sm/services/nonprofitAnalytics';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 

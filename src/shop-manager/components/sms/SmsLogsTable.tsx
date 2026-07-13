@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { 
   Table, 
   TableBody, 
@@ -8,12 +8,12 @@ import {
   TableHead, 
   TableHeader, 
   TableRow 
-} from "@/components/ui/table";
+} from "@sm/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 import { format } from "date-fns";
-import { Badge } from "@/components/ui/badge";
-import { Customer } from "@/types/customer";
+import { Badge } from "@sm/components/ui/badge";
+import { Customer } from "@sm/types/customer";
 
 interface SmsLog {
   id: string;

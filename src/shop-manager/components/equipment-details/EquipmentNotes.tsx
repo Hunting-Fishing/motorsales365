@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 
 interface EquipmentNotesProps {
   notes?: string;

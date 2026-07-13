@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { EmailSequenceEnrollment } from '@/types/email';
+import { supabase } from '@sm/lib/supabase';
+import { useToast } from '@sm/hooks/use-toast';
+import { EmailSequenceEnrollment } from '@sm/types/email';
 
 export const useEnrollmentActions = (
   setEnrollments: React.Dispatch<React.SetStateAction<EmailSequenceEnrollment[]>>

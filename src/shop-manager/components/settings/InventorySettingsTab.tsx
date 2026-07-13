@@ -1,13 +1,13 @@
 
 import React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { InventoryTableColumnsManager } from "./inventory/InventoryTableColumnsManager";
 import { CategoriesManager } from "./inventory/CategoriesManager";
 import { SuppliersManager } from "./inventory/SuppliersManager";
-import { ClearInventoryButton } from "@/components/inventory/ClearInventoryButton";
-import { ImportExportButtons } from "@/components/inventory/ImportExportButtons";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ClearInventoryButton } from "@sm/components/inventory/ClearInventoryButton";
+import { ImportExportButtons } from "@sm/components/inventory/ImportExportButtons";
+import { Alert, AlertDescription } from "@sm/components/ui/alert";
 import { Info, Building2, Car, Wrench } from "lucide-react";
 
 export const InventorySettingsTab = () => {

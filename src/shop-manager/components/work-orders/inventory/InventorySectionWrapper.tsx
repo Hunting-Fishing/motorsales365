@@ -1,11 +1,11 @@
 
 import React, { useEffect } from "react";
-import { FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { FormField, FormItem, FormLabel } from "@sm/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { WorkOrderInventoryField } from "./WorkOrderInventoryField";
-import { useInventoryManager } from "@/hooks/inventory/useInventoryManager";
-import { toast } from "@/hooks/use-toast";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
+import { useInventoryManager } from "@sm/hooks/inventory/useInventoryManager";
+import { toast } from "@sm/hooks/use-toast";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
 
 interface InventorySectionWrapperProps {
   form: UseFormReturn<WorkOrderFormSchemaValues>;

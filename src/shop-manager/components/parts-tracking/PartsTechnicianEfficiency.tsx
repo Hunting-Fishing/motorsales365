@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Progress } from '@sm/components/ui/progress';
 
 interface TechnicianEfficiency {
   technicianName: string;

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Plus, Clock, Calendar, Ship, Building2, CheckCircle2, XCircle } from 'lucide-react';
-import { useTimesheet } from '@/hooks/useTimesheet';
-import { AddTimesheetEntryDialog } from '@/components/timesheet/AddTimesheetEntryDialog';
+import { useTimesheet } from '@sm/hooks/useTimesheet';
+import { AddTimesheetEntryDialog } from '@sm/components/timesheet/AddTimesheetEntryDialog';
 import { format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
 
 export default function Timesheet() {

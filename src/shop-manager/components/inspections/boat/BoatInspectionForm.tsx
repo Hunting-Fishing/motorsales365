@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@sm/components/ui/radio-group';
+import { Separator } from '@sm/components/ui/separator';
+import { Badge } from '@sm/components/ui/badge';
 import { InteractiveVesselPhoto } from './InteractiveVesselPhoto';
 import { Upload, Camera, Save } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
 import SignatureCanvas from 'react-signature-canvas';
-import vesselDiagramTemplate from '@/assets/vessel-diagram-template.jpg';
+import vesselDiagramTemplate from '@sm/assets/vessel-diagram-template.jpg';
 
 interface InspectionItem {
   id: string;

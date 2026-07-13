@@ -1,7 +1,7 @@
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@sm/lib/supabase";
 import { mapDbServiceReminderToType, mapCreateReminderParamsToDb } from "./reminderMapper";
-import type { ServiceReminder } from "@/types/reminder";
+import type { ServiceReminder } from "@sm/types/reminder";
 
 export interface CreateReminderData {
   customer_id: string;

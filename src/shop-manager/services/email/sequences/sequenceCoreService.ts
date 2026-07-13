@@ -1,6 +1,6 @@
 
-import { supabase } from '@/lib/supabase';
-import { EmailSequence } from '@/types/email';
+import { supabase } from '@sm/lib/supabase';
+import { EmailSequence } from '@sm/types/email';
 import { GenericResponse } from '../utils/supabaseHelper';
 
 /**

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { CarMake, CarModel } from '@/types/vehicle';
-import { fetchMakes, fetchModels as fetchVehicleModels } from '@/services/vehicleDataService';
+import { CarMake, CarModel } from '@sm/types/vehicle';
+import { fetchMakes, fetchModels as fetchVehicleModels } from '@sm/services/vehicleDataService';
 
 export const useVehicleData = () => {
   const [makes, setMakes] = useState<CarMake[]>([]);

@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { PublicPortalTab } from "@/components/settings/PublicPortalTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { PublicPortalTab } from "@sm/components/settings/PublicPortalTab";
 
 export const PublicPortalSettings = () => {
   return (

@@ -1,5 +1,5 @@
 
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@sm/hooks/use-toast';
 import { ErrorType, ErrorSeverity, OnboardingError, ERROR_CODES, USER_FRIENDLY_MESSAGES } from './errorTypes';
 
 export class ErrorHandler {

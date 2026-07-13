@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { getMonthlyRevenue } from '@/services/dashboard';
-import { formatCurrency } from '@/utils/formatters';
+import { getMonthlyRevenue } from '@sm/services/dashboard';
+import { formatCurrency } from '@sm/utils/formatters';
 import { BaseChart } from './shared/BaseChart';
 
 export function MonthlyRevenueChart() {

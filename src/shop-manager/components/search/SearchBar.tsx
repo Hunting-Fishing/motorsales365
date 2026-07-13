@@ -2,10 +2,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { SearchResults } from '@/components/search/SearchResults';
-import { performSearch, SearchResult } from '@/utils/search';
-import { enhancedSearch } from '@/utils/search/enhancedSearch';
+import { Input } from '@sm/components/ui/input';
+import { SearchResults } from '@sm/components/search/SearchResults';
+import { performSearch, SearchResult } from '@sm/utils/search';
+import { enhancedSearch } from '@sm/utils/search/enhancedSearch';
 
 export function SearchBar() {
   const navigate = useNavigate();

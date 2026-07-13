@@ -1,8 +1,8 @@
 
 import React, { useEffect, createContext, useContext } from 'react';
-import { AffiliateProduct } from '@/types/affiliate';
-import { trackProductAnalytics } from '@/services/affiliate/productService';
-import { useToast } from '@/hooks/use-toast';
+import { AffiliateProduct } from '@sm/types/affiliate';
+import { trackProductAnalytics } from '@sm/services/affiliate/productService';
+import { useToast } from '@sm/hooks/use-toast';
 
 // Enum for different types of interactions
 export enum ProductInteractionType {

@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
-import { PermissionSet, RolePreset } from "@/types/permissions";
-import { defaultPermissions, permissionPresets } from "@/data/permissionPresets";
+import { Button } from "@sm/components/ui/button";
+import { toast } from "@sm/hooks/use-toast";
+import { PermissionSet, RolePreset } from "@sm/types/permissions";
+import { defaultPermissions, permissionPresets } from "@sm/data/permissionPresets";
 import { PermissionModuleCard } from "./permissions/PermissionModuleCard";
 import { PermissionPresetButtons } from "./permissions/PermissionPresetButtons";
-import { ResponsiveGrid } from "@/components/ui/responsive-grid";
-import { supabase } from "@/integrations/supabase/client";
+import { ResponsiveGrid } from "@sm/components/ui/responsive-grid";
+import { supabase } from "@sm/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-import type { Json } from "@/integrations/supabase/types";
+import type { Json } from "@sm/integrations/supabase/types";
 
 interface TeamPermissionsProps {
   memberId?: string;

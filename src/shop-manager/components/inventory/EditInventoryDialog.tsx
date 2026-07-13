@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { InventoryItemExtended } from '@/types/inventory';
-import { useInventoryCrud } from '@/hooks/inventory/useInventoryCrud';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { InventoryItemExtended } from '@sm/types/inventory';
+import { useInventoryCrud } from '@sm/hooks/inventory/useInventoryCrud';
 import { toast } from 'sonner';
 import { InventoryForm } from './form/InventoryForm';
 

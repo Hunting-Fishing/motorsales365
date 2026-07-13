@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { CheckCircle, Package, Truck, CreditCard } from 'lucide-react';
-import { getOrderById, updateOrder } from '@/services/orderService';
-import { verifyCheckoutSession } from '@/services/payment/stripeService';
-import { Order } from '@/types/order';
-import LoadingSkeleton from '@/components/shopping/LoadingSkeleton';
-import { useToast } from '@/hooks/use-toast';
+import { getOrderById, updateOrder } from '@sm/services/orderService';
+import { verifyCheckoutSession } from '@sm/services/payment/stripeService';
+import { Order } from '@sm/types/order';
+import LoadingSkeleton from '@sm/components/shopping/LoadingSkeleton';
+import { useToast } from '@sm/hooks/use-toast';
 
 const OrderConfirmation = () => {
   const { orderId } = useParams<{ orderId: string }>();

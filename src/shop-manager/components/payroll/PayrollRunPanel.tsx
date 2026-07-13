@@ -1,16 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useTimeCards } from '@/hooks/useTimeCards';
-import { usePayPeriods } from '@/hooks/usePayPeriods';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { useTimeCards } from '@sm/hooks/useTimeCards';
+import { usePayPeriods } from '@sm/hooks/usePayPeriods';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
+import { useToast } from '@sm/hooks/use-toast';
 import { format, isWithinInterval } from 'date-fns';
 import { 
   Play, 
@@ -22,7 +22,7 @@ import {
   AlertTriangle,
   Loader2
 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 export function PayrollRunPanel() {
   const { shopId } = useShopId();

@@ -1,9 +1,9 @@
 import { useState, useRef, useCallback } from 'react';
-import { usePlannerItems, usePlannerMutations } from '@/hooks/usePlannerData';
-import { PlannerBoardItem } from '@/types/planner';
-import { Button } from '@/components/ui/button';
+import { usePlannerItems, usePlannerMutations } from '@sm/hooks/usePlannerData';
+import { PlannerBoardItem } from '@sm/types/planner';
+import { Button } from '@sm/components/ui/button';
 import { StickyNote, ZoomIn, ZoomOut, Move, Hand, Users, Wrench } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 import { WhiteboardNote } from './WhiteboardNote';
 import { WhiteboardResourceCard } from './WhiteboardResourceCard';
 

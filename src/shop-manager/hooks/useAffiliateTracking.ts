@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { trackAffiliateClick } from '@/services/affiliateTrackingService';
+import { trackAffiliateClick } from '@sm/services/affiliateTrackingService';
 
 export const useAffiliateTracking = (moduleId?: string) => {
   const location = useLocation();

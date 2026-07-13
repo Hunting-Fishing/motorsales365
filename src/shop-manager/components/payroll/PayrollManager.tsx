@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
 import { DollarSign, Calendar, Users, CheckCircle } from 'lucide-react';
-import { usePayPeriods } from '@/hooks/usePayPeriods';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { usePayPeriods } from '@sm/hooks/usePayPeriods';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
 
 export function PayrollManager() {

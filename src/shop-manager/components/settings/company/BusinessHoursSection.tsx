@@ -1,10 +1,10 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { BusinessHours } from "@/services/settings/companyService";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Switch } from "@sm/components/ui/switch";
+import { Label } from "@sm/components/ui/label";
+import { Input } from "@sm/components/ui/input";
+import { BusinessHours } from "@sm/services/settings/companyService";
 
 interface BusinessHoursSectionProps {
   businessHours: BusinessHours[];

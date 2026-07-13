@@ -1,16 +1,16 @@
 
 import { useState, useEffect } from 'react';
-import { Customer, CustomerNote } from '@/types/customer';
-import { CustomerCommunication } from '@/types/customer/notes';
-import { WorkOrder } from '@/types/workOrder';
-import { CustomerLoyalty } from '@/types/loyalty';
-import { CustomerInteraction } from '@/types/interaction';
-import { getCustomerById } from '@/services/customer/customerQueryService';
-import { getWorkOrdersByCustomerId } from '@/services/workOrder/workOrderQueryService';
-import { getCustomerNotes } from '@/services/customer/customerNotesService';
-import { getCustomerLoyalty } from '@/services/loyalty/customerLoyaltyService';
-import { getCustomerInteractions } from '@/services/customer/interactions/interactionQueryService';
-import { getCustomerCommunications } from '@/services/customer/communicationsService';
+import { Customer, CustomerNote } from '@sm/types/customer';
+import { CustomerCommunication } from '@sm/types/customer/notes';
+import { WorkOrder } from '@sm/types/workOrder';
+import { CustomerLoyalty } from '@sm/types/loyalty';
+import { CustomerInteraction } from '@sm/types/interaction';
+import { getCustomerById } from '@sm/services/customer/customerQueryService';
+import { getWorkOrdersByCustomerId } from '@sm/services/workOrder/workOrderQueryService';
+import { getCustomerNotes } from '@sm/services/customer/customerNotesService';
+import { getCustomerLoyalty } from '@sm/services/loyalty/customerLoyaltyService';
+import { getCustomerInteractions } from '@sm/services/customer/interactions/interactionQueryService';
+import { getCustomerCommunications } from '@sm/services/customer/communicationsService';
 
 export const useCustomerDetailsOptimized = (customerId: string) => {
   const [customer, setCustomer] = useState<Customer | null>(null);

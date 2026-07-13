@@ -8,8 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
 import {
   Form,
   FormControl,
@@ -17,16 +17,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+} from '@sm/components/ui/form';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 
 const snapshotSchema = z.object({
   snapshot_type: z.string().min(1, 'Type is required'),

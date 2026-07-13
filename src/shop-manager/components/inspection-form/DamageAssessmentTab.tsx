@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@sm/components/ui/card";
 
 export function DamageAssessmentTab() {
   return (

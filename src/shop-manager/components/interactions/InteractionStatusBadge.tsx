@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { InteractionStatus } from "@/types/interaction";
+import { Badge } from "@sm/components/ui/badge";
+import { cn } from "@sm/lib/utils";
+import { InteractionStatus } from "@sm/types/interaction";
 
 interface InteractionStatusBadgeProps {
   status: InteractionStatus;

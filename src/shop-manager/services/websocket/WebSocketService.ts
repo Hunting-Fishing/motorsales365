@@ -1,5 +1,5 @@
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@sm/lib/supabase";
 
 /**
  * WebSocket service that uses Supabase's realtime functionality

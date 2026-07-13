@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getAffiliateAnalytics, AffiliateClickRecord } from '@/services/affiliateTrackingService';
+import { getAffiliateAnalytics, AffiliateClickRecord } from '@sm/services/affiliateTrackingService';
 import { format, subDays, startOfDay, isToday, isThisWeek, parseISO } from 'date-fns';
 
 interface DailyClick {

@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@sm/components/ui/button';
+import { Calendar } from '@sm/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@sm/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface CustomerDateRangeFilterProps {
   dateRange?: DateRange;

@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 
 export function InvoiceListHeader() {
   return (

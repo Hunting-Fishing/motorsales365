@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 
 // License classifications by jurisdiction
 // Canada uses Class 1-6 system (with some variations)

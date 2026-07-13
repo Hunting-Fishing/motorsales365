@@ -1,18 +1,18 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { MoreVertical, Trash2, Repeat } from 'lucide-react';
 import { format } from 'date-fns';
-import type { AssetAssignment } from '@/types/assetAssignment';
-import { useAssetAssignments } from '@/hooks/useAssetAssignments';
+import type { AssetAssignment } from '@sm/types/assetAssignment';
+import { useAssetAssignments } from '@sm/hooks/useAssetAssignments';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+} from '@sm/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@sm/components/ui/tooltip';
 
 interface AssetAssignmentsListProps {
   assignments: AssetAssignment[];

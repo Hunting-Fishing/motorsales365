@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Key, Plus, Calendar, Activity } from 'lucide-react';
-import { enterpriseService } from '@/services/enterpriseService';
-import type { ApiToken } from '@/types/phase4';
+import { enterpriseService } from '@sm/services/enterpriseService';
+import type { ApiToken } from '@sm/types/phase4';
 
 export const ApiTokenManagement = () => {
   const [tokens, setTokens] = useState<ApiToken[]>([]);

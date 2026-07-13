@@ -4,21 +4,21 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Switch } from '@sm/components/ui/switch';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
+} from '@sm/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 import { 
   Clock, 
   Fuel, 
@@ -30,12 +30,12 @@ import {
   PenLine
 } from 'lucide-react';
 import { format, differenceInMinutes } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 import { TruckCompartmentSelector } from './TruckCompartmentSelector';
 import { SignaturePad } from './SignaturePad';
-import { useTruckCompartments, TruckCompartment, useUpdateCompartmentLevel } from '@/hooks/useTruckCompartments';
-import { useFuelProducts, FuelProduct, useProductsByTruck } from '@/hooks/useFuelProducts';
-import { useFuelUnits } from '@/hooks/fuel-delivery/useFuelUnits';
+import { useTruckCompartments, TruckCompartment, useUpdateCompartmentLevel } from '@sm/hooks/useTruckCompartments';
+import { useFuelProducts, FuelProduct, useProductsByTruck } from '@sm/hooks/useFuelProducts';
+import { useFuelUnits } from '@sm/hooks/fuel-delivery/useFuelUnits';
 import { AlertTriangle, CheckCircle2 as CheckIcon } from 'lucide-react';
 
 interface RouteStop {

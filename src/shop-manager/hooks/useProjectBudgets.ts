@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { toast } from 'sonner';
-import type { ProjectBudget, ProjectPhase, ProjectCostItem, ProjectChangeOrder, ProjectBudgetSnapshot } from '@/types/projectBudget';
+import type { ProjectBudget, ProjectPhase, ProjectCostItem, ProjectChangeOrder, ProjectBudgetSnapshot } from '@sm/types/projectBudget';
 
 export function useProjectBudgets() {
   const queryClient = useQueryClient();

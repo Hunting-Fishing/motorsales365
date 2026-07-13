@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
+import { Progress } from "@sm/components/ui/progress";
+import { Input } from "@sm/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { Plus, Search, Filter, Edit, Trash2, TrendingUp, Users, DollarSign, Clock } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { hybridActivitiesService } from "@/services/hybridActivitiesService";
-import { HybridActivity, HybridActivityAnalytics } from "@/types/hybrid";
+import { useToast } from "@sm/hooks/use-toast";
+import { hybridActivitiesService } from "@sm/services/hybridActivitiesService";
+import { HybridActivity, HybridActivityAnalytics } from "@sm/types/hybrid";
 import { HybridActivityForm } from "./HybridActivityForm";
 import {
   AlertDialog,
@@ -19,7 +19,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@sm/components/ui/alert-dialog";
 
 export function HybridActivitiesDashboard() {
   const { toast } = useToast();

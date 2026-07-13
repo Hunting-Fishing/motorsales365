@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Lock, ArrowRight, Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ModuleRouteConfig } from '@/config/moduleRoutes';
+import { cn } from '@sm/lib/utils';
+import { ModuleRouteConfig } from '@sm/config/moduleRoutes';
 
 interface ModuleCardProps {
   module: ModuleRouteConfig;

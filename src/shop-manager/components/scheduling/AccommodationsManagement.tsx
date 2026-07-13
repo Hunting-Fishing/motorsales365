@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
-import { useScheduling } from '@/hooks/useScheduling';
+import { useScheduling } from '@sm/hooks/useScheduling';
 
 export function AccommodationsManagement() {
   const { accommodations, loading } = useScheduling();

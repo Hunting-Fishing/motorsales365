@@ -1,5 +1,5 @@
 // Unified Product Service - Single Source of Truth for Product Operations
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { 
   Product, 
   DatabaseProduct, 
@@ -8,7 +8,7 @@ import {
   PopularProduct,
   transformDatabaseProduct,
   transformPopularProduct
-} from '@/types/product';
+} from '@sm/types/product';
 
 export class ProductService {
   // Get all products with optional filters

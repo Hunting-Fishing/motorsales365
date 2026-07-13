@@ -1,5 +1,5 @@
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@sm/components/ui/badge";
 
 interface WarrantyStatusBadgeProps {
   status: string | null;

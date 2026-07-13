@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@sm/components/ui/collapsible';
 import { Car, ChevronDown, ChevronUp, Loader2, CheckCircle, X, Fuel, Plus } from 'lucide-react';
-import { decodeVin } from '@/services/vinDecoderService';
-import { VinDecodeResult } from '@/types/vehicle';
-import { estimateTankCapacity, mapFuelTypeToPreference } from '@/utils/tankCapacityEstimator';
+import { decodeVin } from '@sm/services/vinDecoderService';
+import { VinDecodeResult } from '@sm/types/vehicle';
+import { estimateTankCapacity, mapFuelTypeToPreference } from '@sm/utils/tankCapacityEstimator';
 import { FuelTypeSelect } from './FuelTypeSelect';
 
 export interface VehicleFormData {

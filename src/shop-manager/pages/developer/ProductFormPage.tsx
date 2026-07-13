@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import ProductForm from '@/components/developer/shopping/ProductForm';
+import ProductForm from '@sm/components/developer/shopping/ProductForm';
 
 export default function ProductFormPage() {
   const { productId } = useParams();

@@ -1,7 +1,7 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { InventoryItemExtended } from '@/types/inventory';
-import { formatInventoryItem } from '@/utils/inventory/inventoryUtils';
+import { supabase } from '@sm/integrations/supabase/client';
+import { InventoryItemExtended } from '@sm/types/inventory';
+import { formatInventoryItem } from '@sm/utils/inventory/inventoryUtils';
 
 export async function filterInventoryItems(filters: any): Promise<InventoryItemExtended[]> {
   try {

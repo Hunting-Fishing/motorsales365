@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import { HybridActivity, ComplianceRequirement, CreateHybridActivityData, CreateComplianceRequirementData, HybridActivityAnalytics } from '@/types/hybrid';
+import { supabase } from '@sm/integrations/supabase/client';
+import { HybridActivity, ComplianceRequirement, CreateHybridActivityData, CreateComplianceRequirementData, HybridActivityAnalytics } from '@sm/types/hybrid';
 
 class HybridActivitiesService {
   

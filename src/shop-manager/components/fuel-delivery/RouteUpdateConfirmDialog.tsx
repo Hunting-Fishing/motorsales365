@@ -8,10 +8,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
+} from '@sm/components/ui/alert-dialog';
+import { Badge } from '@sm/components/ui/badge';
 import { Calendar, Plus, Minus, Route } from 'lucide-react';
-import { RouteUpdateSummary, formatDeliveryDays } from '@/services/fuelDelivery/RouteScheduleService';
+import { RouteUpdateSummary, formatDeliveryDays } from '@sm/services/fuelDelivery/RouteScheduleService';
 import { format } from 'date-fns';
 
 interface RouteUpdateConfirmDialogProps {

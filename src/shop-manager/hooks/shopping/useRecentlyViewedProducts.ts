@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getRecentlyViewedProducts } from '@/services/productAnalyticsService';
-import { useToast } from '@/hooks/use-toast';
+import { getRecentlyViewedProducts } from '@sm/services/productAnalyticsService';
+import { useToast } from '@sm/hooks/use-toast';
 
 interface RecentlyViewedProduct {
   product_id: string;

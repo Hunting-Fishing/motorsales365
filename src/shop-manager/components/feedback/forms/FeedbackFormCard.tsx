@@ -2,11 +2,11 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { Settings, Trash, BarChart, FileText } from 'lucide-react';
-import { FeedbackForm } from '@/types/feedback';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { FeedbackForm } from '@sm/types/feedback';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { AlertDialogTrigger } from '@sm/components/ui/alert-dialog';
 
 interface FeedbackFormCardProps {
   form: FeedbackForm;

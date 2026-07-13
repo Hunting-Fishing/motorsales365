@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Play, 
   CheckCircle2, 
@@ -11,8 +11,8 @@ import {
   ChevronRight,
   Timer
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { TechnicianTask } from '@/hooks/useTechnicianTasks';
+import { cn } from '@sm/lib/utils';
+import type { TechnicianTask } from '@sm/hooks/useTechnicianTasks';
 
 interface TechnicianTaskCardProps {
   task: TechnicianTask;

@@ -1,10 +1,10 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
 import { Link } from "react-router-dom";
 import { FileText, History } from "lucide-react";
-import { ServiceHistoryTable } from "@/components/service-history/ServiceHistoryTable";
-import { WorkOrder } from "@/types/workOrder";
+import { ServiceHistoryTable } from "@sm/components/service-history/ServiceHistoryTable";
+import { WorkOrder } from "@sm/types/workOrder";
 
 interface EquipmentServiceHistoryProps {
   equipmentId: string;

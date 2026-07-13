@@ -1,6 +1,6 @@
 import React from 'react';
-import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { SettingsPageHeader } from '@sm/components/settings/SettingsPageHeader';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Calendar, Clock, Users, Settings } from 'lucide-react';
 
 export default function SchedulingSettings() {

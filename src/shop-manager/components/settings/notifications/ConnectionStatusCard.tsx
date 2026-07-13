@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
 import { Wifi, WifiOff, Bell } from "lucide-react";
 import { motion } from "framer-motion";
 

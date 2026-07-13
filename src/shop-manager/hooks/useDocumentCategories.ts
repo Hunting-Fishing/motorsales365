@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { DocumentCategory } from '@/types/document';
-import { DocumentService } from '@/services/documentService';
+import { DocumentCategory } from '@sm/types/document';
+import { DocumentService } from '@sm/services/documentService';
 
 export function useDocumentCategories() {
   const [categories, setCategories] = useState<DocumentCategory[]>([]);

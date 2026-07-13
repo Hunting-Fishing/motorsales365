@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Equipment } from '@/types/equipment';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Equipment } from '@sm/types/equipment';
+import { useToast } from '@sm/hooks/use-toast';
 
 export function useEquipmentManagement() {
   const [loading, setLoading] = useState(false);

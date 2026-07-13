@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Plus, Calendar, List, CalendarDays } from 'lucide-react';
-import { useAssetAssignments } from '@/hooks/useAssetAssignments';
+import { useAssetAssignments } from '@sm/hooks/useAssetAssignments';
 import { AssetAssignmentsList } from './AssetAssignmentsList';
 import { AddAssetAssignmentDialog } from './AddAssetAssignmentDialog';
 import { AssetAssignmentTimeline } from './AssetAssignmentTimeline';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 
 export function AssetAssignments() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);

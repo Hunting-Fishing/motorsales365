@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
-import { PlannerBoardItem, PlannerBoardColumn, PlannerSwimlane, PlannerPreferences } from '@/types/planner';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
+import { PlannerBoardItem, PlannerBoardColumn, PlannerSwimlane, PlannerPreferences } from '@sm/types/planner';
 import { toast } from 'sonner';
 
 export function usePlannerColumns(boardId: string = 'default') {

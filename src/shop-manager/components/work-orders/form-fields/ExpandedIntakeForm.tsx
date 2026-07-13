@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Switch } from "@sm/components/ui/switch";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
 import { Clock, AlertTriangle, User, Car, FileText, Phone, DollarSign, CheckCircle2 } from "lucide-react";
 import { EnhancedVehicleDamageAssessment, DamageArea } from "../vehicle/EnhancedVehicleDamageAssessment";
 

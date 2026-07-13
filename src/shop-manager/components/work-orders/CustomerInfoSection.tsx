@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Customer } from "@/types/customer";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Customer } from "@sm/types/customer";
 import { Loader2 } from "lucide-react";
 
 interface CustomerInfoSectionProps {

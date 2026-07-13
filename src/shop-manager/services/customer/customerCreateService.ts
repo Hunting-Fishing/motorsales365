@@ -1,7 +1,7 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { Customer, CustomerCreate } from '@/types/customer';
-import { CustomerVehicle } from '@/types/customer/vehicle';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Customer, CustomerCreate } from '@sm/types/customer';
+import { CustomerVehicle } from '@sm/types/customer/vehicle';
 
 // Utility function to extract actual values from wrapped objects
 const extractValue = (value: any): string => {

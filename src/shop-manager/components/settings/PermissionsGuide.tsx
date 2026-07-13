@@ -1,5 +1,5 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Alert, AlertDescription } from "@sm/components/ui/alert";
 import { Shield, Users, Settings, CheckCircle, Info } from "lucide-react";
 
 export function PermissionsGuide() {

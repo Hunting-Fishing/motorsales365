@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
 import { Plus, Trash2, Edit2, Clock, Calendar } from 'lucide-react';
-import { useEmployeeAvailability } from '@/hooks/useEmployeeAvailability';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { supabase } from '@/integrations/supabase/client';
-import type { EmployeeAvailability } from '@/types/employee-availability';
+import { useEmployeeAvailability } from '@sm/hooks/useEmployeeAvailability';
+import { Badge } from '@sm/components/ui/badge';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { supabase } from '@sm/integrations/supabase/client';
+import type { EmployeeAvailability } from '@sm/types/employee-availability';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 

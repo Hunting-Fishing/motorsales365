@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { WorkOrderVehicle } from '@/types/workOrder';
+import { WorkOrderVehicle } from '@sm/types/workOrder';
 
 interface InvoiceVehicleInfoProps {
   vehicle?: WorkOrderVehicle | null;

@@ -1,19 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Eye, Plus, AlertTriangle, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { WorkOrder } from '@/types/workOrder';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Alert, AlertDescription, AlertTitle } from '@sm/components/ui/alert';
 import { 
   getCustomerName, 
   getWorkOrderDate, 
   getStatusBadgeVariant,
   validateWorkOrderData
-} from '@/utils/workOrders/dataHelpers';
+} from '@sm/utils/workOrders/dataHelpers';
 
 interface VehicleWorkOrdersProps {
   vehicleId: string;
@@ -95,7 +95,7 @@ export const VehicleWorkOrders: React.FC<VehicleWorkOrdersProps> = ({
           setInternalError(null);
           console.log('VehicleWorkOrders: Fetching work orders for vehicle:', vehicleId);
           
-          const { getAllWorkOrders } = await import('@/services/workOrder');
+          const { getAllWorkOrders } = await import('@sm/services/workOrder');
           const allWorkOrders = await getAllWorkOrders();
           const vehicleWorkOrders = allWorkOrders.filter(wo => wo.vehicle_id === vehicleId);
           

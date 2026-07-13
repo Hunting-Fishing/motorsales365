@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { useShopId } from './useShopId';
 import { useToast } from './use-toast';
-import type { ShiftTemplate } from '@/types/shift-template';
+import type { ShiftTemplate } from '@sm/types/shift-template';
 
 export function useShiftTemplates() {
   const { shopId } = useShopId();

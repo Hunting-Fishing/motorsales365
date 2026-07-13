@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { Wrench, ArrowRight, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useEquipment } from '@/hooks/useEquipment';
+import { useEquipment } from '@sm/hooks/useEquipment';
 
 export function EquipmentHealthWidget() {
   const navigate = useNavigate();

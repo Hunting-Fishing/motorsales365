@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { TimeEntry } from '@/types/workOrder';
-import { Customer } from '@/types/customer';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { TimeEntry } from '@sm/types/workOrder';
+import { Customer } from '@sm/types/customer';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Calendar, User, Car, MapPin, Clock, Wrench, Package, DollarSign } from 'lucide-react';
 
 interface WorkOrderUnifiedHeaderProps {

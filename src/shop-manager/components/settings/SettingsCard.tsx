@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@sm/components/ui/card";
 import { Link } from "react-router-dom";
 import { LucideIcon } from "lucide-react";
 

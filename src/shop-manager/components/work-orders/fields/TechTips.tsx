@@ -1,9 +1,9 @@
 
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
 import { LightbulbIcon, ClipboardCopy } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@sm/hooks/use-toast";
 
 interface TipType {
   title: string;

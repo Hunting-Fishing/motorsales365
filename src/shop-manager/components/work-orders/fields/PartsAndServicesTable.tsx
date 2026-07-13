@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { 
   Table, 
   TableBody, 
@@ -8,10 +8,10 @@ import {
   TableHead, 
   TableHeader, 
   TableRow 
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
+} from "@sm/components/ui/table";
+import { Input } from "@sm/components/ui/input";
 import { Plus, Trash2 } from "lucide-react";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 
 interface Item {
   id: string;

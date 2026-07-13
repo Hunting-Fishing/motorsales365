@@ -1,7 +1,7 @@
 
 import React, { useEffect } from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { AccountTab } from "@/components/settings/AccountTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { AccountTab } from "@sm/components/settings/AccountTab";
 import { useLocation } from "react-router-dom";
 
 export const AccountSettings = () => {

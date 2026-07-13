@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { CustomerForm } from '@/components/customers/form/CustomerForm';
-import { useCustomerEdit } from '@/hooks/useCustomerEdit';
-import type { CustomerFormValues } from '@/components/customers/form/schemas/customerSchema';
-import { formatVehicleYear } from '@/types/customer/vehicle';
+import { CustomerForm } from '@sm/components/customers/form/CustomerForm';
+import { useCustomerEdit } from '@sm/hooks/useCustomerEdit';
+import type { CustomerFormValues } from '@sm/components/customers/form/schemas/customerSchema';
+import { formatVehicleYear } from '@sm/types/customer/vehicle';
 
 export default function CustomerEdit() {
   const { customerId } = useParams<{ customerId: string }>();

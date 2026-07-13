@@ -6,19 +6,19 @@ import {
   SheetTitle,
   SheetDescription,
   SheetTrigger
-} from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+} from '@sm/components/ui/sheet';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@sm/components/ui/radio-group';
 import { AlertTriangle, Camera, MapPin, Send, Loader2, X, Image as ImageIcon } from 'lucide-react';
-import { useTechnicianOfflineStorage } from '@/hooks/useTechnicianOfflineStorage';
-import { useShopId } from '@/hooks/useShopId';
-import { usePWA } from '@/hooks/usePWA';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+import { useTechnicianOfflineStorage } from '@sm/hooks/useTechnicianOfflineStorage';
+import { useShopId } from '@sm/hooks/useShopId';
+import { usePWA } from '@sm/hooks/usePWA';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
+import { cn } from '@sm/lib/utils';
 
 interface QuickHazardReportProps {
   trigger?: React.ReactNode;

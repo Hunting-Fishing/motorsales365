@@ -1,16 +1,16 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
 import { 
   User, Building2, Phone, Mail, MapPin, Tag, Car, 
   Calendar, FileText, Clock, Printer, Download
 } from "lucide-react";
-import { Customer, CustomerVehicle } from "@/types/customer";
-import { formatPhoneNumber } from "@/utils/formatters";
-import { customerToVcard } from "@/utils/export/customerExport";
-import { useToast } from "@/hooks/use-toast";
+import { Customer, CustomerVehicle } from "@sm/types/customer";
+import { formatPhoneNumber } from "@sm/utils/formatters";
+import { customerToVcard } from "@sm/utils/export/customerExport";
+import { useToast } from "@sm/hooks/use-toast";
 
 interface EnhancedCustomerPreviewProps {
   customer: Customer;

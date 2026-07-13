@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Camera, Upload, X } from "lucide-react";
 
 interface ImageUploadButtonProps {

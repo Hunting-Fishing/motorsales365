@@ -1,6 +1,6 @@
 
 import React from "react";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { LoadingSpinner } from "@sm/components/ui/loading-spinner";
 
 export function InventoryLoadingState() {
   return (

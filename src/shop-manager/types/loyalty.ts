@@ -102,6 +102,6 @@ export const DEFAULT_LOYALTY_TIERS: LoyaltyTier[] = [
 
 // Helper function for easier migration
 export async function getLoyaltyTiers() {
-  const { loyaltySettingsService } = await import('@/services/settings/loyaltySettingsService');
+  const { loyaltySettingsService } = await import('@sm/services/settings/loyaltySettingsService');
   return await loyaltySettingsService.getTierTemplates();
 }

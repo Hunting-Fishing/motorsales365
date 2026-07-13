@@ -1,9 +1,9 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { useInventoryView } from '@/contexts/InventoryViewContext';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
+import { useInventoryView } from '@sm/contexts/InventoryViewContext';
+import { useToast } from '@sm/hooks/use-toast';
 import { 
   Trash2, 
   Edit3, 
@@ -14,7 +14,7 @@ import {
   Upload
 } from 'lucide-react';
 import { ConfirmationDialog } from './ConfirmationDialog';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface BulkActionsBarProps {
   onBulkEdit: (itemIds: string[]) => void;

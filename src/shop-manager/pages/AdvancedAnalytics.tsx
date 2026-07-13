@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { BarChart, DollarSign, Clock, AlertTriangle, TrendingUp } from 'lucide-react';
-import { LaborCostDashboard } from '@/components/analytics/LaborCostDashboard';
-import { TimeCardManager } from '@/components/payroll/TimeCardManager';
-import { PayrollManager } from '@/components/payroll/PayrollManager';
-import { ComplianceMonitor } from '@/components/compliance/ComplianceMonitor';
-import { ForecastingDashboard } from '@/components/forecasting/ForecastingDashboard';
+import { LaborCostDashboard } from '@sm/components/analytics/LaborCostDashboard';
+import { TimeCardManager } from '@sm/components/payroll/TimeCardManager';
+import { PayrollManager } from '@sm/components/payroll/PayrollManager';
+import { ComplianceMonitor } from '@sm/components/compliance/ComplianceMonitor';
+import { ForecastingDashboard } from '@sm/components/forecasting/ForecastingDashboard';
 
 export default function AdvancedAnalytics() {
   const [activeTab, setActiveTab] = useState('labor');

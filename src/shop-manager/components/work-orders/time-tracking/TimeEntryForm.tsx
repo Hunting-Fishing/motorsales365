@@ -1,10 +1,10 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { TimeEntry } from "@/types/workOrder";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Switch } from "@sm/components/ui/switch";
+import { TimeEntry } from "@sm/types/workOrder";
 
 export interface TimeEntryFormProps {
   initialData: Partial<TimeEntry>;

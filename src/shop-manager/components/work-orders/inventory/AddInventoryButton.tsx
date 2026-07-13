@@ -1,8 +1,8 @@
 
 import React from "react";
 import { Package } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@sm/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@sm/components/ui/tooltip";
 
 interface AddInventoryButtonProps {
   onShowDialog: () => void;

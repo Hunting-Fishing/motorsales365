@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
-import { CustomerLoyalty } from "@/types/loyalty";
+import { supabase } from "@sm/integrations/supabase/client";
+import { CustomerLoyalty } from "@sm/types/loyalty";
 
 export const getCustomerLoyalty = async (customerId: string): Promise<CustomerLoyalty | null> => {
   try {

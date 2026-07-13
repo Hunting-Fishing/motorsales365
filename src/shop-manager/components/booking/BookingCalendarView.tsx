@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@sm/components/ui/dialog';
+import { Textarea } from '@sm/components/ui/textarea';
 import { Clock, User, Phone, Mail, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { 
   format, 
@@ -20,7 +20,7 @@ import {
   isSameDay, 
   parseISO 
 } from 'date-fns';
-import { BookingAppointment, BookableService, useUpdateBookingAppointment, useCancelBookingAppointment } from '@/hooks/useBookingSystem';
+import { BookingAppointment, BookableService, useUpdateBookingAppointment, useCancelBookingAppointment } from '@sm/hooks/useBookingSystem';
 import { BookingCalendarHeader, CalendarViewType } from './BookingCalendarHeader';
 import { BookingCalendarMonthView } from './BookingCalendarMonthView';
 import { BookingCalendarDayView } from './BookingCalendarDayView';

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { InventoryItemDetails } from '@/components/inventory/InventoryItemDetails';
-import { useInventoryItem } from '@/hooks/inventory/useInventoryItem';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { Button } from '@/components/ui/button';
+import { InventoryItemDetails } from '@sm/components/inventory/InventoryItemDetails';
+import { useInventoryItem } from '@sm/hooks/inventory/useInventoryItem';
+import { LoadingSpinner } from '@sm/components/common/LoadingSpinner';
+import { Button } from '@sm/components/ui/button';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

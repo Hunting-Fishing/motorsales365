@@ -1,12 +1,12 @@
 
 import React from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Equipment } from "@/types/equipment";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Equipment } from "@sm/types/equipment";
 import { UseFormReturn } from "react-hook-form";
-import { RepairPlanFormValues } from "@/types/repairPlan";
+import { RepairPlanFormValues } from "@sm/types/repairPlan";
 
 interface RepairPlanBasicInfoFieldsProps {
   form: UseFormReturn<RepairPlanFormValues>;

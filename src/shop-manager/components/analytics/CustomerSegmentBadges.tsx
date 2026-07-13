@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
 import { 
   CustomerSegmentType, 
   analyzeCustomerSegments 
-} from '@/utils/analytics/customerSegmentation';
-import { Skeleton } from '@/components/ui/skeleton';
+} from '@sm/utils/analytics/customerSegmentation';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface CustomerSegmentBadgesProps {
   customerId: string;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { format, startOfWeek, addDays, isSameDay, isToday } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { StaffScheduleEvent } from '@/types/staffScheduleCalendar';
+import { cn } from '@sm/lib/utils';
+import { StaffScheduleEvent } from '@sm/types/staffScheduleCalendar';
 import { StaffCalendarEvent } from './StaffCalendarEvent';
 
 interface StaffCalendarWeekViewProps {

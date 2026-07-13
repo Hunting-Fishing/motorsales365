@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Package, DollarSign, TrendingUp } from 'lucide-react';
 
 interface PartsInventorySummaryProps {

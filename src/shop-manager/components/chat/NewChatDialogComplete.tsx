@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Plus, MessageCircle, Users, Wrench } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { createChatRoom } from '@/services/chat';
-import { supabase } from '@/integrations/supabase/client';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { generateUniqueDisplayNames, formatDisplayName } from '@/utils/duplicateNameHandler';
+import { useToast } from '@sm/hooks/use-toast';
+import { createChatRoom } from '@sm/services/chat';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { generateUniqueDisplayNames, formatDisplayName } from '@sm/utils/duplicateNameHandler';
 
 interface NewChatDialogCompleteProps {
   currentUserId: string;
-  onChatCreated?: (room: import('@/types/chat').ChatRoom) => void;
+  onChatCreated?: (room: import('@sm/types/chat').ChatRoom) => void;
   trigger?: React.ReactNode;
 }
 

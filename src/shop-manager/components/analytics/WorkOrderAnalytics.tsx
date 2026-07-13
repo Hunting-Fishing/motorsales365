@@ -1,6 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { WorkOrderDataPoint } from '@/types/analytics';
+import { WorkOrderDataPoint } from '@sm/types/analytics';
 
 interface WorkOrderAnalyticsProps {
   data?: WorkOrderDataPoint[];

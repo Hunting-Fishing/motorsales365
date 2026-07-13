@@ -1,5 +1,5 @@
 import React from 'react';
-import { MobileInventoryScanner } from '@/components/inventory/MobileInventoryScanner';
+import { MobileInventoryScanner } from '@sm/components/inventory/MobileInventoryScanner';
 
 export default function MobileInventory() {
   return (

@@ -1,6 +1,6 @@
 
-import { ReminderStatus } from "@/types/reminder";
-import { Badge } from "@/components/ui/badge";
+import { ReminderStatus } from "@sm/types/reminder";
+import { Badge } from "@sm/components/ui/badge";
 import { format, isPast, parseISO } from "date-fns";
 
 export interface ReminderStatusBadgeProps {

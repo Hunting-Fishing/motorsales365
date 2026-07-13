@@ -1,6 +1,6 @@
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 import { AlertTriangle, Clock } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@sm/components/ui/tooltip';
 
 interface MilestoneAlertBadgeProps {
   overdueCount: number;

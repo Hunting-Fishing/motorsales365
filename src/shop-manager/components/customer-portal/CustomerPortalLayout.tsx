@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, LogIn, UserPlus, Home, Sparkles } from 'lucide-react';
-import customerPortalBg from '@/assets/customer-portal-bg.jpg';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { Particles } from '@/components/ui/magicui/particles';
+import customerPortalBg from '@sm/assets/customer-portal-bg.jpg';
+import { ThemeToggle } from '@sm/components/theme/ThemeToggle';
+import { Particles } from '@sm/components/ui/magicui/particles';
 
 interface CustomerPortalLayoutProps {
   children: React.ReactNode;

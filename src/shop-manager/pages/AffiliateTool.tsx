@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react';
 import { Container } from 'semantic-ui-react';
-import CategoryGrid from '@/components/affiliate/CategoryGrid';
-import HeroSection from '@/components/affiliate/HeroSection';
-import SearchBar from '@/components/affiliate/SearchBar';
-import FeaturedTools from '@/components/affiliate/FeaturedTools';
-import BestSellingTools from '@/components/affiliate/BestSellingTools';
-import ManufacturersGrid from '@/components/affiliate/ManufacturersGrid';
+import CategoryGrid from '@sm/components/affiliate/CategoryGrid';
+import HeroSection from '@sm/components/affiliate/HeroSection';
+import SearchBar from '@sm/components/affiliate/SearchBar';
+import FeaturedTools from '@sm/components/affiliate/FeaturedTools';
+import BestSellingTools from '@sm/components/affiliate/BestSellingTools';
+import ManufacturersGrid from '@sm/components/affiliate/ManufacturersGrid';
 import { useQuery } from '@tanstack/react-query';
-import { categories } from '@/data/toolCategories';
-import { manufacturers } from '@/data/manufacturers';
-import { supabase } from '@/integrations/supabase/client';
+import { categories } from '@sm/data/toolCategories';
+import { manufacturers } from '@sm/data/manufacturers';
+import { supabase } from '@sm/integrations/supabase/client';
 
 // Convert the categories dictionary to an array format for display
 const categoryList = Object.keys(categories).map((name, id) => ({

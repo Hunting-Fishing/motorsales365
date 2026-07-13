@@ -9,15 +9,15 @@ import {
   FileImage,
   Smartphone
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useDeviceCapabilities } from '@/hooks/useDeviceCapabilities';
-import { useCamera } from '@/hooks/useCamera';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
-import { cn } from '@/lib/utils';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { useDeviceCapabilities } from '@sm/hooks/useDeviceCapabilities';
+import { useCamera } from '@sm/hooks/useCamera';
+import { useGeolocation } from '@sm/hooks/useGeolocation';
+import { BarcodeScanner } from '@sm/components/inventory/BarcodeScanner';
+import { cn } from '@sm/lib/utils';
 
 interface DeviceIntegrationProps {
   workOrderId?: string;

@@ -1,6 +1,6 @@
 
-import { supabase } from '@/lib/supabase';
-import { EmailTemplate, EmailCategory, EmailTemplateVariable } from '@/types/email';
+import { supabase } from '@sm/lib/supabase';
+import { EmailTemplate, EmailCategory, EmailTemplateVariable } from '@sm/types/email';
 import { parseJsonField } from './utils';
 
 export const emailTemplateService = {

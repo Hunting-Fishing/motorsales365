@@ -1,9 +1,9 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { InventoryFormField } from "./InventoryFormField";
 import { InventoryFormActions } from "./InventoryFormActions";
-import { InventoryItemExtended } from "@/types/inventory";
+import { InventoryItemExtended } from "@sm/types/inventory";
 import { InventoryFormProps } from "./InventoryFormProps";
 
 export function InventoryForm({ onSubmit, onCancel, isLoading = false }: InventoryFormProps) {

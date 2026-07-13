@@ -1,10 +1,10 @@
 
 import React, { useState, useMemo } from 'react';
-import { ServiceMainCategory, ServiceJob, ServiceSector } from '@/types/service';
-import { SelectedService } from '@/types/selectedService';
+import { ServiceMainCategory, ServiceJob, ServiceSector } from '@sm/types/service';
+import { SelectedService } from '@sm/types/selectedService';
 import { ServiceCategoryList } from './ServiceCategoryList';
 import { ServiceSearch } from './ServiceSearch';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 
 interface HierarchicalServiceSelectorProps {
   sectors: ServiceSector[];

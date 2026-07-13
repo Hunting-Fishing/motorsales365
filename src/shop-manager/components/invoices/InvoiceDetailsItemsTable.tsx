@@ -1,5 +1,5 @@
 
-import { InvoiceItem } from "@/types/invoice";
+import { InvoiceItem } from "@sm/types/invoice";
 
 interface InvoiceDetailsItemsTableProps {
   items: InvoiceItem[];

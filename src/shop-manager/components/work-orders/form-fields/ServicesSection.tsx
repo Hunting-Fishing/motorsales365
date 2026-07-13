@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { IntegratedServiceSelector } from "@/components/work-orders/fields/services/IntegratedServiceSelector";
+import { Button } from "@sm/components/ui/button";
+import { IntegratedServiceSelector } from "@sm/components/work-orders/fields/services/IntegratedServiceSelector";
 import { EnhancedComplaintForm } from "./EnhancedComplaintForm";
-import { ServiceSector, ServiceJob } from "@/types/service";
-import { SelectedService } from "@/types/selectedService";
-import { useServiceSectors } from "@/hooks/useServiceCategories";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
+import { ServiceSector, ServiceJob } from "@sm/types/service";
+import { SelectedService } from "@sm/types/selectedService";
+import { useServiceSectors } from "@sm/hooks/useServiceCategories";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
 
 interface ServicesSectionProps {
   form: UseFormReturn<WorkOrderFormSchemaValues>;

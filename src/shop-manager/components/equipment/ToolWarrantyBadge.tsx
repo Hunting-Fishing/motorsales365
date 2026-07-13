@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@sm/components/ui/badge";
 import { ShieldCheck, ShieldAlert, ShieldX, ShieldOff } from "lucide-react";
 
 interface ToolWarrantyBadgeProps {

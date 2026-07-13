@@ -1,7 +1,7 @@
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { InventoryItem } from "@/types/inventory";
-import { InvoiceTemplate } from "@/types/invoice";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
+import { InventoryItem } from "@sm/types/inventory";
+import { InvoiceTemplate } from "@sm/types/invoice";
 
 export interface InventoryItemSelectorProps {
   open?: boolean; // Make this compatible with both open and isOpen

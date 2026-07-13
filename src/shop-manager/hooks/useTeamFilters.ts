@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { TeamMember } from "@/types/team";
+import { TeamMember } from "@sm/types/team";
 
 export function useTeamFilters(teamMembers: TeamMember[]) {
   const [searchQuery, setSearchQuery] = useState("");

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Separator } from '@sm/components/ui/separator';
 import { 
   Users, 
   Building2, 
@@ -23,9 +23,9 @@ import {
   Calendar,
   Settings
 } from 'lucide-react';
-import { useDepartmentMembers } from '@/hooks/team/useDepartmentMembers';
-import { useTeamRolesPage } from '@/hooks/useTeamRolesPage';
-import { useTeamMembers } from '@/hooks/useTeamMembers';
+import { useDepartmentMembers } from '@sm/hooks/team/useDepartmentMembers';
+import { useTeamRolesPage } from '@sm/hooks/useTeamRolesPage';
+import { useTeamMembers } from '@sm/hooks/useTeamMembers';
 import { TeamOverviewStats } from './enhanced-team/TeamOverviewStats';
 import { TeamMembersGrid } from './enhanced-team/TeamMembersGrid';
 import { DepartmentAnalytics } from './enhanced-team/DepartmentAnalytics';

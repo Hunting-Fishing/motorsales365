@@ -1,10 +1,10 @@
 
 import React, { useState } from "react";
-import { Bay } from "@/services/diybay/diybayService";
-import { Button } from "@/components/ui/button";
+import { Bay } from "@sm/services/diybay/diybayService";
+import { Button } from "@sm/components/ui/button";
 import { Plus } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@sm/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@sm/components/ui/dialog";
 
 interface AddBayButtonProps {
   onAddBay: () => Promise<boolean>;

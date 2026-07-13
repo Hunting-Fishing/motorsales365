@@ -1,6 +1,6 @@
 
-import { supabase } from '@/lib/supabase';
-import { EmailCampaign, EmailABTest, EmailCampaignStatus } from '@/types/email';
+import { supabase } from '@sm/lib/supabase';
+import { EmailCampaign, EmailABTest, EmailCampaignStatus } from '@sm/types/email';
 import { GenericResponse, parseJsonField, prepareForSupabase } from '../utils/supabaseHelper';
 
 // Helper function to convert database campaign to typed EmailCampaign

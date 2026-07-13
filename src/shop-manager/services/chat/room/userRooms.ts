@@ -1,6 +1,6 @@
 
 import { supabase } from "../supabaseClient";
-import { ChatRoom, ChatMessage } from "@/types/chat";
+import { ChatRoom, ChatMessage } from "@sm/types/chat";
 import { DatabaseChatRoom } from "./types";
 
 // Get all chat rooms for a specific user

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useSafetyDocuments } from '@/hooks/useSafetyDocuments';
-import { SafetyDocumentUpload } from '@/components/safety/SafetyDocumentUpload';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { useSafetyDocuments } from '@sm/hooks/useSafetyDocuments';
+import { SafetyDocumentUpload } from '@sm/components/safety/SafetyDocumentUpload';
 import { FileText, Plus, Search, ExternalLink, AlertTriangle, Wrench, Zap, ArrowUpFromLine } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 export default function SafetyDocuments() {
   const { loading, documents, searchSDS, getByType, getExpiringDocuments } = useSafetyDocuments();

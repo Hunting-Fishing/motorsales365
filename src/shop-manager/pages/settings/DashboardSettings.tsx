@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { DashboardSettingsTab } from "@/components/settings/DashboardSettingsTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { DashboardSettingsTab } from "@sm/components/settings/DashboardSettingsTab";
 
 export const DashboardSettings = () => {
   return (

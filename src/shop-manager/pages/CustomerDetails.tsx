@@ -2,12 +2,12 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useCustomerDetailsOptimized } from '@/hooks/useCustomerDetailsOptimized';
-import { CustomerDetailsHeader } from '@/components/customers/details/CustomerDetailsHeader';
-import { CustomerDetailsTabs } from '@/components/customers/details/CustomerDetailsTabs';
-import { AddInteractionDialog } from '@/components/interactions/AddInteractionDialog';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useCustomerDetailsOptimized } from '@sm/hooks/useCustomerDetailsOptimized';
+import { CustomerDetailsHeader } from '@sm/components/customers/details/CustomerDetailsHeader';
+import { CustomerDetailsTabs } from '@sm/components/customers/details/CustomerDetailsTabs';
+import { AddInteractionDialog } from '@sm/components/interactions/AddInteractionDialog';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 
 export default function CustomerDetails() {

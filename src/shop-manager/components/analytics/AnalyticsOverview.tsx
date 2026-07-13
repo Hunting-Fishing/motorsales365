@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { DollarSign, ShoppingCart, Users, TrendingUp } from 'lucide-react';
-import { AnalyticsData } from '@/types/analytics';
+import { AnalyticsData } from '@sm/types/analytics';
 
 interface AnalyticsOverviewProps {
   analytics: AnalyticsData | null;

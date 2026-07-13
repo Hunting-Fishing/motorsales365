@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@sm/components/ui/progress';
 import * as XLSX from 'xlsx';
 
 interface ExcelImportDialogProps {

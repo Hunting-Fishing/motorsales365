@@ -1,9 +1,9 @@
 
-import { supabase } from '@/lib/supabase';
-import { saveProfileMetadata } from '@/lib/profileMetadata';
-import { TeamMemberFormValues } from '@/components/team/form/formValidation';
-import { toast } from '@/hooks/use-toast';
-import { mapRoleToDbValue, validateRoleValue } from '@/utils/roleUtils';
+import { supabase } from '@sm/lib/supabase';
+import { saveProfileMetadata } from '@sm/lib/profileMetadata';
+import { TeamMemberFormValues } from '@sm/components/team/form/formValidation';
+import { toast } from '@sm/hooks/use-toast';
+import { mapRoleToDbValue, validateRoleValue } from '@sm/utils/roleUtils';
 
 /**
  * Updates a user's profile in the Supabase profiles table

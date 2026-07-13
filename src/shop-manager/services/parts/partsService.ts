@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabase';
-import { WorkOrderPart } from '@/types/workOrderPart';
+import { supabase } from '@sm/lib/supabase';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
 
 export interface PartsSearchResult {
   parts: WorkOrderPart[];

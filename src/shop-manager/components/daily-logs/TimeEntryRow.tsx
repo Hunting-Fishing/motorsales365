@@ -1,9 +1,9 @@
 import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Trash2 } from 'lucide-react';
-import { ActivityType } from '@/hooks/useActivityTypes';
+import { ActivityType } from '@sm/hooks/useActivityTypes';
 
 interface VesselEquipment {
   id: string;

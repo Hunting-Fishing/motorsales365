@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Plus, DollarSign, TrendingUp, Clock, AlertTriangle, GanttChart, Users, BarChart3 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useProjectBudgets } from '@/hooks/useProjectBudgets';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { useProjectBudgets } from '@sm/hooks/useProjectBudgets';
 import { ProjectBudgetCard } from './ProjectBudgetCard';
 import { CreateProjectDialog } from './CreateProjectDialog';
 import { ProjectBudgetDetails } from './ProjectBudgetDetails';
@@ -11,8 +11,8 @@ import { ApprovalQueue } from './ApprovalQueue';
 import { MultiYearTimeline } from './MultiYearTimeline';
 import { ResourceUtilizationChart } from './ResourceUtilizationChart';
 import { ProjectCapacityPanel } from './ProjectCapacityPanel';
-import { Skeleton } from '@/components/ui/skeleton';
-import { formatCurrency } from '@/lib/utils';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { formatCurrency } from '@sm/lib/utils';
 
 export function ProjectBudgetDashboard() {
   const { projects, isLoading } = useProjectBudgets();

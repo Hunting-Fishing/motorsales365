@@ -10,9 +10,9 @@ import {
   TrendingUp,
   Image as ImageIcon
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Badge } from '@sm/components/ui/badge';
+import { Card } from '@sm/components/ui/card';
+import { Separator } from '@sm/components/ui/separator';
 
 interface Update {
   id: string;

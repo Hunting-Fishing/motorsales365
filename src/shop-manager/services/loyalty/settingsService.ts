@@ -1,6 +1,6 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { LoyaltySettings } from "@/types/loyalty";
+import { supabase } from "@sm/integrations/supabase/client";
+import { LoyaltySettings } from "@sm/types/loyalty";
 
 // Get loyalty settings for a shop
 export const getLoyaltySettings = async (shopId: string): Promise<LoyaltySettings | null> => {

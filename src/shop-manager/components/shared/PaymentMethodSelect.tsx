@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import { 
   Banknote, 
   FileCheck, 
@@ -19,7 +19,7 @@ import {
   Receipt, 
   MoreHorizontal 
 } from 'lucide-react';
-import { PAYMENT_METHODS } from '@/constants/paymentMethods';
+import { PAYMENT_METHODS } from '@sm/constants/paymentMethods';
 
 const iconMap: Record<string, React.ElementType> = {
   Banknote,

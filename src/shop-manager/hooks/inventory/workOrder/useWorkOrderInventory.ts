@@ -1,8 +1,8 @@
 
 import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { WorkOrderFormValues, WorkOrderInventoryItem } from "@/types/workOrder";
-import { InventoryItemExtended } from "@/types/inventory";
+import { WorkOrderFormValues, WorkOrderInventoryItem } from "@sm/types/workOrder";
+import { InventoryItemExtended } from "@sm/types/inventory";
 
 export const useWorkOrderInventory = (form: UseFormReturn<WorkOrderFormValues>) => {
   const [showInventoryDialog, setShowInventoryDialog] = useState(false);

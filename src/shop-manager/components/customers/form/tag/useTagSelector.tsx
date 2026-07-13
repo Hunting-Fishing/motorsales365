@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 
 export const useTagSelector = (selectedTags: string[], onChange: (tags: string[]) => void) => {
   const [inputValue, setInputValue] = useState("");

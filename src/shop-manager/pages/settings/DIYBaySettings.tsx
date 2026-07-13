@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { DIYBayRatesTab } from "@/components/settings/DIYBayRatesTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { DIYBayRatesTab } from "@sm/components/settings/DIYBayRatesTab";
 
 export const DIYBaySettings = () => {
   return (

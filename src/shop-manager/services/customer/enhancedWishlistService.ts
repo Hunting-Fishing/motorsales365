@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
-import { WishlistItem } from "@/services/wishlistService";
+import { supabase } from "@sm/integrations/supabase/client";
+import { WishlistItem } from "@sm/services/wishlistService";
 
 export interface WishlistShare {
   id: string;

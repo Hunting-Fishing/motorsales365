@@ -6,11 +6,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { DuplicateMatch } from '@/lib/services/duplicateDetectionService';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { DuplicateMatch } from '@sm/lib/services/duplicateDetectionService';
 import { AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 
 interface DuplicateJobDialogProps {

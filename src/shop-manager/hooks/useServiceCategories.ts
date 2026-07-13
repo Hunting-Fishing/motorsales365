@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { ServiceMainCategory, ServiceSubcategory, ServiceJob, ServiceSector } from '@/types/service';
-import { fetchServiceSectors, fetchServiceCategories } from '@/lib/services/serviceApi';
+import { supabase } from '@sm/integrations/supabase/client';
+import { ServiceMainCategory, ServiceSubcategory, ServiceJob, ServiceSector } from '@sm/types/service';
+import { fetchServiceSectors, fetchServiceCategories } from '@sm/lib/services/serviceApi';
 
 export const useServiceCategories = () => {
   const [categories, setCategories] = useState<ServiceMainCategory[]>([]);

@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { WorkOrder } from '@/types/workOrder';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Input } from '@sm/components/ui/input';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
 
 interface WorkOrderSelectorProps {

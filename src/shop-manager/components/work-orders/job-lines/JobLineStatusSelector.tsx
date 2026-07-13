@@ -1,8 +1,8 @@
 import React from 'react';
-import { WorkOrderJobLine, JobLineStatus, jobLineStatusMap } from '@/types/jobLine';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { WorkOrderJobLine, JobLineStatus, jobLineStatusMap } from '@sm/types/jobLine';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { 
   Clock, 
   UserCheck, 

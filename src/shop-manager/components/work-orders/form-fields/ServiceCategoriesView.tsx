@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@sm/components/ui/collapsible';
 import { Clock, DollarSign, ChevronDown, ChevronRight } from 'lucide-react';
-import { ServiceMainCategory } from '@/types/service';
-import { useServiceCategories } from '@/hooks/useServiceCategories';
+import { ServiceMainCategory } from '@sm/types/service';
+import { useServiceCategories } from '@sm/hooks/useServiceCategories';
 
 interface ServiceCategoriesViewProps {
   showSelectionMode?: boolean;

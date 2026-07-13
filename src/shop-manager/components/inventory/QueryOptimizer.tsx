@@ -1,9 +1,9 @@
 import React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@sm/components/ui/popover';
 import { RefreshCw, Database, Zap, AlertTriangle, Settings2 } from 'lucide-react';
 
 export function QueryOptimizer() {

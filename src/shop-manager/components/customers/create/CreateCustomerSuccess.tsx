@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@sm/components/ui/alert";
 import { Check } from "lucide-react";
 
 interface CreateCustomerSuccessProps {

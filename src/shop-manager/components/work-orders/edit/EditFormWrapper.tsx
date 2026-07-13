@@ -1,8 +1,8 @@
 
 import React, { ReactNode } from "react";
-import { Form } from "@/components/ui/form";
+import { Form } from "@sm/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
 
 interface EditFormWrapperProps {
   form: UseFormReturn<WorkOrderFormSchemaValues>;

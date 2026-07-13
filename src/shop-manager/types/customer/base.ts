@@ -83,5 +83,5 @@ export interface PreferredTechnicianChange {
 export type CustomerCreate = Omit<Customer, 'id' | 'created_at' | 'updated_at'>;
 
 // Import from other module types to avoid circular dependencies
-import { CustomerLoyalty } from '@/types/loyalty';
+import { CustomerLoyalty } from '@sm/types/loyalty';
 import { CustomerVehicle } from './vehicle';

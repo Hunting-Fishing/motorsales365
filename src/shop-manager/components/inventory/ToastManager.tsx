@@ -1,4 +1,4 @@
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@sm/hooks/use-toast';
 import { CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 
 export class ToastManager {

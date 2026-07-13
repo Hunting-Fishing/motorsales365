@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { AnalyticsOverview } from './AnalyticsOverview';
 import { EnhancedRevenueChart } from './EnhancedRevenueChart';
 import { ComparisonMetrics } from './ComparisonMetrics';
 import { DrillDownAnalytics } from './DrillDownAnalytics';
 import { CustomKPITracker } from './CustomKPITracker';
-import { useAnalytics } from '@/hooks/useAnalytics';
-import { useEnhancedAnalytics } from '@/hooks/useEnhancedAnalytics';
+import { useAnalytics } from '@sm/hooks/useAnalytics';
+import { useEnhancedAnalytics } from '@sm/hooks/useEnhancedAnalytics';
 import { BarChart3, TrendingUp, Users, Wrench, Calendar, Download, RefreshCw } from 'lucide-react';
 
 export function EnhancedAnalyticsPage() {

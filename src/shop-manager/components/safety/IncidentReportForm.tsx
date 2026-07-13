@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
 import { 
   AlertTriangle, 
   ChevronLeft, 
@@ -19,7 +19,7 @@ import {
   FileText,
   Shield
 } from 'lucide-react';
-import { useSafetyIncidents } from '@/hooks/useSafetyIncidents';
+import { useSafetyIncidents } from '@sm/hooks/useSafetyIncidents';
 import { 
   IncidentType, 
   IncidentSeverity, 
@@ -27,7 +27,7 @@ import {
   INCIDENT_TYPE_LABELS, 
   SEVERITY_LABELS,
   INJURED_PERSON_TYPE_LABELS 
-} from '@/types/safety';
+} from '@sm/types/safety';
 
 const STEPS = [
   { id: 1, title: 'Basic Info', icon: FileText },

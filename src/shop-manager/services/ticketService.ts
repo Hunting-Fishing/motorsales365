@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import type { RaffleTicket, CreateTicketData } from '@/types/raffle';
+import { supabase } from '@sm/integrations/supabase/client';
+import type { RaffleTicket, CreateTicketData } from '@sm/types/raffle';
 
 export class TicketService {
   // Get all tickets for a raffle

@@ -1,8 +1,8 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import {
   MaintenancePrediction,
   MaintenanceServiceItem,
-} from '@/types/maintenance';
+} from '@sm/types/maintenance';
 import { addDays, addWeeks, addMonths, addYears, differenceInDays } from 'date-fns';
 
 /**

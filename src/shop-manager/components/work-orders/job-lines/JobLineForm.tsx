@@ -1,5 +1,5 @@
 import React from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 
 export interface JobLineFormProps {
   workOrderId: string;

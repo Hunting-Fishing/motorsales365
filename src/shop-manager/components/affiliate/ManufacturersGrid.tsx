@@ -1,17 +1,17 @@
 
 import React, { useState } from 'react';
-import { Manufacturer, ManufacturerCategory } from '@/types/affiliate';
+import { Manufacturer, ManufacturerCategory } from '@sm/types/affiliate';
 import { Link } from 'react-router-dom';
-import { ResponsiveGrid } from '@/components/ui/responsive-grid';
+import { ResponsiveGrid } from '@sm/components/ui/responsive-grid';
 import { Car, Truck, Ship, Tractor, Filter, Anchor, Hammer, Wrench, ChevronDown, ChevronUp } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Badge } from "@sm/components/ui/badge";
 import { 
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@sm/components/ui/accordion";
 
 interface ManufacturersGridProps {
   manufacturers: Manufacturer[];

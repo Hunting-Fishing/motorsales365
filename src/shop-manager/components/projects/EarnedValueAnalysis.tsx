@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, DollarSign, Clock } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { formatCurrency } from '@/lib/utils';
-import type { ProjectBudget, ProjectPhase } from '@/types/projectBudget';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
+import { formatCurrency } from '@sm/lib/utils';
+import type { ProjectBudget, ProjectPhase } from '@sm/types/projectBudget';
 
 interface EarnedValueAnalysisProps {
   project: ProjectBudget;

@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from '@/components/ui/skeleton';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CustomerSegmentChart } from '@/components/analytics/CustomerSegmentChart';
-import { CustomerLifetimeValueChart } from '@/components/analytics/CustomerLifetimeValueChart';
-import { CustomerRetentionChart } from '@/components/analytics/CustomerRetentionChart';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { CustomerSegmentChart } from '@sm/components/analytics/CustomerSegmentChart';
+import { CustomerLifetimeValueChart } from '@sm/components/analytics/CustomerLifetimeValueChart';
+import { CustomerRetentionChart } from '@sm/components/analytics/CustomerRetentionChart';
+import { Button } from '@sm/components/ui/button';
 import { DownloadIcon, RefreshCcw } from 'lucide-react';
 import { 
   ChartContainer,
   ChartTooltip, 
   ChartTooltipContent,
   ChartContainer as Chart
-} from "@/components/ui/chart";
-import { getCustomersWithSegments } from '@/utils/analytics/customerSegmentation';
-import { getAverageCustomerLifetimeValue } from '@/utils/analytics/customerLifetimeValue';
+} from "@sm/components/ui/chart";
+import { getCustomersWithSegments } from '@sm/utils/analytics/customerSegmentation';
+import { getAverageCustomerLifetimeValue } from '@sm/utils/analytics/customerLifetimeValue';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Cell, Legend, ResponsiveContainer } from 'recharts';
 import { Tooltip } from 'recharts';
 

@@ -1,6 +1,6 @@
 
 // This file now imports data from hooks for real database data
-import { useBusinessConstants, BusinessConstant } from "@/hooks/useBusinessConstants";
+import { useBusinessConstants, BusinessConstant } from "@sm/hooks/useBusinessConstants";
 
 // Re-export the hooks for access to real data
 export { useBusinessConstants };

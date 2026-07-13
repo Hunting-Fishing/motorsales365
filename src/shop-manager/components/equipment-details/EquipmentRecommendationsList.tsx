@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { ArrowRight, AlertTriangle, Settings, ShieldCheck, CheckCircle } from "lucide-react";
-import { EquipmentRecommendation, getRecommendationTypeColor } from "@/utils/equipment/recommendations";
+import { EquipmentRecommendation, getRecommendationTypeColor } from "@sm/utils/equipment/recommendations";
 
 interface EquipmentRecommendationsListProps {
   recommendations: EquipmentRecommendation[];

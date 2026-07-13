@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useDebounce } from '@/hooks/use-debounce';
+import { useDebounce } from '@sm/hooks/use-debounce';
 
 const BASE_URL = 'https://exercisedb-api.vercel.app/api/v1';
 

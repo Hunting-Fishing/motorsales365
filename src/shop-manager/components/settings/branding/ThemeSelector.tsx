@@ -1,5 +1,5 @@
 
-import { Label } from "@/components/ui/label";
+import { Label } from "@sm/components/ui/label";
 
 interface ThemeSelectorProps {
   theme: string;

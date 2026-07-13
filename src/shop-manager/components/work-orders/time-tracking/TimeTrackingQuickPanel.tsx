@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { getWorkOrderTimeEntries, addTimeEntryToWorkOrder, updateTimeEntry } from "@/services/workOrder/workOrderTimeTrackingService";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@sm/components/ui/card";
+import { getWorkOrderTimeEntries, addTimeEntryToWorkOrder, updateTimeEntry } from "@sm/services/workOrder/workOrderTimeTrackingService";
 import { Loader2, Check, X } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { TimeEntry } from "@/types/workOrder";
+import { toast } from "@sm/hooks/use-toast";
+import { TimeEntry } from "@sm/types/workOrder";
 
 interface TimeTrackingQuickPanelProps {
   workOrderId: string;

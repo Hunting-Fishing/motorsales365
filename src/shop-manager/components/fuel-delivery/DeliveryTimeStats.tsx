@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Clock, TrendingUp, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { differenceInMinutes, parseISO } from 'date-fns';
 

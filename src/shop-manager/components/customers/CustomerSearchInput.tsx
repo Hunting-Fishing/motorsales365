@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@sm/components/ui/input";
 import { Loader2, X, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Customer } from "@/types/customer";
-import { searchCustomers } from "@/services/customer";
+import { Button } from "@sm/components/ui/button";
+import { Customer } from "@sm/types/customer";
+import { searchCustomers } from "@sm/services/customer";
 
 interface CustomerSearchInputProps {
   onSelectCustomer: (customer: Customer | null) => void;

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { TrendingUp, PieChart, Building2 } from "lucide-react";
 import {
   LineChart,
@@ -15,8 +15,8 @@ import {
   Bar,
   Legend,
 } from "recharts";
-import { InsurancePremiumTrend, InsuranceByType } from "@/types/insurance";
-import { formatCurrency } from "@/lib/utils";
+import { InsurancePremiumTrend, InsuranceByType } from "@sm/types/insurance";
+import { formatCurrency } from "@sm/lib/utils";
 
 interface InsuranceTrendsCardProps {
   premiumTrends: InsurancePremiumTrend[];

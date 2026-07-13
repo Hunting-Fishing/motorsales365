@@ -1,9 +1,9 @@
 
 import React, { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
 import { Flag } from "lucide-react";
-import { TeamMember } from "@/types/team";
+import { TeamMember } from "@sm/types/team";
 import { ActivityFilters } from "./activity/ActivityFilters";
 import { ActivityList } from "./activity/ActivityList";
 import { EmptyState } from "./activity/EmptyState";

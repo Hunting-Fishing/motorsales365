@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Plus, 
   Download, 
@@ -21,7 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@sm/components/ui/dropdown-menu';
 import { useNavigate } from 'react-router-dom';
 
 interface QuickActionsFloatingButtonProps {

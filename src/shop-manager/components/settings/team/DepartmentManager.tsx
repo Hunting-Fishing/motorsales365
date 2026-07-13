@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@sm/components/ui/form';
+import { Badge } from '@sm/components/ui/badge';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useDepartments } from '@/hooks/team/useDepartments';
-import { toast } from '@/hooks/use-toast';
+import { useDepartments } from '@sm/hooks/team/useDepartments';
+import { toast } from '@sm/hooks/use-toast';
 
 const departmentSchema = z.object({
   name: z.string().min(2, 'Department name must be at least 2 characters'),

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { useScheduling } from '@/hooks/useScheduling';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Progress } from '@sm/components/ui/progress';
+import { useScheduling } from '@sm/hooks/useScheduling';
 
 export function PTOManagement() {
   const { ptoBalances, loading } = useScheduling();

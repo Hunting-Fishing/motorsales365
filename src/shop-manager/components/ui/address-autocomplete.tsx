@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
+import { Input } from '@sm/components/ui/input';
 import { MapPin, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface AddressSuggestion {
   place_id: number;

@@ -1,9 +1,9 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Equipment } from "@/types/equipment";
-import { EquipmentStatusBadge } from "@/components/equipment/EquipmentStatusBadge";
-import { WarrantyStatusBadge } from "@/components/equipment/WarrantyStatusBadge";
-import { maintenanceFrequencyMap } from "@/data/equipmentData";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Equipment } from "@sm/types/equipment";
+import { EquipmentStatusBadge } from "@sm/components/equipment/EquipmentStatusBadge";
+import { WarrantyStatusBadge } from "@sm/components/equipment/WarrantyStatusBadge";
+import { maintenanceFrequencyMap } from "@sm/data/equipmentData";
 
 interface EquipmentDetailCardsProps {
   equipmentItem: Equipment;

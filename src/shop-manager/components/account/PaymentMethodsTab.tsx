@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { useToast } from '@sm/hooks/use-toast';
 import { Plus, CreditCard, Trash2 } from 'lucide-react';
 import { 
   getCustomerPaymentMethods, 
   deleteCustomerPaymentMethod 
-} from '@/services/customerProfileService';
-import { CustomerPaymentMethod } from '@/types/phase3';
+} from '@sm/services/customerProfileService';
+import { CustomerPaymentMethod } from '@sm/types/phase3';
 
 interface PaymentMethodsTabProps {
   userId: string;

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { AnalyticsOverview } from './AnalyticsOverview';
 import { RevenueAnalytics } from './RevenueAnalytics';
 import { WorkOrderAnalytics } from './WorkOrderAnalytics';
 import { CustomerAnalytics } from './CustomerAnalytics';
 import { PerformanceMetrics } from './PerformanceMetrics';
-import { useAnalytics } from '@/hooks/useAnalytics';
+import { useAnalytics } from '@sm/hooks/useAnalytics';
 import { BarChart3, TrendingUp, Users, Wrench } from 'lucide-react';
 
 export function AnalyticsPage() {

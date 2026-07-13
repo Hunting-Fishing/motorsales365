@@ -1,6 +1,6 @@
 
 import React from "react";
-import { TableHeader, TableHead, TableRow } from "@/components/ui/table";
+import { TableHeader, TableHead, TableRow } from "@sm/components/ui/table";
 
 export const BaysTableHeader: React.FC = () => {
   return (

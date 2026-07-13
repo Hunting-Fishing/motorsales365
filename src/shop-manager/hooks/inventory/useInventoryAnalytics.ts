@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { InventoryItemExtended } from '@/types/inventory';
+import { InventoryItemExtended } from '@sm/types/inventory';
 import { useInventoryData } from './useInventoryData';
 
 interface InventoryAnalytics {

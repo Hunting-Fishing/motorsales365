@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { GraduationCap, Plus, RefreshCw, AlertTriangle, CheckCircle, Clock, BookOpen } from 'lucide-react';
-import { useSafetyTraining } from '@/hooks/useSafetyTraining';
-import { TrainingCoursesTab } from '@/components/safety/training/TrainingCoursesTab';
-import { TrainingAssignmentsTab } from '@/components/safety/training/TrainingAssignmentsTab';
-import { TrainingMatrixTab } from '@/components/safety/training/TrainingMatrixTab';
+import { useSafetyTraining } from '@sm/hooks/useSafetyTraining';
+import { TrainingCoursesTab } from '@sm/components/safety/training/TrainingCoursesTab';
+import { TrainingAssignmentsTab } from '@sm/components/safety/training/TrainingAssignmentsTab';
+import { TrainingMatrixTab } from '@sm/components/safety/training/TrainingMatrixTab';
 
 export default function SafetyTraining() {
   const { 

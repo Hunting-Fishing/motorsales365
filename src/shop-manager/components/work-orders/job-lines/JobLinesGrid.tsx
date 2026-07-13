@@ -1,15 +1,15 @@
 
 import React, { useState } from 'react';
 import { DndContext, DragOverlay, closestCenter } from '@dnd-kit/core';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Plus } from 'lucide-react';
 import { JobLineCard } from './JobLineCard';
 import { AddJobLineDialog } from './AddJobLineDialog';
 import { DraggablePartCard } from '../parts/DraggablePartCard';
-import { usePartsDragDrop } from '@/hooks/usePartsDragDrop';
+import { usePartsDragDrop } from '@sm/hooks/usePartsDragDrop';
 
 interface JobLinesGridProps {
   workOrderId: string;

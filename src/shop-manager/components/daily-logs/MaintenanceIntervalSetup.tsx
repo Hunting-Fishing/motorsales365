@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-import { useMaintenanceIntervalTracking, CreateIntervalInput } from '@/hooks/useMaintenanceIntervalTracking';
-import { useEquipmentHierarchy } from '@/hooks/useEquipmentHierarchy';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Badge } from '@sm/components/ui/badge';
+import { useToast } from '@sm/hooks/use-toast';
+import { useMaintenanceIntervalTracking, CreateIntervalInput } from '@sm/hooks/useMaintenanceIntervalTracking';
+import { useEquipmentHierarchy } from '@sm/hooks/useEquipmentHierarchy';
 import { Loader2, Plus, Settings, Trash2, X } from 'lucide-react';
 import { EquipmentHierarchySelector } from './EquipmentHierarchySelector';
 

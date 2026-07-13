@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@sm/components/ui/alert';
 import { Shield, AlertTriangle, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { enterpriseService } from '@/services/enterpriseService';
-import type { SecurityEvent } from '@/types/phase4';
+import { enterpriseService } from '@sm/services/enterpriseService';
+import type { SecurityEvent } from '@sm/types/phase4';
 
 export const SecurityManagement = () => {
   const [events, setEvents] = useState<SecurityEvent[]>([]);

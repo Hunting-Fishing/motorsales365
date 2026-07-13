@@ -2,8 +2,8 @@
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent } from '@sm/components/ui/card';
 
 interface DashboardErrorFallbackProps {
   error: Error;

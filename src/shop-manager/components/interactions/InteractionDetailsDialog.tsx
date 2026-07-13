@@ -1,13 +1,13 @@
 
 import React from "react";
-import { CustomerInteraction } from "@/types/interaction";
+import { CustomerInteraction } from "@sm/types/interaction";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
 import { InteractionTypeBadge } from "./InteractionTypeBadge";
 import { InteractionStatusBadge } from "./InteractionStatusBadge";
 import { format, parseISO } from "date-fns";

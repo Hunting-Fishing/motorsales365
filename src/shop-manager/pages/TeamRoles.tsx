@@ -1,11 +1,11 @@
 
 import React from "react";
-import { Card } from "@/components/ui/card";
-import { ResponsiveContainer } from "@/components/ui/responsive-container";
-import { RolesPageHeader } from "@/components/team/roles/RolesPageHeader";
-import { RolesContent } from "@/components/team/roles/RolesContent";
-import { RoleDialogs } from "@/components/team/roles/RoleDialogs";
-import { useTeamRolesPage } from "@/hooks/useTeamRolesPage";
+import { Card } from "@sm/components/ui/card";
+import { ResponsiveContainer } from "@sm/components/ui/responsive-container";
+import { RolesPageHeader } from "@sm/components/team/roles/RolesPageHeader";
+import { RolesContent } from "@sm/components/team/roles/RolesContent";
+import { RoleDialogs } from "@sm/components/team/roles/RoleDialogs";
+import { useTeamRolesPage } from "@sm/hooks/useTeamRolesPage";
 
 export default function TeamRoles() {
   const {

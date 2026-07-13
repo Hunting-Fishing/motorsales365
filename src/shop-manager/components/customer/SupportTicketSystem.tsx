@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { MessageCircle, Plus, Send, Paperclip, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Separator } from '@/components/ui/separator';
-import { supportService, SupportTicket, SupportTicketMessage, CreateTicketRequest } from '@/services/customer/supportService';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Separator } from '@sm/components/ui/separator';
+import { supportService, SupportTicket, SupportTicketMessage, CreateTicketRequest } from '@sm/services/customer/supportService';
+import { useToast } from '@sm/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface SupportTicketSystemProps {
   userId: string;

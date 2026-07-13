@@ -1,11 +1,11 @@
 import { CheckCircle, XCircle, DollarSign, Calendar } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useProjectBudgets } from '@/hooks/useProjectBudgets';
-import { formatCurrency } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { useProjectBudgets } from '@sm/hooks/useProjectBudgets';
+import { formatCurrency } from '@sm/lib/utils';
 import { format } from 'date-fns';
-import { PROJECT_TYPES } from '@/types/projectBudget';
+import { PROJECT_TYPES } from '@sm/types/projectBudget';
 
 export function ApprovalQueue() {
   const { projects, approveProject, updateProject } = useProjectBudgets();

@@ -3,8 +3,8 @@ import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,10 +13,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { InvoiceItem, Invoice, InvoiceTemplate } from "@/types/invoice";
+} from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
+import { InvoiceItem, Invoice, InvoiceTemplate } from "@sm/types/invoice";
 import { Save } from "lucide-react";
 
 const formSchema = z.object({

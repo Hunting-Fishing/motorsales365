@@ -1,12 +1,12 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@sm/components/ui/dialog";
 import { Plus, Calendar } from "lucide-react";
-import { RemindersList } from "@/components/reminders/list/RemindersList";
-import { AddReminderForm } from "@/components/reminders/AddReminderForm";
-import { Customer } from "@/types/customer";
+import { RemindersList } from "@sm/components/reminders/list/RemindersList";
+import { AddReminderForm } from "@sm/components/reminders/AddReminderForm";
+import { Customer } from "@sm/types/customer";
 
 interface CustomerServiceRemindersProps {
   customer: Customer;

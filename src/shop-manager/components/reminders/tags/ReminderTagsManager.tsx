@@ -1,15 +1,15 @@
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { Plus, X } from "lucide-react";
-import { ReminderTag } from "@/types/reminder";
-import { getReminderTags } from "@/services/reminders/reminderQueries";
-import { createReminderTag } from "@/services/reminders/reminderMutations";
-import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
+import { ReminderTag } from "@sm/types/reminder";
+import { getReminderTags } from "@sm/services/reminders/reminderQueries";
+import { createReminderTag } from "@sm/services/reminders/reminderMutations";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Input } from "@sm/components/ui/input";
+import { toast } from "@sm/hooks/use-toast";
+import { Badge } from "@sm/components/ui/badge";
 
 export function ReminderTagsManager() {
   const [tags, setTags] = useState<ReminderTag[]>([]);

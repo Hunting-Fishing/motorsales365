@@ -1,18 +1,18 @@
 
 import { useParams, useSearchParams } from "react-router-dom";
-import { useInvoiceForm } from "@/hooks/useInvoiceForm";
-import { InvoiceCreateLayout } from "@/components/invoices/InvoiceCreateLayout";
-import { useWorkOrderSelector } from "@/hooks/invoices/useWorkOrderSelector";
-import { supabase } from "@/lib/supabase"; 
+import { useInvoiceForm } from "@sm/hooks/useInvoiceForm";
+import { InvoiceCreateLayout } from "@sm/components/invoices/InvoiceCreateLayout";
+import { useWorkOrderSelector } from "@sm/hooks/invoices/useWorkOrderSelector";
+import { supabase } from "@sm/lib/supabase"; 
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { WorkOrder } from "@/types/workOrder";
+import { WorkOrder } from "@sm/types/workOrder";
 import { 
   InvoiceItem, 
   StaffMember, 
   InvoiceTemplate 
-} from "@/types/invoice";
-import { InventoryItem } from "@/types/inventory";
+} from "@sm/types/invoice";
+import { InventoryItem } from "@sm/types/inventory";
 
 export default function InvoiceCreate() {
   const { workOrderId } = useParams<{ workOrderId?: string }>();

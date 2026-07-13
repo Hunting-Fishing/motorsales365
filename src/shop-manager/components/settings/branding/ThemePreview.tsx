@@ -3,7 +3,7 @@ interface ThemePreviewProps {
   theme: string;
 }
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 
 export function ThemePreview({ theme }: ThemePreviewProps) {
   return (

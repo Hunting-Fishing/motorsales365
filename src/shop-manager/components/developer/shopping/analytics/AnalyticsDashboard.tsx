@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
 import { ProductsByCategoryChart } from './ProductsByCategoryChart';
 import { ProductInteractionsChart } from './ProductInteractionsChart';
 import { TopProductsTable } from './TopProductsTable';
-import { useProductAnalyticsData } from '@/hooks/useProductAnalyticsData';
-import { Button } from '@/components/ui/button';
+import { useProductAnalyticsData } from '@sm/hooks/useProductAnalyticsData';
+import { Button } from '@sm/components/ui/button';
 import { Download, RefreshCw } from 'lucide-react';
 
 export const AnalyticsDashboard: React.FC = () => {

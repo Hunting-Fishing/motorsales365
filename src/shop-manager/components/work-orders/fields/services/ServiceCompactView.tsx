@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { ServiceMainCategory, ServiceJob } from '@/types/service';
-import { SelectedService } from '@/types/selectedService';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { ServiceMainCategory, ServiceJob } from '@sm/types/service';
+import { SelectedService } from '@sm/types/selectedService';
+import { Badge } from '@sm/components/ui/badge';
 import { Clock, DollarSign, Plus, Check } from 'lucide-react';
 
 interface ServiceCompactViewProps {

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Badge } from "@sm/components/ui/badge";
+import { Switch } from "@sm/components/ui/switch";
+import { Textarea } from "@sm/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@sm/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@sm/components/ui/alert-dialog";
 import { ArrowLeft, Plus, Shield, User, Trash2, Crown, AlertTriangle } from "lucide-react";
 import {
   usePlatformDevelopers,
@@ -34,7 +34,7 @@ import {
   useUpdatePlatformDeveloper,
   useRemovePlatformDeveloper,
   PlatformDeveloper,
-} from '@/hooks/usePlatformDeveloper';
+} from '@sm/hooks/usePlatformDeveloper';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 

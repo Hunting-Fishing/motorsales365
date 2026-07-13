@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Plus, Check, X, ArrowDown } from 'lucide-react';
-import { SelectedService } from '@/types/selectedService';
-import { useServiceSectors } from '@/hooks/useServiceCategories';
-import { IntegratedServiceSelector } from '@/components/work-orders/fields/services/IntegratedServiceSelector';
+import { SelectedService } from '@sm/types/selectedService';
+import { useServiceSectors } from '@sm/hooks/useServiceCategories';
+import { IntegratedServiceSelector } from '@sm/components/work-orders/fields/services/IntegratedServiceSelector';
 
 interface WorkOrderServiceSelectorProps {
   selectedServices: SelectedService[];

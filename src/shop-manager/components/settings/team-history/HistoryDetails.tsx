@@ -1,6 +1,6 @@
 
 import React from "react";
-import { TeamMemberHistoryRecord } from "@/utils/team/history";
+import { TeamMemberHistoryRecord } from "@sm/utils/team/history";
 
 interface HistoryDetailsProps {
   record: TeamMemberHistoryRecord;

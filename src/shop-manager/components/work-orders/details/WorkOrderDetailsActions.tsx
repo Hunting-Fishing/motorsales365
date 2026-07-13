@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { WorkOrder } from '@/types/workOrder';
+import { Button } from '@sm/components/ui/button';
+import { WorkOrder } from '@sm/types/workOrder';
 import { ConvertToInvoiceButton } from '../ConvertToInvoiceButton';
 import { Printer, Share, RotateCcw, Zap, Loader2 } from 'lucide-react';
-import { useWorkOrderReopen } from '@/hooks/useWorkOrderReopen';
-import { printElement } from '@/utils/printUtils';
-import { convertWorkOrderToInvoice } from '@/services/quote/quoteService';
+import { useWorkOrderReopen } from '@sm/hooks/useWorkOrderReopen';
+import { printElement } from '@sm/utils/printUtils';
+import { convertWorkOrderToInvoice } from '@sm/services/quote/quoteService';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@sm/hooks/use-toast';
 
 interface WorkOrderDetailsActionsProps {
   workOrder: WorkOrder;

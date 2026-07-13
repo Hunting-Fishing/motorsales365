@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import type { MappedServiceData, ImportProgress, ProcessedServiceData, ImportStats } from '@/types/service';
+import { supabase } from '@sm/integrations/supabase/client';
+import type { MappedServiceData, ImportProgress, ProcessedServiceData, ImportStats } from '@sm/types/service';
 
 export async function processServiceDataFromSheets(sheetsData: any[], updateProgress?: (progress: ImportProgress) => void): Promise<ProcessedServiceData> {
   const sectors = [];

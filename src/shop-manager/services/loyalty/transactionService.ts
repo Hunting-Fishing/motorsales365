@@ -1,9 +1,9 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { CustomerLoyalty, LoyaltyTransaction } from "@/types/loyalty";
+import { supabase } from "@sm/integrations/supabase/client";
+import { CustomerLoyalty, LoyaltyTransaction } from "@sm/types/loyalty";
 import { getCustomerLoyalty, createCustomerLoyalty } from './customerLoyaltyService';
 import { calculateTier } from './tierService';
-import { useShopId } from "@/hooks/useShopId";
+import { useShopId } from "@sm/hooks/useShopId";
 
 // Add points to customer
 export const addCustomerPoints = async (

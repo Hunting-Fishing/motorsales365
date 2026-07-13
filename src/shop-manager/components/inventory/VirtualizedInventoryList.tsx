@@ -1,8 +1,8 @@
 import React, { useMemo, useCallback } from 'react';
 import { FixedSizeList as List } from 'react-window';
-import { InventoryItemExtended } from '@/types/inventory';
+import { InventoryItemExtended } from '@sm/types/inventory';
 import { InventoryListItem } from './InventoryListItem';
-import { Card } from '@/components/ui/card';
+import { Card } from '@sm/components/ui/card';
 
 interface VirtualizedInventoryListProps {
   items: InventoryItemExtended[];

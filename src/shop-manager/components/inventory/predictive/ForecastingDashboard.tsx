@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { TrendingUp, AlertTriangle, Package, Calendar } from 'lucide-react';
-import { InventoryForecast } from '@/types/inventory/predictive';
-import { getInventoryForecasts } from '@/services/inventory/predictiveService';
-import { getInventoryItems } from '@/services/inventory/crudService';
-import { InventoryItemExtended } from '@/types/inventory';
-import { Badge } from '@/components/ui/badge';
+import { InventoryForecast } from '@sm/types/inventory/predictive';
+import { getInventoryForecasts } from '@sm/services/inventory/predictiveService';
+import { getInventoryItems } from '@sm/services/inventory/crudService';
+import { InventoryItemExtended } from '@sm/types/inventory';
+import { Badge } from '@sm/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -13,7 +13,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@sm/components/ui/table';
 import { format } from 'date-fns';
 
 export function ForecastingDashboard() {

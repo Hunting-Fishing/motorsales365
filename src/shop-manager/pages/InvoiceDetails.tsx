@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { ArrowLeft, Download, Mail, CreditCard, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
-import { getInvoiceDetails, addPayment, type InvoiceDetails } from '@/services/invoice/invoiceDetailsService';
-import { SendInvoiceEmailModal } from '@/components/shared/SendInvoiceEmailModal';
+import { getInvoiceDetails, addPayment, type InvoiceDetails } from '@sm/services/invoice/invoiceDetailsService';
+import { SendInvoiceEmailModal } from '@sm/components/shared/SendInvoiceEmailModal';
 
 export default function InvoiceDetails() {
   const { id } = useParams<{ id: string }>();

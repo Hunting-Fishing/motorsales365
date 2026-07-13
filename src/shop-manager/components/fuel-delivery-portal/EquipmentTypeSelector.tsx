@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@sm/components/ui/popover';
 import { Car, Ship, Fuel, Zap, Tractor, Package, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 export type EquipmentType = 'vehicle' | 'boat' | 'fuel_tank' | 'generator' | 'farm_equipment' | 'other';
 

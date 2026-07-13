@@ -1,11 +1,11 @@
 
 import { useNavigate, useLocation } from "react-router-dom";
-import { ComprehensiveInventoryForm } from "@/components/inventory/form/ComprehensiveInventoryForm";
-import { useInventoryCrud } from "@/hooks/inventory/useInventoryCrud";
-import { InventoryItemExtended } from "@/types/inventory";
-import { toast } from "@/hooks/use-toast";
+import { ComprehensiveInventoryForm } from "@sm/components/inventory/form/ComprehensiveInventoryForm";
+import { useInventoryCrud } from "@sm/hooks/inventory/useInventoryCrud";
+import { InventoryItemExtended } from "@sm/types/inventory";
+import { toast } from "@sm/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 
 export default function InventoryAdd() {
   const navigate = useNavigate();

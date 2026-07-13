@@ -1,6 +1,6 @@
 
-import { Invoice } from '@/types/invoice';
-import { WorkOrder } from '@/types/workOrder';
+import { Invoice } from '@sm/types/invoice';
+import { WorkOrder } from '@sm/types/workOrder';
 
 export const useInvoiceWorkOrder = () => {
   const handleSelectWorkOrder = (workOrder: WorkOrder) => {

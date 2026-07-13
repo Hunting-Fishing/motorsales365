@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { useEquipmentInspections, GYRStatus } from '@/hooks/useEquipmentInspections';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Switch } from '@sm/components/ui/switch';
+import { useEquipmentInspections, GYRStatus } from '@sm/hooks/useEquipmentInspections';
 import { GYRSelector, GYRLegend } from './GYRSelector';
 import { AlertTriangle } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
+import { Card } from '@sm/components/ui/card';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface PreTripInspectionDialogProps {
   open: boolean;

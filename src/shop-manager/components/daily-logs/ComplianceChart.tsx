@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { PieChart, CheckCircle } from 'lucide-react';
-import { ComplianceStats, TrendDataPoint } from '@/hooks/useMaintenanceTrends';
+import { ComplianceStats, TrendDataPoint } from '@sm/hooks/useMaintenanceTrends';
 import { 
   ResponsiveContainer, 
   PieChart as RechartsPie, 

@@ -1,5 +1,5 @@
 
-import { Invoice } from "@/types/invoice";
+import { Invoice } from "@sm/types/invoice";
 
 // All invoice data should come from the database - no mock data
 export const sampleInvoices: Invoice[] = [];

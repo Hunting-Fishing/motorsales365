@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { PlannerBoardItem } from '@/types/planner';
-import { cn } from '@/lib/utils';
+import { PlannerBoardItem } from '@sm/types/planner';
+import { cn } from '@sm/lib/utils';
 import { Trash2, GripVertical } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@sm/components/ui/button';
+import { Textarea } from '@sm/components/ui/textarea';
 
 interface WhiteboardNoteProps {
   item: PlannerBoardItem;

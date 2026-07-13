@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Wrench } from "lucide-react";
-import { CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeader, CardTitle } from "@sm/components/ui/card";
 
 export function RepairPlanFormHeader() {
   return (

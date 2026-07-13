@@ -1,9 +1,9 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { ArrowLeft, AlertTriangle } from 'lucide-react';
-import { IncidentReportForm } from '@/components/safety/IncidentReportForm';
+import { IncidentReportForm } from '@sm/components/safety/IncidentReportForm';
 
 export default function SafetyIncidentNew() {
   const navigate = useNavigate();

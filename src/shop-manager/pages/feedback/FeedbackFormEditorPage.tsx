@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FeedbackFormEditor } from '@/components/feedback/FeedbackFormEditor';
+import { FeedbackFormEditor } from '@sm/components/feedback/FeedbackFormEditor';
 
 export default function FeedbackFormEditorPage() {
   return (

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { TimeEntry } from '@/types/workOrder';
-import { Button } from '@/components/ui/button';
+import { TimeEntry } from '@sm/types/workOrder';
+import { Button } from '@sm/components/ui/button';
 import { Plus } from 'lucide-react';
 import { format } from 'date-fns';
 

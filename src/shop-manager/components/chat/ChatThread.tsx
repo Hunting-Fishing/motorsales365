@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { ChatMessage as ChatMessageType } from '@/types/chat';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { ChatMessage as ChatMessageType } from '@sm/types/chat';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
 import { X } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
 

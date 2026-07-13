@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Plus, Package, AlertCircle } from 'lucide-react';
-import { WorkOrderPart } from '@/types/workOrderPart';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
 import { SpecialOrderDialog } from '../shared/SpecialOrderDialog';
 
 interface UnassignedPartsSectionProps {

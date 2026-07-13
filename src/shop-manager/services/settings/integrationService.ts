@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { IntegrationSettings } from "@/types/settings";
+import { supabase } from "@sm/lib/supabase";
+import { IntegrationSettings } from "@sm/types/settings";
 
 export const integrationService = {
   async getIntegrationSettings(shopId: string, type?: string): Promise<IntegrationSettings[]> {

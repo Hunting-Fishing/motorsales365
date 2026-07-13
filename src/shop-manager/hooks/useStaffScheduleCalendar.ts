@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { useShopId } from './useShopId';
 import { useToast } from './use-toast';
 import { 
@@ -9,7 +9,7 @@ import {
   AssetOption,
   EMPLOYEE_COLORS,
   ASSET_TYPE_COLORS 
-} from '@/types/staffScheduleCalendar';
+} from '@sm/types/staffScheduleCalendar';
 import { startOfMonth, endOfMonth, addMonths, subMonths, parseISO, format } from 'date-fns';
 
 interface WorkScheduleAssignment {

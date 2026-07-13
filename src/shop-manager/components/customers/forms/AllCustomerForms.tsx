@@ -1,18 +1,18 @@
 
 import React, { useEffect, useState } from 'react';
-import { getAllCustomerForms, updateFormStatus } from '@/services/customerFormService';
-import { CustomerProvidedForm } from '@/types/customerForms';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from '@/hooks/use-toast';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { getAllCustomerForms, updateFormStatus } from '@sm/services/customerFormService';
+import { CustomerProvidedForm } from '@sm/types/customerForms';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { toast } from '@sm/hooks/use-toast';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { FileIcon, FileText, Download, Eye, CheckCircle, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
 
 export function AllCustomerForms() {
   const [forms, setForms] = useState<CustomerProvidedForm[]>([]);

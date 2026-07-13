@@ -1,7 +1,7 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { mapDatabasePartToWorkOrderPart } from '@/utils/databaseMappers';
+import { supabase } from '@sm/integrations/supabase/client';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { mapDatabasePartToWorkOrderPart } from '@sm/utils/databaseMappers';
 
 export async function getWorkOrderParts(workOrderId: string): Promise<WorkOrderPart[]> {
   console.log('Fetching parts for work order:', workOrderId);

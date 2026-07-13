@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { BusinessInfoSection } from '@/components/settings/BusinessInfoSection';
-import { useBusinessConstants } from '@/hooks/useBusinessConstants';
-import { useShopData } from '@/hooks/useShopData';
+import { Button } from '@sm/components/ui/button';
+import { BusinessInfoSection } from '@sm/components/settings/BusinessInfoSection';
+import { useBusinessConstants } from '@sm/hooks/useBusinessConstants';
+import { useShopData } from '@sm/hooks/useShopData';
 
 interface StepProps {
   onNext: () => void;

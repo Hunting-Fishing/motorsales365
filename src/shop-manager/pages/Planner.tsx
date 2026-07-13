@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { Calendar, Kanban, GanttChart, PenTool, BarChart3, Plus, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { PlannerView } from '@/types/planner';
-import { PlannerKanbanBoard } from '@/components/planner/board/PlannerKanbanBoard';
-import { ResourceTimeline } from '@/components/planner/timeline/ResourceTimeline';
-import { PlannerWhiteboard } from '@/components/planner/whiteboard/PlannerWhiteboard';
-import { CapacityDashboard } from '@/components/planner/capacity/CapacityDashboard';
-import { PlannerCalendarView } from '@/components/planner/calendar/PlannerCalendarView';
-import { PlannerResourceSidebar } from '@/components/planner/sidebar/PlannerResourceSidebar';
+import { Button } from '@sm/components/ui/button';
+import { PlannerView } from '@sm/types/planner';
+import { PlannerKanbanBoard } from '@sm/components/planner/board/PlannerKanbanBoard';
+import { ResourceTimeline } from '@sm/components/planner/timeline/ResourceTimeline';
+import { PlannerWhiteboard } from '@sm/components/planner/whiteboard/PlannerWhiteboard';
+import { CapacityDashboard } from '@sm/components/planner/capacity/CapacityDashboard';
+import { PlannerCalendarView } from '@sm/components/planner/calendar/PlannerCalendarView';
+import { PlannerResourceSidebar } from '@sm/components/planner/sidebar/PlannerResourceSidebar';
 
 const Planner = () => {
   const [activeView, setActiveView] = useState<PlannerView>('kanban');

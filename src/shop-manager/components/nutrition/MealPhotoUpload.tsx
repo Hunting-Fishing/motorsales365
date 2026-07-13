@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Camera, ImagePlus, X, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Dialog, DialogContent } from '@sm/components/ui/dialog';
 
 interface Props {
   onPhotoUploaded: (url: string) => void;

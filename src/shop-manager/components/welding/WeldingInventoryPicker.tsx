@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { Button } from "@sm/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@sm/components/ui/dialog";
+import { Badge } from "@sm/components/ui/badge";
+import { Input } from "@sm/components/ui/input";
 import { Package, Search } from "lucide-react";
 
 interface InventoryItem {

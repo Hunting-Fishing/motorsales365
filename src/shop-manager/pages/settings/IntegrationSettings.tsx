@@ -1,8 +1,8 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { IntegrationsTab } from "@/components/settings/IntegrationsTab";
-import { useShopId } from "@/hooks/useShopId";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { IntegrationsTab } from "@sm/components/settings/IntegrationsTab";
+import { useShopId } from "@sm/hooks/useShopId";
 
 export const IntegrationSettings = () => {
   const { shopId } = useShopId();

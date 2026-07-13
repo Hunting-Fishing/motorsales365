@@ -1,9 +1,9 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { Mail, Phone, MapPin, Building2, Calendar, Car } from "lucide-react";
-import { Customer, getCustomerFullName } from "@/types/customer";
+import { Customer, getCustomerFullName } from "@sm/types/customer";
 
 interface CustomerInfoCardProps {
   customer: Customer & { name?: string, dateAdded?: string };

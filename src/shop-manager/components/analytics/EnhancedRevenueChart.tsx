@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Line, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Bar, BarChart, Area, AreaChart } from 'recharts';
-import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@sm/components/ui/dropdown-menu';
+import { Badge } from '@sm/components/ui/badge';
 import { MoreHorizontal, TrendingUp, TrendingDown, Activity } from 'lucide-react';
 
 interface EnhancedRevenueChartProps {

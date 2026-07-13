@@ -1,7 +1,7 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { InventoryMarkupTab } from "@/components/settings/InventoryMarkupTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { InventoryMarkupTab } from "@sm/components/settings/InventoryMarkupTab";
 
 export const MarkupSettings = () => {
   return (

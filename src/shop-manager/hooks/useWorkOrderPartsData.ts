@@ -1,12 +1,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { WorkOrderPart, WorkOrderPartFormValues } from '@/types/workOrderPart';
+import { WorkOrderPart, WorkOrderPartFormValues } from '@sm/types/workOrderPart';
 import { 
   getWorkOrderParts, 
   createWorkOrderPart, 
   updateWorkOrderPart, 
   deleteWorkOrderPart 
-} from '@/services/workOrder/workOrderPartsService';
+} from '@sm/services/workOrder/workOrderPartsService';
 import { toast } from 'sonner';
 
 export function useWorkOrderPartsData(workOrderId: string) {

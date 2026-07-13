@@ -1,14 +1,14 @@
 import React from 'react';
-import { useDashboardPreferences } from '@/hooks/useDashboardPreferences';
-import { StatsCards } from '@/components/dashboard/StatsCards';
-import { RevenueChart } from '@/components/dashboard/RevenueChart';
-import { ServiceTypeDistributionChart } from '@/components/dashboard/ServiceTypeDistributionChart';
-import { TechnicianPerformanceChart } from '@/components/dashboard/TechnicianPerformanceChart';
-import { WorkOrderPhaseProgress } from '@/components/dashboard/WorkOrderPhaseProgress';
-import { TodaySchedule } from '@/components/dashboard/TodaySchedule';
-import { EquipmentRecommendations } from '@/components/dashboard/EquipmentRecommendations';
-import { DashboardAlerts } from '@/components/dashboard/DashboardAlerts';
-import { useDashboardData } from '@/hooks/useDashboardData';
+import { useDashboardPreferences } from '@sm/hooks/useDashboardPreferences';
+import { StatsCards } from '@sm/components/dashboard/StatsCards';
+import { RevenueChart } from '@sm/components/dashboard/RevenueChart';
+import { ServiceTypeDistributionChart } from '@sm/components/dashboard/ServiceTypeDistributionChart';
+import { TechnicianPerformanceChart } from '@sm/components/dashboard/TechnicianPerformanceChart';
+import { WorkOrderPhaseProgress } from '@sm/components/dashboard/WorkOrderPhaseProgress';
+import { TodaySchedule } from '@sm/components/dashboard/TodaySchedule';
+import { EquipmentRecommendations } from '@sm/components/dashboard/EquipmentRecommendations';
+import { DashboardAlerts } from '@sm/components/dashboard/DashboardAlerts';
+import { useDashboardData } from '@sm/hooks/useDashboardData';
 
 interface CustomizableDashboardProps {
   layout?: 'compact' | 'detailed' | 'executive';

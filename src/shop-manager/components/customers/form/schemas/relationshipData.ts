@@ -1,5 +1,5 @@
 
-import { useRelationshipData } from "@/hooks/useRelationshipData";
+import { useRelationshipData } from "@sm/hooks/useRelationshipData";
 
 // This file now re-exports the hooks that fetch data from the database
 export { useRelationshipData };

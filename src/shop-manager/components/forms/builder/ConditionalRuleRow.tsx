@@ -1,9 +1,9 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Trash2 } from 'lucide-react';
-import { ConditionalRule, ConditionOperator, ConditionType, FormBuilderField } from '@/types/formBuilder';
+import { ConditionalRule, ConditionOperator, ConditionType, FormBuilderField } from '@sm/types/formBuilder';
 
 interface ConditionalRuleRowProps {
   rule: ConditionalRule;

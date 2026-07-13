@@ -1,5 +1,5 @@
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 
 // Define interfaces that match the actual database schema
 interface DatabaseProduct {

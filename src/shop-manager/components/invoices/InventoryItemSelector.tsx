@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Plus, Package } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,8 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { InventoryItem } from "@/types/inventory"; 
+} from "@sm/components/ui/dialog";
+import { InventoryItem } from "@sm/types/inventory"; 
 
 interface InventoryItemSelectorProps {
   inventoryItems: InventoryItem[];

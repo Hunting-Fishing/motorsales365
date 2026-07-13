@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { getTechnicianPerformance } from "@/services/dashboard"; // Updated import
-import { TechnicianPerformanceData } from "@/types/dashboard";
+import { getTechnicianPerformance } from "@sm/services/dashboard"; // Updated import
+import { TechnicianPerformanceData } from "@sm/types/dashboard";
 
 export function TechnicianPerformanceChart() {
   const [performance, setPerformance] = useState<TechnicianPerformanceData>({ chartData: [], technicians: [] });

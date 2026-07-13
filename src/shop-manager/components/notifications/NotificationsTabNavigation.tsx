@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Badge } from '@sm/components/ui/badge';
 
 interface CategoryCounts {
   [key: string]: number;

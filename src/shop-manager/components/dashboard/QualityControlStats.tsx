@@ -1,6 +1,6 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChecklistStat, DashboardStats } from "@/types/dashboard";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { ChecklistStat, DashboardStats } from "@sm/types/dashboard";
 import { Loader2, CheckCircle2, AlertCircle, BarChart3 } from "lucide-react";
 
 interface QualityControlStatsProps {

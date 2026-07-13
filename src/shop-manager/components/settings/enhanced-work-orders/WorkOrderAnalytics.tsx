@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Badge } from '@sm/components/ui/badge';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -14,9 +14,9 @@ import {
   RefreshCw,
   Calendar
 } from 'lucide-react';
-import { useWorkOrderStats } from '@/hooks/work-orders/useWorkOrderStats';
-import { useDailyWorkOrders } from '@/hooks/work-orders/useDailyWorkOrders';
-import { useWorkOrderAnalytics, TimePeriod } from '@/hooks/work-orders/useWorkOrderAnalytics';
+import { useWorkOrderStats } from '@sm/hooks/work-orders/useWorkOrderStats';
+import { useDailyWorkOrders } from '@sm/hooks/work-orders/useDailyWorkOrders';
+import { useWorkOrderAnalytics, TimePeriod } from '@sm/hooks/work-orders/useWorkOrderAnalytics';
 
 export function WorkOrderAnalytics() {
   const [timeRange, setTimeRange] = useState<TimePeriod>('month');

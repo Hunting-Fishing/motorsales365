@@ -1,5 +1,5 @@
-import { FormCategory, FormCategoryResponse } from '@/types/formBuilder';
-import { supabase } from '@/lib/supabase';
+import { FormCategory, FormCategoryResponse } from '@sm/types/formBuilder';
+import { supabase } from '@sm/lib/supabase';
 
 export async function getFormCategories(): Promise<FormCategory[]> {
   try {

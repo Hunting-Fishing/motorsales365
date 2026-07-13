@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Document } from '@/types/document';
+import { Document } from '@sm/types/document';
 import { DocumentCard } from './DocumentCard';
 
 interface DocumentGridProps {

@@ -1,10 +1,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
+import { Input } from '@sm/components/ui/input';
 import { Search, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ServiceMainCategory, ServiceJob } from '@/types/service';
-import { Card } from '@/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { ServiceMainCategory, ServiceJob } from '@sm/types/service';
+import { Card } from '@sm/components/ui/card';
 
 interface EnhancedServiceSearchProps {
   value: string;

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import { CustomerFormValues } from '@/components/customers/form/schemas/customerSchema';
-import { createCustomer } from '@/services/customer/customerCreateService';
-import { convertFormVehicleToCustomerVehicle } from '@/types/customer/vehicle';
-import { Customer } from '@/types/customer';
+import { useToast } from '@sm/hooks/use-toast';
+import { CustomerFormValues } from '@sm/components/customers/form/schemas/customerSchema';
+import { createCustomer } from '@sm/services/customer/customerCreateService';
+import { convertFormVehicleToCustomerVehicle } from '@sm/types/customer/vehicle';
+import { Customer } from '@sm/types/customer';
 
 export function useCustomerSubmit() {
   const [isSubmitting, setIsSubmitting] = useState(false);

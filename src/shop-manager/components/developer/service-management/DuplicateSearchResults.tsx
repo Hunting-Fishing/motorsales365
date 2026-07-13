@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { X, Trash2, AlertTriangle, Info } from 'lucide-react';
-import { DuplicateItem, DuplicateSearchOptions } from '@/utils/search/duplicateSearch';
+import { DuplicateItem, DuplicateSearchOptions } from '@sm/utils/search/duplicateSearch';
 
 interface DuplicateSearchResultsProps {
   duplicates: DuplicateItem[];

@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useShopName } from '@/hooks/useShopName';
-import { useCompanyInfo } from '@/hooks/useCompanyInfo';
+import { useShopName } from '@sm/hooks/useShopName';
+import { useCompanyInfo } from '@sm/hooks/useCompanyInfo';
 
 interface CompanyContextType {
   companyName: string;

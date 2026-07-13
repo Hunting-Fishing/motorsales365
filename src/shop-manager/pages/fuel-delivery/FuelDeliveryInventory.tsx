@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Progress } from '@sm/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Plus, Search, BarChart3, ArrowLeft, AlertTriangle, Droplets } from 'lucide-react';
-import { useFuelDeliveryInventory, useCreateFuelDeliveryInventory, useFuelDeliveryProducts } from '@/hooks/useFuelDelivery';
+import { useFuelDeliveryInventory, useCreateFuelDeliveryInventory, useFuelDeliveryProducts } from '@sm/hooks/useFuelDelivery';
 import { useNavigate } from 'react-router-dom';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useShopId } from '@/hooks/useShopId';
-import { useModuleDisplayInfo } from '@/hooks/useModuleDisplayInfo';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { useShopId } from '@sm/hooks/useShopId';
+import { useModuleDisplayInfo } from '@sm/hooks/useModuleDisplayInfo';
 
 export default function FuelDeliveryInventory() {
   const navigate = useNavigate();

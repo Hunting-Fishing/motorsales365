@@ -1,6 +1,6 @@
 
-import { WorkOrder } from "@/types/workOrder";
-import { WorkOrderInventoryItem, TimeEntry } from "@/types/workOrder";
+import { WorkOrder } from "@sm/types/workOrder";
+import { WorkOrderInventoryItem, TimeEntry } from "@sm/types/workOrder";
 
 // Maps our application WorkOrder type to Supabase database format
 export const mapToDbWorkOrder = (workOrder: Partial<WorkOrder>) => {

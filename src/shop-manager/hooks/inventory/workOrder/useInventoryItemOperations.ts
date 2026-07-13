@@ -1,9 +1,9 @@
 
 import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
-import { InventoryItemExtended } from "@/types/inventory";
-import { WorkOrderInventoryItem } from "@/types/workOrder";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
+import { InventoryItemExtended } from "@sm/types/inventory";
+import { WorkOrderInventoryItem } from "@sm/types/workOrder";
 
 /**
  * Hook to manage inventory item operations in a work order form

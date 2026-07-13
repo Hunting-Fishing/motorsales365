@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { supabase } from '@sm/lib/supabase';
+import { useToast } from '@sm/hooks/use-toast';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@sm/components/ui/card';
 import { Loader2, UserPlus, Building2, CheckCircle, KeyRound } from 'lucide-react';
-import { getShopBySlug, getShopByInviteCode, ShopPublicInfo } from '@/services/shopLookupService';
-import { CustomerPortalLayout } from '@/components/customer-portal/CustomerPortalLayout';
+import { getShopBySlug, getShopByInviteCode, ShopPublicInfo } from '@sm/services/shopLookupService';
+import { CustomerPortalLayout } from '@sm/components/customer-portal/CustomerPortalLayout';
 
 export default function CustomerPortalRegister() {
   const navigate = useNavigate();

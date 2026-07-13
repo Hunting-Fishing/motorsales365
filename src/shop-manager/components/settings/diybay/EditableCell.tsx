@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
-import { TableCell } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
+import { TableCell } from "@sm/components/ui/table";
+import { Input } from "@sm/components/ui/input";
 import { Check, X } from "lucide-react";
 
 export interface EditableCellProps {

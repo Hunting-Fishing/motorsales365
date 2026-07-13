@@ -1,7 +1,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { SETTINGS_TABS, SETTINGS_SECTIONS, DEFAULT_SETTINGS_TAB } from '@/config/settingsConfig';
+import { SETTINGS_TABS, SETTINGS_SECTIONS, DEFAULT_SETTINGS_TAB } from '@sm/config/settingsConfig';
 
 export interface UseSettingsNavigationResult {
   activeTab: string;

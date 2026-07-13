@@ -1,6 +1,6 @@
 
-import { InventoryItemExtended } from "@/types/inventory";
-import { supabase } from "@/integrations/supabase/client";
+import { InventoryItemExtended } from "@sm/types/inventory";
+import { supabase } from "@sm/integrations/supabase/client";
 import { getInventoryStatus, needsReorder } from "./statusUtils";
 
 /**

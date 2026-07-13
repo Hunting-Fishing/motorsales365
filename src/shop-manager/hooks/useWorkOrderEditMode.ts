@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { WorkOrder } from '@/types/workOrder';
+import { WorkOrder } from '@sm/types/workOrder';
 
 export function useWorkOrderEditMode(workOrder: WorkOrder | null | undefined) {
   const [forceEditMode, setForceEditMode] = useState(false);

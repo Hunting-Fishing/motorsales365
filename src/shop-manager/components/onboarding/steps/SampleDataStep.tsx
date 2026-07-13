@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { Progress } from '@sm/components/ui/progress';
 import { Users, Package, Wrench, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface SampleDataStepProps {

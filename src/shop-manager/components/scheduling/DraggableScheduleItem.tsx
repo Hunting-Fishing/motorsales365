@@ -1,9 +1,9 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { Card } from '@/components/ui/card';
+import { Card } from '@sm/components/ui/card';
 import { GripVertical } from 'lucide-react';
-import type { WorkScheduleAssignment } from '@/types/scheduling';
+import type { WorkScheduleAssignment } from '@sm/types/scheduling';
 
 interface DraggableScheduleItemProps {
   schedule: WorkScheduleAssignment;

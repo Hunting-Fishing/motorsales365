@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardContent, CardTitle } from "@sm/components/ui/card";
 import { ClipboardEdit, Clock, User, AlertTriangle } from "lucide-react";
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 
 interface WorkOrderActivityHistoryProps {

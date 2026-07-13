@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useCallback, useMemo } from 'react';
-import { InventoryItemExtended, AutoReorderSettings, ReorderSettings } from '@/types/inventory';
+import { InventoryItemExtended, AutoReorderSettings, ReorderSettings } from '@sm/types/inventory';
 import { useInventoryData } from './useInventoryData';
-import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface ReorderAlert {
   id: string;

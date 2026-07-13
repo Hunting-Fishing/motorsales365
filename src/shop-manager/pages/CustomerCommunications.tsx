@@ -1,7 +1,7 @@
 import React from 'react';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { CustomerCommunications } from '@/components/customers/communications/CustomerCommunications';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { CustomerCommunications } from '@sm/components/customers/communications/CustomerCommunications';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { MessageSquare, Phone, Mail } from 'lucide-react';
 
 export default function CustomerCommunicationsPage() {

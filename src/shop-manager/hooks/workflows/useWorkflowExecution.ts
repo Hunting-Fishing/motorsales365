@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { workflowExecutionService, WorkflowExecution } from '@/services/workflows/workflowExecutionService';
-import { useToast } from '@/hooks/use-toast';
+import { workflowExecutionService, WorkflowExecution } from '@sm/services/workflows/workflowExecutionService';
+import { useToast } from '@sm/hooks/use-toast';
 
 export function useWorkflowExecution(triggerId?: string) {
   const [executions, setExecutions] = useState<WorkflowExecution[]>([]);

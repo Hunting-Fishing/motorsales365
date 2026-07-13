@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { useShopId } from './useShopId';
 import { useToast } from './use-toast';
-import type { ShiftSwapRequest } from '@/types/employee-availability';
+import type { ShiftSwapRequest } from '@sm/types/employee-availability';
 
 export function useShiftSwaps() {
   const { shopId } = useShopId();

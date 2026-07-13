@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { 
   Breadcrumb,
@@ -10,7 +10,7 @@ import {
   BreadcrumbLink,
   BreadcrumbSeparator,
   BreadcrumbPage,
-} from '@/components/ui/breadcrumb';
+} from '@sm/components/ui/breadcrumb';
 
 interface SettingsPageHeaderProps {
   title: string;

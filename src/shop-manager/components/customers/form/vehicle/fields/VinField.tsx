@@ -1,13 +1,13 @@
 
 import React from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
 import { HelpCircle, Zap, AlertCircle, RotateCcw } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@sm/components/ui/tooltip";
+import { Badge } from "@sm/components/ui/badge";
 import { BaseFieldProps } from "./BaseFieldTypes";
-import { VinDecodeResult } from "@/types/vehicle";
+import { VinDecodeResult } from "@sm/types/vehicle";
 
 interface VinFieldProps extends BaseFieldProps {
   processing?: boolean;

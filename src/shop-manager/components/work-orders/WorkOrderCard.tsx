@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Link } from 'react-router-dom';
 import { CalendarClock, Car, DollarSign, Hash, User2 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
-import type { WorkOrder } from '@/types/workOrder';
+import type { WorkOrder } from '@sm/types/workOrder';
 
 interface WorkOrderCardProps {
   wo: WorkOrder;

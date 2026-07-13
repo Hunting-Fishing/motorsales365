@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Label } from "@sm/components/ui/label";
 import { Wrench, AlertTriangle, ThumbsUp } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@sm/components/ui/checkbox";
+import { Textarea } from "@sm/components/ui/textarea";
 import InspectionItem from "./shared/InspectionItem";
 import ImageUploadButton from './shared/ImageUploadButton';
 

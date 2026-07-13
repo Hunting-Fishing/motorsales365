@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Button } from "@sm/components/ui/button";
 import { ArrowLeft, Building } from "lucide-react";
-import OrganizationDetails from '@/components/developer/organization/OrganizationDetails';
-import ShopsManagement from '@/components/developer/organization/ShopsManagement';
-import { BookingPermissionsManager } from '@/components/developer/organization/BookingPermissionsManager';
-import { DepartmentSubmissionsManager } from '@/components/developer/organization/DepartmentSubmissionsManager';
+import OrganizationDetails from '@sm/components/developer/organization/OrganizationDetails';
+import ShopsManagement from '@sm/components/developer/organization/ShopsManagement';
+import { BookingPermissionsManager } from '@sm/components/developer/organization/BookingPermissionsManager';
+import { DepartmentSubmissionsManager } from '@sm/components/developer/organization/DepartmentSubmissionsManager';
 
 export default function OrganizationManagement() {
   const [activeTab, setActiveTab] = useState("details");

@@ -1,10 +1,10 @@
 
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@sm/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { Control } from "react-hook-form";
 import { TeamMemberFormValues } from "./formValidation";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@sm/components/ui/skeleton";
+import { Badge } from "@sm/components/ui/badge";
 import { useEffect, useState } from "react";
 import { getDepartmentNames, getJobTitlesForDepartment, getSuggestedRole, roleMetadata } from "./jobTitleData";
 import { Check, X } from "lucide-react";

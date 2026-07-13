@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@sm/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { UseFormReturn } from 'react-hook-form';
-import { WorkOrderPartFormValues, PART_TYPES, WORK_ORDER_PART_STATUSES, partStatusMap } from '@/types/workOrderPart';
-import { Badge } from '@/components/ui/badge';
+import { WorkOrderPartFormValues, PART_TYPES, WORK_ORDER_PART_STATUSES, partStatusMap } from '@sm/types/workOrderPart';
+import { Badge } from '@sm/components/ui/badge';
 
 interface PartTypeAndStatusFieldsProps {
   form: UseFormReturn<WorkOrderPartFormValues>;

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useUserRoles } from '@/hooks/useUserRoles';
-import { useEnabledModules } from '@/hooks/useEnabledModules';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useUserRoles } from '@sm/hooks/useUserRoles';
+import { useEnabledModules } from '@sm/hooks/useEnabledModules';
 
 export interface SidebarVisibilitySettings {
   hidden_sections: string[];

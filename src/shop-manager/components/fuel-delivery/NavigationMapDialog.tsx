@@ -6,12 +6,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Loader2, Navigation, MapPin, Phone, ExternalLink, Fuel, X } from 'lucide-react';
-import { useMapboxPublicToken } from '@/hooks/useMapboxPublicToken';
-import { cn } from '@/lib/utils';
+import { useMapboxPublicToken } from '@sm/hooks/useMapboxPublicToken';
+import { cn } from '@sm/lib/utils';
 
 interface NavigationStop {
   id: string;

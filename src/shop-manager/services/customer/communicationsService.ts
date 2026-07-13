@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
-import { CustomerCommunication } from "@/types/customer/notes";
+import { supabase } from "@sm/integrations/supabase/client";
+import { CustomerCommunication } from "@sm/types/customer/notes";
 
 export const getCustomerCommunications = async (customerId: string): Promise<CustomerCommunication[]> => {
   try {

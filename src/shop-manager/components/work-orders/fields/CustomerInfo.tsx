@@ -1,13 +1,13 @@
 
 import { useState } from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CustomerSearchInput } from "@/components/customers/CustomerSearchInput";
-import { Customer } from "@/types/customer";
-import { Button } from "@/components/ui/button";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { CustomerSearchInput } from "@sm/components/customers/CustomerSearchInput";
+import { Customer } from "@sm/types/customer";
+import { Button } from "@sm/components/ui/button";
 import { UserPlus, Phone } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import { Input } from "@sm/components/ui/input";
+import { Separator } from "@sm/components/ui/separator";
 
 interface CustomerInfoProps {
   form: any;

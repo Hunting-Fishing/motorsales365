@@ -10,8 +10,8 @@ import {
   isSameDay,
   parseISO
 } from 'date-fns';
-import { Badge } from '@/components/ui/badge';
-import { BookingAppointment, BookableService } from '@/hooks/useBookingSystem';
+import { Badge } from '@sm/components/ui/badge';
+import { BookingAppointment, BookableService } from '@sm/hooks/useBookingSystem';
 
 interface BookingCalendarMonthViewProps {
   currentDate: Date;

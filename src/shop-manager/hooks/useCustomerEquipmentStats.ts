@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Customer, CustomerEquipmentType } from '@/types/customer';
+import { Customer, CustomerEquipmentType } from '@sm/types/customer';
 
 export interface EquipmentTypeCount {
   type: CustomerEquipmentType;

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Clock, ExternalLink } from 'lucide-react';
-import { useRecentlyViewedProducts } from '@/hooks/shopping/useRecentlyViewedProducts';
-import { Badge } from '@/components/ui/badge';
+import { useRecentlyViewedProducts } from '@sm/hooks/shopping/useRecentlyViewedProducts';
+import { Badge } from '@sm/components/ui/badge';
 
 interface RecentlyViewedProductsProps {
   userId?: string;

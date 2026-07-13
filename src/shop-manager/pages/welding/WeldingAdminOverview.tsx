@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import WeldingAdminLayout from "@/components/welding/WeldingAdminLayout";
-import { Card, CardContent } from "@/components/ui/card";
+import { supabase } from "@sm/integrations/supabase/client";
+import WeldingAdminLayout from "@sm/components/welding/WeldingAdminLayout";
+import { Card, CardContent } from "@sm/components/ui/card";
 import { FileText, DollarSign, Warehouse, Inbox, AlertTriangle } from "lucide-react";
 
 const WeldingAdminOverview = () => {

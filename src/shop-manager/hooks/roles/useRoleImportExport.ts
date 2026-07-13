@@ -1,7 +1,7 @@
 
-import { Role } from "@/types/team";
-import { toast } from "@/hooks/use-toast";
-import { validateImportedRoles } from "@/utils/roleImportExport";
+import { Role } from "@sm/types/team";
+import { toast } from "@sm/hooks/use-toast";
+import { validateImportedRoles } from "@sm/utils/roleImportExport";
 
 export function useRoleImportExport(roles: Role[], setRoles: React.Dispatch<React.SetStateAction<Role[]>>) {
   const handleImportRoles = (importedRoles: Role[]) => {

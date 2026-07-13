@@ -5,9 +5,9 @@ import {
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+} from "@sm/components/ui/dropdown-menu";
+import { Button } from "@sm/components/ui/button";
+import { toast } from "@sm/components/ui/use-toast";
 
 interface ExportMenuBaseProps {
   onExport: (format: "csv" | "excel" | "pdf") => void;

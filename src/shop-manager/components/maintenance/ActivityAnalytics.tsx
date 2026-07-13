@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { BarChart, TrendingUp, Users, Activity } from 'lucide-react';
 import { format, subDays, isAfter } from 'date-fns';
 

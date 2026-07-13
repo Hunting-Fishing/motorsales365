@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
 import { CheckCircle, XCircle, AlertTriangle, Download, Users } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
-import { TRAINING_TYPE_LABELS, TrainingType } from '@/types/safety';
+import { TRAINING_TYPE_LABELS, TrainingType } from '@sm/types/safety';
 
 interface StaffMember {
   id: string;

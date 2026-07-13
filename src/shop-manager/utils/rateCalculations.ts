@@ -1,5 +1,5 @@
 
-import { RateSettings } from "@/services/diybay/diybayService";
+import { RateSettings } from "@sm/services/diybay/diybayService";
 
 /**
  * Calculate daily rate based on hourly rate and settings

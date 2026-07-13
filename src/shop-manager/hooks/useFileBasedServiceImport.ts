@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { processExcelFileFromStorage } from '@/lib/services/excelProcessor';
-import { clearAllServiceData, testDatabaseConnection } from '@/lib/services/databaseOperations';
-import type { StorageFile } from '@/types/service';
+import { useToast } from '@sm/hooks/use-toast';
+import { processExcelFileFromStorage } from '@sm/lib/services/excelProcessor';
+import { clearAllServiceData, testDatabaseConnection } from '@sm/lib/services/databaseOperations';
+import type { StorageFile } from '@sm/types/service';
 
 export const useFileBasedServiceImport = () => {
   const [isImporting, setIsImporting] = useState(false);

@@ -1,5 +1,5 @@
 
-import { Notification } from "@/types/notification";
+import { Notification } from "@sm/types/notification";
 
 export interface NotificationServiceEvents {
   onNotification: (notification: Notification) => void;

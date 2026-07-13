@@ -1,12 +1,12 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 import { 
   ReferralSource, 
   CustomerReferral, 
   ReferralTransaction,
   CustomerReferralView,
   ReferralStatistics
-} from "@/types/referral";
+} from "@sm/types/referral";
 
 /**
  * Fetches all referral sources from the database

@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Calendar } from '@sm/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@sm/components/ui/popover';
+import { Badge } from '@sm/components/ui/badge';
 import { CalendarIcon, Clock, User, Search } from 'lucide-react';
 import { format, addMinutes, setHours, setMinutes, startOfDay } from 'date-fns';
-import { BookableService, useCreateBookingAppointment } from '@/hooks/useBookingSystem';
-import { Input } from '@/components/ui/input';
+import { BookableService, useCreateBookingAppointment } from '@sm/hooks/useBookingSystem';
+import { Input } from '@sm/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { cn } from '@/lib/utils';
+import { supabase } from '@sm/integrations/supabase/client';
+import { cn } from '@sm/lib/utils';
 
 interface CreateBookingDialogProps {
   open: boolean;

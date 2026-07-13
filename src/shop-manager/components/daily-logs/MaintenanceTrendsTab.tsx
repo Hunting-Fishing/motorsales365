@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Button } from '@sm/components/ui/button';
 import { TrendingUp, RefreshCw, AlertTriangle, Clock, CheckCircle, XCircle } from 'lucide-react';
-import { useMaintenanceTrends } from '@/hooks/useMaintenanceTrends';
+import { useMaintenanceTrends } from '@sm/hooks/useMaintenanceTrends';
 import { ComplianceChart } from './ComplianceChart';
 import { EmployeePerformanceCard } from './EmployeePerformanceCard';
 import { BreakdownTracker } from './BreakdownTracker';

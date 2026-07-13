@@ -1,16 +1,16 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Calendar } from "@sm/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { InventoryFormSelect } from "@/components/inventory/form/InventoryFormSelect";
-import { WorkOrderInventoryItem } from "@/types/workOrder";
+import { cn } from "@sm/lib/utils";
+import { InventoryFormSelect } from "@sm/components/inventory/form/InventoryFormSelect";
+import { WorkOrderInventoryItem } from "@sm/types/workOrder";
 
 interface SpecialOrderItemFormProps {
   onAdd: (item: WorkOrderInventoryItem) => void;

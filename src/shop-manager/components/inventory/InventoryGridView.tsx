@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { InventoryItemExtended } from '@/types/inventory';
+import { InventoryItemExtended } from '@sm/types/inventory';
 import { InventoryCard } from './InventoryCard';
 import { BulkActionsToolbar } from './BulkActionsToolbar';
-import { useInventoryView } from '@/contexts/InventoryViewContext';
-import { Button } from '@/components/ui/button';
+import { useInventoryView } from '@sm/contexts/InventoryViewContext';
+import { Button } from '@sm/components/ui/button';
 import { CheckSquare, Square } from 'lucide-react';
 
 interface InventoryGridViewProps {

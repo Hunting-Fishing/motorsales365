@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { CarMake, CarModel } from '@/types/vehicle';
+import { supabase } from '@sm/integrations/supabase/client';
+import { CarMake, CarModel } from '@sm/types/vehicle';
 
 /**
  * Fetch all available car makes from the database

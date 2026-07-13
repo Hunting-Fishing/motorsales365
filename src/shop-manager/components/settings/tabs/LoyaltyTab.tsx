@@ -1,17 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Switch } from '@sm/components/ui/switch';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { Loader2, AlertTriangle, Save, RefreshCw } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { loyaltySettingsService } from '@/services/settings/loyaltySettingsService';
-import { useToast } from '@/hooks/use-toast';
-import { LoyaltyTierManager } from '@/components/loyalty/LoyaltyTierManager';
-import type { LoyaltyConfiguration } from '@/services/settings/loyaltySettingsService';
+import { supabase } from '@sm/integrations/supabase/client';
+import { loyaltySettingsService } from '@sm/services/settings/loyaltySettingsService';
+import { useToast } from '@sm/hooks/use-toast';
+import { LoyaltyTierManager } from '@sm/components/loyalty/LoyaltyTierManager';
+import type { LoyaltyConfiguration } from '@sm/services/settings/loyaltySettingsService';
 
 export function LoyaltyTab() {
   const { toast } = useToast();

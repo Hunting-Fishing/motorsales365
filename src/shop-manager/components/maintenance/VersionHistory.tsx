@@ -1,14 +1,14 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getScheduleVersions, restoreScheduleVersion } from '@/services/maintenance/versionService';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { getScheduleVersions, restoreScheduleVersion } from '@sm/services/maintenance/versionService';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
 import { History, RotateCcw } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useShopId } from '@/hooks/useShopId';
-import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
+import { useShopId } from '@sm/hooks/useShopId';
+import { supabase } from '@sm/integrations/supabase/client';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +18,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@sm/components/ui/alert-dialog';
 
 interface VersionHistoryProps {
   scheduleId: string;

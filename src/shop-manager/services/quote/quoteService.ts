@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { Quote, QuoteItem, ConversionAudit, QuoteStatus, QuoteItemType } from '@/types/quote';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Quote, QuoteItem, ConversionAudit, QuoteStatus, QuoteItemType } from '@sm/types/quote';
 
 export async function getAllQuotes(): Promise<Quote[]> {
   console.log('getAllQuotes: Starting fetch...');

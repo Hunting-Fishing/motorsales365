@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
-import { useCompliance } from '@/hooks/useCompliance';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
+import { useCompliance } from '@sm/hooks/useCompliance';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
 
 export function ComplianceMonitor() {

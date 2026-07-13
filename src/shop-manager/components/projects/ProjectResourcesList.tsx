@@ -1,38 +1,38 @@
 import { useState } from 'react';
-import { useProjectResources } from '@/hooks/useProjectResources';
-import { useStaffForPlanner, useEquipmentForPlanner } from '@/hooks/usePlannerData';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useProjectResources } from '@sm/hooks/useProjectResources';
+import { useStaffForPlanner, useEquipmentForPlanner } from '@sm/hooks/usePlannerData';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
+} from '@sm/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+} from '@sm/components/ui/collapsible';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Plus, Users, Wrench, Trash2, Clock, ChevronDown, ChevronRight, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
-import type { ResourceType } from '@/types/projectResource';
-import type { ProjectPhase } from '@/types/projectBudget';
+import type { ResourceType } from '@sm/types/projectResource';
+import type { ProjectPhase } from '@sm/types/projectBudget';
 import { TimeEntryDialog } from './TimeEntryDialog';
 import { ResourceTimeEntries } from './ResourceTimeEntries';
-import type { TimeEntry } from '@/types/projectResource';
-import type { Json } from '@/integrations/supabase/types';
+import type { TimeEntry } from '@sm/types/projectResource';
+import type { Json } from '@sm/integrations/supabase/types';
 
 // Helper function to parse time entries from JSON
 function parseTimeEntries(entries: Json | null): TimeEntry[] {

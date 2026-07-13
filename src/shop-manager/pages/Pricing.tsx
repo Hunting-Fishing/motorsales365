@@ -1,6 +1,6 @@
 import React from 'react';
-import { PublicLayout } from '@/components/layout/PublicLayout';
-import { PricingSection } from '@/components/landing/PricingSection';
+import { PublicLayout } from '@sm/components/layout/PublicLayout';
+import { PricingSection } from '@sm/components/landing/PricingSection';
 
 export default function Pricing() {
   return (

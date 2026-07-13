@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { WorkOrderJobLine, JOB_LINE_STATUSES, LABOR_RATE_TYPES } from '@/types/jobLine';
-import { useServiceSectors } from '@/hooks/useServiceCategories';
-import { toast } from '@/hooks/use-toast';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { WorkOrderJobLine, JOB_LINE_STATUSES, LABOR_RATE_TYPES } from '@sm/types/jobLine';
+import { useServiceSectors } from '@sm/hooks/useServiceCategories';
+import { toast } from '@sm/hooks/use-toast';
 
 interface ServiceBasedJobLineEditFormProps {
   jobLine: WorkOrderJobLine;

@@ -1,6 +1,6 @@
 
-import { useInvoiceData } from "@/hooks/useInvoiceData";
-import { WorkOrder } from "@/types/workOrder";
+import { useInvoiceData } from "@sm/hooks/useInvoiceData";
+import { WorkOrder } from "@sm/types/workOrder";
 
 // This file now re-exports the hook that fetches data from the database
 export { useInvoiceData };

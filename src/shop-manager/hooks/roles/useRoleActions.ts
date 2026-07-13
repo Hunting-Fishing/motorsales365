@@ -1,7 +1,7 @@
 
-import { Role } from "@/types/team";
-import { PermissionSet } from "@/types/permissions";
-import { toast } from "@/hooks/use-toast";
+import { Role } from "@sm/types/team";
+import { PermissionSet } from "@sm/types/permissions";
+import { toast } from "@sm/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
 
 export function useRoleActions(roles: Role[], setRoles: React.Dispatch<React.SetStateAction<Role[]>>) {

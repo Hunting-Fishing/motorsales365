@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { WorkOrder } from '@/types/workOrder';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { WorkOrderStatusBadge } from './WorkOrderStatusBadge';
 import { Calendar, User, Car, DollarSign, Clock, Eye } from 'lucide-react';
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { useToast } from './use-toast';
-import type { BIReport, ReportExecution } from '@/types/phase4';
+import type { BIReport, ReportExecution } from '@sm/types/phase4';
 
 export function useBIReports() {
   const { toast } = useToast();

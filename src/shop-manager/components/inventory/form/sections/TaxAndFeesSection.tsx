@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { InventoryFormField } from '../InventoryFormField';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@sm/components/ui/checkbox';
 
 interface TaxAndFeesSectionProps {
   values: any;

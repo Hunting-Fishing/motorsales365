@@ -1,14 +1,14 @@
 
 import React, { useState, useCallback } from "react";
-import { useDIYBayRates } from "@/hooks/useDIYBayRates";
-import { Bay } from "@/services/diybay/diybayService";
+import { useDIYBayRates } from "@sm/hooks/useDIYBayRates";
+import { Bay } from "@sm/services/diybay/diybayService";
 import { DIYBayHeader } from "./diybay/DIYBayHeader";
 import { RateSettingsForm } from "./diybay/RateSettingsForm";
 import { BaySection } from "./diybay/BaySection";
 import { DIYBayDialogs } from "./diybay/DIYBayDialogs";
-import { useDialogState } from "@/hooks/diybay/useDialogState";
-import { useBayOrder } from "@/hooks/diybay/useBayOrder";
-import { toast } from "@/hooks/use-toast";
+import { useDialogState } from "@sm/hooks/diybay/useDialogState";
+import { useBayOrder } from "@sm/hooks/diybay/useBayOrder";
+import { toast } from "@sm/hooks/use-toast";
 
 export const DIYBayRatesTab: React.FC = () => {
   const {

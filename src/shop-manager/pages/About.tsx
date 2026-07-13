@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Shield, Users, Wrench, Target } from 'lucide-react';
-import ab365Logo from '@/assets/ab365-logo.png';
-import { PublicLayout } from '@/components/layout/PublicLayout';
+import ab365Logo from '@sm/assets/ab365-logo.png';
+import { PublicLayout } from '@sm/components/layout/PublicLayout';
 
 export default function About() {
   return (

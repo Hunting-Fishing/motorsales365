@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart, WorkOrderPartFormValues } from '@/types/workOrderPart';
-import { TimeEntry } from '@/types/workOrder';
-import { Customer } from '@/types/customer';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Button } from '@sm/components/ui/button';
+import { Label } from '@sm/components/ui/label';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart, WorkOrderPartFormValues } from '@sm/types/workOrderPart';
+import { TimeEntry } from '@sm/types/workOrder';
+import { Customer } from '@sm/types/customer';
 import { Calculator } from 'lucide-react';
 import { CompactJobLinesTable } from '../job-lines/CompactJobLinesTable';
-import { useWorkOrderJobLineOperations } from '@/hooks/useWorkOrderJobLineOperations';
-import { useWorkOrderPartsData } from '@/hooks/useWorkOrderPartsData';
-import { useWorkOrderTaxCalculations } from '@/hooks/useWorkOrderTaxCalculations';
+import { useWorkOrderJobLineOperations } from '@sm/hooks/useWorkOrderJobLineOperations';
+import { useWorkOrderPartsData } from '@sm/hooks/useWorkOrderPartsData';
+import { useWorkOrderTaxCalculations } from '@sm/hooks/useWorkOrderTaxCalculations';
 
 interface WorkOrderDetailedFormProps {
   workOrder: WorkOrder;

@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from 'react';
-import { companyService, type CompanyInfo, type BusinessHours } from '@/services/settings/companyService';
-import { useBusinessConstants } from '@/hooks/useBusinessConstants';
-import { useToast } from '@/hooks/use-toast';
-import { cleanPhoneNumber } from '@/utils/formatters';
-import { useAuthUser } from '@/hooks/useAuthUser';
+import { companyService, type CompanyInfo, type BusinessHours } from '@sm/services/settings/companyService';
+import { useBusinessConstants } from '@sm/hooks/useBusinessConstants';
+import { useToast } from '@sm/hooks/use-toast';
+import { cleanPhoneNumber } from '@sm/utils/formatters';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
 
 export function useCompanyInfo() {
   const { toast } = useToast();

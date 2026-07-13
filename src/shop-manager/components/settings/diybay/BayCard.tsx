@@ -1,12 +1,12 @@
 
 import React from "react";
-import { Bay } from "@/services/diybay/diybayService";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Bay } from "@sm/services/diybay/diybayService";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
 import { Pencil, Trash2, History, GripVertical } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import { formatCurrency } from "@/lib/formatters";
+import { Switch } from "@sm/components/ui/switch";
+import { formatCurrency } from "@sm/lib/formatters";
 
 interface BayCardProps {
   bay: Bay;

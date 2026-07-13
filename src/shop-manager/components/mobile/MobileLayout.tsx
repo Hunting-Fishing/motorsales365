@@ -3,9 +3,9 @@ import { MobileHeader } from './MobileHeader';
 import { MobileNavigation } from './MobileNavigation';
 import { OfflineManager } from './OfflineManager';
 import { PWAInstallPrompt } from './PWAInstallPrompt';
-import { AppFooter } from '@/components/layout/AppFooter';
-import { usePWA } from '@/hooks/usePWA';
-import { cn } from '@/lib/utils';
+import { AppFooter } from '@sm/components/layout/AppFooter';
+import { usePWA } from '@sm/hooks/usePWA';
+import { cn } from '@sm/lib/utils';
 
 interface MobileLayoutProps {
   children: React.ReactNode;

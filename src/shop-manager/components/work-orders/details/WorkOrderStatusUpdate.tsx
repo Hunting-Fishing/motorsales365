@@ -1,19 +1,19 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+} from '@sm/components/ui/select';
+import { Badge } from '@sm/components/ui/badge';
 import { Check, Loader2, AlertCircle } from 'lucide-react';
-import { WorkOrder } from '@/types/workOrder';
-import { updateWorkOrderStatus } from '@/services/workOrder';
-import { toast } from '@/hooks/use-toast';
-import { WORK_ORDER_STATUSES } from '@/data/workOrderConstants';
+import { WorkOrder } from '@sm/types/workOrder';
+import { updateWorkOrderStatus } from '@sm/services/workOrder';
+import { toast } from '@sm/hooks/use-toast';
+import { WORK_ORDER_STATUSES } from '@sm/data/workOrderConstants';
 
 interface WorkOrderStatusUpdateProps {
   workOrder: WorkOrder;

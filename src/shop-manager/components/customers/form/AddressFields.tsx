@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
 import { CustomerFormValues } from "./schemas/customerSchema";
 import { countries, usStates, canadianProvinces } from "./schemas/locationData";
 import { 
@@ -11,7 +11,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "@/components/ui/select";
+} from "@sm/components/ui/select";
 import { AddressAutocomplete } from "./AddressAutocomplete";
 
 interface AddressFieldsProps {

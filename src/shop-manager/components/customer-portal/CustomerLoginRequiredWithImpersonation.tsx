@@ -1,12 +1,12 @@
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent } from "@sm/components/ui/card";
 import { Lock, User, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useImpersonation } from "@/contexts/ImpersonationContext";
+import { useImpersonation } from "@sm/contexts/ImpersonationContext";
 import { useNavigate } from "react-router-dom";
-import { CompanyContactEnhanced } from "@/components/common/CompanyContactEnhanced";
-import { useCompany } from "@/contexts/CompanyContext";
+import { CompanyContactEnhanced } from "@sm/components/common/CompanyContactEnhanced";
+import { useCompany } from "@sm/contexts/CompanyContext";
 
 export function CustomerLoginRequiredWithImpersonation() {
   const { isImpersonating, stopImpersonation } = useImpersonation();

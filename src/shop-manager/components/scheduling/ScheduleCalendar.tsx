@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { Plus, ChevronLeft, ChevronRight, RefreshCw, Calendar, Layout, Users } from 'lucide-react';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, endOfWeek } from 'date-fns';
 import { DndContext, DragEndEvent, DragOverlay } from '@dnd-kit/core';
-import { useScheduling } from '@/hooks/useScheduling';
-import { useSchedulingConflicts } from '@/hooks/useSchedulingConflicts';
+import { useScheduling } from '@sm/hooks/useScheduling';
+import { useSchedulingConflicts } from '@sm/hooks/useSchedulingConflicts';
 import { AddScheduleDialog } from './AddScheduleDialog';
 import { ScheduleWeekView } from './ScheduleWeekView';
 import { SchedulingStatsCard } from './SchedulingStatsCard';
@@ -16,9 +16,9 @@ import { ScheduleBulkActions } from './ScheduleBulkActions';
 import { ScheduleExportButton } from './ScheduleExportButton';
 import { ShiftTemplateManager } from './ShiftTemplateManager';
 import { ScheduleCoverageView } from './ScheduleCoverageView';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import type { WorkScheduleAssignment } from '@/types/scheduling';
+import { useToast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import type { WorkScheduleAssignment } from '@sm/types/scheduling';
 
 export function ScheduleCalendar() {
   const [currentWeek, setCurrentWeek] = useState(startOfWeek(new Date(), { weekStartsOn: 0 }));

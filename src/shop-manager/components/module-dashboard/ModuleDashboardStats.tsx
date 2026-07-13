@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { LucideIcon } from 'lucide-react';
 
 interface StatCard {

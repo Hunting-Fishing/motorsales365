@@ -1,7 +1,7 @@
 
 import { useState } from "react";
-import { InvoiceItem } from "@/types/invoice";
-import { InventoryItem } from "@/types/inventory";
+import { InvoiceItem } from "@sm/types/invoice";
+import { InventoryItem } from "@sm/types/inventory";
 
 export function useInvoiceItems(initialItems: InvoiceItem[] = []) {
   const [items, setItems] = useState<InvoiceItem[]>(initialItems);

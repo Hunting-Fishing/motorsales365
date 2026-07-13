@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Package, Eye, Search, Calendar } from 'lucide-react';
-import { getAllOrders } from '@/services/orderService';
-import { Order } from '@/types/order';
+import { getAllOrders } from '@sm/services/orderService';
+import { Order } from '@sm/types/order';
 
 interface OrderHistoryTabProps {
   userId: string;

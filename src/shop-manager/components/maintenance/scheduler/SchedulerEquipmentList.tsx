@@ -1,10 +1,10 @@
 
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import type { EquipmentWithMaintenance } from "@/services/equipmentService";
-import { formatDate } from "@/utils/workOrders";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@sm/components/ui/table";
+import { Button } from "@sm/components/ui/button";
+import type { EquipmentWithMaintenance } from "@sm/services/equipmentService";
+import { formatDate } from "@sm/utils/workOrders";
 import { CalendarRange, Clock } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@sm/components/ui/badge";
 import { Link } from "react-router-dom";
 
 interface SchedulerEquipmentListProps {

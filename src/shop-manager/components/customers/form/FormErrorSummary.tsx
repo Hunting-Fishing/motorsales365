@@ -1,6 +1,6 @@
 import React from "react";
 import { FieldErrors } from "react-hook-form";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertTitle, AlertDescription } from "@sm/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { CustomerFormValues } from "./schemas/customerSchema";
 

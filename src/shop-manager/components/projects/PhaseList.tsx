@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Edit, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Progress } from '@sm/components/ui/progress';
+import { Input } from '@sm/components/ui/input';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+} from '@sm/components/ui/collapsible';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,11 +19,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useProjectDetails } from '@/hooks/useProjectBudgets';
-import { formatCurrency } from '@/lib/utils';
+} from '@sm/components/ui/alert-dialog';
+import { useProjectDetails } from '@sm/hooks/useProjectBudgets';
+import { formatCurrency } from '@sm/lib/utils';
 import { format } from 'date-fns';
-import type { ProjectPhase } from '@/types/projectBudget';
+import type { ProjectPhase } from '@sm/types/projectBudget';
 
 interface PhaseListProps {
   phases: ProjectPhase[];

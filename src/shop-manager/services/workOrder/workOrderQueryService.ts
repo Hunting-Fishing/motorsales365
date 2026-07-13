@@ -1,7 +1,7 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { WorkOrder } from '@/types/workOrder';
-import { mapDatabaseWorkOrder } from '@/utils/workOrders/typeMappers';
+import { supabase } from '@sm/integrations/supabase/client';
+import { WorkOrder } from '@sm/types/workOrder';
+import { mapDatabaseWorkOrder } from '@sm/utils/workOrders/typeMappers';
 
 export async function getAllWorkOrders(): Promise<WorkOrder[]> {
   try {

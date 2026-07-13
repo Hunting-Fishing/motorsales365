@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Plus, Clock, Users, Calendar, MapPin, Trash2, Edit } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { useToast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
 import { VolunteerForm } from './forms/VolunteerForm';
-import type { Database } from '@/integrations/supabase/types';
+import type { Database } from '@sm/integrations/supabase/types';
 
 type VolunteerHour = Database['public']['Tables']['volunteer_hours']['Row'];
 type Volunteer = Database['public']['Tables']['volunteers']['Row'];

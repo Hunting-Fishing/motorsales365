@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Switch } from '@sm/components/ui/switch';
 import { Loader2, Save, MapPin, RefreshCw, Fuel } from 'lucide-react';
 import { 
   useShopFuelPriceSettings, 
   useUpdateFuelPriceSettings, 
   useRefreshFuelPrices,
-} from '@/hooks/fuel-delivery/useFuelMarketPrices';
+} from '@sm/hooks/fuel-delivery/useFuelMarketPrices';
 import { FuelMarketPrices } from '../FuelMarketPrices';
 import { CitySearchCombobox } from './CitySearchCombobox';
 

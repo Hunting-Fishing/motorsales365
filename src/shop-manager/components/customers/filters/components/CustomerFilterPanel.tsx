@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Separator } from '@/components/ui/separator';
-import { Card } from '@/components/ui/card';
+import { Separator } from '@sm/components/ui/separator';
+import { Card } from '@sm/components/ui/card';
 import { DateRange } from 'react-day-picker';
 import { CustomerFilters } from '../CustomerFilterControls';
 import { CustomerFilterTags } from './CustomerFilterTags';

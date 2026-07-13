@@ -1,8 +1,8 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { Link } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
-import type { EquipmentWithMaintenance } from "@/services/equipmentService";
+import type { EquipmentWithMaintenance } from "@sm/services/equipmentService";
 
 interface WarrantyExpiringCardProps {
   equipment: EquipmentWithMaintenance[];

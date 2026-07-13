@@ -5,12 +5,12 @@ import {
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { exportToCSV, exportToExcel, exportMultiSheetExcel } from "@/utils/export";
-import { toast } from "@/components/ui/use-toast";
-import { WorkOrder, TimeEntry } from "@/types/workOrder";
-import { generateWorkOrderPdf, savePdf } from "@/utils/pdf";
+} from "@sm/components/ui/dropdown-menu";
+import { Button } from "@sm/components/ui/button";
+import { exportToCSV, exportToExcel, exportMultiSheetExcel } from "@sm/utils/export";
+import { toast } from "@sm/components/ui/use-toast";
+import { WorkOrder, TimeEntry } from "@sm/types/workOrder";
+import { generateWorkOrderPdf, savePdf } from "@sm/utils/pdf";
 
 interface WorkOrderExportMenuProps {
   workOrder: WorkOrder;

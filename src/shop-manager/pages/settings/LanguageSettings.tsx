@@ -1,7 +1,7 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { LanguageTab } from "@/components/settings/LanguageTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { LanguageTab } from "@sm/components/settings/LanguageTab";
 
 export const LanguageSettings = () => {
   return (

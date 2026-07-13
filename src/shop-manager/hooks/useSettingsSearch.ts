@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { SettingsSection, SettingsTabConfig } from '@/types/settingsConfig';
+import { SettingsSection, SettingsTabConfig } from '@sm/types/settingsConfig';
 
 interface SearchResult {
   tab: SettingsTabConfig;

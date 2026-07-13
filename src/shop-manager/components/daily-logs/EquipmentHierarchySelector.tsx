@@ -1,7 +1,7 @@
 import React from 'react';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useEquipmentHierarchy, EquipmentNode } from '@/hooks/useEquipmentHierarchy';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useEquipmentHierarchy, EquipmentNode } from '@sm/hooks/useEquipmentHierarchy';
 import { Loader2, Ship, Cog } from 'lucide-react';
 
 interface EquipmentHierarchySelectorProps {

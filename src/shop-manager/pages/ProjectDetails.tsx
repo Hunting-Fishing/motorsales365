@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ProjectBudgetDetails } from '@/components/projects/ProjectBudgetDetails';
-import { Button } from '@/components/ui/button';
+import { ProjectBudgetDetails } from '@sm/components/projects/ProjectBudgetDetails';
+import { Button } from '@sm/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 
 export default function ProjectDetails() {

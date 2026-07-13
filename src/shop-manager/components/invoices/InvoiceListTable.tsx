@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
-import { Invoice } from "@/types/invoice";
+import { Invoice } from "@sm/types/invoice";
 import { InvoiceListEmptyState } from "./InvoiceListEmptyState";
 
 interface InvoiceListTableProps {

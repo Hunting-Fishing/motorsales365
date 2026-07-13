@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { FuelDeliverySidebar } from './FuelDeliverySidebar';
 import { FuelDeliveryHeader } from './FuelDeliveryHeader';
-import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@sm/lib/utils';
+import { useIsMobile } from '@sm/hooks/use-mobile';
 
 interface FuelDeliveryLayoutProps {
   children: React.ReactNode;

@@ -1,7 +1,7 @@
 
 import React from "react";
 import { InvoiceItemRow } from "./InvoiceItemRow";
-import { InvoiceItem } from "@/types/invoice";
+import { InvoiceItem } from "@sm/types/invoice";
 
 interface InvoiceItemsTableProps {
   items: InvoiceItem[];

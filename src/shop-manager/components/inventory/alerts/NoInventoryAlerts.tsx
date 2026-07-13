@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@sm/components/ui/card";
 import { CheckCircle } from 'lucide-react';
 
 export function NoInventoryAlerts() {

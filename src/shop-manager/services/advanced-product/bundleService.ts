@@ -1,6 +1,6 @@
 // Product Bundle Service
-import { supabase } from '@/integrations/supabase/client';
-import { ProductBundle, BundleItem, BundleFormData, BundleCalculation } from '@/types/advanced-product';
+import { supabase } from '@sm/integrations/supabase/client';
+import { ProductBundle, BundleItem, BundleFormData, BundleCalculation } from '@sm/types/advanced-product';
 
 export class BundleService {
   // Get all active bundles

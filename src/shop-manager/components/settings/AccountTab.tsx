@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from "react";
 import { ProfileForm } from "./profile/ProfileForm";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
 // Theme functionality temporarily disabled
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@sm/hooks/use-toast";
 import { Loader2, User, Palette, Building } from "lucide-react";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserProfile } from "@sm/hooks/useUserProfile";
 import { BrandingTab } from "./BrandingTab";
 import { CompanyTab } from "./CompanyTab";
 

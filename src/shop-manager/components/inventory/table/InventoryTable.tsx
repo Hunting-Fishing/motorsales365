@@ -1,7 +1,7 @@
 
 import React, { useEffect } from "react";
-import { Table } from "@/components/ui/table";
-import { InventoryItemExtended } from "@/types/inventory";
+import { Table } from "@sm/components/ui/table";
+import { InventoryItemExtended } from "@sm/types/inventory";
 import { useNavigate } from "react-router-dom";
 import { 
   DndContext, 

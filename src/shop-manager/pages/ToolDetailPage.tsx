@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { Container, Header, Segment, Grid, Icon } from 'semantic-ui-react';
 import { useParams, Link } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@sm/components/ui/tabs';
 import { 
   BreadcrumbList, 
   BreadcrumbItem, 
@@ -13,9 +13,9 @@ import {
   BreadcrumbPage, 
   BreadcrumbSeparator, 
   Breadcrumb 
-} from '@/components/ui/breadcrumb';
+} from '@sm/components/ui/breadcrumb';
 import { Star, ShoppingCart, Heart, Settings, Check, X, Share2, Loader2 } from 'lucide-react';
-import { useTool } from '@/hooks/useTool';
+import { useTool } from '@sm/hooks/useTool';
 
 export default function ToolDetailPage() {
   const params = useParams<{ category?: string; toolId?: string }>();

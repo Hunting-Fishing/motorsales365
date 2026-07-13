@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { LoyaltyTier } from '@/types/loyalty';
-import { loyaltySettingsService } from '@/services/settings/loyaltySettingsService';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Badge } from '@sm/components/ui/badge';
+import { LoyaltyTier } from '@sm/types/loyalty';
+import { loyaltySettingsService } from '@sm/services/settings/loyaltySettingsService';
 import { toast } from 'sonner';
 import { 
   Plus, 
@@ -25,14 +25,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@sm/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 
 interface LoyaltyTierManagerProps {
   tiers: LoyaltyTier[];

@@ -1,6 +1,6 @@
 
-import { supabase } from '@/lib/supabase';
-import { InventoryOrder, CreateInventoryOrderDto, UpdateInventoryOrderDto, ReceiveInventoryOrderDto } from '@/types/inventory/orders';
+import { supabase } from '@sm/lib/supabase';
+import { InventoryOrder, CreateInventoryOrderDto, UpdateInventoryOrderDto, ReceiveInventoryOrderDto } from '@sm/types/inventory/orders';
 
 // Define the valid status type
 type InventoryOrderStatus = 'ordered' | 'partially received' | 'received' | 'cancelled';

@@ -1,11 +1,11 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { FileText } from "lucide-react";
-import { Customer, getCustomerFullName } from "@/types/customer";
-import { ServiceHistoryTable } from "@/components/service-history/ServiceHistoryTable";
+import { Customer, getCustomerFullName } from "@sm/types/customer";
+import { ServiceHistoryTable } from "@sm/components/service-history/ServiceHistoryTable";
 
 interface CustomerServiceTabProps {
   customer: Customer & { name?: string };

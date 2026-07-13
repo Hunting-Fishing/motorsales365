@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { Customer } from '@/types/customer';
-import { useWorkOrderTaxCalculations } from '@/hooks/useWorkOrderTaxCalculations';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { Customer } from '@sm/types/customer';
+import { useWorkOrderTaxCalculations } from '@sm/hooks/useWorkOrderTaxCalculations';
 import { Calculator, DollarSign, TrendingUp, Receipt, ShieldCheck } from 'lucide-react';
 
 interface WorkOrderTotalsProps {

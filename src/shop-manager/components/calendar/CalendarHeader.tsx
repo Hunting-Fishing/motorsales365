@@ -1,8 +1,8 @@
 
 import { format, addMonths, addWeeks, addDays, subMonths, subWeeks, subDays } from "date-fns";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { CalendarIcon, ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { CalendarViewType } from "@/types/calendar";
+import { CalendarViewType } from "@sm/types/calendar";
 
 interface CalendarHeaderProps {
   currentDate: Date;

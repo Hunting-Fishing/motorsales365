@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { User, Mail, Phone, MapPin, Car } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuthUser } from '@/hooks/useAuthUser';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
 
 export function CustomerAccountCard() {
   const { userId } = useAuthUser();

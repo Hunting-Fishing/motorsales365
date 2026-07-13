@@ -1,20 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { useModuleAccess } from '@/hooks/useModuleSubscriptions';
-import { getAllModuleRoutes } from '@/config/moduleRoutes';
-import { ModuleCard } from '@/components/module-hub/ModuleCard';
-import { ModuleHubHeader } from '@/components/module-hub/ModuleHubHeader';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Spotlight } from '@/components/ui/spotlight';
-import { StaticBeams } from '@/components/ui/background-beams';
-import { Card3D } from '@/components/ui/card-3d';
-import { Particles } from '@/components/ui/magicui/particles';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { useModuleAccess } from '@sm/hooks/useModuleSubscriptions';
+import { getAllModuleRoutes } from '@sm/config/moduleRoutes';
+import { ModuleCard } from '@sm/components/module-hub/ModuleCard';
+import { ModuleHubHeader } from '@sm/components/module-hub/ModuleHubHeader';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@sm/components/ui/collapsible';
+import { Spotlight } from '@sm/components/ui/spotlight';
+import { StaticBeams } from '@sm/components/ui/background-beams';
+import { Card3D } from '@sm/components/ui/card-3d';
+import { Particles } from '@sm/components/ui/magicui/particles';
 import { 
   LayoutGrid, Sparkles, Search, X, ChevronDown, ChevronRight, 
   Home, HardHat, Car, Scissors, Dog, UtensilsCrossed, Monitor, 

@@ -1,9 +1,9 @@
 
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Invoice } from '@/types/invoice';
-import { formatCurrency, formatDate } from '@/utils/formatters';
-import { formatPaymentMethodForDisplay } from '@/constants/paymentMethods';
+import { Invoice } from '@sm/types/invoice';
+import { formatCurrency, formatDate } from '@sm/utils/formatters';
+import { formatPaymentMethodForDisplay } from '@sm/constants/paymentMethods';
 
 /**
  * Generate invoice PDF

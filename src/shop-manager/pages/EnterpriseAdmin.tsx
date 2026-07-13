@@ -1,14 +1,14 @@
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { Shield, BarChart3, Users, Settings, Key, Activity } from 'lucide-react';
-import { EnterpriseDashboard } from '@/components/enterprise/EnterpriseDashboard';
-import { SecurityManagement } from '@/components/enterprise/SecurityManagement';
-import { AuditTrail } from '@/components/enterprise/AuditTrail';
-import { PerformanceMonitoring } from '@/components/enterprise/PerformanceMonitoring';
-import { UserRoleManagement } from '@/components/enterprise/UserRoleManagement';
-import { ApiTokenManagement } from '@/components/enterprise/ApiTokenManagement';
-import { BIReporting } from '@/components/enterprise/BIReporting';
-import { SystemSettings } from '@/components/enterprise/SystemSettings';
+import { EnterpriseDashboard } from '@sm/components/enterprise/EnterpriseDashboard';
+import { SecurityManagement } from '@sm/components/enterprise/SecurityManagement';
+import { AuditTrail } from '@sm/components/enterprise/AuditTrail';
+import { PerformanceMonitoring } from '@sm/components/enterprise/PerformanceMonitoring';
+import { UserRoleManagement } from '@sm/components/enterprise/UserRoleManagement';
+import { ApiTokenManagement } from '@sm/components/enterprise/ApiTokenManagement';
+import { BIReporting } from '@sm/components/enterprise/BIReporting';
+import { SystemSettings } from '@sm/components/enterprise/SystemSettings';
 
 export const EnterpriseAdmin = () => {
   return (

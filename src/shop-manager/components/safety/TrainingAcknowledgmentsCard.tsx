@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { GraduationCap, Plus, Calendar, User } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
 import { format } from 'date-fns';
 import { TrainingAcknowledgmentDialog } from './TrainingAcknowledgmentDialog';
-import { TRAINING_TYPE_LABELS, type TrainingType } from '@/types/safety';
+import { TRAINING_TYPE_LABELS, type TrainingType } from '@sm/types/safety';
 
 interface TrainingRecord {
   id: string;

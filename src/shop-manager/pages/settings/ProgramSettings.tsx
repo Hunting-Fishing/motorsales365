@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { ProgramManagementTab } from "@/components/settings/ProgramManagementTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { ProgramManagementTab } from "@sm/components/settings/ProgramManagementTab";
 
 export const ProgramSettings = () => {
   return (

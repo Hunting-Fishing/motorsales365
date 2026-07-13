@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Progress } from '@sm/components/ui/progress';
+import { Button } from '@sm/components/ui/button';
 import { CheckCircle, XCircle, AlertCircle, Loader2, X } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 
 interface ServiceImportProgressProps {
   isImporting: boolean;

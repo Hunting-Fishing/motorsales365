@@ -1,6 +1,6 @@
 
 import React, { useMemo } from 'react';
-import { Bay } from '@/services/diybay/diybayService';
+import { Bay } from '@sm/services/diybay/diybayService';
 import { 
   Chart as ChartJS, 
   CategoryScale, 

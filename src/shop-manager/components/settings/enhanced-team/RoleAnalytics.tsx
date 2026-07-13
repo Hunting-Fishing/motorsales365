@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Progress } from '@sm/components/ui/progress';
 import { Shield, Users, Settings, Edit, Copy, MoreHorizontal, Key, Crown } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { supabase } from '@/integrations/supabase/client';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@sm/components/ui/dropdown-menu';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface RoleAnalyticsProps {
   roles: any[];

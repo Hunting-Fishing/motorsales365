@@ -1,18 +1,18 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Switch } from '@sm/components/ui/switch';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import {
   ArrowLeft,
   Plus,
@@ -38,15 +38,15 @@ import {
   useDeleteInspectionItem,
   useReorderInspectionItems,
   useReorderInspectionSections,
-} from '@/hooks/useInspectionTemplates';
-import type { InspectionFormSection, InspectionFormItem, InspectionItemType } from '@/types/inspectionTemplate';
-import { ITEM_TYPE_LABELS } from '@/types/inspectionTemplate';
-import { useToast } from '@/hooks/use-toast';
+} from '@sm/hooks/useInspectionTemplates';
+import type { InspectionFormSection, InspectionFormItem, InspectionItemType } from '@sm/types/inspectionTemplate';
+import { ITEM_TYPE_LABELS } from '@sm/types/inspectionTemplate';
+import { useToast } from '@sm/hooks/use-toast';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+} from '@sm/components/ui/collapsible';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,11 +56,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@sm/components/ui/alert-dialog';
 import { ComponentPickerDialog } from './ComponentPickerDialog';
 import { TemplatePreviewDialog } from './TemplatePreviewDialog';
 import { AssignTemplateToEquipmentDialog } from './AssignTemplateToEquipmentDialog';
-import type { ComponentDefinition } from '@/config/componentCatalog';
+import type { ComponentDefinition } from '@sm/config/componentCatalog';
 import {
   DndContext,
   closestCenter,

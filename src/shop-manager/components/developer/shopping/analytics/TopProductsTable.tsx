@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import {
   Table,
   TableBody,
@@ -8,9 +8,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@sm/components/ui/table";
 import { Eye, MousePointer, Heart, Share2 } from 'lucide-react';
-import { TopProductAnalytics } from '@/types/analytics';
+import { TopProductAnalytics } from '@sm/types/analytics';
 
 interface TopProductsTableProps {
   title: string;

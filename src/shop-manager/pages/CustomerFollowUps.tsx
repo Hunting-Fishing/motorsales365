@@ -1,19 +1,19 @@
 
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FollowUpsList } from '@/components/follow-ups/FollowUpsList';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { FollowUpsList } from '@sm/components/follow-ups/FollowUpsList';
+import { Calendar } from '@sm/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@sm/components/ui/popover';
 import { format } from 'date-fns';
 import { CalendarIcon, Filter, PlusCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { useFollowUps } from '@/hooks/useFollowUps';
-import { useShopName } from "@/hooks/useShopName";
-import { getInitials } from '@/utils/teamUtils';
+import { cn } from '@sm/lib/utils';
+import { Badge } from '@sm/components/ui/badge';
+import { useFollowUps } from '@sm/hooks/useFollowUps';
+import { useShopName } from "@sm/hooks/useShopName";
+import { getInitials } from '@sm/utils/teamUtils';
 
 export default function CustomerFollowUps() {
   const [searchTerm, setSearchTerm] = useState('');

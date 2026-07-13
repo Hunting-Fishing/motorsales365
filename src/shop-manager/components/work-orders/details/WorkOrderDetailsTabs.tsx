@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { TimeEntry } from '@/types/workOrder';
-import { Customer } from '@/types/customer';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { TimeEntry } from '@sm/types/workOrder';
+import { Customer } from '@sm/types/customer';
 import { WorkOrderOverviewTab } from './WorkOrderOverviewTab';
 import { WorkOrderLineItems } from '../job-lines/WorkOrderLineItems';
 import { JobLinesSection } from '../form-fields/JobLinesSection';

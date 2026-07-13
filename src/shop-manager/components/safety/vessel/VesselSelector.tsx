@@ -1,8 +1,8 @@
 import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Label } from '@sm/components/ui/label';
 import { Ship, Clock, Calendar } from 'lucide-react';
-import { VesselEquipment } from '@/hooks/useVesselInspection';
+import { VesselEquipment } from '@sm/hooks/useVesselInspection';
 import { format } from 'date-fns';
 
 interface VesselSelectorProps {

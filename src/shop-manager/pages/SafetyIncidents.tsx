@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { 
   AlertTriangle, 
   Plus, 
@@ -17,13 +17,13 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { useSafetyIncidents } from '@/hooks/useSafetyIncidents';
+import { useSafetyIncidents } from '@sm/hooks/useSafetyIncidents';
 import { 
   INCIDENT_TYPE_LABELS, 
   SEVERITY_LABELS, 
   STATUS_LABELS,
   InvestigationStatus
-} from '@/types/safety';
+} from '@sm/types/safety';
 
 const severityColors: Record<string, string> = {
   minor: 'bg-blue-500/10 text-blue-600 border-blue-200',

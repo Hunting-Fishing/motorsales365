@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { TagInput } from '@/components/customers/documents/TagInput';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { TagInput } from '@sm/components/customers/documents/TagInput';
+import { Label } from '@sm/components/ui/label';
+import { cn } from '@sm/lib/utils';
 
 interface TagSelectorProps {
   selectedTags: string[];

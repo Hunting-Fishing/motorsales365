@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { VolunteerManagementTab } from "@/components/settings/VolunteerManagementTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { VolunteerManagementTab } from "@sm/components/settings/VolunteerManagementTab";
 
 export const VolunteerSettings = () => {
   return (

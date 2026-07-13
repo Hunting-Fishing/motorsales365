@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { usePaymentHistory } from '@/hooks/usePaymentHistory';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Payment } from '@/types/payment';
+import { usePaymentHistory } from '@sm/hooks/usePaymentHistory';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Payment } from '@sm/types/payment';
 import { format } from 'date-fns';
 import { Plus, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@sm/components/ui/alert';
 
 interface PaymentHistoryListProps {
   customerId: string;

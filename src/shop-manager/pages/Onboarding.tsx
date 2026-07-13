@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { OnboardingProgress } from '@/components/onboarding/OnboardingProgress';
-import { ModuleSelectionStep } from '@/components/onboarding/ModuleSelectionStep';
-import { CompanySetupStep } from '@/components/onboarding/CompanySetupStep';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@sm/components/ui/avatar';
+import { useToast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { OnboardingProgress } from '@sm/components/onboarding/OnboardingProgress';
+import { ModuleSelectionStep } from '@sm/components/onboarding/ModuleSelectionStep';
+import { CompanySetupStep } from '@sm/components/onboarding/CompanySetupStep';
 import { Home, LayoutDashboard, User } from 'lucide-react';
 
 const STEPS = ['Select Modules', 'Company Setup'];

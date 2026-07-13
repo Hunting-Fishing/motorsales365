@@ -1,12 +1,12 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@sm/components/ui/dropdown-menu';
 import { Calendar, Clock, User, MoreVertical, Bell, CheckCircle, XCircle, ArrowRight } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
-import { BookingWaitlist, BookableService, useUpdateWaitlistEntry } from '@/hooks/useBookingSystem';
+import { BookingWaitlist, BookableService, useUpdateWaitlistEntry } from '@sm/hooks/useBookingSystem';
 
 interface BookingWaitlistViewProps {
   waitlist: BookingWaitlist[];

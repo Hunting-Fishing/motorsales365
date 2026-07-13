@@ -1,7 +1,7 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { HardHat, Package, AlertTriangle, MapPin } from 'lucide-react';
-import { PPEItem } from '@/hooks/usePPEManagement';
+import { PPEItem } from '@sm/hooks/usePPEManagement';
 
 interface PPEInventoryCardProps {
   item: PPEItem;

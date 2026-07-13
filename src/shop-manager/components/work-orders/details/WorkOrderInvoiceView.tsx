@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { normalizeVehicleForInvoice } from '@/utils/workOrders/dataHelpers';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { normalizeVehicleForInvoice } from '@sm/utils/workOrders/dataHelpers';
 import { 
   InvoiceHeader,
   InvoiceCustomerInfo,

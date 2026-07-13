@@ -1,8 +1,8 @@
 
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
-import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@sm/components/ui/form";
+import { Switch } from "@sm/components/ui/switch";
+import { Input } from "@sm/components/ui/input";
 import { ReminderFormValues } from "../schemas/reminderFormSchema";
 import { 
   Select, 
@@ -10,7 +10,7 @@ import {
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from "@/components/ui/select";
+} from "@sm/components/ui/select";
 
 interface RecurrenceFieldsProps {
   form: UseFormReturn<ReminderFormValues>;

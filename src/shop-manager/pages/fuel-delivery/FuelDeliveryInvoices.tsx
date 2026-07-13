@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
 import { Plus, Search, Filter, Receipt, ArrowLeft } from 'lucide-react';
-import { useFuelDeliveryInvoices } from '@/hooks/useFuelDelivery';
+import { useFuelDeliveryInvoices } from '@sm/hooks/useFuelDelivery';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useShopId } from '@/hooks/useShopId';
-import { useModuleDisplayInfo } from '@/hooks/useModuleDisplayInfo';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { useShopId } from '@sm/hooks/useShopId';
+import { useModuleDisplayInfo } from '@sm/hooks/useModuleDisplayInfo';
 
 export default function FuelDeliveryInvoices() {
   const navigate = useNavigate();

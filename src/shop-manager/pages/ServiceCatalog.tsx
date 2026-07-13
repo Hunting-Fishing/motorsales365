@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useServiceSectors } from '@/hooks/useServiceCategories';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { useServiceSectors } from '@sm/hooks/useServiceCategories';
+import { Badge } from '@sm/components/ui/badge';
 import { Clock, DollarSign } from 'lucide-react';
 
 export default function ServiceCatalog() {

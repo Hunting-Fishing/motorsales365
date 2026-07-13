@@ -1,10 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@sm/lib/utils";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import React, { ReactNode, Children, isValidElement, cloneElement } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { staggerContainer, staggerItem, staggerItemScale } from "@/lib/animations";
+import { staggerContainer, staggerItem, staggerItemScale } from "@sm/lib/animations";
 
 interface AnimatedListProps {
   children: ReactNode;

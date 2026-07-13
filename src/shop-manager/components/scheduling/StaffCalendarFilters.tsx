@@ -1,22 +1,22 @@
 import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { Checkbox } from '@/components/ui/checkbox';
+} from '@sm/components/ui/popover';
+import { Checkbox } from '@sm/components/ui/checkbox';
 import { Search, Filter, X, Ship, Wrench, Truck, Users } from 'lucide-react';
-import { StaffCalendarFilters as FiltersType, EmployeeOption, AssetOption, ASSET_TYPE_COLORS } from '@/types/staffScheduleCalendar';
+import { StaffCalendarFilters as FiltersType, EmployeeOption, AssetOption, ASSET_TYPE_COLORS } from '@sm/types/staffScheduleCalendar';
 
 interface StaffCalendarFiltersProps {
   filters: FiltersType;

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
 import { Shield, Lock } from 'lucide-react';
-import { usePermissionsManager } from '@/hooks/usePermissionsManager';
-import { Skeleton } from '@/components/ui/skeleton';
-import type { Permission } from '@/types/phase4';
+import { usePermissionsManager } from '@sm/hooks/usePermissionsManager';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import type { Permission } from '@sm/types/phase4';
 
 export function PermissionsManager() {
   const { loading, permissions } = usePermissionsManager();

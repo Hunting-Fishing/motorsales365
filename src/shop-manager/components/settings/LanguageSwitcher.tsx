@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLanguage } from '@/context/LanguageContext';
+import { useLanguage } from '@sm/context/LanguageContext';
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 
 export function LanguageSwitcher() {
   const { t } = useTranslation();

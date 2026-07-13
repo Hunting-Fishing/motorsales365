@@ -1,11 +1,11 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import type { 
   Raffle, 
   RaffleStats, 
   CreateRaffleData, 
   UpdateRaffleData,
   DrawWinnerData 
-} from '@/types/raffle';
+} from '@sm/types/raffle';
 
 export class RaffleService {
   // Get all raffles for a shop

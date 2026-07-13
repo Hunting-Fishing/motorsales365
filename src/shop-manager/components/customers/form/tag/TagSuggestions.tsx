@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Input } from '@/components/ui/input';
-import { supabase } from '@/integrations/supabase/client';
-import { cn } from "@/lib/utils";
+import { Button } from '@sm/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@sm/components/ui/popover';
+import { Input } from '@sm/components/ui/input';
+import { supabase } from '@sm/integrations/supabase/client';
+import { cn } from "@sm/lib/utils";
 
 interface TagSuggestionsProps {
   onSelectTag: (tag: string) => void;

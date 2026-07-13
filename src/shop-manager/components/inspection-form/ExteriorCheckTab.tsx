@@ -1,17 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Textarea } from "@sm/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@sm/components/ui/radio-group";
+import { Label } from "@sm/components/ui/label";
 import { Check, AlertCircle } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { VehicleBodyStyle } from '@/types/vehicleBodyStyles';
+import { toast } from "@sm/hooks/use-toast";
+import { VehicleBodyStyle } from '@sm/types/vehicleBodyStyles';
 import VehicleInteractivePanel from '../customers/vehicles/VehicleInteractivePanel';
-import { DamageArea } from '@/services/vehicleInspectionService';
+import { DamageArea } from '@sm/services/vehicleInspectionService';
 
 interface ExteriorCheckTabProps {
   vehicleBodyStyle: VehicleBodyStyle;

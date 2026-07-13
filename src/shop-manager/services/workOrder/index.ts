@@ -4,7 +4,7 @@ export { WorkOrderService } from './WorkOrderService';
 export { WorkOrderRepository } from './WorkOrderRepository';
 
 // Export the main hook
-export { useWorkOrderService } from '@/hooks/useWorkOrderService';
+export { useWorkOrderService } from '@sm/hooks/useWorkOrderService';
 
 // Legacy exports for backward compatibility
 export { WorkOrderService as default } from './WorkOrderService';

@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
 import { PaymentMethodForm } from './PaymentMethodForm';
-import { usePaymentMethods } from '@/hooks/usePaymentMethods';
+import { usePaymentMethods } from '@sm/hooks/usePaymentMethods';
 
 interface AddPaymentMethodDialogProps {
   open: boolean;

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { useTaxSettings } from '@/hooks/useTaxSettings';
-import { calculateTax } from '@/utils/taxCalculations';
+import { useTaxSettings } from '@sm/hooks/useTaxSettings';
+import { calculateTax } from '@sm/utils/taxCalculations';
 
 interface FleetTaxSettings {
   isFleetTaxExempt: boolean;

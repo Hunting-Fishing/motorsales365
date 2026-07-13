@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
+import { Input } from "@sm/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { Plus, Search, AlertTriangle, CheckCircle, Clock, Calendar, Edit, Trash2, Flag } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { hybridActivitiesService } from "@/services/hybridActivitiesService";
-import { ComplianceRequirement } from "@/types/hybrid";
+import { useToast } from "@sm/hooks/use-toast";
+import { hybridActivitiesService } from "@sm/services/hybridActivitiesService";
+import { ComplianceRequirement } from "@sm/types/hybrid";
 import { ComplianceRequirementForm } from "./ComplianceRequirementForm";
 import {
   AlertDialog,
@@ -18,7 +18,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@sm/components/ui/alert-dialog";
 
 export function ComplianceDashboard() {
   const { toast } = useToast();

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface SearchAnalyticsProps {
   query: string;

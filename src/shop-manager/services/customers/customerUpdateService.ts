@@ -1,6 +1,6 @@
-import { supabase } from "@/lib/supabase";
-import { Customer, adaptCustomerForUI } from "@/types/customer";
-import { CustomerFormValues } from '@/components/customers/form/schemas/customerSchema';
+import { supabase } from "@sm/lib/supabase";
+import { Customer, adaptCustomerForUI } from "@sm/types/customer";
+import { CustomerFormValues } from '@sm/components/customers/form/schemas/customerSchema';
 
 // Helper function to extract values from VIN-decoded objects or return string values
 const extractValue = (field: any): string | null => {

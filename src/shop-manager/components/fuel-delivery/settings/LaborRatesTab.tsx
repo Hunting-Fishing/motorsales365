@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Switch } from '@sm/components/ui/switch';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Badge } from '@sm/components/ui/badge';
 import { Clock, Plus, Pencil, Trash2, Loader2, Star } from 'lucide-react';
-import { useLaborRates, LaborRate } from '@/hooks/fuel-delivery/useLaborRates';
+import { useLaborRates, LaborRate } from '@sm/hooks/fuel-delivery/useLaborRates';
 
 interface LaborRatesTabProps {
   shopId: string | null;

@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { Calculator, FileSpreadsheet, ArrowUpDown, BookOpen, Download, RefreshCw } from 'lucide-react';
-import { useFinancialReports, AccountBalance } from '@/hooks/useFinancialReports';
-import { useAccountingIntegration } from '@/hooks/useAccountingIntegration';
+import { useFinancialReports, AccountBalance } from '@sm/hooks/useFinancialReports';
+import { useAccountingIntegration } from '@sm/hooks/useAccountingIntegration';
 import { format, startOfMonth, endOfMonth, startOfYear } from 'date-fns';
 
 export function FinancialReportsPanel() {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useShopData } from '@/hooks/useShopData';
+import { useShopData } from '@sm/hooks/useShopData';
 
 interface OnboardingStatus {
   isComplete: boolean;

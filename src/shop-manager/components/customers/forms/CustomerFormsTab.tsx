@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Customer } from '@/types/customer';
+import { Customer } from '@sm/types/customer';
 import { CustomerFormsList } from './CustomerFormsList';
 
 interface CustomerFormsTabProps {

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
-import { useSafetyDashboard } from '@/hooks/useSafetyDashboard';
-import { useDailyInspections } from '@/hooks/useDailyInspections';
-import { useDVIR } from '@/hooks/useDVIR';
-import { useLiftInspections } from '@/hooks/useLiftInspections';
+import { useSafetyDashboard } from '@sm/hooks/useSafetyDashboard';
+import { useDailyInspections } from '@sm/hooks/useDailyInspections';
+import { useDVIR } from '@sm/hooks/useDVIR';
+import { useLiftInspections } from '@sm/hooks/useLiftInspections';
 import {
   SafetyDashboardStats,
   RecentIncidentsList,
@@ -16,16 +16,16 @@ import {
   TodaysHazardsWidget,
   FlaggedVehiclesCard,
   CriticalDefectsCard
-} from '@/components/safety';
-import { ServiceAlertsPanel } from '@/components/safety/dashboard/ServiceAlertsPanel';
-import { CorrectiveActionsWidget } from '@/components/safety/dashboard/CorrectiveActionsWidget';
-import { NearMissWidget } from '@/components/safety/dashboard/NearMissWidget';
-import { TrainingComplianceWidget } from '@/components/safety/dashboard/TrainingComplianceWidget';
-import { ComplianceScoreWidget } from '@/components/safety/dashboard/ComplianceScoreWidget';
-import { EquipmentHealthWidget } from '@/components/safety/dashboard/EquipmentHealthWidget';
-import { UpcomingInspectionsWidget } from '@/components/safety/dashboard/UpcomingInspectionsWidget';
+} from '@sm/components/safety';
+import { ServiceAlertsPanel } from '@sm/components/safety/dashboard/ServiceAlertsPanel';
+import { CorrectiveActionsWidget } from '@sm/components/safety/dashboard/CorrectiveActionsWidget';
+import { NearMissWidget } from '@sm/components/safety/dashboard/NearMissWidget';
+import { TrainingComplianceWidget } from '@sm/components/safety/dashboard/TrainingComplianceWidget';
+import { ComplianceScoreWidget } from '@sm/components/safety/dashboard/ComplianceScoreWidget';
+import { EquipmentHealthWidget } from '@sm/components/safety/dashboard/EquipmentHealthWidget';
+import { UpcomingInspectionsWidget } from '@sm/components/safety/dashboard/UpcomingInspectionsWidget';
 import { Shield, RefreshCw, BarChart3 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 
 export default function Safety() {
   const navigate = useNavigate();

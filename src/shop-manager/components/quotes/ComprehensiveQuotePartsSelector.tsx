@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Plus, Package, Trash2 } from 'lucide-react';
-import { UltimateAddPartDialog } from '@/components/work-orders/parts/UltimateAddPartDialog';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { formatCurrency } from '@/utils/formatters';
+import { UltimateAddPartDialog } from '@sm/components/work-orders/parts/UltimateAddPartDialog';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { formatCurrency } from '@sm/utils/formatters';
 
 interface ComprehensiveQuotePart {
   id?: string;

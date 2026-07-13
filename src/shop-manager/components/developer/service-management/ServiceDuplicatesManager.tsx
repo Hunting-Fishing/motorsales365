@@ -1,13 +1,13 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ServiceMainCategory, ServiceJob } from '@/types/service';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Progress } from '@sm/components/ui/progress';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@sm/components/ui/collapsible';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { ServiceMainCategory, ServiceJob } from '@sm/types/service';
 import { Copy, AlertTriangle, ChevronDown, Merge, Eye, CheckCircle, Trash2 } from 'lucide-react';
 
 interface ServiceDuplicatesManagerProps {

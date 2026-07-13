@@ -1,12 +1,12 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getRecentWorkOrders } from "@/services/dashboard/workOrderService";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { getRecentWorkOrders } from "@sm/services/dashboard/workOrderService";
+import { Badge } from "@sm/components/ui/badge";
 import { Loader2, Eye, ClipboardList } from "lucide-react";
-import { RecentWorkOrder } from "@/types/dashboard";
+import { RecentWorkOrder } from "@sm/types/dashboard";
 import { useNavigate } from "react-router-dom";
-import { EmptyState } from "@/components/ui/empty-state";
+import { EmptyState } from "@sm/components/ui/empty-state";
 
 export function RecentWorkOrders() {
   const [workOrders, setWorkOrders] = useState<RecentWorkOrder[]>([]);

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Card, CardContent, CardHeader } from '@sm/components/ui/card';
 import { X, Loader2, Search, ChevronDown, ChevronUp } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 import { EquipmentType, getEquipmentTypeConfig } from './EquipmentTypeSelector';
-import { FuelTypeSelect } from '@/components/fuel-delivery/FuelTypeSelect';
+import { FuelTypeSelect } from '@sm/components/fuel-delivery/FuelTypeSelect';
 
 export interface EquipmentData {
   id: string;

@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Play } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { sequenceProcessingService } from '@/services/email/sequences/sequenceProcessingService';
+import { useToast } from '@sm/hooks/use-toast';
+import { sequenceProcessingService } from '@sm/services/email/sequences/sequenceProcessingService';
 
 interface ProcessEnrollmentStepButtonProps {
   enrollmentId: string;

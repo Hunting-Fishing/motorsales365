@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@sm/components/ui/accordion';
 import { Search, Plus, Clock, DollarSign, Ship } from 'lucide-react';
-import { getMarineServiceCategories, searchMarineServices } from '@/lib/marineServiceHierarchy';
-import { ServiceJob } from '@/types/service';
+import { getMarineServiceCategories, searchMarineServices } from '@sm/lib/marineServiceHierarchy';
+import { ServiceJob } from '@sm/types/service';
 
 interface MarineServiceSelectorProps {
   onServiceSelect: (service: ServiceJob, category: string, subcategory: string) => void;

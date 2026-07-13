@@ -1,8 +1,8 @@
 import React from 'react';
 import { Car, Plus, FileText, Activity, Wrench, DollarSign } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { GradientOrbs } from './GradientOrbs';
-import heroCar from '@/assets/automotive-hero.jpg';
+import heroCar from '@sm/assets/automotive-hero.jpg';
 
 interface HeroProps {
   openJobs: number;

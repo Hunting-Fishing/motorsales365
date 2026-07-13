@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { useTimeCards } from '@/hooks/useTimeCards';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Textarea } from '@sm/components/ui/textarea';
+import { useTimeCards } from '@sm/hooks/useTimeCards';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { format, differenceInSeconds } from 'date-fns';
 import { 
   Play, 
@@ -15,7 +15,7 @@ import {
   Coffee,
   PlayCircle
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 
 export function EmployeeTimeClock() {
   const { toast } = useToast();

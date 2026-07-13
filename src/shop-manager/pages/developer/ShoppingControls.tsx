@@ -1,15 +1,15 @@
 
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Button } from "@sm/components/ui/button";
 import { ArrowLeft, Store } from "lucide-react";
-import ProductsManagementAdvanced from '@/components/developer/shopping/ProductsManagementAdvanced';
-import CategoriesManagement from '@/components/developer/shopping/CategoriesManagement';
-import AnalyticsTab from '@/components/developer/shopping/AnalyticsTab';
-import OrderManagement from '@/components/developer/shopping/OrderManagement';
-import CustomerManagement from '@/components/developer/shopping/CustomerManagement';
-import ShoppingSettings from '@/components/developer/shopping/ShoppingSettings';
+import ProductsManagementAdvanced from '@sm/components/developer/shopping/ProductsManagementAdvanced';
+import CategoriesManagement from '@sm/components/developer/shopping/CategoriesManagement';
+import AnalyticsTab from '@sm/components/developer/shopping/AnalyticsTab';
+import OrderManagement from '@sm/components/developer/shopping/OrderManagement';
+import CustomerManagement from '@sm/components/developer/shopping/CustomerManagement';
+import ShoppingSettings from '@sm/components/developer/shopping/ShoppingSettings';
 
 export default function ShoppingControls() {
   const [activeTab, setActiveTab] = useState("products");

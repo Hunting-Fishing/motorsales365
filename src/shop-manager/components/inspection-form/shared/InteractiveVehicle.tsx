@@ -1,8 +1,8 @@
 import React from "react";
-import { Card } from "@/components/ui/card";
+import { Card } from "@sm/components/ui/card";
 import { Car, AlertTriangle } from "lucide-react";
-import { VehicleBodyStyle } from "@/types/vehicleBodyStyles";
-import { cn } from "@/lib/utils";
+import { VehicleBodyStyle } from "@sm/types/vehicleBodyStyles";
+import { cn } from "@sm/lib/utils";
 
 interface InteractiveVehicleProps {
   bodyStyle: VehicleBodyStyle;

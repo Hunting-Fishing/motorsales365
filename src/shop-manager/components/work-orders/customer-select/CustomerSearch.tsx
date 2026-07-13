@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
 import { Search, Plus, User } from 'lucide-react';
-import { Customer } from '@/types/customer';
-import { searchCustomers } from '@/services/customer/customerSearchService';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Customer } from '@sm/types/customer';
+import { searchCustomers } from '@sm/services/customer/customerSearchService';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 
 interface CustomerSearchProps {
   onSelectCustomer: (customer: Customer | null) => void;

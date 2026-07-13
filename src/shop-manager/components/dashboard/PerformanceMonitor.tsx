@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { Monitor, Clock, Database, Activity } from 'lucide-react';
-import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
+import { usePerformanceMonitor } from '@sm/hooks/usePerformanceMonitor';
 
 export function PerformanceMonitor() {
   const { metrics, isVisible } = usePerformanceMonitor();

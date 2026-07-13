@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { Avatar, AvatarFallback } from '@sm/components/ui/avatar';
+import { Badge } from '@sm/components/ui/badge';
 import { Send, Bot, User, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { toast } from '@sm/hooks/use-toast';
 
 interface Message {
   id: string;

@@ -1,7 +1,7 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { getTools, getToolById, getToolsByCategory } from './liveToolService';
-import { AffiliateTool } from '@/types/affiliate';
+import { AffiliateTool } from '@sm/types/affiliate';
 
 // Transform database tool to AffiliateTool for compatibility
 const transformTool = (tool: any): AffiliateTool => ({

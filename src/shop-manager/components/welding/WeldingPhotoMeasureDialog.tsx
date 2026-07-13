@@ -1,15 +1,15 @@
 import { useState, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Badge } from "@sm/components/ui/badge";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { LoadingSpinner } from "@sm/components/ui/loading-spinner";
 import { Camera, Upload, Sparkles, Check, X, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { useWeldingSettings } from "@/contexts/WeldingSettingsContext";
+import { supabase } from "@sm/integrations/supabase/client";
+import { useWeldingSettings } from "@sm/contexts/WeldingSettingsContext";
 
 interface ProposedMaterial {
   name: string;

@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { useInvoiceTemplates } from "@/hooks/useInvoiceTemplates";
-import { Invoice, InvoiceTemplate } from "@/types/invoice";
-import { useTaxSettings } from "@/hooks/useTaxSettings";
-import { useShopId } from "@/hooks/useShopId";
+import { Button } from "@sm/components/ui/button";
+import { useInvoiceTemplates } from "@sm/hooks/useInvoiceTemplates";
+import { Invoice, InvoiceTemplate } from "@sm/types/invoice";
+import { useTaxSettings } from "@sm/hooks/useTaxSettings";
+import { useShopId } from "@sm/hooks/useShopId";
 
 interface InvoiceTemplateActionsProps {
   invoice: Invoice;

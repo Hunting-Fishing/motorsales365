@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Button } from '@sm/components/ui/button';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

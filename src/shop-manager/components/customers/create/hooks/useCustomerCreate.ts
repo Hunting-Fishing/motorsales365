@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { CustomerFormValues } from "@/components/customers/form/schemas/customerSchema";
+import { CustomerFormValues } from "@sm/components/customers/form/schemas/customerSchema";
 import { useShopData } from "./useShopData";
 import { useCustomerSubmit } from "./useCustomerSubmit";
 import { showImportCompleteNotification } from "../utils/customerNotificationHandler";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@sm/hooks/use-toast";
 
 export const useCustomerCreate = () => {
   const { isLoading, availableShops, currentUserShopId } = useShopData();

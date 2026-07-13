@@ -4,4 +4,4 @@
  */
 
 // Re-export the official Supabase client for backward compatibility
-export { supabase } from '@/integrations/supabase/client';
+export { supabase } from '@sm/integrations/supabase/client';

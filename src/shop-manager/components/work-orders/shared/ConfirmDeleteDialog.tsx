@@ -8,8 +8,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+} from "@sm/components/ui/alert-dialog";
+import { Button } from "@sm/components/ui/button";
 import { Trash2 } from "lucide-react";
 
 interface ConfirmDeleteDialogProps {

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useCompany } from '@/contexts/CompanyContext';
+import { useCompany } from '@sm/contexts/CompanyContext';
 import { Phone, Mail, MapPin } from 'lucide-react';
 
 interface CompanyContactProps {

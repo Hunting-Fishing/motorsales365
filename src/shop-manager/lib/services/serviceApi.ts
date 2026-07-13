@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import type { ServiceSector, ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@/types/service';
+import { supabase } from '@sm/integrations/supabase/client';
+import type { ServiceSector, ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@sm/types/service';
 
 export async function fetchServiceSectors(): Promise<ServiceSector[]> {
   try {

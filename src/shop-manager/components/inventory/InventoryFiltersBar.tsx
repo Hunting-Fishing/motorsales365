@@ -1,15 +1,15 @@
 
 import React from "react";
 import { Search, Filter, Download, Upload } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@sm/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -17,7 +17,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@sm/components/ui/dropdown-menu";
 
 interface InventoryFiltersBarProps {
   searchQuery: string;

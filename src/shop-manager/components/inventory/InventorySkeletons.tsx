@@ -1,6 +1,6 @@
 import React from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useInventoryView } from '@/contexts/InventoryViewContext';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { useInventoryView } from '@sm/contexts/InventoryViewContext';
 
 export function InventoryTableSkeleton() {
   return (

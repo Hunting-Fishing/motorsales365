@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@/types/service';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@sm/types/service';
 import ServiceAnalytics from './ServiceAnalytics';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 
 interface ServiceHierarchyManagerProps {
   categories: ServiceMainCategory[];

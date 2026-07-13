@@ -1,4 +1,4 @@
-import { workOrderSettingsService } from '@/services/settings/workOrderSettingsService';
+import { workOrderSettingsService } from '@sm/services/settings/workOrderSettingsService';
 
 // DEPRECATED: Use workOrderSettingsService.getAvailableStatuses() instead
 // This is kept for backward compatibility but will be removed in future versions

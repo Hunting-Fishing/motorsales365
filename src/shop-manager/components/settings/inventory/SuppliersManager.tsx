@@ -1,17 +1,17 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
 import { PlusCircle, Trash2, Building2, Search } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Separator } from "@sm/components/ui/separator";
 import { 
   getInventorySuppliers, 
   addInventorySupplier, 
   deleteInventorySupplier 
-} from "@/services/inventory/supplierService";
-import { toast } from "@/hooks/use-toast";
+} from "@sm/services/inventory/supplierService";
+import { toast } from "@sm/hooks/use-toast";
 import { AutomotiveSuppliersSetup } from "./AutomotiveSuppliersSetup";
 
 export function SuppliersManager() {

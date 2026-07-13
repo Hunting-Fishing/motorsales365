@@ -1,9 +1,9 @@
 import React from 'react';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { useWorkOrders } from '@/hooks/useWorkOrders';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { useWorkOrders } from '@sm/hooks/useWorkOrders';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { CalendarDays, Clock, Users, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

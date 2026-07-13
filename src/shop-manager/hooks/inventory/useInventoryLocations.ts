@@ -7,9 +7,9 @@ import {
   updateInventoryLocation,
   deleteInventoryLocation,
   getLocationHierarchy
-} from "@/services/inventory/locationService";
-import { InventoryLocation, CreateInventoryLocationDto } from "@/types/inventory/locations";
-import { toast } from "@/hooks/use-toast";
+} from "@sm/services/inventory/locationService";
+import { InventoryLocation, CreateInventoryLocationDto } from "@sm/types/inventory/locations";
+import { toast } from "@sm/hooks/use-toast";
 
 export function useInventoryLocations() {
   const [loading, setLoading] = useState(false);

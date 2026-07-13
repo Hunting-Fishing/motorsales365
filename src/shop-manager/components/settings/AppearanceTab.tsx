@@ -1,16 +1,16 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { appearanceService } from "@/services/settings/appearanceService";
-import { AppearanceSettings } from "@/types/settings";
-import { useToast } from "@/components/ui/use-toast";
+import { Card, CardHeader, CardContent, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Label } from "@sm/components/ui/label";
+import { Input } from "@sm/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Separator } from "@sm/components/ui/separator";
+import { appearanceService } from "@sm/services/settings/appearanceService";
+import { AppearanceSettings } from "@sm/types/settings";
+import { useToast } from "@sm/components/ui/use-toast";
 import { Palette, Type, Brush } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 
 export function AppearanceTab({ shopId }: { shopId?: string }) {
   const [settings, setSettings] = useState<AppearanceSettings | null>(null);

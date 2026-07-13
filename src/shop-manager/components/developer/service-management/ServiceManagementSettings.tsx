@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -10,10 +10,10 @@ import {
   DialogTrigger,
   DialogDescription,
   DialogFooter
-} from '@/components/ui/dialog';
+} from '@sm/components/ui/dialog';
 import { AlertTriangle, Trash2, Database } from 'lucide-react';
 import { ServiceImportProgress } from './ServiceImportProgress';
-import { useServiceManagement } from '@/hooks/useServiceManagement';
+import { useServiceManagement } from '@sm/hooks/useServiceManagement';
 
 interface ServiceManagementSettingsProps {
   children: React.ReactNode;

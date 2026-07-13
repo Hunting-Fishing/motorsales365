@@ -1,11 +1,11 @@
 
 import React, { memo } from "react";
-import { Table } from "@/components/ui/table";
-import { InventoryItemExtended } from "@/types/inventory";
+import { Table } from "@sm/components/ui/table";
+import { InventoryItemExtended } from "@sm/types/inventory";
 import { useNavigate } from "react-router-dom";
 import { Column } from "./table/SortableColumnHeader";
-import { Badge } from "@/components/ui/badge";
-import { formatCurrency } from "@/utils/formatters";
+import { Badge } from "@sm/components/ui/badge";
+import { formatCurrency } from "@sm/utils/formatters";
 
 interface ExcelViewTableProps {
   items: InventoryItemExtended[];

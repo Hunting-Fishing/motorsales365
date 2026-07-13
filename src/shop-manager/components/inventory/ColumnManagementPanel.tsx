@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@sm/components/ui/button';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
 import {
   Sheet,
   SheetContent,
@@ -10,13 +10,13 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
+} from '@sm/components/ui/sheet';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { Badge } from '@/components/ui/badge';
+} from '@sm/components/ui/collapsible';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Settings2, 
   Eye, 

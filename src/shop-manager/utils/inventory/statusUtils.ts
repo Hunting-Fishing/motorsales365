@@ -1,5 +1,5 @@
 
-import { InventoryItemExtended } from "@/types/inventory";
+import { InventoryItemExtended } from "@sm/types/inventory";
 
 /**
  * Status calculation utilities for inventory items

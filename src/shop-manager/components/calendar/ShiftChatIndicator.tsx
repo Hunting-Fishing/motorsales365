@@ -1,7 +1,7 @@
 
 import { format } from "date-fns";
 import { CalendarPlus } from "lucide-react";
-import { ChatRoom } from "@/types/chat";
+import { ChatRoom } from "@sm/types/chat";
 
 interface ShiftChatIndicatorProps {
   date: Date;

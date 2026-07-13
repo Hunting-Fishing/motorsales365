@@ -1,11 +1,11 @@
 
-import { useInvoiceFormState } from "@/hooks/invoice/useInvoiceFormState";
-import { useInvoiceTemplates } from "@/hooks/invoice/useInvoiceTemplates";
-import { useInvoiceSave } from "@/hooks/invoice/useInvoiceSave";
-import { useInvoiceTotals } from "@/hooks/invoice/useInvoiceTotals";
-import { useInvoiceWorkOrder } from "@/hooks/invoice/useInvoiceWorkOrder";
-import { StaffMember, Invoice, InvoiceTemplate, InvoiceItem } from "@/types/invoice";
-import { InventoryItem } from "@/types/inventory";
+import { useInvoiceFormState } from "@sm/hooks/invoice/useInvoiceFormState";
+import { useInvoiceTemplates } from "@sm/hooks/invoice/useInvoiceTemplates";
+import { useInvoiceSave } from "@sm/hooks/invoice/useInvoiceSave";
+import { useInvoiceTotals } from "@sm/hooks/invoice/useInvoiceTotals";
+import { useInvoiceWorkOrder } from "@sm/hooks/invoice/useInvoiceWorkOrder";
+import { StaffMember, Invoice, InvoiceTemplate, InvoiceItem } from "@sm/types/invoice";
+import { InventoryItem } from "@sm/types/inventory";
 import { useState } from "react";
 
 export function useInvoiceForm(initialWorkOrderId?: string, initialInvoiceData?: Partial<Invoice>) {

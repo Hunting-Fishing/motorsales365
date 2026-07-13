@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import { getWorkOrderById, updateWorkOrder } from '@/services/workOrder';
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderForm } from '@/components/work-orders/WorkOrderForm';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { useToast } from '@sm/hooks/use-toast';
+import { getWorkOrderById, updateWorkOrder } from '@sm/services/workOrder';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderForm } from '@sm/components/work-orders/WorkOrderForm';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 
 const WorkOrderEdit = () => {
   const { id } = useParams<{ id: string }>();

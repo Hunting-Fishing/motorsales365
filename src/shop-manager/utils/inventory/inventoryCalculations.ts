@@ -1,6 +1,6 @@
 
-import { InventoryItem } from "@/types/inventory";
-import { WorkOrderInventoryItem } from "@/types/workOrder";
+import { InventoryItem } from "@sm/types/inventory";
+import { WorkOrderInventoryItem } from "@sm/types/workOrder";
 
 export function calculateInventoryTotal(items: WorkOrderInventoryItem[]): number {
   return items.reduce((total, item) => total + (item.quantity * item.unit_price), 0);

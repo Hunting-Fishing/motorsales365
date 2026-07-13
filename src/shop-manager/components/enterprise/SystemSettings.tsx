@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Switch } from '@sm/components/ui/switch';
 import { Settings, Save, Shield, Clock, Database } from 'lucide-react';
-import { enterpriseService } from '@/services/enterpriseService';
-import type { SystemSetting } from '@/types/phase4';
+import { enterpriseService } from '@sm/services/enterpriseService';
+import type { SystemSetting } from '@sm/types/phase4';
 
 export const SystemSettings = () => {
   const [settings, setSettings] = useState<SystemSetting[]>([]);

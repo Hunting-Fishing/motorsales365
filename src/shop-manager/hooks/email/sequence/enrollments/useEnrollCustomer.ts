@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { sequenceProcessingService } from '@/services/email/sequences/sequenceProcessingService';
+import { supabase } from '@sm/lib/supabase';
+import { useToast } from '@sm/hooks/use-toast';
+import { sequenceProcessingService } from '@sm/services/email/sequences/sequenceProcessingService';
 
 export interface EnrollCustomerParams {
   customerId: string;

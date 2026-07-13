@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Progress } from "@sm/components/ui/progress";
 import { TrendingUp, TrendingDown, Calendar, AlertTriangle, CheckCircle } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import { MaintenanceBudget } from "@/hooks/useBudgetFilters";
+import { formatCurrency } from "@sm/lib/utils";
+import { MaintenanceBudget } from "@sm/hooks/useBudgetFilters";
 import {
   AreaChart,
   Area,

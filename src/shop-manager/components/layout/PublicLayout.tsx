@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import ab365Logo from '@/assets/ab365-logo.png';
+import ab365Logo from '@sm/assets/ab365-logo.png';
 
 interface PublicLayoutProps {
   children: React.ReactNode;

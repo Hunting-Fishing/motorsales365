@@ -9,7 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@sm/components/ui/alert-dialog';
 
 interface DeleteFormDialogProps {
   isOpen: boolean;

@@ -1,5 +1,5 @@
 
-import { InventoryItemExtended } from "@/types/inventory";
+import { InventoryItemExtended } from "@sm/types/inventory";
 
 export const normalizeInventoryItem = (item: any): InventoryItemExtended => {
   console.log('normalizeInventoryItem: Processing item:', item);

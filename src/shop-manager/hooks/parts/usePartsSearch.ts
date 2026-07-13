@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { searchParts, getPartCategories, getPartSuppliers, type PartsSearchFilters, type PartsSearchResult } from '@/services/parts/partsService';
+import { searchParts, getPartCategories, getPartSuppliers, type PartsSearchFilters, type PartsSearchResult } from '@sm/services/parts/partsService';
 
 export function usePartsSearch() {
   const [loading, setLoading] = useState(false);

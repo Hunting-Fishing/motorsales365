@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { CustomerLoyalty } from '@/types/loyalty';
-import { getCustomerLoyalty, ensureCustomerLoyalty } from '@/services/loyalty/customerLoyaltyService';
-import { useToast } from '@/hooks/use-toast';
+import { CustomerLoyalty } from '@sm/types/loyalty';
+import { getCustomerLoyalty, ensureCustomerLoyalty } from '@sm/services/loyalty/customerLoyaltyService';
+import { useToast } from '@sm/hooks/use-toast';
 
 export const useCustomerLoyalty = (customerId: string | undefined) => {
   const [customerLoyalty, setCustomerLoyalty] = useState<CustomerLoyalty | null>(null);

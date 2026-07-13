@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
 import { Plus, Wrench, Settings, FileText, Package } from 'lucide-react';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 import { UltimateAddPartDialog } from '../parts/UltimateAddPartDialog';
 import { ServiceBasedJobLineForm } from './ServiceBasedJobLineForm';
-import { WorkOrderPartFormValues } from '@/types/workOrderPart';
+import { WorkOrderPartFormValues } from '@sm/types/workOrderPart';
 
 interface DetailFormButtonProps {
   jobLine: WorkOrderJobLine;

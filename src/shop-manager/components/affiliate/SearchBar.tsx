@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Segment } from 'semantic-ui-react';
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
 import { Search } from 'lucide-react';
 
 interface SearchBarProps {

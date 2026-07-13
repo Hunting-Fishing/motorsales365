@@ -1,7 +1,7 @@
 import { format, parseISO, isSameDay, getHours, getMinutes } from 'date-fns';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 import { Clock, User, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import { BookingAppointment, BookableService } from '@/hooks/useBookingSystem';
+import { BookingAppointment, BookableService } from '@sm/hooks/useBookingSystem';
 
 interface BookingCalendarDayViewProps {
   currentDate: Date;

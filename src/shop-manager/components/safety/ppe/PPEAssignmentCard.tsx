@@ -1,8 +1,8 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { User, Calendar, AlertTriangle, CheckCircle } from 'lucide-react';
 import { format, differenceInDays, isPast } from 'date-fns';
-import { PPEAssignment } from '@/hooks/usePPEManagement';
+import { PPEAssignment } from '@sm/hooks/usePPEManagement';
 
 interface PPEAssignmentCardProps {
   assignment: PPEAssignment;

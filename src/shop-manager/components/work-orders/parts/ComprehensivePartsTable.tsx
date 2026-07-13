@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Table, 
   TableBody, 
@@ -12,14 +12,14 @@ import {
   TableHead, 
   TableHeader, 
   TableRow 
-} from '@/components/ui/table';
+} from '@sm/components/ui/table';
 import { Package, Plus, Edit, Trash2, AlertCircle } from 'lucide-react';
 import { AddPartButton } from './AddPartButton';
 import { EnhancedPartRow } from './EnhancedPartRow';
 import { EditPartDialog } from './EditPartDialog';
-import { partStatusMap } from '@/types/workOrderPart';
+import { partStatusMap } from '@sm/types/workOrderPart';
 import { toast } from 'sonner';
-import { updateWorkOrderPart } from '@/services/workOrder/workOrderPartsService';
+import { updateWorkOrderPart } from '@sm/services/workOrder/workOrderPartsService';
 
 interface ComprehensivePartsTableProps {
   workOrderId: string;
@@ -65,7 +65,7 @@ export function ComprehensivePartsTable({
   const handlePartDelete = async (partId: string) => {
     try {
       setIsProcessing(true);
-      const { deleteWorkOrderPart } = await import('@/services/workOrder/workOrderPartsService');
+      const { deleteWorkOrderPart } = await import('@sm/services/workOrder/workOrderPartsService');
       await deleteWorkOrderPart(partId);
       toast.success('Part deleted successfully');
       await onPartsChange();

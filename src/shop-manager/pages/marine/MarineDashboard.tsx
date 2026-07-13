@@ -29,8 +29,8 @@ import {
   ModuleDashboardAlerts,
   ModuleDashboardQuickActions,
   ModuleDashboardRecentActivity,
-} from '@/components/module-dashboard';
-import { useMarineStats, useMarineWorkOrders, useMarineInspections } from '@/hooks/useMarineStats';
+} from '@sm/components/module-dashboard';
+import { useMarineStats, useMarineWorkOrders, useMarineInspections } from '@sm/hooks/useMarineStats';
 
 export default function MarineDashboard() {
   const navigate = useNavigate();

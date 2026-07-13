@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useDailyTargets } from '@/hooks/useNutrition';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { useDailyTargets } from '@sm/hooks/useNutrition';
 import { Loader2, Flame, Beef, Wheat, Droplets } from 'lucide-react';
 
 interface Props {

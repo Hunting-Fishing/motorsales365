@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { WorkOrderJobLine, LaborRateType } from '@/types/jobLine';
+import { supabase } from '@sm/integrations/supabase/client';
+import { WorkOrderJobLine, LaborRateType } from '@sm/types/jobLine';
 
 // Type guard to validate labor rate type
 function validateLaborRateType(type: string): LaborRateType {

@@ -1,16 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getQuoteById } from '@/services/quote/quoteService';
-import { Quote, quoteStatusMap } from '@/types/quote';
-import { formatCurrency } from '@/utils/formatters';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { getQuoteById } from '@sm/services/quote/quoteService';
+import { Quote, quoteStatusMap } from '@sm/types/quote';
+import { formatCurrency } from '@sm/utils/formatters';
 import { AlertCircle, Loader2 } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { ConvertToWorkOrderButton } from './ConvertToWorkOrderButton';
-import { useQuoteTaxCalculations } from '@/hooks/useQuoteTaxCalculations';
-import { getTaxSummaryText } from '@/utils/taxCalculations';
+import { useQuoteTaxCalculations } from '@sm/hooks/useQuoteTaxCalculations';
+import { getTaxSummaryText } from '@sm/utils/taxCalculations';
 import { useNavigate } from 'react-router-dom';
 
 interface QuoteDetailsViewProps {

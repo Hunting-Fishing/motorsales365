@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { useShopId } from './useShopId';
 import { useToast } from './use-toast';
 import { addDays, format } from 'date-fns';
-import type { SafetySchedule } from '@/types/safety';
+import type { SafetySchedule } from '@sm/types/safety';
 
 export interface CreateScheduleData {
   schedule_name: string;

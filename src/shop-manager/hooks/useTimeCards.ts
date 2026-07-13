@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { useShopId } from './useShopId';
 import { useToast } from './use-toast';
-import type { TimeCardEntry } from '@/types/phase5';
+import type { TimeCardEntry } from '@sm/types/phase5';
 
 export function useTimeCards(employeeId?: string) {
   const { shopId } = useShopId();

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { nonprofitAnalyticsService, AnalyticsDashboard, NonprofitAnalytics, GrantAnalytics, DonorAnalytics, FinancialHealth } from '@/services/nonprofitAnalytics';
+import { nonprofitAnalyticsService, AnalyticsDashboard, NonprofitAnalytics, GrantAnalytics, DonorAnalytics, FinancialHealth } from '@sm/services/nonprofitAnalytics';
 
 export interface UseNonprofitAnalyticsResult {
   dashboard: AnalyticsDashboard | null;

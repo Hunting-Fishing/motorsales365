@@ -1,7 +1,7 @@
 
 import React from "react";
 import { LayoutGrid, Table, Columns } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@sm/components/ui/toggle-group";
 
 interface ViewModeToggleProps {
   viewMode: "table" | "cards" | "compact";

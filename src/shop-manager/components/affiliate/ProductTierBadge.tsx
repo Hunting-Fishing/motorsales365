@@ -1,6 +1,6 @@
 
-import { Badge } from "@/components/ui/badge";
-import { ProductTier } from "@/types/affiliate";
+import { Badge } from "@sm/components/ui/badge";
+import { ProductTier } from "@sm/types/affiliate";
 
 interface ProductTierBadgeProps {
   tier: ProductTier;

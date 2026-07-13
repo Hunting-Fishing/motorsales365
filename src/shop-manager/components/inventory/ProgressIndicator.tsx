@@ -1,5 +1,5 @@
 import React from 'react';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@sm/components/ui/progress';
 import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
 
 interface ProgressIndicatorProps {

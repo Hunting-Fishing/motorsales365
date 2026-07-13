@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { Label } from '@sm/components/ui/label';
+import { cn } from '@sm/lib/utils';
 
 interface BaseFormFieldProps {
   label: string;

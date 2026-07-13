@@ -1,5 +1,5 @@
 
-import { Equipment } from "@/types/equipment";
+import { Equipment } from "@sm/types/equipment";
 
 // Equipment status mapping with styles
 export const equipmentStatusMap = {

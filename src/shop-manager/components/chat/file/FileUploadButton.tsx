@@ -1,9 +1,9 @@
 
 import React, { useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { PaperclipIcon } from 'lucide-react';
-import { uploadChatFile } from '@/services/chat/fileService';
-import { toast } from '@/hooks/use-toast';
+import { uploadChatFile } from '@sm/services/chat/fileService';
+import { toast } from '@sm/hooks/use-toast';
 
 interface FileUploadButtonProps {
   roomId: string;

@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Progress } from '@sm/components/ui/progress';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { useToast } from '@sm/hooks/use-toast';
 import { 
   Upload, 
   Download, 
@@ -15,7 +15,7 @@ import {
   FileSpreadsheet,
   Database
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface ImportExportDialogProps {
   isOpen: boolean;

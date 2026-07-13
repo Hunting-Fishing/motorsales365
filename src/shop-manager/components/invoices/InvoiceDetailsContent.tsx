@@ -1,12 +1,12 @@
 
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@sm/components/ui/separator";
 import { InvoiceDetailsCompanyInfo } from "./InvoiceDetailsCompanyInfo";
 import { InvoiceDetailsCustomerInfo } from "./InvoiceDetailsCustomerInfo";
 import { InvoiceDetailsItemsTable } from "./InvoiceDetailsItemsTable";
 import { InvoiceDetailsNotes } from "./InvoiceDetailsNotes";
 import { InvoiceDetailsPaymentInfo } from "./InvoiceDetailsPaymentInfo";
-import { useShopName } from "@/hooks/useShopName";
-import { Invoice } from "@/types/invoice";
+import { useShopName } from "@sm/hooks/useShopName";
+import { Invoice } from "@sm/types/invoice";
 
 interface InvoiceDetailsContentProps {
   invoice: Invoice & { 

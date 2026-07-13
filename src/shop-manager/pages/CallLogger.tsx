@@ -1,7 +1,7 @@
 import React from 'react';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { CallHistory } from '@/components/calls/CallHistory';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { CallHistory } from '@sm/components/calls/CallHistory';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Phone, PhoneCall, PhoneIncoming, PhoneOutgoing } from 'lucide-react';
 
 export default function CallLoggerPage() {

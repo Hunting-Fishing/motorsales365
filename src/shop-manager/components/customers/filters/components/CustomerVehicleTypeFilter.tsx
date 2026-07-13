@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@sm/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 
 interface CustomerVehicleTypeFilterProps {
   vehicleType?: string;

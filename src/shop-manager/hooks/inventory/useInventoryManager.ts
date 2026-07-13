@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { InventoryItemExtended, ReorderSettings } from '@/types/inventory';
-import { getInventoryItems } from '@/services/inventory/crudService';
-import { countLowStockItems, countOutOfStockItems } from '@/utils/inventory/inventoryUtils';
+import { InventoryItemExtended, ReorderSettings } from '@sm/types/inventory';
+import { getInventoryItems } from '@sm/services/inventory/crudService';
+import { countLowStockItems, countOutOfStockItems } from '@sm/utils/inventory/inventoryUtils';
 
 export function useInventoryManager() {
   const [lowStockItems, setLowStockItems] = useState<InventoryItemExtended[]>([]);

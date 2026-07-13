@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Package, Truck, MapPin, Calendar, ExternalLink } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { orderTrackingService, OrderTracking } from '@/services/customer/orderTrackingService';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Separator } from '@sm/components/ui/separator';
+import { orderTrackingService, OrderTracking } from '@sm/services/customer/orderTrackingService';
+import { useToast } from '@sm/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 
 interface OrderTrackingCardProps {

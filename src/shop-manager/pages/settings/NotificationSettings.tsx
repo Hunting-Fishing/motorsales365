@@ -1,7 +1,7 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { NotificationsTab } from "@/components/settings/NotificationsTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { NotificationsTab } from "@sm/components/settings/NotificationsTab";
 
 export const NotificationSettings = () => {
   return (

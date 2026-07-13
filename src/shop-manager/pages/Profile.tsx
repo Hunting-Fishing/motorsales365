@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import { useUserRole } from '@/hooks/useUserRole';
-import { supabase } from '@/lib/supabase';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { useUserProfile } from '@sm/hooks/useUserProfile';
+import { useUserRole } from '@sm/hooks/useUserRole';
+import { supabase } from '@sm/lib/supabase';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, User, Building2, Shield, Mail, Key, LogOut, Save } from 'lucide-react';
-import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
-import { ChangeEmailDialog } from '@/components/profile/ChangeEmailDialog';
-import { BusinessInformationCard } from '@/components/profile/BusinessInformationCard';
+import { ChangePasswordDialog } from '@sm/components/profile/ChangePasswordDialog';
+import { ChangeEmailDialog } from '@sm/components/profile/ChangeEmailDialog';
+import { BusinessInformationCard } from '@sm/components/profile/BusinessInformationCard';
 
 export default function Profile() {
   const { user } = useAuthUser();

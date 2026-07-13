@@ -1,5 +1,5 @@
 
-import type { ServiceReminder, ReminderTemplate, ReminderCategory, ReminderTag } from "@/types/reminder";
+import type { ServiceReminder, ReminderTemplate, ReminderCategory, ReminderTag } from "@sm/types/reminder";
 
 // Database types that match the actual database schema
 export interface DbServiceReminder {

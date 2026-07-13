@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import type { SectorFiles, StorageFile } from '@/types/service';
+import { supabase } from '@sm/integrations/supabase/client';
+import type { SectorFiles, StorageFile } from '@sm/types/service';
 
 export const bucketViewerService = {
   async getAllSectorFiles(): Promise<SectorFiles[]> {

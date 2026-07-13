@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardFooter } from '@sm/components/ui/card';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface LoadingSkeletonProps {
   variant?: 'card' | 'list' | 'grid';

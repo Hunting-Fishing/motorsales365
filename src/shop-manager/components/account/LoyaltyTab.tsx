@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
+import { Separator } from '@sm/components/ui/separator';
 import { Star, Gift, Truck, Calendar, Percent } from 'lucide-react';
 import { 
   getLoyaltyPointTransactions, 
   getTierBenefits 
-} from '@/services/loyaltyService';
-import { LoyaltyPoints, LoyaltyPointTransaction } from '@/types/phase3';
+} from '@sm/services/loyaltyService';
+import { LoyaltyPoints, LoyaltyPointTransaction } from '@sm/types/phase3';
 
 interface LoyaltyTabProps {
   loyaltyPoints: LoyaltyPoints | null;

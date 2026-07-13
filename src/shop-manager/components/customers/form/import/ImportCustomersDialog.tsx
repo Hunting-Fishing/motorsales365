@@ -1,12 +1,12 @@
 
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Alert, AlertDescription } from "@sm/components/ui/alert";
 import { Upload, FileText, AlertCircle, Check } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { importCustomersFromCSV } from "@/services/customerService";
+import { useToast } from "@sm/hooks/use-toast";
+import { importCustomersFromCSV } from "@sm/services/customerService";
 
 interface ImportCustomersDialogProps {
   onImportComplete: () => void;

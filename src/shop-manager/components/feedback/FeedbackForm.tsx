@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { FeedbackFormQuestion } from './form/FeedbackFormQuestion';
 import { FeedbackFormSuccess } from './form/FeedbackFormSuccess';
 import { FeedbackFormLoading } from './form/FeedbackFormLoading';

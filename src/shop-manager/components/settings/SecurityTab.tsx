@@ -1,17 +1,17 @@
 
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Switch } from "@sm/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
 import { Shield, Key, Lock, LogOut, AlertTriangle, Smartphone } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { userSecurityService, UserSession, User2FA } from "@/services/user/userSecurityService";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@sm/components/ui/badge";
+import { Separator } from "@sm/components/ui/separator";
+import { userSecurityService, UserSession, User2FA } from "@sm/services/user/userSecurityService";
+import { useToast } from "@sm/hooks/use-toast";
+import { supabase } from "@sm/integrations/supabase/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@sm/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
 
 export function SecurityTab() {

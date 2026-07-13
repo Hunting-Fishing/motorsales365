@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { CustomerProvidedForm, CustomerFormComment } from '@/types/customerForms';
+import { supabase } from '@sm/integrations/supabase/client';
+import { CustomerProvidedForm, CustomerFormComment } from '@sm/types/customerForms';
 
 interface UploadFormParams {
   file: File;

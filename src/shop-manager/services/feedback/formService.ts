@@ -1,7 +1,7 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 import { FeedbackForm, FeedbackQuestion, QuestionType } from "./types";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@sm/hooks/use-toast";
 
 // Fetch all feedback forms for a shop
 export const getFeedbackForms = async (shopId: string): Promise<FeedbackForm[]> => {

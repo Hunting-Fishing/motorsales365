@@ -1,16 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useTimeCards } from '@/hooks/useTimeCards';
-import { usePayPeriods } from '@/hooks/usePayPeriods';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useTimeCards } from '@sm/hooks/useTimeCards';
+import { usePayPeriods } from '@sm/hooks/usePayPeriods';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
+import { useToast } from '@sm/hooks/use-toast';
 import { format, isWithinInterval } from 'date-fns';
 import { 
   CheckCircle, 
@@ -21,9 +21,9 @@ import {
   X,
   Calendar
 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { TimeCardEditDialog } from './TimeCardEditDialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 
 interface TimeCardWithProfile {
   id: string;

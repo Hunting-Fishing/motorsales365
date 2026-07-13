@@ -4,11 +4,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useTaskData } from '@/hooks/useTaskData';
+} from '@sm/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { useTaskData } from '@sm/hooks/useTaskData';
 import { TaskOverviewTab } from './TaskOverviewTab';
 import { TaskAssigneesTab } from './TaskAssigneesTab';
 import { TaskNotesTab } from './TaskNotesTab';

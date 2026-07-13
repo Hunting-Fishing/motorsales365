@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import { VinDecodeResult } from '@/types/vehicle';
+import { VinDecodeResult } from '@sm/types/vehicle';
 import { useVinDecoder } from './hooks/useVinDecoder';
 import { UseFormReturn } from 'react-hook-form';
-import { fetchMakes, fetchModels as fetchVehicleModels } from '@/services/vehicleDataService';
+import { fetchMakes, fetchModels as fetchVehicleModels } from '@sm/services/vehicleDataService';
 
 interface UseVehicleFormProps {
   form: UseFormReturn<any>;

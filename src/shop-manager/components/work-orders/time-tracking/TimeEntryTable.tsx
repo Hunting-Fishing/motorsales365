@@ -1,10 +1,10 @@
 
 import React from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
+import { Button } from "@sm/components/ui/button";
 import { Pencil, Trash } from "lucide-react";
-import { TimeEntry } from "@/types/workOrder";
-import { formatTimeInHoursAndMinutes } from "@/utils/workOrders";
+import { TimeEntry } from "@sm/types/workOrder";
+import { formatTimeInHoursAndMinutes } from "@sm/utils/workOrders";
 import { format } from "date-fns";
 
 interface TimeEntryTableProps {

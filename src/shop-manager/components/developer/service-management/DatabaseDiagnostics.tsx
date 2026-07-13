@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Badge } from '@sm/components/ui/badge';
 import { Database, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
-import { validateDatabaseStructure, testDatabaseOperations } from '@/lib/services/databaseUtils';
-import { enableServiceTableRLS } from '@/lib/services/serviceRLS';
+import { validateDatabaseStructure, testDatabaseOperations } from '@sm/lib/services/databaseUtils';
+import { enableServiceTableRLS } from '@sm/lib/services/serviceRLS';
 
 interface DiagnosticResult {
   table: string;

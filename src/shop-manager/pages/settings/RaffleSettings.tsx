@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { RaffleManagementTab } from "@/components/settings/RaffleManagementTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { RaffleManagementTab } from "@sm/components/settings/RaffleManagementTab";
 
 export const RaffleSettings = () => {
   return (

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@sm/hooks/use-toast";
 
 export function KeyboardShortcuts() {
   const navigate = useNavigate();

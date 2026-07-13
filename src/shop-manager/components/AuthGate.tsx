@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Button } from '@/components/ui/button';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
+import { Button } from '@sm/components/ui/button';
 import { RefreshCw, LogIn } from 'lucide-react';
 
 interface AuthGateProps {

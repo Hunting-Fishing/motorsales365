@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
-import { VinDecodeResult } from '@/types/vehicle';
-import { decodeVin, getVinValidationError } from '@/services/vinDecoderService';
+import { VinDecodeResult } from '@sm/types/vehicle';
+import { decodeVin, getVinValidationError } from '@sm/services/vinDecoderService';
 
 export interface UseVinDecoderReturn {
   decode: (vin: string) => Promise<VinDecodeResult | null>;

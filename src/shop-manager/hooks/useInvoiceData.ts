@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { StaffMember, Invoice, InvoiceItem } from '@/types/invoice';
-import { WorkOrder } from '@/types/workOrder';
-import { InventoryItem } from '@/types/inventory';
+import { StaffMember, Invoice, InvoiceItem } from '@sm/types/invoice';
+import { WorkOrder } from '@sm/types/workOrder';
+import { InventoryItem } from '@sm/types/inventory';
 import { v4 as uuidv4 } from 'uuid';
-import { useTaxSettings } from '@/hooks/useTaxSettings';
-import { useShopId } from '@/hooks/useShopId';
+import { useTaxSettings } from '@sm/hooks/useTaxSettings';
+import { useShopId } from '@sm/hooks/useShopId';
 
 export function useInvoiceData(initialWorkOrderId?: string) {
   const { shopId } = useShopId();

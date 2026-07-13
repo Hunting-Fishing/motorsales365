@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Progress } from "@sm/components/ui/progress";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@sm/components/ui/select";
 import { Ship, Truck, Wrench, DollarSign, TrendingUp, Loader2 } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@sm/lib/utils";
 import {
   BarChart,
   Bar,

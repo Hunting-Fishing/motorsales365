@@ -1,7 +1,7 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { Camera, Square, RotateCcw, Check, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Card } from '@sm/components/ui/card';
 
 interface CameraCaptureProps {
   onCapture: (file: File) => void;

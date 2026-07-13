@@ -1,15 +1,15 @@
 
 import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
 import { Palette, Upload, PaintBucket } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@sm/hooks/use-toast";
+import { supabase } from "@sm/integrations/supabase/client";
 import { BrandingActions } from "./branding/BrandingActions";
 import { ColorsTab } from "./branding/ColorsTab";
 import { LogoTab } from "./branding/LogoTab";
 import { ThemeTab } from "./branding/ThemeTab";
-import { useShopName } from "@/hooks/useShopName";
-import { useShopData } from "@/hooks/useShopData";
+import { useShopName } from "@sm/hooks/useShopName";
+import { useShopData } from "@sm/hooks/useShopData";
 
 // Default branding colors
 const defaultColors = {

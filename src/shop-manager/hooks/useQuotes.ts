@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { Quote } from '@/types/quote';
-import { getAllQuotes, updateQuoteStatus } from '@/services/quote/quoteService';
-import { toast } from '@/hooks/use-toast';
+import { Quote } from '@sm/types/quote';
+import { getAllQuotes, updateQuoteStatus } from '@sm/services/quote/quoteService';
+import { toast } from '@sm/hooks/use-toast';
 
 export function useQuotes() {
   const [quotes, setQuotes] = useState<Quote[]>([]);

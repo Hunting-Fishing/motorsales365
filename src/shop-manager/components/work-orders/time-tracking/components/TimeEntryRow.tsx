@@ -1,6 +1,6 @@
 
 import React from "react";
-import { TimeEntry } from "@/types/workOrder";
+import { TimeEntry } from "@sm/types/workOrder";
 import { format } from "date-fns";
 import { CheckCircle, XCircle } from "lucide-react";
 

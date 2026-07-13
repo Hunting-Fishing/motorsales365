@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+import { Label } from "@sm/components/ui/label";
+import { Input } from "@sm/components/ui/input";
+import { Calendar } from "@sm/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
+import { Button } from "@sm/components/ui/button";
 import { format } from "date-fns";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@sm/components/ui/switch";
 import { CalendarIcon } from "lucide-react";
 
 interface ShiftChatSettingsProps {

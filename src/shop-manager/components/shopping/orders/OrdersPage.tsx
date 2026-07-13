@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-import { getUserOrders } from '@/services/orderService';
-import { Order } from '@/types/order';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { useToast } from '@sm/hooks/use-toast';
+import { getUserOrders } from '@sm/services/orderService';
+import { Order } from '@sm/types/order';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
 import { Package, Eye, ShoppingBag } from 'lucide-react';
 
 export const OrdersPage = () => {

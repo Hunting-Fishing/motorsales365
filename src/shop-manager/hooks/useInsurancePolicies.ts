@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { InsurancePolicy, InsuranceFormData, InsuranceStats } from '@/types/insurance';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
+import { InsurancePolicy, InsuranceFormData, InsuranceStats } from '@sm/types/insurance';
 import { differenceInDays, parseISO, startOfDay } from 'date-fns';
 
 export function useInsurancePolicies() {

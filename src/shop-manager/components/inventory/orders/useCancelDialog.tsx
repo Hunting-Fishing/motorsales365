@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
-import { useInventoryOrders } from "@/hooks/inventory/useInventoryOrders";
-import { InventoryOrder } from "@/types/inventory/orders";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { useInventoryOrders } from "@sm/hooks/inventory/useInventoryOrders";
+import { InventoryOrder } from "@sm/types/inventory/orders";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
 
 export function useCancelDialog() {
   const [isOpen, setIsOpen] = useState(false);

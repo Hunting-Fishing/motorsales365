@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Plus, Wrench } from 'lucide-react';
 import { AddJobLineDialog } from '../job-lines/AddJobLineDialog';
 

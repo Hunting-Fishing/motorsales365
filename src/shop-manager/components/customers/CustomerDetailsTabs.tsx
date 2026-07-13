@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Customer } from "@/types/customer";
-import { CustomerInteraction } from "@/types/interaction";
-import { CustomerCommunication } from "@/types/customer";
-import { AddCommunicationDialog } from "@/components/customers/communications/AddCommunicationDialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Customer } from "@sm/types/customer";
+import { CustomerInteraction } from "@sm/types/interaction";
+import { CustomerCommunication } from "@sm/types/customer";
+import { AddCommunicationDialog } from "@sm/components/customers/communications/AddCommunicationDialog";
 import { CustomerAnalyticsSection } from './details/CustomerAnalyticsSection';
 
 interface CustomerDetailsTabsProps {

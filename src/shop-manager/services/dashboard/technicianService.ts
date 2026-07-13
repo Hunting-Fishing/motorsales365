@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { TechnicianEfficiencyData, TechnicianPerformanceData } from "@/types/dashboard";
+import { supabase } from "@sm/lib/supabase";
+import { TechnicianEfficiencyData, TechnicianPerformanceData } from "@sm/types/dashboard";
 
 export const getTechnicianEfficiency = async (): Promise<TechnicianEfficiencyData[]> => {
   try {

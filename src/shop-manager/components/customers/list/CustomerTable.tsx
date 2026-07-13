@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { TableCell, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Customer } from "@/types/customer";
+import { TableCell, TableRow } from "@sm/components/ui/table";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { Customer } from "@sm/types/customer";
 import { Eye, Edit, Phone, Mail, MapPin, Building, User } from "lucide-react";
 import { Link } from "react-router-dom";
 

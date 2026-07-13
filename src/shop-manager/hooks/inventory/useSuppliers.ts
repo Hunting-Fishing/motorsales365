@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { getInventorySuppliers, InventorySupplier } from '@/services/inventory/supplierService';
+import { getInventorySuppliers, InventorySupplier } from '@sm/services/inventory/supplierService';
 
 export function useSuppliers() {
   const [suppliers, setSuppliers] = useState<InventorySupplier[]>([]);

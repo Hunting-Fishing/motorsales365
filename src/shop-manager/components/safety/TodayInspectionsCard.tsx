@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { ClipboardCheck, Plus, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
-import type { DailyShopInspection } from '@/types/safety';
+import type { DailyShopInspection } from '@sm/types/safety';
 import { useNavigate } from 'react-router-dom';
 
 interface TodayInspectionsCardProps {

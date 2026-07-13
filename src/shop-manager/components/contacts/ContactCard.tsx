@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@sm/components/ui/avatar';
 import { 
   Star, StarOff, Phone, Mail, Globe, MapPin, 
   MoreVertical, Pencil, Trash2, Building2, User
@@ -12,8 +12,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Contact } from '@/types/contacts';
+} from '@sm/components/ui/dropdown-menu';
+import { Contact } from '@sm/types/contacts';
 
 interface ContactCardProps {
   contact: Contact;

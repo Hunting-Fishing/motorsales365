@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
-import { CalendarHeader } from '@/components/calendar/CalendarHeader';
-import { CalendarView } from '@/components/calendar/CalendarView';
-import { CalendarFilters } from '@/components/calendar/CalendarFilters';
-import { CalendarDayDetailDialog } from '@/components/calendar/CalendarDayDetailDialog';
-import { AddTaskDialog } from '@/components/calendar/AddTaskDialog';
-import { useCalendarEvents } from '@/hooks/useCalendarEvents';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
-import { CalendarViewType, CalendarEvent } from '@/types/calendar';
-import { Card } from '@/components/ui/card';
+import { CalendarHeader } from '@sm/components/calendar/CalendarHeader';
+import { CalendarView } from '@sm/components/calendar/CalendarView';
+import { CalendarFilters } from '@sm/components/calendar/CalendarFilters';
+import { CalendarDayDetailDialog } from '@sm/components/calendar/CalendarDayDetailDialog';
+import { AddTaskDialog } from '@sm/components/calendar/AddTaskDialog';
+import { useCalendarEvents } from '@sm/hooks/useCalendarEvents';
+import { useBusinessHours } from '@sm/hooks/useBusinessHours';
+import { CalendarViewType, CalendarEvent } from '@sm/types/calendar';
+import { Card } from '@sm/components/ui/card';
 import { isSameDay } from 'date-fns';
 
 export default function Calendar() {

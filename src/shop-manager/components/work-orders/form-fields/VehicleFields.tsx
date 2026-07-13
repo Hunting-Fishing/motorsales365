@@ -7,10 +7,10 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
+} from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Card } from "@sm/components/ui/card";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
 import { Car, Calendar, Hash, CreditCard, Wrench } from "lucide-react";
 
 interface VehicleFieldsProps {

@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Badge } from "@sm/components/ui/badge";
+import { Progress } from "@sm/components/ui/progress";
+import { supabase } from "@sm/integrations/supabase/client";
+import { useToast } from "@sm/hooks/use-toast";
 import { BarChart3, DollarSign, Target, CheckCircle, AlertTriangle, Plus } from "lucide-react";
-import { AccountingStreamsManagement } from "@/components/nonprofit/AccountingStreamsManagement";
-import { ImpactMeasurementManagement } from "@/components/nonprofit/ImpactMeasurementManagement";
-import { HybridActivitiesDashboard } from "@/components/hybrid/HybridActivitiesDashboard";
-import { ComplianceDashboard } from "@/components/hybrid/ComplianceDashboard";
+import { AccountingStreamsManagement } from "@sm/components/nonprofit/AccountingStreamsManagement";
+import { ImpactMeasurementManagement } from "@sm/components/nonprofit/ImpactMeasurementManagement";
+import { HybridActivitiesDashboard } from "@sm/components/hybrid/HybridActivitiesDashboard";
+import { ComplianceDashboard } from "@sm/components/hybrid/ComplianceDashboard";
 
 interface HybridActivity {
   id: string;

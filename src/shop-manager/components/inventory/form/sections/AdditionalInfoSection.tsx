@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { InventoryFormField } from '../InventoryFormField';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@sm/components/ui/separator';
 import { WebLinksSection } from './WebLinksSection';
 
 interface AdditionalInfoSectionProps {

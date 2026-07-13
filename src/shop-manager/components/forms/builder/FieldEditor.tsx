@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
 import { Trash2, Plus, X, GitBranch } from 'lucide-react';
-import { FormBuilderField, ConditionalRule } from '@/types/formBuilder';
+import { FormBuilderField, ConditionalRule } from '@sm/types/formBuilder';
 import { ConditionalRulesEditor } from './ConditionalRulesEditor';
 
 interface FieldEditorProps {

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Eye, X, Clock } from 'lucide-react';
-import { getRecentlyViewedProducts, clearRecentlyViewedProducts, RecentlyViewedProduct } from '@/services/recentlyViewedService';
-import { useAuth } from '@/hooks/useAuth';
+import { getRecentlyViewedProducts, clearRecentlyViewedProducts, RecentlyViewedProduct } from '@sm/services/recentlyViewedService';
+import { useAuth } from '@sm/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 
 interface RecentlyViewedProps {
   limit?: number;

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Camera, Upload, X, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface EquipmentImageUploadProps {
   imageUrl?: string | null;

@@ -1,15 +1,15 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Button } from "@sm/components/ui/button";
 import { Loader2, Search } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@sm/hooks/use-toast";
 import { useForm } from "react-hook-form";
-import { VehicleBodyStyle, VinDecodeResult } from "@/types/vehicle";
-import { decodeVin, getVinValidationError } from "@/services/vinDecoderService";
+import { VehicleBodyStyle, VinDecodeResult } from "@sm/types/vehicle";
+import { decodeVin, getVinValidationError } from "@sm/services/vinDecoderService";
 
 interface VehicleInfoTabProps {
   vehicleInfo: {

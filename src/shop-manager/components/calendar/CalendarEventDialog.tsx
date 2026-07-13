@@ -1,12 +1,12 @@
 
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { CalendarEvent } from "@/types/calendar";
-import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { CalendarEvent } from "@sm/types/calendar";
+import { Badge } from "@sm/components/ui/badge";
 import { Clock, MapPin, User, Calendar as CalendarIcon, FileText, Wrench, CheckSquare } from "lucide-react";
-import { statusMap } from "@/utils/workOrders";
-import { formatDate, formatTime } from "@/utils/dateUtils";
+import { statusMap } from "@sm/utils/workOrders";
+import { formatDate, formatTime } from "@sm/utils/dateUtils";
 import { Link } from "react-router-dom";
 import { TaskDetailDialog } from "./tasks/TaskDetailDialog";
 

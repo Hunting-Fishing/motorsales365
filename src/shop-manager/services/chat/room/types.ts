@@ -1,5 +1,5 @@
 
-import { ChatRoom, ChatRoomMetadata } from '@/types/chat';
+import { ChatRoom, ChatRoomMetadata } from '@sm/types/chat';
 
 export interface DatabaseChatRoom {
   id: string;

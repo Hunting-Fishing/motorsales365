@@ -1,8 +1,8 @@
 
-import { PaymentMethod } from '@/types/payment';
+import { PaymentMethod } from '@sm/types/payment';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@sm/lib/supabase';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface InvoiceDetailsPaymentInfoProps {
   paymentMethod: string;

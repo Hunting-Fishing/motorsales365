@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { formatCurrency, formatTaxRate } from '@/utils/taxCalculations';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { formatCurrency, formatTaxRate } from '@sm/utils/taxCalculations';
 
 interface TaxBreakdownCardProps {
   laborTax: number;

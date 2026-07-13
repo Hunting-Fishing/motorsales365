@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { WorkOrder } from "@/types/workOrder";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
+import { WorkOrder } from "@sm/types/workOrder";
 
 export interface WorkOrderSelectorProps {
   open: boolean;

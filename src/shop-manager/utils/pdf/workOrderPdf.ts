@@ -1,8 +1,8 @@
 
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
-import { WorkOrder, TimeEntry, WorkOrderInventoryItem } from "@/types/workOrder";
-import { formatDate, formatCurrency } from "@/utils/formatters";
+import { WorkOrder, TimeEntry, WorkOrderInventoryItem } from "@sm/types/workOrder";
+import { formatDate, formatCurrency } from "@sm/utils/formatters";
 
 export const generateWorkOrderPdf = (workOrder: WorkOrder): jsPDF => {
   const doc = new jsPDF();

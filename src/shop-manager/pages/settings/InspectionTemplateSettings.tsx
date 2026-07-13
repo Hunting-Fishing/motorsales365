@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { 
   Plus, 
   FileText, 
@@ -19,18 +19,18 @@ import {
   Eye,
   Link2
 } from 'lucide-react';
-import { useInspectionTemplates, useDeleteInspectionTemplate, useDuplicateInspectionTemplate } from '@/hooks/useInspectionTemplates';
-import { useEquipmentByTemplate } from '@/hooks/useEquipmentByTemplate';
-import { InspectionTemplateBuilder } from '@/components/inspection-templates/InspectionTemplateBuilder';
-import { CreateTemplateDialog } from '@/components/inspection-templates/CreateTemplateDialog';
-import { TemplatePreviewDialog } from '@/components/inspection-templates/TemplatePreviewDialog';
+import { useInspectionTemplates, useDeleteInspectionTemplate, useDuplicateInspectionTemplate } from '@sm/hooks/useInspectionTemplates';
+import { useEquipmentByTemplate } from '@sm/hooks/useEquipmentByTemplate';
+import { InspectionTemplateBuilder } from '@sm/components/inspection-templates/InspectionTemplateBuilder';
+import { CreateTemplateDialog } from '@sm/components/inspection-templates/CreateTemplateDialog';
+import { TemplatePreviewDialog } from '@sm/components/inspection-templates/TemplatePreviewDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@sm/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,10 +40,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import type { AssetType, InspectionFormTemplate } from '@/types/inspectionTemplate';
-import { ASSET_TYPE_LABELS } from '@/types/inspectionTemplate';
-import { Skeleton } from '@/components/ui/skeleton';
+} from '@sm/components/ui/alert-dialog';
+import type { AssetType, InspectionFormTemplate } from '@sm/types/inspectionTemplate';
+import { ASSET_TYPE_LABELS } from '@sm/types/inspectionTemplate';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 const ASSET_TYPE_ICONS: Record<AssetType, React.ReactNode> = {
   vessel: <Ship className="h-4 w-4" />,

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
 import { EquipmentGrid } from './EquipmentGrid';
 import { EquipmentFilters } from './EquipmentFilters';
 import { AddEquipmentDialog } from './AddEquipmentDialog';
-import { useEquipment } from '@/hooks/useEquipment';
+import { useEquipment } from '@sm/hooks/useEquipment';
 import { Plus, Search, Filter } from 'lucide-react';
 
 export function EquipmentPage() {

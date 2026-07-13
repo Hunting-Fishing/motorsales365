@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { usePaymentMethods } from '@/hooks/usePaymentMethods';
-import { usePaymentHistory } from '@/hooks/usePaymentHistory';
-import { PaymentMethodsList } from '@/components/payments/PaymentMethodsList';
-import { PaymentHistoryList } from '@/components/payments/PaymentHistoryList';
-import { useToast } from '@/hooks/use-toast';
-import { Customer } from '@/types/customer';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { usePaymentMethods } from '@sm/hooks/usePaymentMethods';
+import { usePaymentHistory } from '@sm/hooks/usePaymentHistory';
+import { PaymentMethodsList } from '@sm/components/payments/PaymentMethodsList';
+import { PaymentHistoryList } from '@sm/components/payments/PaymentHistoryList';
+import { useToast } from '@sm/hooks/use-toast';
+import { Customer } from '@sm/types/customer';
+import { Alert, AlertDescription, AlertTitle } from '@sm/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 
 interface CustomerPaymentTabProps {

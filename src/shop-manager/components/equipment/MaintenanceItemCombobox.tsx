@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@sm/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@sm/components/ui/popover';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Check, ChevronsUpDown, Plus, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useMaintenanceItemPresets, MaintenanceItemPreset } from '@/hooks/useMaintenanceItemPresets';
+import { cn } from '@sm/lib/utils';
+import { useMaintenanceItemPresets, MaintenanceItemPreset } from '@sm/hooks/useMaintenanceItemPresets';
 
 interface MaintenanceItemComboboxProps {
   value: string;

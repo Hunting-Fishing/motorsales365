@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from '@sm/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@sm/components/ui/popover';
+import { Button } from '@sm/components/ui/button';
 import { Check, ChevronsUpDown, Plus, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useMaintenanceTypePresets, MaintenanceTypePreset } from '@/hooks/useMaintenanceTypePresets';
+import { cn } from '@sm/lib/utils';
+import { useMaintenanceTypePresets, MaintenanceTypePreset } from '@sm/hooks/useMaintenanceTypePresets';
 
 interface MaintenanceTypeComboboxProps {
   value: string;

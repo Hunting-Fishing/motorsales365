@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
 import { ChevronLeft, ChevronRight, Search, Calendar, CalendarDays, CalendarRange } from 'lucide-react';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 

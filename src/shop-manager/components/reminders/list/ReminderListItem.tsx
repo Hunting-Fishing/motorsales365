@@ -1,10 +1,10 @@
 
 import { useState } from "react";
-import { ServiceReminder } from "@/types/reminder";
+import { ServiceReminder } from "@sm/types/reminder";
 import { ReminderDetails } from "./ReminderDetails";
 import { ReminderActions } from "./ReminderActions";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@sm/components/ui/badge";
+import { Avatar, AvatarFallback } from "@sm/components/ui/avatar";
 import { Tag, Calendar, RotateCw } from "lucide-react";
 import { format, parseISO, isAfter } from "date-fns";
 

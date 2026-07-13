@@ -1,5 +1,5 @@
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@sm/lib/supabase";
 import { addDays, format } from "date-fns";
 
 export interface TimeSlot {

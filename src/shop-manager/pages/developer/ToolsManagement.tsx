@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { ArrowLeft, Hammer, Plus, Search, Wrench } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { toolsService, Tool, ToolCategory } from '@/services/developer/toolsService';
+import { Input } from "@sm/components/ui/input";
+import { toolsService, Tool, ToolCategory } from '@sm/services/developer/toolsService';
 import { toast } from 'sonner';
 
 export default function ToolsManagement() {

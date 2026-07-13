@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 import { 
   createWorkOrderJobLine, 
   updateWorkOrderJobLine, 
@@ -7,7 +7,7 @@ import {
   updateJobLineCompletion,
   reorderJobLines,
   toggleJobLineStatus
-} from '@/services/workOrder/jobLineOperations';
+} from '@sm/services/workOrder/jobLineOperations';
 import { toast } from 'sonner';
 
 export function useWorkOrderJobLineOperations(

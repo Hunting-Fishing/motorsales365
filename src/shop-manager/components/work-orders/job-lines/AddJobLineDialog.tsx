@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 import { ServiceBasedJobLineForm } from './ServiceBasedJobLineForm';
 export interface AddJobLineDialogProps {
   workOrderId: string;

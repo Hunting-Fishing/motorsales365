@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { CircleAlert, Package, Truck, DollarSign } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@sm/lib/utils";
 
 interface InventoryStatsProps {
   totalItems: number;

@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { FeedbackQuestion, QuestionType } from '@/types/feedback';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Button } from '@/components/ui/button';
+import { FeedbackQuestion, QuestionType } from '@sm/types/feedback';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@sm/components/ui/radio-group';
+import { Button } from '@sm/components/ui/button';
 import { Star, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { RequiredIndicator } from '@/components/ui/required-indicator';
+import { RequiredIndicator } from '@sm/components/ui/required-indicator';
 
 interface FeedbackFormQuestionProps {
   question: FeedbackQuestion;

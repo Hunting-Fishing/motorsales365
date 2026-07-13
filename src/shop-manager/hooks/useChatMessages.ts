@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChatMessage } from '@/types/chat';
+import { ChatMessage } from '@sm/types/chat';
 import { 
   getChatMessages,
   markMessagesAsRead,
@@ -9,15 +9,15 @@ import {
   flagChatMessage,
   editMessage,
   getThreadReplies
-} from '@/services/chat';
-import { toast } from '@/hooks/use-toast';
-import { MessageSendParams } from '@/services/chat/message/types';
-import { parseFileFromMessage } from '@/services/chat/fileService';
+} from '@sm/services/chat';
+import { toast } from '@sm/hooks/use-toast';
+import { MessageSendParams } from '@sm/services/chat/message/types';
+import { parseFileFromMessage } from '@sm/services/chat/fileService';
 import { 
   setTypingIndicator, 
   clearTypingIndicator, 
   subscribeToTypingIndicators 
-} from '@/services/chat/message/typingIndicator';
+} from '@sm/services/chat/message/typingIndicator';
 
 interface UseChatMessagesProps {
   userId: string;

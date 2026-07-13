@@ -1,6 +1,6 @@
 import React from 'react';
 import { format, addDays } from 'date-fns';
-import type { WorkScheduleAssignment } from '@/types/scheduling';
+import type { WorkScheduleAssignment } from '@sm/types/scheduling';
 import { DraggableScheduleItem } from './DraggableScheduleItem';
 import { DroppableTimeSlot } from './DroppableTimeSlot';
 

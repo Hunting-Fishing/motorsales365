@@ -1,8 +1,8 @@
 
 import { useEffect, useState } from "react";
-import { getRevenueData } from "@/services/dashboard";
+import { getRevenueData } from "@sm/services/dashboard";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
-import { MonthlyRevenueData } from "@/types/dashboard";
+import { MonthlyRevenueData } from "@sm/types/dashboard";
 import { BaseChart } from "./shared/BaseChart";
 
 export function RevenueChart() {

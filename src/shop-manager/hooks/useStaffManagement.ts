@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { toast } from 'sonner';
 import { useFetchUserRoles } from './team/useFetchUserRoles';
 import { useShopId } from './useShopId';

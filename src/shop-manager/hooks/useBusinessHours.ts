@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { useCompany } from '@/contexts/CompanyContext';
+import { useCompany } from '@sm/contexts/CompanyContext';
 
 interface BusinessHour {
   day_of_week: number;

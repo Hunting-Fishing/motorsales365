@@ -1,5 +1,5 @@
 
-import { EmailSequence, EmailSequenceAnalytics, EmailSequenceEnrollment } from "@/types/email";
+import { EmailSequence, EmailSequenceAnalytics, EmailSequenceEnrollment } from "@sm/types/email";
 
 export interface UseSequencesReturn {
   sequences: EmailSequence[];

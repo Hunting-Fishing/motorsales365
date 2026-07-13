@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { CardTitle } from "@/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { CardTitle } from "@sm/components/ui/card";
 import { Edit, Trash, Shield, Copy, ArrowUp, ArrowDown } from "lucide-react";
 
 

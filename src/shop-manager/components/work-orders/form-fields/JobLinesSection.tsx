@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Plus } from 'lucide-react';
 import { AddJobLineDialog } from '../job-lines/AddJobLineDialog';
 import { UnifiedJobLineFormDialog } from '../job-lines/UnifiedJobLineFormDialog';
 import { CompactJobLinesTable } from '../job-lines/CompactJobLinesTable';
 import { ConfirmDeleteDialog } from '../shared/ConfirmDeleteDialog';
 import { WorkOrderServiceSelector } from '../services/WorkOrderServiceSelector';
-import { useWorkOrderServiceSelection } from '@/hooks/useWorkOrderServiceSelection';
-import { deleteWorkOrderJobLine } from '@/services/workOrder/jobLinesService';
-import { toast } from '@/hooks/use-toast';
+import { useWorkOrderServiceSelection } from '@sm/hooks/useWorkOrderServiceSelection';
+import { deleteWorkOrderJobLine } from '@sm/services/workOrder/jobLinesService';
+import { toast } from '@sm/hooks/use-toast';
 interface JobLinesSectionProps {
   workOrderId: string;
   description?: string;

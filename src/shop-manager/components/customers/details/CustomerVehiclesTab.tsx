@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Customer } from '@/types/customer';
-import { Card } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+import { Customer } from '@sm/types/customer';
+import { Card } from '@sm/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Button } from '@sm/components/ui/button';
 import { Plus, Car, Pencil, Eye } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 
 interface CustomerVehiclesTabProps {

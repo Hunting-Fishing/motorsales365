@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 import {
   Fuel,
   LayoutDashboard,
@@ -24,10 +24,10 @@ import {
   ChevronRight,
   Cog,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useShopId } from '@/hooks/useShopId';
-import { useModuleDisplayInfo } from '@/hooks/useModuleDisplayInfo';
+import { Button } from '@sm/components/ui/button';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { useShopId } from '@sm/hooks/useShopId';
+import { useModuleDisplayInfo } from '@sm/hooks/useModuleDisplayInfo';
 
 interface NavItem {
   title: string;

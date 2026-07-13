@@ -1,5 +1,5 @@
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@sm/lib/supabase";
 import { 
   mapDbServiceReminderToType, 
   mapDbReminderTemplateToType, 
@@ -10,7 +10,7 @@ import type {
   ReminderTemplate, 
   ReminderCategory, 
   ReminderTag 
-} from "@/types/reminder";
+} from "@sm/types/reminder";
 
 // Define filters interface
 export interface ReminderFilters {

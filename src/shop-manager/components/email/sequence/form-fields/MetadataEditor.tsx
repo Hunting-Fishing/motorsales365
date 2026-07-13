@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { FormDescription, FormMessage } from '@/components/ui/form';
+import { Textarea } from '@sm/components/ui/textarea';
+import { FormDescription, FormMessage } from '@sm/components/ui/form';
 
 interface MetadataEditorProps {
   value: string;

@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { InventoryPurchaseOrder } from "@/types/inventory/purchaseOrders";
+import { supabase } from "@sm/lib/supabase";
+import { InventoryPurchaseOrder } from "@sm/types/inventory/purchaseOrders";
 
 // Define a helper method with the correct parameter count
 const updatePurchaseOrderStatus = async (

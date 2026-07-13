@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Avatar, AvatarFallback } from '@sm/components/ui/avatar';
 import { Send, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface TaskNotesTabProps {
-  taskData: ReturnType<typeof import('@/hooks/useTaskData').useTaskData>;
+  taskData: ReturnType<typeof import('@sm/hooks/useTaskData').useTaskData>;
 }
 
 export function TaskNotesTab({ taskData }: TaskNotesTabProps) {

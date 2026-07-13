@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Button } from '@sm/components/ui/button';
 import { WifiOff, Wifi, RefreshCw } from 'lucide-react';
 
 const OfflineIndicator: React.FC = () => {

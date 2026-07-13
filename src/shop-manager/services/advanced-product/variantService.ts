@@ -1,6 +1,6 @@
 // Product Variants Service
-import { supabase } from '@/integrations/supabase/client';
-import { ProductVariant, VariantFormData } from '@/types/advanced-product';
+import { supabase } from '@sm/integrations/supabase/client';
+import { ProductVariant, VariantFormData } from '@sm/types/advanced-product';
 
 export class VariantService {
   // Get variants for a product

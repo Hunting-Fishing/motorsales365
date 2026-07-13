@@ -1,6 +1,6 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { AuthSecurityService } from './authSecurity';
-import type { Database } from '@/integrations/supabase/types';
+import type { Database } from '@sm/integrations/supabase/types';
 
 type AppRole = Database['public']['Enums']['app_role'];
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 import { CheckCircle2, AlertTriangle, XCircle, FileText, Image as ImageIcon } from 'lucide-react';
 import { DeficiencyDialog } from './DeficiencyDialog';
 

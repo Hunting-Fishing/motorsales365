@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { WorkOrder, WorkOrderStatusType, WorkOrderInventoryItem } from "@/types/workOrder";
+import { WorkOrder, WorkOrderStatusType, WorkOrderInventoryItem } from "@sm/types/workOrder";
 import { toast } from "sonner";
 import { useWorkOrderService } from './useWorkOrderService';
 import { useNavigate } from "react-router-dom";

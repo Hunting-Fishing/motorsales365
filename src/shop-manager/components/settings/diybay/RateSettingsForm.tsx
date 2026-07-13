@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { FormField } from "@/components/ui/form-field";
-import { RateSettings } from "@/services/diybay/diybayService";
+import { Button } from "@sm/components/ui/button";
+import { FormField } from "@sm/components/ui/form-field";
+import { RateSettings } from "@sm/services/diybay/diybayService";
 import { ChevronDown, ChevronUp, Save } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@sm/components/ui/collapsible";
 
 interface RateSettingsFormProps {
   settings: RateSettings;

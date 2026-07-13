@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { supabase } from '@sm/integrations/supabase/client';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   LogOut, 
@@ -29,15 +29,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuGroup,
-} from '@/components/ui/dropdown-menu';
-import { usePrimaryRoleInfo } from '@/hooks/useAllUserRoles';
-import { useUserRoles } from '@/hooks/useUserRoles';
-import { hasRoutePermission } from '@/utils/routeGuards';
-import { cleanupAuthState } from '@/utils/authCleanup';
-import { useEnabledModules, useUserShopId } from '@/hooks/useEnabledModules';
-import { MODULE_ROUTES } from '@/config/moduleRoutes';
+} from '@sm/components/ui/dropdown-menu';
+import { usePrimaryRoleInfo } from '@sm/hooks/useAllUserRoles';
+import { useUserRoles } from '@sm/hooks/useUserRoles';
+import { hasRoutePermission } from '@sm/utils/routeGuards';
+import { cleanupAuthState } from '@sm/utils/authCleanup';
+import { useEnabledModules, useUserShopId } from '@sm/hooks/useEnabledModules';
+import { MODULE_ROUTES } from '@sm/config/moduleRoutes';
 import { useQuery } from '@tanstack/react-query';
-import { SubmitChangeRequestDialog } from '@/components/feedback/SubmitChangeRequestDialog';
+import { SubmitChangeRequestDialog } from '@sm/components/feedback/SubmitChangeRequestDialog';
 
 export function HeaderActions() {
   const { isAuthenticated, userName, isLoading } = useAuthUser();

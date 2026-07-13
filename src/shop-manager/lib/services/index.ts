@@ -42,4 +42,4 @@ export {
 export { bucketViewerService } from './bucketViewerService';
 
 // Export all types from the consolidated types file
-export type * from '@/types/service';
+export type * from '@sm/types/service';

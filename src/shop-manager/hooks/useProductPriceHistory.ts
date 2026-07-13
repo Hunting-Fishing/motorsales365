@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { productPriceHistoryService, PriceHistoryEntry } from '@/services/productPriceHistoryService';
-import { toast } from '@/hooks/use-toast';
+import { productPriceHistoryService, PriceHistoryEntry } from '@sm/services/productPriceHistoryService';
+import { toast } from '@sm/hooks/use-toast';
 
 export function useProductPriceHistory(productId: string) {
   const [priceHistory, setPriceHistory] = useState<PriceHistoryEntry[]>([]);

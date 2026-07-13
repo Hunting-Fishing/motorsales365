@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { TeamMemberFormValues } from '@/components/team/form/formValidation';
-import { recordTeamMemberHistory } from '@/utils/teamHistoryUtils';
-import { toast } from '@/hooks/use-toast';
+import { supabase } from '@sm/lib/supabase';
+import { TeamMemberFormValues } from '@sm/components/team/form/formValidation';
+import { recordTeamMemberHistory } from '@sm/utils/teamHistoryUtils';
+import { toast } from '@sm/hooks/use-toast';
 
 export function useTeamMemberUpdate() {
   const [isLoading, setIsLoading] = useState(false);

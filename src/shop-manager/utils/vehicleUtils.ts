@@ -1,6 +1,6 @@
 
-import { VehicleService } from '@/lib/services/VehicleService';
-import { Vehicle, CreateVehicleInput, UpdateVehicleInput } from '@/lib/database/repositories/VehicleRepository';
+import { VehicleService } from '@sm/lib/services/VehicleService';
+import { Vehicle, CreateVehicleInput, UpdateVehicleInput } from '@sm/lib/database/repositories/VehicleRepository';
 
 const vehicleService = new VehicleService();
 

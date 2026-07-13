@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { Document, DocumentCategory, CreateDocumentData, DocumentSearchParams } from '@/types/document';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Document, DocumentCategory, CreateDocumentData, DocumentSearchParams } from '@sm/types/document';
 
 // File validation constants
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB

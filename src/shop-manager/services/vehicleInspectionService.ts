@@ -1,8 +1,8 @@
 
-import { supabase } from '@/lib/supabase';
-import { toast } from '@/hooks/use-toast';
-import type { VehicleBodyStyle } from '@/types/vehicleBodyStyles';
-import type { Json } from '@/integrations/supabase/types';
+import { supabase } from '@sm/lib/supabase';
+import { toast } from '@sm/hooks/use-toast';
+import type { VehicleBodyStyle } from '@sm/types/vehicleBodyStyles';
+import type { Json } from '@sm/integrations/supabase/types';
 
 export interface DamageArea {
   id: string;

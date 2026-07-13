@@ -1,11 +1,11 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
 import { Link } from "react-router-dom";
 import { CalendarClock, Clock, AlertTriangle } from "lucide-react";
-import { formatDate } from "@/utils/workOrders";
-import { maintenanceFrequencyMap } from "@/data/equipmentData";
-import type { EquipmentWithMaintenance } from "@/services/equipmentService";
+import { formatDate } from "@sm/utils/workOrders";
+import { maintenanceFrequencyMap } from "@sm/data/equipmentData";
+import type { EquipmentWithMaintenance } from "@sm/services/equipmentService";
 
 interface MaintenanceDueCardProps {
   equipment: EquipmentWithMaintenance[];

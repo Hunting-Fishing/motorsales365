@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IntegratedServiceSelector } from "@/components/work-orders/fields/services/IntegratedServiceSelector";
-import { ServiceSector, ServiceJob } from "@/types/service";
-import { SelectedService } from "@/types/selectedService";
-import { fetchServiceSectors } from "@/lib/services/serviceApi";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { IntegratedServiceSelector } from "@sm/components/work-orders/fields/services/IntegratedServiceSelector";
+import { ServiceSector, ServiceJob } from "@sm/types/service";
+import { SelectedService } from "@sm/types/selectedService";
+import { fetchServiceSectors } from "@sm/lib/services/serviceApi";
 import { Settings } from "lucide-react";
 
 interface WorkOrderInfoSectionProps {

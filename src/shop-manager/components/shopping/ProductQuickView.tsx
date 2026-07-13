@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { Heart, Share2, ShoppingCart, Star, ExternalLink, Package } from 'lucide-react';
-import { AffiliateProduct } from '@/types/affiliate';
-import { ProductRating } from '@/components/affiliate/ProductRating';
-import ProductTierBadge from '@/components/affiliate/ProductTierBadge';
-import ProductVariants from '@/components/shopping/product/ProductVariants';
-import ProductBundles from '@/components/shopping/product/ProductBundles';
-import InventoryAlerts from '@/components/shopping/product/InventoryAlerts';
-import { useCart } from '@/hooks/shopping/useCart';
-import { formatCurrency } from '@/lib/utils';
+import { AffiliateProduct } from '@sm/types/affiliate';
+import { ProductRating } from '@sm/components/affiliate/ProductRating';
+import ProductTierBadge from '@sm/components/affiliate/ProductTierBadge';
+import ProductVariants from '@sm/components/shopping/product/ProductVariants';
+import ProductBundles from '@sm/components/shopping/product/ProductBundles';
+import InventoryAlerts from '@sm/components/shopping/product/InventoryAlerts';
+import { useCart } from '@sm/hooks/shopping/useCart';
+import { formatCurrency } from '@sm/lib/utils';
 import { toast } from 'sonner';
-import { ProductVariant } from '@/types/advanced-product';
+import { ProductVariant } from '@sm/types/advanced-product';
 
 interface ProductQuickViewProps {
   product: AffiliateProduct | null;

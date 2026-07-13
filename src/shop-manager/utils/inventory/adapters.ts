@@ -1,6 +1,6 @@
 
-import { WorkOrderInventoryItem } from "@/types/workOrder";
-import { InventoryItemExtended } from "@/types/inventory";
+import { WorkOrderInventoryItem } from "@sm/types/workOrder";
+import { InventoryItemExtended } from "@sm/types/inventory";
 
 /**
  * Standardize inventory item to InventoryItemExtended format

@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { ServiceSectorsList } from '@/components/developer/service-management/ServiceSectorsList';
-import { useServiceSectors } from '@/hooks/useServiceCategories';
+import { ServiceSectorsList } from '@sm/components/developer/service-management/ServiceSectorsList';
+import { useServiceSectors } from '@sm/hooks/useServiceCategories';
 import { Database } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 
 export function ServiceOverviewPage() {
   const { sectors, loading, error, refetch } = useServiceSectors();

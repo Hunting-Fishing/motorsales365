@@ -6,17 +6,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { Label } from '@sm/components/ui/label';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { Badge } from '@sm/components/ui/badge';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { Loader2, Ship, Truck, Wrench, Package, Info } from 'lucide-react';
-import { useEquipmentForTemplateAssignment, useAssignTemplateToEquipment } from '@/hooks/useTemplateEquipmentAssignment';
+import { useEquipmentForTemplateAssignment, useAssignTemplateToEquipment } from '@sm/hooks/useTemplateEquipmentAssignment';
 import { toast } from 'sonner';
-import type { AssetType } from '@/types/inspectionTemplate';
+import type { AssetType } from '@sm/types/inspectionTemplate';
 
 interface AssignTemplateToEquipmentDialogProps {
   open: boolean;

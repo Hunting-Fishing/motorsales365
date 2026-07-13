@@ -1,17 +1,17 @@
 
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { usePageTitle } from '@/hooks/usePageTitle';
-import { DashboardStats } from '@/components/dashboard/DashboardStats';
-import { RecentWorkOrders } from '@/components/dashboard/RecentWorkOrders';
-import { UpcomingAppointments } from '@/components/dashboard/UpcomingAppointments';
-import { TodaySchedule } from '@/components/dashboard/TodaySchedule';
-import { DashboardTour } from '@/components/onboarding/DashboardTour';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
-import { LowStockAlerts } from '@/components/inventory/LowStockAlerts';
-import { ServiceDueDashboard } from '@/components/inventory/ServiceDueDashboard';
-import { UpcomingMilestones } from '@/components/projects/UpcomingMilestones';
-import { Button } from '@/components/ui/button';
+import { usePageTitle } from '@sm/hooks/usePageTitle';
+import { DashboardStats } from '@sm/components/dashboard/DashboardStats';
+import { RecentWorkOrders } from '@sm/components/dashboard/RecentWorkOrders';
+import { UpcomingAppointments } from '@sm/components/dashboard/UpcomingAppointments';
+import { TodaySchedule } from '@sm/components/dashboard/TodaySchedule';
+import { DashboardTour } from '@sm/components/onboarding/DashboardTour';
+import { DashboardHeader } from '@sm/components/dashboard/DashboardHeader';
+import { LowStockAlerts } from '@sm/components/inventory/LowStockAlerts';
+import { ServiceDueDashboard } from '@sm/components/inventory/ServiceDueDashboard';
+import { UpcomingMilestones } from '@sm/components/projects/UpcomingMilestones';
+import { Button } from '@sm/components/ui/button';
 
 export default function Dashboard() {
   usePageTitle('Dashboard');

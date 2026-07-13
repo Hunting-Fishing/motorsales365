@@ -6,13 +6,13 @@ import {
   Collapsible, 
   CollapsibleContent, 
   CollapsibleTrigger 
-} from "@/components/ui/collapsible";
-import { Badge } from "@/components/ui/badge";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+} from "@sm/components/ui/collapsible";
+import { Badge } from "@sm/components/ui/badge";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Switch } from "@sm/components/ui/switch";
 import { CustomerFormValues } from "../schemas/customerSchema";
-import { cn } from "@/lib/utils";
+import { cn } from "@sm/lib/utils";
 
 interface FleetManagementSectionProps {
   form: UseFormReturn<CustomerFormValues>;

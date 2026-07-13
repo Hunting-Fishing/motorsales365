@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { InventoryItemExtended } from "@/types/inventory";
+import { InventoryItemExtended } from "@sm/types/inventory";
 
 export function useInventoryFormValidation() {
   type FormErrors = {

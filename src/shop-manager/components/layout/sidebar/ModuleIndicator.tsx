@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useEnabledModules } from '@/hooks/useEnabledModules';
-import { MODULE_ROUTES, getAllModuleRoutes } from '@/config/moduleRoutes';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+import { useEnabledModules } from '@sm/hooks/useEnabledModules';
+import { MODULE_ROUTES, getAllModuleRoutes } from '@sm/config/moduleRoutes';
+import { cn } from '@sm/lib/utils';
+import { Badge } from '@sm/components/ui/badge';
 import { ChevronRight, AlertCircle, Rocket, Zap } from 'lucide-react';
 
 export function ModuleIndicator() {

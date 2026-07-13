@@ -1,5 +1,5 @@
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 interface FormActionsProps {

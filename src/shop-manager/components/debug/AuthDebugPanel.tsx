@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@sm/components/ui/collapsible';
 import { ChevronDown, RefreshCw, Bug, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
-import { useAuthDebugger } from '@/hooks/useAuthDebugger';
-import { useSessionRecovery } from '@/hooks/useSessionRecovery';
-import { useAuthUser } from '@/hooks/useAuthUser';
+import { useAuthDebugger } from '@sm/hooks/useAuthDebugger';
+import { useSessionRecovery } from '@sm/hooks/useSessionRecovery';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
 
 export function AuthDebugPanel() {
   const [isOpen, setIsOpen] = useState(false);

@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { SelectedService } from '@/types/selectedService';
-import { Button } from '@/components/ui/button';
+import { SelectedService } from '@sm/types/selectedService';
+import { Button } from '@sm/components/ui/button';
 import { X, Clock, DollarSign } from 'lucide-react';
 
 interface SelectedServiceCardProps {

@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useServiceSectors } from '@/hooks/useServiceCategories';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { useServiceSectors } from '@sm/hooks/useServiceCategories';
 import { Loader2, Building, TreePine } from 'lucide-react';
 
 export function ServiceSectorsList() {

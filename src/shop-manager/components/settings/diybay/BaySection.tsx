@@ -1,19 +1,19 @@
 
 import React from "react";
-import { Bay } from "@/services/diybay/diybayService";
+import { Bay } from "@sm/services/diybay/diybayService";
 import { BayList } from "./BayList";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@sm/components/ui/card";
 import { AddBayButton } from "./AddBayButton";
 import { ViewModeToggle } from "./ViewModeToggle";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BayViewMode } from "@/types/diybay";
+import { Tabs, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { BayViewMode } from "@sm/types/diybay";
 import { Loader2, GripVertical, AlertCircle, Printer } from "lucide-react";
 import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { printElement } from "@/utils/printUtils";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { printElement } from "@sm/utils/printUtils";
 
 interface BaySectionProps {
   bays: Bay[];

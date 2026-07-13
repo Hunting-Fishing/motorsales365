@@ -4,10 +4,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+} from "@sm/components/ui/dialog";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { Separator } from "@sm/components/ui/separator";
 import { 
   Phone, 
   Mail, 
@@ -21,7 +21,7 @@ import {
   FileText,
   User
 } from "lucide-react";
-import { InventorySupplier } from "@/services/inventory/supplierService";
+import { InventorySupplier } from "@sm/services/inventory/supplierService";
 
 interface SupplierDetailsDialogProps {
   supplier: InventorySupplier | null;

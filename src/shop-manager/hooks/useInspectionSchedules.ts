@@ -3,7 +3,7 @@
  * and now queries the consolidated safety_schedules table.
  */
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { useShopId } from './useShopId';
 import { useToast } from './use-toast';
 

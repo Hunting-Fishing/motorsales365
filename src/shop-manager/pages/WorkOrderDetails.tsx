@@ -2,8 +2,8 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Layout } from '@/components/layout/Layout';
-import { WorkOrderDetailsView } from '@/components/work-orders/WorkOrderDetailsView';
+import { Layout } from '@sm/components/layout/Layout';
+import { WorkOrderDetailsView } from '@sm/components/work-orders/WorkOrderDetailsView';
 
 export default function WorkOrderDetails() {
   const { id: workOrderId } = useParams<{ id: string }>();

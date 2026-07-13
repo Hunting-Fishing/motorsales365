@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Switch } from "@sm/components/ui/switch";
+import { Alert, AlertDescription } from "@sm/components/ui/alert";
+import { Button } from "@sm/components/ui/button";
 import { Shield, Lock, Save, Loader2, AlertCircle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useUserRole } from "@/hooks/useUserRole";
-import { useAuthUser } from "@/hooks/useAuthUser";
-import { useToast } from "@/hooks/use-toast";
-import { PERMISSION_MODULES, MODULE_CATEGORIES } from "@/types/permissionModules";
+import { supabase } from "@sm/integrations/supabase/client";
+import { useUserRole } from "@sm/hooks/useUserRole";
+import { useAuthUser } from "@sm/hooks/useAuthUser";
+import { useToast } from "@sm/hooks/use-toast";
+import { PERMISSION_MODULES, MODULE_CATEGORIES } from "@sm/types/permissionModules";
 
 interface PermissionsTabProps {
   memberRole: string;

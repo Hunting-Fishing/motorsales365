@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 import { 
   Plus, Search, Users, Globe, Star, Filter,
   Truck, Package, Wrench, FileText
 } from 'lucide-react';
-import { ContactCard } from '@/components/contacts/ContactCard';
-import { ResourceCard } from '@/components/contacts/ResourceCard';
-import { ContactDialog } from '@/components/contacts/ContactDialog';
-import { ResourceDialog } from '@/components/contacts/ResourceDialog';
+import { ContactCard } from '@sm/components/contacts/ContactCard';
+import { ResourceCard } from '@sm/components/contacts/ResourceCard';
+import { ContactDialog } from '@sm/components/contacts/ContactDialog';
+import { ResourceDialog } from '@sm/components/contacts/ResourceDialog';
 import { 
   useContacts, 
   useResources, 
@@ -24,8 +24,8 @@ import {
   useDeleteResource,
   useToggleContactFavorite,
   useToggleResourceFavorite,
-} from '@/hooks/useContacts';
-import { Contact, Resource } from '@/types/contacts';
+} from '@sm/hooks/useContacts';
+import { Contact, Resource } from '@sm/types/contacts';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,7 +35,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@sm/components/ui/alert-dialog';
 
 const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   truck: Truck,

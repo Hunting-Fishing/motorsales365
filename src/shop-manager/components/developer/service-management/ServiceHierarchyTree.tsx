@@ -1,10 +1,10 @@
 
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { 
   ChevronDown, 
   ChevronRight, 
@@ -14,7 +14,7 @@ import {
   FileText,
   Wrench
 } from 'lucide-react';
-import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@/types/service';
+import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@sm/types/service';
 
 interface ServiceHierarchyTreeProps {
   categories: ServiceMainCategory[];

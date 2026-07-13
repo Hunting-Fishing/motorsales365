@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Command, CommandInput, CommandList, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Dialog, DialogContent } from "@sm/components/ui/dialog";
+import { Command, CommandInput, CommandList, CommandGroup, CommandItem } from "@sm/components/ui/command";
 import { useNavigate } from "react-router-dom";
 
 export interface GlobalCommandMenuProps {

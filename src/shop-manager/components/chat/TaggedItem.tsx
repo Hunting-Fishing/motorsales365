@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 import { TagIcon, Wrench, ShieldCheck, FileText } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 type TagType = 'work-order' | 'part' | 'warranty' | 'job';
 

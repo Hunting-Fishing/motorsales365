@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Check, Sparkles, Car, Droplets, Target, Anchor, Wrench, Package, Users, FileText, Calculator, BarChart3, Settings, Loader2 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { cn } from '@sm/lib/utils';
+import { supabase } from '@sm/integrations/supabase/client';
 
 // Extended icon map for all possible module icons
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {

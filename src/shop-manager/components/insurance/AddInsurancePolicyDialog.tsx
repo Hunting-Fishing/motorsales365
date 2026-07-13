@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -8,22 +8,22 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+} from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Switch } from "@sm/components/ui/switch";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useInsurancePolicies } from "@/hooks/useInsurancePolicies";
-import { InsuranceFormData, INSURANCE_TYPES, PAYMENT_FREQUENCIES } from "@/types/insurance";
+} from "@sm/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { useInsurancePolicies } from "@sm/hooks/useInsurancePolicies";
+import { InsuranceFormData, INSURANCE_TYPES, PAYMENT_FREQUENCIES } from "@sm/types/insurance";
 
 interface AddInsurancePolicyDialogProps {
   open: boolean;

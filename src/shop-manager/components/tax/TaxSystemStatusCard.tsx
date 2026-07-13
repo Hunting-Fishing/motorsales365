@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { CheckCircle, AlertTriangle, XCircle, Loader2 } from 'lucide-react';
-import { useSystemTaxIntegration } from '@/hooks/useSystemTaxIntegration';
+import { useSystemTaxIntegration } from '@sm/hooks/useSystemTaxIntegration';
 
 interface TaxSystemStatusCardProps {
   shopId?: string;

@@ -1,10 +1,10 @@
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
 import { Plus } from "lucide-react";
-import { InventoryItemExtended } from "@/types/inventory";
+import { InventoryItemExtended } from "@sm/types/inventory";
 
 interface InventoryItemCardProps {
   item: InventoryItemExtended;

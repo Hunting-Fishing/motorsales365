@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@sm/lib/supabase";
 import { toast } from "sonner";
 
 export function useActivityData(memberId: string) {

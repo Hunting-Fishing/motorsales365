@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Plus, MessageSquare, Phone, Mail } from 'lucide-react';
 
 interface WorkOrderCommunicationsProps {

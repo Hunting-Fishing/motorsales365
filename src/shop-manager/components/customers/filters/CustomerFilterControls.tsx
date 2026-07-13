@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Search, Filter, X, Sliders } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 

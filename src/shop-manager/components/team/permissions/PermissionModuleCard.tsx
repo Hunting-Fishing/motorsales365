@@ -1,13 +1,13 @@
 
 import { CheckCircle, XCircle } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@sm/components/ui/switch";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@sm/components/ui/card";
 
 interface PermissionModuleCardProps {
   moduleName: string;

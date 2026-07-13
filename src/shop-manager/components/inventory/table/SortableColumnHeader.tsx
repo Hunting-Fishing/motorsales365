@@ -1,7 +1,7 @@
 
 import React from "react";
 import { ArrowUpDown, EyeOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 
 export interface Column {
   id: string;

@@ -1,5 +1,5 @@
 
-import { RateSettings, calculateRates } from "@/services/diybay/diybayService";
+import { RateSettings, calculateRates } from "@sm/services/diybay/diybayService";
 
 export function useRateCalculation() {
   const calculateRate = (

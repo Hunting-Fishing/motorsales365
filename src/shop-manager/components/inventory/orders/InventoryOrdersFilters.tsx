@@ -2,14 +2,14 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
-import { Card } from "@/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
+import { Calendar } from "@sm/components/ui/calendar";
+import { Checkbox } from "@sm/components/ui/checkbox";
+import { cn } from "@sm/lib/utils";
+import { Card } from "@sm/components/ui/card";
 
 interface InventoryOrdersFiltersProps {
   statusFilter: string[];

@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { StaffMember } from "@/types/invoice";
+import { StaffMember } from "@sm/types/invoice";
 
 export function useInvoiceStaff(initialStaff: StaffMember[] = []) {
   const [assignedStaff, setAssignedStaff] = useState<StaffMember[]>(initialStaff);

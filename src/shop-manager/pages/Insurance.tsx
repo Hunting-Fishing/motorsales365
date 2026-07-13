@@ -1,6 +1,6 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
-import { InsuranceDashboard } from "@/components/insurance/InsuranceDashboard";
+import { InsuranceDashboard } from "@sm/components/insurance/InsuranceDashboard";
 
 const Insurance = () => {
   return (

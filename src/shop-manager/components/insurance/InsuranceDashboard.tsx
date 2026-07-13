@@ -1,19 +1,19 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
 import { 
   Shield, Plus, AlertTriangle, FileText, TrendingUp, 
   DollarSign, Calendar, Bell, Loader2, AlertCircle 
 } from "lucide-react";
-import { useInsurancePolicies } from "@/hooks/useInsurancePolicies";
-import { useInsuranceAnalytics } from "@/hooks/useInsuranceAnalytics";
+import { useInsurancePolicies } from "@sm/hooks/useInsurancePolicies";
+import { useInsuranceAnalytics } from "@sm/hooks/useInsuranceAnalytics";
 import { InsurancePolicyList } from "./InsurancePolicyList";
 import { AddInsurancePolicyDialog } from "./AddInsurancePolicyDialog";
 import { InsuranceRenewalAlerts } from "./InsuranceRenewalAlerts";
 import { InsuranceTrendsCard } from "./InsuranceTrendsCard";
 import { InsuranceBudgetTracker } from "./InsuranceBudgetTracker";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@sm/lib/utils";
 
 export function InsuranceDashboard() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);

@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Role } from "@/types/team";
+import { Role } from "@sm/types/team";
 
 export function useRoleFilter() {
   const [searchQuery, setSearchQuery] = useState("");

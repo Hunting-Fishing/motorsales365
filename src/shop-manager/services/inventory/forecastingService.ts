@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import { InventoryForecast } from '@/types/inventory/predictive';
+import { supabase } from '@sm/integrations/supabase/client';
+import { InventoryForecast } from '@sm/types/inventory/predictive';
 
 export interface ForecastInput {
   inventoryItemId: string;

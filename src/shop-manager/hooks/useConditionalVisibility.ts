@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ConditionalRule, FormBuilderField } from '@/types/formBuilder';
+import { ConditionalRule, FormBuilderField } from '@sm/types/formBuilder';
 
 /**
  * Evaluates a single conditional rule against form values

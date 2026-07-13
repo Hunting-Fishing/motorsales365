@@ -1,4 +1,4 @@
-import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@/types/service';
+import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@sm/types/service';
 
 export interface DuplicateOccurrence {
   itemId: string;

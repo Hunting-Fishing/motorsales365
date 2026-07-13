@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { ProjectPhase } from '@/types/projectBudget';
+import type { ProjectPhase } from '@sm/types/projectBudget';
 import { differenceInDays } from 'date-fns';
 
 interface CriticalPathResult {

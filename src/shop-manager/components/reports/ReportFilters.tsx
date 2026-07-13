@@ -1,19 +1,19 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+} from "@sm/components/ui/select";
+import { Calendar } from "@sm/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
 import { CalendarRange, Filter, Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { format, isValid, subMonths } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn } from "@sm/lib/utils";
 
 interface ReportFiltersProps {
   timeframe: string;

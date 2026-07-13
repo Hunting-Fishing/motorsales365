@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { AffiliateTool, AffiliateProduct } from "@/types/affiliate";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Label } from "@sm/components/ui/label";
+import { AffiliateTool, AffiliateProduct } from "@sm/types/affiliate";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@sm/components/ui/tabs";
 import { Check, ExternalLink, AlertTriangle, History } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useProductPriceHistory } from "@/hooks/useProductPriceHistory";
+import { toast } from "@sm/hooks/use-toast";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
+import { useProductPriceHistory } from "@sm/hooks/useProductPriceHistory";
 
 interface PriceHistoryEntry {
   date: string;

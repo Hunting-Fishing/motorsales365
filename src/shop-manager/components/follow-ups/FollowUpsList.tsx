@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { FollowUp } from '@/hooks/useFollowUps';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { FollowUp } from '@sm/hooks/useFollowUps';
+import { Button } from '@sm/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@sm/components/ui/avatar';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
 import { Phone, Calendar, MessageCircle } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card } from '@sm/components/ui/card';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface FollowUpsListProps {
   followUps: FollowUp[];

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@sm/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "./schemas/customerSchema";
-import { FormControl } from "@/components/ui/form";
+import { FormControl } from "@sm/components/ui/form";
 
 interface AddressAutocompleteProps {
   form: UseFormReturn<CustomerFormValues>;

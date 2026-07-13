@@ -1,5 +1,5 @@
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@sm/components/ui/card";
 import { Calendar, Clock, AlertTriangle, CheckCircle } from "lucide-react";
 
 interface MaintenanceStatsProps {

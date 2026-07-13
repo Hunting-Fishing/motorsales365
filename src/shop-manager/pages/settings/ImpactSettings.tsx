@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { ImpactMeasurementTab } from "@/components/settings/ImpactMeasurementTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { ImpactMeasurementTab } from "@sm/components/settings/ImpactMeasurementTab";
 
 export const ImpactSettings = () => {
   return (

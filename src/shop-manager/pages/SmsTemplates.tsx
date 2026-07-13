@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { ResponsiveContainer } from '@/components/ui/responsive-container';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SmsTemplatesList } from '@/components/sms/SmsTemplatesList';
+import { ResponsiveContainer } from '@sm/components/ui/responsive-container';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { SmsTemplatesList } from '@sm/components/sms/SmsTemplatesList';
 
 export default function SmsTemplates() {
   return (

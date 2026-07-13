@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
 import { Search, MapPin, Loader2, X } from 'lucide-react';
-import { useMapboxPublicToken } from '@/hooks/useMapboxPublicToken';
-import { cn } from '@/lib/utils';
+import { useMapboxPublicToken } from '@sm/hooks/useMapboxPublicToken';
+import { cn } from '@sm/lib/utils';
 
 interface LocationPickerMapProps {
   latitude?: number;

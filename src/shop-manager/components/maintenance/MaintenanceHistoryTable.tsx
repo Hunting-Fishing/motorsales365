@@ -1,13 +1,13 @@
 
 import React from "react";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardContent, CardTitle } from "@sm/components/ui/card";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@sm/components/ui/table";
+import { Badge } from "@sm/components/ui/badge";
 import { Clock, CheckCircle, Loader2 } from "lucide-react";
-import type { EquipmentWithMaintenance } from "@/services/equipmentService";
-import { formatDate } from "@/utils/workOrders";
+import type { EquipmentWithMaintenance } from "@sm/services/equipmentService";
+import { formatDate } from "@sm/utils/workOrders";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 
 interface MaintenanceHistoryTableProps {
   equipment: EquipmentWithMaintenance[];

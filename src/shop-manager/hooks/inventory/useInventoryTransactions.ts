@@ -4,7 +4,7 @@ import {
   getInventoryTransactions, 
   getItemTransactions, 
   recordInventoryTransaction 
-} from '@/services/inventory/transactionService';
+} from '@sm/services/inventory/transactionService';
 
 export function useInventoryTransactions(itemId?: string) {
   const [transactions, setTransactions] = useState<any[]>([]);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 export function useWorkOrdersCount() {
   const [activeCount, setActiveCount] = useState(0);

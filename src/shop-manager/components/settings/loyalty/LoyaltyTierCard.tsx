@@ -1,8 +1,8 @@
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { LoyaltyTier } from "@/types/loyalty";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
+import { LoyaltyTier } from "@sm/types/loyalty";
 import { Award, Edit2, Trash2 } from "lucide-react";
 
 interface LoyaltyTierCardProps {

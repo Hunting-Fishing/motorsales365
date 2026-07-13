@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { taxSettingsService, type TaxSettings } from '@/services/settings/taxSettingsService';
-import { useToast } from '@/hooks/use-toast';
+import { taxSettingsService, type TaxSettings } from '@sm/services/settings/taxSettingsService';
+import { useToast } from '@sm/hooks/use-toast';
 
 export function useTaxSettings(shopId?: string) {
   const { toast } = useToast();

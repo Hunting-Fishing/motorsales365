@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Invoice } from "@/types/invoice";
-import { formatCurrency } from "@/utils/formatters";
+import { Invoice } from "@sm/types/invoice";
+import { formatCurrency } from "@sm/utils/formatters";
 
 interface InvoicePDFProps {
   invoice: Invoice;

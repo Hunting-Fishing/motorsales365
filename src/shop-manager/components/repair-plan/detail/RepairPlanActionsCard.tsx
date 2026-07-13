@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardContent, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
 import { Calendar, Tag } from "lucide-react";
 
 export function RepairPlanActionsCard() {

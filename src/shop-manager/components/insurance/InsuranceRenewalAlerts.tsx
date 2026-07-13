@@ -1,14 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
 import { 
   AlertTriangle, Bell, Calendar, Phone, Mail, 
   Clock, RefreshCw, Ship, Truck 
 } from "lucide-react";
-import { InsurancePolicy } from "@/types/insurance";
+import { InsurancePolicy } from "@sm/types/insurance";
 import { format, parseISO } from "date-fns";
-import { formatCurrency } from "@/lib/utils";
-import { useInsurancePolicies } from "@/hooks/useInsurancePolicies";
+import { formatCurrency } from "@sm/lib/utils";
+import { useInsurancePolicies } from "@sm/hooks/useInsurancePolicies";
 
 interface InsuranceRenewalAlertsProps {
   renewals: (InsurancePolicy & { daysUntilExpiry: number })[];

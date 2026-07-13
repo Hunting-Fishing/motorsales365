@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { CalendarViewType } from '@/types/calendar';
+import { CalendarViewType } from '@sm/types/calendar';
 import { CalendarHeader } from './CalendarHeader';
 import { CalendarView } from './CalendarView';
 import { CalendarFilters } from './CalendarFilters';
 import { CalendarDayDetailDialog } from './CalendarDayDetailDialog';
-import { useModuleCalendarEvents, ModuleType } from '@/hooks/useModuleCalendarEvents';
-import { MODULE_ROUTES } from '@/config/moduleRoutes';
-import { cn } from '@/lib/utils';
+import { useModuleCalendarEvents, ModuleType } from '@sm/hooks/useModuleCalendarEvents';
+import { MODULE_ROUTES } from '@sm/config/moduleRoutes';
+import { cn } from '@sm/lib/utils';
 
 interface UnifiedModuleCalendarProps {
   moduleType?: ModuleType;

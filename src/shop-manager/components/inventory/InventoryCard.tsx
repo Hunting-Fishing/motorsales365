@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { InventoryItemExtended } from '@/types/inventory';
+import { Card, CardContent, CardHeader } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { InventoryItemExtended } from '@sm/types/inventory';
 import { 
   Edit, 
   MoreVertical, 
@@ -17,7 +17,7 @@ import {
   Star,
   MapPin
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@sm/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -25,13 +25,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@sm/components/ui/dropdown-menu';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from '@sm/components/ui/tooltip';
 
 interface InventoryCardProps {
   item: InventoryItemExtended;

@@ -1,7 +1,7 @@
 
-import { Invoice, InvoiceItem, InvoiceTemplate } from "@/types/invoice";
-import { WorkOrder } from "@/types/workOrder";
-import { InventoryItem } from "@/types/inventory";
+import { Invoice, InvoiceItem, InvoiceTemplate } from "@sm/types/invoice";
+import { WorkOrder } from "@sm/types/workOrder";
+import { InventoryItem } from "@sm/types/inventory";
 
 export interface InvoiceTemplateActionsProps {
   invoice: Invoice;

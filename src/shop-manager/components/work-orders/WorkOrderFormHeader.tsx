@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@sm/components/ui/alert";
 import { AlertCircle, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 
 interface WorkOrderFormHeaderProps {
   isEditing?: boolean;

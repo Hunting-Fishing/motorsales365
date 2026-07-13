@@ -3,34 +3,34 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle 
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+} from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { 
   Dialog, DialogContent, DialogDescription, DialogFooter, 
   DialogHeader, DialogTitle, DialogTrigger 
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+} from '@sm/components/ui/dialog';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
 import { 
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import { 
   Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage 
-} from '@/components/ui/form';
+} from '@sm/components/ui/form';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow
-} from '@/components/ui/table';
+} from '@sm/components/ui/table';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { format } from 'date-fns';
-import { useEmailSequences } from '@/hooks/email/useEmailSequences';
-import { Badge } from '@/components/ui/badge';
+import { useEmailSequences } from '@sm/hooks/email/useEmailSequences';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Plus, Mail, ArrowRight, Clock, Play, BarChart2, 
   Trash2, Calendar, PauseCircle, ScrollText 
 } from 'lucide-react';
-import { ManageSequenceProcessingButton } from '@/components/email/sequence/ManageSequenceProcessingButton';
+import { ManageSequenceProcessingButton } from '@sm/components/email/sequence/ManageSequenceProcessingButton';
 
 const sequenceSchema = z.object({
   name: z.string().min(2, {

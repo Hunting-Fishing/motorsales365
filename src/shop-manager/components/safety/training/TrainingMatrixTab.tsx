@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
 import { isPast, addDays, isFuture } from 'date-fns';
 

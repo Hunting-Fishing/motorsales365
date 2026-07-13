@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { StaffMember } from '@/types/invoice';
+import { Button } from '@sm/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { StaffMember } from '@sm/types/invoice';
 
 interface StaffSelectorProps {
   isOpen: boolean; // Changed from 'open' to 'isOpen'

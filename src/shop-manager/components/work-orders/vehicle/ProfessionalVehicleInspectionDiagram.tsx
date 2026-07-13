@@ -1,13 +1,13 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { ZoomIn, ZoomOut, RotateCcw, Grid3X3, Eye, Camera, Save } from 'lucide-react';
-import vehicleFrontView from '@/assets/vehicle-front-view.jpg';
-import vehicleBackView from '@/assets/vehicle-back-view.jpg';
-import vehicleTopView from '@/assets/vehicle-top-view.jpg';
-import vehicleSideView from '@/assets/vehicle-side-view.jpg';
+import vehicleFrontView from '@sm/assets/vehicle-front-view.jpg';
+import vehicleBackView from '@sm/assets/vehicle-back-view.jpg';
+import vehicleTopView from '@sm/assets/vehicle-top-view.jpg';
+import vehicleSideView from '@sm/assets/vehicle-side-view.jpg';
 
 export interface DamageArea {
   id: string;

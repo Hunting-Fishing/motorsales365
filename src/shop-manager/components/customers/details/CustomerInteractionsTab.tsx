@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Customer } from '@/types/customer';
-import { CustomerInteraction } from '@/types/interaction';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Customer } from '@sm/types/customer';
+import { CustomerInteraction } from '@sm/types/interaction';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Plus, MessageSquare, Calendar } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
 
 interface CustomerInteractionsTabProps {

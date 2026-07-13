@@ -1,9 +1,9 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Invoice } from "@/types/invoice";
-import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { Invoice } from "@sm/types/invoice";
+import { toast } from "@sm/hooks/use-toast";
+import { supabase } from "@sm/integrations/supabase/client";
 
 export function useInvoiceSave() {
   const navigate = useNavigate();

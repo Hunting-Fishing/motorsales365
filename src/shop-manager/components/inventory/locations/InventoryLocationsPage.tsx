@@ -7,16 +7,16 @@ import {
   TableHead, 
   TableRow, 
   TableCell 
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+} from "@sm/components/ui/table";
+import { Button } from "@sm/components/ui/button";
 import { PlusCircle, Trash, Edit, ChevronRight, ChevronDown } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useInventoryLocations } from "@/hooks/inventory/useInventoryLocations";
-import { InventoryLocation } from "@/types/inventory/locations";
-import { toast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@sm/components/ui/card";
+import { Input } from "@sm/components/ui/input";
+import { LoadingSpinner } from "@sm/components/ui/loading-spinner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { useInventoryLocations } from "@sm/hooks/inventory/useInventoryLocations";
+import { InventoryLocation } from "@sm/types/inventory/locations";
+import { toast } from "@sm/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -24,8 +24,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+} from "@sm/components/ui/dialog";
+import { Label } from "@sm/components/ui/label";
 
 export function InventoryLocationsPage() {
   const [isLoading, setIsLoading] = useState(true);

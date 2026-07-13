@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Label } from '@sm/components/ui/label';
+import { Switch } from '@sm/components/ui/switch';
+import { Button } from '@sm/components/ui/button';
+import { Checkbox } from '@sm/components/ui/checkbox';
 import { Bell, Mail, Loader2 } from 'lucide-react';
-import { useMilestoneNotifications } from '@/hooks/useMilestoneNotifications';
+import { useMilestoneNotifications } from '@sm/hooks/useMilestoneNotifications';
 
 export function MilestoneNotificationSettings() {
   const { preferences, savePreferences, isSavingPreferences, isLoading } = useMilestoneNotifications();

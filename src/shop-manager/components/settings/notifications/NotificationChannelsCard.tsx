@@ -1,9 +1,9 @@
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { NotificationPreferences } from "@/types/notification";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@sm/components/ui/card";
+import { Switch } from "@sm/components/ui/switch";
+import { Badge } from "@sm/components/ui/badge";
+import { NotificationPreferences } from "@sm/types/notification";
 import { MessageSquare, Mail, BellRing } from "lucide-react";
 
 interface NotificationChannelsCardProps {

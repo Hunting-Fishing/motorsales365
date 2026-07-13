@@ -7,17 +7,17 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
+} from "@sm/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
-import { WORK_ORDER_STATUSES } from "@/data/workOrderConstants";
+} from "@sm/components/ui/select";
+import { Badge } from "@sm/components/ui/badge";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
+import { WORK_ORDER_STATUSES } from "@sm/data/workOrderConstants";
 import { Clock, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 interface StatusFieldsProps {

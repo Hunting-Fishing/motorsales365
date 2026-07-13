@@ -1,5 +1,5 @@
 
-import { useUserRoles } from '@/hooks/useUserRoles';
+import { useUserRoles } from '@sm/hooks/useUserRoles';
 
 export interface RoutePermission {
   path: string;

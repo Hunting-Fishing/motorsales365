@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
-import { updateWorkOrderStatus } from '@/services/workOrder';
-import { toast } from '@/hooks/use-toast';
+import { updateWorkOrderStatus } from '@sm/services/workOrder';
+import { toast } from '@sm/hooks/use-toast';
 
 export function useWorkOrderReopen() {
   const [isReopening, setIsReopening] = useState(false);

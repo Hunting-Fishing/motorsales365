@@ -1,7 +1,7 @@
 import React from 'react';
 import { format, isSameDay, startOfDay, addHours } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { StaffScheduleEvent } from '@/types/staffScheduleCalendar';
+import { cn } from '@sm/lib/utils';
+import { StaffScheduleEvent } from '@sm/types/staffScheduleCalendar';
 import { StaffCalendarEvent } from './StaffCalendarEvent';
 
 interface StaffCalendarDayViewProps {

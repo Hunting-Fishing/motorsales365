@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Checkbox } from '@sm/components/ui/checkbox';
 import { Edit2, Trash2, Wrench, FileText, GripVertical } from 'lucide-react';
-import { jobLineStatusMap } from '@/types/jobLine';
+import { jobLineStatusMap } from '@sm/types/jobLine';
 import { DetailFormButton } from './DetailFormButton';
 import { JobLinePartsDisplay } from '../parts/JobLinePartsDisplay';
-import { WorkOrderPart, WorkOrderPartFormValues } from '@/types/workOrderPart';
+import { WorkOrderPart, WorkOrderPartFormValues } from '@sm/types/workOrderPart';
 import { SimpleJobLineEditDialog } from './SimpleJobLineEditDialog';
 import {
   DndContext,

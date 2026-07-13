@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { storageService, type StorageFile } from '@/lib/services/unifiedStorageService';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { storageService, type StorageFile } from '@sm/lib/services/unifiedStorageService';
 import { FolderOpen, FileText, Download, RefreshCw } from 'lucide-react';
 
 interface StorageFileBrowserProps {

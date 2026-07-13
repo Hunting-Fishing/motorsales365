@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { JOB_LINE_STATUSES, WORK_ORDER_PART_STATUSES } from '@/types/jobLine';
-import { WORK_ORDER_STATUSES } from '@/data/workOrderConstants';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { JOB_LINE_STATUSES, WORK_ORDER_PART_STATUSES } from '@sm/types/jobLine';
+import { WORK_ORDER_STATUSES } from '@sm/data/workOrderConstants';
 
 interface StatusSelectorProps {
   currentStatus: string;

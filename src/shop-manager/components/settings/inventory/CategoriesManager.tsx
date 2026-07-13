@@ -1,17 +1,17 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Alert, AlertDescription } from "@sm/components/ui/alert";
 import { Trash2, Plus, Search, Package } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@sm/hooks/use-toast";
 import {
   getInventoryCategories,
   addInventoryCategory,
   deleteInventoryCategory
-} from "@/services/inventory/categoryService";
+} from "@sm/services/inventory/categoryService";
 
 export const CategoriesManager = () => {
   const [categories, setCategories] = useState<string[]>([]);

@@ -8,17 +8,17 @@ import {
   ShoppingCart, Hammer, ChevronRight, AlertCircle, XCircle, Sparkles, Activity,
   CheckCircle2,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAutomotiveStats, useAutomotiveWorkOrders, useAutomotiveAppointments } from '@/hooks/useAutomotiveStats';
+import { cn } from '@sm/lib/utils';
+import { useAutomotiveStats, useAutomotiveWorkOrders, useAutomotiveAppointments } from '@sm/hooks/useAutomotiveStats';
 import {
   BentoStatCard,
   CategoryTile,
   ModuleHero,
   QuickActionRail,
   ActivityFeedCard,
-} from '@/components/module-dashboard/bento';
-import { Particles } from '@/components/ui/magicui/particles';
-import heroCar from '@/assets/automotive-hero.jpg';
+} from '@sm/components/module-dashboard/bento';
+import { Particles } from '@sm/components/ui/magicui/particles';
+import heroCar from '@sm/assets/automotive-hero.jpg';
 
 export default function AutomotiveDashboard() {
   const navigate = useNavigate();

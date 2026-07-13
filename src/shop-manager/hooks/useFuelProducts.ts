@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import type { Tables } from '@/integrations/supabase/types';
+import { supabase } from '@sm/integrations/supabase/client';
+import type { Tables } from '@sm/integrations/supabase/types';
 
 export type FuelProduct = Tables<'fuel_delivery_products'>;
 

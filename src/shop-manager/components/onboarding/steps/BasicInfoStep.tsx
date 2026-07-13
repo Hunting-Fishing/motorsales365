@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { FormField } from '@/components/ui/form-field';
-import { useShopData } from '@/hooks/useShopData';
-import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@sm/components/ui/button';
+import { FormField } from '@sm/components/ui/form-field';
+import { useShopData } from '@sm/hooks/useShopData';
+import { supabase } from '@sm/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface StepProps {

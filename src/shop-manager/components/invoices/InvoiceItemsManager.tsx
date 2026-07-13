@@ -2,8 +2,8 @@
 import React from "react";
 import { InvoiceItemsHeader } from "./InvoiceItemsHeader";
 import { InvoiceItemsTable } from "./InvoiceItemsTable";
-import { InvoiceItem } from "@/types/invoice";
-import { InventoryItem } from "@/types/inventory";
+import { InvoiceItem } from "@sm/types/invoice";
+import { InventoryItem } from "@sm/types/inventory";
 
 interface InvoiceItemsManagerProps {
   items: InvoiceItem[];

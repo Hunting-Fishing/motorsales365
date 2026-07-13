@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 
 export const ErrorState = ({ onRetry }: { onRetry?: () => void }) => {

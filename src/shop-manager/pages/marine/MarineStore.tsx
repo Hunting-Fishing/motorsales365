@@ -1,4 +1,4 @@
-import { ModuleStore, StoreCategory } from '@/components/store/ModuleStore';
+import { ModuleStore, StoreCategory } from '@sm/components/store/ModuleStore';
 import { Anchor, Package, Wrench, Compass, Ship, Gauge } from 'lucide-react';
 
 const MARINE_CATEGORIES: StoreCategory[] = [

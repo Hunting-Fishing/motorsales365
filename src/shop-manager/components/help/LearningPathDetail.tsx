@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
+import { Progress } from "@sm/components/ui/progress";
+import { Separator } from "@sm/components/ui/separator";
 import { 
   BookOpen, 
   Clock, 
@@ -19,8 +19,8 @@ import {
   ChevronRight,
   Circle
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@sm/integrations/supabase/client";
+import { useToast } from "@sm/hooks/use-toast";
 
 interface Article {
   id: string;

@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
 import { Image } from "lucide-react";
 
 interface LogoUploadSectionProps {

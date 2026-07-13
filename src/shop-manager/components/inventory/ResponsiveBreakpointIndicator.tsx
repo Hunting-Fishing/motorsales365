@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Smartphone, 
   Tablet, 
@@ -14,7 +14,7 @@ import {
   List,
   Table as TableIcon
 } from 'lucide-react';
-import { ViewMode } from '@/contexts/InventoryViewContext';
+import { ViewMode } from '@sm/contexts/InventoryViewContext';
 
 interface ResponsiveBreakpointIndicatorProps {
   currentViewMode: ViewMode;

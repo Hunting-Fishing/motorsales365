@@ -1,5 +1,5 @@
 
-import { ChatParticipant } from "@/types/chat";
+import { ChatParticipant } from "@sm/types/chat";
 import { supabase } from "./supabaseClient";
 
 // Get participants for a chat room

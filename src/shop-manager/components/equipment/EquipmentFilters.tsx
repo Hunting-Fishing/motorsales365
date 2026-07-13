@@ -1,7 +1,7 @@
 import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Label } from '@sm/components/ui/label';
+import { Button } from '@sm/components/ui/button';
 
 interface EquipmentFiltersProps {
   searchQuery: string;

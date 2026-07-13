@@ -1,10 +1,10 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { toast } from "@sm/hooks/use-toast";
 import { useEffect, useState } from "react";
-import { getInventoryItemById } from "@/services/inventory/crudService";
+import { getInventoryItemById } from "@sm/services/inventory/crudService";
 
 interface InventoryQuantityManagerProps {
   itemId: string;

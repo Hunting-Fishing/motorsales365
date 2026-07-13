@@ -1,7 +1,7 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 import { FeedbackQuestion, QuestionType } from "./types";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@sm/hooks/use-toast";
 
 // Create feedback questions for a form
 export const createFeedbackQuestions = async (questions: Omit<FeedbackQuestion, 'id' | 'created_at' | 'updated_at'>[]): Promise<FeedbackQuestion[] | null> => {

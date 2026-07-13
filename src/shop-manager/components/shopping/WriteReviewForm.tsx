@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Star } from 'lucide-react';
 import ReviewForm from './ReviewForm';
 

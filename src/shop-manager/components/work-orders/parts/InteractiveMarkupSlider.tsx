@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@sm/components/ui/form';
+import { Input } from '@sm/components/ui/input';
+import { Slider } from '@sm/components/ui/slider';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { DollarSign, TrendingUp } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
-import { WorkOrderPartFormValues } from '@/types/workOrderPart';
+import { WorkOrderPartFormValues } from '@sm/types/workOrderPart';
 
 interface InteractiveMarkupSliderProps {
   form: UseFormReturn<WorkOrderPartFormValues>;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { useShopId } from './useShopId';
-import type { SafetyDashboardStats, SafetyIncident, DailyShopInspection, LiftHoistInspection } from '@/types/safety';
+import type { SafetyDashboardStats, SafetyIncident, DailyShopInspection, LiftHoistInspection } from '@sm/types/safety';
 
 export function useSafetyDashboard() {
   const { shopId } = useShopId();

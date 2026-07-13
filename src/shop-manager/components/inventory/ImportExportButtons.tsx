@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Download, Upload, FileSpreadsheet } from 'lucide-react';
-import { useInventoryImportExport } from '@/hooks/inventory/useInventoryImportExport';
+import { useInventoryImportExport } from '@sm/hooks/inventory/useInventoryImportExport';
 
 export function ImportExportButtons() {
   const fileInputRef = useRef<HTMLInputElement>(null);

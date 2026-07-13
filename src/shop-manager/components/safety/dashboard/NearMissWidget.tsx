@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { AlertTriangle, ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useNearMissReports } from '@/hooks/useNearMissReports';
+import { useNearMissReports } from '@sm/hooks/useNearMissReports';
 import { subDays, isAfter } from 'date-fns';
 
 export function NearMissWidget() {

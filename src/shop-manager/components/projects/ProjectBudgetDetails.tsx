@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { ArrowLeft, Edit, Trash2, CheckCircle, XCircle, Plus, Users, Wrench, History, FileDown, Paperclip, MessageSquare, Save, Bell } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Progress } from '@sm/components/ui/progress';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,13 +14,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useProjectDetails } from '@/hooks/useProjectBudgets';
-import { useProjectBudgets } from '@/hooks/useProjectBudgets';
-import { useProjectResources } from '@/hooks/useProjectResources';
-import { formatCurrency } from '@/lib/utils';
+} from '@sm/components/ui/alert-dialog';
+import { useProjectDetails } from '@sm/hooks/useProjectBudgets';
+import { useProjectBudgets } from '@sm/hooks/useProjectBudgets';
+import { useProjectResources } from '@sm/hooks/useProjectResources';
+import { formatCurrency } from '@sm/lib/utils';
 import { format } from 'date-fns';
-import { PROJECT_STATUSES, PROJECT_TYPES } from '@/types/projectBudget';
+import { PROJECT_STATUSES, PROJECT_TYPES } from '@sm/types/projectBudget';
 import { PhaseList } from './PhaseList';
 import { PhaseTimeline } from './PhaseTimeline';
 import { EarnedValueAnalysis } from './EarnedValueAnalysis';
@@ -33,7 +33,7 @@ import { CreatePhaseDialog } from './CreatePhaseDialog';
 import { CreateCostItemDialog } from './CreateCostItemDialog';
 import { CreateChangeOrderDialog } from './CreateChangeOrderDialog';
 import { CreateSnapshotDialog } from './CreateSnapshotDialog';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { ProjectPdfExport } from './ProjectPdfExport';
 import { ProjectCsvExport } from './ProjectCsvExport';
 import { SaveAsTemplateDialog } from './SaveAsTemplateDialog';

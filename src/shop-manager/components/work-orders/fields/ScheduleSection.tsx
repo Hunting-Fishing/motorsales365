@@ -1,15 +1,15 @@
 
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { CalendarIcon, Clock } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
+import { Button } from "@sm/components/ui/button";
+import { Calendar } from "@sm/components/ui/calendar";
+import { cn } from "@sm/lib/utils";
 import { format } from "date-fns";
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@sm/components/ui/textarea";
 
 interface ScheduleSectionProps {
   form: any;

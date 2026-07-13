@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Bell, Search, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNotifications } from "@/context/notifications";
-import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@sm/components/ui/button";
+import { useNotifications } from "@sm/context/notifications";
+import { NotificationsDropdown } from "@sm/components/notifications/NotificationsDropdown";
+import { useIsMobile } from "@sm/hooks/use-mobile";
 import { HeaderSidebarToggle } from "./HeaderSidebarToggle";
 import { HeaderActions } from "./HeaderActions";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ThemeToggle } from "@sm/components/theme/ThemeToggle";
 
 export function Header() {
   const { unreadCount } = useNotifications();

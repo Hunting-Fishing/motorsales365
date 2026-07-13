@@ -1,23 +1,23 @@
 
 import React, { useState } from 'react';
-import { ChatMessage as ChatMessageType } from '@/types/chat';
+import { ChatMessage as ChatMessageType } from '@sm/types/chat';
 import { formatDistanceToNow } from 'date-fns';
-import { parseFileFromMessage } from '@/services/chat/fileService';
+import { parseFileFromMessage } from '@sm/services/chat/fileService';
 import { ChatFileMessage } from './file/ChatFileMessage';
-import { cn } from "@/lib/utils";
+import { cn } from "@sm/lib/utils";
 import { TaggedItem } from './TaggedItem';
-import { parseTaggedItems } from '@/services/chat/message/types';
-import { Button } from '@/components/ui/button';
+import { parseTaggedItems } from '@sm/services/chat/message/types';
+import { Button } from '@sm/components/ui/button';
 import { Save, AlertCircle, MessageSquare, Edit2, Trash2, ThumbsUp, Heart, Smile } from 'lucide-react';
-import { saveMessageToRecord } from '@/services/chat/message/mutations';
-import { toast } from '@/hooks/use-toast';
+import { saveMessageToRecord } from '@sm/services/chat/message/mutations';
+import { toast } from '@sm/hooks/use-toast';
 import { 
   addMessageReaction, 
   removeMessageReaction, 
   getMessageReactions 
-} from '@/services/chat/message/reactions';
+} from '@sm/services/chat/message/reactions';
 import { useEffect } from 'react';
-import { markMessageAsRead } from '@/services/chat/message/readReceipts';
+import { markMessageAsRead } from '@sm/services/chat/message/readReceipts';
 
 interface ChatMessageProps {
   message: ChatMessageType;

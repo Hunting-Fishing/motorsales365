@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { TeamMember } from "@/types/team";
-import { getInitials } from "@/utils/teamUtils";
+import { Avatar, AvatarFallback, AvatarImage } from "@sm/components/ui/avatar";
+import { Button } from "@sm/components/ui/button";
+import { TeamMember } from "@sm/types/team";
+import { getInitials } from "@sm/utils/teamUtils";
 
 interface TeamMembersListProps {
   teamMembers: TeamMember[];

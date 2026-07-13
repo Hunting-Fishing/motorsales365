@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { FileDown } from "lucide-react";
 import { jsPDF } from "jspdf";
 import 'jspdf-autotable';
-import { ProjectBudget } from "@/types/projectBudget";
+import { ProjectBudget } from "@sm/types/projectBudget";
 import { format } from "date-fns";
 import { toast } from "sonner";
 

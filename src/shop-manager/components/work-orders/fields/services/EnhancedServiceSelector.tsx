@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ServiceSector, ServiceJob } from '@/types/service';
-import { SelectedService, ServiceSelectionSummary } from '@/types/selectedService';
+import { ServiceSector, ServiceJob } from '@sm/types/service';
+import { SelectedService, ServiceSelectionSummary } from '@sm/types/selectedService';
 import { HierarchicalServiceSelector } from './HierarchicalServiceSelector';
 import { SelectedServiceCard } from './SelectedServiceCard';
 import { ServiceSelectionSummary as SummaryComponent } from './ServiceSelectionSummary';
 import { CollapsedServiceSelector } from './CollapsedServiceSelector';
-import { ResponsiveGrid } from '@/components/ui/responsive-grid';
+import { ResponsiveGrid } from '@sm/components/ui/responsive-grid';
 
 interface EnhancedServiceSelectorProps {
   sectors: ServiceSector[];

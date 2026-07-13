@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Avatar, AvatarFallback } from '@sm/components/ui/avatar';
 import {
   History,
   UserPlus,
@@ -15,7 +15,7 @@ import {
 import { format } from 'date-fns';
 
 interface TaskHistoryTabProps {
-  taskData: ReturnType<typeof import('@/hooks/useTaskData').useTaskData>;
+  taskData: ReturnType<typeof import('@sm/hooks/useTaskData').useTaskData>;
 }
 
 export function TaskHistoryTab({ taskData }: TaskHistoryTabProps) {

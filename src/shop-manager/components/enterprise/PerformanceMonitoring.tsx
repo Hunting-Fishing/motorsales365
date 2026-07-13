@@ -1,10 +1,10 @@
 
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Progress } from '@sm/components/ui/progress';
 import { TrendingUp, Activity, Clock, Zap, Loader2, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@sm/components/ui/button';
+import { supabase } from '@sm/integrations/supabase/client';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface PerformanceMetric {

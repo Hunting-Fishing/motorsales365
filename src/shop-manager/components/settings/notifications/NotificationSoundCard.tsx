@@ -1,11 +1,11 @@
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Card, CardHeader, CardTitle, CardContent } from "@sm/components/ui/card";
+import { Label } from "@sm/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@sm/components/ui/radio-group";
 import { Bell } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { playNotificationSound } from "@/utils/notificationSounds";
+import { Button } from "@sm/components/ui/button";
+import { playNotificationSound } from "@sm/utils/notificationSounds";
 
 interface NotificationSoundCardProps {
   selectedSound: string;

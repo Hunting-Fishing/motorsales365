@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
 import { Search, Download, Upload, Plus, Save } from 'lucide-react';
 
 interface ExcelViewHeaderProps {

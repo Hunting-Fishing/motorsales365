@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { Card } from '@sm/components/ui/card';
+import { Label } from '@sm/components/ui/label';
+import { Input } from '@sm/components/ui/input';
 import { Gauge, Clock, TrendingUp } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface HourMeterInputProps {
   itemKey: string;

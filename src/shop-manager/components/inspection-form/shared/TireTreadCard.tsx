@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { Label } from "@sm/components/ui/label";
+import { Slider } from "@sm/components/ui/slider";
 import { AlertTriangle, Check, AlertCircle, Gauge } from "lucide-react";
 
 interface TireTreadCardProps {

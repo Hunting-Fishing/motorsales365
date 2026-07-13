@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@/types/service';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Progress } from '@sm/components/ui/progress';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@sm/types/service';
 import { 
   BarChart, 
   Bar, 

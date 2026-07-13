@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useAuth } from '@sm/hooks/useAuth';
 import {
   getTaskActivities,
   getTaskAssignees,
@@ -23,8 +23,8 @@ import {
   TaskAssignment,
   TaskTimeEntry,
   TaskPart,
-} from '@/services/calendar/taskService';
-import { CalendarEvent } from '@/types/calendar/events';
+} from '@sm/services/calendar/taskService';
+import { CalendarEvent } from '@sm/types/calendar/events';
 import { toast } from 'sonner';
 
 export function useTaskData(taskId: string | null) {

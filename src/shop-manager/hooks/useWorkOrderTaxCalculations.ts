@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { useTaxSettings } from './useTaxSettings';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { Customer } from '@/types/customer';
-import { calculateTax, TaxCalculationResult } from '@/utils/taxCalculations';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { Customer } from '@sm/types/customer';
+import { calculateTax, TaxCalculationResult } from '@sm/utils/taxCalculations';
 
 interface UseWorkOrderTaxCalculationsProps {
   jobLines: WorkOrderJobLine[];

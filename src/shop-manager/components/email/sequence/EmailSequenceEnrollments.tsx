@@ -2,17 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Card, CardContent, CardDescription, CardHeader, CardTitle 
-} from '@/components/ui/card';
+} from '@sm/components/ui/card';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+} from '@sm/components/ui/table';
+import { Button } from '@sm/components/ui/button';
 import { Play, Pause, X, User } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
-import { useEmailSequences } from '@/hooks/email/useEmailSequences';
-import { Skeleton } from '@/components/ui/skeleton';
-import { EmailSequenceEnrollment } from '@/types/email';
+import { useEmailSequences } from '@sm/hooks/email/useEmailSequences';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { EmailSequenceEnrollment } from '@sm/types/email';
 import { ProcessEnrollmentStepButton } from './ProcessEnrollmentStepButton';
 
 interface EmailSequenceEnrollmentsProps {

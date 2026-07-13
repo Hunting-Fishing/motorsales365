@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Layout } from '@/components/layout/Layout';
-import { SignaturePad } from '@/components/signature/SignaturePad';
-import { CompactSignaturePad } from '@/components/signature/CompactSignaturePad';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/components/ui/use-toast';
+import { Layout } from '@sm/components/layout/Layout';
+import { SignaturePad } from '@sm/components/signature/SignaturePad';
+import { CompactSignaturePad } from '@sm/components/signature/CompactSignaturePad';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { useToast } from '@sm/components/ui/use-toast';
 
 export default function SignatureDemo() {
   const [signature1, setSignature1] = useState<string | null>(null);

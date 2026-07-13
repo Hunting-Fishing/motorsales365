@@ -1,7 +1,7 @@
 
-import { supabase } from "@/lib/supabase";
-import { InventoryLocation, CreateInventoryLocationDto } from "@/types/inventory/locations";
-import { handleApiError } from "@/utils/errorHandling";
+import { supabase } from "@sm/lib/supabase";
+import { InventoryLocation, CreateInventoryLocationDto } from "@sm/types/inventory/locations";
+import { handleApiError } from "@sm/utils/errorHandling";
 
 export async function getInventoryLocations(): Promise<InventoryLocation[]> {
   try {

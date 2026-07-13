@@ -7,7 +7,7 @@ import {
   SelectValue,
   SelectGroup,
   SelectLabel,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 
 export const FUEL_TYPE_OPTIONS = [
   { value: 'gasoline_87', label: 'Gasoline 87 (Regular)', group: 'gasoline' },

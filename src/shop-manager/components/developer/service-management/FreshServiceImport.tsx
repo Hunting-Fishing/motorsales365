@@ -1,14 +1,14 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { RefreshCw, Database, Trash2 } from 'lucide-react';
 import { StorageImportManager } from './StorageImportManager';
 import { ServiceImportProgress } from './ServiceImportProgress';
 import { LiveBucketViewer } from './LiveBucketViewer';
 import { DatabaseDiagnostics } from './DatabaseDiagnostics';
-import { useServiceManagement } from '@/hooks/useServiceManagement';
+import { useServiceManagement } from '@sm/hooks/useServiceManagement';
 
 export function FreshServiceImport({ onImportComplete }: { onImportComplete?: () => void }) {
   const {

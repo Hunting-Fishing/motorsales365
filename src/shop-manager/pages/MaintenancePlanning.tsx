@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Calendar, Wrench, DollarSign, Package, AlertTriangle, TrendingUp, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@sm/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { generateMaintenanceForecast } from '@/services/maintenance/predictiveMaintenanceService';
+import { supabase } from '@sm/integrations/supabase/client';
+import { generateMaintenanceForecast } from '@sm/services/maintenance/predictiveMaintenanceService';
 import { format } from 'date-fns';
-import { useShopId } from '@/hooks/useShopId';
-import { getMaintenanceActivities } from '@/services/maintenance/maintenanceActivityService';
-import { CreateScheduleDialog } from '@/components/maintenance/CreateScheduleDialog';
-import { EditScheduleDialog } from '@/components/maintenance/EditScheduleDialog';
-import { BudgetDashboard } from '@/components/maintenance/BudgetDashboard';
-import { MaintenanceCalendar } from '@/components/maintenance/MaintenanceCalendar';
-import { MaintenanceHistory } from '@/components/maintenance/MaintenanceHistory';
-import { ActivityAnalytics } from '@/components/maintenance/ActivityAnalytics';
-import { ActivityExport } from '@/components/maintenance/ActivityExport';
-import { ScheduleActions } from '@/components/maintenance/ScheduleActions';
+import { useShopId } from '@sm/hooks/useShopId';
+import { getMaintenanceActivities } from '@sm/services/maintenance/maintenanceActivityService';
+import { CreateScheduleDialog } from '@sm/components/maintenance/CreateScheduleDialog';
+import { EditScheduleDialog } from '@sm/components/maintenance/EditScheduleDialog';
+import { BudgetDashboard } from '@sm/components/maintenance/BudgetDashboard';
+import { MaintenanceCalendar } from '@sm/components/maintenance/MaintenanceCalendar';
+import { MaintenanceHistory } from '@sm/components/maintenance/MaintenanceHistory';
+import { ActivityAnalytics } from '@sm/components/maintenance/ActivityAnalytics';
+import { ActivityExport } from '@sm/components/maintenance/ActivityExport';
+import { ScheduleActions } from '@sm/components/maintenance/ScheduleActions';
 
 export default function MaintenancePlanning() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);

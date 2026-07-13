@@ -1,8 +1,8 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { InventoryItemExtended } from "@/types/inventory";
-import { supabase } from "@/integrations/supabase/client";
+import { InventoryItemExtended } from "@sm/types/inventory";
+import { supabase } from "@sm/integrations/supabase/client";
 
 export function useManualReorder() {
   const [isReordering, setIsReordering] = useState(false);

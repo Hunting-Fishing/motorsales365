@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Contact, ContactCategory, Resource, ContactFormData, ResourceFormData } from '@/types/contacts';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Contact, ContactCategory, Resource, ContactFormData, ResourceFormData } from '@sm/types/contacts';
 import { toast } from 'sonner';
 
 const DEFAULT_SHOP_ID = '00000000-0000-0000-0000-000000000000';

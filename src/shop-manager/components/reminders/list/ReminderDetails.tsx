@@ -1,7 +1,7 @@
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@sm/components/ui/badge";
 import { Calendar, Car, Bell } from "lucide-react";
-import { ServiceReminder } from "@/types/reminder";
+import { ServiceReminder } from "@sm/types/reminder";
 import { format, parseISO } from "date-fns";
 import { ReminderStatusBadge } from "./ReminderStatusBadge";
 

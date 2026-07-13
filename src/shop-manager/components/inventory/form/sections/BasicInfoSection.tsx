@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { InventoryFormField } from '../InventoryFormField';
 import { InventoryFormSelect } from '../InventoryFormSelect';
 import { HierarchicalCategorySelect } from '../HierarchicalCategorySelect';

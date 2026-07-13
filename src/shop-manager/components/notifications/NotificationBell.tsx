@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Bell } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useNotifications } from '@/context/notifications';
+import { Button } from '@sm/components/ui/button';
+import { useNotifications } from '@sm/context/notifications';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { SafeComponentWrapper } from '../safety/SafeComponentWrapper';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 export function NotificationBell() {
   return (

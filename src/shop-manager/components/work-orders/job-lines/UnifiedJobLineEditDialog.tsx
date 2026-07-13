@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { jobLineStatusMap, JOB_LINE_STATUSES, LABOR_RATE_TYPES } from '@/types/jobLine';
-import { updateWorkOrderJobLine } from '@/services/workOrder/jobLinesService';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { jobLineStatusMap, JOB_LINE_STATUSES, LABOR_RATE_TYPES } from '@sm/types/jobLine';
+import { updateWorkOrderJobLine } from '@sm/services/workOrder/jobLinesService';
 export interface UnifiedJobLineEditDialogProps {
   jobLine: WorkOrderJobLine | null;
   workOrderId: string;

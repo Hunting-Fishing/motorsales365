@@ -1,5 +1,5 @@
 
-import { AffiliateProduct } from '@/types/affiliate';
+import { AffiliateProduct } from '@sm/types/affiliate';
 
 /**
  * Sample product generation has been completely disabled

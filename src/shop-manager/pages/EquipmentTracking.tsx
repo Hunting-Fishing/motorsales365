@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useEquipment } from '@/hooks/useEquipment';
-import { useEquipmentInspections } from '@/hooks/useEquipmentInspections';
-import { useMaintenanceSchedules } from '@/hooks/useMaintenanceSchedules';
-import { PreTripInspectionDialogWithTemplate } from '@/components/equipment/PreTripInspectionDialogWithTemplate';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { useEquipment } from '@sm/hooks/useEquipment';
+import { useEquipmentInspections } from '@sm/hooks/useEquipmentInspections';
+import { useMaintenanceSchedules } from '@sm/hooks/useMaintenanceSchedules';
+import { PreTripInspectionDialogWithTemplate } from '@sm/components/equipment/PreTripInspectionDialogWithTemplate';
 import { ClipboardCheck, Calendar, TrendingUp, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 

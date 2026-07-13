@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { Save } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useShopId } from "@/hooks/useShopId";
-import type { Json } from "@/integrations/supabase/types";
+import { useToast } from "@sm/hooks/use-toast";
+import { supabase } from "@sm/integrations/supabase/client";
+import { useShopId } from "@sm/hooks/useShopId";
+import type { Json } from "@sm/integrations/supabase/types";
 
 const COST_RANGES = [
   { min: 0, max: 5, label: "$0 - $5" },

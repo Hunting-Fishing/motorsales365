@@ -1,7 +1,7 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import type { Equipment, EquipmentStatus, MaintenanceRecord, MaintenanceSchedule } from "@/types/equipment";
-import { transformEquipmentData, prepareEquipmentForInsert } from "@/utils/equipment/typeUtils";
+import { supabase } from "@sm/integrations/supabase/client";
+import type { Equipment, EquipmentStatus, MaintenanceRecord, MaintenanceSchedule } from "@sm/types/equipment";
+import { transformEquipmentData, prepareEquipmentForInsert } from "@sm/utils/equipment/typeUtils";
 
 // Define the interface that matches the actual database structure
 export interface EquipmentWithMaintenance extends Equipment {

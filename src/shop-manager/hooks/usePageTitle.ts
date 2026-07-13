@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react';
-import { useCompany } from '@/contexts/CompanyContext';
+import { useCompany } from '@sm/contexts/CompanyContext';
 
 export const usePageTitle = (pageTitle: string, includeCompanyName = true) => {
   const { companyName } = useCompany();

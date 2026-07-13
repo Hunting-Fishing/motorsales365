@@ -1,6 +1,6 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 
 interface WorkOrdersPaginationProps {
   currentPage: number;

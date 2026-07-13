@@ -1,20 +1,20 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@sm/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
 import { Plus, Pencil, Trash2, Users, Search, Building2, Wrench, HeadphonesIcon, ShieldCheck, Calculator, Truck, Settings, UserCheck, ChevronDown } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useDepartmentMembers } from '@/hooks/team/useDepartmentMembers';
-import { useDepartments } from '@/hooks/team/useDepartments';
-import { toast } from '@/hooks/use-toast';
+import { useDepartmentMembers } from '@sm/hooks/team/useDepartmentMembers';
+import { useDepartments } from '@sm/hooks/team/useDepartments';
+import { toast } from '@sm/hooks/use-toast';
 import { AssignUserDialog } from './AssignUserDialog';
 const predefinedDepartments = [{
   name: 'Service Operations',

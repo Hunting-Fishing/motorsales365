@@ -1,8 +1,8 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useDebounce } from './useDebounce';
-import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@/types/service';
-import { enhancedSearch, sortByRelevance, SearchMatch } from '@/utils/search/enhancedSearch';
+import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@sm/types/service';
+import { enhancedSearch, sortByRelevance, SearchMatch } from '@sm/utils/search/enhancedSearch';
 
 interface EnhancedServiceJob extends ServiceJob {
   searchMatch?: SearchMatch;

@@ -8,7 +8,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@sm/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -16,18 +16,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+} from '@sm/components/ui/form';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { useFeatureRequests } from '@/hooks/useFeatureRequests';
+} from '@sm/components/ui/select';
+import { Button } from '@sm/components/ui/button';
+import { useFeatureRequests } from '@sm/hooks/useFeatureRequests';
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),

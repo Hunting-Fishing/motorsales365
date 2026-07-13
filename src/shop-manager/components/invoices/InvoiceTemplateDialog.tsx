@@ -5,9 +5,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { InvoiceTemplate } from "@/types/invoice";
+} from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { InvoiceTemplate } from "@sm/types/invoice";
 import { format } from "date-fns";
 import { CalendarPlus } from "lucide-react";
 

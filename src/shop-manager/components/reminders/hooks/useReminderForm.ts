@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { toast } from "@/hooks/use-toast";
-import { createReminder, CreateReminderData } from "@/services/reminders/reminderMutations";
-import { ReminderType, ReminderPriority, RecurrenceUnit, ReminderCategory } from "@/types/reminder";
+import { toast } from "@sm/hooks/use-toast";
+import { createReminder, CreateReminderData } from "@sm/services/reminders/reminderMutations";
+import { ReminderType, ReminderPriority, RecurrenceUnit, ReminderCategory } from "@sm/types/reminder";
 import { reminderFormSchema, ReminderFormValues } from "../schemas/reminderFormSchema";
 
 interface UseReminderFormProps {

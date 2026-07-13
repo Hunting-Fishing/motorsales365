@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { 
   Download, 
   Printer, 

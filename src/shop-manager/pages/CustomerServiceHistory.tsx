@@ -1,17 +1,17 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { ArrowLeft, FileText, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ServiceHistoryTable } from '@/components/service-history/ServiceHistoryTable';
-import { useWorkOrdersByCustomer } from '@/hooks/useWorkOrdersByCustomer';
-import { useCustomerByName } from '@/hooks/useCustomerByName';
-import { WorkOrder } from '@/types/workOrder';
-import { Customer } from '@/types/customer';
-import { mapDatabaseWorkOrder } from '@/utils/workOrders/typeMappers';
-import { toast } from '@/hooks/use-toast';
+import { ServiceHistoryTable } from '@sm/components/service-history/ServiceHistoryTable';
+import { useWorkOrdersByCustomer } from '@sm/hooks/useWorkOrdersByCustomer';
+import { useCustomerByName } from '@sm/hooks/useCustomerByName';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Customer } from '@sm/types/customer';
+import { mapDatabaseWorkOrder } from '@sm/utils/workOrders/typeMappers';
+import { toast } from '@sm/hooks/use-toast';
 
 const CustomerServiceHistory = () => {
   const { customerName } = useParams<{ customerName: string }>();

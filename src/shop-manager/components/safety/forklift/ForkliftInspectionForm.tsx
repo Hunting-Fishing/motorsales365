@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/hooks/use-toast';
-import { useForkliftInspections, ItemStatus } from '@/hooks/useForkliftInspections';
-import { useMaintenanceIntervalTracking } from '@/hooks/useMaintenanceIntervalTracking';
-import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Badge } from '@sm/components/ui/badge';
+import { Switch } from '@sm/components/ui/switch';
+import { Separator } from '@sm/components/ui/separator';
+import { useToast } from '@sm/hooks/use-toast';
+import { useForkliftInspections, ItemStatus } from '@sm/hooks/useForkliftInspections';
+import { useMaintenanceIntervalTracking } from '@sm/hooks/useMaintenanceIntervalTracking';
+import { supabase } from '@sm/integrations/supabase/client';
 import { ForkliftInspectionItem } from './ForkliftInspectionItem';
 import { ServiceIntervalCountdown } from './ServiceIntervalCountdown';
-import { CompactSignaturePad } from '@/components/signature/CompactSignaturePad';
+import { CompactSignaturePad } from '@sm/components/signature/CompactSignaturePad';
 import {
   Loader2, Forklift, Gauge, Armchair, Siren, Eye, Wrench, 
   Battery, Flame, Droplets, Wind, Shield, AlertTriangle, PenTool

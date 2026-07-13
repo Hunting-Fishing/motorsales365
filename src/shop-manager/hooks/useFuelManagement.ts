@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
 import { toast } from 'sonner';
-import { Database } from '@/integrations/supabase/types';
+import { Database } from '@sm/integrations/supabase/types';
 
 type FuelEntry = Database['public']['Tables']['fuel_entries']['Row'];
 type FuelCard = Database['public']['Tables']['fuel_cards']['Row'];

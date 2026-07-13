@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@sm/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { UseFormReturn } from 'react-hook-form';
-import { useSuppliers } from '@/hooks/inventory/useSuppliers';
-import { WorkOrderPartFormValues } from '@/types/workOrderPart';
+import { useSuppliers } from '@sm/hooks/inventory/useSuppliers';
+import { WorkOrderPartFormValues } from '@sm/types/workOrderPart';
 
 interface SupplierSelectorProps {
   form: UseFormReturn<WorkOrderPartFormValues>;

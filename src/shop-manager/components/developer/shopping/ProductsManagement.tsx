@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Link } from "react-router-dom";
 import { Edit, Trash2, Plus, Search, ArrowUpDown, Star, Trophy } from "lucide-react";
 import { toast } from 'sonner';
-import { fetchAllProducts, deleteProductAdmin, toggleProductFeature, toggleProductBestseller } from '@/services/admin/productAdminService';
+import { fetchAllProducts, deleteProductAdmin, toggleProductFeature, toggleProductBestseller } from '@sm/services/admin/productAdminService';
 import { useNavigate } from 'react-router-dom';
-import { Product } from '@/services/admin/productAdminService';
-import { Badge } from '@/components/ui/badge';
+import { Product } from '@sm/services/admin/productAdminService';
+import { Badge } from '@sm/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -15,8 +15,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
+} from "@sm/components/ui/table";
+import { Input } from "@sm/components/ui/input";
 
 const ProductsManagement = () => {
   const [products, setProducts] = useState<Product[]>([]);

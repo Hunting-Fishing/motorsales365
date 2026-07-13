@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { SecuritySettings } from "@/types/settings";
+import { supabase } from "@sm/lib/supabase";
+import { SecuritySettings } from "@sm/types/settings";
 
 export const securityService = {
   async getSecuritySettings(shopId: string): Promise<SecuritySettings | null> {

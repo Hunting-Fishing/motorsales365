@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
 import { 
   FileText, 
   Clock, 
@@ -13,7 +13,7 @@ import {
   TrendingDown,
   RefreshCw
 } from 'lucide-react';
-import { useWorkOrderStats } from '@/hooks/work-orders/useWorkOrderStats';
+import { useWorkOrderStats } from '@sm/hooks/work-orders/useWorkOrderStats';
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {

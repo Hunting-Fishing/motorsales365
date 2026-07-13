@@ -1,5 +1,5 @@
 
-import { Bay as BaseBay, RateSettings } from "@/services/diybay/diybayService";
+import { Bay as BaseBay, RateSettings } from "@sm/services/diybay/diybayService";
 
 export type BayViewMode = "table" | "cards" | "compact";
 

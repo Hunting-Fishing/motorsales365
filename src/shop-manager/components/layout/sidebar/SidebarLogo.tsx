@@ -1,9 +1,9 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useSidebar } from "@/hooks/use-sidebar";
-import { useCompany } from "@/contexts/CompanyContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@sm/components/ui/avatar";
+import { useSidebar } from "@sm/hooks/use-sidebar";
+import { useCompany } from "@sm/contexts/CompanyContext";
 
 export function SidebarLogo() {
   const { isOpen } = useSidebar();

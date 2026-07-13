@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { toast } from '@/hooks/use-toast';
-import { InvoiceTemplate } from '@/types/invoice';
+import { supabase } from '@sm/lib/supabase';
+import { toast } from '@sm/hooks/use-toast';
+import { InvoiceTemplate } from '@sm/types/invoice';
 
 export function useInvoiceTemplates() {
   const [templates, setTemplates] = useState<InvoiceTemplate[]>([]);

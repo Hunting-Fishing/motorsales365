@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { Briefcase, TrendingUp, AlertTriangle, Clock, DollarSign } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { formatCurrency } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
+import { formatCurrency } from '@sm/lib/utils';
 import { differenceInDays } from 'date-fns';
-import type { ProjectBudget } from '@/types/projectBudget';
+import type { ProjectBudget } from '@sm/types/projectBudget';
 
 interface ProjectSummaryWidgetProps {
   projects: ProjectBudget[];

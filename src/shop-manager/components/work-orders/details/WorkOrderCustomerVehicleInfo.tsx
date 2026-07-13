@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { User, Car, Phone, Mail, MapPin } from 'lucide-react';
 
 interface WorkOrderCustomerVehicleInfoProps {

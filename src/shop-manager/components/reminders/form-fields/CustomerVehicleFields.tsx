@@ -7,8 +7,8 @@ import {
   FormLabel, 
   FormControl, 
   FormMessage 
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
 import { ReminderFormValues } from "../schemas/reminderFormSchema";
 
 interface CustomerVehicleFieldsProps {

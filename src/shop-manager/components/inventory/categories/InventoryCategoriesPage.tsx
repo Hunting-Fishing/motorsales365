@@ -7,18 +7,18 @@ import {
   TableHead, 
   TableRow, 
   TableCell 
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+} from "@sm/components/ui/table";
+import { Button } from "@sm/components/ui/button";
 import { PlusCircle, Trash } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@sm/components/ui/card";
 import { 
   getInventoryCategories, 
   addInventoryCategory, 
   deleteInventoryCategory 
-} from "@/services/inventory/categoryService";
-import { toast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+} from "@sm/services/inventory/categoryService";
+import { toast } from "@sm/hooks/use-toast";
+import { Input } from "@sm/components/ui/input";
+import { LoadingSpinner } from "@sm/components/ui/loading-spinner";
 
 export function InventoryCategoriesPage() {
   const [categories, setCategories] = useState<string[]>([]);

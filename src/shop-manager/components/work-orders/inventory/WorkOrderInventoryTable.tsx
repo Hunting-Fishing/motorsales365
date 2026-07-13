@@ -1,9 +1,9 @@
 
 import React from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
+import { Button } from "@sm/components/ui/button";
 import { Trash } from "lucide-react";
-import { WorkOrderInventoryItem } from "@/types/workOrder"; // Updated import
+import { WorkOrderInventoryItem } from "@sm/types/workOrder"; // Updated import
 
 interface WorkOrderInventoryTableProps {
   items: WorkOrderInventoryItem[];

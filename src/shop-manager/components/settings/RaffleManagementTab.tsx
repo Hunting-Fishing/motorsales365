@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { RaffleDashboard } from '@/components/raffle/RaffleDashboard';
-import { RaffleForm } from '@/components/raffle/RaffleForm';
-import { TicketSalesManager } from '@/components/raffle/TicketSalesManager';
-import { RaffleService } from '@/services/raffleService';
-import { Raffle, CreateRaffleData, UpdateRaffleData } from '@/types/raffle';
-import { useToast } from '@/hooks/use-toast';
+import { RaffleDashboard } from '@sm/components/raffle/RaffleDashboard';
+import { RaffleForm } from '@sm/components/raffle/RaffleForm';
+import { TicketSalesManager } from '@sm/components/raffle/TicketSalesManager';
+import { RaffleService } from '@sm/services/raffleService';
+import { Raffle, CreateRaffleData, UpdateRaffleData } from '@sm/types/raffle';
+import { useToast } from '@sm/hooks/use-toast';
 
 export function RaffleManagementTab() {
   const { toast } = useToast();

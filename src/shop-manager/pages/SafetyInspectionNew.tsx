@@ -1,8 +1,8 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { DailyShopInspectionForm } from '@/components/safety/DailyShopInspectionForm';
+import { Button } from '@sm/components/ui/button';
+import { DailyShopInspectionForm } from '@sm/components/safety/DailyShopInspectionForm';
 import { ArrowLeft } from 'lucide-react';
 
 export default function SafetyInspectionNew() {

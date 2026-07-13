@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Package } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 
 interface EmptyInventoryProps {
   searchQuery?: string;

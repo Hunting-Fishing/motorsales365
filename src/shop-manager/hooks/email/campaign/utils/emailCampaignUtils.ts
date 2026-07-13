@@ -1,5 +1,5 @@
 
-import { EmailCampaignStatus, EmailABTest } from '@/types/email';
+import { EmailCampaignStatus, EmailABTest } from '@sm/types/email';
 
 /**
  * Validates a string value against allowed EmailCampaignStatus values

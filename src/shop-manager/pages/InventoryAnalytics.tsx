@@ -1,9 +1,9 @@
 import React from 'react';
-import { InventoryAnalyticsDashboard } from '@/components/inventory/InventoryAnalyticsDashboard';
-import { ReportGenerator } from '@/components/inventory/ReportGenerator';
-import { ForecastingDashboard } from '@/components/inventory/predictive/ForecastingDashboard';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { InventoryAnalyticsDashboard } from '@sm/components/inventory/InventoryAnalyticsDashboard';
+import { ReportGenerator } from '@sm/components/inventory/ReportGenerator';
+import { ForecastingDashboard } from '@sm/components/inventory/predictive/ForecastingDashboard';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { BarChart3, FileText, Activity, TrendingUp } from 'lucide-react';
 
 export default function InventoryAnalytics() {

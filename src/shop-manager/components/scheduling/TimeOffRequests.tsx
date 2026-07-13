@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Plus, Check, X } from 'lucide-react';
 import { format } from 'date-fns';
-import { useScheduling } from '@/hooks/useScheduling';
-import { useToast } from '@/hooks/use-toast';
+import { useScheduling } from '@sm/hooks/useScheduling';
+import { useToast } from '@sm/hooks/use-toast';
 import { AddTimeOffDialog } from './AddTimeOffDialog';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import type { TimeOffRequest } from '@/types/scheduling';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import type { TimeOffRequest } from '@sm/types/scheduling';
 
 export function TimeOffRequests() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);

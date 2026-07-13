@@ -1,11 +1,11 @@
 
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { PlusCircle } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EmailTemplate } from "@/types/email";
-import { useEmailTemplates } from "@/hooks/email/useEmailTemplates";
-import { EmailTemplateEditor } from "@/components/email/template/EmailTemplateEditor";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { EmailTemplate } from "@sm/types/email";
+import { useEmailTemplates } from "@sm/hooks/email/useEmailTemplates";
+import { EmailTemplateEditor } from "@sm/components/email/template/EmailTemplateEditor";
 
 export default function EmailTemplates() {
   const [activeTab, setActiveTab] = useState("list");

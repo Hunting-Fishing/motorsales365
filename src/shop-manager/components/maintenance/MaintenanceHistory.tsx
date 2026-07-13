@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useShopId } from '@/hooks/useShopId';
-import { getMaintenanceActivities } from '@/services/maintenance/maintenanceActivityService';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+import { useShopId } from '@sm/hooks/useShopId';
+import { getMaintenanceActivities } from '@sm/services/maintenance/maintenanceActivityService';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Button } from '@sm/components/ui/button';
 import { format } from 'date-fns';
 import { History, Search, Filter, RefreshCcw } from 'lucide-react';
 

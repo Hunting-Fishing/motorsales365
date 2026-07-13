@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { Database, Upload, Folder } from 'lucide-react';
 import { BucketFileBrowser } from './BucketFileBrowser';
 import { FileBasedImportSelector } from './FileBasedImportSelector';
 import { ImportProgressIndicator } from './ImportProgressIndicator';
-import { useFileBasedServiceImport } from '@/hooks/useFileBasedServiceImport';
-import type { StorageFile } from '@/types/service';
+import { useFileBasedServiceImport } from '@sm/hooks/useFileBasedServiceImport';
+import type { StorageFile } from '@sm/types/service';
 
 interface StorageImportManagerProps {
   onImportComplete?: () => void;

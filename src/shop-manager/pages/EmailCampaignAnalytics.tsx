@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@sm/hooks/use-toast";
 import { 
   Card, 
   CardContent, 
@@ -8,10 +8,10 @@ import {
   CardFooter, 
   CardHeader, 
   CardTitle 
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@sm/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Button } from "@sm/components/ui/button";
+import { Skeleton } from "@sm/components/ui/skeleton";
 import { 
   BarChart, 
   LineChart, 
@@ -42,13 +42,13 @@ import {
   Mail,
   Link as LinkIcon
 } from "lucide-react";
-import { useEmailCampaignAnalytics } from "@/hooks/email/campaign/useEmailCampaignAnalytics";
-import { ReportExportMenu } from "@/components/reports/ReportExportMenu";
+import { useEmailCampaignAnalytics } from "@sm/hooks/email/campaign/useEmailCampaignAnalytics";
+import { ReportExportMenu } from "@sm/components/reports/ReportExportMenu";
 import { 
   ChartContainer, 
   ChartTooltip, 
   ChartTooltipContent 
-} from "@/components/ui/chart";
+} from "@sm/components/ui/chart";
 
 export default function EmailCampaignAnalytics() {
   const { id } = useParams<{ id: string }>();

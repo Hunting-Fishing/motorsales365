@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { InventoryItemExtended } from '@/types/inventory';
+import { InventoryItemExtended } from '@sm/types/inventory';
 
 export function useInventoryForm() {
   const [values, setValues] = useState<Partial<InventoryItemExtended>>({});

@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
 import { Trash2, Plus, Package } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { WorkOrderInventoryItem } from "@/types/workOrder";
+import { Input } from "@sm/components/ui/input";
+import { WorkOrderInventoryItem } from "@sm/types/workOrder";
 import { InventorySelectionDialog } from "./InventorySelectionDialog";
 import { SpecialOrderItemForm } from "./SpecialOrderItemForm";
-import { InventoryItemExtended } from "@/types/inventory";
+import { InventoryItemExtended } from "@sm/types/inventory";
 import { UseFormReturn } from "react-hook-form";
 
 interface WorkOrderInventoryFieldProps {

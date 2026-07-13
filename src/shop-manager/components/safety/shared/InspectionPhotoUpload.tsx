@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Camera, X, Upload, Loader2, Image as ImageIcon } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+import { supabase } from '@sm/integrations/supabase/client';
+import { toast } from '@sm/hooks/use-toast';
+import { cn } from '@sm/lib/utils';
 
 interface InspectionPhotoUploadProps {
   photos: string[];

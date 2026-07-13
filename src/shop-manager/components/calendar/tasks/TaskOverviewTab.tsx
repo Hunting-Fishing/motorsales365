@@ -1,19 +1,19 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import { CheckCircle2, Clock, Calendar, MapPin, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface TaskOverviewTabProps {
-  taskData: ReturnType<typeof import('@/hooks/useTaskData').useTaskData>;
+  taskData: ReturnType<typeof import('@sm/hooks/useTaskData').useTaskData>;
   onClose: () => void;
 }
 

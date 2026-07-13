@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart, WorkOrderPartFormValues } from '@/types/workOrderPart';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart, WorkOrderPartFormValues } from '@sm/types/workOrderPart';
 import { JobLinesTable } from './JobLinesTable';
 import { WorkOrderPartsSection } from '../parts/WorkOrderPartsSection';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Plus, Wrench } from 'lucide-react';
 import { QuickAddDropdown } from '../details/QuickAddDropdown';
 import { ServiceBasedJobLineForm } from './ServiceBasedJobLineForm';
-import { generateTempJobLineId } from '@/services/jobLineParserEnhanced';
+import { generateTempJobLineId } from '@sm/services/jobLineParserEnhanced';
 
 interface WorkOrderLineItemsProps {
   jobLines: WorkOrderJobLine[];

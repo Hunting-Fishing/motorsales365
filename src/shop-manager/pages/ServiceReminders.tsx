@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Bell, Plus, Calendar, Users, Clock, AlertTriangle } from 'lucide-react';
-import { RemindersList } from '@/components/reminders/list/RemindersList';
-import { AddReminderForm } from '@/components/reminders/AddReminderForm';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { RemindersList } from '@sm/components/reminders/list/RemindersList';
+import { AddReminderForm } from '@sm/components/reminders/AddReminderForm';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
 export default function ServiceReminders() {
   const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
   const handleReminderCreated = () => {

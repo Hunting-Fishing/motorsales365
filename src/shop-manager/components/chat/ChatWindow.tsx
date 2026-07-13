@@ -1,17 +1,17 @@
 
 import React, { useRef, useEffect, useState } from 'react';
-import { ChatRoom, ChatMessage as ChatMessageType } from '@/types/chat';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { ChatRoom, ChatMessage as ChatMessageType } from '@sm/types/chat';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
 import { Send, Info, Users, MoreVertical, MessageSquare, Trash2 } from 'lucide-react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@sm/components/ui/alert-dialog';
 import { ChatMessage } from './ChatMessage';
 import { AudioRecorder } from './AudioRecorder';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { formatFileMessage, ChatFileInfo } from '@/services/chat/fileService';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@sm/components/ui/tooltip';
+import { formatFileMessage, ChatFileInfo } from '@sm/services/chat/fileService';
 import { FileUploadButton } from './file/FileUploadButton';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@sm/components/ui/dropdown-menu';
 import { ChatThread } from './ChatThread';
 
 interface ChatWindowProps {

@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { WorkOrder } from '@/types/workOrder';
-import { Customer } from '@/types/customer';
-import { Vehicle } from '@/types/vehicle';
+import { supabase } from '@sm/integrations/supabase/client';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Customer } from '@sm/types/customer';
+import { Vehicle } from '@sm/types/vehicle';
 
 interface Shop {
   id: string;

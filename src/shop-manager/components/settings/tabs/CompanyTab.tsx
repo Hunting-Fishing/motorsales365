@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { SettingsFormWrapper } from '../SettingsFormWrapper';
-import { useCompanyInfo } from '@/hooks/useCompanyInfo';
-import { CompanyInfoForm } from '@/components/settings/forms/CompanyInfoForm';
-import { BusinessHoursForm } from '@/components/settings/forms/BusinessHoursForm';
+import { useCompanyInfo } from '@sm/hooks/useCompanyInfo';
+import { CompanyInfoForm } from '@sm/components/settings/forms/CompanyInfoForm';
+import { BusinessHoursForm } from '@sm/components/settings/forms/BusinessHoursForm';
 
 export function CompanyTab() {
   const {

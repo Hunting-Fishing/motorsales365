@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { WorkOrderInventoryItem } from '@/types/workOrder';
+import { WorkOrderInventoryItem } from '@sm/types/workOrder';
 import { 
   Table, 
   TableBody, 
@@ -8,7 +8,7 @@ import {
   TableHead, 
   TableHeader, 
   TableRow 
-} from '@/components/ui/table';
+} from '@sm/components/ui/table';
 
 export interface WorkOrderInventoryItemsProps {
   workOrderId: string;

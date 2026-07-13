@@ -1,6 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Plus, 
   ExternalLink, 
@@ -13,7 +13,7 @@ import {
   Activity,
   CheckCircle
 } from 'lucide-react';
-import { IntegrationProvider } from '@/hooks/integrations/useIntegrationProviders';
+import { IntegrationProvider } from '@sm/hooks/integrations/useIntegrationProviders';
 
 const categoryIcons = {
   'crm': Database,

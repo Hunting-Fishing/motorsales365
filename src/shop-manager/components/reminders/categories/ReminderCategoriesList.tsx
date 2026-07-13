@@ -1,14 +1,14 @@
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
-import { ReminderCategory } from "@/types/reminder";
-import { getReminderCategories } from "@/services/reminders/reminderQueries";
+import { ReminderCategory } from "@sm/types/reminder";
+import { getReminderCategories } from "@sm/services/reminders/reminderQueries";
 import { EditCategoryDialog } from "./EditCategoryDialog";
 import { DeleteCategoryDialog } from "./DeleteCategoryDialog";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "@/hooks/use-toast";
+import { Badge } from "@sm/components/ui/badge";
+import { toast } from "@sm/hooks/use-toast";
 
 export function ReminderCategoriesList() {
   const [categories, setCategories] = useState<ReminderCategory[]>([]);

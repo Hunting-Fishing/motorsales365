@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { FormBuilderTemplate } from '@/types/formBuilder';
+import { supabase } from '@sm/integrations/supabase/client';
+import { FormBuilderTemplate } from '@sm/types/formBuilder';
 
 interface UseFormsByCategoryOptions {
   category?: string;

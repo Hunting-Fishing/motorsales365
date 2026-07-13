@@ -1,8 +1,8 @@
 
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { formatCurrency as formatCurrencyUtil } from '@/utils/formatters';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { formatCurrency as formatCurrencyUtil } from '@sm/utils/formatters';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

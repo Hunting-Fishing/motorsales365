@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { BoardMeetingTab } from "@/components/settings/BoardMeetingTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { BoardMeetingTab } from "@sm/components/settings/BoardMeetingTab";
 
 export const BoardMeetingSettings = () => {
   return (

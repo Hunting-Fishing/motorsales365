@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 
 /**
  * Generic response interface for service methods

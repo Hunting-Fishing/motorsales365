@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { MODULE_ROUTES, ModuleRouteConfig } from '@/config/moduleRoutes';
-import { useEnabledModules } from '@/hooks/useEnabledModules';
+import { MODULE_ROUTES, ModuleRouteConfig } from '@sm/config/moduleRoutes';
+import { useEnabledModules } from '@sm/hooks/useEnabledModules';
 
 export type ModuleSlug = keyof typeof MODULE_ROUTES;
 

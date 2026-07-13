@@ -1,18 +1,18 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { MessageCircle, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getWorkOrderChatRoom, createChatRoom } from '@/services/chat';
-import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { getWorkOrderChatRoom, createChatRoom } from '@sm/services/chat';
+import { toast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { CreateRoomParams } from '@/services/chat/room/types';
+} from "@sm/components/ui/tooltip";
+import { CreateRoomParams } from '@sm/services/chat/room/types';
 
 export interface WorkOrderChatButtonProps {
   workOrderId: string;

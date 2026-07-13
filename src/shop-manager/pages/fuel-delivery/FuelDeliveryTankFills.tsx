@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Badge } from '@sm/components/ui/badge';
+import { useToast } from '@sm/hooks/use-toast';
 import { Plus, Droplets, Truck, User, Calendar, FileText } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useFuelDeliveryCustomers, useFuelDeliveryProducts, useFuelDeliveryDrivers, useFuelDeliveryTrucks } from '@/hooks/useFuelDelivery';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { useFuelDeliveryCustomers, useFuelDeliveryProducts, useFuelDeliveryDrivers, useFuelDeliveryTrucks } from '@sm/hooks/useFuelDelivery';
 import { format } from 'date-fns';
-import { Textarea } from '@/components/ui/textarea';
-import { useFuelUnits } from '@/hooks/fuel-delivery/useFuelUnits';
+import { Textarea } from '@sm/components/ui/textarea';
+import { useFuelUnits } from '@sm/hooks/fuel-delivery/useFuelUnits';
 
 interface TankFill {
   id: string;

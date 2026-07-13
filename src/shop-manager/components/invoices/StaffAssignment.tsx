@@ -1,8 +1,8 @@
 
 import React from "react";
 import { X, Users, Plus } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Label } from "@sm/components/ui/label";
+import { Button } from "@sm/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,14 +10,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@sm/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@sm/components/ui/select";
 
 interface StaffMember {
   id: number;

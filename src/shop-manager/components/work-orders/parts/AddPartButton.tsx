@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 import { UltimateAddPartDialog } from './UltimateAddPartDialog';
 import { toast } from 'sonner';
 

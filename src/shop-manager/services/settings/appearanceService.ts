@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { AppearanceSettings } from "@/types/settings";
+import { supabase } from "@sm/lib/supabase";
+import { AppearanceSettings } from "@sm/types/settings";
 
 export const appearanceService = {
   async getAppearanceSettings(shopId: string): Promise<AppearanceSettings | null> {

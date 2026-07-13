@@ -1,5 +1,5 @@
 
-import { WorkOrderStatus } from '@/utils/workOrders/constants';
+import { WorkOrderStatus } from '@sm/utils/workOrders/constants';
 
 // Base interfaces
 export interface TimeEntry {
@@ -179,5 +179,5 @@ export interface WorkOrderTemplate {
 export type WorkOrderStatusType = WorkOrderStatus;
 
 // Re-export types from constants using export type
-export type { WorkOrderStatus } from '@/utils/workOrders/constants';
-export { statusMap, priorityMap } from '@/utils/workOrders/constants';
+export type { WorkOrderStatus } from '@sm/utils/workOrders/constants';
+export { statusMap, priorityMap } from '@sm/utils/workOrders/constants';

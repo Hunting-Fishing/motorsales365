@@ -2,8 +2,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../schemas/customerSchema";
-import { saveDraftCustomer, getDraftCustomer } from "@/services/customers";
-import { useToast } from "@/hooks/use-toast";
+import { saveDraftCustomer, getDraftCustomer } from "@sm/services/customers";
+import { useToast } from "@sm/hooks/use-toast";
 
 interface UseDraftCustomerProps {
   form: UseFormReturn<CustomerFormValues>;

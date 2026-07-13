@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getPartsAnalytics, PartsAnalytics } from '@/services/parts/partsAnalyticsService';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { getPartsAnalytics, PartsAnalytics } from '@sm/services/parts/partsAnalyticsService';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
 export function PartsAnalyticsDashboard() {

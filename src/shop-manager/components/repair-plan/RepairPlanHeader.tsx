@@ -1,9 +1,9 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { ArrowLeft, Edit } from "lucide-react";
-import { RepairPlan } from "@/types/repairPlan";
+import { RepairPlan } from "@sm/types/repairPlan";
 
 interface RepairPlanHeaderProps {
   repairPlan: RepairPlan;

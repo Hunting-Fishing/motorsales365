@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { EmailCampaign } from '@/types/email';
-import { abTestingService } from '@/services/email';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/lib/supabase';
+import { EmailCampaign } from '@sm/types/email';
+import { abTestingService } from '@sm/services/email';
+import { useToast } from '@sm/hooks/use-toast';
 
 export const useABTestVariants = () => {
   const [abTestLoading, setAbTestLoading] = useState(false);

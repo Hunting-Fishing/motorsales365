@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthUser } from '@/hooks/useAuthUser';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
 import { RoleGuard } from './RoleGuard';
 import { ShopGuard } from './ShopGuard';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent } from '@sm/components/ui/card';
 import { RefreshCw, LogIn, Home } from 'lucide-react';
-import { performAuthRecovery } from '@/utils/authCleanup';
+import { performAuthRecovery } from '@sm/utils/authCleanup';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

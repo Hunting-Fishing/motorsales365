@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { Payment, PaymentFormValues, PaymentType, PaymentStatus } from '@/types/payment';
-import { getCustomerPayments, recordPayment, getInvoicePayments } from '@/services/payment/paymentService';
-import { toast } from '@/hooks/use-toast';
+import { Payment, PaymentFormValues, PaymentType, PaymentStatus } from '@sm/types/payment';
+import { getCustomerPayments, recordPayment, getInvoicePayments } from '@sm/services/payment/paymentService';
+import { toast } from '@sm/hooks/use-toast';
 
 export function usePaymentHistory(customerId?: string, invoiceId?: string) {
   const [payments, setPayments] = useState<Payment[]>([]);

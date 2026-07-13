@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@sm/lib/supabase';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Users, Wrench, Package, Receipt } from 'lucide-react';
 
 interface DashboardStats {

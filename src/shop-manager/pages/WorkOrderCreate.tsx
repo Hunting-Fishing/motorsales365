@@ -1,13 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ResponsiveContainer } from '@/components/ui/responsive-container';
-import { useToast } from '@/hooks/use-toast';
-import { createWorkOrder } from '@/services/workOrder';
-import { WorkOrderForm } from '@/components/work-orders/WorkOrderForm';
+import { ResponsiveContainer } from '@sm/components/ui/responsive-container';
+import { useToast } from '@sm/hooks/use-toast';
+import { createWorkOrder } from '@sm/services/workOrder';
+import { WorkOrderForm } from '@sm/components/work-orders/WorkOrderForm';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { getMaintenanceRequestById } from '@/services/calendar/maintenanceRequestService';
+import { Button } from '@sm/components/ui/button';
+import { getMaintenanceRequestById } from '@sm/services/calendar/maintenanceRequestService';
 
 const WorkOrderCreate = () => {
   const [searchParams] = useSearchParams();

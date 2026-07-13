@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@sm/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,14 +10,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@sm/components/ui/dropdown-menu';
 import { Bell, Menu, Search, Settings, LogOut, User, Fuel } from 'lucide-react';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { Badge } from '@/components/ui/badge';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
-import { useModuleDisplayInfo } from '@/hooks/useModuleDisplayInfo';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { Badge } from '@sm/components/ui/badge';
+import { useIsMobile } from '@sm/hooks/use-mobile';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
+import { useModuleDisplayInfo } from '@sm/hooks/useModuleDisplayInfo';
 
 interface FuelDeliveryHeaderProps {
   onMenuToggle: () => void;

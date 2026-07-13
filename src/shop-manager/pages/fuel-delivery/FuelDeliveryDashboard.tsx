@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Fuel, 
   Calendar, 
@@ -22,15 +22,15 @@ import {
   Filter,
   Container
 } from 'lucide-react';
-import { useFuelDeliveryStats, useFuelDeliveryOrders } from '@/hooks/useFuelDelivery';
+import { useFuelDeliveryStats, useFuelDeliveryOrders } from '@sm/hooks/useFuelDelivery';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Skeleton } from '@/components/ui/skeleton';
-import { CustomerPortalQRCode } from '@/components/fuel-delivery/CustomerPortalQRCode';
-import { FuelMarketPrices } from '@/components/fuel-delivery/FuelMarketPrices';
-import { useShopId } from '@/hooks/useShopId';
-import { useModuleDisplayInfo } from '@/hooks/useModuleDisplayInfo';
-import { useFuelUnits } from '@/hooks/fuel-delivery/useFuelUnits';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { CustomerPortalQRCode } from '@sm/components/fuel-delivery/CustomerPortalQRCode';
+import { FuelMarketPrices } from '@sm/components/fuel-delivery/FuelMarketPrices';
+import { useShopId } from '@sm/hooks/useShopId';
+import { useModuleDisplayInfo } from '@sm/hooks/useModuleDisplayInfo';
+import { useFuelUnits } from '@sm/hooks/fuel-delivery/useFuelUnits';
 
 export default function FuelDeliveryDashboard() {
   const navigate = useNavigate();

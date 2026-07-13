@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
 import { FileText, Calendar, User, Activity } from 'lucide-react';
-import { useAuditTrail } from '@/hooks/useAuditTrail';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useAuditTrail } from '@sm/hooks/useAuditTrail';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { format } from 'date-fns';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 
 export function AuditTrailViewer() {
   const [resourceTypeFilter, setResourceTypeFilter] = useState<string>('');

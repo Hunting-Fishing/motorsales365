@@ -1,9 +1,9 @@
 import { Filter, RefreshCw, Clock, Search, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
 import { useState, useEffect } from "react";
-import { getMaintenanceTechnicians, getUniqueEquipment } from "@/services/calendar/calendarFilterService";
-import { statusMap } from "@/types/workOrder";
+import { getMaintenanceTechnicians, getUniqueEquipment } from "@sm/services/calendar/calendarFilterService";
+import { statusMap } from "@sm/types/workOrder";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -11,19 +11,19 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@sm/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@sm/components/ui/select";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@sm/components/ui/popover";
 import { BusinessHoursInfo } from "./BusinessHoursInfo";
 
 interface BusinessHour {

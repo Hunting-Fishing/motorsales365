@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { MobileLayout } from '@/components/mobile/MobileLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { MobileLayout } from '@sm/components/mobile/MobileLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 import { 
   ClipboardList, 
   Clock, 
@@ -14,14 +14,14 @@ import {
   RefreshCw,
   Cloud
 } from 'lucide-react';
-import { useTechnicianTasks, type TechnicianTask } from '@/hooks/useTechnicianTasks';
-import { useTechnicianOfflineStorage } from '@/hooks/useTechnicianOfflineStorage';
-import { usePWA } from '@/hooks/usePWA';
-import { TechnicianTaskCard } from '@/components/technician/TechnicianTaskCard';
-import { TaskDetailsSheet } from '@/components/technician/TaskDetailsSheet';
-import { QuickHazardReport } from '@/components/technician/QuickHazardReport';
-import { SyncQueuePanel } from '@/components/technician/SyncQueuePanel';
-import { cn } from '@/lib/utils';
+import { useTechnicianTasks, type TechnicianTask } from '@sm/hooks/useTechnicianTasks';
+import { useTechnicianOfflineStorage } from '@sm/hooks/useTechnicianOfflineStorage';
+import { usePWA } from '@sm/hooks/usePWA';
+import { TechnicianTaskCard } from '@sm/components/technician/TechnicianTaskCard';
+import { TaskDetailsSheet } from '@sm/components/technician/TaskDetailsSheet';
+import { QuickHazardReport } from '@sm/components/technician/QuickHazardReport';
+import { SyncQueuePanel } from '@sm/components/technician/SyncQueuePanel';
+import { cn } from '@sm/lib/utils';
 
 export default function TechnicianPortal() {
   const [selectedTask, setSelectedTask] = useState<TechnicianTask | null>(null);

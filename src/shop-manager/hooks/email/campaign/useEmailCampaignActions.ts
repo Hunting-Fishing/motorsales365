@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
-import { EmailCampaignStatus } from '@/types/email';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
+import { EmailCampaignStatus } from '@sm/types/email';
+import { supabase } from '@sm/lib/supabase';
+import { useToast } from '@sm/hooks/use-toast';
 import { validateCampaignStatus } from './utils/emailCampaignUtils';
 
 /**

@@ -1,6 +1,6 @@
 import React from 'react';
-import { SettingsPageLayout } from '@/components/settings/SettingsPageLayout';
-import { BillingTab } from '@/components/billing/BillingTab';
+import { SettingsPageLayout } from '@sm/components/settings/SettingsPageLayout';
+import { BillingTab } from '@sm/components/billing/BillingTab';
 
 export default function BillingSettings() {
   return (

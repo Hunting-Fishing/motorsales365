@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
 import { Briefcase, Calendar, DollarSign, Users, AlertTriangle, TrendingUp } from 'lucide-react';
-import { useProjectBudgets } from '@/hooks/useProjectBudgets';
-import { useAllProjectResources } from '@/hooks/useProjectResources';
-import { formatCurrency } from '@/lib/utils';
+import { useProjectBudgets } from '@sm/hooks/useProjectBudgets';
+import { useAllProjectResources } from '@sm/hooks/useProjectResources';
+import { formatCurrency } from '@sm/lib/utils';
 import { format, differenceInDays, isAfter, isBefore, startOfMonth, endOfMonth } from 'date-fns';
 
 interface ProjectCapacityPanelProps {

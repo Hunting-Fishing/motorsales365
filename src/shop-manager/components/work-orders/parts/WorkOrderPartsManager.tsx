@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Package, AlertCircle, Loader2 } from 'lucide-react';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 import { ComprehensivePartsTable } from './ComprehensivePartsTable';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 
 interface WorkOrderPartsManagerProps {
   workOrderId: string;

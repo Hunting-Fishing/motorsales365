@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
 import { 
   MapPin, 
   Phone, 
@@ -12,7 +12,7 @@ import {
   Navigation,
   ExternalLink
 } from 'lucide-react';
-import { getPublicShops, type ShopDirectoryItem } from '@/services/shopDirectory/shopDirectoryService';
+import { getPublicShops, type ShopDirectoryItem } from '@sm/services/shopDirectory/shopDirectoryService';
 
 // Using live data from ShopDirectoryService
 

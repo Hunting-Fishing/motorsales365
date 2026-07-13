@@ -1,9 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Shield, CheckCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { detectExtensionConflicts, initializeDOMProtection } from '@/utils/domProtection';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { detectExtensionConflicts, initializeDOMProtection } from '@sm/utils/domProtection';
 
 interface ConflictInfo {
   hasConflicts: boolean;

@@ -1,17 +1,17 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useWeldingSettings } from "@/contexts/WeldingSettingsContext";
-import { Button } from "@/components/ui/button";
+import { useWeldingSettings } from "@sm/contexts/WeldingSettingsContext";
+import { Button } from "@sm/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+} from "@sm/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@sm/components/ui/sheet";
 import {
   FileText, Package, DollarSign, Users, Inbox, BarChart3,
   ShoppingCart, Warehouse, LogOut, Home, ChevronLeft, Image, Settings, Menu,
   CalendarDays, Handshake, Link2, MoreHorizontal
 } from "lucide-react";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 
 export const weldingAdminLinks = [
   { label: "Overview", to: "/welding", icon: BarChart3 },

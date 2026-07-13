@@ -1,5 +1,5 @@
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Edit, Trash } from "lucide-react";
 
 interface HeaderActionsProps {

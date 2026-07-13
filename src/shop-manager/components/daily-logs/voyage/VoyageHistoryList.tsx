@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Ship, Clock, MapPin, AlertTriangle, ChevronRight, Users, Package } from 'lucide-react';
-import { VoyageLog, VOYAGE_TYPE_LABELS } from '@/types/voyage';
+import { VoyageLog, VOYAGE_TYPE_LABELS } from '@sm/types/voyage';
 import { format, formatDistanceStrict } from 'date-fns';
-import { useVoyageLogs } from '@/hooks/useVoyageLogs';
+import { useVoyageLogs } from '@sm/hooks/useVoyageLogs';
 import { VoyagePdfExport } from './VoyagePdfExport';
 export function VoyageHistoryList() {
   const { voyageLogs, isLoading } = useVoyageLogs();

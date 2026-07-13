@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Play, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,8 +10,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { sequenceProcessingService } from '@/services/email/sequences/sequenceProcessingService';
+} from '@sm/components/ui/dropdown-menu';
+import { sequenceProcessingService } from '@sm/services/email/sequences/sequenceProcessingService';
 
 export function ManageSequenceProcessingButton() {
   const { toast } = useToast();

@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { Customer } from "@/types/customer";
+import { supabase } from "@sm/lib/supabase";
+import { Customer } from "@sm/types/customer";
 import { SearchResult } from "./types";
 
 export const searchCustomers = async (query: string): Promise<Customer[]> => {

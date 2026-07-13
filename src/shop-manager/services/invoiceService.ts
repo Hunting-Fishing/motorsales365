@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { Invoice } from '@/types/invoice';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Invoice } from '@sm/types/invoice';
 
 // Transform database invoice to our Invoice type
 const transformDatabaseInvoice = (dbInvoice: any): Invoice => ({

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { toast } from '@/hooks/use-toast';
+import { supabase } from '@sm/lib/supabase';
+import { toast } from '@sm/hooks/use-toast';
 
 export interface Role {
   id: string;

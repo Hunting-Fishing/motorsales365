@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Package, TrendingDown } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { useOptimizedInventoryItems } from '@/hooks/inventory/useOptimizedInventoryItems';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Badge } from '@sm/components/ui/badge';
+import { useOptimizedInventoryItems } from '@sm/hooks/inventory/useOptimizedInventoryItems';
 
 interface InventoryIntegrationProps {
   productId: string;

@@ -6,15 +6,15 @@ import {
   DialogHeader, 
   DialogTitle,
   DialogFooter
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { InventoryItemExtended } from "@/types/inventory";
-import { getStatusColorClass } from "@/utils/inventory/inventoryCalculations";
+} from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { InventoryItemExtended } from "@sm/types/inventory";
+import { getStatusColorClass } from "@sm/utils/inventory/inventoryCalculations";
 import { Loader2, Package, Plus, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { standardizeInventoryItem } from "@/utils/inventory/adapters";
+import { supabase } from "@sm/integrations/supabase/client";
+import { standardizeInventoryItem } from "@sm/utils/inventory/adapters";
 
 interface InventorySelectionDialogProps {
   open: boolean;

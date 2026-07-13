@@ -7,16 +7,16 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
+} from "@sm/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@sm/components/ui/select";
 import { CustomerFormValues } from "./schemas/customerSchema";
-import { useTechnicians } from "@/hooks/useTechnicians";
+import { useTechnicians } from "@sm/hooks/useTechnicians";
 
 interface PreferencesFieldsProps {
   form: UseFormReturn<CustomerFormValues>;

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { EmailCampaign } from "@/types/email";
+import { EmailCampaign } from "@sm/types/email";
 import { useEmailCampaignList } from "./campaign/useEmailCampaignList";
 import { useCampaignDetails } from "./campaign/useCampaignDetails";
 import { useEmailCampaignActions } from "./campaign/useEmailCampaignActions";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@sm/hooks/use-toast";
 
 export const useEmailCampaigns = () => {
   const [currentCampaign, setCurrentCampaign] = useState<EmailCampaign | null>(null);

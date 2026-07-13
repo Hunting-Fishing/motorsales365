@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 import { Search, FileText, Loader2 } from 'lucide-react';
-import { useFormsByCategory } from '@/hooks/useFormsByCategory';
-import { FormBuilderTemplate } from '@/types/formBuilder';
+import { useFormsByCategory } from '@sm/hooks/useFormsByCategory';
+import { FormBuilderTemplate } from '@sm/types/formBuilder';
 
 interface FormSelectorProps {
   open: boolean;

@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { useEnabledModules } from '@/hooks/useEnabledModules';
-import { MODULE_ROUTES, ModuleSectionItem } from '@/config/moduleRoutes';
-import { useSidebar } from '@/hooks/use-sidebar';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@sm/lib/utils';
+import { useEnabledModules } from '@sm/hooks/useEnabledModules';
+import { MODULE_ROUTES, ModuleSectionItem } from '@sm/config/moduleRoutes';
+import { useSidebar } from '@sm/hooks/use-sidebar';
+import { useIsMobile } from '@sm/hooks/use-mobile';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 import { 
   AnimatedCollapsible, 
   CollapsibleTrigger, 
   CollapsibleContent 
-} from '@/components/ui/animated-collapsible';
+} from '@sm/components/ui/animated-collapsible';
 import { motion } from 'framer-motion';
-import { trackAffiliateClick } from '@/services/affiliateTrackingService';
+import { trackAffiliateClick } from '@sm/services/affiliateTrackingService';
 
 export function ModuleSections() {
   const location = useLocation();

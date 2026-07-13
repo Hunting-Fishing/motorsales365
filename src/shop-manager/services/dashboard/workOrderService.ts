@@ -1,6 +1,6 @@
 
-import { WorkOrderService } from "@/services/workOrder/WorkOrderService";
-import { PhaseProgressItem, RecentWorkOrder } from "@/types/dashboard";
+import { WorkOrderService } from "@sm/services/workOrder/WorkOrderService";
+import { PhaseProgressItem, RecentWorkOrder } from "@sm/types/dashboard";
 
 const workOrderService = new WorkOrderService();
 

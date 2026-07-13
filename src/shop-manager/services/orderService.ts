@@ -1,6 +1,6 @@
-import { supabase } from "@/integrations/supabase/client";
-import { Order, OrderItem, CreateOrderRequest, UpdateOrderRequest } from "@/types/order";
-import { taxSettingsService } from "@/services/settings/taxSettingsService";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Order, OrderItem, CreateOrderRequest, UpdateOrderRequest } from "@sm/types/order";
+import { taxSettingsService } from "@sm/services/settings/taxSettingsService";
 
 /**
  * Create a new order from cart items with enhanced calculations

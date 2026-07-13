@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import { Customer } from '@/types/customer';
-import { getCustomerById } from '@/services/customer/customerQueryService';
-import { updateCustomer } from '@/services/customer/customerUpdateService';
-import { getAllShops } from '@/services/shops/shopService';
-import { convertFormVehicleToCustomerVehicle } from '@/types/customer/vehicle';
+import { useToast } from '@sm/hooks/use-toast';
+import { Customer } from '@sm/types/customer';
+import { getCustomerById } from '@sm/services/customer/customerQueryService';
+import { updateCustomer } from '@sm/services/customer/customerUpdateService';
+import { getAllShops } from '@sm/services/shops/shopService';
+import { convertFormVehicleToCustomerVehicle } from '@sm/types/customer/vehicle';
 
 export function useCustomerEdit(customerId: string | undefined) {
   const [formValues, setFormValues] = useState<Customer | null>(null);

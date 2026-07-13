@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Clock, User, MapPin, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Link } from 'react-router-dom';
-import { useWorkOrders } from '@/hooks/useWorkOrders';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { useWorkOrders } from '@sm/hooks/useWorkOrders';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
 
 export function LiveRecentWorkOrders() {
   const { workOrders, loading, error } = useWorkOrders();

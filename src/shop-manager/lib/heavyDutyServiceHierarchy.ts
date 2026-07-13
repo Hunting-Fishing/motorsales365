@@ -1,4 +1,4 @@
-import { ServiceMainCategory } from '@/types/service';
+import { ServiceMainCategory } from '@sm/types/service';
 
 // Heavy Duty Truck & Equipment Service Categories
 export const heavyDutyServiceCategories: ServiceMainCategory[] = [

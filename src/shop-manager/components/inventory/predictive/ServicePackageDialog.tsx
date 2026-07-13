@@ -6,28 +6,28 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { ServicePackage, USAGE_METRICS, UNIT_OPTIONS } from '@/types/inventory/predictive';
+} from '@sm/components/ui/select';
+import { ServicePackage, USAGE_METRICS, UNIT_OPTIONS } from '@sm/types/inventory/predictive';
 import {
   createServicePackage,
   updateServicePackage,
   addItemToServicePackage,
   removeItemFromServicePackage,
-} from '@/services/inventory/predictiveService';
-import { toast } from '@/hooks/use-toast';
+} from '@sm/services/inventory/predictiveService';
+import { toast } from '@sm/hooks/use-toast';
 import { Plus, Trash2 } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '@sm/components/ui/switch';
 
 interface ServicePackageDialogProps {
   open: boolean;

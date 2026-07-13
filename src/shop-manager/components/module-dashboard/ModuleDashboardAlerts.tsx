@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 import { AlertTriangle } from 'lucide-react';
 
 interface Alert {

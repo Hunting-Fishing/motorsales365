@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Form } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Form } from '@sm/components/ui/form';
+import { Button } from '@sm/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { WorkOrderPartFormValues, WORK_ORDER_PART_STATUSES, PART_TYPES } from '@/types/workOrderPart';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { createWorkOrderPart } from '@/services/workOrder/workOrderPartsService';
+import { WorkOrderPartFormValues, WORK_ORDER_PART_STATUSES, PART_TYPES } from '@sm/types/workOrderPart';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { createWorkOrderPart } from '@sm/services/workOrder/workOrderPartsService';
 import { BasicPartFields } from './BasicPartFields';
 import { PartTypeAndStatusFields } from './PartTypeAndStatusFields';
 import { JobLineSelector } from './JobLineSelector';

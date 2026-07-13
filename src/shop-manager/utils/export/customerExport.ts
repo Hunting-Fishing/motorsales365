@@ -1,6 +1,6 @@
 
-import { Customer } from "@/types/customer";
-import { formatPhoneNumber } from "@/utils/formatters";
+import { Customer } from "@sm/types/customer";
+import { formatPhoneNumber } from "@sm/utils/formatters";
 
 /**
  * Convert a customer object to a vCard format for exporting contacts

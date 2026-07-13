@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { AffiliateProduct } from '@/types/affiliate';
-import { useToast } from '@/hooks/use-toast';
+import { AffiliateProduct } from '@sm/types/affiliate';
+import { useToast } from '@sm/hooks/use-toast';
 
 const MAX_COMPARISON_PRODUCTS = 4;
 const STORAGE_KEY = 'product_comparison';

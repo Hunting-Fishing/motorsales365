@@ -3,8 +3,8 @@ import React from 'react';
 import { CustomerHeader } from '../CustomerHeader';
 import { CustomerInfoCard } from '../CustomerInfoCard';
 import { CustomerLoyaltyCard } from '../loyalty/CustomerLoyaltyCard';
-import { Customer } from '@/types/customer';
-import { CustomerLoyalty } from '@/types/loyalty';
+import { Customer } from '@sm/types/customer';
+import { CustomerLoyalty } from '@sm/types/loyalty';
 
 interface CustomerDetailsHeaderProps {
   customer: Customer;

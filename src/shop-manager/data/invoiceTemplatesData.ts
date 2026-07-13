@@ -1,11 +1,11 @@
 
-import { useInvoiceTemplates } from "@/hooks/useInvoiceTemplates";
+import { useInvoiceTemplates } from "@sm/hooks/useInvoiceTemplates";
 
 // This file now re-exports the hook that fetches data from the database
 export { useInvoiceTemplates };
 
 // For backwards compatibility - no mock fallbacks
-import { InvoiceTemplate } from "@/types/invoice";
+import { InvoiceTemplate } from "@sm/types/invoice";
 export const invoiceTemplates: InvoiceTemplate[] = [];
 
 export const updateTemplateUsage = async (templateId: string) => {

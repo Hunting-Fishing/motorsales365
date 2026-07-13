@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
 import { X, Plus, ShoppingCart, Heart, ExternalLink, GitCompare } from 'lucide-react';
-import { AffiliateProduct } from '@/types/affiliate';
-import { formatCurrency } from '@/lib/utils';
+import { AffiliateProduct } from '@sm/types/affiliate';
+import { formatCurrency } from '@sm/lib/utils';
 import ImageWithFallback from './ImageWithFallback';
-import { ProductRating } from '@/components/affiliate/ProductRating';
-import { useToast } from '@/hooks/use-toast';
+import { ProductRating } from '@sm/components/affiliate/ProductRating';
+import { useToast } from '@sm/hooks/use-toast';
 
 interface ProductComparisonProps {
   products: AffiliateProduct[];

@@ -1,8 +1,8 @@
 import { format } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { SafetyMeeting } from '@/hooks/useSafetyMeetings';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { SafetyMeeting } from '@sm/hooks/useSafetyMeetings';
 import { Calendar, Clock, MapPin, User, Users, ChevronRight, MessageSquare } from 'lucide-react';
 
 interface MeetingCardProps {

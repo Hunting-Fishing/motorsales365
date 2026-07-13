@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Truck, AlertTriangle, Wrench, Eye } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
-import type { DVIRReport } from '@/types/safety';
+import type { DVIRReport } from '@sm/types/safety';
 
 interface FlaggedVehiclesCardProps {
   dvirReports: DVIRReport[];

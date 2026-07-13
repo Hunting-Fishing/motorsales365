@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { EmailSequence, EmailSequenceStep } from '@/types/email';
-import { emailSequenceService } from '@/services/email';
-import { useToast } from '@/hooks/use-toast';
+import { EmailSequence, EmailSequenceStep } from '@sm/types/email';
+import { emailSequenceService } from '@sm/services/email';
+import { useToast } from '@sm/hooks/use-toast';
 
 export const useSequenceCRUD = () => {
   const [sequences, setSequences] = useState<EmailSequence[]>([]);

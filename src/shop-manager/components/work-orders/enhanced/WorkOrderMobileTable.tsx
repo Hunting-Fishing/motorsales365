@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { WorkOrder } from '@/types/workOrder';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { WorkOrderStatusBadge } from '../WorkOrderStatusBadge';
 import { Calendar, User, Car, DollarSign, Clock, Eye, Phone, MessageSquare } from 'lucide-react';
-import { useResponsive } from '@/hooks/useResponsive';
+import { useResponsive } from '@sm/hooks/useResponsive';
 
 interface WorkOrderMobileTableProps {
   workOrders: WorkOrder[];

@@ -1,9 +1,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEmailSequences } from "@/hooks/email/useEmailSequences";
-import { EmailSequenceDetails } from "@/components/email/sequence/EmailSequenceDetails";
-import { useToast } from "@/hooks/use-toast";
+import { useEmailSequences } from "@sm/hooks/email/useEmailSequences";
+import { EmailSequenceDetails } from "@sm/components/email/sequence/EmailSequenceDetails";
+import { useToast } from "@sm/hooks/use-toast";
 
 export default function EmailSequenceDetailsPage() {
   const { id } = useParams<{ id: string }>();

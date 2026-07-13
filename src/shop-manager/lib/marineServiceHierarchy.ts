@@ -1,6 +1,6 @@
 
 // Marine service hierarchy types and utilities
-import { ServiceMainCategory } from '@/types/service';
+import { ServiceMainCategory } from '@sm/types/service';
 
 // Comprehensive marine service categories
 export const marineServiceCategories: ServiceMainCategory[] = [

@@ -1,12 +1,12 @@
 
-import { useInventoryOrders } from "@/hooks/inventory/useInventoryOrders";
+import { useInventoryOrders } from "@sm/hooks/inventory/useInventoryOrders";
 import { InventoryOrdersHeader } from "./InventoryOrdersHeader";
 import { InventoryOrdersFilters } from "./InventoryOrdersFilters";
 import { InventoryOrdersTable } from "./InventoryOrdersTable";
 import { OverdueOrdersAlert } from "./OverdueOrdersAlert";
 import { useReceiveDialog } from "./useReceiveDialog";
 import { useCancelDialog } from "./useCancelDialog";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { LoadingSpinner } from "@sm/components/ui/loading-spinner";
 
 export function InventoryOrdersPage() {
   const { 

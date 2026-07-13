@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { ServiceHierarchyExcelView } from '@/components/developer/service-management/ServiceHierarchyExcelView';
-import { useServiceSectors } from '@/hooks/useServiceCategories';
+import { ServiceHierarchyExcelView } from '@sm/components/developer/service-management/ServiceHierarchyExcelView';
+import { useServiceSectors } from '@sm/hooks/useServiceCategories';
 import * as XLSX from 'xlsx';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@sm/hooks/use-toast';
 
 export function ServiceExcelViewPage() {
   const { sectors } = useServiceSectors();

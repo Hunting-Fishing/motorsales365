@@ -1,8 +1,8 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CustomReportBuilder } from '@/components/reports/CustomReportBuilder';
-import { ReportConfig } from '@/types/reports';
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { CustomReportBuilder } from '@sm/components/reports/CustomReportBuilder';
+import { ReportConfig } from '@sm/types/reports';
+import { Skeleton } from "@sm/components/ui/skeleton";
 
 interface CustomTabContentProps {
   customReportConfig: ReportConfig | null;

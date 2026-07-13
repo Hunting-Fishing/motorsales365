@@ -1,11 +1,11 @@
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { ShoppingCart, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { getAllInventoryOrders } from "@/services/inventory/orderService";
-import { InventoryOrder } from "@/types/inventory/orders";
+import { Button } from "@sm/components/ui/button";
+import { getAllInventoryOrders } from "@sm/services/inventory/orderService";
+import { InventoryOrder } from "@sm/types/inventory/orders";
 import { Link } from "react-router-dom";
 
 export function PendingOrdersCard() {

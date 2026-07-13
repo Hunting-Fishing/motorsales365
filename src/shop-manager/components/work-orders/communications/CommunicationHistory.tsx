@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Card, CardContent } from '@sm/components/ui/card';
 import { Phone, MessageSquare, Mail, User, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 

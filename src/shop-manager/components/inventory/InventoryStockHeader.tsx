@@ -1,10 +1,10 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Download, Upload, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ServiceErrorBoundary } from "@/components/common/ServiceErrorBoundary";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { ServiceErrorBoundary } from "@sm/components/common/ServiceErrorBoundary";
+import { LoadingSpinner } from "@sm/components/common/LoadingSpinner";
 
 interface InventoryStockHeaderProps {
   title: string;

@@ -1,5 +1,5 @@
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@sm/components/ui/badge";
 import { FileCheck } from "lucide-react";
 
 interface InvoiceDetailsTemplateInfoProps {

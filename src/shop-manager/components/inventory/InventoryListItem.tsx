@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { InventoryItemExtended } from '@/types/inventory';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { InventoryItemExtended } from '@sm/types/inventory';
 import { Package, Edit, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

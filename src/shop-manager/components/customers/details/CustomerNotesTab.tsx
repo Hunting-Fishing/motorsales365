@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Customer, CustomerNote } from '@/types/customer';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Customer, CustomerNote } from '@sm/types/customer';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Plus, StickyNote, Calendar } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
 
 interface CustomerNotesTabProps {

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { CheckCircle2, XCircle, Clock, AlertTriangle, User } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
 import { format } from 'date-fns';
-import type { DailyShopInspection } from '@/types/safety';
+import type { DailyShopInspection } from '@sm/types/safety';
 
 interface InspectionAssignment {
   id: string;

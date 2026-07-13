@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ServiceMainCategory } from '@/types/service';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { ServiceMainCategory } from '@sm/types/service';
 import { X, Filter } from 'lucide-react';
 
 interface ServiceCategoryFilterProps {

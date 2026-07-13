@@ -1,17 +1,17 @@
 
 import { useState, useEffect } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@sm/hooks/use-toast';
 import { 
   getAllInventoryOrders, 
   createInventoryOrder, 
   receiveInventoryOrder, 
   cancelInventoryOrder 
-} from '@/services/inventory/orderService';
+} from '@sm/services/inventory/orderService';
 import { 
   InventoryOrder, 
   CreateInventoryOrderDto, 
   ReceiveInventoryOrderDto 
-} from '@/types/inventory/orders';
+} from '@sm/types/inventory/orders';
 
 export function useInventoryOrders() {
   const [orders, setOrders] = useState<InventoryOrder[]>([]);

@@ -2,15 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlusCircle } from 'lucide-react';
-import { FeedbackForm } from '@/types/feedback';
-import { getFeedbackForms, deleteFeedbackForm } from '@/services/feedbackService';
-import { Button } from '@/components/ui/button';
-import { toast } from '@/hooks/use-toast';
-import { AlertDialog } from '@/components/ui/alert-dialog';
+import { FeedbackForm } from '@sm/types/feedback';
+import { getFeedbackForms, deleteFeedbackForm } from '@sm/services/feedbackService';
+import { Button } from '@sm/components/ui/button';
+import { toast } from '@sm/hooks/use-toast';
+import { AlertDialog } from '@sm/components/ui/alert-dialog';
 import { FeedbackFormCard } from './FeedbackFormCard';
 import { EmptyFormsList } from './EmptyFormsList';
 import { DeleteFormDialog } from './DeleteFormDialog';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 export const FeedbackFormsList: React.FC = () => {
   const [forms, setForms] = useState<FeedbackForm[]>([]);

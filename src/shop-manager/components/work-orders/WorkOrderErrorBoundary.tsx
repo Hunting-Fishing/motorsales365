@@ -2,8 +2,8 @@
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { AlertTriangle, RefreshCw, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 
 interface WorkOrderErrorFallbackProps {

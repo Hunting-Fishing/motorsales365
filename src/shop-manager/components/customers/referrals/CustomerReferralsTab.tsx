@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@sm/components/ui/card";
 import { Plus, RefreshCcw, Users, UserPlus } from "lucide-react";
-import { Customer } from "@/types/customer";
-import { CustomerReferralView } from "@/types/referral";
-import { getReferralsByReferrer } from "@/services/referral/referralService";
+import { Customer } from "@sm/types/customer";
+import { CustomerReferralView } from "@sm/types/referral";
+import { getReferralsByReferrer } from "@sm/services/referral/referralService";
 import { ReferralsTable } from "./ReferralsTable";
 import { ReferralStats } from "./ReferralStats";
 import { AddReferralDialog } from "./AddReferralDialog";

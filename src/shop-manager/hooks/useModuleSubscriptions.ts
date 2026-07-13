@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { useIsPlatformDeveloper } from '@/hooks/usePlatformDeveloper';
-import { MODULE_CONFIGS, TIER_CONFIGS, TierSlug } from '@/config/moduleSubscriptions';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { useIsPlatformDeveloper } from '@sm/hooks/usePlatformDeveloper';
+import { MODULE_CONFIGS, TIER_CONFIGS, TierSlug } from '@sm/config/moduleSubscriptions';
 import { toast } from 'sonner';
 
 export interface ModuleSubscription {

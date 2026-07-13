@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/lib/supabase';
+import { useToast } from '@sm/hooks/use-toast';
 
 export interface PersonalizationField {
   key: string;

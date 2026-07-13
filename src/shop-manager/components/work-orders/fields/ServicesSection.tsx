@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from "react";
 import { IntegratedServiceSelector } from "./services/IntegratedServiceSelector";
-import { ServiceSector, ServiceJob } from "@/types/service";
-import { SelectedService } from "@/types/selectedService";
-import { useServiceSectors } from "@/hooks/useServiceCategories";
+import { ServiceSector, ServiceJob } from "@sm/types/service";
+import { SelectedService } from "@sm/types/selectedService";
+import { useServiceSectors } from "@sm/hooks/useServiceCategories";
 
 interface ServicesSectionProps {
   onServiceSelect?: (service: ServiceJob, categoryName: string, subcategoryName: string) => void;

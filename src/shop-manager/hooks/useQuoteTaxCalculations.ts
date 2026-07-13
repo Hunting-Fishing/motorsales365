@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { useTaxSettings } from '@/hooks/useTaxSettings';
-import { calculateTax } from '@/utils/taxCalculations';
-import { Quote, QuoteItem } from '@/types/quote';
-import { Customer } from '@/types/customer';
+import { useTaxSettings } from '@sm/hooks/useTaxSettings';
+import { calculateTax } from '@sm/utils/taxCalculations';
+import { Quote, QuoteItem } from '@sm/types/quote';
+import { Customer } from '@sm/types/customer';
 
 interface UseQuoteTaxCalculationsProps {
   quote?: Quote | null;

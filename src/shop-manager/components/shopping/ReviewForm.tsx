@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Label } from '@sm/components/ui/label';
 import { Star, Upload, X } from 'lucide-react';
-import { createProductReview } from '@/services/productReviewService';
-import { checkVerifiedPurchase } from '@/services/verificationService';
-import { uploadReviewImage } from '@/services/imageUploadService';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { createProductReview } from '@sm/services/productReviewService';
+import { checkVerifiedPurchase } from '@sm/services/verificationService';
+import { uploadReviewImage } from '@sm/services/imageUploadService';
+import { useAuth } from '@sm/hooks/useAuth';
+import { useToast } from '@sm/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
 
 interface ReviewFormProps {
   productId: string;

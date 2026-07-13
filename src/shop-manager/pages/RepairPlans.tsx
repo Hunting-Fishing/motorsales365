@@ -1,7 +1,7 @@
 
-import { RepairPlansList } from "@/components/repair-plan/RepairPlansList";
-import { useRepairPlans } from "@/hooks/useRepairPlans";
-import { Button } from "@/components/ui/button";
+import { RepairPlansList } from "@sm/components/repair-plan/RepairPlansList";
+import { useRepairPlans } from "@sm/hooks/useRepairPlans";
+import { Button } from "@sm/components/ui/button";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 

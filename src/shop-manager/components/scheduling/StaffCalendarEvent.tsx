@@ -1,14 +1,14 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 import { Ship, Wrench, Truck, Clock, RefreshCw } from 'lucide-react';
-import { StaffScheduleEvent, ASSET_TYPE_COLORS } from '@/types/staffScheduleCalendar';
+import { StaffScheduleEvent, ASSET_TYPE_COLORS } from '@sm/types/staffScheduleCalendar';
 import { format } from 'date-fns';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from '@sm/components/ui/tooltip';
 
 interface StaffCalendarEventProps {
   event: StaffScheduleEvent;

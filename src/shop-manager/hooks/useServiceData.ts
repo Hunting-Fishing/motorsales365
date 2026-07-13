@@ -1,8 +1,8 @@
 
 import { useState, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { useServiceSectors } from '@/hooks/useServiceCategories';
-import { getServiceCounts } from '@/lib/services';
+import { useToast } from '@sm/hooks/use-toast';
+import { useServiceSectors } from '@sm/hooks/useServiceCategories';
+import { getServiceCounts } from '@sm/lib/services';
 
 export const useServiceData = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);

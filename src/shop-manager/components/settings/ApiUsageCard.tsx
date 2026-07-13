@@ -1,10 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { useApiUsage } from "@/hooks/useApiUsage";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Progress } from "@sm/components/ui/progress";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { useApiUsage } from "@sm/hooks/useApiUsage";
 import { Bot, MessageSquare, Phone, Mail, TrendingUp, AlertTriangle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@sm/components/ui/skeleton";
 
 interface ApiUsageCardProps {
   shopId?: string;

@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Avatar, AvatarFallback } from '@sm/components/ui/avatar';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import { UserPlus, X, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface TaskAssigneesTabProps {
-  taskData: ReturnType<typeof import('@/hooks/useTaskData').useTaskData>;
+  taskData: ReturnType<typeof import('@sm/hooks/useTaskData').useTaskData>;
 }
 
 export function TaskAssigneesTab({ taskData }: TaskAssigneesTabProps) {

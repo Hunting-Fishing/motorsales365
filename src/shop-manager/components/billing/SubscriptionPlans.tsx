@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Check, Loader2, Crown, Building2, Zap, Rocket } from 'lucide-react';
-import { useSubscription } from '@/hooks/useSubscription';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
-import { MODULE_STRIPE_PRICING, ModuleId } from '@/config/stripePricing';
-import { PRICING_TIERS } from '@/config/pricing';
+import { useSubscription } from '@sm/hooks/useSubscription';
+import { useToast } from '@sm/hooks/use-toast';
+import { cn } from '@sm/lib/utils';
+import { MODULE_STRIPE_PRICING, ModuleId } from '@sm/config/stripePricing';
+import { PRICING_TIERS } from '@sm/config/pricing';
 
 interface SubscriptionPlansProps {
   moduleId?: ModuleId;

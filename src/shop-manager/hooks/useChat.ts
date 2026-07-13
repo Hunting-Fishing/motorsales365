@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { ChatRoom } from '@/types/chat';
+import { ChatRoom } from '@sm/types/chat';
 import { useChatRooms } from './useChatRooms';
 import { useChatMessages } from './useChatMessages';
 

@@ -1,8 +1,8 @@
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { CalendarDays, Plus, Bell, Download } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useNotifications } from "@/context/notifications";
+import { useNotifications } from "@sm/context/notifications";
 
 interface MaintenanceHeaderProps {
   totalScheduled: number;

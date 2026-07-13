@@ -1,14 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useSafetyDocuments } from '@/hooks/useSafetyDocuments';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useSafetyDocuments } from '@sm/hooks/useSafetyDocuments';
 import { Upload, FileText, X } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
-import type { SafetyDocumentType } from '@/types/safety';
+import type { SafetyDocumentType } from '@sm/types/safety';
 
 const DOCUMENT_TYPES: { value: SafetyDocumentType; label: string; category?: string }[] = [
   { value: 'sds', label: 'Safety Data Sheet (SDS)', category: 'chemical' },

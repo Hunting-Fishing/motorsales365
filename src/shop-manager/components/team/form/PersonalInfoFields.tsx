@@ -1,6 +1,6 @@
 
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
 import { Control } from "react-hook-form";
 import { TeamMemberFormValues } from "./formValidation";
 

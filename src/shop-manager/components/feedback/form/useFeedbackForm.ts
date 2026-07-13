@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { FeedbackForm, FeedbackQuestion } from '@/types/feedback';
-import { getFeedbackFormWithQuestions, submitFeedbackResponse } from '@/services/feedbackService';
-import { toast } from '@/hooks/use-toast';
+import { FeedbackForm, FeedbackQuestion } from '@sm/types/feedback';
+import { getFeedbackFormWithQuestions, submitFeedbackResponse } from '@sm/services/feedbackService';
+import { toast } from '@sm/hooks/use-toast';
 
 interface UseFeedbackFormProps {
   formId: string;

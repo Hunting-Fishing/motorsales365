@@ -1,8 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Mic, Square, Send } from "lucide-react";
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface AudioRecorderProps {
   onAudioRecorded: (audioBlob: Blob) => void;

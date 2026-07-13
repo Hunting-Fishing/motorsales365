@@ -1,9 +1,9 @@
 
 import React from "react";
-import { CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
 import { Clock, PlusCircle, Play, Pause } from "lucide-react";
-import { TimeEntry } from "@/types/workOrder";
+import { TimeEntry } from "@sm/types/workOrder";
 
 interface TimeTrackingHeaderProps {
   activeTimer: TimeEntry | null;

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { WorkOrderPart, WorkOrderPartFormValues } from '@/types/workOrderPart';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { Button } from '@/components/ui/button';
+import { WorkOrderPart, WorkOrderPartFormValues } from '@sm/types/workOrderPart';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { Button } from '@sm/components/ui/button';
 import { Edit, Trash2, XCircle } from 'lucide-react';
-import { deleteWorkOrderPart, updateWorkOrderPart } from '@/services/workOrder';
+import { deleteWorkOrderPart, updateWorkOrderPart } from '@sm/services/workOrder';
 import { toast } from 'sonner';
 import { EditPartDialog } from './EditPartDialog';
 

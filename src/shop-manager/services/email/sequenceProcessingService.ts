@@ -1,6 +1,6 @@
 
-import { supabase } from '@/lib/supabase';
-import { EmailSequence } from '@/types/email';
+import { supabase } from '@sm/lib/supabase';
+import { EmailSequence } from '@sm/types/email';
 
 /**
  * Service for handling the processing of email sequences

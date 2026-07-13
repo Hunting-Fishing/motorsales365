@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { clearAllServiceData } from '@/lib/services';
+import { useToast } from '@sm/hooks/use-toast';
+import { clearAllServiceData } from '@sm/lib/services';
 import { useServiceData } from './useServiceData';
 
 export const useServiceDatabase = () => {

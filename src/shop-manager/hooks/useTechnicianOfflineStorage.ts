@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { useToast } from './use-toast';
 
 export type OfflineDataType = 'task_update' | 'hazard_report' | 'inspection' | 'time_entry' | 'photo_capture';

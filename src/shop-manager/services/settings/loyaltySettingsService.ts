@@ -1,6 +1,6 @@
-import { supabase } from '@/integrations/supabase/client';
-import { unifiedSettingsService } from '@/services/unified/unifiedSettingsService';
-import { LoyaltyTier } from '@/types/loyalty';
+import { supabase } from '@sm/integrations/supabase/client';
+import { unifiedSettingsService } from '@sm/services/unified/unifiedSettingsService';
+import { LoyaltyTier } from '@sm/types/loyalty';
 
 export interface LoyaltyConfiguration {
   enabled: boolean;

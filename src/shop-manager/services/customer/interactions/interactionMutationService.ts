@@ -1,6 +1,6 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { CustomerInteraction, InteractionType, InteractionStatus } from "@/types/interaction";
+import { supabase } from "@sm/integrations/supabase/client";
+import { CustomerInteraction, InteractionType, InteractionStatus } from "@sm/types/interaction";
 
 export const addCustomerInteraction = async (
   interaction: Omit<CustomerInteraction, 'id'>

@@ -1,8 +1,8 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { Form } from "@/components/ui/form";
-import { Tabs } from "@/components/ui/tabs";
+import { Form } from "@sm/components/ui/form";
+import { Tabs } from "@sm/components/ui/tabs";
 import { CustomerFormValues } from "./schemas/customerSchema";
 import { DuplicateCustomerAlert } from "./DuplicateCustomerAlert";
 import { FormTabs } from "./FormTabs";
@@ -12,7 +12,7 @@ import { FormErrorSummary } from "./FormErrorSummary";
 import { FormStatusAlert } from "./FormStatusAlert";
 import { FormProgressIndicator } from "./FormProgressIndicator";
 import { useFormValidation } from "./useFormValidation";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@sm/hooks/use-mobile";
 
 interface FormContentWrapperProps {
   form: UseFormReturn<CustomerFormValues>;

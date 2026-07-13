@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent } from '@sm/components/ui/card';
 import { Download, X, Smartphone } from 'lucide-react';
-import { useResponsive } from '@/hooks/useResponsive';
+import { useResponsive } from '@sm/hooks/useResponsive';
 
 interface PWAInstallPromptProps {
   onInstall?: () => void;

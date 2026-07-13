@@ -1,5 +1,5 @@
 
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertTitle, AlertDescription } from "@sm/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
 interface TeamErrorProps {

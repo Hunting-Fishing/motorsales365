@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useBudgetData } from '@/hooks/useBudgetData';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Progress } from '@sm/components/ui/progress';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { useBudgetData } from '@sm/hooks/useBudgetData';
 import { BudgetCategoryManager } from './BudgetCategoryManager';
 import { BudgetEntryForm } from './BudgetEntryForm';
 import { BudgetVsActualChart } from './BudgetVsActualChart';
 import { BudgetAlertsPanel } from './BudgetAlertsPanel';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { DollarSign, TrendingUp, TrendingDown, AlertTriangle, PlusCircle } from 'lucide-react';
 
 export function BudgetDashboard() {

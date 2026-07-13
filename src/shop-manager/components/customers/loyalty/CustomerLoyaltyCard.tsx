@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
+import { Progress } from "@sm/components/ui/progress";
 import { Award } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
-import { CustomerLoyalty } from '@/types/loyalty';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { useToast } from '@sm/hooks/use-toast';
+import { CustomerLoyalty } from '@sm/types/loyalty';
 
 interface CustomerLoyaltyCardProps {
   customerLoyalty?: CustomerLoyalty | null;

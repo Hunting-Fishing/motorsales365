@@ -1,7 +1,7 @@
 import React from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@sm/components/ui/alert';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

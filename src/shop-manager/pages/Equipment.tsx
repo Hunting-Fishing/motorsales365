@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Settings, Wrench, Package, Car } from 'lucide-react';
-import { EquipmentList } from '@/components/equipment/EquipmentList';
-import { AddEquipmentDialog } from '@/components/equipment/AddEquipmentDialog';
-import { useEquipmentByAssetClass } from '@/hooks/useEquipmentByAssetClass';
-import { useEquipmentCategories } from '@/hooks/useEquipmentCategories';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { getTypesForCategory, getCategoryForType } from '@/types/equipmentCategory';
+import { EquipmentList } from '@sm/components/equipment/EquipmentList';
+import { AddEquipmentDialog } from '@sm/components/equipment/AddEquipmentDialog';
+import { useEquipmentByAssetClass } from '@sm/hooks/useEquipmentByAssetClass';
+import { useEquipmentCategories } from '@sm/hooks/useEquipmentCategories';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { getTypesForCategory, getCategoryForType } from '@sm/types/equipmentCategory';
 
 export default function Equipment() {
   const [dialogOpen, setDialogOpen] = useState(false);

@@ -1,6 +1,6 @@
 
 // This file now uses real database data through the WorkOrderTemplateService
-import { WorkOrderTemplateService } from '@/lib/services/WorkOrderTemplateService';
+import { WorkOrderTemplateService } from '@sm/lib/services/WorkOrderTemplateService';
 
 const templateService = new WorkOrderTemplateService();
 

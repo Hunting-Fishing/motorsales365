@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { 
   BarChart, 
   Bar, 
@@ -10,7 +10,7 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
-import { CategoryBudgetSummary } from '@/hooks/useBudgetData';
+import { CategoryBudgetSummary } from '@sm/hooks/useBudgetData';
 
 interface BudgetVsActualChartProps {
   categorySummaries: CategoryBudgetSummary[];

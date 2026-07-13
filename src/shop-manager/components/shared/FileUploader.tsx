@@ -2,8 +2,8 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Cloud, File, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@sm/components/ui/button';
+import { Progress } from '@sm/components/ui/progress';
 
 interface FileWithProgress {
   file: File;

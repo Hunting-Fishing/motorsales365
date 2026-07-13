@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Switch } from '@sm/components/ui/switch';
 import { Plus, Search, MapPin, ArrowLeft } from 'lucide-react';
-import { useFuelDeliveryLocations, useCreateFuelDeliveryLocation, useFuelDeliveryCustomers } from '@/hooks/useFuelDelivery';
+import { useFuelDeliveryLocations, useCreateFuelDeliveryLocation, useFuelDeliveryCustomers } from '@sm/hooks/useFuelDelivery';
 import { useNavigate } from 'react-router-dom';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { format } from 'date-fns';
-import { AddressAutocomplete, AddressResult } from '@/components/fuel-delivery/AddressAutocomplete';
-import { useFuelUnits } from '@/hooks/fuel-delivery/useFuelUnits';
+import { AddressAutocomplete, AddressResult } from '@sm/components/fuel-delivery/AddressAutocomplete';
+import { useFuelUnits } from '@sm/hooks/fuel-delivery/useFuelUnits';
 
 export default function FuelDeliveryLocations() {
   const navigate = useNavigate();

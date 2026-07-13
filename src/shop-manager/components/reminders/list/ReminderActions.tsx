@@ -1,10 +1,10 @@
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Bell, CheckCircle2, ChevronRight } from "lucide-react";
-import { ServiceReminder } from "@/types/reminder";
-import { updateReminder } from "@/services/reminders/reminderMutations";
-import { sendReminderNotifications } from "@/services/reminders/reminderNotifications";
-import { toast } from "@/hooks/use-toast";
+import { ServiceReminder } from "@sm/types/reminder";
+import { updateReminder } from "@sm/services/reminders/reminderMutations";
+import { sendReminderNotifications } from "@sm/services/reminders/reminderNotifications";
+import { toast } from "@sm/hooks/use-toast";
 
 interface ReminderActionsProps {
   reminder: ServiceReminder;

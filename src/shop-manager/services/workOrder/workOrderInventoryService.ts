@@ -1,6 +1,6 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { WorkOrderInventoryItem } from "@/types/workOrder";
+import { supabase } from "@sm/integrations/supabase/client";
+import { WorkOrderInventoryItem } from "@sm/types/workOrder";
 
 /**
  * Get inventory items for a work order

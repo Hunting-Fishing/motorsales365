@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { FeedbackForm, FeedbackQuestion, QuestionType } from '@/types/feedback';
+import { supabase } from '@sm/integrations/supabase/client';
+import { FeedbackForm, FeedbackQuestion, QuestionType } from '@sm/types/feedback';
 import { 
   createFeedbackForm, 
   getFeedbackFormWithQuestions, 
@@ -10,14 +10,14 @@ import {
   createFeedbackQuestions,
   updateFeedbackQuestion,
   deleteFeedbackQuestion
-} from '@/services/feedbackService';
+} from '@sm/services/feedbackService';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Switch } from '@sm/components/ui/switch';
 import {
   Form,
   FormControl,
@@ -26,17 +26,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@sm/components/ui/form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { toast } from '@/hooks/use-toast';
+} from '@sm/components/ui/select';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Label } from '@sm/components/ui/label';
+import { toast } from '@sm/hooks/use-toast';
 import { ArrowLeft, Plus, Trash, MoveUp, MoveDown, Save } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 

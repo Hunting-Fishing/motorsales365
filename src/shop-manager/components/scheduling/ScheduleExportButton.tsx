@@ -1,15 +1,15 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Download, FileText, FileSpreadsheet } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { exportToExcel, exportToCSV, exportToPDF } from '@/utils/export';
-import { useToast } from '@/hooks/use-toast';
-import type { WorkScheduleAssignment } from '@/types/scheduling';
+} from '@sm/components/ui/dropdown-menu';
+import { exportToExcel, exportToCSV, exportToPDF } from '@sm/utils/export';
+import { useToast } from '@sm/hooks/use-toast';
+import type { WorkScheduleAssignment } from '@sm/types/scheduling';
 
 interface ScheduleExportButtonProps {
   schedules: WorkScheduleAssignment[];

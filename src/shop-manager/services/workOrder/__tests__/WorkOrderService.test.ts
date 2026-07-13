@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { WorkOrderService } from '../WorkOrderService';
 import { WorkOrderRepository } from '../WorkOrderRepository';
-import { WorkOrder, WorkOrderFormValues } from '@/types/workOrder';
+import { WorkOrder, WorkOrderFormValues } from '@sm/types/workOrder';
 
 // Mock the repository
 jest.mock('../WorkOrderRepository');

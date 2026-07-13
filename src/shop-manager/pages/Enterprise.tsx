@@ -1,18 +1,18 @@
 
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Shield, FileText, AlertTriangle, BarChart, Settings, Lock, Key, Bell } from 'lucide-react';
-import { PermissionsManager } from '@/components/enterprise/PermissionsManager';
-import { AuditTrailViewer } from '@/components/enterprise/AuditTrailViewer';
-import { SecurityEventsMonitor } from '@/components/enterprise/SecurityEventsMonitor';
-import { BIReportManager } from '@/components/enterprise/BIReportManager';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { PermissionsManager } from '@sm/components/enterprise/PermissionsManager';
+import { AuditTrailViewer } from '@sm/components/enterprise/AuditTrailViewer';
+import { SecurityEventsMonitor } from '@sm/components/enterprise/SecurityEventsMonitor';
+import { BIReportManager } from '@sm/components/enterprise/BIReportManager';
+import { Label } from '@sm/components/ui/label';
+import { Switch } from '@sm/components/ui/switch';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { useToast } from '@sm/hooks/use-toast';
 
 export default function Enterprise() {
   const [activeTab, setActiveTab] = useState('permissions');

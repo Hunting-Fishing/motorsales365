@@ -1,13 +1,13 @@
 
 import { useState, useEffect, useMemo } from 'react';
-import { getInventoryItems } from '@/services/inventory/crudService';
-import { InventoryItemExtended } from '@/types/inventory';
+import { getInventoryItems } from '@sm/services/inventory/crudService';
+import { InventoryItemExtended } from '@sm/types/inventory';
 import { 
   getInventoryCategories, 
   getInventorySuppliers, 
   getInventoryLocations,
   getInventoryStatuses
-} from '@/services/inventory/filterService';
+} from '@sm/services/inventory/filterService';
 
 export function useInventoryFilters() {
   const [items, setItems] = useState<InventoryItemExtended[]>([]);

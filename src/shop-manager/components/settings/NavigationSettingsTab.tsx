@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Label } from '@sm/components/ui/label';
+import { Switch } from '@sm/components/ui/switch';
+import { Button } from '@sm/components/ui/button';
+import { Checkbox } from '@sm/components/ui/checkbox';
 import { LayoutList, Save, ChevronDown, ChevronRight, ShieldX } from 'lucide-react';
-import { navigation } from '@/components/layout/sidebar/navigation';
-import { useSidebarVisibilitySettings, useUpdateSidebarVisibility, SidebarVisibilitySettings } from '@/hooks/useSidebarVisibility';
+import { navigation } from '@sm/components/layout/sidebar/navigation';
+import { useSidebarVisibilitySettings, useUpdateSidebarVisibility, SidebarVisibilitySettings } from '@sm/hooks/useSidebarVisibility';
 import { toast } from 'sonner';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { RoleGuard } from '@/components/auth/RoleGuard';
-import { AccountMenuSettingsCard } from '@/components/settings/AccountMenuSettingsCard';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@sm/components/ui/collapsible';
+import { RoleGuard } from '@sm/components/auth/RoleGuard';
+import { AccountMenuSettingsCard } from '@sm/components/settings/AccountMenuSettingsCard';
 
 const AVAILABLE_ROLES = [
   { value: 'owner', label: 'Owner' },

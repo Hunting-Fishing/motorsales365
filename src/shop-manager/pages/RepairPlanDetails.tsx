@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import { repairPlansService, RepairPlan, RepairPlanTask } from '@/services/repairPlansService';
+import { useToast } from '@sm/hooks/use-toast';
+import { repairPlansService, RepairPlan, RepairPlanTask } from '@sm/services/repairPlansService';
 
 interface DisplayRepairPlan extends RepairPlan {
   tasks: RepairPlanTask[];

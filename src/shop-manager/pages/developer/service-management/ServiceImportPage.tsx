@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { FreshServiceImport } from '@/components/developer/service-management/FreshServiceImport';
-import { useServiceSectors } from '@/hooks/useServiceCategories';
+import { FreshServiceImport } from '@sm/components/developer/service-management/FreshServiceImport';
+import { useServiceSectors } from '@sm/hooks/useServiceCategories';
 
 export function ServiceImportPage() {
   const { refetch } = useServiceSectors();

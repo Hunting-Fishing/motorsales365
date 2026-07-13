@@ -5,11 +5,11 @@ import {
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { exportToCSV, exportToExcel, exportToPDF } from "@/utils/export";
-import { toast } from "@/components/ui/use-toast";
-import { generateReportPdf, savePdf } from "@/utils/pdf";
+} from "@sm/components/ui/dropdown-menu";
+import { Button } from "@sm/components/ui/button";
+import { exportToCSV, exportToExcel, exportToPDF } from "@sm/utils/export";
+import { toast } from "@sm/components/ui/use-toast";
+import { generateReportPdf, savePdf } from "@sm/utils/pdf";
 
 interface ReportExportMenuProps {
   data: any[];

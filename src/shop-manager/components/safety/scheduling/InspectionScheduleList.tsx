@@ -1,12 +1,12 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Calendar, Clock, AlertTriangle, CheckCircle2, 
   Trash2, Edit, Play 
 } from 'lucide-react';
-import { useInspectionSchedules, InspectionSchedule } from '@/hooks/useInspectionSchedules';
+import { useInspectionSchedules, InspectionSchedule } from '@sm/hooks/useInspectionSchedules';
 import { formatDistanceToNow, isPast, parseISO } from 'date-fns';
 
 interface InspectionScheduleListProps {

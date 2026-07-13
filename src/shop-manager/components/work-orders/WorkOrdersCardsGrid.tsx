@@ -1,8 +1,8 @@
 import React from 'react';
-import type { WorkOrder } from '@/types/workOrder';
+import type { WorkOrder } from '@sm/types/workOrder';
 import { WorkOrderCard } from './WorkOrderCard';
 import { ClipboardList } from 'lucide-react';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState } from '@sm/components/ui/empty-state';
 
 interface WorkOrdersCardsGridProps {
   workOrders: WorkOrder[];

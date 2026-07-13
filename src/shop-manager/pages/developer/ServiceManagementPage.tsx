@@ -2,9 +2,9 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { ArrowLeft, Wrench } from 'lucide-react';
-import { ServiceManagementNavigation } from '@/components/developer/service-management/ServiceManagementNavigation';
+import { ServiceManagementNavigation } from '@sm/components/developer/service-management/ServiceManagementNavigation';
 import { ServiceOverviewPage } from './service-management/ServiceOverviewPage';
 import { ServiceTreeViewPage } from './service-management/ServiceTreeViewPage';
 import { ServiceExcelViewPage } from './service-management/ServiceExcelViewPage';

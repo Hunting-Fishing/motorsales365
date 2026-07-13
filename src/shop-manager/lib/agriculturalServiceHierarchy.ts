@@ -1,4 +1,4 @@
-import { ServiceMainCategory } from '@/types/service';
+import { ServiceMainCategory } from '@sm/types/service';
 
 // Agricultural Equipment Service Categories
 export const agriculturalServiceCategories: ServiceMainCategory[] = [

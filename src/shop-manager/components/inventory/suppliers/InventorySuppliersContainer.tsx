@@ -1,6 +1,6 @@
 
 import React from "react";
-import { InventoryHeader } from "@/components/inventory/InventoryHeader";
+import { InventoryHeader } from "@sm/components/inventory/InventoryHeader";
 import { InventorySuppliersPage } from "./InventorySuppliersPage";
 
 export function InventorySuppliersContainer() {

@@ -1,8 +1,8 @@
 
 import React, { useState } from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Button } from "@sm/components/ui/button";
 import { Maximize2, Minimize2 } from "lucide-react";
 
 interface WorkOrderDescriptionFieldProps {

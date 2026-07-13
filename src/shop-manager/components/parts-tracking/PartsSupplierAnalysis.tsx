@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface SupplierMetrics {
   name: string;

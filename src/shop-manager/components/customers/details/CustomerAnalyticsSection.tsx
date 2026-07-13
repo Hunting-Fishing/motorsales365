@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Customer } from "@/types/customer";
-import { SmsLogsTable } from "@/components/sms/SmsLogsTable";
-import { SmsTemplatesList } from "@/components/sms/SmsTemplatesList";
-import { CustomerLifetimeValueCard } from "@/components/analytics/CustomerLifetimeValueCard";
-import { CustomerSegmentBadges } from "@/components/analytics/CustomerSegmentBadges";
-import { ChartContainer } from "@/components/analytics/ChartContainer";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Customer } from "@sm/types/customer";
+import { SmsLogsTable } from "@sm/components/sms/SmsLogsTable";
+import { SmsTemplatesList } from "@sm/components/sms/SmsTemplatesList";
+import { CustomerLifetimeValueCard } from "@sm/components/analytics/CustomerLifetimeValueCard";
+import { CustomerSegmentBadges } from "@sm/components/analytics/CustomerSegmentBadges";
+import { ChartContainer } from "@sm/components/analytics/ChartContainer";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { customerAnalyticsService, CustomerAnalytics } from "@/services/analytics/customerAnalyticsService";
+import { customerAnalyticsService, CustomerAnalytics } from "@sm/services/analytics/customerAnalyticsService";
 import { Loader2 } from "lucide-react";
 
 interface CustomerAnalyticsSectionProps {

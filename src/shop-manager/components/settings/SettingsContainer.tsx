@@ -2,10 +2,10 @@
 import React, { useMemo } from 'react';
 import { SettingsGroupedTabsList } from './SettingsGroupedTabsList';
 import { SearchInput } from './SearchInput';
-import { SETTINGS_SECTIONS } from '@/config/settingsConfig';
-import { useSettingsSearch } from '@/hooks/useSettingsSearch';
-import { useUserRoles } from '@/hooks/useUserRoles';
-import { SettingsSection } from '@/types/settingsConfig';
+import { SETTINGS_SECTIONS } from '@sm/config/settingsConfig';
+import { useSettingsSearch } from '@sm/hooks/useSettingsSearch';
+import { useUserRoles } from '@sm/hooks/useUserRoles';
+import { SettingsSection } from '@sm/types/settingsConfig';
 
 interface SettingsContainerProps {
   className?: string;

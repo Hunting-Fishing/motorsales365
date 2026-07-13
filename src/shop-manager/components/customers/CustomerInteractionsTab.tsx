@@ -1,9 +1,9 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Plus } from "lucide-react";
-import { CustomerInteraction } from "@/types/interaction";
-import { InteractionsList } from "@/components/interactions/InteractionsList";
+import { CustomerInteraction } from "@sm/types/interaction";
+import { InteractionsList } from "@sm/components/interactions/InteractionsList";
 
 interface CustomerInteractionsTabProps {
   customerInteractions: CustomerInteraction[];

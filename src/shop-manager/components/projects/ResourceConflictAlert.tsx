@@ -1,12 +1,12 @@
 import { AlertTriangle, Users, Truck, Ship, Car, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useResourceConflicts, ResourceConflict } from '@/hooks/useResourceConflicts';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@sm/components/ui/collapsible';
+import { useResourceConflicts, ResourceConflict } from '@sm/hooks/useResourceConflicts';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 const resourceIcons = {
   employee: Users,

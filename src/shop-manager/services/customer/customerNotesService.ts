@@ -1,6 +1,6 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { CustomerNote } from "@/types/customer";
+import { supabase } from "@sm/integrations/supabase/client";
+import { CustomerNote } from "@sm/types/customer";
 
 // Get customer notes
 export const getCustomerNotes = async (customerId: string): Promise<CustomerNote[]> => {

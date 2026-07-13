@@ -1,9 +1,9 @@
 
 import { useMemo } from 'react';
-import { InvoiceItem } from '@/types/invoice';
-import { useTaxSettings } from '@/hooks/useTaxSettings';
-import { Customer } from '@/types/customer';
-import { calculateTax } from '@/utils/taxCalculations';
+import { InvoiceItem } from '@sm/types/invoice';
+import { useTaxSettings } from '@sm/hooks/useTaxSettings';
+import { Customer } from '@sm/types/customer';
+import { calculateTax } from '@sm/utils/taxCalculations';
 
 interface UseInvoiceTotalsProps {
   items?: InvoiceItem[];

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { NavigationSection, NavigationItem, UserNavigationPreferences, NavigationSectionWithItems } from '@/types/navigation';
+import { supabase } from '@sm/integrations/supabase/client';
+import { NavigationSection, NavigationItem, UserNavigationPreferences, NavigationSectionWithItems } from '@sm/types/navigation';
 
 export function useNavigationSections() {
   return useQuery({

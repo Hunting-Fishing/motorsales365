@@ -1,7 +1,7 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { DataExportTab } from "@/components/settings/DataExportTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { DataExportTab } from "@sm/components/settings/DataExportTab";
 
 export const DataExportSettings = () => {
   return (

@@ -1,6 +1,6 @@
 
 // @ts-nocheck
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { PostgrestError } from '@supabase/supabase-js';
 
 // Simple database row type that matches what we actually get from the database

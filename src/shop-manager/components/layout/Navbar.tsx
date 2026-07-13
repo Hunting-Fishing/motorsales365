@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Plus, FileText, Wrench, Receipt, ClipboardList, Calendar } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { useUserRoles } from '@/hooks/useUserRoles';
-import { hasRoutePermission } from '@/utils/routeGuards';
+import { Button } from "@sm/components/ui/button";
+import { useUserRoles } from '@sm/hooks/useUserRoles';
+import { hasRoutePermission } from '@sm/utils/routeGuards';
 
 // Quick action items for creating new records
 const quickActions = [

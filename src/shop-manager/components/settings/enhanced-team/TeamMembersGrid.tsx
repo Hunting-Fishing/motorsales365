@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@sm/components/ui/avatar';
 import { 
   MoreHorizontal, 
   Mail, 
@@ -19,8 +19,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useTeamMembers } from '@/hooks/useTeamMembers';
+} from '@sm/components/ui/dropdown-menu';
+import { useTeamMembers } from '@sm/hooks/useTeamMembers';
 
 interface TeamMembersGridProps {
   searchQuery: string;

@@ -1,4 +1,4 @@
-import { useAuthContext } from '@/context/AuthContext';
+import { useAuthContext } from '@sm/context/AuthContext';
 
 /**
  * Singleton auth hook — reads from AuthProvider context.

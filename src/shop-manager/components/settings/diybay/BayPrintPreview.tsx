@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Bay } from "@/services/diybay/diybayService";
+import { Bay } from "@sm/services/diybay/diybayService";
 
 interface BayPrintPreviewProps {
   bays: Bay[];

@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { Customer, CustomerCreate } from '@/types/customer';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Customer, CustomerCreate } from '@sm/types/customer';
 
 export async function getAllCustomers(): Promise<Customer[]> {
   console.log('Fetching all customers...');

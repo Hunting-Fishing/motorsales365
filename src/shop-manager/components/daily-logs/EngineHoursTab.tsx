@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { useToast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Save, Clock, Gauge } from 'lucide-react';
 import { format } from 'date-fns';
 import { EquipmentHierarchySelector } from './EquipmentHierarchySelector';
 import { MaintenanceCountdown } from './MaintenanceCountdown';
-import { EquipmentNode } from '@/hooks/useEquipmentHierarchy';
+import { EquipmentNode } from '@sm/hooks/useEquipmentHierarchy';
 
 export function EngineHoursTab() {
   const { toast } = useToast();

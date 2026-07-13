@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { MaintenanceRecord } from "@/types/equipment";
-import { formatDate } from "@/utils/dateUtils";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@sm/components/ui/table";
+import { MaintenanceRecord } from "@sm/types/equipment";
+import { formatDate } from "@sm/utils/dateUtils";
 import { History, Wrench } from "lucide-react";
 
 interface EquipmentMaintenanceHistoryProps {

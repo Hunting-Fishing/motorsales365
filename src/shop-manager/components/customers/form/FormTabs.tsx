@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
 import { Car, User, Building2, CreditCard, Users, Heart } from "lucide-react";
 
 type TabValue = "personal" | "business" | "payment" | "vehicles" | "preferences" | "household" | "loyalty";

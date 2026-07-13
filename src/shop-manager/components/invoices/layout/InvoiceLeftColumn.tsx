@@ -1,15 +1,15 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { StaffMember, Invoice, InvoiceTemplate, InvoiceItem } from "@/types/invoice";
-import { WorkOrder } from "@/types/workOrder";
-import { InventoryItem } from "@/types/inventory";
-import { useTaxSettings } from "@/hooks/useTaxSettings";
-import { useShopId } from "@/hooks/useShopId";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Label } from "@sm/components/ui/label";
+import { StaffMember, Invoice, InvoiceTemplate, InvoiceItem } from "@sm/types/invoice";
+import { WorkOrder } from "@sm/types/workOrder";
+import { InventoryItem } from "@sm/types/inventory";
+import { useTaxSettings } from "@sm/hooks/useTaxSettings";
+import { useShopId } from "@sm/hooks/useShopId";
 
 interface InvoiceLeftColumnProps {
   invoice: Invoice;

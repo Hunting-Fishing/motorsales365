@@ -1,7 +1,7 @@
 
 import React from "react";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { PermissionSet } from "@/types/permissions";
+import { PermissionSet } from "@sm/types/permissions";
 
 interface RoleCardPermissionsProps {
   keyPermissions: {

@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { Eye, Plus, Search, RefreshCw, AlertTriangle, TrendingUp, Clock, BarChart3 } from 'lucide-react';
-import { useNearMissReports, NearMissReport } from '@/hooks/useNearMissReports';
-import { NearMissReportDialog } from '@/components/safety/near-miss/NearMissReportDialog';
-import { NearMissCard } from '@/components/safety/near-miss/NearMissCard';
-import { NearMissTrendChart } from '@/components/safety/near-miss/NearMissTrendChart';
+import { useNearMissReports, NearMissReport } from '@sm/hooks/useNearMissReports';
+import { NearMissReportDialog } from '@sm/components/safety/near-miss/NearMissReportDialog';
+import { NearMissCard } from '@sm/components/safety/near-miss/NearMissCard';
+import { NearMissTrendChart } from '@sm/components/safety/near-miss/NearMissTrendChart';
 
 export default function SafetyNearMiss() {
   const { loading, reports, totalThisMonth, pendingReview, createReport, updateReport, refetch } = useNearMissReports();

@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { Wrench, Plus, RefreshCw, AlertCircle } from 'lucide-react';
 import { EnhancedJobLineItem } from './EnhancedJobLineItem';
 import { AddJobLineDialog } from './AddJobLineDialog';
-import { toast } from '@/hooks/use-toast';
-import { getWorkOrderJobLines } from '@/services/workOrder/jobLinesService';
+import { toast } from '@sm/hooks/use-toast';
+import { getWorkOrderJobLines } from '@sm/services/workOrder/jobLinesService';
 
 interface WorkOrderJobLinesSectionProps {
   workOrderId: string;

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Progress } from '@sm/components/ui/progress';
+import { Badge } from '@sm/components/ui/badge';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { Shield, CheckCircle, AlertTriangle, XCircle, TrendingUp, Award } from 'lucide-react';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts';
-import { ComplianceScore } from '@/hooks/useSafetyReports';
+import { ComplianceScore } from '@sm/hooks/useSafetyReports';
 
 interface Props {
   score: ComplianceScore | null;

@@ -1,5 +1,5 @@
 
-import { InventoryItemExtended } from "@/types/inventory";
+import { InventoryItemExtended } from "@sm/types/inventory";
 
 /**
  * Get inventory status based on quantity and reorder point

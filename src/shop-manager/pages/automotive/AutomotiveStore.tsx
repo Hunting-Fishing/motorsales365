@@ -1,4 +1,4 @@
-import { ModuleStore, StoreCategory } from '@/components/store/ModuleStore';
+import { ModuleStore, StoreCategory } from '@sm/components/store/ModuleStore';
 import { Car, Package, Wrench, Cog, Gauge, Shield } from 'lucide-react';
 
 const AUTOMOTIVE_CATEGORIES: StoreCategory[] = [

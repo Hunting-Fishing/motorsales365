@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { PRODUCT_PLAN_MAP, TierType } from '@/config/stripePricing';
+import { PRODUCT_PLAN_MAP, TierType } from '@sm/config/stripePricing';
 
 export interface SubscriptionStatus {
   subscribed: boolean;

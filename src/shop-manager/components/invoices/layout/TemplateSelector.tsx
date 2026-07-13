@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { InvoiceTemplate } from "@/types/invoice";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
+import { InvoiceTemplate } from "@sm/types/invoice";
 
 export interface TemplateSelectorProps {
   open: boolean;

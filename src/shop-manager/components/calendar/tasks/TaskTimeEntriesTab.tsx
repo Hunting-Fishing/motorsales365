@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@sm/components/ui/dialog';
 import { Play, Square, Plus, Clock, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface TaskTimeEntriesTabProps {
-  taskData: ReturnType<typeof import('@/hooks/useTaskData').useTaskData>;
+  taskData: ReturnType<typeof import('@sm/hooks/useTaskData').useTaskData>;
 }
 
 export function TaskTimeEntriesTab({ taskData }: TaskTimeEntriesTabProps) {

@@ -1,11 +1,11 @@
 import React, { useState, useRef, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
+import { Badge } from "@sm/components/ui/badge";
+import { Separator } from "@sm/components/ui/separator";
+import { ScrollArea } from "@sm/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
 import { 
   ZoomIn, 
   ZoomOut, 
@@ -18,8 +18,8 @@ import {
   Trash2,
   Eye
 } from "lucide-react";
-import { VehicleBodyStyle } from "@/types/vehicleBodyStyles";
-import { cn } from "@/lib/utils";
+import { VehicleBodyStyle } from "@sm/types/vehicleBodyStyles";
+import { cn } from "@sm/lib/utils";
 import { VehicleDamageMarker } from "./VehicleDamageMarker";
 import { DamageDetailsPanel } from "./DamageDetailsPanel";
 

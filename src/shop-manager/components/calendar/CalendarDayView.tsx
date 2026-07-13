@@ -1,9 +1,9 @@
 
 import { format, isSameDay, isPast, set } from "date-fns";
-import { CalendarEvent } from "@/types/calendar";
-import { cn } from "@/lib/utils";
-import { priorityMap } from "@/utils/workOrders";
-import { ChatRoom } from "@/types/chat";
+import { CalendarEvent } from "@sm/types/calendar";
+import { cn } from "@sm/lib/utils";
+import { priorityMap } from "@sm/utils/workOrders";
+import { ChatRoom } from "@sm/types/chat";
 import { AlertTriangle } from "lucide-react";
 
 interface BusinessHour {

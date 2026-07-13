@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { MessageSquare } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { sendSms } from '@/services/calls/callService';
-import { recordSmsActivity } from '@/utils/activity/communicationActivity';
+import { toast } from '@sm/hooks/use-toast';
+import { sendSms } from '@sm/services/calls/callService';
+import { recordSmsActivity } from '@sm/utils/activity/communicationActivity';
 
 interface SendSmsButtonProps {
   phoneNumber: string;

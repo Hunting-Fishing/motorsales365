@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { CustomerVehicle } from '@/types/customer';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { CustomerVehicle } from '@sm/types/customer';
+import { useToast } from '@sm/hooks/use-toast';
 
 interface AddVehicleDialogProps {
   customerId: string;

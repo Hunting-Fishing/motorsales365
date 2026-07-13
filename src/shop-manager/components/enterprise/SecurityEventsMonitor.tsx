@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
 import { AlertTriangle, Shield, Check } from 'lucide-react';
-import { useSecurityEvents } from '@/hooks/useSecurityEvents';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
+import { useSecurityEvents } from '@sm/hooks/useSecurityEvents';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { Button } from '@sm/components/ui/button';
 import { format } from 'date-fns';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 
 export function SecurityEventsMonitor() {
   const { loading, events, resolveEvent } = useSecurityEvents();

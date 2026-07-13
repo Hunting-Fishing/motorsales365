@@ -3,8 +3,8 @@ import React from 'react';
 import { 
   Card, 
   CardContent 
-} from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+} from "@sm/components/ui/card";
+import { cn } from "@sm/lib/utils";
 
 interface StatCardProps {
   title: string;

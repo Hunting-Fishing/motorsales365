@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Loader2, Search, KeyRound, Building2, Crosshair, ArrowRight, UserPlus, LogIn, MapPin, Briefcase } from 'lucide-react';
-import { getShopBySlug, getShopByInviteCode, enhancedSearchShops, getAvailableIndustries, ShopPublicInfo } from '@/services/shopLookupService';
-import { useToast } from '@/hooks/use-toast';
-import { CustomerPortalLayout } from '@/components/customer-portal/CustomerPortalLayout';
+import { getShopBySlug, getShopByInviteCode, enhancedSearchShops, getAvailableIndustries, ShopPublicInfo } from '@sm/services/shopLookupService';
+import { useToast } from '@sm/hooks/use-toast';
+import { CustomerPortalLayout } from '@sm/components/customer-portal/CustomerPortalLayout';
 
 type ConnectionMethod = 'code' | 'search' | null;
 

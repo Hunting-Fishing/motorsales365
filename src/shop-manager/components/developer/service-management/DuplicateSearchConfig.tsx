@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { DuplicateSearchOptions } from '@/utils/search/duplicateSearch';
+import { Button } from '@sm/components/ui/button';
+import { Label } from '@sm/components/ui/label';
+import { Slider } from '@sm/components/ui/slider';
+import { Switch } from '@sm/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Separator } from '@sm/components/ui/separator';
+import { DuplicateSearchOptions } from '@sm/utils/search/duplicateSearch';
 
 interface DuplicateSearchConfigProps {
   options: DuplicateSearchOptions;

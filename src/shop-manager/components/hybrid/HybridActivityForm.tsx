@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Calendar } from "@sm/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
-import { hybridActivitiesService } from "@/services/hybridActivitiesService";
-import { HybridActivity, CreateHybridActivityData } from "@/types/hybrid";
+import { cn } from "@sm/lib/utils";
+import { useToast } from "@sm/hooks/use-toast";
+import { hybridActivitiesService } from "@sm/services/hybridActivitiesService";
+import { HybridActivity, CreateHybridActivityData } from "@sm/types/hybrid";
 
 interface HybridActivityFormProps {
   open: boolean;

@@ -1,10 +1,10 @@
 
 import { format, isPast, isToday, startOfDay } from "date-fns";
-import { cn } from "@/lib/utils";
-import { CalendarEvent } from "@/types/calendar";
-import { priorityMap } from "@/utils/workOrders";
+import { cn } from "@sm/lib/utils";
+import { CalendarEvent } from "@sm/types/calendar";
+import { priorityMap } from "@sm/utils/workOrders";
 import { ShiftChatIndicator } from "./ShiftChatIndicator";
-import { ChatRoom } from "@/types/chat";
+import { ChatRoom } from "@sm/types/chat";
 import { useNavigate } from "react-router-dom";
 import { Clock, AlertTriangle } from "lucide-react";
 

@@ -1,6 +1,6 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { LoyaltyReward } from "@/types/loyalty";
+import { supabase } from "@sm/integrations/supabase/client";
+import { LoyaltyReward } from "@sm/types/loyalty";
 
 // Get available rewards
 export const getAvailableRewards = async (shopId: string): Promise<LoyaltyReward[]> => {

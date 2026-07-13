@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ServiceManagementNavigation } from '@/components/developer/service-management/ServiceManagementNavigation';
-import { ServiceManagementSettings } from '@/components/developer/service-management/ServiceManagementSettings';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { ServiceManagementNavigation } from '@sm/components/developer/service-management/ServiceManagementNavigation';
+import { ServiceManagementSettings } from '@sm/components/developer/service-management/ServiceManagementSettings';
 import { Settings, Database, FileText, Search, Building, RefreshCw, AlertTriangle } from 'lucide-react';
-import { useServiceSectors } from '@/hooks/useServiceCategories';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useServiceSectors } from '@sm/hooks/useServiceCategories';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 
 export function ServiceManagementLayout() {
   const { sectors, loading, refetch } = useServiceSectors();

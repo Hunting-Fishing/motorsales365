@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
-import { getWorkOrderParts } from '@/services/workOrder/workOrderPartsService';
+import { getWorkOrderParts } from '@sm/services/workOrder/workOrderPartsService';
 import { Loader2, Package, DollarSign, AlertTriangle } from 'lucide-react';
 
 export function PartsInventoryOverview() {

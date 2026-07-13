@@ -1,6 +1,6 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
 import { InventoryFieldManager } from "./InventoryFieldManager";
 
 export function InventoryManagerContainer() {

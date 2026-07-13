@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RepairPlanForm } from '@/components/repair-plan/RepairPlanForm';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { RepairPlanForm } from '@sm/components/repair-plan/RepairPlanForm';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import { fetchEquipment } from '@/services/equipmentService';
-import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import type { EquipmentWithMaintenance } from '@/services/equipmentService';
-import type { RepairPlanFormValues } from '@/types/repairPlan';
+import { fetchEquipment } from '@sm/services/equipmentService';
+import { toast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import type { EquipmentWithMaintenance } from '@sm/services/equipmentService';
+import type { RepairPlanFormValues } from '@sm/types/repairPlan';
 
 export default function CreateRepairPlan() {
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Plus } from "lucide-react";
-import { RepairTask } from "@/types/repairPlan";
+import { RepairTask } from "@sm/types/repairPlan";
 import { RepairTaskList } from "../RepairTaskList";
 
 interface RepairPlanTasksSectionProps {

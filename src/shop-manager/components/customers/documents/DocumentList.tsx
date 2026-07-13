@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { CustomerDocument } from '@/types/document';
-import { DocumentService } from '@/services/documentService';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { CustomerDocument } from '@sm/types/document';
+import { DocumentService } from '@sm/services/documentService';
 import { Download, Eye, FileText, Trash2, Edit } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 
 interface DocumentListProps {
   documents: CustomerDocument[];

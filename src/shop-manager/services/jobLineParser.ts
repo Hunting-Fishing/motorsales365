@@ -1,5 +1,5 @@
 
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 
 export function parseJobLineData(data: any[]): WorkOrderJobLine[] {
   return data.map(item => ({

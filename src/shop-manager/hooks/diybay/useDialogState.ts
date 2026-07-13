@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Bay } from "@/services/diybay/diybayService";
+import { Bay } from "@sm/services/diybay/diybayService";
 
 export function useDialogState() {
   const [editBay, setEditBay] = useState<Bay | null>(null);

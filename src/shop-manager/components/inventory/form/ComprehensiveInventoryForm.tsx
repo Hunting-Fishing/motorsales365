@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Button } from "@sm/components/ui/button";
+import { Progress } from "@sm/components/ui/progress";
+import { Badge } from "@sm/components/ui/badge";
 import { 
   Package, 
   DollarSign, 
@@ -23,7 +23,7 @@ import { ProductDetailsSection } from "./sections/ProductDetailsSection";
 import { TaxAndFeesSection } from "./sections/TaxAndFeesSection";
 import { AdditionalInfoSection } from "./sections/AdditionalInfoSection";
 
-import { InventoryItemExtended } from "@/types/inventory";
+import { InventoryItemExtended } from "@sm/types/inventory";
 
 interface ComprehensiveInventoryFormProps {
   onSubmit: (data: Omit<InventoryItemExtended, "id">) => Promise<void>;

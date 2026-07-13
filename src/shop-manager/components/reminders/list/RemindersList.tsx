@@ -1,13 +1,13 @@
 
 import { memo, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { ReminderListItem } from "./ReminderListItem";
 import { EmptyRemindersList } from "./EmptyRemindersList";
 import { RemindersLoading } from "./RemindersLoading";
 import { useReminders } from "./useReminders";
-import { ServiceReminder } from "@/types/reminder";
+import { ServiceReminder } from "@sm/types/reminder";
 import { DateRange } from "react-day-picker";
-import { updateReminder } from "@/services/reminders/reminderMutations";
+import { updateReminder } from "@sm/services/reminders/reminderMutations";
 
 interface RemindersListProps {
   customerId?: string;

@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Download } from 'lucide-react';
-import { FeedbackForm, FeedbackResponse } from '@/types/feedback';
+import { FeedbackForm, FeedbackResponse } from '@sm/types/feedback';
 import { format } from 'date-fns';
 
 interface ExportButtonProps {

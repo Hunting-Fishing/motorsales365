@@ -1,5 +1,5 @@
 
-import { Manufacturer } from '@/types/affiliate';
+import { Manufacturer } from '@sm/types/affiliate';
 import { automotiveManufacturers } from './automotive';
 import { heavyDutyManufacturers } from './heavy-duty';
 import { equipmentManufacturers } from './equipment';

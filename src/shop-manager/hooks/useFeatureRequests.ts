@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { exportToCSV } from '@/utils/export';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
+import { exportToCSV } from '@sm/utils/export';
 import {
   FeatureRequest,
   CreateFeatureRequestPayload,
   FeatureRequestVote,
   ModuleType,
-} from '@/types/feature-requests';
+} from '@sm/types/feature-requests';
 
 export function useFeatureRequests(moduleFilter?: ModuleType) {
   const [featureRequests, setFeatureRequests] = useState<FeatureRequest[]>([]);

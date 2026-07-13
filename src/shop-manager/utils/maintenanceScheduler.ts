@@ -1,6 +1,6 @@
 
-import type { EquipmentWithMaintenance } from "@/services/equipmentService";
-import { supabase } from "@/integrations/supabase/client";
+import type { EquipmentWithMaintenance } from "@sm/services/equipmentService";
+import { supabase } from "@sm/integrations/supabase/client";
 import { addMonths, addDays, addYears, parseISO, format } from 'date-fns';
 
 // Get upcoming maintenance schedules from equipment list

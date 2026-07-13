@@ -2,8 +2,8 @@
 import { useServiceImport } from './useServiceImport';
 import { useServiceData } from './useServiceData';
 import { useServiceDatabase } from './useServiceDatabase';
-import { useFileBasedServiceImport } from '@/hooks/useFileBasedServiceImport';
-import { importServicesFromStorage } from '@/lib/services';
+import { useFileBasedServiceImport } from '@sm/hooks/useFileBasedServiceImport';
+import { importServicesFromStorage } from '@sm/lib/services';
 
 export const useServiceManagement = () => {
   const { sectors, isRefreshing, refreshData } = useServiceData();

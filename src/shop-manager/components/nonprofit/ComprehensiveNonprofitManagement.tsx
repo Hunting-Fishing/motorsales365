@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { useToast } from '@sm/hooks/use-toast';
 import { 
   Plus, 
   Edit, 
@@ -17,10 +17,10 @@ import {
   Calendar,
   AlertCircle
 } from 'lucide-react';
-import { nonprofitApi } from '@/lib/services/nonprofitApi';
-import { DonationEntryDialog } from '@/components/forms/DonationEntryDialog';
-import { GrantEntryDialog } from '@/components/forms/GrantEntryDialog';
-import { FinancialHealthEntryDialog } from '@/components/forms/FinancialHealthEntryDialog';
+import { nonprofitApi } from '@sm/lib/services/nonprofitApi';
+import { DonationEntryDialog } from '@sm/components/forms/DonationEntryDialog';
+import { GrantEntryDialog } from '@sm/components/forms/GrantEntryDialog';
+import { FinancialHealthEntryDialog } from '@sm/components/forms/FinancialHealthEntryDialog';
 import { format } from 'date-fns';
 
 export function ComprehensiveNonprofitManagement() {

@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { CustomerCreateForm } from '@/components/customers/create/CustomerCreateForm';
-import { CreateCustomerHeader } from '@/components/customers/create/CreateCustomerHeader';
-import { useCustomerCreate } from '@/components/customers/create/hooks/useCustomerCreate';
+import { CustomerCreateForm } from '@sm/components/customers/create/CustomerCreateForm';
+import { CreateCustomerHeader } from '@sm/components/customers/create/CreateCustomerHeader';
+import { useCustomerCreate } from '@sm/components/customers/create/hooks/useCustomerCreate';
 
 export default function CreateCustomer() {
   const { handleImportComplete, isSubmitting } = useCustomerCreate();

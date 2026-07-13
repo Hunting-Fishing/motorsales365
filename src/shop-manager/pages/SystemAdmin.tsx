@@ -13,8 +13,8 @@ import ShoppingControls from './developer/ShoppingControls';
 import ProductFormPage from './developer/ProductFormPage';
 import TrialManagement from './developer/TrialManagement';
 import PlatformDevelopers from './developer/PlatformDevelopers';
-import { DeveloperNavigation } from '@/components/developer/DeveloperNavigation';
-import AffiliateAnalyticsDashboard from '@/components/developer/analytics/AffiliateAnalyticsDashboard';
+import { DeveloperNavigation } from '@sm/components/developer/DeveloperNavigation';
+import AffiliateAnalyticsDashboard from '@sm/components/developer/analytics/AffiliateAnalyticsDashboard';
 
 export default function DeveloperPortal() {
   return (

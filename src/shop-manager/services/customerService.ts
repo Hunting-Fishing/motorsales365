@@ -1,7 +1,7 @@
-import { supabase } from "@/integrations/supabase/client";
-import { Customer, CustomerCreate, adaptCustomerForUI } from "@/types/customer";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Customer, CustomerCreate, adaptCustomerForUI } from "@sm/types/customer";
 import { getCustomerLoyalty } from "./loyalty/customerLoyaltyService";
-import { CustomerFormValues } from '@/components/customers/form/schemas/customerSchema';
+import { CustomerFormValues } from '@sm/components/customers/form/schemas/customerSchema';
 import { importCustomersFromCSV } from "./customers/customerImportService";
 
 // Export CustomerCreate type

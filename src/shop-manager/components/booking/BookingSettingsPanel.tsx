@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Switch } from '@sm/components/ui/switch';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Separator } from '@sm/components/ui/separator';
 import { Settings, Clock, Mail, Bell, Shield, Save } from 'lucide-react';
-import { BookingSettings, useUpdateBookingSettings } from '@/hooks/useBookingSystem';
+import { BookingSettings, useUpdateBookingSettings } from '@sm/hooks/useBookingSystem';
 
 interface BookingSettingsPanelProps {
   settings: BookingSettings | null | undefined;

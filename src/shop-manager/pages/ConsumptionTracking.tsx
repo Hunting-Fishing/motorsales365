@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConsumptionTracker } from '@/components/inventory/consumption/ConsumptionTracker';
+import { ConsumptionTracker } from '@sm/components/inventory/consumption/ConsumptionTracker';
 
 export default function ConsumptionTracking() {
   return (

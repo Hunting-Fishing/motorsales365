@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabase';
-import { Equipment } from '@/types/equipment';
+import { supabase } from '@sm/lib/supabase';
+import { Equipment } from '@sm/types/equipment';
 
 export interface EquipmentDetails extends Equipment {
   maintenanceRecords: Array<{

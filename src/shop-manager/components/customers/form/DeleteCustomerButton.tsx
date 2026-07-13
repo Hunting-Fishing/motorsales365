@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import {
   AlertDialog,
@@ -12,9 +12,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useToast } from '@/hooks/use-toast';
-import { deleteCustomer } from '@/services/customer/customerDeleteService';
+} from '@sm/components/ui/alert-dialog';
+import { useToast } from '@sm/hooks/use-toast';
+import { deleteCustomer } from '@sm/services/customer/customerDeleteService';
 
 interface DeleteCustomerButtonProps {
   customerId: string;

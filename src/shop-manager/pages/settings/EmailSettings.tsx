@@ -1,8 +1,8 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { EmailSettingsTab } from "@/components/settings/EmailSettingsTab";
-import { useShopId } from "@/hooks/useShopId";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { EmailSettingsTab } from "@sm/components/settings/EmailSettingsTab";
+import { useShopId } from "@sm/hooks/useShopId";
 
 export const EmailSettings = () => {
   const { shopId } = useShopId();

@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabase';
-import { EmailSequence, EmailSequenceStep, EmailSequenceAnalytics } from '@/types/email';
+import { supabase } from '@sm/lib/supabase';
+import { EmailSequence, EmailSequenceStep, EmailSequenceAnalytics } from '@sm/types/email';
 import { parseJsonField } from './utils';
 
 export const emailSequenceService = {

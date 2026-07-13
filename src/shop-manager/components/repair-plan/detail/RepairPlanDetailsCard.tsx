@@ -1,12 +1,12 @@
 
 import React from "react";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardContent, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { Calendar, Clock, Wrench } from "lucide-react";
-import { RepairPlan } from "@/types/repairPlan";
-import { formatDate } from "@/utils/workOrders";
-import { SendSmsButton } from "@/components/calls/SendSmsButton";
-import { VoiceCallButton } from "@/components/calls/VoiceCallButton";
+import { RepairPlan } from "@sm/types/repairPlan";
+import { formatDate } from "@sm/utils/workOrders";
+import { SendSmsButton } from "@sm/components/calls/SendSmsButton";
+import { VoiceCallButton } from "@sm/components/calls/VoiceCallButton";
 
 interface RepairPlanDetailsCardProps {
   repairPlan: RepairPlan;

@@ -1,14 +1,14 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { getInventoryItems } from '@/services/inventory/crudService';
+import { getInventoryItems } from '@sm/services/inventory/crudService';
 import { 
   getInventoryCategories, 
   getInventorySuppliers, 
   getInventoryLocations,
   getInventoryStatuses
-} from '@/services/inventory/filterService';
-import { InventoryItemExtended } from '@/types/inventory';
+} from '@sm/services/inventory/filterService';
+import { InventoryItemExtended } from '@sm/types/inventory';
 
 /**
  * Centralized inventory data hook that provides all inventory-related data

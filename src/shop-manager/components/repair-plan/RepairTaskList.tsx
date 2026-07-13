@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { RepairTask } from "@/types/repairPlan";
+import { RepairTask } from "@sm/types/repairPlan";
 import { RepairTaskItem } from "./task/RepairTaskItem";
 import { RepairTaskEmptyState } from "./task/RepairTaskEmptyState";
 

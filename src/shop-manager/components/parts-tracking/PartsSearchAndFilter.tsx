@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Button } from '@sm/components/ui/button';
 import { Search } from 'lucide-react';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { usePartsSearch } from '@/hooks/parts/usePartsSearch';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { usePartsSearch } from '@sm/hooks/parts/usePartsSearch';
 
 export function PartsSearchAndFilter() {
   const [searchTerm, setSearchTerm] = useState('');

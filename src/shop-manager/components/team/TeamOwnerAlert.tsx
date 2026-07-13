@@ -1,10 +1,10 @@
 
 import { useState } from "react";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Alert, AlertTitle, AlertDescription } from "@sm/components/ui/alert";
+import { Button } from "@sm/components/ui/button";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { useRoleAssignment } from "@/hooks/team/useRoleAssignment";
+import { useToast } from "@sm/components/ui/use-toast";
+import { useRoleAssignment } from "@sm/hooks/team/useRoleAssignment";
 
 interface TeamOwnerAlertProps {
   userId: string;

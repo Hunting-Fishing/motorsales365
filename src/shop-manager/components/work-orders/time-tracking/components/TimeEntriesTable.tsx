@@ -1,6 +1,6 @@
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { TimeEntry } from "@/types/workOrder";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
+import { TimeEntry } from "@sm/types/workOrder";
 import { TimeEntryRow } from "./TimeEntryRow";
 import { EmptyTimeEntriesTable } from "./EmptyTimeEntriesTable";
 

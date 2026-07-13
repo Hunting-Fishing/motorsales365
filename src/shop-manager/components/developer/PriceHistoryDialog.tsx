@@ -5,12 +5,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+} from '@sm/components/ui/dialog';
+import { Badge } from '@sm/components/ui/badge';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 import { History, TrendingUp, TrendingDown, Minus, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { productPriceHistoryService, PriceHistoryEntry } from '@/services/productPriceHistoryService';
+import { productPriceHistoryService, PriceHistoryEntry } from '@sm/services/productPriceHistoryService';
 import { format } from 'date-fns';
 
 interface PriceHistoryDialogProps {

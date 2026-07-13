@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useDebounce } from '@/hooks/use-debounce';
+import { useDebounce } from '@sm/hooks/use-debounce';
 
 export interface ICD10Result {
   code: string;

@@ -1,11 +1,11 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase'; 
+import { supabase } from '@sm/lib/supabase'; 
 import { 
   TopProductAnalytics, 
   ProductAnalyticsData,
   CategoryAnalytics
-} from '@/types/analytics';
+} from '@sm/types/analytics';
 
 export const useProductAnalyticsData = () => {
   // Fetch analytics data

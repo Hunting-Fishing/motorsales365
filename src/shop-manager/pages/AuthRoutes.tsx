@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import AuthPage from '@/pages/Auth';
+import AuthPage from '@sm/pages/Auth';
 
 export default function AuthRoutes() {
   return (

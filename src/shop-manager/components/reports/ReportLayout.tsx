@@ -1,6 +1,6 @@
 
 import React, { ReactNode } from 'react';
-import { Card } from "@/components/ui/card";
+import { Card } from "@sm/components/ui/card";
 import { Loader2 } from "lucide-react";
 
 interface ReportLayoutProps {

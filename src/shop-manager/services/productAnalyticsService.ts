@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 export type InteractionType = 'view' | 'click' | 'add_to_cart' | 'save' | 'share' | 'purchase' | 'compare';
 

@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { 
   DiscountType, 
   JobLineDiscount, 
@@ -7,7 +7,7 @@ import {
   WorkOrderDiscount, 
   ApplyDiscountRequest,
   DiscountCalculationResult 
-} from '@/types/discount';
+} from '@sm/types/discount';
 
 // Get all discount types
 export const getDiscountTypes = async (): Promise<DiscountType[]> => {

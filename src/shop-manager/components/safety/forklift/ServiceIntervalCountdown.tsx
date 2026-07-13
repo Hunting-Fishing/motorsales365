@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Progress } from '@sm/components/ui/progress';
+import { Badge } from '@sm/components/ui/badge';
 import { Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 interface Interval {

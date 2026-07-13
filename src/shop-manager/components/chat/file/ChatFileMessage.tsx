@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { ChatFileInfo } from '@/services/chat/fileService';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { ChatFileInfo } from '@sm/services/chat/fileService';
+import { Card } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Download, FileIcon, Image as ImageIcon, Film, FileAudio, FileText } from 'lucide-react';
 
 interface ChatFileMessageProps {

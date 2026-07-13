@@ -78,8 +78,8 @@ async function exampleComplexChange() {
 /**
  * INTEGRATION INTO PermissionsTab.tsx:
  * 
- * import { logNavigationAccessChange } from '@/utils/team/history';
- * import { useAuthUser } from '@/hooks/useAuthUser';
+ * import { logNavigationAccessChange } from '@sm/utils/team/history';
+ * import { useAuthUser } from '@sm/hooks/useAuthUser';
  * 
  * // Inside your component:
  * const { userId: currentUserId, user } = useAuthUser();

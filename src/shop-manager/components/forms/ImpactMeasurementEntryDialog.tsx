@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { FormField } from '@/components/ui/form-field';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { FormField } from '@sm/components/ui/form-field';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Calendar } from '@sm/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@sm/components/ui/popover';
 import { CalendarIcon, Plus } from 'lucide-react';
 import { format } from 'date-fns';
-import { useToast } from '@/hooks/use-toast';
-import { nonprofitApi } from '@/lib/services/nonprofitApi';
+import { useToast } from '@sm/hooks/use-toast';
+import { nonprofitApi } from '@sm/lib/services/nonprofitApi';
 
 interface ImpactMeasurementEntryDialogProps {
   onMeasurementAdded?: () => void;

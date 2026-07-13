@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Trophy, Star, Award, Target, TrendingUp } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Progress } from '@sm/components/ui/progress';
+import { Badge } from '@sm/components/ui/badge';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface UserStats {
   totalPoints: number;

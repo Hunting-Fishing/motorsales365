@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { updateUserProfile, showProfileUpdateToast } from '@/utils/profileUtils';
+import { updateUserProfile, showProfileUpdateToast } from '@sm/utils/profileUtils';
 
 /**
  * Hook for handling profile information updates

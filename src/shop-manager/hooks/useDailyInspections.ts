@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { useShopId } from './useShopId';
 import { useToast } from './use-toast';
-import type { DailyShopInspection, InspectionOverallStatus, InspectionShift, FloorCondition, ToolsCondition, ChecklistItem } from '@/types/safety';
+import type { DailyShopInspection, InspectionOverallStatus, InspectionShift, FloorCondition, ToolsCondition, ChecklistItem } from '@sm/types/safety';
 
 export interface CreateInspectionData {
   inspection_date: string;

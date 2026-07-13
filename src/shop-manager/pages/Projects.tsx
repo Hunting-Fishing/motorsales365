@@ -1,7 +1,7 @@
-import { ProjectBudgetDashboard } from '@/components/projects/ProjectBudgetDashboard';
-import { ResourceConflictAlert } from '@/components/projects/ResourceConflictAlert';
-import { UpcomingMilestones } from '@/components/projects/UpcomingMilestones';
-import { useMilestoneNotifications } from '@/hooks/useMilestoneNotifications';
+import { ProjectBudgetDashboard } from '@sm/components/projects/ProjectBudgetDashboard';
+import { ResourceConflictAlert } from '@sm/components/projects/ResourceConflictAlert';
+import { UpcomingMilestones } from '@sm/components/projects/UpcomingMilestones';
+import { useMilestoneNotifications } from '@sm/hooks/useMilestoneNotifications';
 
 export default function Projects() {
   const { overdueCount, approachingCount } = useMilestoneNotifications();

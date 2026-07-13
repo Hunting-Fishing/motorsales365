@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Role } from "@/types/team";
-import { PermissionSet } from "@/types/permissions";
+import { Role } from "@sm/types/team";
+import { PermissionSet } from "@sm/types/permissions";
 import { AddRoleDialog } from "./AddRoleDialog";
 import { EditRoleDialog } from "./EditRoleDialog";
 import { DeleteRoleDialog } from "./DeleteRoleDialog";

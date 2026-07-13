@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Building2, Users, TrendingUp, Check, X, MessageSquare, Search, Filter } from 'lucide-react';
-import { departmentSubmissionService, DepartmentSubmission } from '@/services/team/departmentSubmissionService';
-import { toast } from '@/hooks/use-toast';
+import { departmentSubmissionService, DepartmentSubmission } from '@sm/services/team/departmentSubmissionService';
+import { toast } from '@sm/hooks/use-toast';
 import { format } from 'date-fns';
 
 export function DepartmentSubmissionsManager() {

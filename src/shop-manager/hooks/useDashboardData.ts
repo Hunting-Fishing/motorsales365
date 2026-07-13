@@ -1,9 +1,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { PhaseProgressItem } from '@/types/dashboard';
-import { getPhaseProgress, getRecentWorkOrders } from '@/services/dashboard/workOrderService';
-import { getStats } from '@/services/dashboard/statsService';
-import { supabase } from '@/lib/supabase';
+import { PhaseProgressItem } from '@sm/types/dashboard';
+import { getPhaseProgress, getRecentWorkOrders } from '@sm/services/dashboard/workOrderService';
+import { getStats } from '@sm/services/dashboard/statsService';
+import { supabase } from '@sm/lib/supabase';
 
 interface DashboardCache {
   data: any;

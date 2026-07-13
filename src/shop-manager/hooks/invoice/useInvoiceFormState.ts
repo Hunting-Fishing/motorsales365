@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Invoice } from '@/types/invoice';
+import { Invoice } from '@sm/types/invoice';
 
 export function useInvoiceFormState(initialInvoice?: Partial<Invoice>) {
   const [invoice, setInvoice] = useState<Invoice>(() => ({

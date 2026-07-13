@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Loader2, Building2, UserPlus, LogIn, MapPin, Phone, ArrowLeft } from 'lucide-react';
-import { getShopBySlug, ShopPublicInfo } from '@/services/shopLookupService';
+import { getShopBySlug, ShopPublicInfo } from '@sm/services/shopLookupService';
 
 export default function BusinessLanding() {
   const { slug } = useParams<{ slug: string }>();

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { TimeEntry } from "@/types/workOrder";
+import { TimeEntry } from "@sm/types/workOrder";
 import { TimeTrackingSection } from "./TimeTrackingSection";
 
 export interface TimeTrackingProps {

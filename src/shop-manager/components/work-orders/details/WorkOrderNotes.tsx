@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Button } from '@sm/components/ui/button';
 
 export interface WorkOrderNotesProps {
   workOrderId: string;

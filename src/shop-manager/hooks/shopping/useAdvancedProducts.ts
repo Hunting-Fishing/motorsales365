@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { AffiliateTool } from '@/types/affiliate';
-import { ProductBundle, ProductVariant, PricingRule } from '@/types/advanced-product';
-import { bundleService } from '@/services/advanced-product/bundleService';
-import { variantService } from '@/services/advanced-product/variantService';
-import { pricingService } from '@/services/advanced-product/pricingService';
-import { useProductsManager } from '@/hooks/affiliate/useProductsManager';
+import { AffiliateTool } from '@sm/types/affiliate';
+import { ProductBundle, ProductVariant, PricingRule } from '@sm/types/advanced-product';
+import { bundleService } from '@sm/services/advanced-product/bundleService';
+import { variantService } from '@sm/services/advanced-product/variantService';
+import { pricingService } from '@sm/services/advanced-product/pricingService';
+import { useProductsManager } from '@sm/hooks/affiliate/useProductsManager';
 
 interface UseAdvancedProductsReturn {
   // Base products

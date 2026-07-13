@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, Loader2 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
-import { Badge } from '@/components/ui/badge';
-import { getCalendarEvents, getWorkOrderEvents } from '@/services/calendar/calendarEventService';
-import { getMaintenanceRequestEvents } from '@/services/calendar/maintenanceRequestService';
-import { supabase } from '@/integrations/supabase/client';
+import { Badge } from '@sm/components/ui/badge';
+import { getCalendarEvents, getWorkOrderEvents } from '@sm/services/calendar/calendarEventService';
+import { getMaintenanceRequestEvents } from '@sm/services/calendar/maintenanceRequestService';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface MaintenanceEvent {
   id: string;

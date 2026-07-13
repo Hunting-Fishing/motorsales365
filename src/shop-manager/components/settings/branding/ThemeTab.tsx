@@ -1,8 +1,8 @@
 
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardContent, CardTitle } from "@sm/components/ui/card";
 import { ThemeSelector } from "./ThemeSelector";
 import { ThemePreview } from "./ThemePreview";
-import { Label } from "@/components/ui/label";
+import { Label } from "@sm/components/ui/label";
 // Theme functionality temporarily disabled
 
 export function ThemeTab() {

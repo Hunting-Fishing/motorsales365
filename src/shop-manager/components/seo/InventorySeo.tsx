@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { EnhancedSeoHead } from '@/components/common/EnhancedSeoHead';
-import { useShopName } from '@/hooks/useShopName';
+import { EnhancedSeoHead } from '@sm/components/common/EnhancedSeoHead';
+import { useShopName } from '@sm/hooks/useShopName';
 
 export const InventorySeo: React.FC = () => {
   const { shopName } = useShopName();

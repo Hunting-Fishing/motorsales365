@@ -1,11 +1,11 @@
 
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { Home, Search } from "lucide-react";
-import { CompanyContactEnhanced } from "@/components/common/CompanyContactEnhanced";
-import { useCompany } from "@/contexts/CompanyContext";
+import { CompanyContactEnhanced } from "@sm/components/common/CompanyContactEnhanced";
+import { useCompany } from "@sm/contexts/CompanyContext";
 
 const NotFound = () => {
   const location = useLocation();

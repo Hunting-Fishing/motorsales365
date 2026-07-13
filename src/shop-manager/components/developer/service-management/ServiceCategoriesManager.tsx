@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { ServiceMainCategory } from '@/types/service';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ServiceMainCategory } from '@sm/types/service';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { Plus, Edit, Trash2, ChevronDown, ChevronRight, RefreshCw, AlertCircle, Eye, EyeOff, Search, MoreVertical } from 'lucide-react';
 
 interface ServiceCategoriesManagerProps {

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { useProductAnalytics } from '@/hooks/shopping/useProductAnalytics';
-import { AffiliateProduct } from '@/types/affiliate';
+import { useProductAnalytics } from '@sm/hooks/shopping/useProductAnalytics';
+import { AffiliateProduct } from '@sm/types/affiliate';
 
 interface ProductViewTrackerProps {
   product: AffiliateProduct;

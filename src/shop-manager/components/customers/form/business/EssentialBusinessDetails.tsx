@@ -6,13 +6,13 @@ import {
   Collapsible, 
   CollapsibleContent, 
   CollapsibleTrigger 
-} from "@/components/ui/collapsible";
-import { Badge } from "@/components/ui/badge";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+} from "@sm/components/ui/collapsible";
+import { Badge } from "@sm/components/ui/badge";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { CustomerFormValues } from "../schemas/customerSchema";
-import { cn } from "@/lib/utils";
+import { cn } from "@sm/lib/utils";
 
 interface EssentialBusinessDetailsProps {
   form: UseFormReturn<CustomerFormValues>;

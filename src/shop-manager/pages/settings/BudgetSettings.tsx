@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { BudgetManagementTab } from "@/components/settings/BudgetManagementTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { BudgetManagementTab } from "@sm/components/settings/BudgetManagementTab";
 
 export const BudgetSettings = () => {
   return (

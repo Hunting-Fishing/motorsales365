@@ -1,11 +1,11 @@
 import React from 'react';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { useCompanyInfo } from '@/hooks/useCompanyInfo';
-import { useCompany } from '@/contexts/CompanyContext';
-import { useTeamMembers } from '@/hooks/useTeamMembers';
-import { teamDataService } from '@/services/team/teamDataService';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { useCompanyInfo } from '@sm/hooks/useCompanyInfo';
+import { useCompany } from '@sm/contexts/CompanyContext';
+import { useTeamMembers } from '@sm/hooks/useTeamMembers';
+import { teamDataService } from '@sm/services/team/teamDataService';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Building2, MapPin, Phone, Mail, Clock, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';

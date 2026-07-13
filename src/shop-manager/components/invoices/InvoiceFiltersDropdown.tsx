@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@sm/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@sm/components/ui/dropdown-menu";
 import { Filter } from "lucide-react";
-import { InvoiceFilters, InvoiceFiltersDropdownProps } from "@/types/invoice";
+import { InvoiceFilters, InvoiceFiltersDropdownProps } from "@sm/types/invoice";
 
 export function InvoiceFiltersDropdown({ 
   filters, 

@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { startOfMonth, endOfMonth, subMonths } from 'date-fns';
 
 export interface PartsAnalytics {

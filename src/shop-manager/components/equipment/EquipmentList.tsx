@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@sm/components/ui/alert-dialog';
 import { Search, AlertTriangle, CheckCircle, Clock, Wrench, Loader2, Trash2, X, ImageIcon } from 'lucide-react';
-import { Equipment } from '@/types/equipment';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { Equipment } from '@sm/types/equipment';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { useEquipmentFilterOptions, formatEquipmentType } from '@/hooks/useEquipmentFilterOptions';
+import { useEquipmentFilterOptions, formatEquipmentType } from '@sm/hooks/useEquipmentFilterOptions';
 
 const getEquipmentIcon = (category: string) => {
   // Return appropriate icon based on category

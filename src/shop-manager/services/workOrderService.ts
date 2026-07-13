@@ -1,12 +1,12 @@
 
-import { WorkOrder, WorkOrderInventoryItem, TimeEntry } from "@/types/workOrder";
-import { supabase } from "@/lib/supabase";
-import { mapFromDbWorkOrder, mapTimeEntryFromDb, mapInventoryItemFromDb } from "@/utils/supabaseMappers";
+import { WorkOrder, WorkOrderInventoryItem, TimeEntry } from "@sm/types/workOrder";
+import { supabase } from "@sm/lib/supabase";
+import { mapFromDbWorkOrder, mapTimeEntryFromDb, mapInventoryItemFromDb } from "@sm/utils/supabaseMappers";
 import { 
   triggerWorkflowOnWorkOrderCreate, 
   triggerWorkflowOnWorkOrderStatusUpdate, 
   triggerWorkflowOnWorkOrderComplete 
-} from "@/services/workflows/workflowEventService";
+} from "@sm/services/workflows/workflowEventService";
 
 /**
  * Create a new work order

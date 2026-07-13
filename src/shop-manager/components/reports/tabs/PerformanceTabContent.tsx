@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { 
   BarChart, 
   Bar, 
@@ -10,8 +10,8 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Skeleton } from "@sm/components/ui/skeleton";
 
 interface PerformanceTabContentProps {
   servicePerformance: any[];

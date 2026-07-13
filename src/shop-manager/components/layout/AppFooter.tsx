@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { MessageSquarePlus, HelpCircle } from 'lucide-react';
-import { SubmitChangeRequestDialog } from '@/components/feedback/SubmitChangeRequestDialog';
+import { SubmitChangeRequestDialog } from '@sm/components/feedback/SubmitChangeRequestDialog';
 import { useLocation } from 'react-router-dom';
 
 export function AppFooter() {

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useWorkOrders } from '@/hooks/inventory/useWorkOrders';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useWorkOrders } from '@sm/hooks/inventory/useWorkOrders';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Plus, CheckCircle, Clock, AlertCircle, Trash2 } from 'lucide-react';
 import { CreateWorkOrderDialog } from './CreateWorkOrderDialog';
 import { format } from 'date-fns';

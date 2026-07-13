@@ -1,14 +1,14 @@
 
 import React, { useState } from "react";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardContent, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Input } from "@sm/components/ui/input";
 import { Plus, Search, Calendar, Clock, User, DollarSign } from "lucide-react";
-import { RepairPlan, RepairStatus, RepairPriority } from "@/types/repairPlan";
-import { getStatusColor, getPriorityColor } from "@/utils/repairPlanUtils";
-import { formatDate } from "@/utils/workOrders";
+import { RepairPlan, RepairStatus, RepairPriority } from "@sm/types/repairPlan";
+import { getStatusColor, getPriorityColor } from "@sm/utils/repairPlanUtils";
+import { formatDate } from "@sm/utils/workOrders";
 import { Link } from "react-router-dom";
 
 interface RepairPlansListProps {

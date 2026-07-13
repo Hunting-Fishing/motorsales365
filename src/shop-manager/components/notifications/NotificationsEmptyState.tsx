@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { BellOff } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 
 interface NotificationsEmptyStateProps {
   connectionStatus: boolean;

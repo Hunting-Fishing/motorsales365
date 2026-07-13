@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 
 interface JobLinePartsDisplayProps {
   jobLineId: string;

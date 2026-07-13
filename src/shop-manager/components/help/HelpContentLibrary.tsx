@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { BookOpen, Video, FileText, Star, Clock, Users, Download, ExternalLink, Filter, SortAsc, Grid, List, Search, PlayCircle, Award, TrendingUp, Code, Zap, Wrench, Shield, Rocket, Package, DollarSign, BarChart3, Heart, AlertCircle, Settings, Smartphone, MessageSquare } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { useHelpCategories, useHelpArticles, useHelpLearningPaths, useHelpResources } from '@/hooks/useHelp';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Progress } from '@sm/components/ui/progress';
+import { useHelpCategories, useHelpArticles, useHelpLearningPaths, useHelpResources } from '@sm/hooks/useHelp';
 
 // Helper function to get category icon based on name
 const getCategoryIconByName = (categoryName: string) => {

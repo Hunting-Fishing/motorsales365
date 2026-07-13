@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
 import { Column } from './SortableColumnHeader';
 
 interface InventoryTableHeaderProps {

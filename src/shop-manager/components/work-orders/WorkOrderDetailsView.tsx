@@ -1,19 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { useNavigate, useParams } from 'react-router-dom';
 import { WorkOrderErrorBoundary } from './WorkOrderErrorBoundary';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
-import { useWorkOrderData } from '@/hooks/useWorkOrderData';
+import { useWorkOrderData } from '@sm/hooks/useWorkOrderData';
 import { WorkOrderDetailsHeader } from './details/WorkOrderDetailsHeader';
 import { WorkOrderDetailsTabs } from './details/WorkOrderDetailsTabs';
 import { WorkOrderStatsCards } from './details/WorkOrderStatsCards';
-import { useWorkOrderEditMode } from '@/hooks/useWorkOrderEditMode';
-import { useWorkOrderStatus } from '@/hooks/useWorkOrderStatus';
-import { useToast } from '@/hooks/use-toast';
+import { useWorkOrderEditMode } from '@sm/hooks/useWorkOrderEditMode';
+import { useWorkOrderStatus } from '@sm/hooks/useWorkOrderStatus';
+import { useToast } from '@sm/hooks/use-toast';
 import { WorkOrderPrintLayout } from './WorkOrderPrintLayout';
 import { WorkOrderViewModeToggle, WorkOrderViewMode } from './details/WorkOrderViewModeToggle';
 import { WorkOrderDetailedForm } from './details/WorkOrderDetailedForm';

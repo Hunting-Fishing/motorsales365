@@ -2,7 +2,7 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { BarChart3, TreePine, Table, Upload } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 const navigationItems = [
   {

@@ -1,9 +1,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
-import { CalendarEvent } from '@/types/calendar';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
+import { CalendarEvent } from '@sm/types/calendar';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, subDays } from 'date-fns';
 
 export type ModuleType = 'gunsmith' | 'power_washing' | 'marine' | 'fuel_delivery' | 'automotive' | 'default';

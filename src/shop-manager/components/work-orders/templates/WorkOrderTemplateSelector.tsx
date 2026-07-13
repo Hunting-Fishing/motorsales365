@@ -1,10 +1,10 @@
 
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
 import { Search } from "lucide-react";
-import { WorkOrderTemplate } from "@/types/workOrder";
+import { WorkOrderTemplate } from "@sm/types/workOrder";
 
 interface WorkOrderTemplateSelectorProps {
   templates: WorkOrderTemplate[];

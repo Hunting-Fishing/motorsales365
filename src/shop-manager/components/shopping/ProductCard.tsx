@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Star, Heart, ShoppingCart, Eye, ExternalLink } from 'lucide-react';
-import { AffiliateProduct } from '@/types/affiliate';
-import { useProductAnalytics } from '@/hooks/shopping/useProductAnalytics';
-import { useWishlist } from '@/hooks/shopping/useWishlist';
-import { useCart } from '@/hooks/shopping/useCart';
-import { useToast } from '@/hooks/use-toast';
+import { AffiliateProduct } from '@sm/types/affiliate';
+import { useProductAnalytics } from '@sm/hooks/shopping/useProductAnalytics';
+import { useWishlist } from '@sm/hooks/shopping/useWishlist';
+import { useCart } from '@sm/hooks/shopping/useCart';
+import { useToast } from '@sm/hooks/use-toast';
 import ProductViewTracker from './ProductViewTracker';
 
 interface ProductCardProps {

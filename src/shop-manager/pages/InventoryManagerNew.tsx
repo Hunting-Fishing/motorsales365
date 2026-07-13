@@ -1,5 +1,5 @@
 import React from 'react';
-import { InventorySettingsPanel } from '@/components/inventory/InventorySettingsPanel';
+import { InventorySettingsPanel } from '@sm/components/inventory/InventorySettingsPanel';
 
 export default function InventoryManager() {
   return (

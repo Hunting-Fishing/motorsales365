@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form } from '@/components/ui/form';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Form } from '@sm/components/ui/form';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { WorkOrderFormFields } from '../WorkOrderFormFields';
-import { WorkOrderFormSchemaValues } from '@/schemas/workOrderSchema';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { useToast } from '@/hooks/use-toast';
+import { WorkOrderFormSchemaValues } from '@sm/schemas/workOrderSchema';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { useToast } from '@sm/hooks/use-toast';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { ClickableErrorItem } from '../shared/ClickableErrorItem';
 

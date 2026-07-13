@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PayrollDashboard } from '@/components/payroll/PayrollDashboard';
-import { EmployeeTimeClock } from '@/components/payroll/EmployeeTimeClock';
-import { EnhancedTimeCardManager } from '@/components/payroll/EnhancedTimeCardManager';
-import { PayPeriodManager } from '@/components/payroll/PayPeriodManager';
-import { PayrollReportsPanel } from '@/components/payroll/PayrollReportsPanel';
-import { EmployeeRatesPanel } from '@/components/payroll/EmployeeRatesPanel';
-import { OvertimeAlertsPanel } from '@/components/payroll/OvertimeAlertsPanel';
-import { OvertimeConfigPanel } from '@/components/payroll/OvertimeConfigPanel';
-import { PayrollRunPanel } from '@/components/payroll/PayrollRunPanel';
-import { LeaveManagementPanel } from '@/components/payroll/LeaveManagementPanel';
-import { DeductionsAdditionsPanel } from '@/components/payroll/DeductionsAdditionsPanel';
-import { TimeCardDisputesPanel } from '@/components/payroll/TimeCardDisputesPanel';
-import { PayrollAuditTrail } from '@/components/payroll/PayrollAuditTrail';
-import { PayrollHistoryPanel } from '@/components/payroll/PayrollHistoryPanel';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { PayrollDashboard } from '@sm/components/payroll/PayrollDashboard';
+import { EmployeeTimeClock } from '@sm/components/payroll/EmployeeTimeClock';
+import { EnhancedTimeCardManager } from '@sm/components/payroll/EnhancedTimeCardManager';
+import { PayPeriodManager } from '@sm/components/payroll/PayPeriodManager';
+import { PayrollReportsPanel } from '@sm/components/payroll/PayrollReportsPanel';
+import { EmployeeRatesPanel } from '@sm/components/payroll/EmployeeRatesPanel';
+import { OvertimeAlertsPanel } from '@sm/components/payroll/OvertimeAlertsPanel';
+import { OvertimeConfigPanel } from '@sm/components/payroll/OvertimeConfigPanel';
+import { PayrollRunPanel } from '@sm/components/payroll/PayrollRunPanel';
+import { LeaveManagementPanel } from '@sm/components/payroll/LeaveManagementPanel';
+import { DeductionsAdditionsPanel } from '@sm/components/payroll/DeductionsAdditionsPanel';
+import { TimeCardDisputesPanel } from '@sm/components/payroll/TimeCardDisputesPanel';
+import { PayrollAuditTrail } from '@sm/components/payroll/PayrollAuditTrail';
+import { PayrollHistoryPanel } from '@sm/components/payroll/PayrollHistoryPanel';
 import { 
   LayoutDashboard, 
   Clock, 

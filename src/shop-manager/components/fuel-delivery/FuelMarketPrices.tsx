@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { Fuel, TrendingUp, TrendingDown, Minus, RefreshCw, ExternalLink } from 'lucide-react';
-import { useConfiguredFuelPrices, useRefreshFuelPrices, FuelMarketPrice } from '@/hooks/fuel-delivery/useFuelMarketPrices';
+import { useConfiguredFuelPrices, useRefreshFuelPrices, FuelMarketPrice } from '@sm/hooks/fuel-delivery/useFuelMarketPrices';
 import { format, parseISO } from 'date-fns';
 
 interface FuelMarketPricesProps {

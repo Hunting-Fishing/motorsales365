@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO } from 'date-fns';
-import type { AssetAssignment } from '@/types/assetAssignment';
+import type { AssetAssignment } from '@sm/types/assetAssignment';
 import { Repeat } from 'lucide-react';
 
 interface AssetAssignmentTimelineProps {

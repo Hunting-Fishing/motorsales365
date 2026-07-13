@@ -3,11 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Package } from 'lucide-react';
 import { Container, Header, Grid, Segment } from 'semantic-ui-react';
 import { useQuery } from '@tanstack/react-query';
-import { getAffiliateTools } from '@/services/tools/toolService';
-import { getToolCategories } from '@/services/tools/liveToolService';
-import ProductCard from '@/components/affiliate/ProductCard';
-import { Button } from '@/components/ui/button';
-import { AffiliateTool, AffiliateProduct } from '@/types/affiliate';
+import { getAffiliateTools } from '@sm/services/tools/toolService';
+import { getToolCategories } from '@sm/services/tools/liveToolService';
+import ProductCard from '@sm/components/affiliate/ProductCard';
+import { Button } from '@sm/components/ui/button';
+import { AffiliateTool, AffiliateProduct } from '@sm/types/affiliate';
 
 export default function ToolCategoryPage() {
   const { category } = useParams<{ category: string }>();

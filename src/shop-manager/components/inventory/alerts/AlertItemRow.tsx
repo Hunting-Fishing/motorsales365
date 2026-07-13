@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { TableCell, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { InventoryItemExtended, AutoReorderSettings } from "@/types/inventory";
+import { TableCell, TableRow } from "@sm/components/ui/table";
+import { Button } from "@sm/components/ui/button";
+import { InventoryItemExtended, AutoReorderSettings } from "@sm/types/inventory";
 import ReorderDialog from './ReorderDialog';
 import AutoReorderDialog from './AutoReorderDialog';
-import { getStatusColorClass } from '@/utils/inventory/inventoryCalculations';
+import { getStatusColorClass } from '@sm/utils/inventory/inventoryCalculations';
 import AutoReorderStatus from './AutoReorderStatus';
 
 interface AlertItemRowProps {

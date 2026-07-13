@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { EquipmentCategory } from '@/types/equipmentCategory';
+import { supabase } from '@sm/integrations/supabase/client';
+import { EquipmentCategory } from '@sm/types/equipmentCategory';
 
 export function useEquipmentCategories() {
   const [categories, setCategories] = useState<EquipmentCategory[]>([]);

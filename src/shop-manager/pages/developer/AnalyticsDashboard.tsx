@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { ArrowLeft, BarChart3, TrendingUp, Users, DollarSign, ShoppingCart, Activity } from "lucide-react";
-import { analyticsService, AnalyticsData, ChartData, PerformanceMetric } from '@/services/developer/analyticsService';
+import { analyticsService, AnalyticsData, ChartData, PerformanceMetric } from '@sm/services/developer/analyticsService';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { toast } from 'sonner';
 

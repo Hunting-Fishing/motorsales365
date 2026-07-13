@@ -1,9 +1,9 @@
 
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { RepairPlan } from "@/types/repairPlan";
-import { RepairPlansList } from "@/components/repair-plan/RepairPlansList";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { RepairPlan } from "@sm/types/repairPlan";
+import { RepairPlansList } from "@sm/components/repair-plan/RepairPlansList";
 import { Plus, Wrench } from "lucide-react";
 
 interface EquipmentRepairPlansProps {

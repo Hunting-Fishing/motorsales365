@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Edit, Trash2, MapPin } from 'lucide-react';
-import { partStatusMap } from '@/types/workOrderPart';
+import { partStatusMap } from '@sm/types/workOrderPart';
 
 interface EnhancedPartRowProps {
   part: WorkOrderPart;

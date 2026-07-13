@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { PlannerBoardItem } from '@/types/planner';
-import { cn } from '@/lib/utils';
+import { PlannerBoardItem } from '@sm/types/planner';
+import { cn } from '@sm/lib/utils';
 import { Trash2, GripVertical, User, Wrench } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@sm/components/ui/avatar';
+import { Badge } from '@sm/components/ui/badge';
 
 interface ResourceData {
   type: 'staff' | 'equipment';

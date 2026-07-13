@@ -1,6 +1,6 @@
 
-import { EmailCampaign } from '@/types/email';
-import { supabase } from '@/lib/supabase';
+import { EmailCampaign } from '@sm/types/email';
+import { supabase } from '@sm/lib/supabase';
 
 /**
  * Fetches analytics data for a campaign from the analytics table or events table

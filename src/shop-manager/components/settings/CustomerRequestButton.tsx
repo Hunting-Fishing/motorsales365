@@ -1,5 +1,5 @@
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { 
   Dialog, 
   DialogContent, 
@@ -8,14 +8,14 @@ import {
   DialogHeader, 
   DialogTitle, 
   DialogTrigger 
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+} from "@sm/components/ui/dialog";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Label } from "@sm/components/ui/label";
 import { UserPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 
 export function CustomerRequestButton() {
   const [open, setOpen] = useState(false);

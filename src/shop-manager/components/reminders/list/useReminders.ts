@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useMemo } from "react";
-import { ServiceReminder } from "@/types/reminder";
-import { getAllReminders, getCustomerReminders, getVehicleReminders, getUpcomingReminders } from "@/services/reminderService";
-import { toast } from "@/hooks/use-toast";
+import { ServiceReminder } from "@sm/types/reminder";
+import { getAllReminders, getCustomerReminders, getVehicleReminders, getUpcomingReminders } from "@sm/services/reminderService";
+import { toast } from "@sm/hooks/use-toast";
 import { DateRange } from "react-day-picker";
 import { useQuery } from "@tanstack/react-query";
 

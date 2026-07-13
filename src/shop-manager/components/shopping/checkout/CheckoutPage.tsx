@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { useCart } from '@/hooks/shopping/useCart';
-import { useAuth } from '@/hooks/useAuth';
-import { createOrder, checkInventoryAvailability } from '@/services/orderService';
-import { createCheckoutSession, verifyCheckoutSession } from '@/services/payment/stripeService';
-import { AddressForm } from '@/components/checkout/AddressForm';
-import { PaymentForm } from '@/components/checkout/PaymentForm';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { useToast } from '@sm/hooks/use-toast';
+import { useCart } from '@sm/hooks/shopping/useCart';
+import { useAuth } from '@sm/hooks/useAuth';
+import { createOrder, checkInventoryAvailability } from '@sm/services/orderService';
+import { createCheckoutSession, verifyCheckoutSession } from '@sm/services/payment/stripeService';
+import { AddressForm } from '@sm/components/checkout/AddressForm';
+import { PaymentForm } from '@sm/components/checkout/PaymentForm';
 import { OrderSummary } from './OrderSummary';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { supabase } from '@/integrations/supabase/client';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
+import { supabase } from '@sm/integrations/supabase/client';
 import { AlertTriangle, ShieldCheck } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 
 export const CheckoutPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);

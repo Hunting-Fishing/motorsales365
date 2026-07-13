@@ -1,6 +1,6 @@
 // Inventory Alert Service
-import { supabase } from '@/integrations/supabase/client';
-import { InventoryAlert } from '@/types/advanced-product';
+import { supabase } from '@sm/integrations/supabase/client';
+import { InventoryAlert } from '@sm/types/advanced-product';
 
 export class InventoryAlertService {
   // Get all active alerts

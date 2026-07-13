@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useCart } from '@/hooks/shopping/useCart';
-import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { useCart } from '@sm/hooks/shopping/useCart';
+import { supabase } from '@sm/integrations/supabase/client';
 import { 
   ShoppingCart, 
   Star, 

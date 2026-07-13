@@ -1,7 +1,7 @@
 
 import React, { memo, useEffect, useMemo } from "react";
-import { Table } from "@/components/ui/table";
-import { InventoryItemExtended } from "@/types/inventory";
+import { Table } from "@sm/components/ui/table";
+import { InventoryItemExtended } from "@sm/types/inventory";
 import { useNavigate } from "react-router-dom";
 import { 
   DndContext, 
@@ -19,7 +19,7 @@ import { useColumnDragDrop } from "./table/useColumnDragDrop";
 import { ColumnManagementPanel } from "./ColumnManagementPanel";
 import { BulkActionsToolbar } from "./BulkActionsToolbar";
 import { Column } from "./table/SortableColumnHeader";
-import { useInventoryView } from "@/contexts/InventoryViewContext";
+import { useInventoryView } from "@sm/contexts/InventoryViewContext";
 import { ExcelViewTable } from "./ExcelViewTable";
 
 interface OptimizedInventoryTableProps {

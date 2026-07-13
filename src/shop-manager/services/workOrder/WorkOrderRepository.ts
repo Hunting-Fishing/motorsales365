@@ -1,6 +1,6 @@
 
-import { supabase } from '@/lib/supabase';
-import { WorkOrder } from '@/types/workOrder';
+import { supabase } from '@sm/lib/supabase';
+import { WorkOrder } from '@sm/types/workOrder';
 import { recordWorkOrderActivity } from './workOrderActivityService';
 
 export class WorkOrderRepository {

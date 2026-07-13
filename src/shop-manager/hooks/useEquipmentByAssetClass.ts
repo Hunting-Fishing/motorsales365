@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Equipment, EquipmentStats } from '@/types/equipment';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Equipment, EquipmentStats } from '@sm/types/equipment';
 
 export type AssetClass = 'shop_equipment' | 'fleet' | 'safety';
 

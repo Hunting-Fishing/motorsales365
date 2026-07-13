@@ -1,10 +1,10 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { ArrowLeft, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { InspectionAnalyticsCharts } from '@/components/safety/dashboard/InspectionAnalyticsCharts';
-import { ServiceAlertsPanel } from '@/components/safety/dashboard/ServiceAlertsPanel';
+import { InspectionAnalyticsCharts } from '@sm/components/safety/dashboard/InspectionAnalyticsCharts';
+import { ServiceAlertsPanel } from '@sm/components/safety/dashboard/ServiceAlertsPanel';
 
 export default function InspectionAnalytics() {
   const navigate = useNavigate();

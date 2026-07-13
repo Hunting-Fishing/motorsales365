@@ -1,8 +1,8 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { TrendingUp, DollarSign, Users, Package } from 'lucide-react';
-import { RevenueChart, ServiceDistributionChart, CustomerActivityChart } from '@/components/analytics/AnalyticsCharts';
+import { RevenueChart, ServiceDistributionChart, CustomerActivityChart } from '@sm/components/analytics/AnalyticsCharts';
 
 export default function Analytics() {
   return (

@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
-import { supabase } from '@/integrations/supabase/client';
-import type { MappedServiceData, ImportResult, ProcessedServiceData } from '@/types/service';
+import { supabase } from '@sm/integrations/supabase/client';
+import type { MappedServiceData, ImportResult, ProcessedServiceData } from '@sm/types/service';
 
 export async function processExcelFile(file: File, sectorName: string): Promise<ImportResult> {
   try {

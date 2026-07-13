@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { Customer } from '@/types/customer';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Customer } from '@sm/types/customer';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Edit3, Save, X, Calendar, User, FileText } from 'lucide-react';
-import { WORK_ORDER_STATUSES } from '@/data/workOrderConstants';
-import { useWorkOrderStatus } from '@/hooks/useWorkOrderStatus';
+import { WORK_ORDER_STATUSES } from '@sm/data/workOrderConstants';
+import { useWorkOrderStatus } from '@sm/hooks/useWorkOrderStatus';
 
 interface WorkOrderHeaderProps {
   workOrder: WorkOrder;

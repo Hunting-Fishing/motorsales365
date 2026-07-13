@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Switch } from '@sm/components/ui/switch';
 import { 
   Bell, 
   Mail, 
@@ -18,9 +18,9 @@ import {
   Settings,
   Eye
 } from 'lucide-react';
-import { useNotificationRules } from '@/hooks/workflows/useNotificationRules';
-import { useEscalationRules } from '@/hooks/workflows/useEscalationRules';
-import { useNotificationAnalytics } from '@/hooks/workflows/useNotificationAnalytics';
+import { useNotificationRules } from '@sm/hooks/workflows/useNotificationRules';
+import { useEscalationRules } from '@sm/hooks/workflows/useEscalationRules';
+import { useNotificationAnalytics } from '@sm/hooks/workflows/useNotificationAnalytics';
 import { NotificationRuleBuilder } from './NotificationRuleBuilder';
 import { EscalationRuleBuilder } from './EscalationRuleBuilder';
 import { NotificationQueueMonitor } from './NotificationQueueMonitor';

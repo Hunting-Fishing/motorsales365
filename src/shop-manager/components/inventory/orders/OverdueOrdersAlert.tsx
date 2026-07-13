@@ -1,7 +1,7 @@
 
 import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { InventoryOrder } from "@/types/inventory/orders";
+import { Alert, AlertDescription, AlertTitle } from "@sm/components/ui/alert";
+import { InventoryOrder } from "@sm/types/inventory/orders";
 
 interface OverdueOrdersAlertProps {
   orders: InventoryOrder[];

@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
-import { Database } from "@/integrations/supabase/types";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Database } from "@sm/integrations/supabase/types";
 
 type Donation = Database['public']['Tables']['donations']['Row'];
 type CreateDonation = Database['public']['Tables']['donations']['Insert'];

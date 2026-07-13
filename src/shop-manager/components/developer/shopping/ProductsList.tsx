@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
+import { Button } from "@sm/components/ui/button";
 import { PenLine, Trash2, Eye, ExternalLink, Star, ArrowUpDown } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { AffiliateTool } from "@/types/affiliate";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@sm/components/ui/badge";
+import { AffiliateTool } from "@sm/types/affiliate";
+import { Skeleton } from "@sm/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@sm/components/ui/tooltip";
 
 export interface ProductsListProps {
   products: AffiliateTool[];

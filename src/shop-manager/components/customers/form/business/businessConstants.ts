@@ -1,5 +1,5 @@
 
-import { useBusinessConstants } from "@/hooks/useBusinessConstants";
+import { useBusinessConstants } from "@sm/hooks/useBusinessConstants";
 
 // This file now re-exports the hooks that fetch data from the database
 export { useBusinessConstants };

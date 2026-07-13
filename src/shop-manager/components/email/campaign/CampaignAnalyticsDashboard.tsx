@@ -6,7 +6,7 @@ import {
   CardDescription, 
   CardHeader, 
   CardTitle 
-} from '@/components/ui/card';
+} from '@sm/components/ui/card';
 import { 
   Table, 
   TableBody, 
@@ -14,12 +14,12 @@ import {
   TableHead, 
   TableHeader, 
   TableRow 
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+} from '@sm/components/ui/table';
+import { Button } from '@sm/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Progress } from '@sm/components/ui/progress';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
 import { 
   BarChart, 
   Bar, 
@@ -56,8 +56,8 @@ import {
   AlertTriangle,
   UserMinus
 } from 'lucide-react';
-import { EmailCampaign, EmailCampaignAnalytics, EmailCampaignStatus, EmailABTestResult, EmailABTestVariant } from '@/types/email';
-import { useEmailCampaigns } from '@/hooks/email/useEmailCampaigns';
+import { EmailCampaign, EmailCampaignAnalytics, EmailCampaignStatus, EmailABTestResult, EmailABTestVariant } from '@sm/types/email';
+import { useEmailCampaigns } from '@sm/hooks/email/useEmailCampaigns';
 
 const COLORS = {
   primary: '#0ea5e9',

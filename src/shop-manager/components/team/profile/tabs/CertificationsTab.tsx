@@ -1,12 +1,12 @@
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
+import { Separator } from "@sm/components/ui/separator";
 import { Award, Plus, Calendar, Building2, FileText, ExternalLink, AlertCircle, CheckCircle2, Clock, XCircle } from "lucide-react";
-import { useTeamMemberCertificates } from "@/hooks/team/useTeamMemberCertificates";
-import { useTeamMemberTraining } from "@/hooks/team/useTeamMemberTraining";
+import { useTeamMemberCertificates } from "@sm/hooks/team/useTeamMemberCertificates";
+import { useTeamMemberTraining } from "@sm/hooks/team/useTeamMemberTraining";
 import { format, isPast, differenceInDays } from "date-fns";
 import { CertificateDialog } from "./certifications/CertificateDialog";
 import { TrainingDialog } from "./certifications/TrainingDialog";

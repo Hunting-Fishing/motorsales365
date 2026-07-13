@@ -1,15 +1,15 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Badge } from '@sm/components/ui/badge';
 import { Radio, Plus, ArrowDownLeft, ArrowUpRight, AlertCircle } from 'lucide-react';
-import { useVoyageCommunications } from '@/hooks/useVoyageLogs';
-import { CommunicationCallType, CALL_TYPE_LABELS } from '@/types/voyage';
+import { useVoyageCommunications } from '@sm/hooks/useVoyageLogs';
+import { CommunicationCallType, CALL_TYPE_LABELS } from '@sm/types/voyage';
 import { format } from 'date-fns';
 
 interface CommunicationsLogProps {

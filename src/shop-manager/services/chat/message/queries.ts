@@ -1,5 +1,5 @@
 
-import { ChatMessage } from "@/types/chat";
+import { ChatMessage } from "@sm/types/chat";
 import { supabase, DatabaseChatMessage } from "../supabaseClient";
 import { transformDatabaseMessage } from "./types";
 

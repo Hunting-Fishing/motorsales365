@@ -1,6 +1,6 @@
 
-import { Button } from "@/components/ui/button";
-import { RolePreset } from "@/types/permissions";
+import { Button } from "@sm/components/ui/button";
+import { RolePreset } from "@sm/types/permissions";
 
 interface PermissionPresetsProps {
   onApplyPreset: (role: RolePreset) => void;

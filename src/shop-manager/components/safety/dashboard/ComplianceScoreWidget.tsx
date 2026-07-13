@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Progress } from '@sm/components/ui/progress';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { Shield, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { useSafetyReports } from '@/hooks/useSafetyReports';
+import { useSafetyReports } from '@sm/hooks/useSafetyReports';
 
 export function ComplianceScoreWidget() {
   const { complianceScore, loading } = useSafetyReports();

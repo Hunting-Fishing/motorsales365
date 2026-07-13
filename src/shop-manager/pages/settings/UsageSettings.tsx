@@ -1,8 +1,8 @@
 import React from 'react';
-import { SettingsPageLayout } from '@/components/settings/SettingsPageLayout';
-import { ApiUsageCard } from '@/components/settings/ApiUsageCard';
-import { TeamUsageDashboard } from '@/components/settings/TeamUsageDashboard';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SettingsPageLayout } from '@sm/components/settings/SettingsPageLayout';
+import { ApiUsageCard } from '@sm/components/settings/ApiUsageCard';
+import { TeamUsageDashboard } from '@sm/components/settings/TeamUsageDashboard';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { User, Users } from 'lucide-react';
 
 export default function UsageSettings() {

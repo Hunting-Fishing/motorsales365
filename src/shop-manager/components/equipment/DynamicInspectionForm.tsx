@@ -1,19 +1,19 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card } from '@sm/components/ui/card';
+import { Label } from '@sm/components/ui/label';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Checkbox } from '@sm/components/ui/checkbox';
 import { GYRLegend } from './GYRSelector';
 import { GYRSelectorWithDeficiency } from './GYRSelectorWithDeficiency';
 import { HourMeterInput } from './HourMeterInput';
-import { GYRStatus } from '@/hooks/useEquipmentInspections';
+import { GYRStatus } from '@sm/hooks/useEquipmentInspections';
 import type { 
   InspectionFormTemplate, 
   InspectionFormSection, 
   InspectionFormItem,
   InspectionDataValue 
-} from '@/types/inspectionTemplate';
+} from '@sm/types/inspectionTemplate';
 
 interface MediaItem {
   url: string;

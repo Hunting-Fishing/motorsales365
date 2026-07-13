@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import { unifiedSettingsService } from '@/services/unified/unifiedSettingsService';
+import { supabase } from '@sm/integrations/supabase/client';
+import { unifiedSettingsService } from '@sm/services/unified/unifiedSettingsService';
 
 export interface WorkOrderOption {
   value: string;

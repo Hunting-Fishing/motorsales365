@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Textarea } from "@sm/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -14,24 +14,24 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@sm/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
+} from "@sm/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { useToast } from "@sm/hooks/use-toast";
 import { 
   Plus, LayoutGrid, Table as TableIcon, BarChart3, Loader2, AlertCircle, 
   DollarSign, Users, Fuel, Wrench, Ship, Bell, TrendingUp, Shield 
 } from "lucide-react";
-import { useBudgetFilters, MaintenanceBudget } from "@/hooks/useBudgetFilters";
-import { InsuranceBudgetTracker } from "@/components/insurance/InsuranceBudgetTracker";
-import { useInsurancePolicies } from "@/hooks/useInsurancePolicies";
-import { useInsuranceAnalytics } from "@/hooks/useInsuranceAnalytics";
+import { useBudgetFilters, MaintenanceBudget } from "@sm/hooks/useBudgetFilters";
+import { InsuranceBudgetTracker } from "@sm/components/insurance/InsuranceBudgetTracker";
+import { useInsurancePolicies } from "@sm/hooks/useInsurancePolicies";
+import { useInsuranceAnalytics } from "@sm/hooks/useInsuranceAnalytics";
 import { BudgetFiltersBar } from "./BudgetFiltersBar";
 import { BudgetCategoryCards } from "./BudgetCategoryCards";
 import { BudgetAnalyticsCharts } from "./BudgetAnalyticsCharts";

@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Label } from '@sm/components/ui/label';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
 import { ArrowLeftRight, Check, X, Clock } from 'lucide-react';
-import { useShiftSwaps } from '@/hooks/useShiftSwaps';
-import { useScheduling } from '@/hooks/useScheduling';
-import { supabase } from '@/integrations/supabase/client';
+import { useShiftSwaps } from '@sm/hooks/useShiftSwaps';
+import { useScheduling } from '@sm/hooks/useScheduling';
+import { supabase } from '@sm/integrations/supabase/client';
 import { format } from 'date-fns';
 
 export function ShiftSwapManager() {

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { FileText, Hash, Calendar, CheckSquare, List, Mail, Phone, Upload, PenTool } from 'lucide-react';
-import { FormFieldType } from '@/types/formBuilder';
+import { FormFieldType } from '@sm/types/formBuilder';
 
 const fieldTypes: { type: FormFieldType; label: string; icon: React.ReactNode }[] = [
   { type: 'text', label: 'Text', icon: <FileText className="h-4 w-4" /> },

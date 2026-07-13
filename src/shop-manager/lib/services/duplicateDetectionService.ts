@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import { ServiceJob } from '@/types/service';
+import { supabase } from '@sm/integrations/supabase/client';
+import { ServiceJob } from '@sm/types/service';
 
 export interface DuplicateMatch {
   job: ServiceJob;

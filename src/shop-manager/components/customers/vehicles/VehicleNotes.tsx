@@ -1,13 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { FileText, Plus } from 'lucide-react';
-import { CustomerNote } from '@/types/customer';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { CustomerNote } from '@sm/types/customer';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Label } from '@sm/components/ui/label';
+import { useToast } from '@sm/hooks/use-toast';
 
 export const VehicleNotes: React.FC<{ 
   vehicleId: string;

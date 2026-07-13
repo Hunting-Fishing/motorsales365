@@ -1,15 +1,15 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { ArrowLeft, Wrench, AlertTriangle, Clock, DollarSign, Activity, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { FleetHealthOverview } from '@/components/equipment-dashboard/FleetHealthOverview';
-import { EquipmentStatusChart } from '@/components/equipment-dashboard/EquipmentStatusChart';
-import { MaintenanceCostTrends } from '@/components/equipment-dashboard/MaintenanceCostTrends';
-import { UpcomingMaintenanceWidget } from '@/components/equipment-dashboard/UpcomingMaintenanceWidget';
-import { EquipmentAlertsPanel } from '@/components/equipment-dashboard/EquipmentAlertsPanel';
+import { FleetHealthOverview } from '@sm/components/equipment-dashboard/FleetHealthOverview';
+import { EquipmentStatusChart } from '@sm/components/equipment-dashboard/EquipmentStatusChart';
+import { MaintenanceCostTrends } from '@sm/components/equipment-dashboard/MaintenanceCostTrends';
+import { UpcomingMaintenanceWidget } from '@sm/components/equipment-dashboard/UpcomingMaintenanceWidget';
+import { EquipmentAlertsPanel } from '@sm/components/equipment-dashboard/EquipmentAlertsPanel';
 
 export default function EquipmentDashboard() {
   const navigate = useNavigate();

@@ -7,16 +7,16 @@ import {
   TableHead, 
   TableHeader, 
   TableRow 
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+} from "@sm/components/ui/table";
+import { Button } from "@sm/components/ui/button";
 import { 
   CheckCircle, 
   Clock, 
   XCircle, 
   Package 
 } from "lucide-react";
-import { InventoryOrder } from "@/types/inventory/orders";
-import { Badge } from "@/components/ui/badge";
+import { InventoryOrder } from "@sm/types/inventory/orders";
+import { Badge } from "@sm/components/ui/badge";
 
 interface InventoryOrdersTableProps {
   orders: InventoryOrder[];

@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Checkbox } from '@sm/components/ui/checkbox';
 import { ShoppingCart, Printer, ChefHat, Clock, Lightbulb } from 'lucide-react';
-import { useMealPlans } from '@/hooks/useNutrition';
+import { useMealPlans } from '@sm/hooks/useNutrition';
 import { useState } from 'react';
 
 interface Props {

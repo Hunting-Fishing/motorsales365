@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { FileText, Plus, Eye, Loader2, Calendar } from 'lucide-react';
-import { FormSelector } from '@/components/forms/FormSelector';
-import { FormDialog } from '@/components/forms/FormDialog';
-import { useFormSubmissions } from '@/hooks/useFormsByCategory';
-import { FormBuilderTemplate } from '@/types/formBuilder';
+import { FormSelector } from '@sm/components/forms/FormSelector';
+import { FormDialog } from '@sm/components/forms/FormDialog';
+import { useFormSubmissions } from '@sm/hooks/useFormsByCategory';
+import { FormBuilderTemplate } from '@sm/types/formBuilder';
 import { format } from 'date-fns';
 
 interface QuoteFormsSectionProps {

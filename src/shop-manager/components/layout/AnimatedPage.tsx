@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { ReactNode } from "react";
-import { pageTransition, fadeIn, fadeInUp } from "@/lib/animations";
+import { pageTransition, fadeIn, fadeInUp } from "@sm/lib/animations";
 
 interface AnimatedPageProps {
   children: ReactNode;

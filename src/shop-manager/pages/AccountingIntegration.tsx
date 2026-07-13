@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Switch } from '@sm/components/ui/switch';
 import { 
   Link, Plus, RefreshCw, Settings, BookOpen, FileSpreadsheet, 
   Calculator, CheckCircle, XCircle, Clock, AlertTriangle,
   ArrowUpDown, Trash2, Edit, Repeat, CalendarCheck
 } from 'lucide-react';
-import { useAccountingIntegration, ChartOfAccount, JournalEntry } from '@/hooks/useAccountingIntegration';
+import { useAccountingIntegration, ChartOfAccount, JournalEntry } from '@sm/hooks/useAccountingIntegration';
 import { format } from 'date-fns';
-import { FinancialReportsPanel } from '@/components/accounting/FinancialReportsPanel';
-import { RecurringJournalTemplatesPanel } from '@/components/accounting/RecurringJournalTemplatesPanel';
-import { FinancialPeriodsPanel } from '@/components/accounting/FinancialPeriodsPanel';
+import { FinancialReportsPanel } from '@sm/components/accounting/FinancialReportsPanel';
+import { RecurringJournalTemplatesPanel } from '@sm/components/accounting/RecurringJournalTemplatesPanel';
+import { FinancialPeriodsPanel } from '@sm/components/accounting/FinancialPeriodsPanel';
 
 const INTEGRATION_TYPES = [
   { value: 'quickbooks_online', label: 'QuickBooks Online', icon: '📊' },

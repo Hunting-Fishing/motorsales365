@@ -1,10 +1,10 @@
 
 import { useState } from "react";
-import { useInventoryItems } from "@/hooks/inventory/useInventoryItems";
-import { InventoryItemExtended } from "@/types/inventory";
-import { useInventoryVendors } from "@/hooks/inventory/useInventoryVendors";
-import { useInventoryOrders } from "@/hooks/inventory/useInventoryOrders";
-import { toast } from "@/hooks/use-toast";
+import { useInventoryItems } from "@sm/hooks/inventory/useInventoryItems";
+import { InventoryItemExtended } from "@sm/types/inventory";
+import { useInventoryVendors } from "@sm/hooks/inventory/useInventoryVendors";
+import { useInventoryOrders } from "@sm/hooks/inventory/useInventoryOrders";
+import { toast } from "@sm/hooks/use-toast";
 
 export const useCreateOrderDialog = () => {
   const [isOpen, setIsOpen] = useState(false);

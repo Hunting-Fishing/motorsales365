@@ -1,8 +1,8 @@
 import React from 'react';
-import { InventoryItemExtended } from '@/types/inventory';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { InventoryItemExtended } from '@sm/types/inventory';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Checkbox } from '@sm/components/ui/checkbox';
 import { 
   Edit, 
   MoreVertical, 
@@ -11,15 +11,15 @@ import {
   TrendingUp,
   Eye
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@sm/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { useInventoryView } from '@/contexts/InventoryViewContext';
+import { useInventoryView } from '@sm/contexts/InventoryViewContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@sm/components/ui/dropdown-menu';
 
 interface InventoryListViewProps {
   items: InventoryItemExtended[];

@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { EmailSequenceEnrollment } from '@/types/email';
+import { EmailSequenceEnrollment } from '@sm/types/email';
 
 /**
  * Hook for managing enrollment state

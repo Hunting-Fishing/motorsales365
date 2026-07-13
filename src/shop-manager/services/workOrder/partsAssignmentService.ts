@@ -1,5 +1,5 @@
 
-import { WorkOrderPart } from '@/types/workOrderPart';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
 import { updateWorkOrderPart } from './workOrderPartsService';
 
 export interface PartsAssignmentData {

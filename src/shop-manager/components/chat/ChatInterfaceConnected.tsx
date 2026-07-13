@@ -1,15 +1,15 @@
 import React, { useEffect, useCallback } from 'react';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { useChat } from '@/hooks/useChat';
-import { useChatNotifications } from '@/hooks/useChatNotifications';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { useChat } from '@sm/hooks/useChat';
+import { useChatNotifications } from '@sm/hooks/useChatNotifications';
 import { ChatPageLayout } from './ChatPageLayout';
 import { ChatLoading } from './ChatLoading';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@sm/components/ui/card';
 import { MessageSquare, UserPlus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { NewChatDialogComplete } from './NewChatDialogComplete';
-import { ChatRoom } from '@/types/chat';
+import { ChatRoom } from '@sm/types/chat';
 
 export function ChatInterfaceConnected() {
   const { user, userId } = useAuthUser();

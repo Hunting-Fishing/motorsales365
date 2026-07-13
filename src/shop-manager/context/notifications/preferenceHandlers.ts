@@ -1,5 +1,5 @@
 
-import { NotificationPreferences } from '@/types/notification';
+import { NotificationPreferences } from '@sm/types/notification';
 
 export const createUpdatePreferencesHandler = (
   setPreferences: React.Dispatch<React.SetStateAction<NotificationPreferences>>

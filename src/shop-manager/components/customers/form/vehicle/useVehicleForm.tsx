@@ -1,8 +1,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { CarMake, CarModel, VinDecodeResult } from '@/types/vehicle';
-import { useVehicleData } from '@/hooks/useVehicleData';
+import { CarMake, CarModel, VinDecodeResult } from '@sm/types/vehicle';
+import { useVehicleData } from '@sm/hooks/useVehicleData';
 import { useVinDecoder } from './hooks/useVinDecoder';
 
 interface UseVehicleFormProps {

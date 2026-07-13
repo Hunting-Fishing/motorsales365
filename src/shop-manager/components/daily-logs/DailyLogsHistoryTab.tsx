@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
 import { Search, Filter, Download, Gauge, Route, Fuel, Wrench, RefreshCw } from 'lucide-react';
-import { useDailyLogsHistory, DailyLogsFilters } from '@/hooks/useDailyLogsHistory';
-import { useEquipmentHierarchy } from '@/hooks/useEquipmentHierarchy';
+import { useDailyLogsHistory, DailyLogsFilters } from '@sm/hooks/useDailyLogsHistory';
+import { useEquipmentHierarchy } from '@sm/hooks/useEquipmentHierarchy';
 import { format } from 'date-fns';
 
 const logTypeIcons = {

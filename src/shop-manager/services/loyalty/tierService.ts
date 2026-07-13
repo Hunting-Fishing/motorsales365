@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { LoyaltyTier } from "@/types/loyalty";
+import { supabase } from "@sm/lib/supabase";
+import { LoyaltyTier } from "@sm/types/loyalty";
 
 // Function to calculate tier based on lifetime points
 export const calculateTier = async (lifetimePoints: number, shopId: string): Promise<LoyaltyTier> => {

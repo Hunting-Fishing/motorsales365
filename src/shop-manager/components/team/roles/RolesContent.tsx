@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Card } from "@/components/ui/card";
+import { Card } from "@sm/components/ui/card";
 import { RolesSearch } from "./RolesSearch";
 import { RolesGrid } from "./RolesGrid";
 

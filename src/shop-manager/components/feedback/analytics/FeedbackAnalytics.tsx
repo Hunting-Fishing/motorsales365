@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FeedbackForm, FeedbackResponse } from '@/types/feedback';
+import { FeedbackForm, FeedbackResponse } from '@sm/types/feedback';
 import { 
   getFeedbackFormWithQuestions, 
   getFeedbackAnalytics,
   getFeedbackResponses
-} from '@/services/feedbackService';
-import { Card } from '@/components/ui/card';
+} from '@sm/services/feedbackService';
+import { Card } from '@sm/components/ui/card';
 import { FeedbackAnalyticsHeader } from './FeedbackAnalyticsHeader';
 import { StatCards } from './StatCards';
 import { NpsChart } from './charts/NpsChart';
@@ -128,5 +128,5 @@ export const FeedbackAnalytics: React.FC = () => {
 };
 
 // Import FeedbackAnalyticsType
-import { FeedbackAnalytics as FeedbackAnalyticsType } from '@/types/feedback';
+import { FeedbackAnalytics as FeedbackAnalyticsType } from '@sm/types/feedback';
 

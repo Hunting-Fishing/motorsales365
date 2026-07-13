@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { TeamContent } from '@/components/team/TeamContent';
-import { TeamHeader } from '@/components/team/TeamHeader';
-import { TeamSearchFilters } from '@/components/team/TeamSearchFilters';
-import { useTeamMembers } from '@/hooks/useTeamMembers';
-import { useTeamFilters } from '@/hooks/useTeamFilters';
+import { TeamContent } from '@sm/components/team/TeamContent';
+import { TeamHeader } from '@sm/components/team/TeamHeader';
+import { TeamSearchFilters } from '@sm/components/team/TeamSearchFilters';
+import { useTeamMembers } from '@sm/hooks/useTeamMembers';
+import { useTeamFilters } from '@sm/hooks/useTeamFilters';
 import TeamMemberProfile from './TeamMemberProfile';
 import TeamMemberCreate from './TeamMemberCreate';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 
 /**
  * IMPORTANT: This page uses full team management functionality

@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface GradientOrbsProps {
   /** Tailwind color classes for the 3 orbs, e.g. ["bg-indigo-500","bg-violet-500","bg-sky-400"] */

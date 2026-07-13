@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { 
   PieChart, 
   Pie, 
@@ -13,9 +13,9 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Skeleton } from "@sm/components/ui/skeleton";
+import { Badge } from "@sm/components/ui/badge";
 import { useState } from "react";
 
 interface InventoryTabContentProps {

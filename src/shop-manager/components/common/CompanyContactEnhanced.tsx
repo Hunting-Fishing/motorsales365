@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { useCompany } from '@/contexts/CompanyContext';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { useCompany } from '@sm/contexts/CompanyContext';
+import { useBusinessHours } from '@sm/hooks/useBusinessHours';
 import { Phone, Mail, MapPin, Clock, Globe } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 
 interface CompanyContactEnhancedProps {
   variant?: 'default' | 'card' | 'inline' | 'footer';

@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { WorkOrderJobLine, isValidJobLineStatus } from '@/types/jobLine';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { WorkOrderJobLine, isValidJobLineStatus } from '@sm/types/jobLine';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Edit2, Trash2 } from 'lucide-react';
 import { UnifiedJobLineEditDialog } from './UnifiedJobLineEditDialog';
-import { jobLineStatusMap } from '@/types/jobLine';
+import { jobLineStatusMap } from '@sm/types/jobLine';
 
 interface EnhancedJobLineItemProps {
   jobLine: WorkOrderJobLine;

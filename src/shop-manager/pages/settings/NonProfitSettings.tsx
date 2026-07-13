@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { NonProfitTab } from "@/components/settings/NonProfitTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { NonProfitTab } from "@sm/components/settings/NonProfitTab";
 
 export const NonProfitSettings = () => {
   return (

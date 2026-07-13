@@ -1,5 +1,5 @@
 import React from 'react';
-import { ServicePackageManager } from '@/components/inventory/predictive/ServicePackageManager';
+import { ServicePackageManager } from '@sm/components/inventory/predictive/ServicePackageManager';
 
 export default function ServicePackages() {
   return (

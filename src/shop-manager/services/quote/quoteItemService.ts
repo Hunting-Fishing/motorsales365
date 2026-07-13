@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import { QuoteItem, QuoteItemFormValues, QuoteItemType } from '@/types/quote';
+import { supabase } from '@sm/integrations/supabase/client';
+import { QuoteItem, QuoteItemFormValues, QuoteItemType } from '@sm/types/quote';
 
 export async function createQuoteItems(quoteId: string, items: QuoteItemFormValues[]): Promise<QuoteItem[]> {
   console.log('createQuoteItems: Creating items for quote:', quoteId, items);

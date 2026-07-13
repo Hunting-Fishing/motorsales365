@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { Invoice } from '@/types/invoice';
+import { Invoice } from '@sm/types/invoice';
 
 export const useInvoiceFilters = (initialInvoices: Invoice[] = []) => {
   const [statusFilter, setStatusFilter] = useState<string>('all');

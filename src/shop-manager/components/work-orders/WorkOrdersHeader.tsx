@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { WorkOrder } from '@/types/workOrder';
+import { WorkOrder } from '@sm/types/workOrder';
 
 interface WorkOrdersHeaderProps {
   workOrders: WorkOrder[];

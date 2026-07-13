@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Search, X, Clock, DollarSign, Plus } from 'lucide-react';
-import { ServiceSector, ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@/types/service';
-import { SelectedService } from '@/types/selectedService';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useServiceSearch } from '@/hooks/useServiceSearch';
+import { ServiceSector, ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@sm/types/service';
+import { SelectedService } from '@sm/types/selectedService';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { useServiceSearch } from '@sm/hooks/useServiceSearch';
 import { AddSectorDialog } from './AddSectorDialog';
 import { AddCategoryDialog } from './AddCategoryDialog';
 import { AddSubcategoryDialog } from './AddSubcategoryDialog';

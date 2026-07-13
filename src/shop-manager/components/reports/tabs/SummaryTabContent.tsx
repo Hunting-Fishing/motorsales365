@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { 
   BarChart, 
   Bar, 
@@ -13,10 +13,10 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ComparisonReportCard } from '@/components/reports/ComparisonReportCard';
-import { ReportDataPoint, ComparisonReportData } from "@/types/reports";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { ComparisonReportCard } from '@sm/components/reports/ComparisonReportCard';
+import { ReportDataPoint, ComparisonReportData } from "@sm/types/reports";
+import { Skeleton } from "@sm/components/ui/skeleton";
 
 interface SummaryTabContentProps {
   showComparison: boolean;

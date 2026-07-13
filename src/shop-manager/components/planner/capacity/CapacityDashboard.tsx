@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
-import { useStaffForPlanner, useWorkOrdersForPlanner, useEquipmentForPlanner } from '@/hooks/usePlannerData';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useStaffForPlanner, useWorkOrdersForPlanner, useEquipmentForPlanner } from '@sm/hooks/usePlannerData';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@sm/components/ui/avatar';
 import { Users, Wrench, AlertTriangle, TrendingUp, Clock, FolderKanban } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { ResourceCapacity } from '@/types/planner';
+import { cn } from '@sm/lib/utils';
+import { Badge } from '@sm/components/ui/badge';
+import { ResourceCapacity } from '@sm/types/planner';
 import { startOfWeek, endOfWeek, isWithinInterval, parseISO } from 'date-fns';
-import { useAllProjectResources } from '@/hooks/useProjectResources';
-import { ProjectResourceAssignment } from '@/types/projectResource';
-import { Progress } from '@/components/ui/progress';
+import { useAllProjectResources } from '@sm/hooks/useProjectResources';
+import { ProjectResourceAssignment } from '@sm/types/projectResource';
+import { Progress } from '@sm/components/ui/progress';
 
 const WEEKLY_HOURS = 40; // Standard work week
 

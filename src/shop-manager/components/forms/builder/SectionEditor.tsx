@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
 import { GripVertical, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-import { FormBuilderSection, FormBuilderField, FormFieldType } from '@/types/formBuilder';
+import { FormBuilderSection, FormBuilderField, FormFieldType } from '@sm/types/formBuilder';
 import { FieldEditor } from './FieldEditor';
 
 interface SectionEditorProps {

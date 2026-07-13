@@ -1,17 +1,17 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Button } from "@sm/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { VehicleInfoTab } from "@/components/inspection-form/VehicleInfoTab";
-import { DamageAssessmentTab } from "@/components/inspection-form/DamageAssessmentTab";
-import { AdditionalNotesTab } from "@/components/inspection-form/AdditionalNotesTab";
-import { VehicleBodyStyle } from "@/types/vehicle";
-import { supabase } from "@/integrations/supabase/client";
-import { useShopId } from "@/hooks/useShopId";
+import { useToast } from "@sm/hooks/use-toast";
+import { VehicleInfoTab } from "@sm/components/inspection-form/VehicleInfoTab";
+import { DamageAssessmentTab } from "@sm/components/inspection-form/DamageAssessmentTab";
+import { AdditionalNotesTab } from "@sm/components/inspection-form/AdditionalNotesTab";
+import { VehicleBodyStyle } from "@sm/types/vehicle";
+import { supabase } from "@sm/integrations/supabase/client";
+import { useShopId } from "@sm/hooks/useShopId";
 
 interface InspectionFormData {
   vin: string;

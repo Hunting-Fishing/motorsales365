@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { Brain, MessageSquare, Search, Lightbulb, Zap, TrendingUp, Bell, BarChart3, CheckCircle } from 'lucide-react';
-import { AIChat, AIRecommendations, AISearch, AIInsights, SmartNotifications } from '@/components/ai';
+import { AIChat, AIRecommendations, AISearch, AIInsights, SmartNotifications } from '@sm/components/ai';
 
 const AIHub = () => {
   const [activeTab, setActiveTab] = useState('overview');

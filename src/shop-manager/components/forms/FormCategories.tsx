@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
 import { 
   Card, 
   CardHeader, 
   CardTitle, 
   CardContent,
   CardFooter
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { 
   Dialog,
   DialogContent,
@@ -18,13 +18,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from "@/components/ui/dialog";
+} from "@sm/components/ui/dialog";
 import { Plus, Pencil, Trash2 } from "lucide-react";
-import { FormCategory } from "@/types/formBuilder";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { getFormCategories, createFormCategory, updateFormCategory, deleteFormCategory } from "@/services/formCategoryService";
-import { useToast } from "@/components/ui/use-toast";
+import { FormCategory } from "@sm/types/formBuilder";
+import { Label } from "@sm/components/ui/label";
+import { Textarea } from "@sm/components/ui/textarea";
+import { getFormCategories, createFormCategory, updateFormCategory, deleteFormCategory } from "@sm/services/formCategoryService";
+import { useToast } from "@sm/components/ui/use-toast";
 
 export const FormCategories = () => {
   const [categories, setCategories] = useState<FormCategory[]>([]);

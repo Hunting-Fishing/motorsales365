@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
 import { Loader2, AlertCircle } from "lucide-react";
-import { VinDecodeResult } from "@/types/vehicle";
-import { toast } from "@/hooks/use-toast";
-import { decodeVin } from "@/services/vinDecoderService";
-import { VehicleBodyStyle } from "@/types/vehicle";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { VinDecodeResult } from "@sm/types/vehicle";
+import { toast } from "@sm/hooks/use-toast";
+import { decodeVin } from "@sm/services/vinDecoderService";
+import { VehicleBodyStyle } from "@sm/types/vehicle";
+import { Alert, AlertDescription } from "@sm/components/ui/alert";
 
 interface VinDecoderFieldProps {
   form: any;

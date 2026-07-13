@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { AutoReorderSettings } from '@/types/inventory';
+import { AutoReorderSettings } from '@sm/types/inventory';
 import { Clock } from 'lucide-react';
 
 interface AutoReorderStatusProps {

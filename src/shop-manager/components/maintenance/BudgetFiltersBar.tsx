@@ -1,22 +1,22 @@
 import { Search, Filter, X, Calendar } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+} from "@sm/components/ui/select";
+import { Badge } from "@sm/components/ui/badge";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+} from "@sm/components/ui/popover";
+import { Calendar as CalendarComponent } from "@sm/components/ui/calendar";
 import { format } from "date-fns";
-import { BudgetFilters, BudgetPeriodFilter, BudgetStatusFilter } from "@/hooks/useBudgetFilters";
+import { BudgetFilters, BudgetPeriodFilter, BudgetStatusFilter } from "@sm/hooks/useBudgetFilters";
 
 interface BudgetFiltersBarProps {
   filters: BudgetFilters;

@@ -1,10 +1,10 @@
 
 import React from "react";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardHeader, CardContent, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Checkbox } from "@sm/components/ui/checkbox";
 import { Clock, Settings } from "lucide-react";
-import { RepairPlan, RepairTask } from "@/types/repairPlan";
+import { RepairPlan, RepairTask } from "@sm/types/repairPlan";
 
 interface RepairPlanTasksCardProps {
   repairPlan: RepairPlan;

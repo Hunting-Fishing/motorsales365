@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { MessageSquare, Plus, Mail, Phone, Send, Users } from 'lucide-react';
 
 export default function CustomerComms() {

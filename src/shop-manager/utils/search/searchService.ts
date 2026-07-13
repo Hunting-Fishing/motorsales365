@@ -1,4 +1,4 @@
-import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@/types/service';
+import { ServiceMainCategory, ServiceSubcategory, ServiceJob } from '@sm/types/service';
 
 // Helper function to search through service categories
 export const searchServiceCategories = (

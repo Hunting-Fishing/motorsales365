@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
-import { SavedReport } from "@/types/reports";
-import { toast } from "@/components/ui/use-toast";
+import { SavedReport } from "@sm/types/reports";
+import { toast } from "@sm/components/ui/use-toast";
 import { z } from "zod";
 
 interface UseReportFormProps {

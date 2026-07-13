@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { ChevronDown, ChevronUp, Plus } from "lucide-react";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
 
 interface EnhancedComplaintFormProps {
   form: UseFormReturn<WorkOrderFormSchemaValues>;

@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Switch } from '@sm/components/ui/switch';
+import { Label } from '@sm/components/ui/label';
+import { Button } from '@sm/components/ui/button';
+import { Checkbox } from '@sm/components/ui/checkbox';
 import { Save, User, Settings, Brain, BarChart3, Users } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useUserShopId, useBusinessModules } from '@/hooks/useEnabledModules';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useUserShopId, useBusinessModules } from '@sm/hooks/useEnabledModules';
 import { toast } from 'sonner';
 
 type AccountMenuSettings = {

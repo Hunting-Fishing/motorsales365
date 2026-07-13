@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Customer } from '@/types/customer';
-import { CustomerDocument, DocumentCategory } from '@/types/document';
-import { getCustomerDocuments, getDocumentCategories } from '@/services/documentService';
+import { Button } from '@sm/components/ui/button';
+import { Customer } from '@sm/types/customer';
+import { CustomerDocument, DocumentCategory } from '@sm/types/document';
+import { getCustomerDocuments, getDocumentCategories } from '@sm/services/documentService';
 import { Plus, FileText, RefreshCw } from 'lucide-react';
 import { DocumentUploadDialog } from './DocumentUploadDialog';
 import { DocumentList } from './DocumentList';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Label } from '@sm/components/ui/label';
 
 interface CustomerDocumentsTabProps {
   customer: Customer;

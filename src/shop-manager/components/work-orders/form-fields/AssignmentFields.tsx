@@ -1,12 +1,12 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Input } from "@sm/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { User, MapPin, Calendar } from "lucide-react";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
 
 interface Technician {
   id: string;

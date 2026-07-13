@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Settings, 
   RefreshCw, 
@@ -11,7 +11,7 @@ import {
   Activity,
   Clock
 } from 'lucide-react';
-import { ShopIntegration } from '@/hooks/integrations/useShopIntegrations';
+import { ShopIntegration } from '@sm/hooks/integrations/useShopIntegrations';
 
 const statusIcons = {
   'pending': Clock,

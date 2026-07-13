@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
 import { DragEndEvent } from '@dnd-kit/core';
-import { supabase } from '@/integrations/supabase/client';
-import { Bay } from '@/services/diybay/diybayService';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Bay } from '@sm/services/diybay/diybayService';
+import { useToast } from '@sm/hooks/use-toast';
 
 export function useBayOrder(bays: Bay[], setBays: React.Dispatch<React.SetStateAction<Bay[]>>) {
   const [isSavingOrder, setIsSavingOrder] = useState(false);

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useAssetUsage } from '@/hooks/inventory/useAssetUsage';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { useAssetUsage } from '@sm/hooks/inventory/useAssetUsage';
 import { AssetUsageDialog } from './AssetUsageDialog';
 import { UpdateReadingDialog } from './UpdateReadingDialog';
 import { 
@@ -16,7 +16,7 @@ import {
   Calendar,
   Gauge
 } from 'lucide-react';
-import { AssetUsageConfig, AssetType, UsageMetric } from '@/types/inventory/predictive';
+import { AssetUsageConfig, AssetType, UsageMetric } from '@sm/types/inventory/predictive';
 import { format } from 'date-fns';
 
 export function AssetUsageManager() {

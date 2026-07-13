@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@sm/components/ui/alert-dialog';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { Loader2, AlertTriangle } from 'lucide-react';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { deleteWorkOrderPart } from '@/services/workOrder/workOrderPartsService';
-import { PartsFormValidator } from '@/utils/partsErrorHandler';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { deleteWorkOrderPart } from '@sm/services/workOrder/workOrderPartsService';
+import { PartsFormValidator } from '@sm/utils/partsErrorHandler';
 
 interface DeletePartDialogProps {
   open: boolean;

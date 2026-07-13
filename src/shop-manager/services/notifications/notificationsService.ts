@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import type { Notification, NotificationPreferences } from '@/types/notification';
+import { supabase } from '@sm/integrations/supabase/client';
+import type { Notification, NotificationPreferences } from '@sm/types/notification';
 
 export async function getNotifications(userId?: string): Promise<Notification[]> {
   let query = supabase

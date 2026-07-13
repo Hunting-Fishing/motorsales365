@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@sm/components/ui/dropdown-menu';
 import { Plus, Wrench, Package, FileText, Truck } from 'lucide-react';
 import { ChevronDown } from 'lucide-react';
 

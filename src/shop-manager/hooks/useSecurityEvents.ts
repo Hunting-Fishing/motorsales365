@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { useToast } from './use-toast';
-import type { SecurityEvent } from '@/types/phase4';
+import type { SecurityEvent } from '@sm/types/phase4';
 
 export function useSecurityEvents() {
   const { toast } = useToast();

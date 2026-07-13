@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Plus, Save, Eye } from 'lucide-react';
-import { FormBuilderTemplate, FormBuilderSection, FormBuilderField, FormFieldType } from '@/types/formBuilder';
+import { FormBuilderTemplate, FormBuilderSection, FormBuilderField, FormFieldType } from '@sm/types/formBuilder';
 import { SectionEditor } from './SectionEditor';
 import { FieldTypePalette } from './FieldTypePalette';
-import { useToast } from '@/components/ui/use-toast';
-import { saveFormTemplate } from '@/services/formBuilderService';
+import { useToast } from '@sm/components/ui/use-toast';
+import { saveFormTemplate } from '@sm/services/formBuilderService';
 import { v4 as uuidv4 } from 'uuid';
 
 interface FormBuilderEditorProps {

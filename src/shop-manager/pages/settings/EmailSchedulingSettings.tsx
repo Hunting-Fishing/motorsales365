@@ -1,7 +1,7 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { EmailSchedulingTab } from "@/components/settings/EmailSchedulingTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { EmailSchedulingTab } from "@sm/components/settings/EmailSchedulingTab";
 
 export const EmailSchedulingSettings = () => {
   return (

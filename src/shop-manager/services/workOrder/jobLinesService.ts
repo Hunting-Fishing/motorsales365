@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { supabase } from '@sm/integrations/supabase/client';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 
 export async function getWorkOrderJobLines(workOrderId: string): Promise<WorkOrderJobLine[]> {
   console.log('🔍 Fetching job lines for work order:', workOrderId);

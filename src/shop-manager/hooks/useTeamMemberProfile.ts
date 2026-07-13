@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
-import { TeamMember } from "@/types/team";
-import { toast } from "@/hooks/use-toast";
-import { getProfileMetadata } from "@/lib/profileMetadata";
+import { supabase } from "@sm/lib/supabase";
+import { TeamMember } from "@sm/types/team";
+import { toast } from "@sm/hooks/use-toast";
+import { getProfileMetadata } from "@sm/lib/profileMetadata";
 
 export function useTeamMemberProfile(id: string | undefined) {
   const [member, setMember] = useState<TeamMember | null>(null);

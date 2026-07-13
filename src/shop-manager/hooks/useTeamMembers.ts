@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { TeamMember } from "@/types/team";
-import { supabase } from '@/lib/supabase';
-import { generateUniqueDisplayNames, formatDisplayName } from '@/utils/duplicateNameHandler';
+import { TeamMember } from "@sm/types/team";
+import { supabase } from '@sm/lib/supabase';
+import { generateUniqueDisplayNames, formatDisplayName } from '@sm/utils/duplicateNameHandler';
 
 interface ProfileData {
   id: string;

@@ -1,13 +1,13 @@
 
 import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { WorkOrderFormValues, WorkOrderInventoryItem } from "@/types/workOrder";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useShopId } from "@/hooks/useShopId";
+import { WorkOrderFormValues, WorkOrderInventoryItem } from "@sm/types/workOrder";
+import { useToast } from "@sm/hooks/use-toast";
+import { supabase } from "@sm/integrations/supabase/client";
+import { useShopId } from "@sm/hooks/useShopId";
 
 // Re-export for other components using export type
-export type { WorkOrderFormValues } from "@/types/workOrder";
+export type { WorkOrderFormValues } from "@sm/types/workOrder";
 
 export const useWorkOrderForm = (initialData: Partial<WorkOrderFormValues> = {}) => {
   const { toast } = useToast();

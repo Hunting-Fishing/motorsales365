@@ -1,17 +1,17 @@
 
 import React from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { VinDecodeResult } from "@/types/vehicle";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { VinDecodeResult } from "@sm/types/vehicle";
+import { Card, CardHeader, CardTitle, CardContent } from "@sm/components/ui/card";
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from "@/components/ui/select";
-import { VehicleBodyStyle } from "@/types/vehicleBodyStyles";
+} from "@sm/components/ui/select";
+import { VehicleBodyStyle } from "@sm/types/vehicleBodyStyles";
 
 interface DecodedVehicleFieldsProps {
   form: any;

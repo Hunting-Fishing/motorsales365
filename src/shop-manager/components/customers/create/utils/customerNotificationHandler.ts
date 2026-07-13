@@ -1,5 +1,5 @@
 
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@sm/hooks/use-toast";
 
 /**
  * Handles success notifications for customer creation

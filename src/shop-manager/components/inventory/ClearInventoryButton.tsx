@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Trash2 } from 'lucide-react';
-import { clearAllInventoryItems } from '@/services/inventory/crudService';
+import { clearAllInventoryItems } from '@sm/services/inventory/crudService';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@sm/components/ui/alert-dialog";
 
 interface ClearInventoryButtonProps {
   onCleared?: () => void;

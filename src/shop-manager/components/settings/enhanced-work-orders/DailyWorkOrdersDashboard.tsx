@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { LoadingSpinner } from '@sm/components/ui/loading-spinner';
 import { 
   Calendar,
   Clock, 
@@ -15,7 +15,7 @@ import {
   Edit,
   RefreshCw
 } from 'lucide-react';
-import { useDailyWorkOrders } from '@/hooks/work-orders/useDailyWorkOrders';
+import { useDailyWorkOrders } from '@sm/hooks/work-orders/useDailyWorkOrders';
 
 const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {

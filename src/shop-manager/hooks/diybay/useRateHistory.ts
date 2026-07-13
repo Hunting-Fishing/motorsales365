@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Bay, RateHistory, fetchRateHistory } from "@/services/diybay/diybayService";
+import { Bay, RateHistory, fetchRateHistory } from "@sm/services/diybay/diybayService";
 
 export function useRateHistory() {
   const [rateHistory, setRateHistory] = useState<RateHistory[]>([]);

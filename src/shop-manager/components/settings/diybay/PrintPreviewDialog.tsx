@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bay } from "@/services/diybay/diybayService";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Slider } from "@sm/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Bay } from "@sm/services/diybay/diybayService";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Badge } from "@sm/components/ui/badge";
 import { Printer, RefreshCw, Copy } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { printElement } from "@/utils/printUtils";
+import { Label } from "@sm/components/ui/label";
+import { printElement } from "@sm/utils/printUtils";
 
 interface PrintPreviewDialogProps {
   isOpen: boolean;

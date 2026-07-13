@@ -1,6 +1,6 @@
 
-import { supabase } from "@/lib/supabase";
-import { ShiftChat } from "@/types/calendar";
+import { supabase } from "@sm/lib/supabase";
+import { ShiftChat } from "@sm/types/calendar";
 
 /**
  * Get shift chats for a date range

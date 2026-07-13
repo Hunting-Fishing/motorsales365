@@ -1,7 +1,7 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { SavedSearch } from "@/types/document";
-import { SearchResult } from "@/utils/search/types";
+import { supabase } from "@sm/integrations/supabase/client";
+import { SavedSearch } from "@sm/types/document";
+import { SearchResult } from "@sm/utils/search/types";
 
 // Save a search query
 export const saveSavedSearch = async (

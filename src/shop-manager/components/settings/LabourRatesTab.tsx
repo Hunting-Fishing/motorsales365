@@ -1,11 +1,11 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
+import { Label } from "@sm/components/ui/label";
 import { Save, DollarSign } from "lucide-react";
-import { useLabourRates } from "@/hooks/useLabourRates";
+import { useLabourRates } from "@sm/hooks/useLabourRates";
 
 export function LabourRatesTab() {
   const { 

@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FormItem, FormLabel, FormControl, FormMessage } from '@sm/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Control, FieldPath, useController } from 'react-hook-form';
 
 interface VehicleMakeSelectorProps<T> {

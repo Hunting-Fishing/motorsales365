@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Bay, RateSettings } from "@/services/diybay/diybayService";
-import { RateHistory } from "@/services/diybay/diybayService";
+import { Bay, RateSettings } from "@sm/services/diybay/diybayService";
+import { RateHistory } from "@sm/services/diybay/diybayService";
 import { EditBayDialog } from "./EditBayDialog";
 import { RateHistoryDialog } from "./RateHistoryDialog";
 

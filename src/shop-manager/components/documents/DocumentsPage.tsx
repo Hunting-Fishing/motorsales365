@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react';
-import { useDocuments } from '@/hooks/useDocuments';
+import { useDocuments } from '@sm/hooks/useDocuments';
 import { DocumentGrid } from './DocumentGrid';
 import { DocumentUploadDialog } from './DocumentUploadDialog';
 import { DocumentSearchFilters } from './DocumentSearchFilters';
 // import { DocumentDetailDialog } from './DocumentDetailDialog';
 import { DocumentEditDialog } from './DocumentEditDialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
 import { Plus, Search } from 'lucide-react';
-import { Document, DocumentSearchParams } from '@/types/document';
-import { toast } from '@/hooks/use-toast';
+import { Document, DocumentSearchParams } from '@sm/types/document';
+import { toast } from '@sm/hooks/use-toast';
 
 export function DocumentsPage() {
   const [searchParams, setSearchParams] = useState<DocumentSearchParams>({});

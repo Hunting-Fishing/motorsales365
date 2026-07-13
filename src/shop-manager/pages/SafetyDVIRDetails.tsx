@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Label } from '@sm/components/ui/label';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { Separator } from '@sm/components/ui/separator';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -22,10 +22,10 @@ import {
   FileSignature,
   Loader2
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
 import { format } from 'date-fns';
-import type { DVIRReport } from '@/types/safety';
+import type { DVIRReport } from '@sm/types/safety';
 
 const INSPECTION_ITEMS = [
   { key: 'brakes_ok', label: 'Brakes' },

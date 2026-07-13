@@ -1,10 +1,10 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
 import { Plus, Calendar, Clock } from "lucide-react";
-import type { EquipmentWithMaintenance } from "@/services/equipmentService";
+import type { EquipmentWithMaintenance } from "@sm/services/equipmentService";
 
 interface MaintenanceSchedule {
   id: string;

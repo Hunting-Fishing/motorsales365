@@ -1,5 +1,5 @@
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { PlusCircle, Package, ShoppingCart, Boxes, Truck, Tag, Home, Settings } from "lucide-react";
 

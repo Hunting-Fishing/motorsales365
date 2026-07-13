@@ -1,11 +1,11 @@
 
 import React from "react";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTaxSettings } from "@/hooks/useTaxSettings";
-import { useShopId } from "@/hooks/useShopId";
-import { calculateTax } from "@/utils/taxCalculations";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Textarea } from "@sm/components/ui/textarea";
+import { CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { useTaxSettings } from "@sm/hooks/useTaxSettings";
+import { useShopId } from "@sm/hooks/useShopId";
+import { calculateTax } from "@sm/utils/taxCalculations";
 
 interface WorkOrderSummaryProps {
   form: any;

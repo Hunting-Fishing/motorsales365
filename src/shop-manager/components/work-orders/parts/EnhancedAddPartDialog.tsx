@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form } from '@/components/ui/form';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@sm/components/ui/form';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Form } from '@sm/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { WorkOrderPartFormValues, PART_TYPES, WORK_ORDER_PART_STATUSES } from '@/types/workOrderPart';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { createWorkOrderPart } from '@/services/workOrder/workOrderPartsService';
+import { WorkOrderPartFormValues, PART_TYPES, WORK_ORDER_PART_STATUSES } from '@sm/types/workOrderPart';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { createWorkOrderPart } from '@sm/services/workOrder/workOrderPartsService';
 import { PartTypeAndStatusFields } from './PartTypeAndStatusFields';
 import { AdvancedPartFields } from './AdvancedPartFields';
 import { toast } from 'sonner';
 import { Loader2, AlertTriangle } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 
 const addPartSchema = z.object({
   name: z.string().min(1, 'Part name is required'),

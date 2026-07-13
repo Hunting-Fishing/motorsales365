@@ -1,15 +1,15 @@
 import React from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Button } from "@sm/components/ui/button";
 import { PlusCircle, UserPlus, XCircle } from "lucide-react";
-import { StaffMember } from "@/types/invoice";
+import { StaffMember } from "@sm/types/invoice";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@sm/components/ui/dialog";
 
 // Define the props interface for the InvoiceRightColumn component
 export interface InvoiceRightColumnProps {

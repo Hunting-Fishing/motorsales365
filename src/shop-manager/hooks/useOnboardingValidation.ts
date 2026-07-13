@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
-import { ErrorHandler } from '@/utils/errorHandler';
-import { OnboardingError, ErrorType, ErrorSeverity, ERROR_CODES } from '@/utils/errorTypes';
+import { ErrorHandler } from '@sm/utils/errorHandler';
+import { OnboardingError, ErrorType, ErrorSeverity, ERROR_CODES } from '@sm/utils/errorTypes';
 
 interface ValidationResult {
   isValid: boolean;

@@ -2,7 +2,7 @@
 import React from "react";
 import { TagBadge } from "./TagBadge";
 import { TagSuggestions } from "./TagSuggestions";
-import { Input } from "@/components/ui/input";
+import { Input } from "@sm/components/ui/input";
 import { useTagSelector } from "./useTagSelector.tsx";
 import { Loader2 } from "lucide-react";
 

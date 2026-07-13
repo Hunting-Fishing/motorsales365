@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { Badge } from '@sm/components/ui/badge';
+import { Calendar } from '@sm/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@sm/components/ui/popover';
 import { CalendarDays, X, Filter } from 'lucide-react';
 
 export function AdvancedFilters() {

@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card } from '@sm/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
 import { MessageSquare } from 'lucide-react';
-import { getVehicleInteractions } from '@/services/customer/customerInteractionsService';
-import { CustomerInteraction } from '@/types/interaction';
+import { getVehicleInteractions } from '@sm/services/customer/customerInteractionsService';
+import { CustomerInteraction } from '@sm/types/interaction';
 
 export const VehicleInteractions: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const [interactions, setInteractions] = useState<CustomerInteraction[]>([]);

@@ -1,21 +1,21 @@
 import { Calendar, DollarSign, TrendingUp, MoreVertical } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
+import { Button } from '@sm/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { formatCurrency } from '@/lib/utils';
+} from '@sm/components/ui/dropdown-menu';
+import { formatCurrency } from '@sm/lib/utils';
 import { format, isPast, addDays, isWithinInterval } from 'date-fns';
-import type { ProjectBudget } from '@/types/projectBudget';
-import { PROJECT_STATUSES, PROJECT_TYPES } from '@/types/projectBudget';
+import type { ProjectBudget } from '@sm/types/projectBudget';
+import { PROJECT_STATUSES, PROJECT_TYPES } from '@sm/types/projectBudget';
 import { MilestoneAlertBadge } from './MilestoneAlertBadge';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface ProjectBudgetCardProps {
   project: ProjectBudget;

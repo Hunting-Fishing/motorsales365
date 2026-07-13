@@ -1,17 +1,17 @@
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Quote, quoteStatusMap } from '@/types/quote';
-import { formatCurrency } from '@/utils/formatters';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Quote, quoteStatusMap } from '@sm/types/quote';
+import { formatCurrency } from '@sm/utils/formatters';
 import { Eye, Edit, MoreHorizontal } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@sm/components/ui/dropdown-menu';
 
 interface QuotesTableProps {
   quotes: Quote[];

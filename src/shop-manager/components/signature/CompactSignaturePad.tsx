@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Eraser, Check } from 'lucide-react';
 
 interface CompactSignaturePadProps {

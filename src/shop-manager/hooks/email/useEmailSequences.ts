@@ -2,7 +2,7 @@
 import { useSequenceCRUD } from './sequence/useSequenceCRUD';
 import { useSequenceAnalytics } from './sequence/useSequenceAnalytics';
 import { useSequenceEnrollments } from './sequence/useSequenceEnrollments';
-import { EmailSequence, EmailSequenceStep, EmailSequenceEnrollment } from '@/types/email';
+import { EmailSequence, EmailSequenceStep, EmailSequenceEnrollment } from '@sm/types/email';
 
 export const useEmailSequences = () => {
   const {

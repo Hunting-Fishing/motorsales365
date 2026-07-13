@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
 import type {
   InspectionFormTemplate,
   InspectionFormSection,
   InspectionFormItem,
   CreateInspectionFormTemplate,
   AssetType,
-} from '@/types/inspectionTemplate';
+} from '@sm/types/inspectionTemplate';
 
 // Fetch all templates
 export function useInspectionTemplates(assetType?: AssetType) {

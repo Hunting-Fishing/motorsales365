@@ -1,7 +1,7 @@
 
-import { exportToCSV, exportToExcel, exportToPDF } from "@/utils/export";
-import { toast } from "@/components/ui/use-toast";
-import { Invoice } from "@/types/invoice";
+import { exportToCSV, exportToExcel, exportToPDF } from "@sm/utils/export";
+import { toast } from "@sm/components/ui/use-toast";
+import { Invoice } from "@sm/types/invoice";
 import { ExportMenuBase } from "./ExportMenuBase";
 
 interface InvoiceListExportMenuProps {

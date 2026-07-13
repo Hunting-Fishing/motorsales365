@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { CustomerLoginRequiredWithImpersonation } from '@/components/customer-portal/CustomerLoginRequiredWithImpersonation';
-import { CustomerPortalHeader } from '@/components/customer-portal/CustomerPortalHeader';
-import { CustomerAppointmentBooking } from '@/components/customer-portal/CustomerAppointmentBooking';
-import { useImpersonation } from '@/contexts/ImpersonationContext';
-import { useAuthUser } from '@/hooks/useAuthUser';
+import { CustomerLoginRequiredWithImpersonation } from '@sm/components/customer-portal/CustomerLoginRequiredWithImpersonation';
+import { CustomerPortalHeader } from '@sm/components/customer-portal/CustomerPortalHeader';
+import { CustomerAppointmentBooking } from '@sm/components/customer-portal/CustomerAppointmentBooking';
+import { useImpersonation } from '@sm/contexts/ImpersonationContext';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
 
 export default function ClientBooking() {
   const { impersonatedCustomer } = useImpersonation();

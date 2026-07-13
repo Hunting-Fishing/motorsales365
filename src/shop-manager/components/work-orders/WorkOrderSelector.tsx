@@ -1,11 +1,11 @@
 
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
 import { Search } from "lucide-react";
-import { WorkOrder } from "@/types/workOrder";
-import { formatDate } from "@/utils/formatters";
+import { WorkOrder } from "@sm/types/workOrder";
+import { formatDate } from "@sm/utils/formatters";
 
 export interface WorkOrderSelectorProps {
   workOrders: WorkOrder[];

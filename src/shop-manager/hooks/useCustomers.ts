@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getAllCustomers } from '@/services/customer/customerQueryService';
-import { Customer } from '@/types/customer';
+import { getAllCustomers } from '@sm/services/customer/customerQueryService';
+import { Customer } from '@sm/types/customer';
 
 /**
  * PROTECTED HOOK - Customer management functionality

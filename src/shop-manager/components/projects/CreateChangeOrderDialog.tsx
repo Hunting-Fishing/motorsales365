@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@sm/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -17,12 +17,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { useProjectDetails } from '@/hooks/useProjectBudgets';
-import { formatCurrency } from '@/lib/utils';
+} from '@sm/components/ui/form';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Textarea } from '@sm/components/ui/textarea';
+import { useProjectDetails } from '@sm/hooks/useProjectBudgets';
+import { formatCurrency } from '@sm/lib/utils';
 
 const formSchema = z.object({
   reason: z.string().min(1, 'Reason is required'),

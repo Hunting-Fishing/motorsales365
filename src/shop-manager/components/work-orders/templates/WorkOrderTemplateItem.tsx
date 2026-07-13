@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardFooter } from '@sm/components/ui/card';
 import { Clipboard, Clock } from 'lucide-react';
-import { WorkOrderTemplate } from '@/types/workOrder';
+import { WorkOrderTemplate } from '@sm/types/workOrder';
 
 interface WorkOrderTemplateItemProps {
   template: WorkOrderTemplate;

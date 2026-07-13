@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
-import { getServiceTypeDistribution } from "@/services/dashboard"; // Updated import path
-import { ServiceTypeData } from "@/types/dashboard";
+import { getServiceTypeDistribution } from "@sm/services/dashboard"; // Updated import path
+import { ServiceTypeData } from "@sm/types/dashboard";
 
 export function ServiceTypeDistributionChart() {
   const [data, setData] = useState<ServiceTypeData[]>([]);

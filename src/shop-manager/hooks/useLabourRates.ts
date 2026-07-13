@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
-import { useShopId } from "@/hooks/useShopId";
-import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@sm/lib/supabase";
+import { useShopId } from "@sm/hooks/useShopId";
+import { useToast } from "@sm/hooks/use-toast";
 
 export interface LabourRates {
   id?: string;

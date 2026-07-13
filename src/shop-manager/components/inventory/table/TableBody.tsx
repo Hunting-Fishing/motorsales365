@@ -1,7 +1,7 @@
 
 import React from "react";
-import { TableBody as UITableBody } from "@/components/ui/table";
-import { InventoryItemExtended } from "@/types/inventory";
+import { TableBody as UITableBody } from "@sm/components/ui/table";
+import { InventoryItemExtended } from "@sm/types/inventory";
 import { TableRow } from "./TableRow";
 import { Column } from "./SortableColumnHeader";
 

@@ -1,10 +1,10 @@
 
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { TeamMemberForm } from "@/components/team/form/TeamMemberForm";
-import { TeamMemberFormValues } from "@/components/team/form/formValidation";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@sm/components/ui/card";
+import { TeamMemberForm } from "@sm/components/team/form/TeamMemberForm";
+import { TeamMemberFormValues } from "@sm/components/team/form/formValidation";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
-import { useTeamMemberUpdate } from "@/hooks/useTeamMemberUpdate";
+import { useToast } from "@sm/components/ui/use-toast";
+import { useTeamMemberUpdate } from "@sm/hooks/useTeamMemberUpdate";
 import { useState } from "react";
 
 interface EditProfileTabProps {

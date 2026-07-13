@@ -1,6 +1,6 @@
 
 import React from "react";
-import { BrandingTab } from "@/components/settings/BrandingTab";
+import { BrandingTab } from "@sm/components/settings/BrandingTab";
 
 export const BrandingSettings = () => {
   return (

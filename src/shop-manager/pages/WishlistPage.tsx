@@ -1,15 +1,15 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
 import { Heart, ShoppingCart, Trash2, Share2, ArrowLeft } from 'lucide-react';
-import { useWishlist } from '@/hooks/shopping/useWishlist';
-import { useCart } from '@/hooks/shopping/useCart';
-import { useToast } from '@/hooks/use-toast';
+import { useWishlist } from '@sm/hooks/shopping/useWishlist';
+import { useCart } from '@sm/hooks/shopping/useCart';
+import { useToast } from '@sm/hooks/use-toast';
 import { Link } from 'react-router-dom';
-import ReviewStars from '@/components/shopping/reviews/ReviewStars';
-import LoadingSkeleton from '@/components/shopping/LoadingSkeleton';
+import ReviewStars from '@sm/components/shopping/reviews/ReviewStars';
+import LoadingSkeleton from '@sm/components/shopping/LoadingSkeleton';
 
 const WishlistPage: React.FC = () => {
   const { items, loading, removeFromWishlist } = useWishlist();

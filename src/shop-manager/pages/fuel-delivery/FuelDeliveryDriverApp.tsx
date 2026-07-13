@@ -1,15 +1,15 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
+import { Input } from "@sm/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@sm/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { ScrollArea } from "@sm/components/ui/scroll-area";
 import { 
   Truck, MapPin, Clock, CheckCircle2, AlertCircle, 
   Navigation, Fuel, User, Droplets, Route, Calendar,
@@ -18,13 +18,13 @@ import {
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, parseISO, differenceInMinutes, isBefore } from "date-fns";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { useCreateFuelDeliveryCompletion } from "@/hooks/useFuelDelivery";
-import { LiveClock } from "@/components/fuel-delivery/LiveClock";
-import { DeliveryTimeStats } from "@/components/fuel-delivery/DeliveryTimeStats";
-import { DeliveryCompletionDialog } from "@/components/fuel-delivery/DeliveryCompletionDialog";
-import { SkipStopDialog, SkipData, NavigationMapDialog } from "@/components/fuel-delivery";
-import { ElapsedTimer } from "@/components/fuel-delivery/ElapsedTimer";
-import { useFuelUnits } from "@/hooks/fuel-delivery/useFuelUnits";
+import { useCreateFuelDeliveryCompletion } from "@sm/hooks/useFuelDelivery";
+import { LiveClock } from "@sm/components/fuel-delivery/LiveClock";
+import { DeliveryTimeStats } from "@sm/components/fuel-delivery/DeliveryTimeStats";
+import { DeliveryCompletionDialog } from "@sm/components/fuel-delivery/DeliveryCompletionDialog";
+import { SkipStopDialog, SkipData, NavigationMapDialog } from "@sm/components/fuel-delivery";
+import { ElapsedTimer } from "@sm/components/fuel-delivery/ElapsedTimer";
+import { useFuelUnits } from "@sm/hooks/fuel-delivery/useFuelUnits";
 
 // Types
 interface RouteStop {

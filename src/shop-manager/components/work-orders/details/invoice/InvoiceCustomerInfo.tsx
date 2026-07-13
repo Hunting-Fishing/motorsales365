@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { WorkOrder } from '@/types/workOrder';
+import { WorkOrder } from '@sm/types/workOrder';
 
 interface InvoiceCustomerInfoProps {
   workOrder: WorkOrder;

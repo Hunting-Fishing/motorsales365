@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { Document, DocumentSearchParams } from '@/types/document';
-import { DocumentService } from '@/services/documentService';
+import { Document, DocumentSearchParams } from '@sm/types/document';
+import { DocumentService } from '@sm/services/documentService';
 
 export function useDocuments(searchParams: DocumentSearchParams = {}) {
   const [documents, setDocuments] = useState<Document[]>([]);

@@ -1,10 +1,10 @@
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Edit, Printer, Send } from "lucide-react";
 import { InvoiceExportMenu } from "./InvoiceExportMenu";
-import { Invoice } from "@/types/invoice";
-import { toast } from "@/components/ui/use-toast";
+import { Invoice } from "@sm/types/invoice";
+import { toast } from "@sm/components/ui/use-toast";
 
 interface InvoiceDetailsHeaderProps {
   invoiceId: string;

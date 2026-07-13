@@ -6,8 +6,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
 import {
   Table,
   TableBody,
@@ -15,9 +15,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { formatCurrency } from "@/lib/formatters";
-import { Bay, RateHistory } from "@/services/diybay/diybayService";
+} from "@sm/components/ui/table";
+import { formatCurrency } from "@sm/lib/formatters";
+import { Bay, RateHistory } from "@sm/services/diybay/diybayService";
 import { formatDistanceToNow } from "date-fns";
 
 interface RateHistoryDialogProps {

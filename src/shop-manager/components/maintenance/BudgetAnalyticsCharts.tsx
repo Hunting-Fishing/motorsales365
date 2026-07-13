@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import {
   PieChart,
   Pie,
@@ -14,7 +14,7 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { MaintenanceBudget } from "@/hooks/useBudgetFilters";
+import { MaintenanceBudget } from "@sm/hooks/useBudgetFilters";
 
 interface BudgetAnalyticsChartsProps {
   budgets: MaintenanceBudget[];

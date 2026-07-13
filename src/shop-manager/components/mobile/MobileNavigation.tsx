@@ -11,19 +11,19 @@ import {
   Settings,
   LucideIcon
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { useNotifications } from '@/hooks/useNotifications';
-import { useActiveModuleNavigation, getModuleGroupedSections } from '@/hooks/useActiveModuleNavigation';
+import { cn } from '@sm/lib/utils';
+import { Badge } from '@sm/components/ui/badge';
+import { useNotifications } from '@sm/hooks/useNotifications';
+import { useActiveModuleNavigation, getModuleGroupedSections } from '@sm/hooks/useActiveModuleNavigation';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { SubmitChangeRequestDialog } from '@/components/feedback/SubmitChangeRequestDialog';
+} from '@sm/components/ui/sheet';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { SubmitChangeRequestDialog } from '@sm/components/feedback/SubmitChangeRequestDialog';
 
 interface NavItem {
   id: string;

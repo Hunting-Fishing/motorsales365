@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useOnboardingStatus } from '@sm/hooks/useOnboardingStatus';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface OnboardingGateProps {
   children: React.ReactNode;

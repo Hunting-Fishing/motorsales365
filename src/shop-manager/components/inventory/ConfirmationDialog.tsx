@@ -8,7 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@sm/components/ui/alert-dialog';
 import { AlertTriangle, Trash2, Archive, Tag, Edit3 } from 'lucide-react';
 
 interface ConfirmationDialogProps {

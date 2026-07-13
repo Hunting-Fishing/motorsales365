@@ -6,40 +6,40 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { 
   Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle 
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { useEmailSequences } from '@/hooks/email/useEmailSequences';
-import { useEmailTemplates } from '@/hooks/email/useEmailTemplates';
+} from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { useToast } from '@sm/hooks/use-toast';
+import { useEmailSequences } from '@sm/hooks/email/useEmailSequences';
+import { useEmailTemplates } from '@sm/hooks/email/useEmailTemplates';
 import { 
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import { 
   Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage 
-} from '@/components/ui/form';
+} from '@sm/components/ui/form';
 import { 
   Dialog, DialogContent, DialogDescription, DialogFooter, 
   DialogHeader, DialogTitle, DialogTrigger 
-} from '@/components/ui/dialog';
+} from '@sm/components/ui/dialog';
 import { 
   Tabs, TabsContent, TabsList, TabsTrigger 
-} from '@/components/ui/tabs';
+} from '@sm/components/ui/tabs';
 import { 
   EmailSequence, EmailSequenceStep, EmailTemplate 
-} from '@/types/email';
+} from '@sm/types/email';
 import { 
   DragDropContext, Droppable, Draggable, DropResult 
 } from 'react-beautiful-dnd';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
+import { Switch } from '@sm/components/ui/switch';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Plus, XCircle, ArrowRight, Clock, Mail, ChevronDown, ChevronUp, 
   GripVertical, Settings, Save, ArrowLeft, Trash2 
 } from 'lucide-react';
-import { Label } from '@/components/ui/label';
+import { Label } from '@sm/components/ui/label';
 
 interface EmailSequenceEditorProps {
   sequence?: EmailSequence;

@@ -1,10 +1,10 @@
 
 import React from "react";
 import { CreateWorkOrderTab } from "./details/CreateWorkOrderTab";
-import { workOrderFormSchema, WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
-import { useTechnicians } from "@/hooks/useTechnicians";
+import { workOrderFormSchema, WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
+import { useTechnicians } from "@sm/hooks/useTechnicians";
 import { useState } from "react";
-import { WorkOrderJobLine } from "@/types/jobLine";
+import { WorkOrderJobLine } from "@sm/types/jobLine";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 

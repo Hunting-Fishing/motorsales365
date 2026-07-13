@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { FileText, Download, TrendingUp, AlertTriangle, CheckCircle, Award, RefreshCw } from 'lucide-react';
-import { useSafetyReports } from '@/hooks/useSafetyReports';
-import { IncidentReportsTab } from '@/components/safety/reports/IncidentReportsTab';
-import { InspectionReportsTab } from '@/components/safety/reports/InspectionReportsTab';
-import { CertificationReportsTab } from '@/components/safety/reports/CertificationReportsTab';
-import { ComplianceScorecardTab } from '@/components/safety/reports/ComplianceScorecardTab';
+import { useSafetyReports } from '@sm/hooks/useSafetyReports';
+import { IncidentReportsTab } from '@sm/components/safety/reports/IncidentReportsTab';
+import { InspectionReportsTab } from '@sm/components/safety/reports/InspectionReportsTab';
+import { CertificationReportsTab } from '@sm/components/safety/reports/CertificationReportsTab';
+import { ComplianceScorecardTab } from '@sm/components/safety/reports/ComplianceScorecardTab';
 
 export default function SafetyReports() {
   const { loading, incidentMetrics, inspectionMetrics, certificationMetrics, complianceScore, refetch } = useSafetyReports();

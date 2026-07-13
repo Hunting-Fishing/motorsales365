@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { FormField } from '@/components/ui/form-field';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+import { Button } from '@sm/components/ui/button';
+import { FormField } from '@sm/components/ui/form-field';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Label } from '@sm/components/ui/label';
 import { Loader2, Save, Upload } from 'lucide-react';
-import { useBusinessConstants } from '@/hooks/useBusinessConstants';
-import type { CompanyInfo } from '@/services/settings/companyService';
+import { useBusinessConstants } from '@sm/hooks/useBusinessConstants';
+import type { CompanyInfo } from '@sm/services/settings/companyService';
 
 interface CompanyInfoFormProps {
   companyInfo: CompanyInfo;

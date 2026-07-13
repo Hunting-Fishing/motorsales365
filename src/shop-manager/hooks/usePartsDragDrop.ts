@@ -1,8 +1,8 @@
 
 import { useCallback } from 'react';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { EditService } from '@/services/workOrder/editService';
-import { toast } from '@/hooks/use-toast';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { EditService } from '@sm/services/workOrder/editService';
+import { toast } from '@sm/hooks/use-toast';
 
 export function usePartsDragDrop(
   parts: WorkOrderPart[],

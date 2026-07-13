@@ -1,6 +1,6 @@
 
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderStatus } from '@/utils/workOrders/constants';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderStatus } from '@sm/utils/workOrders/constants';
 
 /**
  * Safely convert database work order data to application format

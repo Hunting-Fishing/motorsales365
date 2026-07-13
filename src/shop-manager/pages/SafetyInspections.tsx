@@ -1,12 +1,12 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useDailyInspections } from '@/hooks/useDailyInspections';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { useDailyInspections } from '@sm/hooks/useDailyInspections';
 import { ClipboardCheck, Plus, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { format } from 'date-fns';
 
 export default function SafetyInspections() {

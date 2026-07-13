@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Eye, ClipboardList } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { EmptyState } from '@/components/ui/empty-state';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { EmptyState } from '@sm/components/ui/empty-state';
 
 interface WorkOrderTableProps {
   workOrders: WorkOrder[];

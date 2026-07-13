@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { FileCheck, Plus, Download, Edit, Upload, Wand2, ClipboardList } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FormBuilderEditor } from '@/components/forms/builder/FormBuilderEditor';
-import { FormRenderer } from '@/components/forms/FormRenderer';
-import { getAllFormTemplates, deleteFormTemplate, FormQueryParams } from '@/services/formBuilderService';
-import { FormBuilderTemplate } from '@/types/formBuilder';
-import { useToast } from '@/components/ui/use-toast';
-import { Badge } from '@/components/ui/badge';
-import { AllCustomerForms } from '@/components/forms/AllCustomerForms';
-import { CustomerFormUploadDialog } from '@/components/forms/CustomerFormUploadDialog';
-import { FormDigitizationWizard } from '@/components/forms/digitize/FormDigitizationWizard';
+import { Button } from '@sm/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { FormBuilderEditor } from '@sm/components/forms/builder/FormBuilderEditor';
+import { FormRenderer } from '@sm/components/forms/FormRenderer';
+import { getAllFormTemplates, deleteFormTemplate, FormQueryParams } from '@sm/services/formBuilderService';
+import { FormBuilderTemplate } from '@sm/types/formBuilder';
+import { useToast } from '@sm/components/ui/use-toast';
+import { Badge } from '@sm/components/ui/badge';
+import { AllCustomerForms } from '@sm/components/forms/AllCustomerForms';
+import { CustomerFormUploadDialog } from '@sm/components/forms/CustomerFormUploadDialog';
+import { FormDigitizationWizard } from '@sm/components/forms/digitize/FormDigitizationWizard';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 
 export default function Forms() {

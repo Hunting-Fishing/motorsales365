@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Form } from "@/components/ui/form";
+import { Form } from "@sm/components/ui/form";
 import { useReminderForm } from "./hooks/useReminderForm";
 import { CustomerVehicleFields } from "./form-fields/CustomerVehicleFields";
 import { ReminderTypeField } from "./form-fields/ReminderTypeField";
@@ -8,12 +8,12 @@ import { ReminderDetailsFields } from "./form-fields/ReminderDetailsFields";
 import { DueDateField } from "./form-fields/DueDateField";
 import { FormActions } from "./form-fields/FormActions";
 import { RecurrenceFields } from "./form-fields/RecurrenceFields";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { getReminderTemplates, getReminderCategories } from "@/services/reminders/reminderQueries";
-import { toast } from "@/hooks/use-toast";
-import { ReminderTemplate, ReminderCategory } from "@/types/reminder";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Card } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { getReminderTemplates, getReminderCategories } from "@sm/services/reminders/reminderQueries";
+import { toast } from "@sm/hooks/use-toast";
+import { ReminderTemplate, ReminderCategory } from "@sm/types/reminder";
 import { Loader2 } from "lucide-react";
 import { AssignmentField } from "./form-fields/AssignmentField";
 

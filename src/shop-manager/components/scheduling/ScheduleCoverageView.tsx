@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Users, AlertTriangle } from 'lucide-react';
-import { useScheduleCoverage } from '@/hooks/useScheduleCoverage';
+import { useScheduleCoverage } from '@sm/hooks/useScheduleCoverage';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const HOURS = Array.from({ length: 24 }, (_, i) => i);

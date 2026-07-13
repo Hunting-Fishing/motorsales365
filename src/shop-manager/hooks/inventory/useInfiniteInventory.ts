@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { getInventoryItems } from '@/services/inventory/crudService';
-import { InventoryItemExtended } from '@/types/inventory';
+import { getInventoryItems } from '@sm/services/inventory/crudService';
+import { InventoryItemExtended } from '@sm/types/inventory';
 
 interface InfiniteInventoryParams {
   pageSize?: number;

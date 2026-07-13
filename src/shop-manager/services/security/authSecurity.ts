@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import { ClientRateLimit } from '@/utils/securityValidation';
+import { supabase } from '@sm/integrations/supabase/client';
+import { ClientRateLimit } from '@sm/utils/securityValidation';
 
 export interface SecurityConfig {
   maxLoginAttempts: number;

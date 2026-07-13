@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { WorkOrder } from '@/types/workOrder';
-import { StatusSelector } from '@/components/work-orders/shared/StatusSelector';
+import { Badge } from '@sm/components/ui/badge';
+import { WorkOrder } from '@sm/types/workOrder';
+import { StatusSelector } from '@sm/components/work-orders/shared/StatusSelector';
 
 interface EditModeIndicatorProps {
   workOrder: WorkOrder | null;

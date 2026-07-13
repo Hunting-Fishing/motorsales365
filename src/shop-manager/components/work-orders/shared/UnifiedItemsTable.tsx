@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
 import { JobLineWithParts } from './JobLineWithParts';
 
 interface UnifiedItemsTableProps {

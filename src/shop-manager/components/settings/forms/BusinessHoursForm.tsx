@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Switch } from '@sm/components/ui/switch';
 import { Loader2, Save } from 'lucide-react';
-import type { BusinessHours } from '@/services/settings/companyService';
+import type { BusinessHours } from '@sm/services/settings/companyService';
 
 interface BusinessHoursFormProps {
   businessHours: BusinessHours[];

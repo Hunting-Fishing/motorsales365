@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
-import { useCompany } from '@/contexts/CompanyContext';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Calendar } from '@sm/components/ui/calendar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useBusinessHours } from '@sm/hooks/useBusinessHours';
+import { useCompany } from '@sm/contexts/CompanyContext';
 import { format, addDays, startOfDay } from 'date-fns';
 
 interface BusinessHoursBookingDialogProps {

@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useShopId } from "@/hooks/useShopId";
-import WeldingAdminLayout from "@/components/welding/WeldingAdminLayout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { supabase } from "@sm/integrations/supabase/client";
+import { useShopId } from "@sm/hooks/useShopId";
+import WeldingAdminLayout from "@sm/components/welding/WeldingAdminLayout";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Badge } from "@sm/components/ui/badge";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sm/components/ui/dialog";
 import { Inbox, Search, Trash2, Mail, MailOpen } from "lucide-react";
 import { toast } from "sonner";
 

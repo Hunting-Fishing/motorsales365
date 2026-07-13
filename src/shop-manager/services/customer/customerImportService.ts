@@ -1,6 +1,6 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { CustomerCreate } from "@/types/customer";
+import { supabase } from "@sm/integrations/supabase/client";
+import { CustomerCreate } from "@sm/types/customer";
 
 // Import customers from CSV file
 export const importCustomersFromCSV = async (file: File): Promise<{ imported: number, errors: string[] }> => {

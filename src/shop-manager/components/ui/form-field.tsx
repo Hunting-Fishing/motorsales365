@@ -1,10 +1,10 @@
 
 import * as React from "react"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { RequiredIndicator } from "@/components/ui/required-indicator"
-import { cn } from "@/lib/utils"
-import { useIsMobile } from "@/hooks/use-mobile"
+import { Label } from "@sm/components/ui/label"
+import { Input } from "@sm/components/ui/input"
+import { RequiredIndicator } from "@sm/components/ui/required-indicator"
+import { cn } from "@sm/lib/utils"
+import { useIsMobile } from "@sm/hooks/use-mobile"
 
 interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;

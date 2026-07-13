@@ -1,4 +1,4 @@
-import { Invoice } from "@/types/invoice";
+import { Invoice } from "@sm/types/invoice";
 
 export const calculateSubtotal = (items: any[]) => {
   return items.reduce((total, item) => {

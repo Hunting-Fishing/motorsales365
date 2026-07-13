@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent } from '@/components/ui/card';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Card, CardContent } from '@sm/components/ui/card';
 import { Package, ArrowRight } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { PartsAssignmentService } from '@/services/workOrder/partsAssignmentService';
+import { toast } from '@sm/hooks/use-toast';
+import { PartsAssignmentService } from '@sm/services/workOrder/partsAssignmentService';
 
 export interface PartsAssignmentDialogProps {
   open: boolean;

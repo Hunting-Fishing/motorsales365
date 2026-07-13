@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 import { ServiceBasedJobLineForm } from './ServiceBasedJobLineForm';
 
 export interface UnifiedJobLineFormDialogProps {

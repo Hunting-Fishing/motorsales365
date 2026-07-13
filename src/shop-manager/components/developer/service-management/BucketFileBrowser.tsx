@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { Loader2, Folder, FileText, Download } from 'lucide-react';
-import { bucketViewerService } from '@/lib/services/bucketViewerService';
-import type { SectorFiles, StorageFile } from '@/types/service';
+import { bucketViewerService } from '@sm/lib/services/bucketViewerService';
+import type { SectorFiles, StorageFile } from '@sm/types/service';
 
 interface BucketFileBrowserProps {
   onImportSelected: (selectedData: { sectorName: string; files: StorageFile[] }[]) => void;

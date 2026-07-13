@@ -1,5 +1,5 @@
 
-import { WorkOrderPart } from '@/types/workOrderPart';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
 
 export function mapDatabasePartToWorkOrderPart(dbPart: any): WorkOrderPart {
   if (!dbPart || !dbPart.id) {

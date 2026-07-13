@@ -1,5 +1,5 @@
 
-import { VinDecodeResult } from '@/types/vehicle';
+import { VinDecodeResult } from '@sm/types/vehicle';
 
 /**
  * Basic VIN analysis when API is unavailable

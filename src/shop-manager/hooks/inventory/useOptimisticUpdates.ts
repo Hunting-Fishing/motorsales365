@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { InventoryItemExtended } from '@/types/inventory';
-import { updateInventoryItem } from '@/services/inventory/crudService';
+import { InventoryItemExtended } from '@sm/types/inventory';
+import { updateInventoryItem } from '@sm/services/inventory/crudService';
 import { toast } from 'sonner';
 
 export function useOptimisticUpdates() {

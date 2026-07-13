@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { ImportProgress } from '@/types/service';
+import { useToast } from '@sm/hooks/use-toast';
+import { ImportProgress } from '@sm/types/service';
 
 export const useServiceImport = () => {
   const [isImporting, setIsImporting] = useState(false);

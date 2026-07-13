@@ -1,5 +1,5 @@
 
-import { Role } from '@/types/team';
+import { Role } from '@sm/types/team';
 
 /**
  * Exports roles as a JSON file for download

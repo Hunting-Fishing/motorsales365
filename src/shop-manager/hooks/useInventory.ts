@@ -1,9 +1,9 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { InventoryItemExtended } from "@/types/inventory";
-import { getInventoryItems } from "@/services/inventory/crudService";
-import { calculateTotalValue, countLowStockItems, countOutOfStockItems } from "@/services/inventory/utils";
-import { exportToCSV } from "@/utils/export";
+import { InventoryItemExtended } from "@sm/types/inventory";
+import { getInventoryItems } from "@sm/services/inventory/crudService";
+import { calculateTotalValue, countLowStockItems, countOutOfStockItems } from "@sm/services/inventory/utils";
+import { exportToCSV } from "@sm/utils/export";
 import { toast } from "sonner";
 
 interface UseInventoryProps {

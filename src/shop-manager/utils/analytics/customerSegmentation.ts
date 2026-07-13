@@ -1,5 +1,5 @@
-import { Customer, adaptCustomerForUI } from "@/types/customer";
-import { supabase } from "@/integrations/supabase/client";
+import { Customer, adaptCustomerForUI } from "@sm/types/customer";
+import { supabase } from "@sm/integrations/supabase/client";
 import { calculateCustomerLifetimeValue } from "./customerLifetimeValue";
 
 // Define customer segment types

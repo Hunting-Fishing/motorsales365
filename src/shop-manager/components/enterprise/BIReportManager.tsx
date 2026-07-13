@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
 import { BarChart, Play, Trash } from 'lucide-react';
-import { useBIReports } from '@/hooks/useBIReports';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useBIReports } from '@sm/hooks/useBIReports';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
 
 export function BIReportManager() {

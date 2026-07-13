@@ -1,11 +1,11 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
 import { CustomerFormValues } from "./schemas/customerSchema";
-import { RequiredIndicator } from "@/components/ui/required-indicator";
+import { RequiredIndicator } from "@sm/components/ui/required-indicator";
 import { AddressFields } from "./AddressFields";
 
 interface PersonalInfoFieldsProps {

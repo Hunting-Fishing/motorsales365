@@ -1,5 +1,5 @@
 
-import type { EquipmentStatus, MaintenanceRecord, MaintenanceSchedule } from "@/types/equipment";
+import type { EquipmentStatus, MaintenanceRecord, MaintenanceSchedule } from "@sm/types/equipment";
 
 /**
  * Safely converts Json arrays to typed arrays

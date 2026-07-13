@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { 
   Card, 
   CardContent, 
@@ -8,9 +8,9 @@ import {
   CardFooter, 
   CardHeader, 
   CardTitle 
-} from '@/components/ui/card';
-import { supabase } from '@/lib/supabase';
-import { Customer } from '@/types/customer';
+} from '@sm/components/ui/card';
+import { supabase } from '@sm/lib/supabase';
+import { Customer } from '@sm/types/customer';
 import { MessageSquare, Send, Trash, Check, X, Phone } from 'lucide-react';
 
 export default function SmsManagement() {

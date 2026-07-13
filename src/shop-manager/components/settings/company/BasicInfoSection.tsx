@@ -1,9 +1,9 @@
 
 import React from "react";
-import { FormField } from "@/components/ui/form-field";
+import { FormField } from "@sm/components/ui/form-field";
 import { LogoUploadSection } from "./LogoUploadSection";
-import { CompanyInfo } from "@/services/settings/companyService";
-import { formatPhoneNumber } from "@/utils/formatters";
+import { CompanyInfo } from "@sm/services/settings/companyService";
+import { formatPhoneNumber } from "@sm/utils/formatters";
 
 interface BasicInfoSectionProps {
   companyInfo: CompanyInfo;

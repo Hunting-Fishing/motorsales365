@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ServiceMainCategory } from '@/types/service';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { ServiceMainCategory } from '@sm/types/service';
 import { ServiceHierarchyTree } from './ServiceHierarchyTree';
 import { ServiceAdvancedFilters } from './ServiceAdvancedFilters';
 import ServiceAnalytics from './ServiceAnalytics';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 
 interface ServiceHierarchyTreeViewProps {
   categories: ServiceMainCategory[];

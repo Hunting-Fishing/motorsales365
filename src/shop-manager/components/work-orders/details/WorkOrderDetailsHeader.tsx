@@ -1,6 +1,6 @@
 import React from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { Customer } from '@/types/customer';
+import { WorkOrder } from '@sm/types/workOrder';
+import { Customer } from '@sm/types/customer';
 import { WorkOrderStatusBadge } from '../WorkOrderStatusBadge';
 import { WorkOrderDetailsActions } from './WorkOrderDetailsActions';
 import { EditModeIndicator } from '../debug/EditModeIndicator';

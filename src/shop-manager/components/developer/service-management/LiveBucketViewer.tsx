@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { Badge } from '@sm/components/ui/badge';
 import { Folder, FileSpreadsheet, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
-import { bucketViewerService } from '@/lib/services/bucketViewerService';
-import type { SectorFiles } from '@/types/service';
+import { bucketViewerService } from '@sm/lib/services/bucketViewerService';
+import type { SectorFiles } from '@sm/types/service';
 
 export function LiveBucketViewer() {
   const [sectorFiles, setSectorFiles] = useState<SectorFiles[]>([]);

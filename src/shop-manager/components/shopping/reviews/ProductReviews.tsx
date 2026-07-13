@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
+import { Separator } from '@sm/components/ui/separator';
 import { Star, ThumbsUp, ThumbsDown, Flag, CheckCircle } from 'lucide-react';
-import { getProductReviews, getReviewSummary, markReviewHelpful, getUserReviewHelpfulness } from '@/services/productReviewService';
+import { getProductReviews, getReviewSummary, markReviewHelpful, getUserReviewHelpfulness } from '@sm/services/productReviewService';
 import WriteReviewForm from '../WriteReviewForm';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 
 interface ProductReview {
   id: string;

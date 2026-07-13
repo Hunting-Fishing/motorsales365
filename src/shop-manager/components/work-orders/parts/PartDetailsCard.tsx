@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Trash2, Edit, Package } from 'lucide-react';
 
 interface PartDetailsCardProps {

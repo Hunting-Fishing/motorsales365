@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { type ServiceSelectionSummary } from '@/types/selectedService';
+import { type ServiceSelectionSummary } from '@sm/types/selectedService';
 import { Clock, DollarSign, Package } from 'lucide-react';
 
 interface ServiceSelectionSummaryProps {

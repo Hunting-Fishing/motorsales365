@@ -1,9 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { supabase } from '@/lib/supabase';
-import { Label } from '@/components/ui/label';
-import { FormDescription } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { supabase } from '@sm/lib/supabase';
+import { Label } from '@sm/components/ui/label';
+import { FormDescription } from '@sm/components/ui/form';
 import { UseFormReturn } from 'react-hook-form';
 
 interface SequenceSelectorProps {

@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
 import { FormRenderer } from './FormRenderer';
-import { FormBuilderTemplate } from '@/types/formBuilder';
+import { FormBuilderTemplate } from '@sm/types/formBuilder';
 import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 
 interface FormDialogProps {
   open: boolean;

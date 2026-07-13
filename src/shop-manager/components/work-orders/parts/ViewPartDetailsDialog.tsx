@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Badge } from '@sm/components/ui/badge';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { Separator } from '@sm/components/ui/separator';
 
 interface ViewPartDetailsDialogProps {
   open: boolean;

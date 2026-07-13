@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { recordTeamMemberHistory } from '@/utils/team/history/recordHistory';
+import { supabase } from '@sm/lib/supabase';
+import { useToast } from '@sm/hooks/use-toast';
+import { recordTeamMemberHistory } from '@sm/utils/team/history/recordHistory';
 
 interface RoleAssignmentProps {
   currentUserName: string;

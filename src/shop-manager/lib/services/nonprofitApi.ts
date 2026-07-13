@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
+import { supabase } from '@sm/integrations/supabase/client';
+import type { Database } from '@sm/integrations/supabase/types';
 import type { 
   Program, 
   Volunteer, 
@@ -11,7 +11,7 @@ import type {
   CreateParticipantData,
   CreateVolunteerAssignmentData,
   CreateImpactMeasurementData
-} from '@/types/nonprofit';
+} from '@sm/types/nonprofit';
 
 type DbProgram = Database['public']['Tables']['programs']['Row'];
 type DbVolunteer = Database['public']['Tables']['volunteers']['Row'];

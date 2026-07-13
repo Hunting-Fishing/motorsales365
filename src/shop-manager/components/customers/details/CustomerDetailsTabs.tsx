@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Customer, CustomerNote } from "@/types/customer";
-import { CustomerInteraction } from "@/types/interaction";
-import { CustomerCommunication } from "@/types/customer/notes";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
+import { Customer, CustomerNote } from "@sm/types/customer";
+import { CustomerInteraction } from "@sm/types/interaction";
+import { CustomerCommunication } from "@sm/types/customer/notes";
 import { CustomerWorkOrdersTab } from "./CustomerWorkOrdersTab";
 import { CustomerDocumentsTab } from "../documents/CustomerDocumentsTab";
 import { InteractionsTab } from "../interactions/InteractionsTab";
@@ -11,7 +11,7 @@ import { CommunicationsTab } from "../communications/CommunicationsTab";
 import { ActivityTimeline } from "../activity/ActivityTimeline";
 import { CustomerAnalyticsSection } from './CustomerAnalyticsSection';
 import { CustomerVehiclesTab } from "../vehicles/CustomerVehiclesTab";
-import { WorkOrder } from "@/types/workOrder";
+import { WorkOrder } from "@sm/types/workOrder";
 
 interface CustomerDetailsTabsProps {
   customer: Customer;

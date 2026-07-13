@@ -1,15 +1,15 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
 import { Plus, Search, Filter, Download, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ViewModeToggle } from './ViewModeToggle';
 import { InventoryStatsCards } from './InventoryStatsCards';
 import { SmartInsightsPanel } from './SmartInsightsPanel';
 import { ResponsiveBreakpointIndicator } from './ResponsiveBreakpointIndicator';
-import { useInventoryView } from '@/contexts/InventoryViewContext';
-import { useOptimizedInventoryItems } from '@/hooks/inventory/useOptimizedInventoryItems';
-import { useOptimizedInventoryFilters } from '@/hooks/inventory/useOptimizedInventoryFilters';
+import { useInventoryView } from '@sm/contexts/InventoryViewContext';
+import { useOptimizedInventoryItems } from '@sm/hooks/inventory/useOptimizedInventoryItems';
+import { useOptimizedInventoryFilters } from '@sm/hooks/inventory/useOptimizedInventoryFilters';
 import { AdvancedSearchInput } from './AdvancedSearchInput';
 import { FilterPresetsManager } from './FilterPresetsManager';
 

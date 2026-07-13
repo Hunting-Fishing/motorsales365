@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
-import { Database } from "@/integrations/supabase/types";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Database } from "@sm/integrations/supabase/types";
 
 type SuccessStory = Database['public']['Tables']['success_stories']['Row'];
 type CreateSuccessStory = Database['public']['Tables']['success_stories']['Insert'];

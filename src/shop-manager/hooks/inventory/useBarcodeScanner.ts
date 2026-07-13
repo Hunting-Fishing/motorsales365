@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@sm/hooks/use-toast';
 
 export function useBarcodeScanner() {
   const [isScanning, setIsScanning] = useState(false);

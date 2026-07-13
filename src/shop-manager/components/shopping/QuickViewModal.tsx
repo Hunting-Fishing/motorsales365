@@ -1,11 +1,11 @@
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Star, ShoppingCart, Heart, ExternalLink } from 'lucide-react';
-import { AffiliateProduct } from '@/types/affiliate';
-import { useCart } from '@/hooks/shopping/useCart';
-import { useToast } from '@/hooks/use-toast';
+import { AffiliateProduct } from '@sm/types/affiliate';
+import { useCart } from '@sm/hooks/shopping/useCart';
+import { useToast } from '@sm/hooks/use-toast';
 
 interface QuickViewModalProps {
   product: AffiliateProduct | null;

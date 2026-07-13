@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { FileText, Folder, AlertCircle, RefreshCw, ChevronRight, ChevronDown } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 
 export interface StorageFileBrowserProps {
   bucketName: string;

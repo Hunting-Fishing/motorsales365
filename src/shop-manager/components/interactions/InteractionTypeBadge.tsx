@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { InteractionType } from "@/types/interaction";
+import { Badge } from "@sm/components/ui/badge";
+import { cn } from "@sm/lib/utils";
+import { InteractionType } from "@sm/types/interaction";
 import { MessageSquare, Wrench, Package, Calendar, ClipboardList } from "lucide-react";
 
 interface InteractionTypeBadgeProps {

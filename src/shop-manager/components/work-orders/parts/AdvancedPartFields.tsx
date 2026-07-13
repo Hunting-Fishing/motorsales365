@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@sm/components/ui/form';
+import { Input } from '@sm/components/ui/input';
+import { Switch } from '@sm/components/ui/switch';
+import { Button } from '@sm/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@sm/components/ui/collapsible';
 import { UseFormReturn } from 'react-hook-form';
-import { WorkOrderPartFormValues } from '@/types/workOrderPart';
+import { WorkOrderPartFormValues } from '@sm/types/workOrderPart';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 
 interface AdvancedPartFieldsProps {

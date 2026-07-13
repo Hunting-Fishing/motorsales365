@@ -1,7 +1,7 @@
 
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { EnhancedErrorBoundary } from '../error/EnhancedErrorBoundary';
-import { protectElement, initializeDOMProtection, detectExtensionConflicts } from '@/utils/domProtection';
+import { protectElement, initializeDOMProtection, detectExtensionConflicts } from '@sm/utils/domProtection';
 import { AlertTriangle, Shield } from 'lucide-react';
 
 interface SafeComponentWrapperProps {

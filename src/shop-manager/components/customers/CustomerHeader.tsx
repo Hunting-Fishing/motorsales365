@@ -1,10 +1,10 @@
 
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
 import { ChevronLeft, Edit, ClipboardList, MessageSquare } from "lucide-react";
-import { Customer, getCustomerFullName } from "@/types/customer";
+import { Customer, getCustomerFullName } from "@sm/types/customer";
 
 interface CustomerHeaderProps {
   customer: Customer & { name?: string, status?: string };

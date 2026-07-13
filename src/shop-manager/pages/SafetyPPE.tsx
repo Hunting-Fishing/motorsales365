@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
 import { HardHat, Package, Users, AlertTriangle, Search, History, Clock } from 'lucide-react';
-import { usePPEManagement } from '@/hooks/usePPEManagement';
-import { AddPPEItemDialog } from '@/components/safety/ppe/AddPPEItemDialog';
-import { AssignPPEDialog } from '@/components/safety/ppe/AssignPPEDialog';
-import { PPEInventoryCard } from '@/components/safety/ppe/PPEInventoryCard';
-import { PPEAssignmentCard } from '@/components/safety/ppe/PPEAssignmentCard';
-import { PPEHistoryCard } from '@/components/safety/ppe/PPEHistoryCard';
+import { usePPEManagement } from '@sm/hooks/usePPEManagement';
+import { AddPPEItemDialog } from '@sm/components/safety/ppe/AddPPEItemDialog';
+import { AssignPPEDialog } from '@sm/components/safety/ppe/AssignPPEDialog';
+import { PPEInventoryCard } from '@sm/components/safety/ppe/PPEInventoryCard';
+import { PPEAssignmentCard } from '@sm/components/safety/ppe/PPEAssignmentCard';
+import { PPEHistoryCard } from '@sm/components/safety/ppe/PPEHistoryCard';
 import { isPast, addDays } from 'date-fns';
 
 const SafetyPPE = () => {

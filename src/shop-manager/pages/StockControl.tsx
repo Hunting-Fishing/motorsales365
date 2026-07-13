@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { BarChart3, Package, TrendingUp, AlertTriangle, Plus, Eye, ShoppingCart, Settings } from 'lucide-react';
-import { useInventoryData } from '@/hooks/inventory/useInventoryData';
+import { useInventoryData } from '@sm/hooks/inventory/useInventoryData';
 import { Link } from 'react-router-dom';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { LoadingSpinner } from '@sm/components/common/LoadingSpinner';
 
 export default function StockControl() {
   const { inventoryStats, isLoading, error } = useInventoryData();

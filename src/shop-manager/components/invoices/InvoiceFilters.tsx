@@ -1,16 +1,16 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Input } from "@sm/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Button } from "@sm/components/ui/button";
 import { CalendarIcon, Filter, RotateCcw, Search } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
+import { Calendar } from "@sm/components/ui/calendar";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { InvoiceFilters as InvoiceFiltersType } from "@/types/invoice";
+import { cn } from "@sm/lib/utils";
+import { InvoiceFilters as InvoiceFiltersType } from "@sm/types/invoice";
 
 interface InvoiceFiltersProps {
   filters: InvoiceFiltersType;

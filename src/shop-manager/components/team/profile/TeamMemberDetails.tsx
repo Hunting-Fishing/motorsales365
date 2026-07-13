@@ -1,5 +1,5 @@
 
-import { TeamMember } from "@/types/team";
+import { TeamMember } from "@sm/types/team";
 import { OverviewTab } from "./tabs/OverviewTab";
 import { PermissionsTab } from "./tabs/PermissionsTab";
 import { ActivityTab } from "./tabs/ActivityTab";

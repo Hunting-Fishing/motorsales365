@@ -1,15 +1,15 @@
 // Product Variants Component
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { RadioGroup, RadioGroupItem } from '@sm/components/ui/radio-group';
+import { Label } from '@sm/components/ui/label';
+import { Separator } from '@sm/components/ui/separator';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
 import { CheckCircle, XCircle, Package, AlertTriangle } from 'lucide-react';
-import { ProductVariant } from '@/types/advanced-product';
-import { variantService } from '@/services/advanced-product/variantService';
+import { ProductVariant } from '@sm/types/advanced-product';
+import { variantService } from '@sm/services/advanced-product/variantService';
 import { toast } from 'sonner';
 
 interface ProductVariantsProps {

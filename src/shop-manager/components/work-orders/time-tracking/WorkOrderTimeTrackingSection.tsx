@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { TimeEntry } from '@/types/workOrder';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TimeEntry } from '@sm/types/workOrder';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Clock, Timer, DollarSign } from 'lucide-react';
 
 interface WorkOrderTimeTrackingSectionProps {

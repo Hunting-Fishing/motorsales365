@@ -1,9 +1,9 @@
 
-import { CustomerFormValues } from "@/components/customers/form/schemas/customerSchema";
-import { createHousehold } from "@/services/households";
-import { addHouseholdMember } from "@/services/households";
-import { assignCustomerToSegments } from "@/services/segments";
-import { CustomerCreate, CustomerVehicle } from "@/types/customer";
+import { CustomerFormValues } from "@sm/components/customers/form/schemas/customerSchema";
+import { createHousehold } from "@sm/services/households";
+import { addHouseholdMember } from "@sm/services/households";
+import { assignCustomerToSegments } from "@sm/services/segments";
+import { CustomerCreate, CustomerVehicle } from "@sm/types/customer";
 
 /**
  * Process household-related data from the customer form

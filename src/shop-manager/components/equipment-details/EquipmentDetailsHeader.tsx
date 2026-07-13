@@ -1,6 +1,6 @@
 
-import { Button } from "@/components/ui/button";
-import { Equipment } from "@/types/equipment";
+import { Button } from "@sm/components/ui/button";
+import { Equipment } from "@sm/types/equipment";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { EquipmentActionButtons } from "./EquipmentActionButtons";

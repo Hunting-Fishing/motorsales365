@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmailSequenceStep } from '@/types/email';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { EmailSequenceStep } from '@sm/types/email';
 import { EmailSequenceFlow } from './EmailSequenceFlow';
 
 interface EmailSequenceStepsProps {

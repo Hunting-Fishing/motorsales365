@@ -9,8 +9,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Textarea } from "@/components/ui/textarea";
+} from "@sm/components/ui/alert-dialog";
+import { Textarea } from "@sm/components/ui/textarea";
 
 interface FlagActivityDialogProps {
   open: boolean;

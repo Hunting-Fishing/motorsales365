@@ -4,7 +4,7 @@ import { CustomersHeader } from "./list/CustomersHeader";
 import { CustomerStatsCards } from "./stats/CustomerStatsCards";
 import { CustomerFiltersPanel } from "./filters/CustomerFiltersPanel";
 import { CustomerTable } from "./table/CustomerTable";
-import { useCustomers } from "@/hooks/useCustomers";
+import { useCustomers } from "@sm/hooks/useCustomers";
 
 /**
  * REFACTORED: Main customers page using existing real customer infrastructure

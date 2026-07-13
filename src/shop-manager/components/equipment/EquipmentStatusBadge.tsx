@@ -1,6 +1,6 @@
 
-import { equipmentStatusMap } from "@/data/equipmentData";
-import { Equipment } from "@/types/equipment";
+import { equipmentStatusMap } from "@sm/data/equipmentData";
+import { Equipment } from "@sm/types/equipment";
 
 interface EquipmentStatusBadgeProps {
   status: Equipment["status"];

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Badge } from "@sm/components/ui/badge";
+import { Input } from "@sm/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { Mail, Phone, MessageSquare, User, Plus, Search, Calendar } from "lucide-react";
-import { Customer } from "@/types/customer";
-import { CustomerCommunication } from "@/types/customer/notes";
+import { Customer } from "@sm/types/customer";
+import { CustomerCommunication } from "@sm/types/customer/notes";
 import { AddCommunicationDialog } from "./AddCommunicationDialog";
 
 interface CommunicationsTabProps {

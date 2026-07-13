@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { NotificationPreferences } from "@/types/notification";
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@sm/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { NotificationPreferences } from "@sm/types/notification";
 import { Clock, Bell } from "lucide-react";
 
 interface NotificationFrequencyCardProps {

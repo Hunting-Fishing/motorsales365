@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Switch } from "@sm/components/ui/switch";
+import { Label } from "@sm/components/ui/label";
+import { useToast } from "@sm/hooks/use-toast";
+import { supabase } from "@sm/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
 interface BookingPermission {

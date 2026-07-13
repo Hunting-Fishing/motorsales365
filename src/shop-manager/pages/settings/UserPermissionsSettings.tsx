@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Label } from "@sm/components/ui/label";
+import { Switch } from "@sm/components/ui/switch";
+import { Button } from "@sm/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@sm/integrations/supabase/client";
+import { useToast } from "@sm/hooks/use-toast";
 import { User, Shield, RefreshCw, AlertCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@sm/components/ui/badge";
+import { Alert, AlertDescription } from "@sm/components/ui/alert";
 
 type UserPermissions = {
   view: boolean;
@@ -19,7 +19,7 @@ type UserPermissions = {
   delete?: boolean;
 };
 
-import { PERMISSION_MODULES, MODULE_CATEGORIES } from "@/types/permissionModules";
+import { PERMISSION_MODULES, MODULE_CATEGORIES } from "@sm/types/permissionModules";
 
 // Use centralized module definitions
 const MODULES = PERMISSION_MODULES.map(module => ({

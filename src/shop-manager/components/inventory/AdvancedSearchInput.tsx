@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { useOptimizedInventoryFilters } from '@/hooks/inventory/useOptimizedInventoryFilters';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@sm/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@sm/components/ui/command';
+import { useOptimizedInventoryFilters } from '@sm/hooks/inventory/useOptimizedInventoryFilters';
 import { Search, X, Filter, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface SearchSuggestion {
   type: 'name' | 'sku' | 'category' | 'supplier' | 'description';

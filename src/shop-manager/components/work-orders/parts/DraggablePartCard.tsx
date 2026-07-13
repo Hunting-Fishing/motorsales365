@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Edit, Trash2, GripVertical } from 'lucide-react';
 import { UnifiedPartEditDialog } from './UnifiedPartEditDialog';
 

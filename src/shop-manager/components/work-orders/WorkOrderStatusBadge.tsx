@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@sm/components/ui/badge';
 
 interface WorkOrderStatusBadgeProps {
   status: string;

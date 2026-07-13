@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
 import { Clock, User, Database, Search } from 'lucide-react';
-import { enterpriseService } from '@/services/enterpriseService';
-import type { AuditTrail as AuditTrailType } from '@/types/phase4';
+import { enterpriseService } from '@sm/services/enterpriseService';
+import type { AuditTrail as AuditTrailType } from '@sm/types/phase4';
 
 export const AuditTrail = () => {
   const [auditLogs, setAuditLogs] = useState<AuditTrailType[]>([]);

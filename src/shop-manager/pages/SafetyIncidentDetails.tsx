@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Separator } from '@sm/components/ui/separator';
 import { 
   ArrowLeft, 
   AlertTriangle, 
@@ -21,7 +21,7 @@ import {
   ClipboardCheck
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { useSafetyIncidents } from '@/hooks/useSafetyIncidents';
+import { useSafetyIncidents } from '@sm/hooks/useSafetyIncidents';
 import { 
   SafetyIncident,
   INCIDENT_TYPE_LABELS, 
@@ -29,7 +29,7 @@ import {
   STATUS_LABELS,
   INJURED_PERSON_TYPE_LABELS,
   InvestigationStatus
-} from '@/types/safety';
+} from '@sm/types/safety';
 
 const severityColors: Record<string, string> = {
   minor: 'bg-blue-500/10 text-blue-600 border-blue-200',

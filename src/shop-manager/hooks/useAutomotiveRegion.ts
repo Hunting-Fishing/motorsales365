@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuthContext } from '@/context/AuthContext';
-import { AutomotiveRegion, DEFAULT_REGION } from '@/lib/regions/automotive';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useAuthContext } from '@sm/context/AuthContext';
+import { AutomotiveRegion, DEFAULT_REGION } from '@sm/lib/regions/automotive';
 
 const KEY = ['automotive-region'];
 

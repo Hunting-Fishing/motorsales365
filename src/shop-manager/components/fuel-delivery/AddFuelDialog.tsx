@@ -6,18 +6,18 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Badge } from '@sm/components/ui/badge';
 import { Fuel, DollarSign, Receipt, Truck as TruckIcon, Calendar } from 'lucide-react';
-import { useTruckCompartments, TruckCompartment } from '@/hooks/useTruckCompartments';
-import { useAddFuelToCompartment } from '@/hooks/fuel-delivery/useAddFuelToCompartment';
-import { useFuelUnits } from '@/hooks/fuel-delivery/useFuelUnits';
-import { FuelDeliveryTruck } from '@/hooks/useFuelDelivery';
-import { cn } from '@/lib/utils';
+import { useTruckCompartments, TruckCompartment } from '@sm/hooks/useTruckCompartments';
+import { useAddFuelToCompartment } from '@sm/hooks/fuel-delivery/useAddFuelToCompartment';
+import { useFuelUnits } from '@sm/hooks/fuel-delivery/useFuelUnits';
+import { FuelDeliveryTruck } from '@sm/hooks/useFuelDelivery';
+import { cn } from '@sm/lib/utils';
 
 interface AddFuelDialogProps {
   open: boolean;

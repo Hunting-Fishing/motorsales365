@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { ServiceMainCategory } from '@/types/service';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { ServiceMainCategory } from '@sm/types/service';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { ChevronDown, ChevronRight, Edit, Trash2, Plus } from 'lucide-react';
 
 interface ServiceCategoryListProps {

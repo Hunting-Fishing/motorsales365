@@ -2,14 +2,14 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useCreateVolunteer } from "@/services/nonprofitData";
-import type { CreateVolunteerData } from "@/types/nonprofit";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@sm/components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { useCreateVolunteer } from "@sm/services/nonprofitData";
+import type { CreateVolunteerData } from "@sm/types/nonprofit";
 
 const volunteerSchema = z.object({
   first_name: z.string().min(1, "First name is required"),

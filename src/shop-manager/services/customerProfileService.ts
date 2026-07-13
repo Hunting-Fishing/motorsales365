@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
-import { CustomerProfile, CustomerAddress, CustomerPaymentMethod } from "@/types/phase3";
+import { supabase } from "@sm/integrations/supabase/client";
+import { CustomerProfile, CustomerAddress, CustomerPaymentMethod } from "@sm/types/phase3";
 
 export const getCustomerProfile = async (userId: string): Promise<CustomerProfile | null> => {
   try {

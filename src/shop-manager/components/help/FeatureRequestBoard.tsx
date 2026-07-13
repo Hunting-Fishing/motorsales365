@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronUp, ChevronDown, MessageSquare, Calendar, User, Clock, Filter, Search, Star, Lightbulb } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useFeatureRequests } from '@/hooks/useFeatureRequests';
-import { FeatureRequest, FeatureRequestVote } from '@/types/feature-requests';
-import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useFeatureRequests } from '@sm/hooks/useFeatureRequests';
+import { FeatureRequest, FeatureRequestVote } from '@sm/types/feature-requests';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface FeatureRequestBoardProps {
   onRequestFeature?: () => void;

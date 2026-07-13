@@ -1,6 +1,6 @@
 
-import { VinDecodeResult } from '@/types/vehicle';
-import { supabase } from '@/integrations/supabase/client';
+import { VinDecodeResult } from '@sm/types/vehicle';
+import { supabase } from '@sm/integrations/supabase/client';
 import { validateVin, getVinValidationError } from './vinDecoder/vinValidator';
 import { performFallbackVinAnalysis } from './vinDecoder/fallbackAnalysis';
 

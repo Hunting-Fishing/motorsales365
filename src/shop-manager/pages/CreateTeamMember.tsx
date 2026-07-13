@@ -2,15 +2,15 @@
 import React, { useState } from 'react';
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { TeamMemberForm } from "@/components/team/TeamMemberForm";
-import { Card } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@sm/components/ui/button";
+import { TeamMemberForm } from "@sm/components/team/TeamMemberForm";
+import { Card } from "@sm/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@sm/components/ui/alert";
 import { ArrowLeft, AlertCircle } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-import { toast } from "@/hooks/use-toast";
-import { TeamMemberFormValues } from "@/components/team/form/formValidation";
-import { mapRoleToDbValue, validateRoleValue } from "@/utils/roleUtils";
+import { supabase } from "@sm/lib/supabase";
+import { toast } from "@sm/hooks/use-toast";
+import { TeamMemberFormValues } from "@sm/components/team/form/formValidation";
+import { mapRoleToDbValue, validateRoleValue } from "@sm/utils/roleUtils";
 
 export default function CreateTeamMember() {
   const navigate = useNavigate();

@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { formatCurrency } from "@/utils/rateCalculations";
-import { Bay, RateSettings } from "@/services/diybay/diybayService";
-import { BayDetails } from "@/types/diybay";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { formatCurrency } from "@sm/utils/rateCalculations";
+import { Bay, RateSettings } from "@sm/services/diybay/diybayService";
+import { BayDetails } from "@sm/types/diybay";
 
 interface EditBayDialogProps {
   bay: Bay | null;

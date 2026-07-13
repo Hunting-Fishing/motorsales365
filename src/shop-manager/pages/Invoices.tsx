@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useInvoices } from '@/hooks/useInvoices';
-import { InvoiceList } from '@/components/invoices/InvoiceList';
-import { Card, CardContent } from '@/components/ui/card';
+import { useInvoices } from '@sm/hooks/useInvoices';
+import { InvoiceList } from '@sm/components/invoices/InvoiceList';
+import { Card, CardContent } from '@sm/components/ui/card';
 import { Loader2 } from 'lucide-react';
 
 export default function Invoices() {

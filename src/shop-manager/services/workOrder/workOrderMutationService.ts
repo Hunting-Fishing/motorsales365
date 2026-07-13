@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { WorkOrderFormSchemaValues } from '@/schemas/workOrderSchema';
+import { supabase } from '@sm/integrations/supabase/client';
+import { WorkOrderFormSchemaValues } from '@sm/schemas/workOrderSchema';
 
 export async function createWorkOrder(formData: WorkOrderFormSchemaValues) {
   console.log('Creating work order with data:', formData);

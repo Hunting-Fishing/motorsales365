@@ -1,15 +1,15 @@
 
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from '@/hooks/use-toast';
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Input } from "@sm/components/ui/input";
+import { Checkbox } from "@sm/components/ui/checkbox";
+import { Label } from "@sm/components/ui/label";
+import { Separator } from "@sm/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { useToast } from '@sm/hooks/use-toast';
 import { Loader2, Mail, Sparkles } from 'lucide-react';
-import { EmailABTestVariant } from '@/types/email';
+import { EmailABTestVariant } from '@sm/types/email';
 
 interface EmailTestFormProps {
   campaignId?: string;

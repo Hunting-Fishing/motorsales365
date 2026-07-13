@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Button } from '@sm/components/ui/button';
 import { Loader2, MapPin, X, Navigation } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useMapboxPublicToken } from '@/hooks/useMapboxPublicToken';
+import { cn } from '@sm/lib/utils';
+import { useMapboxPublicToken } from '@sm/hooks/useMapboxPublicToken';
 
 export interface AddressResult {
   placeName: string;

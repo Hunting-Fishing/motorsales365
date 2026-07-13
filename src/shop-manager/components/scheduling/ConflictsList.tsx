@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { AlertTriangle, CheckCircle, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
-import type { SchedulingConflict } from '@/types/scheduling-conflicts';
+import type { SchedulingConflict } from '@sm/types/scheduling-conflicts';
 
 interface ConflictsListProps {
   conflicts: SchedulingConflict[];

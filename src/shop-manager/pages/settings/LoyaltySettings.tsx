@@ -1,7 +1,7 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { LoyaltyTab } from "@/components/settings/LoyaltyTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { LoyaltyTab } from "@sm/components/settings/LoyaltyTab";
 
 export const LoyaltySettings = () => {
   return (

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
 import { AlertTriangle, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { CategoryBudgetSummary } from '@/hooks/useBudgetData';
+import { CategoryBudgetSummary } from '@sm/hooks/useBudgetData';
 
 interface BudgetAlertsPanelProps {
   categorySummaries: CategoryBudgetSummary[];

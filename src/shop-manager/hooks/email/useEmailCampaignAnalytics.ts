@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { EmailCampaignAnalytics, EmailCampaignTimelinePoint } from '@/types/email';
+import { supabase } from '@sm/lib/supabase';
+import { useToast } from '@sm/hooks/use-toast';
+import { EmailCampaignAnalytics, EmailCampaignTimelinePoint } from '@sm/types/email';
 
 export const useEmailCampaignAnalytics = () => {
   const [analytics, setAnalytics] = useState<EmailCampaignAnalytics | null>(null);

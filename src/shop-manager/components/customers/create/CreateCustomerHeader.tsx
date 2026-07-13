@@ -1,8 +1,8 @@
 
 import React from "react";
-import { WorkOrderFormHeader } from "@/components/work-orders/WorkOrderFormHeader";
-import { ImportCustomersDialog } from "@/components/customers/form/import/ImportCustomersDialog";
-import { Button } from "@/components/ui/button";
+import { WorkOrderFormHeader } from "@sm/components/work-orders/WorkOrderFormHeader";
+import { ImportCustomersDialog } from "@sm/components/customers/form/import/ImportCustomersDialog";
+import { Button } from "@sm/components/ui/button";
 import { UserPlus } from "lucide-react";
 
 interface CreateCustomerHeaderProps {

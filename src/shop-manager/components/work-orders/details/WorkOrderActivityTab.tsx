@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { getWorkOrderActivities } from '@/services/workOrder/workOrderActivityService';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { getWorkOrderActivities } from '@sm/services/workOrder/workOrderActivityService';
 import { Loader2 } from 'lucide-react';
 
 interface WorkOrderActivity {

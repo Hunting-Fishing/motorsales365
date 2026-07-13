@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Customer } from '@/types/customer';
-import { CustomerInteraction } from '@/types/interaction';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Customer } from '@sm/types/customer';
+import { CustomerInteraction } from '@sm/types/interaction';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { Plus, History } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { InteractionsList } from '@/components/interactions/InteractionsList';
+import { Alert, AlertDescription } from '@sm/components/ui/alert';
+import { InteractionsList } from '@sm/components/interactions/InteractionsList';
 
 interface CustomerHistoryTabProps {
   customer: Customer;

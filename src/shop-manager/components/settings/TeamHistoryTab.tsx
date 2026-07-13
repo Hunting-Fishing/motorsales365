@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useTeamHistory } from "@/hooks/useTeamHistory";
+import { Skeleton } from "@sm/components/ui/skeleton";
+import { useTeamHistory } from "@sm/hooks/useTeamHistory";
 import { HistoryTable } from "./team-history/HistoryTable";
 import { HistoryFilters } from "./team-history/HistoryFilters";
 import { HistoryEmptyState } from "./team-history/HistoryEmptyState";

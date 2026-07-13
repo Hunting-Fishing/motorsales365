@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { TeamMember } from '@/types/team';
-import { Badge } from '@/components/ui/badge';
-import { getInitials } from '@/utils/teamUtils';
+import { Avatar, AvatarImage, AvatarFallback } from '@sm/components/ui/avatar';
+import { TeamMember } from '@sm/types/team';
+import { Badge } from '@sm/components/ui/badge';
+import { getInitials } from '@sm/utils/teamUtils';
 
 interface ProfileSidebarProps {
   member: TeamMember;

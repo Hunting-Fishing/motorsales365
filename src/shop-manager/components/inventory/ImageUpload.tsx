@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { Progress } from '@/components/ui/progress';
-import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@sm/hooks/use-toast';
+import { Progress } from '@sm/components/ui/progress';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface ImageWithProgress {
   dataUrl: string;

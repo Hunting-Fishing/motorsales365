@@ -1,12 +1,12 @@
 
 import { useState, useEffect } from "react";
-import { CalendarEvent, CalendarViewType } from "@/types/calendar";
+import { CalendarEvent, CalendarViewType } from "@sm/types/calendar";
 import { CalendarMonthView } from "./CalendarMonthView";
 import { CalendarWeekView } from "./CalendarWeekView";
 import { CalendarDayView } from "./CalendarDayView";
 import { CalendarEventDialog } from "./CalendarEventDialog";
 import { CurrentTimeIndicator } from "./CurrentTimeIndicator";
-import { ChatRoom } from "@/types/chat";
+import { ChatRoom } from "@sm/types/chat";
 
 interface BusinessHour {
   day_of_week: number;

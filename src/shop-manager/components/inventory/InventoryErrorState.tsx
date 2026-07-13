@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@sm/components/ui/alert';
+import { Button } from '@sm/components/ui/button';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface InventoryErrorStateProps {

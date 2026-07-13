@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 import { JobLineForm } from './JobLineForm';
-import { IntegratedServiceSelector } from '@/components/work-orders/fields/services/IntegratedServiceSelector';
-import { ServiceJob } from '@/types/service';
-import { SelectedService } from '@/types/selectedService';
-import { useServiceSectors } from '@/hooks/useServiceCategories';
-import { Button } from '@/components/ui/button';
+import { IntegratedServiceSelector } from '@sm/components/work-orders/fields/services/IntegratedServiceSelector';
+import { ServiceJob } from '@sm/types/service';
+import { SelectedService } from '@sm/types/selectedService';
+import { useServiceSectors } from '@sm/hooks/useServiceCategories';
+import { Button } from '@sm/components/ui/button';
 export interface ServiceBasedJobLineFormProps {
   workOrderId: string;
   onSave: (jobLines: WorkOrderJobLine[]) => void;

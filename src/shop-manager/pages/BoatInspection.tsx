@@ -1,5 +1,5 @@
 import React from 'react';
-import { BoatInspectionForm } from '@/components/inspections/boat/BoatInspectionForm';
+import { BoatInspectionForm } from '@sm/components/inspections/boat/BoatInspectionForm';
 
 export default function BoatInspection() {
   return (

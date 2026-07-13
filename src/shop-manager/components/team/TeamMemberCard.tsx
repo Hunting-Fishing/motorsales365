@@ -1,9 +1,9 @@
 
 import { Link } from "react-router-dom";
 import { Mail, Phone, Eye, Briefcase, Building2 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { TeamMember } from "@/types/team";
+import { Avatar, AvatarFallback, AvatarImage } from "@sm/components/ui/avatar";
+import { Badge } from "@sm/components/ui/badge";
+import { TeamMember } from "@sm/types/team";
 
 interface TeamMemberCardProps {
   member: TeamMember;

@@ -1,13 +1,13 @@
 // Product Bundles Component
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Separator } from '@sm/components/ui/separator';
 import { ShoppingCart, Package, Star, ArrowRight } from 'lucide-react';
-import { ProductBundle, BundleCalculation } from '@/types/advanced-product';
-import { bundleService } from '@/services/advanced-product/bundleService';
-import { useCart } from '@/hooks/shopping/useCart';
+import { ProductBundle, BundleCalculation } from '@sm/types/advanced-product';
+import { bundleService } from '@sm/services/advanced-product/bundleService';
+import { useCart } from '@sm/hooks/shopping/useCart';
 import { toast } from 'sonner';
 
 interface ProductBundlesProps {

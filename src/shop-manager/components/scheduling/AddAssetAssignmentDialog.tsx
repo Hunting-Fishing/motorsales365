@@ -4,22 +4,22 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Label } from '@sm/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { useAssetAssignments } from '@/hooks/useAssetAssignments';
-import { supabase } from '@/lib/supabase';
-import { useShopId } from '@/hooks/useShopId';
-import type { AssetType, RecurrencePattern } from '@/types/assetAssignment';
+} from '@sm/components/ui/select';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { useAssetAssignments } from '@sm/hooks/useAssetAssignments';
+import { supabase } from '@sm/lib/supabase';
+import { useShopId } from '@sm/hooks/useShopId';
+import type { AssetType, RecurrencePattern } from '@sm/types/assetAssignment';
 import { RecurrenceFields } from './RecurrenceFields';
 
 interface AddAssetAssignmentDialogProps {

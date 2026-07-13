@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Switch } from "@sm/components/ui/switch";
+import { Label } from "@sm/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@sm/components/ui/tooltip";
 import { Info } from "lucide-react";
 import { FieldDefinition } from "./InventoryFieldManager";
 

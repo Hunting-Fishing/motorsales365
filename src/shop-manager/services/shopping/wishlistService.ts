@@ -1,6 +1,6 @@
 // Wishlist Service - Complete wishlist management
-import { supabase } from '@/integrations/supabase/client';
-import { Product, WishlistItem } from '@/types/product';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Product, WishlistItem } from '@sm/types/product';
 
 export interface WishlistItemWithProduct extends WishlistItem {
   product?: Product;

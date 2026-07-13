@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderRepository } from '@/services/workOrder/WorkOrderRepository';
-import { useAuthUser } from '@/hooks/useAuthUser';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderRepository } from '@sm/services/workOrder/WorkOrderRepository';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
 
 const workOrderRepository = new WorkOrderRepository();
 

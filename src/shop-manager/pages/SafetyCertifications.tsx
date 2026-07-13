@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { useSafetyCertifications } from '@/hooks/useSafetyCertifications';
-import { AddCertificateDialog } from '@/components/safety/AddCertificateDialog';
-import { TrainingAcknowledgmentsCard } from '@/components/safety/TrainingAcknowledgmentsCard';
-import { TrainingComplianceMatrix } from '@/components/safety/TrainingComplianceMatrix';
-import { TrainingAcknowledgmentDialog } from '@/components/safety/TrainingAcknowledgmentDialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Input } from '@sm/components/ui/input';
+import { useSafetyCertifications } from '@sm/hooks/useSafetyCertifications';
+import { AddCertificateDialog } from '@sm/components/safety/AddCertificateDialog';
+import { TrainingAcknowledgmentsCard } from '@sm/components/safety/TrainingAcknowledgmentsCard';
+import { TrainingComplianceMatrix } from '@sm/components/safety/TrainingComplianceMatrix';
+import { TrainingAcknowledgmentDialog } from '@sm/components/safety/TrainingAcknowledgmentDialog';
 import { 
   Award, 
   AlertTriangle, 
@@ -24,10 +24,10 @@ import {
   LayoutGrid,
   ClipboardCheck
 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { format, differenceInDays } from 'date-fns';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
 
 export default function SafetyCertifications() {
   const { shopId } = useShopId();

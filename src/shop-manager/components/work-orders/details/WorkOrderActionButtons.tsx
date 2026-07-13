@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { 
   FileText, 
   Edit, 
@@ -12,7 +12,7 @@ import {
   Calendar,
   DollarSign
 } from 'lucide-react';
-import { WorkOrder } from '@/types/workOrder';
+import { WorkOrder } from '@sm/types/workOrder';
 
 interface WorkOrderActionButtonsProps {
   workOrder: WorkOrder;

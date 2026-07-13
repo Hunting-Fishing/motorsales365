@@ -1,18 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
 import { Loader2, Navigation, Clock, Route, MapPin, AlertTriangle, LocateFixed, Building2, Globe } from 'lucide-react';
-import { useRouteOptimization, Location, RouteOptimizationResult } from '@/hooks/useMapbox';
-import { cn } from '@/lib/utils';
-import { useMapboxPublicToken } from '@/hooks/useMapboxPublicToken';
-import { validateMapboxPublicToken } from '@/lib/mapbox/validateMapboxPublicToken';
-import { useFuelUnits } from '@/hooks/fuel-delivery/useFuelUnits';
-import { useMapDefaultCenter } from '@/hooks/useMapDefaultCenter';
+import { useRouteOptimization, Location, RouteOptimizationResult } from '@sm/hooks/useMapbox';
+import { cn } from '@sm/lib/utils';
+import { useMapboxPublicToken } from '@sm/hooks/useMapboxPublicToken';
+import { validateMapboxPublicToken } from '@sm/lib/mapbox/validateMapboxPublicToken';
+import { useFuelUnits } from '@sm/hooks/fuel-delivery/useFuelUnits';
+import { useMapDefaultCenter } from '@sm/hooks/useMapDefaultCenter';
 
 interface RouteMapProps {
   origin?: [number, number];

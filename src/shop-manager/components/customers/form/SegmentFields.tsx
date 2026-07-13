@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@sm/components/ui/form';
 import { CustomerFormValues } from './schemas/customerSchema';
 import { TagSelector } from './tag/TagSelector';
 

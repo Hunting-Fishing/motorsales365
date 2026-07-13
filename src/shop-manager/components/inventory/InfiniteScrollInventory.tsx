@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import { VirtualizedInventoryList } from './VirtualizedInventoryList';
 import { InventoryGridView } from './InventoryGridView';
 import { InventoryListView } from './InventoryListView';
-import { useInfiniteInventory } from '@/hooks/inventory/useInfiniteInventory';
-import { useInventoryView } from '@/contexts/InventoryViewContext';
-import { Button } from '@/components/ui/button';
+import { useInfiniteInventory } from '@sm/hooks/inventory/useInfiniteInventory';
+import { useInventoryView } from '@sm/contexts/InventoryViewContext';
+import { Button } from '@sm/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { InventoryItemExtended } from '@/types/inventory';
-import { useOptimisticUpdates } from '@/hooks/inventory/useOptimisticUpdates';
+import { InventoryItemExtended } from '@sm/types/inventory';
+import { useOptimisticUpdates } from '@sm/hooks/inventory/useOptimisticUpdates';
 
 interface InfiniteScrollInventoryProps {
   filters?: Record<string, any>;

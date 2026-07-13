@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SettingsTabConfig } from '@/types/settingsConfig';
+import { TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { SettingsTabConfig } from '@sm/types/settingsConfig';
 
 interface SettingsTabsListProps {
   tabs: SettingsTabConfig[];

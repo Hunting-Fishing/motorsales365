@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
-import { Invoice } from '@/types/invoice';
-import { WorkOrder } from '@/types/workOrder';
+import { Invoice } from '@sm/types/invoice';
+import { WorkOrder } from '@sm/types/workOrder';
 import { Dispatch, SetStateAction } from 'react';
 
 interface UseWorkOrderSelectorProps {

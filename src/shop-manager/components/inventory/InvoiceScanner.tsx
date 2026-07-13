@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { useToast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/lib/supabase';
 import { Upload, Loader2, ArrowRight } from 'lucide-react';
-import { useShopId } from '@/hooks/useShopId';
-import { Badge } from '@/components/ui/badge';
+import { useShopId } from '@sm/hooks/useShopId';
+import { Badge } from '@sm/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 
 interface ExtractedProduct {

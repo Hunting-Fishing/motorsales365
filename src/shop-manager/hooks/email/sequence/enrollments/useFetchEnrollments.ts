@@ -1,7 +1,7 @@
 
-import { supabase } from '@/lib/supabase';
-import { EmailSequenceEnrollment } from '@/types/email';
-import { parseJsonField } from '@/services/email/utils';
+import { supabase } from '@sm/lib/supabase';
+import { EmailSequenceEnrollment } from '@sm/types/email';
+import { parseJsonField } from '@sm/services/email/utils';
 
 /**
  * Hook for fetching email sequence enrollments

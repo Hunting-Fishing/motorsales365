@@ -1,14 +1,14 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Download } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { toast } from "@/components/ui/use-toast";
+} from "@sm/components/ui/dropdown-menu";
+import { toast } from "@sm/components/ui/use-toast";
 
 interface TimeEntryExportMenuProps {
   onExport: (format: "csv" | "excel" | "pdf") => void;

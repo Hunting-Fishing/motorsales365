@@ -2,17 +2,17 @@
 import React, { useEffect } from 'react';
 import { 
   Card, CardContent, CardDescription, CardHeader, CardTitle 
-} from '@/components/ui/card';
-import { useEmailSequences } from '@/hooks/email/useEmailSequences';
+} from '@sm/components/ui/card';
+import { useEmailSequences } from '@sm/hooks/email/useEmailSequences';
 import { EmailSequenceSteps } from './EmailSequenceSteps';
 import { EmailSequenceEnrollments } from './EmailSequenceEnrollments';
 import { EmailSequenceAnalytics } from './EmailSequenceAnalytics';
 import { EmailSequenceProcessButton } from './EmailSequenceProcessButton';
 import { 
   Tabs, TabsContent, TabsList, TabsTrigger 
-} from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+} from '@sm/components/ui/tabs';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Edit, Trash2, Play, Users, Activity, ListChecks 

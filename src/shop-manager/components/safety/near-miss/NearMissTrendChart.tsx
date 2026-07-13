@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import type { NearMissReport } from '@/hooks/useNearMissReports';
+import type { NearMissReport } from '@sm/hooks/useNearMissReports';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
 interface Props {

@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { FileSpreadsheet } from "lucide-react";
-import { ProjectBudget } from "@/types/projectBudget";
+import { ProjectBudget } from "@sm/types/projectBudget";
 import { toast } from "sonner";
 
 interface ProjectCsvExportProps {

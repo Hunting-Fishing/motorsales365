@@ -1,9 +1,9 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { InvoiceScanner } from '@/components/inventory/InvoiceScanner';
+import { InvoiceScanner } from '@sm/components/inventory/InvoiceScanner';
 
 export default function InvoiceScan() {
   const navigate = useNavigate();

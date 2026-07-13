@@ -1,9 +1,9 @@
 
 import React from "react";
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { InvoiceItem } from "@/types/invoice";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { InvoiceItem } from "@sm/types/invoice";
 
 interface InvoiceItemRowProps {
   item: InvoiceItem;

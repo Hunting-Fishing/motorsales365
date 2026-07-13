@@ -1,14 +1,14 @@
 
 import React from "react";
-import { RepairTask } from "@/types/repairPlan";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { RepairTask } from "@sm/types/repairPlan";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
 import { Trash, ChevronUp, ChevronDown } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Checkbox } from "@sm/components/ui/checkbox";
+import { Label } from "@sm/components/ui/label";
 
 interface RepairTaskItemProps {
   task: RepairTask;

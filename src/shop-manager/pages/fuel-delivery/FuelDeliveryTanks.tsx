@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Badge } from '@sm/components/ui/badge';
+import { useToast } from '@sm/hooks/use-toast';
 import { Plus, Fuel, MapPin, AlertTriangle, Droplets, Edit2 } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
-import { useFuelDeliveryCustomers, useFuelDeliveryLocations, useFuelDeliveryProducts } from '@/hooks/useFuelDelivery';
-import { useFuelUnits } from '@/hooks/fuel-delivery/useFuelUnits';
+import { Progress } from '@sm/components/ui/progress';
+import { useFuelDeliveryCustomers, useFuelDeliveryLocations, useFuelDeliveryProducts } from '@sm/hooks/useFuelDelivery';
+import { useFuelUnits } from '@sm/hooks/fuel-delivery/useFuelUnits';
 
 interface Tank {
   id: string;

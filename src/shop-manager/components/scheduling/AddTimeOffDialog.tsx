@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useScheduling } from '@/hooks/useScheduling';
-import { useAuthUser } from '@/hooks/useAuthUser';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
-import { useShopId } from '@/hooks/useShopId';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useScheduling } from '@sm/hooks/useScheduling';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
+import { useToast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/lib/supabase';
+import { useShopId } from '@sm/hooks/useShopId';
 import { differenceInDays } from 'date-fns';
-import type { TimeOffType } from '@/types/scheduling';
+import type { TimeOffType } from '@sm/types/scheduling';
 
 interface AddTimeOffDialogProps {
   open: boolean;

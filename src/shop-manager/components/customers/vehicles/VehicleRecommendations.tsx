@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { CustomerVehicle } from '@/types/customer';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { CustomerVehicle } from '@sm/types/customer';
+import { Card, CardHeader, CardTitle, CardContent } from '@sm/components/ui/card';
 import { AlertTriangle, Check, Clock } from 'lucide-react';
 
 // Define standard service intervals based on mileage

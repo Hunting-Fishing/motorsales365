@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { supabase } from "@sm/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Input } from "@sm/components/ui/input";
 import { Loader2, User } from "lucide-react";
-import { Customer } from "@/types/customer";
+import { Customer } from "@sm/types/customer";
 
 interface CustomerSelectProps {
   onSelectCustomer: (customer: Customer | null) => void;

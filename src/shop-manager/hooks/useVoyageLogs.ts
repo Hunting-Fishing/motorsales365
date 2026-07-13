@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { VoyageLog, VoyageCommunicationLog } from '@/types/voyage';
+import { supabase } from '@sm/integrations/supabase/client';
+import { VoyageLog, VoyageCommunicationLog } from '@sm/types/voyage';
 import { toast } from 'sonner';
 
 export function useVoyageLogs() {

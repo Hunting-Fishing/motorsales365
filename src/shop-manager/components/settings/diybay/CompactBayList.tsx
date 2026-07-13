@@ -1,11 +1,11 @@
 
 import React from "react";
-import { Bay } from "@/services/diybay/diybayService";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
+import { Bay } from "@sm/services/diybay/diybayService";
+import { Badge } from "@sm/components/ui/badge";
+import { Switch } from "@sm/components/ui/switch";
+import { Button } from "@sm/components/ui/button";
 import { GripVertical, Pencil, Trash2, History } from "lucide-react";
-import { formatCurrency } from "@/lib/formatters";
+import { formatCurrency } from "@sm/lib/formatters";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 

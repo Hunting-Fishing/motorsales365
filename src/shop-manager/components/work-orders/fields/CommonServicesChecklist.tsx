@@ -1,16 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { Label } from '@sm/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Clock, DollarSign } from 'lucide-react';
 import { 
   ServiceMainCategory, 
   ServiceSubcategory, 
   ServiceJob
-} from '@/types/service';
-import { fetchServiceCategories } from '@/lib/services/serviceApi';
+} from '@sm/types/service';
+import { fetchServiceCategories } from '@sm/lib/services/serviceApi';
 
 interface CommonServicesChecklistProps {
   selectedServices: string[];

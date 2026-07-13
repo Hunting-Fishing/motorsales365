@@ -1,7 +1,7 @@
 
-import { Customer } from "@/types/customer";
+import { Customer } from "@sm/types/customer";
 import { calculateCustomerLifetimeValue } from "./customerLifetimeValue";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 
 /**
  * Predicts future customer lifetime value based on historical data

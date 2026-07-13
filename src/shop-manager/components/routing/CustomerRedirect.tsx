@@ -1,7 +1,7 @@
 
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@sm/hooks/use-toast";
 
 export const CustomerRedirect = () => {
   const navigate = useNavigate();

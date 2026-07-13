@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { FinancialManagementTab } from "@/components/settings/FinancialManagementTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { FinancialManagementTab } from "@sm/components/settings/FinancialManagementTab";
 
 export const FinancialSettings = () => {
   return (

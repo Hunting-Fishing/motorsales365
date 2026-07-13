@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { useShopId } from './useShopId';
 import { useToast } from './use-toast';
-import type { SafetyIncident, IncidentType, IncidentSeverity, InvestigationStatus, InjuredPersonType } from '@/types/safety';
+import type { SafetyIncident, IncidentType, IncidentSeverity, InvestigationStatus, InjuredPersonType } from '@sm/types/safety';
 
 interface CreateIncidentData {
   incident_date: string;

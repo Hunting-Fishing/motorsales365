@@ -1,10 +1,10 @@
 
 import React, { useEffect } from 'react';
-import { useSequenceAnalytics } from '@/hooks/email/sequence/useSequenceAnalytics';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSequenceAnalytics } from '@sm/hooks/email/sequence/useSequenceAnalytics';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Badge } from '@sm/components/ui/badge';
 import { Loader2 } from 'lucide-react';
 
 interface EmailSequenceAnalyticsProps {

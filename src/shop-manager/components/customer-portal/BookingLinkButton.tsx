@@ -1,11 +1,11 @@
 
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Calendar, AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Skeleton } from "@/components/ui/skeleton";
-import { supabase } from '@/integrations/supabase/client';
-import { useAuthUser } from '@/hooks/useAuthUser';
+import { Skeleton } from "@sm/components/ui/skeleton";
+import { supabase } from '@sm/integrations/supabase/client';
+import { useAuthUser } from '@sm/hooks/useAuthUser';
 
 export function BookingLinkButton() {
   const { userId } = useAuthUser();

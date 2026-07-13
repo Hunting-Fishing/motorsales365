@@ -11,10 +11,10 @@ import {
   Clock, 
   Info
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { CustomerVehicle, formatVehicleYear } from "@/types/customer/vehicle";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { CustomerVehicle, formatVehicleYear } from "@sm/types/customer/vehicle";
 
 interface VehicleDetailHeaderProps {
   vehicle: CustomerVehicle;

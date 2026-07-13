@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { WorkOrderTemplateService } from '@/lib/services/WorkOrderTemplateService';
-import { WorkOrderTemplate, CreateWorkOrderTemplateInput, UpdateWorkOrderTemplateInput } from '@/lib/database/repositories/WorkOrderTemplateRepository';
+import { WorkOrderTemplateService } from '@sm/lib/services/WorkOrderTemplateService';
+import { WorkOrderTemplate, CreateWorkOrderTemplateInput, UpdateWorkOrderTemplateInput } from '@sm/lib/database/repositories/WorkOrderTemplateRepository';
 
 const templateService = new WorkOrderTemplateService();
 

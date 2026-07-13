@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { WorkOrderJobLine } from '@/types/jobLine';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
 import { UnifiedJobLineFormDialog } from './UnifiedJobLineFormDialog';
 
 interface JobLineEditDialogProps {

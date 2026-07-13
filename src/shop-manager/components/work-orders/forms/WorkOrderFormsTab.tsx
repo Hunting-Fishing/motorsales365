@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 import { Plus, FileText, RefreshCw, Eye, Calendar, User } from 'lucide-react';
-import { FormSelector } from '@/components/forms/FormSelector';
-import { FormDialog } from '@/components/forms/FormDialog';
+import { FormSelector } from '@sm/components/forms/FormSelector';
+import { FormDialog } from '@sm/components/forms/FormDialog';
 import { WorkOrderFormsList } from './WorkOrderFormsList';
-import { useFormSubmissions } from '@/hooks/useFormsByCategory';
-import { FormBuilderTemplate } from '@/types/formBuilder';
-import { WorkOrder } from '@/types/workOrder';
+import { useFormSubmissions } from '@sm/hooks/useFormsByCategory';
+import { FormBuilderTemplate } from '@sm/types/formBuilder';
+import { WorkOrder } from '@sm/types/workOrder';
 import { format } from 'date-fns';
 
 interface WorkOrderFormsTabProps {

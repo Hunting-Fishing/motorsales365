@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
 import { TrendingUp, Target, AlertCircle, Activity } from 'lucide-react';
-import { useScheduleForecasts } from '@/hooks/useScheduleForecasts';
-import { useScheduleOptimization } from '@/hooks/useScheduleOptimization';
-import { useOvertimeTracking } from '@/hooks/useOvertimeTracking';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
+import { useScheduleForecasts } from '@sm/hooks/useScheduleForecasts';
+import { useScheduleOptimization } from '@sm/hooks/useScheduleOptimization';
+import { useOvertimeTracking } from '@sm/hooks/useOvertimeTracking';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { Badge } from '@sm/components/ui/badge';
 import { format } from 'date-fns';
 
 export function ForecastingDashboard() {

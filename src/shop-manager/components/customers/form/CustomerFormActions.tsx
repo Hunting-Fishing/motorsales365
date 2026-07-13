@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@sm/hooks/use-mobile";
 import { Save } from "lucide-react";
 
 interface CustomerFormActionsProps {

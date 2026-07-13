@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useShopId } from '@/hooks/useShopId';
-import { getMaintenanceActivities } from '@/services/maintenance/maintenanceActivityService';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useShopId } from '@sm/hooks/useShopId';
+import { getMaintenanceActivities } from '@sm/services/maintenance/maintenanceActivityService';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
 import { format } from 'date-fns';
 import { History, Search, Filter, Flag } from 'lucide-react';
 import {
@@ -13,7 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 
 interface MaintenanceActivity {
   id: string;

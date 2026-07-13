@@ -1,15 +1,15 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Check, ChevronsUpDown, Search, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
+import { cn } from '@sm/lib/utils';
 import { 
   CANADIAN_CITIES, 
   PROVINCE_NAMES, 
   getCitiesByProvince,
   type CanadianCity 
-} from '@/data/canadianCities';
+} from '@sm/data/canadianCities';
 
 interface CitySearchComboboxProps {
   value: string; // Format: "city|province"

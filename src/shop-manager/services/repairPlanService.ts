@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
-import { RepairPlan, RepairTask } from "@/types/repairPlan";
+import { supabase } from "@sm/integrations/supabase/client";
+import { RepairPlan, RepairTask } from "@sm/types/repairPlan";
 
 export interface RepairPlanWithTasks extends Omit<RepairPlan, 'tasks'> {
   tasks: RepairTask[];

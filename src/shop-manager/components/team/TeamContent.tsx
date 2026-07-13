@@ -1,5 +1,5 @@
 
-import { TeamMember } from "@/types/team";
+import { TeamMember } from "@sm/types/team";
 import { TeamMemberGrid } from "./TeamMemberGrid";
 import { TeamMemberTable } from "./TeamMemberTable";
 import { TeamLoading } from "./TeamLoading";

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { InteractionType } from '@/services/productAnalyticsService';
-import { supabase } from '@/integrations/supabase/client';
-import { addRecentlyViewedProduct } from '@/services/recentlyViewedService';
+import { InteractionType } from '@sm/services/productAnalyticsService';
+import { supabase } from '@sm/integrations/supabase/client';
+import { addRecentlyViewedProduct } from '@sm/services/recentlyViewedService';
 
 export interface ProductInteractionData {
   productId: string;

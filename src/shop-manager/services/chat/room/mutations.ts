@@ -1,6 +1,6 @@
 
 import { supabase } from "../supabaseClient";
-import { ChatRoom } from "@/types/chat";
+import { ChatRoom } from "@sm/types/chat";
 import { CreateRoomParams, transformDatabaseRoom } from "./types";
 
 // Create a new chat room

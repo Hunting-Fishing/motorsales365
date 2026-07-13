@@ -1,6 +1,6 @@
 // Dynamic Pricing Service
-import { supabase } from '@/integrations/supabase/client';
-import { PricingRule, PricingRuleFormData, PriceCalculation } from '@/types/advanced-product';
+import { supabase } from '@sm/integrations/supabase/client';
+import { PricingRule, PricingRuleFormData, PriceCalculation } from '@sm/types/advanced-product';
 
 export class PricingService {
   // Get all active pricing rules

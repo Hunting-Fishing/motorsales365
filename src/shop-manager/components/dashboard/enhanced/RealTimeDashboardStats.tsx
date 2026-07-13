@@ -1,10 +1,10 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { supabase } from '@sm/lib/supabase';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Users, Wrench, Package, Receipt, TrendingUp, TrendingDown, Activity, Clock } from 'lucide-react';
-import { useRealtime } from '@/hooks/useRealtime';
+import { useRealtime } from '@sm/hooks/useRealtime';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface DashboardStats {

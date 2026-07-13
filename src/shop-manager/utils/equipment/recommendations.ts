@@ -1,5 +1,5 @@
 
-import { Equipment } from "@/types/equipment";
+import { Equipment } from "@sm/types/equipment";
 import { addDays, differenceInDays, parseISO, isAfter } from "date-fns";
 
 type RecommendationType = 'urgent' | 'soon' | 'normal' | 'good';

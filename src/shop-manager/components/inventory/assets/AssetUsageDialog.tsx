@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAssetUsage } from '@/hooks/inventory/useAssetUsage';
-import { AssetUsageConfig, USAGE_METRICS } from '@/types/inventory/predictive';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useAssetUsage } from '@sm/hooks/inventory/useAssetUsage';
+import { AssetUsageConfig, USAGE_METRICS } from '@sm/types/inventory/predictive';
 import { useForm } from 'react-hook-form';
 
 interface AssetUsageDialogProps {

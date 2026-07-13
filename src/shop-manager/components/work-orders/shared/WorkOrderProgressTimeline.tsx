@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check, Clock, AlertCircle, Wrench, FileText, DollarSign } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@sm/lib/utils';
 
 interface TimelineStep {
   id: string;

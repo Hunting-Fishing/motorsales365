@@ -1,5 +1,5 @@
 import React from 'react';
-import { ForkliftInspectionForm } from '@/components/safety/forklift/ForkliftInspectionForm';
+import { ForkliftInspectionForm } from '@sm/components/safety/forklift/ForkliftInspectionForm';
 
 export default function ForkliftInspection() {
   return (

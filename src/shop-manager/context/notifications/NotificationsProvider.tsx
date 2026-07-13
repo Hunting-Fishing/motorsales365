@@ -1,9 +1,9 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { Notification, NotificationPreferences } from '@/types/notification';
+import { Notification, NotificationPreferences } from '@sm/types/notification';
 import { NotificationsContext } from './NotificationsContext';
 import { defaultNotifications, defaultPreferences } from './defaultData';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@sm/hooks/use-toast';
 import { createUpdatePreferencesHandler, createUpdateSubscriptionHandler } from './preferenceHandlers';
 
 interface NotificationsProviderProps {

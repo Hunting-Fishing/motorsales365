@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useBusinessModules, useShopEnabledModules, useToggleModule } from '@/hooks/useEnabledModules';
-import { useModuleAccess, useSubscribeToModule } from '@/hooks/useModuleSubscriptions';
-import { useUserRoles } from '@/hooks/useUserRoles';
-import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
-import { MODULE_CONFIGS, TIER_CONFIGS, TierSlug, calculateModulePrice, getPaidTiers } from '@/config/moduleSubscriptions';
-import { UPCOMING_MODULES } from '@/config/moduleRoutes';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Switch } from '@sm/components/ui/switch';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { useBusinessModules, useShopEnabledModules, useToggleModule } from '@sm/hooks/useEnabledModules';
+import { useModuleAccess, useSubscribeToModule } from '@sm/hooks/useModuleSubscriptions';
+import { useUserRoles } from '@sm/hooks/useUserRoles';
+import { useToast } from '@sm/hooks/use-toast';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { MODULE_CONFIGS, TIER_CONFIGS, TierSlug, calculateModulePrice, getPaidTiers } from '@sm/config/moduleSubscriptions';
+import { UPCOMING_MODULES } from '@sm/config/moduleRoutes';
 import { format, formatDistanceToNow } from 'date-fns';
 import { 
   Car, Target, Droplets, Anchor, Wind, Zap, Pipette,
@@ -23,7 +23,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@sm/components/ui/dialog';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Car, Target, Droplets, Anchor, Wind, Zap, Pipette,

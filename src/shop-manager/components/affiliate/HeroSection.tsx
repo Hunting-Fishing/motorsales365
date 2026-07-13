@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Grid, Header } from 'semantic-ui-react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Settings } from 'lucide-react';
 
 const HeroSection = () => {

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { FileUploader } from '@/components/shared/FileUploader';
-import { uploadCustomerForm } from '@/services/customerFormService';
-import { toast } from '@/hooks/use-toast';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Label } from '@sm/components/ui/label';
+import { FileUploader } from '@sm/components/shared/FileUploader';
+import { uploadCustomerForm } from '@sm/services/customerFormService';
+import { toast } from '@sm/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { TagInput } from '@/components/customers/documents/TagInput';
+import { TagInput } from '@sm/components/customers/documents/TagInput';
 
 interface CustomerFormUploaderProps {
   customerId: string;

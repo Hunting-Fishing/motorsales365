@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@sm/components/ui/card';
 import { FileText, Image, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 
 interface DocumentPreviewProps {
   documentUrl: string | null;

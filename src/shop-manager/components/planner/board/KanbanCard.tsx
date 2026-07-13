@@ -1,10 +1,10 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { PlannerBoardItem } from '@/types/planner';
-import { cn } from '@/lib/utils';
+import { PlannerBoardItem } from '@sm/types/planner';
+import { cn } from '@sm/lib/utils';
 import { GripVertical, Clock, User, Wrench, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@sm/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@sm/components/ui/avatar';
 import { format } from 'date-fns';
 
 interface KanbanCardProps {

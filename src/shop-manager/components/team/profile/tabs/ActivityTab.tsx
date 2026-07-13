@@ -1,8 +1,8 @@
 
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@sm/components/ui/card";
 import { Clock, FileText, User, Users, AlertCircle, Package, Wrench } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { useTeamMemberActivity } from "@/hooks/team/useTeamMemberActivity";
+import { Badge } from "@sm/components/ui/badge";
+import { useTeamMemberActivity } from "@sm/hooks/team/useTeamMemberActivity";
 import { format } from "date-fns";
 
 interface ActivityTabProps {

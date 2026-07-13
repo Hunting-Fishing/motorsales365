@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { Document } from '@/types/document';
-import { DocumentService } from '@/services/documentService';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@sm/components/ui/dropdown-menu';
+import { Document } from '@sm/types/document';
+import { DocumentService } from '@sm/services/documentService';
 import { Download, Eye, FileText, Image, Link, ExternalLink, MoreVertical, Edit, Trash2, Calendar, Tag, User } from 'lucide-react';
 
 interface DocumentCardProps {

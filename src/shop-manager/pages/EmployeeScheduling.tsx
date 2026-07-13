@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { Calendar, Clock, FileText, Settings, UserCog, Package, CalendarDays, Bell } from 'lucide-react';
-import { StaffSchedulingCalendar } from '@/components/scheduling/StaffSchedulingCalendar';
-import { ScheduleCalendar } from '@/components/scheduling/ScheduleCalendar';
-import { TimeOffRequests } from '@/components/scheduling/TimeOffRequests';
-import { PTOManagement } from '@/components/scheduling/PTOManagement';
-import { AccommodationsManagement } from '@/components/scheduling/AccommodationsManagement';
-import { SchedulingSettings } from '@/components/scheduling/SchedulingSettings';
-import { AssetAssignments } from '@/components/scheduling/AssetAssignments';
-import { EmployeeAvailabilityManager } from '@/components/scheduling/EmployeeAvailabilityManager';
-import { ShiftSwapManager } from '@/components/scheduling/ShiftSwapManager';
-import { ScheduleNotifications } from '@/components/scheduling/ScheduleNotifications';
+import { StaffSchedulingCalendar } from '@sm/components/scheduling/StaffSchedulingCalendar';
+import { ScheduleCalendar } from '@sm/components/scheduling/ScheduleCalendar';
+import { TimeOffRequests } from '@sm/components/scheduling/TimeOffRequests';
+import { PTOManagement } from '@sm/components/scheduling/PTOManagement';
+import { AccommodationsManagement } from '@sm/components/scheduling/AccommodationsManagement';
+import { SchedulingSettings } from '@sm/components/scheduling/SchedulingSettings';
+import { AssetAssignments } from '@sm/components/scheduling/AssetAssignments';
+import { EmployeeAvailabilityManager } from '@sm/components/scheduling/EmployeeAvailabilityManager';
+import { ShiftSwapManager } from '@sm/components/scheduling/ShiftSwapManager';
+import { ScheduleNotifications } from '@sm/components/scheduling/ScheduleNotifications';
 
 export default function EmployeeScheduling() {
   const [activeTab, setActiveTab] = useState('calendar');

@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { Plus, Search, Trash2, Phone, Mail, MapPin, Calendar, Edit, Globe, CreditCard, Clock, Building, FileText } from "lucide-react";
-import { useSuppliers } from "@/hooks/inventory/useSuppliers";
-import { deleteInventorySupplier, InventorySupplier } from "@/services/inventory/supplierService";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { EmptyState } from "@/components/ui/empty-state";
+import { useSuppliers } from "@sm/hooks/inventory/useSuppliers";
+import { deleteInventorySupplier, InventorySupplier } from "@sm/services/inventory/supplierService";
+import { LoadingSpinner } from "@sm/components/ui/loading-spinner";
+import { EmptyState } from "@sm/components/ui/empty-state";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -19,7 +19,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@sm/components/ui/alert-dialog";
 import { AddSupplierDialog } from "./AddSupplierDialog";
 import { EditSupplierDialog } from "./EditSupplierDialog";
 import { SupplierDetailsDialog } from "./SupplierDetailsDialog";

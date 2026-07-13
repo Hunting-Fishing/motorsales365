@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { businessConstantsService, type BusinessConstant } from '@/services/unified/businessConstantsService';
+import { businessConstantsService, type BusinessConstant } from '@sm/services/unified/businessConstantsService';
 
 export { type BusinessConstant };
 

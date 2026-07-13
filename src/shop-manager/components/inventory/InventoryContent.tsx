@@ -2,12 +2,12 @@
 import React from "react";
 import { OptimizedInventoryTable } from "./OptimizedInventoryTable";
 import { InfiniteScrollInventory } from "./InfiniteScrollInventory";
-import { EmptyInventory } from "@/components/inventory/EmptyInventory";
+import { EmptyInventory } from "@sm/components/inventory/EmptyInventory";
 import { InventoryContentSkeleton } from "./InventorySkeletons";
-import { InventoryItemExtended } from "@/types/inventory";
-import { useInventoryView } from "@/contexts/InventoryViewContext";
+import { InventoryItemExtended } from "@sm/types/inventory";
+import { useInventoryView } from "@sm/contexts/InventoryViewContext";
 import { AdvancedFilterSidebar } from "./AdvancedFilterSidebar";
-import { useOptimizedInventoryFilters } from "@/hooks/inventory/useOptimizedInventoryFilters";
+import { useOptimizedInventoryFilters } from "@sm/hooks/inventory/useOptimizedInventoryFilters";
 
 interface InventoryContentProps {
   items: InventoryItemExtended[];

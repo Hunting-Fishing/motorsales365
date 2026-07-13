@@ -1,4 +1,4 @@
-import { CustomerFormValues } from "@/components/customers/form/schemas/customerSchema";
+import { CustomerFormValues } from "@sm/components/customers/form/schemas/customerSchema";
 
 // Local storage key for draft customer
 const DRAFT_CUSTOMER_KEY = 'draft_customer';

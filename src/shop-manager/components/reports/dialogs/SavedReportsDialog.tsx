@@ -8,12 +8,12 @@ import {
   DialogHeader, 
   DialogTitle, 
   DialogTrigger 
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { SavedReport } from "@/types/reports";
+} from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { SavedReport } from "@sm/types/reports";
 import { ReportForm } from "./ReportForm";
 import { ReportsList } from "./ReportsList";
-import { useReportForm } from "@/hooks/useReportForm";
+import { useReportForm } from "@sm/hooks/useReportForm";
 
 interface SavedReportsDialogProps {
   savedReports: SavedReport[];

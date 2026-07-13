@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Customer } from '@/types/customer';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Customer } from '@sm/types/customer';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Label } from '@sm/components/ui/label';
+import { Badge } from '@sm/components/ui/badge';
+import { Separator } from '@sm/components/ui/separator';
 import { CalendarIcon, MapPin, Mail, Phone, CreditCard, Building, Tag } from 'lucide-react';
 import { format } from 'date-fns';
 

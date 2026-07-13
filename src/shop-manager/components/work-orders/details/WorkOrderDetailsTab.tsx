@@ -1,14 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getWorkOrderParts } from '@/services/workOrder/workOrderPartsService';
-import { updateWorkOrderJobLine, deleteWorkOrderJobLine } from '@/services/workOrder/jobLinesService';
-import { updateWorkOrderPart, deleteWorkOrderPart } from '@/services/workOrder/workOrderPartsService';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { getWorkOrderParts } from '@sm/services/workOrder/workOrderPartsService';
+import { updateWorkOrderJobLine, deleteWorkOrderJobLine } from '@sm/services/workOrder/jobLinesService';
+import { updateWorkOrderPart, deleteWorkOrderPart } from '@sm/services/workOrder/workOrderPartsService';
 import { UnifiedItemsTable } from '../shared/UnifiedItemsTable';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@sm/hooks/use-toast';
 
 interface WorkOrderDetailsTabProps {
   workOrder: WorkOrder;

@@ -1,9 +1,9 @@
 
 import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "@sm/components/ui/input";
+import { Button } from "@sm/components/ui/button";
 import { Filter, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@sm/components/ui/badge";
 
 interface CustomerFilterHeaderProps {
   searchQuery: string;

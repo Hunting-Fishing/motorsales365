@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sm/components/ui/table';
 import { Search, Droplets, ArrowLeft, CheckCircle } from 'lucide-react';
-import { useFuelDeliveryCompletions } from '@/hooks/useFuelDelivery';
+import { useFuelDeliveryCompletions } from '@sm/hooks/useFuelDelivery';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useFuelUnits } from '@/hooks/fuel-delivery/useFuelUnits';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import { useFuelUnits } from '@sm/hooks/fuel-delivery/useFuelUnits';
 
 export default function FuelDeliveryCompletions() {
   const navigate = useNavigate();

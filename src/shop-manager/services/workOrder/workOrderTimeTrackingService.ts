@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
-import { TimeEntry } from "@/types/workOrder";
+import { supabase } from "@sm/integrations/supabase/client";
+import { TimeEntry } from "@sm/types/workOrder";
 
 /**
  * Get time entries for a work order and/or specific job line

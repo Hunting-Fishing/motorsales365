@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Invoice } from '@/types/invoice';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Invoice } from '@sm/types/invoice';
 
 export function useInvoices() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);

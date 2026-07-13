@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@sm/components/ui/popover';
+import { useToast } from '@sm/hooks/use-toast';
 import { 
   Bookmark, 
   BookmarkPlus, 
@@ -12,8 +12,8 @@ import {
   Filter,
   Loader2
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useFilterPresets, FilterPreset } from '@/hooks/inventory/useFilterPresets';
+import { cn } from '@sm/lib/utils';
+import { useFilterPresets, FilterPreset } from '@sm/hooks/inventory/useFilterPresets';
 
 interface FilterPresetsManagerProps {
   currentFilters: {

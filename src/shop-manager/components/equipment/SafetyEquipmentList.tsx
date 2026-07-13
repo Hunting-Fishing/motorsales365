@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabase';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Button } from '@sm/components/ui/button';
+import { supabase } from '@sm/lib/supabase';
 import { ShieldCheck, AlertTriangle, Clock, Search, X } from 'lucide-react';
 import { format, differenceInDays, parseISO } from 'date-fns';
-import { formatEquipmentType } from '@/hooks/useEquipmentFilterOptions';
+import { formatEquipmentType } from '@sm/hooks/useEquipmentFilterOptions';
 
 interface SafetyEquipmentItem {
   id: string;

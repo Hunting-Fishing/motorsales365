@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { ClipboardCheck, Plus, Search, RefreshCw, AlertCircle, Clock, CheckCircle2, BarChart3 } from 'lucide-react';
-import { useCorrectiveActions, CorrectiveAction } from '@/hooks/useCorrectiveActions';
-import { CorrectiveActionDialog } from '@/components/safety/corrective-actions/CorrectiveActionDialog';
-import { CorrectiveActionCard } from '@/components/safety/corrective-actions/CorrectiveActionCard';
-import { CorrectiveActionAnalytics } from '@/components/safety/corrective-actions/CorrectiveActionAnalytics';
+import { useCorrectiveActions, CorrectiveAction } from '@sm/hooks/useCorrectiveActions';
+import { CorrectiveActionDialog } from '@sm/components/safety/corrective-actions/CorrectiveActionDialog';
+import { CorrectiveActionCard } from '@sm/components/safety/corrective-actions/CorrectiveActionCard';
+import { CorrectiveActionAnalytics } from '@sm/components/safety/corrective-actions/CorrectiveActionAnalytics';
 import { format } from 'date-fns';
 
 export default function SafetyCorrectiveActions() {

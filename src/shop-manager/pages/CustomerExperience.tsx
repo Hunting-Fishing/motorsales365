@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { OrderTrackingCard } from '@/components/customer/OrderTrackingCard';
-import { NotificationCenter } from '@/components/customer/NotificationCenter';
-import { SupportTicketSystem } from '@/components/customer/SupportTicketSystem';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { OrderTrackingCard } from '@sm/components/customer/OrderTrackingCard';
+import { NotificationCenter } from '@sm/components/customer/NotificationCenter';
+import { SupportTicketSystem } from '@sm/components/customer/SupportTicketSystem';
 import { Bell, Package, MessageCircle, Heart } from 'lucide-react';
 
 export default function CustomerExperience() {

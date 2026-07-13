@@ -5,17 +5,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+} from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Badge } from '@sm/components/ui/badge';
+import { ScrollArea } from '@sm/components/ui/scroll-area';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
+} from '@sm/components/ui/accordion';
 import {
   Gauge,
   Zap,
@@ -31,9 +31,9 @@ import {
   Clock,
   Trash2,
 } from 'lucide-react';
-import { COMPONENT_CATALOG, type ComponentDefinition, type ComponentCategory } from '@/config/componentCatalog';
-import { cn } from '@/lib/utils';
-import { useCustomComponents, useDeleteCustomComponent, CustomComponent } from '@/hooks/useCustomComponents';
+import { COMPONENT_CATALOG, type ComponentDefinition, type ComponentCategory } from '@sm/config/componentCatalog';
+import { cn } from '@sm/lib/utils';
+import { useCustomComponents, useDeleteCustomComponent, CustomComponent } from '@sm/hooks/useCustomComponents';
 import { AddCustomComponentDialog } from './AddCustomComponentDialog';
 
 const ICON_MAP: Record<string, React.ElementType> = {

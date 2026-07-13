@@ -2,10 +2,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { Notification } from '@/types/notification';
+import { Notification } from '@sm/types/notification';
 import { Check, Info, AlertTriangle, CheckCircle2, XCircle, X, Clock, ArrowUp, User, FileText, Package, CreditCard, Users, MessageSquare } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+import { cn } from '@sm/lib/utils';
+import { Badge } from '@sm/components/ui/badge';
 
 interface NotificationItemProps {
   notification: Notification;

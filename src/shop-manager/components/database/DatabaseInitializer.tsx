@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
-import { startupDiagnostics } from '@/services/database/StartupDiagnostics';
-import { databaseHealthMonitor } from '@/services/database/DatabaseHealthMonitor';
-import { WorkOrderRepository } from '@/services/workOrder/WorkOrderRepository';
+import { startupDiagnostics } from '@sm/services/database/StartupDiagnostics';
+import { databaseHealthMonitor } from '@sm/services/database/DatabaseHealthMonitor';
+import { WorkOrderRepository } from '@sm/services/workOrder/WorkOrderRepository';
 
 interface DatabaseInitializerProps {
   children: React.ReactNode;

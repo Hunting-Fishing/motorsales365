@@ -8,10 +8,10 @@ import { AssignmentFields } from "./form-fields/AssignmentFields";
 import { NotesField } from "./form-fields/NotesField";
 import { JobLinesSection } from "./form-fields/JobLinesSection";
 import { ExpandedIntakeForm } from "./form-fields/ExpandedIntakeForm";
-import { WorkOrderFormSchemaValues } from "@/schemas/workOrderSchema";
-import { WorkOrderJobLine } from "@/types/jobLine";
-import { SelectedService } from "@/types/selectedService";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WorkOrderFormSchemaValues } from "@sm/schemas/workOrderSchema";
+import { WorkOrderJobLine } from "@sm/types/jobLine";
+import { SelectedService } from "@sm/types/selectedService";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sm/components/ui/tabs";
 
 interface Technician {
   id: string;

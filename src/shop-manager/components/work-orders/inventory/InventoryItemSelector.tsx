@@ -1,14 +1,14 @@
 
 import React from "react";
 import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@sm/components/ui/dialog";
 
 interface InventoryItem {
   id: string;

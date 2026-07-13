@@ -2,10 +2,10 @@ import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "./schemas/customerSchema";
 import { VehicleSelector } from "./vehicle/VehicleSelector";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Plus, Car, AlertTriangle } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Card, CardContent } from "@sm/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@sm/components/ui/accordion";
 
 interface VehiclesFieldsProps {
   form: UseFormReturn<CustomerFormValues>;

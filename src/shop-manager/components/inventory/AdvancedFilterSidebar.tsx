@@ -1,22 +1,22 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { Badge } from '@sm/components/ui/badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@sm/components/ui/select';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+} from '@sm/components/ui/collapsible';
 import { 
   X, 
   ChevronDown, 
@@ -28,8 +28,8 @@ import {
   MapPin,
   Tag
 } from 'lucide-react';
-import { useInventoryView } from '@/contexts/InventoryViewContext';
-import { useOptimizedInventoryFilters } from '@/hooks/inventory/useOptimizedInventoryFilters';
+import { useInventoryView } from '@sm/contexts/InventoryViewContext';
+import { useOptimizedInventoryFilters } from '@sm/hooks/inventory/useOptimizedInventoryFilters';
 
 export function AdvancedFilterSidebar() {
   const { isFilterSidebarOpen, toggleFilterSidebar } = useInventoryView();

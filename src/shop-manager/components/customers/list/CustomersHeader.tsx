@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { Plus } from "lucide-react";
 
 export const CustomersHeader = () => {

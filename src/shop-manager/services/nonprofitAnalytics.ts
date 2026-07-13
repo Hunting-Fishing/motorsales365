@@ -1,6 +1,6 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import { format, subDays, subMonths, subYears } from 'date-fns';
-import { Json } from '@/integrations/supabase/types';
+import { Json } from '@sm/integrations/supabase/types';
 
 export interface NonprofitAnalytics {
   id: string;

@@ -5,17 +5,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+} from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Label } from "@sm/components/ui/label";
+import { Textarea } from "@sm/components/ui/textarea";
+import { Input } from "@sm/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@sm/components/ui/radio-group";
+import { Calendar } from "@sm/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@sm/components/ui/popover";
 import { format, addDays } from "date-fns";
 import { CalendarIcon, AlertCircle, Clock, XCircle, SkipForward } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@sm/lib/utils";
 
 interface RouteStop {
   id: string;

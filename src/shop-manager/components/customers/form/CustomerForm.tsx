@@ -2,7 +2,7 @@
 import React from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form } from "@/components/ui/form";
+import { Form } from "@sm/components/ui/form";
 import { CustomerFormValues, customerSchema } from "./schemas/customerSchema";
 import { FormTabs } from "./FormTabs";
 import { FormContent } from "./FormContent";

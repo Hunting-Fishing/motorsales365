@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { CustomerForm } from '@/components/customers/form/CustomerForm';
+import { CustomerForm } from '@sm/components/customers/form/CustomerForm';
 import { useCustomerCreate } from './hooks/useCustomerCreate';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState } from '@sm/components/ui/empty-state';
 import { Users } from 'lucide-react';
 
 export function CustomerCreateForm() {

@@ -1,17 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
-import { FormBuilderTemplate, FormBuilderField } from '@/types/formBuilder';
-import { useFormSubmission, FormFieldValue } from '@/hooks/useFormSubmission';
-import { getFormTemplate } from '@/services/formBuilderService';
-import { CompactSignaturePad } from '@/components/signature/CompactSignaturePad';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@sm/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useToast } from '@sm/components/ui/use-toast';
+import { FormBuilderTemplate, FormBuilderField } from '@sm/types/formBuilder';
+import { useFormSubmission, FormFieldValue } from '@sm/hooks/useFormSubmission';
+import { getFormTemplate } from '@sm/services/formBuilderService';
+import { CompactSignaturePad } from '@sm/components/signature/CompactSignaturePad';
 
 interface FormRendererProps {
   templateId: string;

@@ -10,4 +10,4 @@ export {
 } from './customerService';
 
 // Re-export customer types
-export type { Customer, CustomerCreate } from '@/types/customer';
+export type { Customer, CustomerCreate } from '@sm/types/customer';

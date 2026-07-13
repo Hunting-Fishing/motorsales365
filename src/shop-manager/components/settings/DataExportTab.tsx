@@ -1,15 +1,15 @@
 
 import React, { useState } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
+import { Checkbox } from "@sm/components/ui/checkbox";
+import { Label } from "@sm/components/ui/label";
+import { useToast } from "@sm/components/ui/use-toast";
+import { Separator } from "@sm/components/ui/separator";
 import { Download, Calendar, Code, FileText } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useShopId } from "@/hooks/useShopId";
+import { supabase } from "@sm/integrations/supabase/client";
+import { useShopId } from "@sm/hooks/useShopId";
 import { saveAs } from "file-saver";
 
 const TABLE_MAP: Record<string, string> = {

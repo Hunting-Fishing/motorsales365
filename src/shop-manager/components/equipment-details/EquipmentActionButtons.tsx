@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Wrench, Calendar, FileText, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Equipment } from '@/types/equipment';
+import { Equipment } from '@sm/types/equipment';
 
 interface EquipmentActionButtonsProps {
   equipment: Equipment;

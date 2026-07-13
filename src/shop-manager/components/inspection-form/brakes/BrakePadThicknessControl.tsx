@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Slider } from "@sm/components/ui/slider";
+import { Label } from "@sm/components/ui/label";
+import { Input } from "@sm/components/ui/input";
 
 interface BrakePadThicknessControlProps {
   currentThickness: number;

@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { Customer } from '@/types/customer';
-import { WorkOrder } from '@/types/workOrder';
-import { getWorkOrdersByCustomerId } from '@/services/workOrder';
+import { Customer } from '@sm/types/customer';
+import { WorkOrder } from '@sm/types/workOrder';
+import { getWorkOrdersByCustomerId } from '@sm/services/workOrder';
 
 export function useCustomerDetails(customerId: string) {
   const [customer, setCustomer] = useState<Customer | null>(null);

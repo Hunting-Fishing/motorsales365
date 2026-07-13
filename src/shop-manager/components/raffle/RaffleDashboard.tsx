@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Ticket, Trophy, Users, DollarSign, Calendar, Clock, Eye, Gift, Plus } from 'lucide-react';
-import { RaffleService } from '@/services/raffleService';
-import { Raffle, RaffleStats } from '@/types/raffle';
-import { useToast } from '@/hooks/use-toast';
+import { RaffleService } from '@sm/services/raffleService';
+import { Raffle, RaffleStats } from '@sm/types/raffle';
+import { useToast } from '@sm/hooks/use-toast';
 import { format, formatDistanceToNow } from 'date-fns';
 
 interface RaffleDashboardProps {

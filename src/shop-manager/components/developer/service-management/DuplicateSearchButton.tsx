@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import { Search } from 'lucide-react';
-import { ServiceMainCategory } from '@/types/service';
+import { ServiceMainCategory } from '@sm/types/service';
 import { DuplicateResolutionDialog } from './DuplicateResolutionDialog';
 
 interface DuplicateSearchButtonProps {

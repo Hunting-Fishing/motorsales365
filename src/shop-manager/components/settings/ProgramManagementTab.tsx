@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Plus, Users, DollarSign, Calendar, MapPin, Trash2, Edit, Target, TrendingUp, UserCheck, Link2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { nonprofitApi } from '@/lib/services/nonprofitApi';
-import type { Program, CreateProgramData, Volunteer, VolunteerAssignment } from '@/types/nonprofit';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useToast } from '@sm/hooks/use-toast';
+import { nonprofitApi } from '@sm/lib/services/nonprofitApi';
+import type { Program, CreateProgramData, Volunteer, VolunteerAssignment } from '@sm/types/nonprofit';
 
 export function ProgramManagementTab() {
   const [programs, setPrograms] = useState<Program[]>([]);

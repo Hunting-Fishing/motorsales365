@@ -1,6 +1,6 @@
 
 import { z } from "zod";
-import { ReminderCategory, ReminderTemplate } from "@/types/reminder";
+import { ReminderCategory, ReminderTemplate } from "@sm/types/reminder";
 
 // Schema for creating a new reminder
 export const reminderFormSchema = z.object({

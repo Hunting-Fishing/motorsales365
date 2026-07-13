@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { AlertTriangle, Package, User, Clock, Bell } from "lucide-react";
-import { getDashboardAlerts, DashboardAlert } from "@/services/dashboard/alertsService";
+import { getDashboardAlerts, DashboardAlert } from "@sm/services/dashboard/alertsService";
 
 export function DashboardAlerts() {
   const [alerts, setAlerts] = useState<DashboardAlert[]>([]);

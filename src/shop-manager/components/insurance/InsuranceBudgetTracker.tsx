@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Progress } from "@sm/components/ui/progress";
 import { 
   DollarSign, TrendingUp, Calendar, Target, AlertTriangle 
 } from "lucide-react";
@@ -13,8 +13,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { formatCurrency } from "@/lib/utils";
+import { supabase } from "@sm/integrations/supabase/client";
+import { formatCurrency } from "@sm/lib/utils";
 
 interface InsuranceBudgetTrackerProps {
   annualPremiumTotal: number;

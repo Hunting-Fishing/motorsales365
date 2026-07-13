@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { teamDataService, TeamFilterData } from '@/services/team/teamDataService';
+import { teamDataService, TeamFilterData } from '@sm/services/team/teamDataService';
 
 export function useTeamFilterData() {
   const [filterData, setFilterData] = useState<TeamFilterData>({

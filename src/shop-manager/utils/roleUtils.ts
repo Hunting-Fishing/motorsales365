@@ -1,5 +1,5 @@
 
-import { departmentCategories } from '@/components/team/form/jobTitleData';
+import { departmentCategories } from '@sm/components/team/form/jobTitleData';
 
 // Define the allowed app role types for type safety
 export type AppRoleType = 'owner' | 'admin' | 'manager' | 'parts_manager' | 'service_advisor' | 'technician' | 'reception' | 'other_staff';

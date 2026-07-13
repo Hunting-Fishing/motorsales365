@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { StaffMember } from '@/types/invoice';
+import { supabase } from '@sm/lib/supabase';
+import { StaffMember } from '@sm/types/invoice';
 
 export function useStaff() {
   const [staff, setStaff] = useState<StaffMember[]>([]);

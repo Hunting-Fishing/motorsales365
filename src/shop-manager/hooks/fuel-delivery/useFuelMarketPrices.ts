@@ -1,11 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
 import { toast } from 'sonner';
 
 // Re-export from centralized city data
-export { CANADIAN_CITIES, PROVINCE_NAMES, getCitiesByProvince, searchCities } from '@/data/canadianCities';
-export type { CanadianCity } from '@/data/canadianCities';
+export { CANADIAN_CITIES, PROVINCE_NAMES, getCitiesByProvince, searchCities } from '@sm/data/canadianCities';
+export type { CanadianCity } from '@sm/data/canadianCities';
 
 export interface FuelMarketPrice {
   id: string;

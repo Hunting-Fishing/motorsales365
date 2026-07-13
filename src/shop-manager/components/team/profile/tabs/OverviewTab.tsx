@@ -1,6 +1,6 @@
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { TeamMember } from "@/types/team";
+import { Card, CardHeader, CardTitle, CardContent } from "@sm/components/ui/card";
+import { TeamMember } from "@sm/types/team";
 
 interface OverviewTabProps {
   member: TeamMember;

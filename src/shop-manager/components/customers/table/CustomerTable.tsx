@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@sm/components/ui/table";
+import { Badge } from "@sm/components/ui/badge";
+import { Button } from "@sm/components/ui/button";
 import { Eye, Edit, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Customer, getCustomerFullName } from "@/types/customer";
-import { Skeleton } from "@/components/ui/skeleton";
-import { SendSmsDialog } from "@/components/sms/SendSmsDialog";
+import { Customer, getCustomerFullName } from "@sm/types/customer";
+import { Skeleton } from "@sm/components/ui/skeleton";
+import { SendSmsDialog } from "@sm/components/sms/SendSmsDialog";
 
 interface CustomerTableProps {
   customers: Customer[];

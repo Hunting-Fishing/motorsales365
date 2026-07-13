@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { ServiceSector } from '@/types/service';
-import { SelectedService } from '@/types/selectedService';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { ServiceSector } from '@sm/types/service';
+import { SelectedService } from '@sm/types/selectedService';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Info, Database, Users, FileText } from 'lucide-react';
 
 interface ServiceDebugPanelProps {

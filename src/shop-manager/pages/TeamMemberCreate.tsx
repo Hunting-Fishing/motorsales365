@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TeamMemberForm } from '@/components/team/TeamMemberForm';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { useShopId } from '@/hooks/useShopId';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import { TeamMemberForm } from '@sm/components/team/TeamMemberForm';
+import { supabase } from '@sm/lib/supabase';
+import { useToast } from '@sm/hooks/use-toast';
+import { useShopId } from '@sm/hooks/useShopId';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import { Label } from '@sm/components/ui/label';
 
 export default function TeamMemberCreate() {
   const navigate = useNavigate();

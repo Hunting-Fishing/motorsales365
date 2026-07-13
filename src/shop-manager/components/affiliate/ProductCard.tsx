@@ -1,19 +1,19 @@
 
 import React from 'react';
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@sm/components/ui/card";
+import { Button } from "@sm/components/ui/button";
 import { Heart, Share2, ShoppingCart } from "lucide-react";
-import { AffiliateProduct } from '@/types/affiliate';
+import { AffiliateProduct } from '@sm/types/affiliate';
 import ProductTierBadge from './ProductTierBadge';
 import { ProductRating } from './ProductRating';
-import { formatCurrency } from '@/lib/utils';
-import { useToast } from '@/components/ui/use-toast';
+import { formatCurrency } from '@sm/lib/utils';
+import { useToast } from '@sm/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { 
   ProductViewTracker, 
   useProductAnalytics,
   ProductInteractionType 
-} from '@/components/developer/shopping/analytics/AnalyticsTracker';
+} from '@sm/components/developer/shopping/analytics/AnalyticsTracker';
 
 interface ProductCardProps {
   product: AffiliateProduct;

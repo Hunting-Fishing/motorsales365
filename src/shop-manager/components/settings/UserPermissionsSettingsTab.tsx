@@ -1,4 +1,4 @@
-import UserPermissionsSettings from '@/pages/settings/UserPermissionsSettings';
+import UserPermissionsSettings from '@sm/pages/settings/UserPermissionsSettings';
 
 /**
  * Wrapper component for User Permissions Settings to be used in Settings tabs

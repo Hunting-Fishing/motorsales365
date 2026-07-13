@@ -1,5 +1,5 @@
 
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@sm/hooks/use-toast';
 
 export function handleApiError(error: any, defaultMessage = 'An error occurred') {
   console.error('API Error:', error);

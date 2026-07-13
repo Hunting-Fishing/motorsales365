@@ -4,7 +4,7 @@ import { useDIYBayOperations } from './diybay/useDIYBayOperations';
 import { useRateHistory } from './diybay/useRateHistory';
 import { useRateSettings } from './diybay/useRateSettings';
 import { useRateCalculation } from './diybay/useRateCalculation';
-import { RateSettings } from '@/services/diybay/diybayService';
+import { RateSettings } from '@sm/services/diybay/diybayService';
 
 /**
  * Main hook for DIY bay rates management

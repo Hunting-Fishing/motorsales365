@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react';
-import { WorkOrder } from '@/types/workOrder';
-import { WorkOrderJobLine } from '@/types/jobLine';
-import { WorkOrderPart } from '@/types/workOrderPart';
-import { TimeEntry } from '@/types/workOrder';
-import { Customer } from '@/types/customer';
+import { WorkOrder } from '@sm/types/workOrder';
+import { WorkOrderJobLine } from '@sm/types/jobLine';
+import { WorkOrderPart } from '@sm/types/workOrderPart';
+import { TimeEntry } from '@sm/types/workOrder';
+import { Customer } from '@sm/types/customer';
 import { WorkOrderLineItems } from '../job-lines/WorkOrderLineItems';
 import { WorkOrderCustomerCard } from './WorkOrderCustomerCard';
 import { WorkOrderTimeCard } from './WorkOrderTimeCard';
 import { WorkOrderTotals } from '../shared/WorkOrderTotals';
-import { useWorkOrderPartsData } from '@/hooks/useWorkOrderPartsData';
-import { useWorkOrderJobLineOperations } from '@/hooks/useWorkOrderJobLineOperations';
+import { useWorkOrderPartsData } from '@sm/hooks/useWorkOrderPartsData';
+import { useWorkOrderJobLineOperations } from '@sm/hooks/useWorkOrderJobLineOperations';
 
 interface WorkOrderOverviewTabProps {
   workOrder: WorkOrder;

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { AuthService } from '@/lib/services/AuthService';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { AuthService } from '@sm/lib/services/AuthService';
+import { useToast } from '@sm/hooks/use-toast';
 import { Lock, KeyRound, ArrowRight, CheckCircle } from 'lucide-react';
-import ab365Logo from '@/assets/ab365-logo.png';
+import ab365Logo from '@sm/assets/ab365-logo.png';
 
 export default function ResetPassword() {
   const navigate = useNavigate();

@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { Customer, CustomerVehicle } from '@/types/customer';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Customer, CustomerVehicle } from '@sm/types/customer';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { Car, Truck, Wrench, Plus, ChevronRight } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AddVehicleDialog } from '@/components/customers/vehicles/AddVehicleDialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { AddVehicleDialog } from '@sm/components/customers/vehicles/AddVehicleDialog';
 
 interface CustomerEquipmentSelectorProps {
   customer: Customer;

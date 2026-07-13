@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import {
   ServicePackage,
   ServicePackageItem,
@@ -7,7 +7,7 @@ import {
   InventoryForecast,
   AssetUsageConfig,
   SeasonalFactor,
-} from '@/types/inventory/predictive';
+} from '@sm/types/inventory/predictive';
 
 // Service Package Management
 export const getServicePackages = async (): Promise<ServicePackage[]> => {

@@ -1,7 +1,7 @@
 
-import { supabase } from "@/lib/supabase";
-import { EquipmentRecommendation } from "@/types/dashboard";
-import { Equipment } from "@/types/equipment";
+import { supabase } from "@sm/lib/supabase";
+import { EquipmentRecommendation } from "@sm/types/dashboard";
+import { Equipment } from "@sm/types/equipment";
 import { addDays, differenceInDays, parseISO, isAfter } from "date-fns";
 
 // Get equipment recommendations for dashboard

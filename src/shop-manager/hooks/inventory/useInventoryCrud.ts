@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
-import { InventoryItemExtended } from '@/types/inventory';
-import { createInventoryItem, updateInventoryItem, deleteInventoryItem } from '@/services/inventory/crudService';
+import { InventoryItemExtended } from '@sm/types/inventory';
+import { createInventoryItem, updateInventoryItem, deleteInventoryItem } from '@sm/services/inventory/crudService';
 
 export function useInventoryCrud() {
   const [isLoading, setIsLoading] = useState(false);

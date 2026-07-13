@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { useTimeCards } from '@/hooks/useTimeCards';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
+import { useTimeCards } from '@sm/hooks/useTimeCards';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
 import { startOfWeek, endOfWeek, format, isWithinInterval } from 'date-fns';
 import { 
   AlertTriangle, 
@@ -15,7 +15,7 @@ import {
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@sm/components/ui/skeleton';
 
 interface EmployeeOvertimeData {
   employeeId: string;

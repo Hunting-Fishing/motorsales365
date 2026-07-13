@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Progress } from '@sm/components/ui/progress';
 import { Users, ShoppingCart, DollarSign, Shield, TrendingUp, AlertTriangle } from 'lucide-react';
-import { enterpriseService } from '@/services/enterpriseService';
-import type { EnterpriseStats } from '@/types/phase4';
-import { cn } from '@/lib/utils';
+import { enterpriseService } from '@sm/services/enterpriseService';
+import type { EnterpriseStats } from '@sm/types/phase4';
+import { cn } from '@sm/lib/utils';
 
 export const EnterpriseDashboard = () => {
   const [stats, setStats] = useState<EnterpriseStats | null>(null);

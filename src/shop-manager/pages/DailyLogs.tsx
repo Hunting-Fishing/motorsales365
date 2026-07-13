@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { Gauge, Route, Fuel, Wrench, Settings, History, Clock, ClipboardCheck, Ship } from 'lucide-react';
-import { EngineHoursTab } from '@/components/daily-logs/EngineHoursTab';
-import { TripLogsTab } from '@/components/daily-logs/TripLogsTab';
-import { FuelEntryTab } from '@/components/daily-logs/FuelEntryTab';
-import { MaintenancePerformedTab } from '@/components/daily-logs/MaintenancePerformedTab';
-import { MaintenanceIntervalSetup } from '@/components/daily-logs/MaintenanceIntervalSetup';
-import { PreviousMaintenanceEntry } from '@/components/daily-logs/PreviousMaintenanceEntry';
-import { DailyTimesheetTab } from '@/components/daily-logs/DailyTimesheetTab';
-import { InspectionsQuickAccess } from '@/components/daily-logs/InspectionsQuickAccess';
-import { VoyageLogsTab } from '@/components/daily-logs/voyage/VoyageLogsTab';
+import { EngineHoursTab } from '@sm/components/daily-logs/EngineHoursTab';
+import { TripLogsTab } from '@sm/components/daily-logs/TripLogsTab';
+import { FuelEntryTab } from '@sm/components/daily-logs/FuelEntryTab';
+import { MaintenancePerformedTab } from '@sm/components/daily-logs/MaintenancePerformedTab';
+import { MaintenanceIntervalSetup } from '@sm/components/daily-logs/MaintenanceIntervalSetup';
+import { PreviousMaintenanceEntry } from '@sm/components/daily-logs/PreviousMaintenanceEntry';
+import { DailyTimesheetTab } from '@sm/components/daily-logs/DailyTimesheetTab';
+import { InspectionsQuickAccess } from '@sm/components/daily-logs/InspectionsQuickAccess';
+import { VoyageLogsTab } from '@sm/components/daily-logs/voyage/VoyageLogsTab';
 
 export default function DailyLogs() {
   const [activeTab, setActiveTab] = useState('timesheet');

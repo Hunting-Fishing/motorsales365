@@ -1,8 +1,8 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
 import { Wifi, WifiOff, CloudUpload, Loader2 } from 'lucide-react';
-import { useOfflineInspections } from '@/hooks/useOfflineInspections';
+import { useOfflineInspections } from '@sm/hooks/useOfflineInspections';
 
 interface OfflineStatusBarProps {
   onSync?: () => Promise<void>;

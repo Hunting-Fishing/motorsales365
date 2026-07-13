@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { BarChart3, Plus, Play, Calendar, TrendingUp } from 'lucide-react';
-import { enterpriseService } from '@/services/enterpriseService';
-import type { BIReport } from '@/types/phase4';
+import { enterpriseService } from '@sm/services/enterpriseService';
+import type { BIReport } from '@sm/types/phase4';
 
 export const BIReporting = () => {
   const [reports, setReports] = useState<BIReport[]>([]);

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useEquipmentCategories } from '@/hooks/useEquipmentCategories';
-import { getTypesForCategory, getCategoryForType, CATEGORY_TYPE_MAP } from '@/types/equipmentCategory';
+import { Label } from '@sm/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useEquipmentCategories } from '@sm/hooks/useEquipmentCategories';
+import { getTypesForCategory, getCategoryForType, CATEGORY_TYPE_MAP } from '@sm/types/equipmentCategory';
 
 interface EquipmentCategorySelectorProps {
   categoryId: string;

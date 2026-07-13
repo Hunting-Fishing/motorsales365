@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useCallback } from 'react';
-import { InventoryPurchaseOrder, InventoryPurchaseOrderItem } from '@/types/inventory';
-import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { InventoryPurchaseOrder, InventoryPurchaseOrderItem } from '@sm/types/inventory';
+import { toast } from '@sm/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
 
 interface CreatePurchaseOrderParams {
   vendorId: string;

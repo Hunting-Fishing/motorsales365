@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@sm/components/ui/dialog';
+import { Textarea } from '@sm/components/ui/textarea';
 import { Plus, Trash2, Edit2, Clock } from 'lucide-react';
-import { useShiftTemplates } from '@/hooks/useShiftTemplates';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import type { ShiftTemplate } from '@/types/shift-template';
+import { useShiftTemplates } from '@sm/hooks/useShiftTemplates';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Checkbox } from '@sm/components/ui/checkbox';
+import type { ShiftTemplate } from '@sm/types/shift-template';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 

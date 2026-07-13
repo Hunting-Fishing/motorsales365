@@ -1,25 +1,25 @@
 
 import React, { useState } from "react";
-import { Customer, CustomerNote } from "@/types/customer";
+import { Customer, CustomerNote } from "@sm/types/customer";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+} from "@sm/components/ui/dialog";
+import { Button } from "@sm/components/ui/button";
+import { Textarea } from "@sm/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { addCustomerNote } from "@/services/customers";
+} from "@sm/components/ui/select";
+import { Label } from "@sm/components/ui/label";
+import { useToast } from "@sm/hooks/use-toast";
+import { addCustomerNote } from "@sm/services/customers";
 
 interface AddNoteDialogProps {
   customer: Customer;

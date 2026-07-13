@@ -1,4 +1,4 @@
-import { TaxSettings } from '@/services/settings/taxSettingsService';
+import { TaxSettings } from '@sm/services/settings/taxSettingsService';
 
 export interface TaxCalculationInput {
   laborAmount: number;

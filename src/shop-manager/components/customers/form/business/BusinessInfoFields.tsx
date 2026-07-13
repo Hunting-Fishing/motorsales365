@@ -4,7 +4,7 @@ import { UseFormReturn } from "react-hook-form";
 import { 
   Building2
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { CustomerFormValues } from "../schemas/customerSchema";
 import { shops as defaultShops } from "../schemas/relationshipData";
 import { EssentialBusinessDetails } from "./EssentialBusinessDetails";

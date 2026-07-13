@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { Badge } from "@sm/components/ui/badge";
 import { Wrench, TrendingUp, TrendingDown, AlertCircle, Loader2 } from "lucide-react";
-import { useRepairTrends } from "@/hooks/useRepairTrends";
-import { formatCurrency } from "@/lib/utils";
+import { useRepairTrends } from "@sm/hooks/useRepairTrends";
+import { formatCurrency } from "@sm/lib/utils";
 import {
   BarChart,
   Bar,

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   Star, StarOff, ExternalLink, MoreVertical, Pencil, Trash2,
   Globe, FileText, Video, Wrench, Plug, Layout
@@ -11,8 +11,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Resource } from '@/types/contacts';
+} from '@sm/components/ui/dropdown-menu';
+import { Resource } from '@sm/types/contacts';
 
 interface ResourceCardProps {
   resource: Resource;

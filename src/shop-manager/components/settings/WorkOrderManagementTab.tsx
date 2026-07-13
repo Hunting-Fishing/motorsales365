@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
 import { WorkOrderNumberingTab } from './WorkOrderNumberingTab';
 import { WorkOrderWorkflowTab } from './WorkOrderWorkflowTab';
 import { WorkOrderTemplateTab } from './WorkOrderTemplateTab';

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardHeader, CardContent, CardTitle } from "@sm/components/ui/card";
+import { Label } from "@sm/components/ui/label";
+import { Input } from "@sm/components/ui/input";
+import { Switch } from "@sm/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@sm/components/ui/select";
 import { Calculator, Percent } from "lucide-react";
-import { useTaxSettings } from "@/hooks/useTaxSettings";
+import { useTaxSettings } from "@sm/hooks/useTaxSettings";
 
 interface TaxSettingsSectionProps {
   shopId: string;

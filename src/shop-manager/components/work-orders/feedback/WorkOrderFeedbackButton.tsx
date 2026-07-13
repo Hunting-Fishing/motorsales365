@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { FeedbackForm } from '@/components/feedback/FeedbackForm';
-import { getFeedbackForms } from '@/services/feedbackService';
-import { useShopId } from '@/hooks/useShopId';
+import { Button } from '@sm/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { FeedbackForm } from '@sm/components/feedback/FeedbackForm';
+import { getFeedbackForms } from '@sm/services/feedbackService';
+import { useShopId } from '@sm/hooks/useShopId';
 import { MessageSquare, Loader2 } from 'lucide-react';
 
 interface WorkOrderFeedbackButtonProps {

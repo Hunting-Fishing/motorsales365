@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { format, isToday, isFuture, isPast, startOfDay } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useSafetyMeetings, SafetyMeeting } from '@/hooks/useSafetyMeetings';
-import { MeetingCard } from '@/components/safety/meetings/MeetingCard';
-import { CreateMeetingDialog } from '@/components/safety/meetings/CreateMeetingDialog';
-import { MeetingDetailsSheet } from '@/components/safety/meetings/MeetingDetailsSheet';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { useSafetyMeetings, SafetyMeeting } from '@sm/hooks/useSafetyMeetings';
+import { MeetingCard } from '@sm/components/safety/meetings/MeetingCard';
+import { CreateMeetingDialog } from '@sm/components/safety/meetings/CreateMeetingDialog';
+import { MeetingDetailsSheet } from '@sm/components/safety/meetings/MeetingDetailsSheet';
 import { Plus, Search, Calendar, Users, ClipboardList } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
 
 export default function SafetyMeetings() {
   const { meetings, isLoading } = useSafetyMeetings();

@@ -1,7 +1,7 @@
 
 import { useState } from "react";
-import { ReminderTemplate } from "@/types/reminder";
-import { supabase } from "@/integrations/supabase/client";
+import { ReminderTemplate } from "@sm/types/reminder";
+import { supabase } from "@sm/integrations/supabase/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,8 +11,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
+} from "@sm/components/ui/alert-dialog";
+import { useToast } from "@sm/hooks/use-toast";
 
 interface DeleteTemplateDialogProps {
   isOpen: boolean;

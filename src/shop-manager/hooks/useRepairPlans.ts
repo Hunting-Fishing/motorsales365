@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { repairPlanService, RepairPlanWithTasks } from '@/services/repairPlanService';
-import { RepairPlan } from '@/types/repairPlan';
-import { toast } from '@/hooks/use-toast';
+import { repairPlanService, RepairPlanWithTasks } from '@sm/services/repairPlanService';
+import { RepairPlan } from '@sm/types/repairPlan';
+import { toast } from '@sm/hooks/use-toast';
 
 export function useRepairPlans() {
   const [repairPlans, setRepairPlans] = useState<RepairPlanWithTasks[]>([]);

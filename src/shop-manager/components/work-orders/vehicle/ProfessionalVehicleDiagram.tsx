@@ -1,6 +1,6 @@
 import React from "react";
 
-import { VehicleBodyStyle } from "@/types/vehicleBodyStyles";
+import { VehicleBodyStyle } from "@sm/types/vehicleBodyStyles";
 
 interface VehicleDiagramProps {
   view: 'side' | 'top' | 'front' | 'rear';

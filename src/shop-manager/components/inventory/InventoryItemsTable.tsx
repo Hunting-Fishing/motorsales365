@@ -1,5 +1,5 @@
 
-import { InventoryItemExtended } from "@/types/inventory";
+import { InventoryItemExtended } from "@sm/types/inventory";
 import { InventoryTable } from "./InventoryTable";
 import { InventoryHeader } from "./InventoryHeader";
 

@@ -9,8 +9,8 @@ import {
   updateProduct,
   deleteProduct,
   ProductData 
-} from '@/services/affiliate/productService';
-import { AffiliateTool } from '@/types/affiliate';
+} from '@sm/services/affiliate/productService';
+import { AffiliateTool } from '@sm/types/affiliate';
 import { toast } from 'sonner';
 
 interface UseProductsManagerReturn {

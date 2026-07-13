@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { realtimeService, RealtimeEventCallback, DatabaseChangeEvent } from '@/services/realtime/RealtimeService';
+import { realtimeService, RealtimeEventCallback, DatabaseChangeEvent } from '@sm/services/realtime/RealtimeService';
 
 interface UseRealtimeOptions {
   enabled?: boolean;

@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useShopId } from '@/hooks/useShopId';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useShopId } from '@sm/hooks/useShopId';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Badge } from '@sm/components/ui/badge';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
 import { Plus, Search, Hammer, CheckCircle, AlertCircle, XCircle, Wrench as WrenchIcon, Download, ClipboardList, ShieldCheck } from 'lucide-react';
 import { getWarrantyStatus } from './ToolWarrantyBadge';
 import { ToolDialog } from './ToolDialog';
 import { ToolCheckoutDialog } from './ToolCheckoutDialog';
 import { ToolMaintenanceDialog } from './ToolMaintenanceDialog';
 import { ToolCard } from './ToolCard';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@sm/hooks/use-toast';
 
 const statusIcons = {
   available: <CheckCircle className="h-4 w-4 text-green-600" />,

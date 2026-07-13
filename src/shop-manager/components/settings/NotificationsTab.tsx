@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from "react";
-import { useNotifications } from "@/context/notifications";
-import { toast } from "@/hooks/use-toast";
-import { NotificationPreferences } from "@/types/notification";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useNotifications } from "@sm/context/notifications";
+import { toast } from "@sm/hooks/use-toast";
+import { NotificationPreferences } from "@sm/types/notification";
+import { Alert, AlertDescription } from "@sm/components/ui/alert";
 import { ConnectionStatusCard } from "./notifications/ConnectionStatusCard";
 import { NotificationChannelsCard } from "./notifications/NotificationChannelsCard";
 import { NotificationCategoriesCard } from "./notifications/NotificationCategoriesCard";
@@ -11,7 +11,7 @@ import { NotificationSoundCard } from "./notifications/NotificationSoundCard";
 import { NotificationFrequencyCard } from "./notifications/NotificationFrequencyCard";
 import { NotificationPreviewCard } from "./notifications/NotificationPreviewCard";
 import { SaveButton } from "./notifications/SaveButton";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@sm/components/ui/tabs";
 import { Settings } from "lucide-react";
 
 export function NotificationsTab() {

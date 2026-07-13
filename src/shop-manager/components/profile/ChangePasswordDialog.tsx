@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { supabase } from '@/lib/supabase';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@sm/components/ui/dialog';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Label } from '@sm/components/ui/label';
+import { supabase } from '@sm/lib/supabase';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 

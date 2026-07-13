@@ -1,6 +1,6 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { CustomerLoyalty, LoyaltyRedemption } from "@/types/loyalty";
+import { supabase } from "@sm/integrations/supabase/client";
+import { CustomerLoyalty, LoyaltyRedemption } from "@sm/types/loyalty";
 import { getCustomerLoyalty } from './customerLoyaltyService';
 import { createLoyaltyTransaction } from './transactionService';
 import { toast } from "sonner";

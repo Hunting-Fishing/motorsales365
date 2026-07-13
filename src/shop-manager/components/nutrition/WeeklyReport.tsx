@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { Loader2, TrendingUp, Award, Flame, Target, Droplets } from 'lucide-react';
-import { useFoodLogs, useHydrationLogs, useDailyTargets } from '@/hooks/useNutrition';
+import { useFoodLogs, useHydrationLogs, useDailyTargets } from '@sm/hooks/useNutrition';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format, subDays, eachDayOfInterval } from 'date-fns';
 

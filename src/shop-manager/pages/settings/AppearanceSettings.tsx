@@ -1,8 +1,8 @@
 
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { AppearanceTab } from "@/components/settings/AppearanceTab";
-import { useShopId } from "@/hooks/useShopId";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { AppearanceTab } from "@sm/components/settings/AppearanceTab";
+import { useShopId } from "@sm/hooks/useShopId";
 
 export const AppearanceSettings = () => {
   const { shopId } = useShopId();

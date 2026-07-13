@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import type { DailyShopInspection } from '@/types/safety';
+import { Skeleton } from '@sm/components/ui/skeleton';
+import type { DailyShopInspection } from '@sm/types/safety';
 
 interface TodaysHazardsWidgetProps {
   inspections: DailyShopInspection[];

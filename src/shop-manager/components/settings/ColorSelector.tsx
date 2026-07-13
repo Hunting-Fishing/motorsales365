@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Label } from "@sm/components/ui/label";
+import { Input } from "@sm/components/ui/input";
 import { Check } from "lucide-react";
 
 interface ColorSelectorProps {

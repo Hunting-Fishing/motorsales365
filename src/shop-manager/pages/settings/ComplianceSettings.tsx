@@ -1,6 +1,6 @@
 import React from "react";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { ComplianceTab } from "@/components/settings/ComplianceTab";
+import { SettingsPageLayout } from "@sm/components/settings/SettingsPageLayout";
+import { ComplianceTab } from "@sm/components/settings/ComplianceTab";
 
 export const ComplianceSettings = () => {
   return (

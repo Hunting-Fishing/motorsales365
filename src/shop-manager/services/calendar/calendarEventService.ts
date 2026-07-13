@@ -1,6 +1,6 @@
-import { supabase } from "@/lib/supabase";
-import { CalendarEvent, CreateCalendarEventDto } from "@/types/calendar/events";
-import { handleApiError } from "@/utils/errorHandling";
+import { supabase } from "@sm/lib/supabase";
+import { CalendarEvent, CreateCalendarEventDto } from "@sm/types/calendar/events";
+import { handleApiError } from "@sm/utils/errorHandling";
 
 /**
  * Fetch calendar events for a specified date range

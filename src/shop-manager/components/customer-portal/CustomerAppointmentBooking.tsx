@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { BusinessHoursBookingDialog } from '@/components/booking/BusinessHoursBookingDialog';
-import { CalendarView } from '@/components/calendar/CalendarView';
-import { useCalendarEvents } from '@/hooks/useCalendarEvents';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { BusinessHoursBookingDialog } from '@sm/components/booking/BusinessHoursBookingDialog';
+import { CalendarView } from '@sm/components/calendar/CalendarView';
+import { useCalendarEvents } from '@sm/hooks/useCalendarEvents';
+import { useBusinessHours } from '@sm/hooks/useBusinessHours';
 import { Calendar, Clock, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';

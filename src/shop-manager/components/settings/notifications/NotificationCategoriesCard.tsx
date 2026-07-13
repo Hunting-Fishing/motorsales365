@@ -1,10 +1,10 @@
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { NotificationPreferences } from "@/types/notification";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@sm/components/ui/card";
+import { Switch } from "@sm/components/ui/switch";
+import { NotificationPreferences } from "@sm/types/notification";
 import { Bell } from "lucide-react";
-import { capitalize } from "@/utils/stringUtils";
+import { capitalize } from "@sm/utils/stringUtils";
 
 interface NotificationCategoriesCardProps {
   preferences: NotificationPreferences;

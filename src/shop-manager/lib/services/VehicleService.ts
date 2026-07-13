@@ -1,5 +1,5 @@
 
-import { VehicleRepository, Vehicle, CreateVehicleInput, UpdateVehicleInput } from '@/lib/database/repositories/VehicleRepository';
+import { VehicleRepository, Vehicle, CreateVehicleInput, UpdateVehicleInput } from '@sm/lib/database/repositories/VehicleRepository';
 
 export class VehicleService {
   private repository: VehicleRepository;

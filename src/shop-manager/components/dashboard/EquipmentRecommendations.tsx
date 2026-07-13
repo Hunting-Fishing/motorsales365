@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getEquipmentRecommendations } from "@/services/dashboard"; // Updated import path
-import { EquipmentRecommendation } from "@/types/dashboard";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { getEquipmentRecommendations } from "@sm/services/dashboard"; // Updated import path
+import { EquipmentRecommendation } from "@sm/types/dashboard";
 import { Loader2, AlertCircle, Calendar, Wrench } from "lucide-react";
 
 export function EquipmentRecommendations() {

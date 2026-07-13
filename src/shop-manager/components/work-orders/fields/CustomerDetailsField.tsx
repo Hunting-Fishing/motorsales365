@@ -1,9 +1,9 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { FormField, FormItem, FormLabel, FormControl } from "@sm/components/ui/form";
+import { Input } from "@sm/components/ui/input";
 import { User } from "lucide-react";
 
 interface CustomerDetailsFieldProps {

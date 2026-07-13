@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { saveAs } from 'file-saver';
 import { utils as XLSXUtils, write as XLSXWrite } from 'xlsx';
-import { Button } from '@/components/ui/button';
-import { WorkOrder } from '@/types/workOrder';
+import { Button } from '@sm/components/ui/button';
+import { WorkOrder } from '@sm/types/workOrder';
 import { format } from 'date-fns';
 
 export function generateCSV(data: WorkOrder[]) {

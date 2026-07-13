@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@sm/components/ui/card';
 import { DollarSign, Clock, TrendingUp, Users } from 'lucide-react';
-import { useLaborAnalytics } from '@/hooks/useLaborAnalytics';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useLaborAnalytics } from '@sm/hooks/useLaborAnalytics';
+import { Skeleton } from '@sm/components/ui/skeleton';
 import { format } from 'date-fns';
 
 export function LaborCostDashboard() {

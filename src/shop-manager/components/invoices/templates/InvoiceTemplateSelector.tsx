@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@sm/components/ui/button";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -8,9 +8,9 @@ import {
   DropdownMenuLabel, 
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { InvoiceTemplate } from "@/types/invoice";
+} from "@sm/components/ui/dropdown-menu";
+import { ScrollArea } from "@sm/components/ui/scroll-area";
+import { InvoiceTemplate } from "@sm/types/invoice";
 import { FileBox } from "lucide-react";
 
 interface InvoiceTemplateSelectorProps {

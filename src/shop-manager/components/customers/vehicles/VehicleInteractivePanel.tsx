@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
-import { VehicleBodyStyle } from '@/types/vehicleBodyStyles';
+import { Badge } from "@sm/components/ui/badge";
+import { VehicleBodyStyle } from '@sm/types/vehicleBodyStyles';
 
 interface DamageArea {
   id: string;

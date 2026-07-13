@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@sm/integrations/supabase/client';
 import {
   AIAnalytics,
   ChatMessage,
@@ -7,7 +7,7 @@ import {
   AISearchResult,
   WorkflowAutomation,
   AIInsight
-} from '@/types/phase5';
+} from '@sm/types/phase5';
 
 export class AIService {
   // AI Analytics

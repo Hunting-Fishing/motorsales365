@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@sm/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -9,12 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+} from '@sm/components/ui/dialog';
+import { Textarea } from '@sm/components/ui/textarea';
+import { Label } from '@sm/components/ui/label';
 import { Receipt, Loader2 } from 'lucide-react';
-import { convertWorkOrderToInvoice } from '@/services/quote/quoteService';
-import { toast } from '@/hooks/use-toast';
+import { convertWorkOrderToInvoice } from '@sm/services/quote/quoteService';
+import { toast } from '@sm/hooks/use-toast';
 
 interface ConvertToInvoiceButtonProps {
   workOrderId: string;

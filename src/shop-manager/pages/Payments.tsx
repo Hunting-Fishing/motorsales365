@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Button } from '@sm/components/ui/button';
+import { Input } from '@sm/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@sm/components/ui/tabs';
+import { Badge } from '@sm/components/ui/badge';
 import { 
   CreditCard, 
   DollarSign, 
@@ -21,14 +21,14 @@ import {
   Clock,
   XCircle
 } from 'lucide-react';
-import { PaymentHistoryList } from '@/components/payments/PaymentHistoryList';
-import { PaymentMethodsList } from '@/components/payments/PaymentMethodsList';
-import { AddPaymentMethodDialog } from '@/components/payments/AddPaymentMethodDialog';
-import { usePaymentHistory } from '@/hooks/usePaymentHistory';
-import { usePaymentMethods } from '@/hooks/usePaymentMethods';
-import { Payment, PaymentStatus, PaymentType } from '@/types/payment';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { PaymentHistoryList } from '@sm/components/payments/PaymentHistoryList';
+import { PaymentMethodsList } from '@sm/components/payments/PaymentMethodsList';
+import { AddPaymentMethodDialog } from '@sm/components/payments/AddPaymentMethodDialog';
+import { usePaymentHistory } from '@sm/hooks/usePaymentHistory';
+import { usePaymentMethods } from '@sm/hooks/usePaymentMethods';
+import { Payment, PaymentStatus, PaymentType } from '@sm/types/payment';
+import { supabase } from '@sm/integrations/supabase/client';
+import { toast } from '@sm/hooks/use-toast';
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
 
 interface PaymentStats {

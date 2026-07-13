@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@sm/integrations/supabase/client';
+import { useToast } from '@sm/hooks/use-toast';
 
 export type GYRStatus = 1 | 2 | 3; // 1=Red, 2=Yellow, 3=Green
 

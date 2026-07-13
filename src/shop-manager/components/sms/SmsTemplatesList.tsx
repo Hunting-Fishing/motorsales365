@@ -1,11 +1,11 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "@sm/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
+import { useToast } from "@sm/hooks/use-toast";
 import { Plus, Edit, Trash } from "lucide-react";
 import { SmsTemplateDialog } from "./SmsTemplateDialog";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@sm/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export interface SmsTemplate {

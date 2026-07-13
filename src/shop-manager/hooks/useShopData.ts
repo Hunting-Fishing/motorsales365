@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { shopDataService, type ShopData, type CompanyInfo } from '@/services/shopDataService';
-import { toast } from '@/hooks/use-toast';
+import { shopDataService, type ShopData, type CompanyInfo } from '@sm/services/shopDataService';
+import { toast } from '@sm/hooks/use-toast';
 
 /**
  * Hook for managing shop data state and operations

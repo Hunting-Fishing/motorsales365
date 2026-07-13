@@ -1,7 +1,7 @@
 import React from "react";
 import { X, Check, LinkIcon, MessageSquare, Phone } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Label } from "@sm/components/ui/label";
+import { Button } from "@sm/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,10 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { SendSmsButton } from "@/components/calls/SendSmsButton";
-import { VoiceCallButton } from "@/components/calls/VoiceCallButton";
-import { WorkOrder } from "@/types/workOrder";
+} from "@sm/components/ui/dialog";
+import { SendSmsButton } from "@sm/components/calls/SendSmsButton";
+import { VoiceCallButton } from "@sm/components/calls/VoiceCallButton";
+import { WorkOrder } from "@sm/types/workOrder";
 
 interface WorkOrderLinkSectionProps {
   workOrderId: string;

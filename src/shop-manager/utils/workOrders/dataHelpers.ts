@@ -1,5 +1,5 @@
 
-import { WorkOrder, WorkOrderVehicle } from '@/types/workOrder';
+import { WorkOrder, WorkOrderVehicle } from '@sm/types/workOrder';
 
 /**
  * Utility functions for consistent work order data display

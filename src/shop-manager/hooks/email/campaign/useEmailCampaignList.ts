@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { EmailCampaignPreview } from '@/types/email';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
+import { EmailCampaignPreview } from '@sm/types/email';
+import { supabase } from '@sm/lib/supabase';
+import { useToast } from '@sm/hooks/use-toast';
 import { validateCampaignStatus } from './utils/emailCampaignUtils';
 
 export const useEmailCampaignList = () => {

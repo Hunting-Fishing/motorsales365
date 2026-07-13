@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
-import { departmentSubmissionService } from '@/services/team/departmentSubmissionService';
+import { supabase } from '@sm/integrations/supabase/client';
+import { toast } from '@sm/hooks/use-toast';
+import { departmentSubmissionService } from '@sm/services/team/departmentSubmissionService';
 
 export interface Department {
   id: string;

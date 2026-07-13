@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, Users, BookOpen, MessageSquare, Clock, Star, Filter, Calendar, Eye, ThumbsUp } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DatePickerWithRange } from '@/components/ui/date-range-picker';
-import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { Badge } from '@sm/components/ui/badge';
+import { Button } from '@sm/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sm/components/ui/select';
+import { DatePickerWithRange } from '@sm/components/ui/date-range-picker';
+import { supabase } from '@sm/integrations/supabase/client';
 import { DateRange } from 'react-day-picker';
 
 interface AnalyticsData {

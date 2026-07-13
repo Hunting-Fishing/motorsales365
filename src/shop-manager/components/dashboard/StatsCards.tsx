@@ -1,10 +1,10 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@sm/components/ui/card";
 import { Users, Wrench, Package, Clock, TrendingUp, TrendingDown, Wifi, WifiOff } from "lucide-react";
-import { DashboardStats } from "@/services/dashboard/statsService";
-import { useDashboardData } from "@/hooks/useDashboardData";
-import { NumberTicker } from "@/components/ui/number-ticker";
-import { AnimatedList } from "@/components/ui/animated-list";
+import { DashboardStats } from "@sm/services/dashboard/statsService";
+import { useDashboardData } from "@sm/hooks/useDashboardData";
+import { NumberTicker } from "@sm/components/ui/number-ticker";
+import { AnimatedList } from "@sm/components/ui/animated-list";
 import { motion } from "framer-motion";
 
 export function StatsCards() {

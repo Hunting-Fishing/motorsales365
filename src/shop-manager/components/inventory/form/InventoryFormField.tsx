@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@sm/components/ui/input";
+import { Textarea } from "@sm/components/ui/textarea";
 
 export interface InventoryFormFieldProps {
   label: string;

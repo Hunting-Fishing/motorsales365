@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmptyState } from '@/components/ui/empty-state';
+import { Card, CardContent, CardHeader, CardTitle } from '@sm/components/ui/card';
+import { EmptyState } from '@sm/components/ui/empty-state';
 import { Calendar, Clock } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@sm/lib/supabase';
 import { format } from 'date-fns';
 
 interface Appointment {

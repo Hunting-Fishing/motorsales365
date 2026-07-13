@@ -6,9 +6,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+} from "@sm/components/ui/select";
+import { Label } from "@sm/components/ui/label";
+import { FormControl, FormItem, FormLabel, FormMessage } from "@sm/components/ui/form";
 
 export interface SelectOption {
   value: string;
