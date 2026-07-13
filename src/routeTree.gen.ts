@@ -61,6 +61,7 @@ import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
 import { Route as FranchiseIndexRouteImport } from './routes/franchise.index'
+import { Route as DocumentCheckIndexRouteImport } from './routes/document-check.index'
 import { Route as DispatchIndexRouteImport } from './routes/dispatch.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ClubsIndexRouteImport } from './routes/clubs.index'
@@ -574,6 +575,11 @@ const FranchiseIndexRoute = FranchiseIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => FranchiseRoute,
+} as any)
+const DocumentCheckIndexRoute = DocumentCheckIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DocumentCheckRoute,
 } as any)
 const DispatchIndexRoute = DispatchIndexRouteImport.update({
   id: '/',
@@ -1934,7 +1940,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/dispatch': typeof DispatchRouteWithChildren
-  '/document-check': typeof DocumentCheckRoute
+  '/document-check': typeof DocumentCheckRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/franchise': typeof FranchiseRouteWithChildren
@@ -2101,6 +2107,7 @@ export interface FileRoutesByFullPath {
   '/clubs/': typeof ClubsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
+  '/document-check/': typeof DocumentCheckIndexRoute
   '/franchise/': typeof FranchiseIndexRoute
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
@@ -2238,7 +2245,6 @@ export interface FileRoutesByTo {
   '/bundles': typeof BundlesRoute
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
-  '/document-check': typeof DocumentCheckRoute
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/game': typeof GameRoute
@@ -2400,6 +2406,7 @@ export interface FileRoutesByTo {
   '/clubs': typeof ClubsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dispatch': typeof DispatchIndexRoute
+  '/document-check': typeof DocumentCheckIndexRoute
   '/franchise': typeof FranchiseIndexRoute
   '/games': typeof GamesIndexRoute
   '/learn': typeof LearnIndexRoute
@@ -2541,7 +2548,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/dispatch': typeof DispatchRouteWithChildren
-  '/document-check': typeof DocumentCheckRoute
+  '/document-check': typeof DocumentCheckRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/franchise': typeof FranchiseRouteWithChildren
@@ -2708,6 +2715,7 @@ export interface FileRoutesById {
   '/clubs/': typeof ClubsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
+  '/document-check/': typeof DocumentCheckIndexRoute
   '/franchise/': typeof FranchiseIndexRoute
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
@@ -3017,6 +3025,7 @@ export interface FileRouteTypes {
     | '/clubs/'
     | '/dashboard/'
     | '/dispatch/'
+    | '/document-check/'
     | '/franchise/'
     | '/games/'
     | '/learn/'
@@ -3154,7 +3163,6 @@ export interface FileRouteTypes {
     | '/bundles'
     | '/company'
     | '/contact'
-    | '/document-check'
     | '/export'
     | '/forgot-password'
     | '/game'
@@ -3316,6 +3324,7 @@ export interface FileRouteTypes {
     | '/clubs'
     | '/dashboard'
     | '/dispatch'
+    | '/document-check'
     | '/franchise'
     | '/games'
     | '/learn'
@@ -3623,6 +3632,7 @@ export interface FileRouteTypes {
     | '/clubs/'
     | '/dashboard/'
     | '/dispatch/'
+    | '/document-check/'
     | '/franchise/'
     | '/games/'
     | '/learn/'
@@ -3765,7 +3775,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DispatchRoute: typeof DispatchRouteWithChildren
-  DocumentCheckRoute: typeof DocumentCheckRoute
+  DocumentCheckRoute: typeof DocumentCheckRouteWithChildren
   ExportRoute: typeof ExportRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   FranchiseRoute: typeof FranchiseRouteWithChildren
@@ -4262,6 +4272,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/franchise/'
       preLoaderRoute: typeof FranchiseIndexRouteImport
       parentRoute: typeof FranchiseRoute
+    }
+    '/document-check/': {
+      id: '/document-check/'
+      path: '/'
+      fullPath: '/document-check/'
+      preLoaderRoute: typeof DocumentCheckIndexRouteImport
+      parentRoute: typeof DocumentCheckRoute
     }
     '/dispatch/': {
       id: '/dispatch/'
@@ -6497,6 +6514,18 @@ const DispatchRouteWithChildren = DispatchRoute._addFileChildren(
   DispatchRouteChildren,
 )
 
+interface DocumentCheckRouteChildren {
+  DocumentCheckIndexRoute: typeof DocumentCheckIndexRoute
+}
+
+const DocumentCheckRouteChildren: DocumentCheckRouteChildren = {
+  DocumentCheckIndexRoute: DocumentCheckIndexRoute,
+}
+
+const DocumentCheckRouteWithChildren = DocumentCheckRoute._addFileChildren(
+  DocumentCheckRouteChildren,
+)
+
 interface ExportRouteChildren {
   ExportTrustRoute: typeof ExportTrustRoute
 }
@@ -6643,7 +6672,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DispatchRoute: DispatchRouteWithChildren,
-  DocumentCheckRoute: DocumentCheckRoute,
+  DocumentCheckRoute: DocumentCheckRouteWithChildren,
   ExportRoute: ExportRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   FranchiseRoute: FranchiseRouteWithChildren,
