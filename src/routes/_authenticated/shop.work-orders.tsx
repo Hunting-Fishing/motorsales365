@@ -112,7 +112,9 @@ function WorkOrdersList() {
           </Button>
         </div>
 
-        {data.length === 0 ? (
+        {isLoading ? (
+          <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>
+        ) : data.length === 0 ? (
           <Card>
             <CardHeader>
               <CardTitle>No work orders yet</CardTitle>
