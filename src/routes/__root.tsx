@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AnalyticsGA } from "@/components/analytics-ga";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import { ConfirmDialogHost } from "@/components/ui/confirm-dialog";
+import { QrRescueDetector } from "@/components/qr-rescue-detector";
 
 import appCss from "../styles.css?url";
 
@@ -142,6 +143,7 @@ function RootComponent() {
         <FeatureFlagProvider>
           <CurrencyProvider>
             <SandboxBanner />
+            <QrRescueDetector />
             <Outlet />
             <Toaster richColors position="top-right" />
             <ConfirmDialogHost />
