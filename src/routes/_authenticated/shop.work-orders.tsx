@@ -144,7 +144,13 @@ function WorkOrdersList() {
                   {data.map((w: WorkOrderRow) => (
                     <TableRow key={w.id}>
                       <TableCell className="font-mono">
-                        {w.wo_number ?? w.id.slice(0, 8)}
+                        <Link
+                          to="/shop/work-orders/$id"
+                          params={{ id: w.id }}
+                          className="hover:underline"
+                        >
+                          {w.wo_number ?? w.id.slice(0, 8)}
+                        </Link>
                       </TableCell>
                       <TableCell>
                         {w.customers
