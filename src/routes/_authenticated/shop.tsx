@@ -125,22 +125,31 @@ function ShopHome() {
         </Alert>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {MODULES.map((m) => (
-            <Card key={m.title} className="relative">
-              <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-                <m.icon className="h-5 w-5 text-primary" />
-                <CardTitle className="text-base">{m.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">{m.description}</p>
-                <Badge
-                  variant={m.status === "in-progress" ? "default" : "secondary"}
-                >
-                  {m.status === "in-progress" ? "In progress" : "Coming soon"}
-                </Badge>
-              </CardContent>
-            </Card>
-          ))}
+          {MODULES.map((m) => {
+            const inner = (
+              <Card key={m.title} className={`relative ${m.to ? "transition hover:border-primary/50 hover:shadow-md" : ""}`}>
+                <CardHeader className="flex flex-row items-center gap-3 space-y-0">
+                  <m.icon className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-base">{m.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-sm text-muted-foreground">{m.description}</p>
+                  <Badge
+                    variant={m.status === "in-progress" ? "default" : "secondary"}
+                  >
+                    {m.status === "in-progress" ? "In progress" : "Coming soon"}
+                  </Badge>
+                </CardContent>
+              </Card>
+            );
+            return m.to ? (
+              <Link key={m.title} to={m.to as any} className="block">
+                {inner}
+              </Link>
+            ) : (
+              inner
+            );
+          })}
         </div>
 
         <div className="mt-10 text-sm text-muted-foreground">
