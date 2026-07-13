@@ -1,0 +1,16 @@
+api_usage_by_user_daily
+api_usage_by_user_monthly
+customer_overview
+customer_referrals_view
+expiring_certificates
+financial_summary_view
+inventory_stock_view
+inventory_summary
+product_catalog
+product_details
+schedule_coverage_summary
+system_health_view
+timesheet_summary
+user_role_summary
+user_role_view
+user_summary_view
