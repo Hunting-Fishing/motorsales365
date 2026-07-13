@@ -308,7 +308,13 @@ function CustomerDetail() {
                   {vehiclesQ.data!.map((v) => (
                     <TableRow key={v.id}>
                       <TableCell>
-                        {[v.year, v.make, v.model].filter(Boolean).join(" ") || "—"}
+                        <Link
+                          to="/shop/vehicles/$id"
+                          params={{ id: v.id }}
+                          className="text-primary hover:underline font-medium"
+                        >
+                          {[v.year, v.make, v.model].filter(Boolean).join(" ") || "Vehicle"}
+                        </Link>
                         {v.color ? (
                           <span className="text-muted-foreground"> · {v.color}</span>
                         ) : null}

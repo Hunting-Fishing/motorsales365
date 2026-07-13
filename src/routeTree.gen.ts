@@ -322,6 +322,7 @@ import { Route as AdminAdvertisementsAnalyticsCodeRouteImport } from './routes/a
 import { Route as AuthenticatedStaffAcademySlugRouteImport } from './routes/_authenticated/staff.academy.$slug'
 import { Route as AuthenticatedShopWorkOrdersNewRouteImport } from './routes/_authenticated/shop.work-orders.new'
 import { Route as AuthenticatedShopWorkOrdersIdRouteImport } from './routes/_authenticated/shop.work-orders.$id'
+import { Route as AuthenticatedShopVehiclesIdRouteImport } from './routes/_authenticated/shop.vehicles.$id'
 import { Route as AuthenticatedShopCustomersNewRouteImport } from './routes/_authenticated/shop.customers.new'
 import { Route as AuthenticatedShopCustomersIdRouteImport } from './routes/_authenticated/shop.customers.$id'
 import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
@@ -1970,6 +1971,12 @@ const AuthenticatedShopWorkOrdersIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedShopWorkOrdersRoute,
   } as any)
+const AuthenticatedShopVehiclesIdRoute =
+  AuthenticatedShopVehiclesIdRouteImport.update({
+    id: '/vehicles/$id',
+    path: '/vehicles/$id',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
 const AuthenticatedShopCustomersNewRoute =
   AuthenticatedShopCustomersNewRouteImport.update({
     id: '/new',
@@ -2265,6 +2272,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
+  '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2572,6 +2580,7 @@ export interface FileRoutesByTo {
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
+  '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -2892,6 +2901,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/_authenticated/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/_authenticated/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
+  '/_authenticated/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/_authenticated/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/_authenticated/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
   '/_authenticated/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
@@ -3212,6 +3222,7 @@ export interface FileRouteTypes {
     | '/dashboard/clubs/$id'
     | '/shop/customers/$id'
     | '/shop/customers/new'
+    | '/shop/vehicles/$id'
     | '/shop/work-orders/$id'
     | '/shop/work-orders/new'
     | '/staff/academy/$slug'
@@ -3519,6 +3530,7 @@ export interface FileRouteTypes {
     | '/dashboard/clubs/$id'
     | '/shop/customers/$id'
     | '/shop/customers/new'
+    | '/shop/vehicles/$id'
     | '/shop/work-orders/$id'
     | '/shop/work-orders/new'
     | '/staff/academy/$slug'
@@ -3838,6 +3850,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/clubs_/$id'
     | '/_authenticated/shop/customers/$id'
     | '/_authenticated/shop/customers/new'
+    | '/_authenticated/shop/vehicles/$id'
     | '/_authenticated/shop/work-orders/$id'
     | '/_authenticated/shop/work-orders/new'
     | '/_authenticated/staff/academy/$slug'
@@ -6225,6 +6238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopWorkOrdersIdRouteImport
       parentRoute: typeof AuthenticatedShopWorkOrdersRoute
     }
+    '/_authenticated/shop/vehicles/$id': {
+      id: '/_authenticated/shop/vehicles/$id'
+      path: '/vehicles/$id'
+      fullPath: '/shop/vehicles/$id'
+      preLoaderRoute: typeof AuthenticatedShopVehiclesIdRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
     '/_authenticated/shop/customers/new': {
       id: '/_authenticated/shop/customers/new'
       path: '/new'
@@ -6291,12 +6311,14 @@ const AuthenticatedShopWorkOrdersRouteWithChildren =
 interface AuthenticatedShopRouteChildren {
   AuthenticatedShopCustomersRoute: typeof AuthenticatedShopCustomersRouteWithChildren
   AuthenticatedShopWorkOrdersRoute: typeof AuthenticatedShopWorkOrdersRouteWithChildren
+  AuthenticatedShopVehiclesIdRoute: typeof AuthenticatedShopVehiclesIdRoute
 }
 
 const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
   AuthenticatedShopCustomersRoute: AuthenticatedShopCustomersRouteWithChildren,
   AuthenticatedShopWorkOrdersRoute:
     AuthenticatedShopWorkOrdersRouteWithChildren,
+  AuthenticatedShopVehiclesIdRoute: AuthenticatedShopVehiclesIdRoute,
 }
 
 const AuthenticatedShopRouteWithChildren =
