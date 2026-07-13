@@ -1,63 +1,114 @@
-# Pause & Pivot: Handoff Doc + Messaging/Chat Overhaul
+## Goal
 
-## Part 1 — Migration handoff file
+Dissolve the `shop-manager/` sub-project. Move every file into its natural home inside this app's existing folder structure, rewire imports, share the main auth session, and point all queries at this project's `shop_manager` Supabase schema. Delete `shop-manager/` when done.
 
-Create `docs/SHOP_MANAGER_MIGRATION_STATUS.md` capturing where the `shop_manager` schema pull stopped so we can resume later:
+## Why this over the bridge-mount approach
 
-- **Done:** 22 enums, 138 tables, 153 FKs, RLS enabled on all 138, GRANTs to `authenticated` + `service_role`.
-- **Remaining:**
-  - `06_policies_01–03.sql` (1,195 lines of RLS policies) — not yet applied. Currently only `service_role` can read/write.
-  - Wire scoped policies per module as UI is built (work orders → customers → invoices → parts inventory → …).
-  - Frontend surfaces (routes/components) that consume `shop_manager.*` tables — none exist yet.
-  - Data seeding / demo shop.
-- **File locations:** `/mnt/documents/curated/06_policies_0{1,2,3}.sql`.
-- **Resume recipe:** verify counts via `SELECT count(*) FROM pg_policies WHERE schemaname='shop_manager'` (currently 0), then apply policy chunks in order.
+Bridge mount (MemoryRouter under a splat route) is fast but leaves two routers, two auth contexts, and 198 pages using a foreign `react-router-dom` API forever. Merging costs more this pass but gives you a single-stack app: one router, one auth, one Supabase client, one design system trajectory. It also lets us delete duplication (both apps have their own `Layout`, `AuthContext`, `supabase/client`, i18n, notifications).
 
-## Part 2 — Messaging / Chat / Notifications diagnosis
+## Target folder mapping
 
-Current state discovered:
+| From `shop-manager/src/…` | To `src/…` |
+|---|---|
+| `pages/*.tsx` (198 files) | `routes/shop.<slug>.tsx` — one TanStack route per page |
+| `components/**` | `components/shop-manager/**` (namespaced to avoid collisions with existing `src/components/`) |
+| `hooks/**` | `hooks/shop-manager/**` |
+| `lib/services/**`, `lib/**` | `lib/shop-manager/**` |
+| `utils/**` | `lib/shop-manager/utils/**` |
+| `types/**` | `types/shop-manager/**` |
+| `context/**`, `contexts/**` | `lib/shop-manager/context/**` (merged; there are both spellings today) |
+| `i18n/**` | `lib/shop-manager/i18n/**` |
+| `constants/**`, `config/**`, `data/**`, `domain/**`, `schemas/**` | `lib/shop-manager/<same>/**` |
+| `integrations/supabase/**` | **discarded** — replaced by re-export from main client |
+| `styles/mobile.css`, `App.css` | merged into `src/styles.css` (curated, not verbatim) |
+| `main.tsx`, `App.tsx`, `index.html`, `vite.config.ts`, `tsconfig*.json`, `package.json`, `postcss.config.js`, `tailwind.config.ts`, `eslint.config.js` | **deleted** — root config wins |
+| `supabase/functions/**`, `supabase/config.toml` | **deleted** — external project artifacts |
+| `sql/*.sql` | copied into `/mnt/documents/curated/` alongside existing chunks for later migration |
+| `public/manifest.json`, `public/offline.html`, `public/robots.txt`, `public/placeholder.svg` | **discarded** — root has its own |
 
-- Two parallel messaging systems coexist:
-  - `public.messages` — 1:1 listing/DM messages (Marketplace inbox).
-  - `public.chat_threads` + `chat_thread_members` + `chat_thread_messages` — group chat used by `/dashboard/messages`.
-- Tow requests write `tow_requests` with `provider_id = null` and a `matched_provider_ids[]` array. **There is no trigger that inserts a `user_notifications` row for matched providers**, so the provider business never gets an in-app ping. `NotificationsListener` works — it just receives nothing for tow.
-- Nothing links a business's employees/team to a shared inbox. `chat_threads` are ad-hoc groups; there is no "business workspace" thread auto-populated with all `business_staff` / `organization_members`.
-- `dashboard.messages.tsx` only surfaces threads the current user is already a member of — team members can't see other teammates' customer conversations.
+New TS path alias for the sub-app's own `@/…` imports:
+- `@sm/*` → `src/{components,hooks,lib,types}/shop-manager/*`
+- Codemod `shop-manager/src/**` files: rewrite `@/components/...` → `@sm/components/...`, `@/hooks/...` → `@sm/hooks/...`, etc. (only for files being moved).
+- `@/integrations/supabase/client` in moved files → keep as-is; it now resolves to the main client (see next section).
 
-## Fixes to ship
+## Routing conversion (react-router-dom → TanStack file routes)
 
-### A. Tow request notifications (backend)
-1. DB trigger `notify_tow_matched_providers` on `INSERT` / `UPDATE OF matched_provider_ids` of `tow_requests`:
-   - For each `uuid` in `matched_provider_ids`, insert a `user_notifications` row (`type='tow_request'`, title, body with pickup city + vehicle, `link_url=/dashboard/dispatch?request=<id>`).
-   - On `UPDATE status`, notify the customer (`user_id`) and, when accepted, the winning `provider_id`.
-2. If provider is a business owner, also notify every `business_staff` member with `role in ('owner','manager','dispatcher')` via `user_notifications`.
-3. Verify realtime: `user_notifications` is already published; `NotificationsListener` will pop toasts automatically.
+`shop-manager/src/App.tsx` declares 247 `<Route>`s. Convert to file routes under `src/routes/shop.*.tsx`:
 
-### B. Business team inbox (new)
-1. Migration: add `chat_threads.business_id uuid references businesses(id)` + `kind text` ('team' | 'group' | 'customer').
-2. Trigger `ensure_business_team_thread`: when a business is created OR a `business_staff` row is added, upsert a `kind='team'` thread for that `business_id` and add the user as a member. Removing staff removes membership.
-3. RLS on `chat_thread_members` + `chat_thread_messages`: allow read/write when `auth.uid()` is an active `business_staff` of the thread's `business_id`, so the whole team sees the thread automatically.
-4. `/dashboard/business/$businessId/inbox` route (or a "Team" tab inside `dashboard.messages`) that lists:
-   - Team thread (all staff, always pinned).
-   - Customer DMs where `recipient_id = business.owner_id` — expose to staff via a view `business_customer_messages` gated by `is_business_member(auth.uid(), business_id)`.
+- `/` (in shop-manager) → `src/routes/shop.index.tsx`
+- `/work-orders` → `src/routes/shop.work-orders.index.tsx`
+- `/work-orders/:id` → `src/routes/shop.work-orders.$id.tsx`
+- `/customers`, `/customers/:id`, `/vehicles/:id`, `/invoices`, `/inventory`, etc. — same pattern.
+- Nested layout pages (Layout wrapper) → `src/routes/shop.tsx` as pathless-ish parent renders `<ShopLayout><Outlet /></ShopLayout>` and every child lives under it.
+- All shop-manager pages sit under `src/routes/_authenticated/` if they require sign-in (they do), so URL becomes `/shop/work-orders/$id` gated by the existing managed auth layout. Final URL prefix: **`/shop/*`** (matches marketing landing at `/shop-manager` which will link into `/shop`).
 
-### C. Marketplace/DM fix
-- Ensure `messages` inserts also fan out a `user_notifications` row to the recipient (trigger `notify_new_message`) so widgets and bell agree even when the recipient tab is closed.
-- Fix `FloatingMessageWidget` to hydrate from `messages` filtered by `(sender=me OR recipient=me) AND listing_id` (bug: only showing outbound previously).
+Inside each page component:
+- `useParams` from `react-router-dom` → `Route.useParams()` (or `useParams({ from: '/…' })`).
+- `useNavigate` from `react-router-dom` → `useNavigate` from `@tanstack/react-router`.
+- `<Link to="...">` → typed `<Link to="/shop/…" params={…}>`.
+- `<Helmet>` → route `head()`.
 
-### D. UI
-- `/dashboard/messages`: add left-rail sections **Team**, **Customers**, **Marketplace**, using `FolderTabs`.
-- Empty-state CTAs: "Invite teammates" (links to `/dashboard/business/$id/staff`) when team thread has 1 member.
-- Toast + red-dot count on the sidebar `Messages` and `Dispatch` items driven by `useUserNotifications` counts filtered by `type`.
+This is a mechanical codemod, one pass per import symbol. Not every one of the 198 files needs hand-editing; a scripted rewrite handles ~90%.
 
-## Technical details
+## Supabase — repoint + schema
 
-- Files to add/edit: `docs/SHOP_MANAGER_MIGRATION_STATUS.md`, new migration `add_business_team_messaging`, new migration `notify_tow_and_messages`, `src/routes/dashboard.messages.tsx`, `src/components/messaging/*`, `src/lib/business-inbox.functions.ts`, `src/hooks/use-user-notifications.ts`.
-- No changes to `shop_manager` schema in this phase.
-- Realtime: rely on existing `user_notifications` publication + add `chat_threads`, `chat_thread_messages` to `supabase_realtime` if not already.
+- `shop-manager/src/integrations/supabase/client.ts` (which currently hard-codes `oudkbrnvommbvtuispla`) is **deleted**. Any moved file that does `import { supabase } from "@/integrations/supabase/client"` now resolves to the main app's client automatically.
+- Create `src/lib/shop-manager/db.ts` exporting `smSupabase = supabase.schema("shop_manager")`. Codemod every `.from("<known_shop_table>")` in moved files to use `smSupabase` (allow-list of 138 tables generated from the migration).
+- Discard `shop-manager/src/integrations/supabase/types.ts` (stale, from the old project). Regenerate main app's `types.ts` with `shop_manager` schema included via Supabase types tool after the codemod so all moved code typechecks.
 
-## Out of scope (call out to user)
-- Voice/video calls, read receipts per-member, and message search across team inbox — can follow later.
-- Migrating existing marketplace `messages` rows into `chat_threads` — keeping two tables for now.
+## Auth — one session
 
-Confirm and I'll build.
+- Delete `shop-manager/src/context/AuthContext.tsx`.
+- Create `src/lib/shop-manager/auth-adapter.ts` that re-exports the main app's `useAuth` under the shape shop-manager pages expect (`user`, `session`, `loading`, `signOut`).
+- Codemod imports: `from "@/context/AuthContext"` → `from "@sm/lib/auth-adapter"`.
+- Delete `src/lib/shop-manager-sso.server.ts`, `docs/shop-manager-sso.md`, receiver route files, and the `OpenShopManagerButton` server-fn call; replace the button with a plain `<Link to="/shop">`.
+- Remove Cloud secrets `SHOP_MANAGER_SSO_SECRET`, partner-Supabase URL/key (list them for you to clear).
+
+## Providers wiring
+
+Shop-manager needs Helmet, i18n, Notifications, Company, CustomerData, Impersonation, InventoryView, WeldingSettings, Language contexts around its pages. Wrap them once in a `src/routes/_authenticated/shop.tsx` layout route so every `/shop/*` page gets them without touching individual pages. QueryClient is already provided at the root — do not add a second one.
+
+## Styling
+
+- Merge `shop-manager` tailwind theme tokens into root `src/styles.css`'s `@theme` block (only tokens not already defined). Keep the "modern-card" utility classes shop-manager uses.
+- Keep `@fontsource/plus-jakarta-sans` and MUI as-is for now — Phase 2 will strip MUI when native ports happen.
+- `src/styles/mobile.css` content folded into `src/styles.css`.
+
+## Dependencies
+
+Diff `shop-manager/package.json` against root, add missing runtime deps to root: `react-router-dom` (temporary — some deeply nested pages may still import it during transition; remove once codemod is complete), MUI, i18next + react-i18next, react-helmet-async, @dnd-kit/*, @formkit/auto-animate, sentry, plus any charting/PDF libs shop-manager uses. Delete `shop-manager/package.json` after.
+
+## RLS policies
+
+Apply the outstanding `06_policies_01/02/03.sql` chunks from `/mnt/documents/curated/` via `supabase--migration`. Add a first-visit trigger that provisions `shop_manager.profiles` for the authed user from their `businesses` row so scoped policies resolve.
+
+## Execution order (this build pass)
+
+1. **Move & rename** — bulk `mv shop-manager/src/<X>` → `src/**/shop-manager/*`. No code edits yet.
+2. **Alias + codemod** — add `@sm/*` in `tsconfig.json` + `vite.config.ts`; run scripted rewrite of moved-file imports (`@/components/*` → `@sm/components/*`, etc.).
+3. **Repoint Supabase + auth adapter** — delete stale integrations, add `smSupabase` wrapper, codemod `.from(...)` on known shop tables, codemod `AuthContext` imports.
+4. **Router conversion** — generate 198 route files under `src/routes/_authenticated/shop.*.tsx` that each re-export the moved page + provide a small `Route = createFileRoute(...)` shell. Codemod `react-router-dom` symbols to TanStack equivalents.
+5. **Layout** — create `src/routes/_authenticated/shop.tsx` with providers + `<Outlet />`.
+6. **Chrome** — replace `OpenShopManagerButton` with `<Link to="/shop">`. Delete SSO server-fn + receiver + docs.
+7. **Migrations** — apply 06_policies_01/02/03 + `shop_manager.profiles` bridge trigger.
+8. **Regenerate Supabase types** with `shop_manager` schema included.
+9. **Delete `shop-manager/` folder entirely.**
+10. **Smoke test** `/shop` → dashboard, `/shop/work-orders`, `/shop/work-orders/$id`, one create + list write path.
+
+**Rough blast radius:** ~350 file moves, ~200 route files created, ~800 codemod hits, 3 SQL migrations, root `package.json` gains ~15 deps, `shop-manager/` deleted.
+
+## Deferred to Phase 2 (explicit, so you know what's not free)
+
+- Removing MUI, react-router-dom compat imports, and dedup-ing shop-manager's `<Layout>` against `SiteLayout`.
+- Native shadcn ports of the top-10 pages for SSR/SEO of any public-facing shop pages (none currently public).
+- Merging shop-manager's Notifications context with the app's existing `NotificationsListener` / `user_notifications` pipeline.
+- Merging shop-manager's i18n dictionary with any app-side translations you eventually add.
+- Deleting `shop_manager` tables whose functionality is already covered by existing app tables (audit list to be produced during Phase 2).
+
+## Open questions I'll assume unless you say otherwise
+
+- **URL prefix**: `/shop/*` (short, matches the marketing landing `/shop-manager`, which will redirect to `/shop`).
+- **All shop-manager pages require sign-in** — placed under `_authenticated/`.
+- **No public shop-manager pages** need SSR/SEO in Phase 1.
+- **`react-router-dom` stays installed** during transition; removed in Phase 2 once codemod is verified.
+- **MUI stays** for Phase 1.
