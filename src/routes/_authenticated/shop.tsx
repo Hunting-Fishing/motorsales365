@@ -36,6 +36,7 @@ type ModuleCard = {
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   status: "coming-soon" | "in-progress";
+  to?: string;
 };
 
 const MODULES: ModuleCard[] = [
