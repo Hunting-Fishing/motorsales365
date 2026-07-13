@@ -260,6 +260,7 @@ import { Route as AdminAdvertisementsApprovalsRouteImport } from './routes/admin
 import { Route as AdminAdvertisementsAnalyticsRouteImport } from './routes/admin.advertisements.analytics'
 import { Route as AdminAccountsBackfillRouteImport } from './routes/admin.accounts.backfill'
 import { Route as AuthenticatedStaffAcademyRouteImport } from './routes/_authenticated/staff.academy'
+import { Route as AuthenticatedShopWorkOrdersRouteImport } from './routes/_authenticated/shop.work-orders'
 import { Route as AuthenticatedPartsMyRequestsRouteImport } from './routes/_authenticated/parts.my-requests'
 import { Route as AuthenticatedFranchiseStatusRouteImport } from './routes/_authenticated/franchise.status'
 import { Route as AuthenticatedFranchiseDashboardRouteImport } from './routes/_authenticated/franchise.dashboard'
@@ -1606,6 +1607,12 @@ const AuthenticatedStaffAcademyRoute =
     path: '/staff/academy',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedShopWorkOrdersRoute =
+  AuthenticatedShopWorkOrdersRouteImport.update({
+    id: '/work-orders',
+    path: '/work-orders',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
 const AuthenticatedPartsMyRequestsRoute =
   AuthenticatedPartsMyRequestsRouteImport.update({
     id: '/parts/my-requests',
@@ -2001,7 +2008,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/complete-profile': typeof AuthenticatedCompleteProfileRoute
-  '/shop': typeof AuthenticatedShopRoute
+  '/shop': typeof AuthenticatedShopRouteWithChildren
   '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
@@ -2157,6 +2164,7 @@ export interface FileRoutesByFullPath {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
+  '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRoute
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -2459,6 +2467,7 @@ export interface FileRoutesByTo {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
+  '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRoute
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -2616,7 +2625,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/complete-profile': typeof AuthenticatedCompleteProfileRoute
-  '/_authenticated/shop': typeof AuthenticatedShopRoute
+  '/_authenticated/shop': typeof AuthenticatedShopRouteWithChildren
   '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
@@ -2772,6 +2781,7 @@ export interface FileRoutesById {
   '/_authenticated/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/_authenticated/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/_authenticated/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
+  '/_authenticated/shop/work-orders': typeof AuthenticatedShopWorkOrdersRoute
   '/_authenticated/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
@@ -3086,6 +3096,7 @@ export interface FileRouteTypes {
     | '/franchise/dashboard'
     | '/franchise/status'
     | '/parts/my-requests'
+    | '/shop/work-orders'
     | '/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
@@ -3388,6 +3399,7 @@ export interface FileRouteTypes {
     | '/franchise/dashboard'
     | '/franchise/status'
     | '/parts/my-requests'
+    | '/shop/work-orders'
     | '/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
@@ -3700,6 +3712,7 @@ export interface FileRouteTypes {
     | '/_authenticated/franchise/dashboard'
     | '/_authenticated/franchise/status'
     | '/_authenticated/parts/my-requests'
+    | '/_authenticated/shop/work-orders'
     | '/_authenticated/staff/academy'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
@@ -5713,6 +5726,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStaffAcademyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/shop/work-orders': {
+      id: '/_authenticated/shop/work-orders'
+      path: '/work-orders'
+      fullPath: '/shop/work-orders'
+      preLoaderRoute: typeof AuthenticatedShopWorkOrdersRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
     '/_authenticated/parts/my-requests': {
       id: '/_authenticated/parts/my-requests'
       path: '/parts/my-requests'
@@ -6136,6 +6156,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedShopRouteChildren {
+  AuthenticatedShopWorkOrdersRoute: typeof AuthenticatedShopWorkOrdersRoute
+}
+
+const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
+  AuthenticatedShopWorkOrdersRoute: AuthenticatedShopWorkOrdersRoute,
+}
+
+const AuthenticatedShopRouteWithChildren =
+  AuthenticatedShopRoute._addFileChildren(AuthenticatedShopRouteChildren)
+
 interface AuthenticatedStaffAcademyRouteChildren {
   AuthenticatedStaffAcademySlugRoute: typeof AuthenticatedStaffAcademySlugRoute
 }
@@ -6152,7 +6183,7 @@ const AuthenticatedStaffAcademyRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCompleteProfileRoute: typeof AuthenticatedCompleteProfileRoute
-  AuthenticatedShopRoute: typeof AuthenticatedShopRoute
+  AuthenticatedShopRoute: typeof AuthenticatedShopRouteWithChildren
   AuthenticatedAccountDisputesRoute: typeof AuthenticatedAccountDisputesRoute
   AuthenticatedAccountRewardsRoute: typeof AuthenticatedAccountRewardsRoute
   AuthenticatedAccountTrustScoreRoute: typeof AuthenticatedAccountTrustScoreRoute
@@ -6171,7 +6202,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCompleteProfileRoute: AuthenticatedCompleteProfileRoute,
-  AuthenticatedShopRoute: AuthenticatedShopRoute,
+  AuthenticatedShopRoute: AuthenticatedShopRouteWithChildren,
   AuthenticatedAccountDisputesRoute: AuthenticatedAccountDisputesRoute,
   AuthenticatedAccountRewardsRoute: AuthenticatedAccountRewardsRoute,
   AuthenticatedAccountTrustScoreRoute: AuthenticatedAccountTrustScoreRoute,
