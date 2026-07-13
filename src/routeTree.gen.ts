@@ -180,6 +180,7 @@ import { Route as AdminFranchiseRouteImport } from './routes/admin.franchise'
 import { Route as AdminFlashcardsRouteImport } from './routes/admin.flashcards'
 import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-flags'
 import { Route as AdminEducationRouteImport } from './routes/admin.education'
+import { Route as AdminDocumentCheckRouteImport } from './routes/admin.document-check'
 import { Route as AdminDispatchRouteImport } from './routes/admin.dispatch'
 import { Route as AdminDiscoverBusinessesRouteImport } from './routes/admin.discover-businesses'
 import { Route as AdminDiscountAuditsRouteImport } from './routes/admin.discount-audits'
@@ -1176,6 +1177,11 @@ const AdminEducationRoute = AdminEducationRouteImport.update({
   path: '/education',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDocumentCheckRoute = AdminDocumentCheckRouteImport.update({
+  id: '/document-check',
+  path: '/document-check',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDispatchRoute = AdminDispatchRouteImport.update({
   id: '/dispatch',
   path: '/dispatch',
@@ -2003,6 +2009,7 @@ export interface FileRoutesByFullPath {
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/dispatch': typeof AdminDispatchRoute
+  '/admin/document-check': typeof AdminDocumentCheckRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/flashcards': typeof AdminFlashcardsRoute
@@ -2307,6 +2314,7 @@ export interface FileRoutesByTo {
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/dispatch': typeof AdminDispatchRoute
+  '/admin/document-check': typeof AdminDocumentCheckRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/flashcards': typeof AdminFlashcardsRoute
@@ -2615,6 +2623,7 @@ export interface FileRoutesById {
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/dispatch': typeof AdminDispatchRoute
+  '/admin/document-check': typeof AdminDocumentCheckRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/flashcards': typeof AdminFlashcardsRoute
@@ -2927,6 +2936,7 @@ export interface FileRouteTypes {
     | '/admin/discount-audits'
     | '/admin/discover-businesses'
     | '/admin/dispatch'
+    | '/admin/document-check'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/flashcards'
@@ -3231,6 +3241,7 @@ export interface FileRouteTypes {
     | '/admin/discount-audits'
     | '/admin/discover-businesses'
     | '/admin/dispatch'
+    | '/admin/document-check'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/flashcards'
@@ -3538,6 +3549,7 @@ export interface FileRouteTypes {
     | '/admin/discount-audits'
     | '/admin/discover-businesses'
     | '/admin/dispatch'
+    | '/admin/document-check'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/flashcards'
@@ -5131,6 +5143,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEducationRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/document-check': {
+      id: '/admin/document-check'
+      path: '/document-check'
+      fullPath: '/admin/document-check'
+      preLoaderRoute: typeof AdminDocumentCheckRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/dispatch': {
       id: '/admin/dispatch'
       path: '/dispatch'
@@ -6262,6 +6281,7 @@ interface AdminRouteChildren {
   AdminDiscountAuditsRoute: typeof AdminDiscountAuditsRoute
   AdminDiscoverBusinessesRoute: typeof AdminDiscoverBusinessesRoute
   AdminDispatchRoute: typeof AdminDispatchRoute
+  AdminDocumentCheckRoute: typeof AdminDocumentCheckRoute
   AdminEducationRoute: typeof AdminEducationRoute
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
   AdminFlashcardsRoute: typeof AdminFlashcardsRoute
@@ -6316,6 +6336,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDiscountAuditsRoute: AdminDiscountAuditsRoute,
   AdminDiscoverBusinessesRoute: AdminDiscoverBusinessesRoute,
   AdminDispatchRoute: AdminDispatchRoute,
+  AdminDocumentCheckRoute: AdminDocumentCheckRoute,
   AdminEducationRoute: AdminEducationRoute,
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
   AdminFlashcardsRoute: AdminFlashcardsRoute,
