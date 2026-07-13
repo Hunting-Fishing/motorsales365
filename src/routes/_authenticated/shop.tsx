@@ -57,7 +57,8 @@ const MODULES: ModuleCard[] = [
     title: "Customers",
     description: "Household + vehicle history and communications.",
     icon: Users2,
-    status: "coming-soon",
+    status: "in-progress",
+    to: "/shop/customers" as const,
   },
   {
     title: "Inventory",
