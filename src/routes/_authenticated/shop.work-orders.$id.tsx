@@ -174,11 +174,17 @@ function WorkOrderDetailPage() {
                   <CardTitle className="text-base">Customer</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm">
-                  {data.customers ? (
+                  {data.customers && data.customer_id ? (
                     <>
                       <div className="font-medium">
-                        {`${data.customers.first_name ?? ""} ${data.customers.last_name ?? ""}`.trim() ||
-                          "—"}
+                        <Link
+                          to="/shop/customers/$id"
+                          params={{ id: data.customer_id }}
+                          className="text-primary hover:underline"
+                        >
+                          {`${data.customers.first_name ?? ""} ${data.customers.last_name ?? ""}`.trim() ||
+                            "—"}
+                        </Link>
                       </div>
                       <div className="text-muted-foreground">
                         {data.customers.email ?? "no email"}
