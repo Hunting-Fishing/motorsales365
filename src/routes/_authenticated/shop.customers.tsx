@@ -107,14 +107,21 @@ function CustomersList() {
               </p>
             </div>
           </div>
-          <div className="relative w-full sm:w-80">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search name, email, phone…"
-              className="pl-9"
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative w-full sm:w-80">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search name, email, phone…"
+                className="pl-9"
+              />
+            </div>
+            <Button asChild>
+              <Link to="/shop/customers/new">
+                <Plus className="mr-2 h-4 w-4" /> New
+              </Link>
+            </Button>
           </div>
         </div>
 
