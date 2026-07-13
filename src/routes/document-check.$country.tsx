@@ -205,11 +205,8 @@ function CountryPage() {
   );
 }
 
-function DocumentsPanel({
-  documents,
-}: {
-  documents: ReturnType<typeof Route.useLoaderData>["documents"];
-}) {
+function DocumentsPanel({ documents }: { documents: DocCheckDocument[] }) {
+
   if (!documents.length) {
     return (
       <Card>
