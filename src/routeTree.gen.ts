@@ -212,6 +212,7 @@ import { Route as PartsCSlugRouteImport } from './routes/parts.c.$slug'
 import { Route as PartnersPartsOnboardingRouteImport } from './routes/partners.parts.onboarding'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
+import { Route as DocumentCheckCountryQuickGuideRouteImport } from './routes/document-check.$country.quick-guide'
 import { Route as DashboardTeamPerformanceRouteImport } from './routes/dashboard.team.performance'
 import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.team.members'
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
@@ -1339,6 +1340,12 @@ const ListingIdEditRoute = ListingIdEditRouteImport.update({
   path: '/edit',
   getParentRoute: () => ListingIdRoute,
 } as any)
+const DocumentCheckCountryQuickGuideRoute =
+  DocumentCheckCountryQuickGuideRouteImport.update({
+    id: '/quick-guide',
+    path: '/quick-guide',
+    getParentRoute: () => DocumentCheckCountryRoute,
+  } as any)
 const DashboardTeamPerformanceRoute =
   DashboardTeamPerformanceRouteImport.update({
     id: '/performance',
@@ -2069,7 +2076,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/dispatch/join': typeof DispatchJoinRoute
-  '/document-check/$country': typeof DocumentCheckCountryRoute
+  '/document-check/$country': typeof DocumentCheckCountryRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
@@ -2181,6 +2188,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
+  '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
@@ -2370,7 +2378,7 @@ export interface FileRoutesByTo {
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/dispatch/join': typeof DispatchJoinRoute
-  '/document-check/$country': typeof DocumentCheckCountryRoute
+  '/document-check/$country': typeof DocumentCheckCountryRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
@@ -2480,6 +2488,7 @@ export interface FileRoutesByTo {
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
+  '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
@@ -2679,7 +2688,7 @@ export interface FileRoutesById {
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/dispatch/join': typeof DispatchJoinRoute
-  '/document-check/$country': typeof DocumentCheckCountryRoute
+  '/document-check/$country': typeof DocumentCheckCountryRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
@@ -2791,6 +2800,7 @@ export interface FileRoutesById {
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
+  '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
@@ -3102,6 +3112,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
     | '/dashboard/team/performance'
+    | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
@@ -3401,6 +3412,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
     | '/dashboard/team/performance'
+    | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
@@ -3711,6 +3723,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
     | '/dashboard/team/performance'
+    | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
@@ -5342,6 +5355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingIdEditRouteImport
       parentRoute: typeof ListingIdRoute
     }
+    '/document-check/$country/quick-guide': {
+      id: '/document-check/$country/quick-guide'
+      path: '/quick-guide'
+      fullPath: '/document-check/$country/quick-guide'
+      preLoaderRoute: typeof DocumentCheckCountryQuickGuideRouteImport
+      parentRoute: typeof DocumentCheckCountryRoute
+    }
     '/dashboard/team/performance': {
       id: '/dashboard/team/performance'
       path: '/performance'
@@ -6533,13 +6553,24 @@ const DispatchRouteWithChildren = DispatchRoute._addFileChildren(
   DispatchRouteChildren,
 )
 
+interface DocumentCheckCountryRouteChildren {
+  DocumentCheckCountryQuickGuideRoute: typeof DocumentCheckCountryQuickGuideRoute
+}
+
+const DocumentCheckCountryRouteChildren: DocumentCheckCountryRouteChildren = {
+  DocumentCheckCountryQuickGuideRoute: DocumentCheckCountryQuickGuideRoute,
+}
+
+const DocumentCheckCountryRouteWithChildren =
+  DocumentCheckCountryRoute._addFileChildren(DocumentCheckCountryRouteChildren)
+
 interface DocumentCheckRouteChildren {
-  DocumentCheckCountryRoute: typeof DocumentCheckCountryRoute
+  DocumentCheckCountryRoute: typeof DocumentCheckCountryRouteWithChildren
   DocumentCheckIndexRoute: typeof DocumentCheckIndexRoute
 }
 
 const DocumentCheckRouteChildren: DocumentCheckRouteChildren = {
-  DocumentCheckCountryRoute: DocumentCheckCountryRoute,
+  DocumentCheckCountryRoute: DocumentCheckCountryRouteWithChildren,
   DocumentCheckIndexRoute: DocumentCheckIndexRoute,
 }
 
