@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { Plus, Wrench } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Plus, Wrench, Loader2 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,20 +26,17 @@ type WorkOrderRow = {
   vehicles?: { year: number | null; make: string | null; model: string | null } | null;
 };
 
-const workOrdersQuery = queryOptions({
-  queryKey: ["shop-manager", "work-orders", "list"],
-  queryFn: async (): Promise<WorkOrderRow[]> => {
-    const { data, error } = await smSupabase
-      .from("work_orders")
-      .select(
-        "id, wo_number, status, created_at, total_amount, customer_id, customers(first_name,last_name), vehicles(year,make,model)",
-      )
-      .order("created_at", { ascending: false })
-      .limit(100);
-    if (error) throw error;
-    return (data ?? []) as unknown as WorkOrderRow[];
-  },
-});
+async function fetchWorkOrders(): Promise<WorkOrderRow[]> {
+  const { data, error } = await (smSupabase as any)
+    .from("work_orders")
+    .select(
+      "id, wo_number, status, created_at, total_amount, customer_id, customers(first_name,last_name), vehicles(year,make,model)",
+    )
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw error;
+  return (data ?? []) as WorkOrderRow[];
+}
 
 export const Route = createFileRoute("/_authenticated/shop/work-orders")({
   head: () => ({
@@ -53,13 +50,12 @@ export const Route = createFileRoute("/_authenticated/shop/work-orders")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(workOrdersQuery),
   component: WorkOrdersList,
   errorComponent: ({ error, reset }) => (
     <SiteLayout>
       <div className="mx-auto max-w-4xl px-4 py-10">
         <h1 className="text-2xl font-bold">Work Orders</h1>
-        <p className="mt-2 text-destructive">{String(error?.message ?? error)}</p>
+        <p className="mt-2 text-destructive">{String((error as any)?.message ?? error)}</p>
         <Button className="mt-4" onClick={reset}>
           Retry
         </Button>
