@@ -261,6 +261,8 @@ import { Route as AdminAdvertisementsAnalyticsRouteImport } from './routes/admin
 import { Route as AdminAccountsBackfillRouteImport } from './routes/admin.accounts.backfill'
 import { Route as AuthenticatedStaffAcademyRouteImport } from './routes/_authenticated/staff.academy'
 import { Route as AuthenticatedShopWorkOrdersRouteImport } from './routes/_authenticated/shop.work-orders'
+import { Route as AuthenticatedShopInvoicesRouteImport } from './routes/_authenticated/shop.invoices'
+import { Route as AuthenticatedShopInventoryRouteImport } from './routes/_authenticated/shop.inventory'
 import { Route as AuthenticatedShopCustomersRouteImport } from './routes/_authenticated/shop.customers'
 import { Route as AuthenticatedPartsMyRequestsRouteImport } from './routes/_authenticated/parts.my-requests'
 import { Route as AuthenticatedFranchiseStatusRouteImport } from './routes/_authenticated/franchise.status'
@@ -1619,6 +1621,18 @@ const AuthenticatedShopWorkOrdersRoute =
     path: '/work-orders',
     getParentRoute: () => AuthenticatedShopRoute,
   } as any)
+const AuthenticatedShopInvoicesRoute =
+  AuthenticatedShopInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
+const AuthenticatedShopInventoryRoute =
+  AuthenticatedShopInventoryRouteImport.update({
+    id: '/inventory',
+    path: '/inventory',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
 const AuthenticatedShopCustomersRoute =
   AuthenticatedShopCustomersRouteImport.update({
     id: '/customers',
@@ -2207,6 +2221,8 @@ export interface FileRoutesByFullPath {
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
+  '/shop/inventory': typeof AuthenticatedShopInventoryRoute
+  '/shop/invoices': typeof AuthenticatedShopInvoicesRoute
   '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
@@ -2516,6 +2532,8 @@ export interface FileRoutesByTo {
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
+  '/shop/inventory': typeof AuthenticatedShopInventoryRoute
+  '/shop/invoices': typeof AuthenticatedShopInvoicesRoute
   '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
@@ -2836,6 +2854,8 @@ export interface FileRoutesById {
   '/_authenticated/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/_authenticated/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/_authenticated/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
+  '/_authenticated/shop/inventory': typeof AuthenticatedShopInventoryRoute
+  '/_authenticated/shop/invoices': typeof AuthenticatedShopInvoicesRoute
   '/_authenticated/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/_authenticated/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
@@ -3157,6 +3177,8 @@ export interface FileRouteTypes {
     | '/franchise/status'
     | '/parts/my-requests'
     | '/shop/customers'
+    | '/shop/inventory'
+    | '/shop/invoices'
     | '/shop/work-orders'
     | '/staff/academy'
     | '/admin/accounts/backfill'
@@ -3466,6 +3488,8 @@ export interface FileRouteTypes {
     | '/franchise/status'
     | '/parts/my-requests'
     | '/shop/customers'
+    | '/shop/inventory'
+    | '/shop/invoices'
     | '/shop/work-orders'
     | '/staff/academy'
     | '/admin/accounts/backfill'
@@ -3785,6 +3809,8 @@ export interface FileRouteTypes {
     | '/_authenticated/franchise/status'
     | '/_authenticated/parts/my-requests'
     | '/_authenticated/shop/customers'
+    | '/_authenticated/shop/inventory'
+    | '/_authenticated/shop/invoices'
     | '/_authenticated/shop/work-orders'
     | '/_authenticated/staff/academy'
     | '/admin/accounts/backfill'
@@ -5811,6 +5837,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopWorkOrdersRouteImport
       parentRoute: typeof AuthenticatedShopRoute
     }
+    '/_authenticated/shop/invoices': {
+      id: '/_authenticated/shop/invoices'
+      path: '/invoices'
+      fullPath: '/shop/invoices'
+      preLoaderRoute: typeof AuthenticatedShopInvoicesRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
+    '/_authenticated/shop/inventory': {
+      id: '/_authenticated/shop/inventory'
+      path: '/inventory'
+      fullPath: '/shop/inventory'
+      preLoaderRoute: typeof AuthenticatedShopInventoryRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
     '/_authenticated/shop/customers': {
       id: '/_authenticated/shop/customers'
       path: '/customers'
@@ -6310,12 +6350,16 @@ const AuthenticatedShopWorkOrdersRouteWithChildren =
 
 interface AuthenticatedShopRouteChildren {
   AuthenticatedShopCustomersRoute: typeof AuthenticatedShopCustomersRouteWithChildren
+  AuthenticatedShopInventoryRoute: typeof AuthenticatedShopInventoryRoute
+  AuthenticatedShopInvoicesRoute: typeof AuthenticatedShopInvoicesRoute
   AuthenticatedShopWorkOrdersRoute: typeof AuthenticatedShopWorkOrdersRouteWithChildren
   AuthenticatedShopVehiclesIdRoute: typeof AuthenticatedShopVehiclesIdRoute
 }
 
 const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
   AuthenticatedShopCustomersRoute: AuthenticatedShopCustomersRouteWithChildren,
+  AuthenticatedShopInventoryRoute: AuthenticatedShopInventoryRoute,
+  AuthenticatedShopInvoicesRoute: AuthenticatedShopInvoicesRoute,
   AuthenticatedShopWorkOrdersRoute:
     AuthenticatedShopWorkOrdersRouteWithChildren,
   AuthenticatedShopVehiclesIdRoute: AuthenticatedShopVehiclesIdRoute,
@@ -7088,13 +7132,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
