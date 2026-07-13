@@ -106,7 +106,7 @@ function WorkOrdersList() {
             </div>
           </div>
           <Button asChild>
-            <Link to="/shop">
+            <Link to="/shop/work-orders/new">
               <Plus className="mr-2 h-4 w-4" /> New Work Order
             </Link>
           </Button>
