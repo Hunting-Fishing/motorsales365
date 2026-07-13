@@ -106,6 +106,7 @@ import { Route as FranchisePartnersRouteImport } from './routes/franchise.partne
 import { Route as FranchiseApplyRouteImport } from './routes/franchise.apply'
 import { Route as ExportTrustRouteImport } from './routes/export.trust'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as DocumentCheckCountryRouteImport } from './routes/document-check.$country'
 import { Route as DispatchJoinRouteImport } from './routes/dispatch.join'
 import { Route as DispatchCheckoutRouteImport } from './routes/dispatch.checkout'
 import { Route as DashboardWantedRouteImport } from './routes/dashboard.wanted'
@@ -800,6 +801,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DocumentCheckCountryRoute = DocumentCheckCountryRouteImport.update({
+  id: '/$country',
+  path: '/$country',
+  getParentRoute: () => DocumentCheckRoute,
 } as any)
 const DispatchJoinRoute = DispatchJoinRouteImport.update({
   id: '/join',
@@ -2063,6 +2069,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/dispatch/join': typeof DispatchJoinRoute
+  '/document-check/$country': typeof DocumentCheckCountryRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
@@ -2363,6 +2370,7 @@ export interface FileRoutesByTo {
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/dispatch/join': typeof DispatchJoinRoute
+  '/document-check/$country': typeof DocumentCheckCountryRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
@@ -2671,6 +2679,7 @@ export interface FileRoutesById {
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/dispatch/join': typeof DispatchJoinRoute
+  '/document-check/$country': typeof DocumentCheckCountryRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/franchise/apply': typeof FranchiseApplyRoute
@@ -2981,6 +2990,7 @@ export interface FileRouteTypes {
     | '/dashboard/wanted'
     | '/dispatch/checkout'
     | '/dispatch/join'
+    | '/document-check/$country'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/franchise/apply'
@@ -3281,6 +3291,7 @@ export interface FileRouteTypes {
     | '/dashboard/wanted'
     | '/dispatch/checkout'
     | '/dispatch/join'
+    | '/document-check/$country'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/franchise/apply'
@@ -3588,6 +3599,7 @@ export interface FileRouteTypes {
     | '/dashboard/wanted'
     | '/dispatch/checkout'
     | '/dispatch/join'
+    | '/document-check/$country'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/franchise/apply'
@@ -4587,6 +4599,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/document-check/$country': {
+      id: '/document-check/$country'
+      path: '/$country'
+      fullPath: '/document-check/$country'
+      preLoaderRoute: typeof DocumentCheckCountryRouteImport
+      parentRoute: typeof DocumentCheckRoute
     }
     '/dispatch/join': {
       id: '/dispatch/join'
@@ -6515,10 +6534,12 @@ const DispatchRouteWithChildren = DispatchRoute._addFileChildren(
 )
 
 interface DocumentCheckRouteChildren {
+  DocumentCheckCountryRoute: typeof DocumentCheckCountryRoute
   DocumentCheckIndexRoute: typeof DocumentCheckIndexRoute
 }
 
 const DocumentCheckRouteChildren: DocumentCheckRouteChildren = {
+  DocumentCheckCountryRoute: DocumentCheckCountryRoute,
   DocumentCheckIndexRoute: DocumentCheckIndexRoute,
 }
 
