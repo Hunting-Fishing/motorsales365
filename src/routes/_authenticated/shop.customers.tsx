@@ -157,8 +157,9 @@ function CustomersList() {
                     <TableRow key={c.id}>
                       <TableCell>
                         <Link
-                          to="/shop/customers"
-                          className="font-medium hover:underline"
+                          to="/shop/customers/$id"
+                          params={{ id: c.id }}
+                          className="font-medium text-primary hover:underline"
                         >
                           {`${c.first_name ?? ""} ${c.last_name ?? ""}`.trim() ||
                             "—"}
