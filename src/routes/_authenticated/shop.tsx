@@ -50,6 +50,7 @@ const MODULES: ModuleCard[] = [
     description: "Create, dispatch, and close repair jobs.",
     icon: ClipboardList,
     status: "in-progress",
+    to: "/shop/work-orders" as const,
   },
   {
     title: "Customers",
