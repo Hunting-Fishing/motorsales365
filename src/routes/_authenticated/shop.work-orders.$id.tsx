@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, Loader2, Wrench, Package, ListChecks, Plus, Trash2, Receipt } from "lucide-react";
+import { ArrowLeft, Loader2, Wrench, Package, ListChecks, Plus, Trash2, Receipt, ClipboardCheck } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
