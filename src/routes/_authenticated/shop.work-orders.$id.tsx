@@ -382,6 +382,19 @@ function WorkOrderDetailPage() {
                 {data.priority ? (
                   <Badge variant="outline">Priority: {data.priority}</Badge>
                 ) : null}
+                <Button
+                  size="sm"
+                  variant="default"
+                  disabled={generateInvoice.isPending || (jobLines.length === 0 && parts.length === 0)}
+                  onClick={() => generateInvoice.mutate()}
+                >
+                  {generateInvoice.isPending ? (
+                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Receipt className="mr-1 h-4 w-4" />
+                  )}
+                  Generate invoice
+                </Button>
               </div>
             </div>
 
