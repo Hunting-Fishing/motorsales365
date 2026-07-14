@@ -151,7 +151,11 @@ function InvoicesList() {
                 <TableBody>
                   {filtered.map((r) => (
                     <TableRow key={r.id}>
-                      <TableCell className="font-mono">{r.id}</TableCell>
+                      <TableCell className="font-mono">
+                        <Link to="/shop/invoices/$id" params={{ id: r.id }} className="text-primary hover:underline">
+                          {r.id}
+                        </Link>
+                      </TableCell>
                       <TableCell>{r.customer ?? r.customer_email ?? "—"}</TableCell>
                       <TableCell>{r.date ? new Date(r.date).toLocaleDateString() : "—"}</TableCell>
                       <TableCell>{r.due_date ? new Date(r.due_date).toLocaleDateString() : "—"}</TableCell>
@@ -173,7 +177,7 @@ function InvoicesList() {
         )}
 
         <div className="mt-6 text-sm text-muted-foreground">
-          Detail view, PDF export, and payment recording are next on the porting list.
+          PDF export and payment recording are next on the porting list.
         </div>
         <div className="mt-4">
           <Button asChild variant="ghost"><Link to="/shop">← Back to Shop Manager</Link></Button>

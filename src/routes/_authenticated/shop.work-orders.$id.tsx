@@ -1,10 +1,18 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Loader2, Wrench } from "lucide-react";
+import { ArrowLeft, Loader2, Wrench, Package, ListChecks } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { smSupabase } from "@/lib/shop-manager/db";
 
 type WorkOrderDetail = {
@@ -52,6 +60,49 @@ async function fetchWorkOrder(id: string): Promise<WorkOrderDetail | null> {
     .maybeSingle();
   if (error) throw error;
   return (data as WorkOrderDetail) ?? null;
+}
+
+type JobLine = {
+  id: string;
+  name: string | null;
+  category: string | null;
+  description: string | null;
+  estimated_hours: number | null;
+  labor_rate: number | null;
+  total_amount: number | null;
+  status: string | null;
+  display_order: number | null;
+};
+
+type WorkOrderPart = {
+  id: string;
+  part_name: string | null;
+  part_number: string | null;
+  supplier_name: string | null;
+  quantity: number | null;
+  customer_price: number | null;
+  status: string | null;
+  category: string | null;
+};
+
+async function fetchJobLines(id: string): Promise<JobLine[]> {
+  const { data, error } = await (smSupabase as any)
+    .from("work_order_job_lines")
+    .select("id,name,category,description,estimated_hours,labor_rate,total_amount,status,display_order")
+    .eq("work_order_id", id)
+    .order("display_order", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as JobLine[];
+}
+
+async function fetchWorkOrderParts(id: string): Promise<WorkOrderPart[]> {
+  const { data, error } = await (smSupabase as any)
+    .from("work_order_parts")
+    .select("id,part_name,part_number,supplier_name,quantity,customer_price,status,category")
+    .eq("work_order_id", id)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as WorkOrderPart[];
 }
 
 export const Route = createFileRoute("/_authenticated/shop/work-orders/$id")({
@@ -115,6 +166,19 @@ function WorkOrderDetailPage() {
     queryKey: ["shop-manager", "work-orders", "detail", id],
     queryFn: () => fetchWorkOrder(id),
   });
+  const { data: jobLines = [] } = useQuery({
+    queryKey: ["shop-manager", "work-orders", "job-lines", id],
+    queryFn: () => fetchJobLines(id),
+  });
+  const { data: parts = [] } = useQuery({
+    queryKey: ["shop-manager", "work-orders", "parts", id],
+    queryFn: () => fetchWorkOrderParts(id),
+  });
+  const partsTotal = parts.reduce(
+    (s, p) => s + (Number(p.customer_price ?? 0) * Number(p.quantity ?? 0)),
+    0,
+  );
+  const laborTotal = jobLines.reduce((s, j) => s + Number(j.total_amount ?? 0), 0);
 
   return (
     <SiteLayout>
@@ -295,13 +359,115 @@ function WorkOrderDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
                   <Field
+                    label="Labor"
+                    value={laborTotal ? `₱${laborTotal.toLocaleString()}` : null}
+                  />
+                  <Field
+                    label="Parts"
+                    value={partsTotal ? `₱${partsTotal.toLocaleString()}` : null}
+                  />
+                  <Field
                     label="Total cost"
                     value={
                       data.total_cost != null
                         ? `₱${Number(data.total_cost).toLocaleString()}`
-                        : null
+                        : `₱${(laborTotal + partsTotal).toLocaleString()}`
                     }
                   />
+                </CardContent>
+              </Card>
+
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <ListChecks className="h-4 w-4" /> Job lines ({jobLines.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {jobLines.length === 0 ? (
+                    <div className="px-6 pb-6 text-sm text-muted-foreground">
+                      No job lines yet.
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Job</TableHead>
+                          <TableHead>Category</TableHead>
+                          <TableHead className="text-right">Hrs</TableHead>
+                          <TableHead className="text-right">Rate</TableHead>
+                          <TableHead className="text-right">Total ₱</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {jobLines.map((j) => (
+                          <TableRow key={j.id}>
+                            <TableCell className="font-medium">{j.name ?? "—"}</TableCell>
+                            <TableCell>{j.category ?? "—"}</TableCell>
+                            <TableCell className="text-right">{j.estimated_hours ?? "—"}</TableCell>
+                            <TableCell className="text-right">
+                              {j.labor_rate != null ? Number(j.labor_rate).toLocaleString() : "—"}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {j.total_amount != null ? Number(j.total_amount).toLocaleString() : "—"}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{j.status ?? "—"}</Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Package className="h-4 w-4" /> Parts ({parts.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {parts.length === 0 ? (
+                    <div className="px-6 pb-6 text-sm text-muted-foreground">
+                      No parts attached.
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Part</TableHead>
+                          <TableHead>Part #</TableHead>
+                          <TableHead>Supplier</TableHead>
+                          <TableHead className="text-right">Qty</TableHead>
+                          <TableHead className="text-right">Price ₱</TableHead>
+                          <TableHead className="text-right">Total ₱</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {parts.map((p) => {
+                          const qty = Number(p.quantity ?? 0);
+                          const price = Number(p.customer_price ?? 0);
+                          return (
+                            <TableRow key={p.id}>
+                              <TableCell className="font-medium">{p.part_name ?? "—"}</TableCell>
+                              <TableCell className="font-mono text-xs">{p.part_number ?? "—"}</TableCell>
+                              <TableCell>{p.supplier_name ?? "—"}</TableCell>
+                              <TableCell className="text-right">{qty}</TableCell>
+                              <TableCell className="text-right">{price.toLocaleString()}</TableCell>
+                              <TableCell className="text-right">{(qty * price).toLocaleString()}</TableCell>
+                              <TableCell>
+                                <Badge variant="outline">{p.status ?? "—"}</Badge>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  )}
                 </CardContent>
               </Card>
             </div>
