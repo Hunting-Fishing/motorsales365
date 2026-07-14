@@ -132,7 +132,11 @@ function InventoryList() {
                     const low = qty <= rp;
                     return (
                       <TableRow key={i.id}>
-                        <TableCell className="font-medium">{i.name ?? "—"}</TableCell>
+                        <TableCell className="font-medium">
+                          <Link to="/shop/inventory/$id" params={{ id: i.id }} className="text-primary hover:underline">
+                            {i.name ?? "—"}
+                          </Link>
+                        </TableCell>
                         <TableCell className="font-mono text-xs">{i.sku ?? i.part_number ?? "—"}</TableCell>
                         <TableCell>{i.category ?? "—"}</TableCell>
                         <TableCell className="text-right">
