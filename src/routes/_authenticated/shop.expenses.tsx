@@ -56,7 +56,7 @@ function ExpensesPage() {
     queryFn: async () => {
       const { data, error } = await sm
         .from("expenses")
-        .select("id,amount,tax_amount,expense_date,payment_method,reference_number,description,status,category_id")
+        .select("id,amount,tax_amount,expense_date,payment_method,reference_number,description,status,category_id,receipt_url")
         .order("expense_date", { ascending: false })
         .limit(500);
       if (error) throw error;
