@@ -1,17 +1,14 @@
 import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, ExternalLink, Sparkles, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, Sparkles, Check, Globe } from "lucide-react";
 import type { Competitor } from "@/data/competitors-shop-software";
+import { detectRegionCurrency, formatMoney, type RegionCurrency } from "@/lib/region-currency";
 
-function fmtUsd(n: number) {
-  return n % 1 === 0 ? `$${n}` : `$${n.toFixed(2)}`;
-}
-
-function priceLabel(p: Competitor["pricing"]): { big: string; sub: string } {
+function priceLabel(p: Competitor["pricing"], ccy: RegionCurrency): { big: string; sub: string } {
   if (p.unit === "free") return { big: "Free", sub: p.tierName };
   if (p.startingUsd == null) return { big: "Ask", sub: p.tierName };
-  const start = fmtUsd(p.startingUsd);
+  const start = formatMoney(p.startingUsd, ccy);
   if (p.topUsd != null && p.topUsd > p.startingUsd) {
-    return { big: `${start}–${fmtUsd(p.topUsd)}`, sub: `/${p.unit} · ${p.tierName}` };
+    return { big: `${start}–${formatMoney(p.topUsd, ccy)}`, sub: `/${p.unit} · ${p.tierName}` };
   }
   return { big: start, sub: `/${p.unit} · ${p.tierName}` };
 }
@@ -37,6 +34,7 @@ export function CompetitorPricingRail({
   title?: string;
   subtitle?: string;
 }) {
+  const [ccy] = useState<RegionCurrency>(() => detectRegionCurrency());
   const scrollerRef = useRef<HTMLDivElement>(null);
   const dragState = useRef<{ active: boolean; startX: number; startScroll: number; moved: boolean }>({
     active: false,
@@ -92,7 +90,10 @@ export function CompetitorPricingRail({
         <div>
           <h3 className="font-display text-lg font-semibold tracking-tight">{title}</h3>
           {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
-          <p className="mt-0.5 text-[11px] text-muted-foreground/80">Click &amp; drag to scroll →</p>
+          <p className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-muted-foreground/80">
+            <Globe className="h-3 w-3" />
+            {ccy.code}{ccy.code !== "USD" && " ≈"} · click &amp; drag / swipe →
+          </p>
         </div>
         <div className="hidden gap-1 md:flex">
           <button
@@ -134,7 +135,7 @@ export function CompetitorPricingRail({
 
           {competitors.map((c) => {
             const is365 = c.id === "365";
-            const { big, sub } = priceLabel(c.pricing);
+            const { big, sub } = priceLabel(c.pricing, ccy);
             const vs = vsBadge(c.pricing, is365);
             const isExternal = c.pricing.link.startsWith("http");
             return (
