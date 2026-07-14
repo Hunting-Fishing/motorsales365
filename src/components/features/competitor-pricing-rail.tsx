@@ -19,10 +19,13 @@ function priceLabel(p: Competitor["pricing"]): { big: string; sub: string } {
 function vsBadge(p: Competitor["pricing"], is365: boolean): { text: string; className: string } | null {
   if (is365) return null;
   if (p.unit === "free" || (p.startingUsd ?? 0) === 0)
-    return { text: "365 matches free", className: "bg-primary/10 text-primary" };
+    return { text: "365 matches free core", className: "bg-primary/10 text-primary" };
   if (p.startingUsd == null)
-    return { text: "365 is free", className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" };
-  return { text: "365 saves $" + Math.round(p.startingUsd), className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" };
+    return { text: "365 core is free", className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" };
+  return {
+    text: `365 saves $${Math.round(p.startingUsd - 5)}+/mo`,
+    className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  };
 }
 
 export function CompetitorPricingRail({
