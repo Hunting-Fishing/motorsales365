@@ -274,6 +274,7 @@ import { Route as AuthenticatedShopReportsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedShopQuotesRouteImport } from './routes/_authenticated/shop.quotes'
 import { Route as AuthenticatedShopPurchaseOrdersRouteImport } from './routes/_authenticated/shop.purchase-orders'
 import { Route as AuthenticatedShopLoyaltyRouteImport } from './routes/_authenticated/shop.loyalty'
+import { Route as AuthenticatedShopLeaveRequestsRouteImport } from './routes/_authenticated/shop.leave-requests'
 import { Route as AuthenticatedShopLeaveRouteImport } from './routes/_authenticated/shop.leave'
 import { Route as AuthenticatedShopJournalRouteImport } from './routes/_authenticated/shop.journal'
 import { Route as AuthenticatedShopInvoicesRouteImport } from './routes/_authenticated/shop.invoices'
@@ -1726,6 +1727,12 @@ const AuthenticatedShopLoyaltyRoute =
     path: '/loyalty',
     getParentRoute: () => AuthenticatedShopRoute,
   } as any)
+const AuthenticatedShopLeaveRequestsRoute =
+  AuthenticatedShopLeaveRequestsRouteImport.update({
+    id: '/leave-requests',
+    path: '/leave-requests',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
 const AuthenticatedShopLeaveRoute = AuthenticatedShopLeaveRouteImport.update({
   id: '/leave',
   path: '/leave',
@@ -2425,6 +2432,7 @@ export interface FileRoutesByFullPath {
   '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
   '/shop/journal': typeof AuthenticatedShopJournalRoute
   '/shop/leave': typeof AuthenticatedShopLeaveRoute
+  '/shop/leave-requests': typeof AuthenticatedShopLeaveRequestsRoute
   '/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
@@ -2764,6 +2772,7 @@ export interface FileRoutesByTo {
   '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
   '/shop/journal': typeof AuthenticatedShopJournalRoute
   '/shop/leave': typeof AuthenticatedShopLeaveRoute
+  '/shop/leave-requests': typeof AuthenticatedShopLeaveRequestsRoute
   '/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
@@ -3114,6 +3123,7 @@ export interface FileRoutesById {
   '/_authenticated/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
   '/_authenticated/shop/journal': typeof AuthenticatedShopJournalRoute
   '/_authenticated/shop/leave': typeof AuthenticatedShopLeaveRoute
+  '/_authenticated/shop/leave-requests': typeof AuthenticatedShopLeaveRequestsRoute
   '/_authenticated/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/_authenticated/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/_authenticated/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
@@ -3465,6 +3475,7 @@ export interface FileRouteTypes {
     | '/shop/invoices'
     | '/shop/journal'
     | '/shop/leave'
+    | '/shop/leave-requests'
     | '/shop/loyalty'
     | '/shop/purchase-orders'
     | '/shop/quotes'
@@ -3804,6 +3815,7 @@ export interface FileRouteTypes {
     | '/shop/invoices'
     | '/shop/journal'
     | '/shop/leave'
+    | '/shop/leave-requests'
     | '/shop/loyalty'
     | '/shop/purchase-orders'
     | '/shop/quotes'
@@ -4153,6 +4165,7 @@ export interface FileRouteTypes {
     | '/_authenticated/shop/invoices'
     | '/_authenticated/shop/journal'
     | '/_authenticated/shop/leave'
+    | '/_authenticated/shop/leave-requests'
     | '/_authenticated/shop/loyalty'
     | '/_authenticated/shop/purchase-orders'
     | '/_authenticated/shop/quotes'
@@ -6290,6 +6303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopLoyaltyRouteImport
       parentRoute: typeof AuthenticatedShopRoute
     }
+    '/_authenticated/shop/leave-requests': {
+      id: '/_authenticated/shop/leave-requests'
+      path: '/leave-requests'
+      fullPath: '/shop/leave-requests'
+      preLoaderRoute: typeof AuthenticatedShopLeaveRequestsRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
     '/_authenticated/shop/leave': {
       id: '/_authenticated/shop/leave'
       path: '/leave'
@@ -7019,6 +7039,7 @@ interface AuthenticatedShopRouteChildren {
   AuthenticatedShopInvoicesRoute: typeof AuthenticatedShopInvoicesRouteWithChildren
   AuthenticatedShopJournalRoute: typeof AuthenticatedShopJournalRoute
   AuthenticatedShopLeaveRoute: typeof AuthenticatedShopLeaveRoute
+  AuthenticatedShopLeaveRequestsRoute: typeof AuthenticatedShopLeaveRequestsRoute
   AuthenticatedShopLoyaltyRoute: typeof AuthenticatedShopLoyaltyRoute
   AuthenticatedShopPurchaseOrdersRoute: typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   AuthenticatedShopQuotesRoute: typeof AuthenticatedShopQuotesRouteWithChildren
@@ -7047,6 +7068,7 @@ const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
   AuthenticatedShopInvoicesRoute: AuthenticatedShopInvoicesRouteWithChildren,
   AuthenticatedShopJournalRoute: AuthenticatedShopJournalRoute,
   AuthenticatedShopLeaveRoute: AuthenticatedShopLeaveRoute,
+  AuthenticatedShopLeaveRequestsRoute: AuthenticatedShopLeaveRequestsRoute,
   AuthenticatedShopLoyaltyRoute: AuthenticatedShopLoyaltyRoute,
   AuthenticatedShopPurchaseOrdersRoute:
     AuthenticatedShopPurchaseOrdersRouteWithChildren,
