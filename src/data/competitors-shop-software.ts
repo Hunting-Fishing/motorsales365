@@ -226,6 +226,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "SMB shop CRM",
     pricing: {
       startingUsd: 39,
+      topUsd: 189,
       unit: "mo",
       tierName: "Startup",
       includes: ["Work orders", "Inventory + CRM", "Mobile app"],
