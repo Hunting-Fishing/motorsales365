@@ -13,8 +13,10 @@ import {
   PackageSearch,
   Truck,
   Users,
+  Settings,
   Loader2,
 } from "lucide-react";
+import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -93,10 +95,13 @@ const QUICK_LINKS = [
   { title: "Vendors", icon: Truck, to: "/shop/vendors" as const },
   { title: "Vendor Bills", icon: Receipt, to: "/shop/vendor-bills" as const },
   { title: "Technicians", icon: Users, to: "/shop/technicians" as const },
+  { title: "Expenses", icon: Receipt, to: "/shop/expenses" as const },
   { title: "Reports", icon: BarChart3, to: "/shop/reports" as const },
+  { title: "Settings", icon: Settings, to: "/shop/settings" as const },
 ];
 
 function ShopHome() {
+  useShopRealtime();
   const { data, isLoading } = useQuery({ queryKey: ["shop-manager", "dashboard"], queryFn: fetchDashboard });
 
   return (
