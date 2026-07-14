@@ -112,7 +112,12 @@ function ExpensesPage() {
                       <div className="truncate sm:col-span-2">{r.description ?? "—"}</div>
                       <div><Badge variant="outline">{cat?.name ?? "Uncategorized"}</Badge></div>
                       <div className="font-medium">₱{total.toLocaleString()}</div>
-                      <div className="flex justify-end">
+                      <div className="flex justify-end gap-1">
+                        {r.receipt_url && (
+                          <Button size="icon" variant="ghost" title="View receipt" onClick={() => openReceipt(r.receipt_url)}>
+                            <Paperclip className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button size="icon" variant="ghost" onClick={() => { if (confirm("Delete this expense?")) del.mutate(r.id); }}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
