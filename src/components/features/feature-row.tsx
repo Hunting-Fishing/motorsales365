@@ -8,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { FeaturePreview } from "./feature-preview";
 import type { Feature } from "@/data/features-catalog";
 
 export function FeatureRow({ f }: { f: Feature }) {
@@ -42,7 +43,11 @@ export function FeatureRow({ f }: { f: Feature }) {
       </AccordionTrigger>
       <AccordionContent>
         <div className="animate-fade-in space-y-5 px-2 pb-4 pt-1">
+          {f.route && (
+            <FeaturePreview route={f.route} label={f.name} />
+          )}
           <div className="grid gap-5 lg:grid-cols-3">
+
             <div className="rounded-xl border bg-card p-4">
               <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <Cog className="h-3.5 w-3.5 text-primary" /> How it works
