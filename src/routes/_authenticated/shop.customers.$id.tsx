@@ -283,6 +283,7 @@ function CustomerDetail() {
           </Card>
         ) : null}
 
+        <CustomerRemindersCard customerId={c.id} />
         <CustomerCommunicationsLog customerId={c.id} />
 
         <Card>
