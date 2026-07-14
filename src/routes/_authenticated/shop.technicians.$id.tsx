@@ -192,8 +192,76 @@ function TechnicianSchedulePage() {
             </p>
           </CardContent>
         </Card>
+
+        <TechDayCalendar technicianId={id} schedules={schedQ.data ?? []} />
       </div>
     </SiteLayout>
+  );
+}
+
+function TechDayCalendar({ technicianId, schedules }: { technicianId: string; schedules: Schedule[] }) {
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const day = new Date(date + "T00:00:00").getDay();
+  const shift = schedules.find((s) => s.day_of_week === day);
+
+  const dayStart = new Date(date + "T00:00:00").toISOString();
+  const dayEnd = new Date(date + "T23:59:59").toISOString();
+
+  const wosQ = useQuery({
+    queryKey: ["shop-manager", "work_orders", "tech-day", technicianId, date],
+    queryFn: async () => {
+      const { data, error } = await (smSupabase as any)
+        .from("work_orders")
+        .select("id,work_order_number,status,description,start_time,end_time,estimated_hours,customer_id")
+        .eq("technician_id", technicianId)
+        .gte("start_time", dayStart)
+        .lte("start_time", dayEnd)
+        .order("start_time", { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <CardTitle className="text-base flex items-center gap-2"><CalendarClock className="h-4 w-4" /> Daily Calendar</CardTitle>
+        <Input type="date" className="w-44" value={date} onChange={(e) => setDate(e.target.value)} />
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="text-sm">
+          {shift ? (
+            <span>Scheduled <b>{shift.start_time.slice(0, 5)} – {shift.end_time.slice(0, 5)}</b></span>
+          ) : (
+            <span className="text-muted-foreground">Off / no recurring shift for {DAYS[day]}.</span>
+          )}
+        </div>
+        {wosQ.isLoading ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>
+        ) : (wosQ.data ?? []).length === 0 ? (
+          <p className="text-sm text-muted-foreground">No work orders scheduled for this day.</p>
+        ) : (
+          <div className="space-y-2">
+            {(wosQ.data ?? []).map((wo: any) => (
+              <Link key={wo.id} to="/shop/work-orders/$id" params={{ id: wo.id }} className="block">
+                <div className="rounded border p-3 hover:bg-muted/40 transition">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-mono text-xs">
+                      {wo.start_time ? new Date(wo.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—"}
+                      {wo.end_time ? ` – ${new Date(wo.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}
+                    </span>
+                    <Badge variant="outline">{wo.work_order_number ?? wo.id.slice(0, 8)}</Badge>
+                    <Badge variant="secondary">{wo.status ?? "—"}</Badge>
+                    {wo.estimated_hours && <span className="text-xs text-muted-foreground">{wo.estimated_hours}h est</span>}
+                  </div>
+                  {wo.description && <p className="text-sm mt-1 truncate">{wo.description}</p>}
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
