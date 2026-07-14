@@ -142,6 +142,7 @@ function AutomationPage() {
               <DialogFooter><Button onClick={() => create.mutate()} disabled={create.isPending}>{create.isPending ? "Saving…" : "Create"}</Button></DialogFooter>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {q.isLoading ? (
