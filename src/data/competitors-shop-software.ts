@@ -268,9 +268,11 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "Legacy US DMS",
     pricing: {
       startingUsd: 189,
+      topUsd: 289,
       unit: "mo",
       tierName: "Standard",
       includes: ["Windows install", "Catalog integrations", "US-only support"],
+      highest: "Pro ≈ $289/mo",
       link: "https://rowriter.com/pricing/",
     },
   },
