@@ -15,7 +15,10 @@ import {
   Users,
   Settings,
   Loader2,
-} from "lucide-react";
+  Tag,
+  Bell,
+  Award,
+
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
