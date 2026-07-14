@@ -9,6 +9,8 @@ export type Cell = { v: "yes" | "partial" | "no"; note?: string };
 export type CompetitorPricing = {
   /** null = free tier / not-published (custom); "free" wins the vs-365 comparison */
   startingUsd: number | null;
+  /** Top-of-range price in same unit — renders as "$X–$Y/unit" when set. */
+  topUsd?: number | null;
   unit: "mo" | "yr" | "custom" | "free";
   tierName: string;
   includes: string[];
