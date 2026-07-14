@@ -266,9 +266,12 @@ import { Route as AuthenticatedShopVendorBillsRouteImport } from './routes/_auth
 import { Route as AuthenticatedShopVehiclesRouteImport } from './routes/_authenticated/shop.vehicles'
 import { Route as AuthenticatedShopTechniciansRouteImport } from './routes/_authenticated/shop.technicians'
 import { Route as AuthenticatedShopSettingsRouteImport } from './routes/_authenticated/shop.settings'
+import { Route as AuthenticatedShopServiceRemindersRouteImport } from './routes/_authenticated/shop.service-reminders'
+import { Route as AuthenticatedShopSegmentsRouteImport } from './routes/_authenticated/shop.segments'
 import { Route as AuthenticatedShopReportsRouteImport } from './routes/_authenticated/shop.reports'
 import { Route as AuthenticatedShopQuotesRouteImport } from './routes/_authenticated/shop.quotes'
 import { Route as AuthenticatedShopPurchaseOrdersRouteImport } from './routes/_authenticated/shop.purchase-orders'
+import { Route as AuthenticatedShopLoyaltyRouteImport } from './routes/_authenticated/shop.loyalty'
 import { Route as AuthenticatedShopInvoicesRouteImport } from './routes/_authenticated/shop.invoices'
 import { Route as AuthenticatedShopInventoryRouteImport } from './routes/_authenticated/shop.inventory'
 import { Route as AuthenticatedShopExpensesRouteImport } from './routes/_authenticated/shop.expenses'
@@ -1669,6 +1672,18 @@ const AuthenticatedShopSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedShopRoute,
   } as any)
+const AuthenticatedShopServiceRemindersRoute =
+  AuthenticatedShopServiceRemindersRouteImport.update({
+    id: '/service-reminders',
+    path: '/service-reminders',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
+const AuthenticatedShopSegmentsRoute =
+  AuthenticatedShopSegmentsRouteImport.update({
+    id: '/segments',
+    path: '/segments',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
 const AuthenticatedShopReportsRoute =
   AuthenticatedShopReportsRouteImport.update({
     id: '/reports',
@@ -1684,6 +1699,12 @@ const AuthenticatedShopPurchaseOrdersRoute =
   AuthenticatedShopPurchaseOrdersRouteImport.update({
     id: '/purchase-orders',
     path: '/purchase-orders',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
+const AuthenticatedShopLoyaltyRoute =
+  AuthenticatedShopLoyaltyRouteImport.update({
+    id: '/loyalty',
+    path: '/loyalty',
     getParentRoute: () => AuthenticatedShopRoute,
   } as any)
 const AuthenticatedShopInvoicesRoute =
@@ -2351,9 +2372,12 @@ export interface FileRoutesByFullPath {
   '/shop/expenses': typeof AuthenticatedShopExpensesRoute
   '/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
+  '/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
   '/shop/reports': typeof AuthenticatedShopReportsRoute
+  '/shop/segments': typeof AuthenticatedShopSegmentsRoute
+  '/shop/service-reminders': typeof AuthenticatedShopServiceRemindersRoute
   '/shop/settings': typeof AuthenticatedShopSettingsRoute
   '/shop/technicians': typeof AuthenticatedShopTechniciansRouteWithChildren
   '/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
@@ -2680,9 +2704,12 @@ export interface FileRoutesByTo {
   '/shop/expenses': typeof AuthenticatedShopExpensesRoute
   '/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
+  '/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
   '/shop/reports': typeof AuthenticatedShopReportsRoute
+  '/shop/segments': typeof AuthenticatedShopSegmentsRoute
+  '/shop/service-reminders': typeof AuthenticatedShopServiceRemindersRoute
   '/shop/settings': typeof AuthenticatedShopSettingsRoute
   '/shop/technicians': typeof AuthenticatedShopTechniciansRouteWithChildren
   '/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
@@ -3020,9 +3047,12 @@ export interface FileRoutesById {
   '/_authenticated/shop/expenses': typeof AuthenticatedShopExpensesRoute
   '/_authenticated/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/_authenticated/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
+  '/_authenticated/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/_authenticated/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/_authenticated/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
   '/_authenticated/shop/reports': typeof AuthenticatedShopReportsRoute
+  '/_authenticated/shop/segments': typeof AuthenticatedShopSegmentsRoute
+  '/_authenticated/shop/service-reminders': typeof AuthenticatedShopServiceRemindersRoute
   '/_authenticated/shop/settings': typeof AuthenticatedShopSettingsRoute
   '/_authenticated/shop/technicians': typeof AuthenticatedShopTechniciansRouteWithChildren
   '/_authenticated/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
@@ -3361,9 +3391,12 @@ export interface FileRouteTypes {
     | '/shop/expenses'
     | '/shop/inventory'
     | '/shop/invoices'
+    | '/shop/loyalty'
     | '/shop/purchase-orders'
     | '/shop/quotes'
     | '/shop/reports'
+    | '/shop/segments'
+    | '/shop/service-reminders'
     | '/shop/settings'
     | '/shop/technicians'
     | '/shop/vehicles'
@@ -3690,9 +3723,12 @@ export interface FileRouteTypes {
     | '/shop/expenses'
     | '/shop/inventory'
     | '/shop/invoices'
+    | '/shop/loyalty'
     | '/shop/purchase-orders'
     | '/shop/quotes'
     | '/shop/reports'
+    | '/shop/segments'
+    | '/shop/service-reminders'
     | '/shop/settings'
     | '/shop/technicians'
     | '/shop/vehicles'
@@ -4029,9 +4065,12 @@ export interface FileRouteTypes {
     | '/_authenticated/shop/expenses'
     | '/_authenticated/shop/inventory'
     | '/_authenticated/shop/invoices'
+    | '/_authenticated/shop/loyalty'
     | '/_authenticated/shop/purchase-orders'
     | '/_authenticated/shop/quotes'
     | '/_authenticated/shop/reports'
+    | '/_authenticated/shop/segments'
+    | '/_authenticated/shop/service-reminders'
     | '/_authenticated/shop/settings'
     | '/_authenticated/shop/technicians'
     | '/_authenticated/shop/vehicles'
@@ -6105,6 +6144,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopSettingsRouteImport
       parentRoute: typeof AuthenticatedShopRoute
     }
+    '/_authenticated/shop/service-reminders': {
+      id: '/_authenticated/shop/service-reminders'
+      path: '/service-reminders'
+      fullPath: '/shop/service-reminders'
+      preLoaderRoute: typeof AuthenticatedShopServiceRemindersRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
+    '/_authenticated/shop/segments': {
+      id: '/_authenticated/shop/segments'
+      path: '/segments'
+      fullPath: '/shop/segments'
+      preLoaderRoute: typeof AuthenticatedShopSegmentsRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
     '/_authenticated/shop/reports': {
       id: '/_authenticated/shop/reports'
       path: '/reports'
@@ -6124,6 +6177,13 @@ declare module '@tanstack/react-router' {
       path: '/purchase-orders'
       fullPath: '/shop/purchase-orders'
       preLoaderRoute: typeof AuthenticatedShopPurchaseOrdersRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
+    '/_authenticated/shop/loyalty': {
+      id: '/_authenticated/shop/loyalty'
+      path: '/loyalty'
+      fullPath: '/shop/loyalty'
+      preLoaderRoute: typeof AuthenticatedShopLoyaltyRouteImport
       parentRoute: typeof AuthenticatedShopRoute
     }
     '/_authenticated/shop/invoices': {
@@ -6815,9 +6875,12 @@ interface AuthenticatedShopRouteChildren {
   AuthenticatedShopExpensesRoute: typeof AuthenticatedShopExpensesRoute
   AuthenticatedShopInventoryRoute: typeof AuthenticatedShopInventoryRouteWithChildren
   AuthenticatedShopInvoicesRoute: typeof AuthenticatedShopInvoicesRouteWithChildren
+  AuthenticatedShopLoyaltyRoute: typeof AuthenticatedShopLoyaltyRoute
   AuthenticatedShopPurchaseOrdersRoute: typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   AuthenticatedShopQuotesRoute: typeof AuthenticatedShopQuotesRouteWithChildren
   AuthenticatedShopReportsRoute: typeof AuthenticatedShopReportsRoute
+  AuthenticatedShopSegmentsRoute: typeof AuthenticatedShopSegmentsRoute
+  AuthenticatedShopServiceRemindersRoute: typeof AuthenticatedShopServiceRemindersRoute
   AuthenticatedShopSettingsRoute: typeof AuthenticatedShopSettingsRoute
   AuthenticatedShopTechniciansRoute: typeof AuthenticatedShopTechniciansRouteWithChildren
   AuthenticatedShopVehiclesRoute: typeof AuthenticatedShopVehiclesRouteWithChildren
@@ -6833,10 +6896,14 @@ const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
   AuthenticatedShopExpensesRoute: AuthenticatedShopExpensesRoute,
   AuthenticatedShopInventoryRoute: AuthenticatedShopInventoryRouteWithChildren,
   AuthenticatedShopInvoicesRoute: AuthenticatedShopInvoicesRouteWithChildren,
+  AuthenticatedShopLoyaltyRoute: AuthenticatedShopLoyaltyRoute,
   AuthenticatedShopPurchaseOrdersRoute:
     AuthenticatedShopPurchaseOrdersRouteWithChildren,
   AuthenticatedShopQuotesRoute: AuthenticatedShopQuotesRouteWithChildren,
   AuthenticatedShopReportsRoute: AuthenticatedShopReportsRoute,
+  AuthenticatedShopSegmentsRoute: AuthenticatedShopSegmentsRoute,
+  AuthenticatedShopServiceRemindersRoute:
+    AuthenticatedShopServiceRemindersRoute,
   AuthenticatedShopSettingsRoute: AuthenticatedShopSettingsRoute,
   AuthenticatedShopTechniciansRoute:
     AuthenticatedShopTechniciansRouteWithChildren,
