@@ -16,13 +16,13 @@ export function ModuleSection({
   const Icon = (Icons as any)[mod.icon] ?? Icons.Star;
 
   return (
-    <section id={mod.id} className="scroll-mt-24">
+    <section id={mod.id} className="scroll-mt-40">
       <div className="mb-4 flex items-start gap-3">
-        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary ring-1 ring-primary/20">
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <h2 className="font-display text-2xl font-bold tracking-tight">
+          <h2 className="font-display text-2xl font-bold tracking-tight md:text-3xl">
             {mod.label}
             <span className="ml-2 text-sm font-medium text-muted-foreground">
               · {features.length} feature{features.length === 1 ? "" : "s"}
@@ -32,7 +32,8 @@ export function ModuleSection({
         </div>
       </div>
 
-      <div className="rounded-xl border bg-card">
+      <div className="relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary/60 via-primary/20 to-transparent" />
         <Accordion type="multiple" className="px-4">
           {features.map((f) => (
             <FeatureRow key={f.id} f={f} />
