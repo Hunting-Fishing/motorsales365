@@ -58,8 +58,9 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "US SaaS",
     pricing: {
       startingUsd: 199,
+      topUsd: 499,
       unit: "mo",
-      tierName: "Basic",
+      tierName: "Basic → Ultimate",
       includes: ["1 location", "Unlimited ROs", "Invoicing"],
       highest: "Ultimate ≈ $499/mo",
       link: "https://www.shopmonkey.io/pricing",
