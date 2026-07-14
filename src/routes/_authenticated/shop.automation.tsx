@@ -98,6 +98,47 @@ function AutomationPage() {
     onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey: ["shop-manager", "service_automation_rules"] }); },
   });
 
+  const runNow = useMutation({
+    mutationFn: async () => {
+      const { data: rules } = await (smSupabase as any).from("service_automation_rules").select("*").eq("is_active", true);
+      const { data: vehicles } = await (smSupabase as any).from("vehicles").select("id,customer_id,make,model,year,last_service_date");
+      const { data: existing } = await (smSupabase as any).from("service_reminders").select("vehicle_id,type,status").in("status", ["pending", "scheduled"]);
+      const existingSet = new Set((existing ?? []).map((r: any) => `${r.vehicle_id}::${r.type}`));
+      const today = new Date();
+      const toCreate: any[] = [];
+      for (const rule of rules ?? []) {
+        const cfg = rule.automation_config ?? {};
+        const intervalDays = Number(cfg.interval_days) || 0;
+        if (!intervalDays) continue;
+        for (const v of vehicles ?? []) {
+          if (!v.last_service_date) continue;
+          const key = `${v.id}::${rule.service_type}`;
+          if (existingSet.has(key)) continue;
+          const last = new Date(v.last_service_date);
+          const due = new Date(last); due.setDate(due.getDate() + intervalDays);
+          const leadMs = (Number(cfg.lead_days) || 0) * 86400000;
+          if (due.getTime() - today.getTime() <= leadMs) {
+            toCreate.push({
+              vehicle_id: v.id, customer_id: v.customer_id,
+              type: rule.service_type,
+              title: `${rule.rule_name} — ${v.year ?? ""} ${v.make ?? ""} ${v.model ?? ""}`.trim(),
+              due_date: due.toISOString().slice(0, 10),
+              status: "pending", priority: "medium",
+            });
+            existingSet.add(key);
+          }
+        }
+      }
+      if (toCreate.length === 0) return { created: 0 };
+      const { error } = await (smSupabase as any).from("service_reminders").insert(toCreate);
+      if (error) throw error;
+      return { created: toCreate.length };
+    },
+    onSuccess: (r) => { toast.success(r.created ? `Created ${r.created} reminder${r.created === 1 ? "" : "s"}` : "No new reminders due"); qc.invalidateQueries({ queryKey: ["shop-manager", "service_reminders"] }); },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+
   return (
     <SiteLayout>
       <div className="mx-auto max-w-5xl px-4 py-10">
