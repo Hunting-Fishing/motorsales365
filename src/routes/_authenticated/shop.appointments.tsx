@@ -114,9 +114,12 @@ function AppointmentsPage() {
               <p className="text-muted-foreground">Upcoming schedule.</p>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={() => setShowPast((v) => !v)}>
-            {showPast ? "Hide past" : "Show past"}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setShowPast((v) => !v)}>
+              {showPast ? "Hide past" : "Show past"}
+            </Button>
+            <NewAppointmentDialog />
+          </div>
         </div>
 
         {isLoading ? (
