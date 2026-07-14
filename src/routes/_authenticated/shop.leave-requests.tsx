@@ -39,12 +39,33 @@ type Req = {
 };
 
 async function fetchAll() {
-  const [{ data: reqs }, { data: types }] = await Promise.all([
+  const [{ data: reqs }, { data: types }, { data: bals }, { data: userRes }] = await Promise.all([
     (smSupabase as any).from("leave_requests").select("*").order("created_at", { ascending: false }),
     (smSupabase as any).from("leave_types").select("id,name,color").eq("is_active", true),
+    (smSupabase as any).from("employee_leave_balances").select("id,employee_id,leave_type_id,used_hours,balance_hours,accrued_hours"),
+    supabase.auth.getUser(),
   ]);
-  return { reqs: (reqs ?? []) as Req[], types: (types ?? []) as { id: string; name: string; color: string | null }[] };
+  // Determine if current user can approve (manager/admin/owner in shop_manager.profiles or public.user_roles)
+  const uid = userRes?.user?.id ?? null;
+  let canApprove = false;
+  if (uid) {
+    const { data: prof } = await (smSupabase as any).from("profiles").select("role").eq("id", uid).maybeSingle();
+    const role = String(prof?.role ?? "").toLowerCase();
+    if (["owner", "admin", "manager"].includes(role)) canApprove = true;
+    if (!canApprove) {
+      const { data: pubRole } = await supabase.rpc("has_role", { _user_id: uid, _role: "admin" });
+      if (pubRole === true) canApprove = true;
+    }
+  }
+  return {
+    reqs: (reqs ?? []) as Req[],
+    types: (types ?? []) as { id: string; name: string; color: string | null }[],
+    balances: (bals ?? []) as { id: string; employee_id: string; leave_type_id: string; used_hours: number; balance_hours: number; accrued_hours: number }[],
+    currentUserId: uid,
+    canApprove,
+  };
 }
+
 
 function statusBadge(s: string) {
   if (s === "approved") return <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">Approved</Badge>;
