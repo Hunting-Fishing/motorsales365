@@ -34,6 +34,7 @@ export function CompetitorPricingRail({
   title?: string;
   subtitle?: string;
 }) {
+  const [ccy] = useState<RegionCurrency>(() => detectRegionCurrency());
   const scrollerRef = useRef<HTMLDivElement>(null);
   const dragState = useRef<{ active: boolean; startX: number; startScroll: number; moved: boolean }>({
     active: false,
