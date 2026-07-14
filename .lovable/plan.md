@@ -1,96 +1,73 @@
-## Goal
+# Promote & polish the Features hub
 
-Turn `/features` into the definitive "everything 365 does" page — inspired by garage360.io/auto-repair-software-comparison — showing every module (Marketplace, Shop Manager, Parts Network, Franchise, Partner Program, Clubs, Learning, Dispatch/Tow, QR/Referrals, Document Check, etc.), an Upcoming Roadmap, and side-by-side comparisons vs. shop-software rivals AND PH/SEA marketplace rivals.
+## 1. Surface `/features` in strategic places
 
-## Structure of `/features`
+**Footer** (`src/components/site-footer.tsx`)
+- Add `{ to: "/features", label: "All features" }` to the "Sell" (or new "Product") column, placed above "Pricing & plans" so the pair reads Features → Pricing.
 
-```text
-Hero  ── "One app. Every side of the motor business."
-        CTA: Sign up · Book demo · Jump to comparison
+**Header** (`src/components/site-header.tsx`)
+- Desktop nav: add a `Features` link next to `Pricing` (both in the primary nav row and any dropdowns that already contain Pricing).
+- Mobile sheet: add a `Features` `SheetClose`+`Link` block directly above the existing `/pricing` block (line ~804).
 
-Sticky tab bar (anchors)
-  ▸ Marketplace   ▸ Shop Manager   ▸ Parts Network
-  ▸ Franchise     ▸ Partner Program  ▸ Clubs
-  ▸ Learning      ▸ Dispatch & Tow   ▸ QR / Referrals
-  ▸ Trust & Safety  ▸ Roadmap        ▸ vs Competitors
+**Homepage** (`src/routes/index.tsx`)
+- Add a slim "Explore every feature →" CTA strip beneath the hero (or in the existing highlights section) linking to `/features`.
 
-Per module section
-  ├─ Module intro (1 sentence, icon, count of sub-features)
-  └─ Feature rows (accordion)
-       Row collapsed:  [icon] Feature name · one-line pitch · "New / Beta / Live / Roadmap" badge · ▾
-       Row expanded:
-         ├─ Screenshot (auto-captured from live preview route)
-         ├─ How it works (2–3 sentences)
-         ├─ Why it's useful (bullet list, user benefit)
-         ├─ How we match / beat competition (named callouts)
-         └─ Deep link → the actual route in-app
+**Pricing page** (`src/routes/pricing.tsx`)
+- Add a top-of-page callout: "See the full feature list →" linking to `/features`. Reciprocal link from `/features` → `/pricing` already exists.
 
-Upcoming Roadmap
-  Same accordion pattern, badge = "Roadmap"
-  Uses existing roadmap assets already in repo
+**Franchise & Shop Manager landing pages** (`/franchise`, `/shop-manager` if present)
+- Add a "Compare all features" secondary button in the hero CTA cluster.
 
-Comparison section (two tables, tabbed)
-  Tab 1 — Shop software:   365 vs Shopmonkey · Tekmetric · Mitchell1 · AutoLeap · Garage360
-  Tab 2 — PH/SEA market:   365 vs Carousell · OLX · AutoDeal · Philkotse · Facebook Marketplace
-  Rows = capability, cells = ✓ / ✗ / partial with hover tooltip
+**Support page** (`src/routes/support.tsx`)
+- Add a "Not sure what a feature does? Browse all features" card at the top of the help topics grid.
 
-Footer CTA — Sign up · Contact sales · View pricing
-```
+## 2. UI/UX upgrade of `/features`
 
-## Implementation
+Refresh `src/routes/features.tsx` and its subcomponents for a more premium, modern feel:
 
-### 1. Feature inventory (single source of truth)
-Create `src/data/features-catalog.ts` — one array grouped by module. Each entry:
-```ts
-{ id, module, name, pitch, howItWorks, whyUseful[], vsCompetition[], route, status: "live"|"beta"|"new"|"roadmap", screenshot }
-```
-Seed from the actual route list (already inventoried) — ~120 features across 11 modules + ~15 roadmap items.
+**Hero**
+- Replace flat header with a gradient/aurora hero: `bg-gradient-to-br from-primary/15 via-background to-secondary/40` with a subtle grid or radial glow.
+- Add animated counters (live/roadmap/modules) using framer-motion; keep the sparkle badge.
+- Add two primary CTAs in the hero: "Jump to comparison" and "Start free" instead of only the outline button below.
 
-### 2. Screenshot pipeline
-Playwright script `scripts/capture-feature-screenshots.mjs`:
-- Reads `features-catalog.ts`
-- Signs into the preview using injected Supabase session (available for authed routes)
-- Visits each `route`, waits for network idle, screenshots viewport at 1440×900
-- Saves PNGs to `/tmp`, then runs `lovable-assets create` per file → writes `.asset.json` pointers under `src/assets/features/<id>.png.asset.json`
-- Catalog references `import shot from "@/assets/features/<id>.png.asset.json"`
-- Roadmap items reuse existing `roadmap-*.png.asset.json` files in repo
-- Script is re-runnable to refresh shots later
+**Sticky sub-nav**
+- Convert the module quick-nav chips into a sticky bar (top-16 under header) that highlights the active module on scroll (IntersectionObserver). Include a persistent search input inside the sticky bar so users can filter without scrolling back up.
 
-### 3. Routes / components
-```text
-src/routes/features.tsx                    # main hub (rewrites the missing route)
-src/components/features/
-  ├─ features-hero.tsx
-  ├─ module-section.tsx        # renders a module + its accordion rows
-  ├─ feature-row.tsx           # collapsible row (uses shadcn Accordion)
-  ├─ roadmap-section.tsx
-  ├─ comparison-tabs.tsx       # tabs wrapper
-  ├─ comparison-table.tsx      # generic ✓/✗/partial matrix
-  └─ status-badge.tsx
-src/data/features-catalog.ts
-src/data/competitors-shop-software.ts      # rows + which competitor supports which
-src/data/competitors-marketplace.ts
-```
+**Module sections** (`src/components/features/module-section.tsx`)
+- Replace plain accordion list with a card grid at md+ (2 columns of expandable cards) that collapses to a single stacked accordion on mobile.
+- Each card gets: colored module accent bar (per module), icon in gradient tile, status badge in top-right, hover lift (`hover:-translate-y-0.5 hover:shadow-lg`).
+- Add subtle border-gradient on hover for "live" features; muted styling for "roadmap".
 
-### 4. SEO / head
-`head()` on `/features` — title "Every Feature — 365 Motor Sales", targeted meta description, og:title/description, og:image (hero screenshot). Add JSON-LD `ItemList` of top features for rich results.
+**Feature row** (`src/components/features/feature-row.tsx`)
+- Restructure expanded content into three columns at lg+: "How it works", "Why it's useful", "Vs competition" — each with its own icon header (Cog / Sparkles / Trophy).
+- Add a "Open live page →" prominent button and, when screenshot asset exists, show it in a rounded frame with border + drop-shadow (lazy-loaded).
+- Add copy-link button per feature (anchors `#feature-id`) for shareable deep links.
 
-### 5. Nav wiring
-- Footer: add "Features" link
-- Top nav (if not present): add "Features" between Home and Pricing
-- Cross-link from `/pricing`, `/shop-manager`, `/about`
+**Filters & search**
+- Add module chips as toggleable filters (multi-select) beside the search input.
+- Add status filter (All / Live / Beta / New / Roadmap) as segmented control.
+- Persist filter+search in URL (`?q=&module=&status=`) so links are shareable.
+- Show "No matches" empty state with a reset button when filters return zero.
 
-### 6. Competitor matrix content
-Rows include: Marketplace listings, Shop management, VIN-based parts catalog, Live network stock, Franchise program, Partner/affiliate program, Clubs, Learning hub, Dispatch & Tow, QR referrals, LTO/Doc verification, Bookings, Invoicing, Inventory, Loyalty, Automation, PH-local payments, Multi-language, Mobile-first, etc. Each competitor cell: ✓ / partial / ✗ with a short factual tooltip. Values sourced from each competitor's public marketing pages (documented in file comments).
+**Comparison tables** (`src/components/features/comparison-table.tsx`)
+- Pin the first column and the 365 column on horizontal scroll (`sticky left-0`).
+- Highlight the 365 column with a subtle primary tint background and a "You are here" ribbon.
+- Convert Check/Minus/X icons into pill chips with color+label for scannability at a glance.
+- Add category row headers to group capabilities (Marketplace, Ops, Payments, etc.) when the matrix supports it.
 
-## Out of scope (this pass)
-- Admin CMS UI for editing the catalog (data file is fine for now)
-- Localization of comparison copy
-- A/B tests, analytics events beyond a single `features_row_expanded` GA event
+**Roadmap section**
+- Turn the roadmap cards into a horizontally scrollable "coming soon" rail on mobile with snap points; grid at md+. Add ETA badges if available in data.
 
-## Deliverables
-1. `/features` page fully populated from `features-catalog.ts`
-2. Playwright capture script + generated screenshot assets
-3. Two competitor comparison tables with tooltips
-4. Roadmap section with existing roadmap assets
-5. Nav + footer links, SEO metadata, JSON-LD
+**Global polish**
+- Framer-motion `whileInView` fade-in for module sections (staggered).
+- Add breadcrumb ("Home / Features") at top for orientation.
+- Add JSON-LD `ItemList` structured data listing all live features (SEO win).
+- Update `head()` `og:image` to a generated hero cover for `/features`.
+
+## Technical notes
+
+- New files: none required, but may split filter bar into `src/components/features/filter-bar.tsx` and sticky nav into `src/components/features/module-nav.tsx` for clarity.
+- Reuse `framer-motion` (already used in this codebase for motion) and `useSearchParams`/TanStack `useSearch` for URL-synced filters.
+- Keep all colors as semantic tokens (`primary`, `secondary`, `muted`, `emerald-500`, `amber-500` already in use).
+- Ensure the sticky sub-nav has `md:hidden` fallback that collapses to a `<select>` on mobile to save vertical space.
+- No backend changes; catalog remains in `src/data/features-catalog.ts`. Optional: add `eta?: string` field to roadmap entries.

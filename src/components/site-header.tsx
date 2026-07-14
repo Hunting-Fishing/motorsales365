@@ -239,6 +239,13 @@ export function SiteHeader() {
               Parts
             </Link>
             <Link
+              to="/features"
+              className="hidden shrink-0 whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1600px]:inline-flex"
+              activeProps={{ className: "bg-secondary text-foreground" }}
+            >
+              Features
+            </Link>
+            <Link
               to="/shop"
               className="hidden shrink-0 whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[2100px]:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
@@ -799,6 +806,14 @@ export function SiteHeader() {
                         className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
                       >
                         Partner training
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
+                        to="/features"
+                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
+                      >
+                        Features
                       </Link>
                     </SheetClose>
                     <SheetClose asChild>
