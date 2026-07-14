@@ -62,6 +62,49 @@ async function fetchWorkOrder(id: string): Promise<WorkOrderDetail | null> {
   return (data as WorkOrderDetail) ?? null;
 }
 
+type JobLine = {
+  id: string;
+  name: string | null;
+  category: string | null;
+  description: string | null;
+  estimated_hours: number | null;
+  labor_rate: number | null;
+  total_amount: number | null;
+  status: string | null;
+  display_order: number | null;
+};
+
+type WorkOrderPart = {
+  id: string;
+  part_name: string | null;
+  part_number: string | null;
+  supplier_name: string | null;
+  quantity: number | null;
+  customer_price: number | null;
+  status: string | null;
+  category: string | null;
+};
+
+async function fetchJobLines(id: string): Promise<JobLine[]> {
+  const { data, error } = await (smSupabase as any)
+    .from("work_order_job_lines")
+    .select("id,name,category,description,estimated_hours,labor_rate,total_amount,status,display_order")
+    .eq("work_order_id", id)
+    .order("display_order", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as JobLine[];
+}
+
+async function fetchWorkOrderParts(id: string): Promise<WorkOrderPart[]> {
+  const { data, error } = await (smSupabase as any)
+    .from("work_order_parts")
+    .select("id,part_name,part_number,supplier_name,quantity,customer_price,status,category")
+    .eq("work_order_id", id)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as WorkOrderPart[];
+}
+
 export const Route = createFileRoute("/_authenticated/shop/work-orders/$id")({
   head: () => ({
     meta: [
