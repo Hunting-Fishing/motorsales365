@@ -82,7 +82,7 @@ export function ComparisonTable({ matrix }: { matrix: CompetitorMatrix }) {
                 scope="row"
                 className="sticky left-0 z-10 border-b bg-secondary/50 p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground backdrop-blur"
               >
-                Starting price
+                Price range
               </th>
               {matrix.competitors.map((c) => {
                 const is365 = c.id === "365";
