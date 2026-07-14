@@ -9,6 +9,8 @@ import {
   Receipt,
   FileText,
   Calendar as CalendarIcon,
+  Car,
+  PackageSearch,
   Loader2,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
@@ -80,7 +82,9 @@ async function fetchDashboard() {
 const QUICK_LINKS = [
   { title: "Work Orders", icon: ClipboardList, to: "/shop/work-orders" as const },
   { title: "Customers", icon: Users2, to: "/shop/customers" as const },
+  { title: "Vehicles", icon: Car, to: "/shop/vehicles" as const },
   { title: "Inventory", icon: Boxes, to: "/shop/inventory" as const },
+  { title: "Purchase Orders", icon: PackageSearch, to: "/shop/purchase-orders" as const },
   { title: "Invoices", icon: Receipt, to: "/shop/invoices" as const },
   { title: "Quotes", icon: FileText, to: "/shop/quotes" as const },
   { title: "Calendar", icon: CalendarIcon, to: "/shop/appointments" as const },
