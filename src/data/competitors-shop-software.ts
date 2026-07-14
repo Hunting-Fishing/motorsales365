@@ -100,6 +100,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "Legacy desktop-first",
     pricing: {
       startingUsd: 179,
+      topUsd: 329,
       unit: "mo",
       tierName: "Manager SE",
       includes: ["Desktop install", "ProDemand add-on", "Windows only"],
