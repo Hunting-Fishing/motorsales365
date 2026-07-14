@@ -144,10 +144,27 @@ function CompleteProfilePage() {
   const invalidCls = (field: string) =>
     errorFor(field) ? "border-destructive focus-visible:ring-destructive" : "";
 
+  const scrollToField = (field: string) => {
+    if (typeof document === "undefined") return;
+    const el = document.getElementById(field);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      (el as HTMLElement).focus?.();
+    }
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setServerMissing(null);
     if (!clientOk) {
+      const first =
+        (needsPhone && !phoneValid && "phone") ||
+        (needsStreet && !isAddressValid(streetAddress) && "street-address") ||
+        (needsPostal && !isPostalValid(postalCode) && "postal-code") ||
+        (needsBizAddress && !isAddressValid(businessAddress) && "business-address") ||
+        (needsBizPostal && !isPostalValid(businessPostalCode) && "business-postal-code") ||
+        null;
+      if (first) scrollToField(first);
       toast.error("Fix the highlighted fields to continue.");
       return;
     }
@@ -170,10 +187,11 @@ function CompleteProfilePage() {
         return;
       }
       setServerMissing(res.missing);
+      const firstServer = res.missing[0]?.field;
+      if (firstServer) scrollToField(firstServer);
       toast.error(
         `${res.missing.length} field${res.missing.length === 1 ? "" : "s"} still need${res.missing.length === 1 ? "s" : ""} attention.`,
       );
-      // Refetch so we pick up any partial writes and prune already-fixed rows.
       void refetch();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong.");
@@ -195,9 +213,9 @@ function CompleteProfilePage() {
 
   return (
     <SiteLayout>
-      <div className="container mx-auto max-w-2xl px-4 py-12">
-        <header className="mb-8">
-          <h1 className="font-display text-3xl font-bold">Finish your account</h1>
+      <div className="container mx-auto max-w-2xl px-4 py-8 pb-40 md:py-12 md:pb-24">
+        <header className="mb-6 md:mb-8">
+          <h1 className="font-display text-2xl font-bold md:text-3xl">Finish your account</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Google signed you in, but we still need a few required details before you can
             continue. This is the same information every account provides at signup.
@@ -366,11 +384,25 @@ function CompleteProfilePage() {
             </p>
           )}
 
-          <div className="flex items-center justify-between border-t pt-4">
+          {/* Sticky mobile action bar — sits above the bottom nav (bottom-20)
+              on phones and clears the floating help widget. On md+ it renders
+              inline at the bottom of the form. */}
+          <div
+            className={cn(
+              "z-30 flex flex-col-reverse gap-3 border-t bg-background/95 backdrop-blur",
+              "fixed inset-x-0 bottom-20 px-4 py-3 shadow-[0_-6px_16px_-8px_rgba(0,0,0,0.15)]",
+              "md:static md:bottom-auto md:flex-row md:items-center md:justify-between md:px-0 md:py-4 md:shadow-none md:backdrop-blur-none",
+            )}
+          >
             <p className="text-xs text-muted-foreground">
               You can't dismiss this step — the fields above are required for every account.
             </p>
-            <Button type="submit" disabled={!clientOk || submitting}>
+            <Button
+              type="submit"
+              disabled={!clientOk || submitting}
+              className="w-full md:w-auto"
+              size="lg"
+            >
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
