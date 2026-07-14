@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { smSupabase } from "@/lib/shop-manager/db";
 import { CustomerCommunicationsLog } from "@/components/shop-manager/customer-communications-log";
+import { CustomerRemindersCard } from "@/components/shop-manager/customer-reminders-card";
 
 type Customer = {
   id: string;
