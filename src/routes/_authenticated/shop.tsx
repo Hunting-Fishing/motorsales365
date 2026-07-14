@@ -11,6 +11,7 @@ import {
   Calendar as CalendarIcon,
   Car,
   PackageSearch,
+  Truck,
   Loader2,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
