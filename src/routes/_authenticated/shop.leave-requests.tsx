@@ -107,25 +107,25 @@ function LeaveRequestsPage() {
 
   const review = useMutation({
     mutationFn: async ({ id, status, notes }: { id: string; status: "approved" | "rejected"; notes?: string }) => {
+      if (!data?.canApprove) throw new Error("You do not have permission to review leave requests");
+      const row = data.reqs.find(r => r.id === id);
+      if (row && row.employee_id === data.currentUserId) throw new Error("You cannot review your own request");
       const { data: u } = await supabase.auth.getUser();
       const { error } = await (smSupabase as any).from("leave_requests").update({
         status, reviewed_by: u.user?.id ?? null, reviewed_at: new Date().toISOString(), review_notes: notes ?? null,
       }).eq("id", id);
       if (error) throw error;
 
-      // On approve, add to used_hours in balance
-      if (status === "approved") {
-        const row = data?.reqs.find(r => r.id === id);
-        if (row && row.leave_type_id) {
-          const { data: bal } = await (smSupabase as any).from("employee_leave_balances")
-            .select("id,used_hours,balance_hours")
-            .eq("employee_id", row.employee_id).eq("leave_type_id", row.leave_type_id).maybeSingle();
-          if (bal) {
-            await (smSupabase as any).from("employee_leave_balances").update({
-              used_hours: Number(bal.used_hours || 0) + Number(row.hours),
-              balance_hours: Number(bal.balance_hours || 0) - Number(row.hours),
-            }).eq("id", bal.id);
-          }
+      // On approve, deduct from used_hours in balance
+      if (status === "approved" && row && row.leave_type_id) {
+        const { data: bal } = await (smSupabase as any).from("employee_leave_balances")
+          .select("id,used_hours,balance_hours")
+          .eq("employee_id", row.employee_id).eq("leave_type_id", row.leave_type_id).maybeSingle();
+        if (bal) {
+          await (smSupabase as any).from("employee_leave_balances").update({
+            used_hours: Number(bal.used_hours || 0) + Number(row.hours),
+            balance_hours: Number(bal.balance_hours || 0) - Number(row.hours),
+          }).eq("id", bal.id);
         }
       }
     },
@@ -135,6 +135,7 @@ function LeaveRequestsPage() {
     },
     onError: (e: any) => toast.error(e.message),
   });
+
 
   const reqs = data?.reqs ?? [];
   const pending = reqs.filter(r => r.status === "pending");
