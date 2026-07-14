@@ -285,3 +285,143 @@ function Field({ label, value }: { label: string; value: string | null }) {
     </div>
   );
 }
+
+function AdjustStockDialog({
+  itemId,
+  currentQty,
+}: {
+  itemId: string;
+  currentQty: number;
+}) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<"in" | "out" | "set">("in");
+  const [qty, setQty] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const preview =
+    mode === "set"
+      ? Number(qty) || 0
+      : mode === "in"
+        ? currentQty + (Number(qty) || 0)
+        : currentQty - (Number(qty) || 0);
+
+  const adjust = useMutation({
+    mutationFn: async () => {
+      const q = Number(qty);
+      if (!q || q <= 0) throw new Error("Enter a positive quantity");
+      const newQty =
+        mode === "set" ? q : mode === "in" ? currentQty + q : currentQty - q;
+      if (newQty < 0) throw new Error("Resulting quantity cannot be negative");
+
+      const delta = newQty - currentQty;
+      const txnType =
+        mode === "set" ? "adjustment" : mode === "in" ? "stock_in" : "stock_out";
+
+      const { error: txErr } = await (smSupabase as any)
+        .from("inventory_transactions")
+        .insert({
+          inventory_item_id: itemId,
+          transaction_type: txnType,
+          quantity: delta,
+          transaction_date: new Date().toISOString(),
+          reference_type: "manual_adjustment",
+          notes: notes.trim() || null,
+        });
+      if (txErr) throw txErr;
+
+      const { error: upErr } = await (smSupabase as any)
+        .from("inventory_items")
+        .update({ quantity: newQty, quantity_in_stock: newQty })
+        .eq("id", itemId);
+      if (upErr) throw upErr;
+    },
+    onSuccess: () => {
+      toast.success("Stock updated");
+      qc.invalidateQueries({ queryKey: ["shop-manager", "inventory"] });
+      setOpen(false);
+      setQty("");
+      setNotes("");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to adjust"),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <Pencil className="mr-1 h-4 w-4" /> Adjust stock
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Adjust stock</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              type="button"
+              variant={mode === "in" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMode("in")}
+            >
+              <Plus className="mr-1 h-4 w-4" /> Stock in
+            </Button>
+            <Button
+              type="button"
+              variant={mode === "out" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMode("out")}
+            >
+              <Minus className="mr-1 h-4 w-4" /> Stock out
+            </Button>
+            <Button
+              type="button"
+              variant={mode === "set" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMode("set")}
+            >
+              Set exact
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Current</Label>
+              <Input value={currentQty} readOnly />
+            </div>
+            <div>
+              <Label>
+                {mode === "set" ? "New quantity *" : "Quantity *"}
+              </Label>
+              <Input
+                type="number"
+                min="0"
+                value={qty}
+                onChange={(e) => setQty(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="rounded-md bg-muted px-3 py-2 text-sm">
+            After: <span className="font-semibold">{preview}</span>
+          </div>
+          <div>
+            <Label>Reason / notes</Label>
+            <Textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Received PO, cycle count, damage, etc."
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button disabled={!qty || adjust.isPending} onClick={() => adjust.mutate()}>
+            {adjust.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
