@@ -144,10 +144,27 @@ function CompleteProfilePage() {
   const invalidCls = (field: string) =>
     errorFor(field) ? "border-destructive focus-visible:ring-destructive" : "";
 
+  const scrollToField = (field: string) => {
+    if (typeof document === "undefined") return;
+    const el = document.getElementById(field);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      (el as HTMLElement).focus?.();
+    }
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setServerMissing(null);
     if (!clientOk) {
+      const first =
+        (needsPhone && !phoneValid && "phone") ||
+        (needsStreet && !isAddressValid(streetAddress) && "street-address") ||
+        (needsPostal && !isPostalValid(postalCode) && "postal-code") ||
+        (needsBizAddress && !isAddressValid(businessAddress) && "business-address") ||
+        (needsBizPostal && !isPostalValid(businessPostalCode) && "business-postal-code") ||
+        null;
+      if (first) scrollToField(first);
       toast.error("Fix the highlighted fields to continue.");
       return;
     }
@@ -170,10 +187,11 @@ function CompleteProfilePage() {
         return;
       }
       setServerMissing(res.missing);
+      const firstServer = res.missing[0]?.field;
+      if (firstServer) scrollToField(firstServer);
       toast.error(
         `${res.missing.length} field${res.missing.length === 1 ? "" : "s"} still need${res.missing.length === 1 ? "s" : ""} attention.`,
       );
-      // Refetch so we pick up any partial writes and prune already-fixed rows.
       void refetch();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong.");
