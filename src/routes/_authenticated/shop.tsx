@@ -15,7 +15,12 @@ import {
   Users,
   Settings,
   Loader2,
+  Tag,
+  Bell,
+  Award,
 } from "lucide-react";
+
+
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
@@ -98,8 +103,12 @@ const QUICK_LINKS = [
   { title: "Expenses", icon: Receipt, to: "/shop/expenses" as const },
   { title: "Reports", icon: BarChart3, to: "/shop/reports" as const },
   { title: "Accounting", icon: BarChart3, to: "/shop/accounting" as const },
+  { title: "Segments", icon: Tag, to: "/shop/segments" as const },
+  { title: "Service Reminders", icon: Bell, to: "/shop/service-reminders" as const },
+  { title: "Loyalty", icon: Award, to: "/shop/loyalty" as const },
   { title: "Settings", icon: Settings, to: "/shop/settings" as const },
 ];
+
 
 function ShopHome() {
   useShopRealtime();
