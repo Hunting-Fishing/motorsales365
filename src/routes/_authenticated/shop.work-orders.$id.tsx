@@ -211,6 +211,71 @@ function WorkOrderDetailPage() {
   );
   const laborTotal = jobLines.reduce((s, j) => s + Number(j.total_amount ?? 0), 0);
 
+  const generateInvoice = useMutation({
+    mutationFn: async () => {
+      if (!data) throw new Error("Work order not loaded");
+      if (!data.customer_id) throw new Error("Work order has no customer");
+      if (jobLines.length === 0 && parts.length === 0) {
+        throw new Error("Add job lines or parts before invoicing");
+      }
+      const subtotal = laborTotal + partsTotal;
+      const invoiceId = `INV-${Date.now().toString(36).toUpperCase()}`;
+      const customerName = data.customers
+        ? `${(data.customers as any).first_name ?? ""} ${(data.customers as any).last_name ?? ""}`.trim()
+        : null;
+
+      const { error: invErr } = await (smSupabase as any).from("invoices").insert({
+        id: invoiceId,
+        customer: customerName,
+        customer_id: data.customer_id,
+        customer_email: (data.customers as any)?.email ?? null,
+        work_order_id: data.id,
+        description: data.description ?? data.service_type ?? null,
+        date: new Date().toISOString(),
+        status: "draft",
+        subtotal,
+        tax: 0,
+        total: subtotal,
+      });
+      if (invErr) throw invErr;
+
+      const items = [
+        ...jobLines.map((j: any) => ({
+          invoice_id: invoiceId,
+          name: j.name ?? "Labor",
+          description: j.description ?? null,
+          quantity: Number(j.hours ?? 1),
+          price: Number(j.labor_rate ?? j.total_amount ?? 0),
+          total: Number(j.total_amount ?? 0),
+          hours: true,
+        })),
+        ...parts.map((p: any) => ({
+          invoice_id: invoiceId,
+          name: p.name ?? p.part_number ?? "Part",
+          description: p.description ?? p.part_number ?? null,
+          quantity: Number(p.quantity ?? 1),
+          price: Number(p.customer_price ?? p.unit_price ?? 0),
+          total: Number(p.customer_price ?? 0) * Number(p.quantity ?? 0),
+          hours: false,
+        })),
+      ];
+      if (items.length > 0) {
+        const { error: itErr } = await (smSupabase as any)
+          .from("invoice_items")
+          .insert(items);
+        if (itErr) throw itErr;
+      }
+      return invoiceId;
+    },
+    onSuccess: (invoiceId) => {
+      toast.success("Invoice created");
+      qc.invalidateQueries({ queryKey: ["shop-manager", "invoices"] });
+      navigate({ to: "/shop/invoices/$id", params: { id: invoiceId } });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to generate invoice"),
+  });
+
+
   const updateStatus = useMutation({
     mutationFn: async (status: string) => {
       const { error } = await (smSupabase as any)
