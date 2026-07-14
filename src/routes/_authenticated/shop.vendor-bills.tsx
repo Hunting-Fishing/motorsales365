@@ -99,26 +99,28 @@ function BillsPage() {
         ) : (
           <div className="grid gap-2">
             {filtered.map((b: any) => (
-              <Card key={b.id} className="hover:border-primary/50 transition">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3">
-                  <div>
-                    <CardTitle className="text-base font-mono">{b.bill_number ?? b.id.slice(0, 8)}</CardTitle>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {b.suppliers?.name ?? "—"} · {b.bill_date ?? "—"}
-                      {b.due_date ? <> · due {b.due_date}</> : null}
+              <Link key={b.id} to="/shop/vendor-bills/$id" params={{ id: b.id }}>
+                <Card className="hover:border-primary/50 transition">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3">
+                    <div>
+                      <CardTitle className="text-base font-mono">{b.bill_number ?? b.id.slice(0, 8)}</CardTitle>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {b.suppliers?.name ?? "—"} · {b.bill_date ?? "—"}
+                        {b.due_date ? <> · due {b.due_date}</> : null}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <div className="font-mono">{peso(b.total_amount)}</div>
-                      {Number(b.balance_due ?? 0) > 0 ? (
-                        <div className="text-xs text-destructive">{peso(b.balance_due)} due</div>
-                      ) : null}
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <div className="font-mono">{peso(b.total_amount)}</div>
+                        {Number(b.balance_due ?? 0) > 0 ? (
+                          <div className="text-xs text-destructive">{peso(b.balance_due)} due</div>
+                        ) : null}
+                      </div>
+                      <Badge variant="outline" className="capitalize">{b.status ?? "—"}</Badge>
                     </div>
-                    <Badge variant="outline" className="capitalize">{b.status ?? "—"}</Badge>
-                  </div>
-                </CardHeader>
-              </Card>
+                  </CardHeader>
+                </Card>
+              </Link>
             ))}
           </div>
         )}
