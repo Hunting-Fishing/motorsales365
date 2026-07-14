@@ -57,12 +57,15 @@ function ReportsPage() {
     queryKey: ["shop-manager", "reports", range],
     queryFn: async () => {
       const sm = smSupabase as any;
-      const [invc, wo, pay, inv, cust] = await Promise.all([
+      const [invc, wo, pay, inv, cust, timeEntries, techs, ratesRow] = await Promise.all([
         sm.from("invoices").select("id,total,status,created_at,customer_id").gte("created_at", fromISO).limit(2000),
         sm.from("work_orders").select("id,status,created_at,total_cost").gte("created_at", fromISO).limit(2000),
         sm.from("payments").select("id,amount,created_at").gte("created_at", fromISO).limit(2000),
         sm.from("inventory_items").select("id,quantity,unit_price,cost,reorder_point").limit(2000),
         sm.from("customers").select("id,first_name,last_name").limit(2000),
+        sm.from("work_order_time_entries").select("employee_id,duration,billable,hourly_rate,start_time").gte("start_time", fromISO).limit(10000),
+        sm.from("profiles").select("id,full_name,first_name,last_name,hourly_rate,cost_rate").limit(1000),
+        sm.from("labor_rates").select("standard_rate").limit(1).maybeSingle(),
       ]);
 
       const invoices = invc.data ?? [];
@@ -119,12 +122,43 @@ function ReportsPage() {
       const series = Array.from(bucket.entries()).map(([date, amt]) => ({ date, amt }));
       const maxAmt = Math.max(1, ...series.map((s) => s.amt));
 
+      // Per-technician contribution
+      const defaultBill = Number((ratesRow.data as any)?.standard_rate ?? 0);
+      const techMap = new Map<string, any>((techs.data ?? []).map((t: any) => [t.id, t]));
+      const techAgg: Record<string, { revenue: number; cost: number; sec: number; billableSec: number }> = {};
+      for (const e of timeEntries.data ?? []) {
+        if (!e.employee_id) continue;
+        const t = techMap.get(e.employee_id);
+        const bill = Number(e.hourly_rate ?? t?.hourly_rate ?? defaultBill) || 0;
+        const cost = Number(t?.cost_rate ?? 0) || 0;
+        const dur = Number(e.duration ?? 0);
+        const a = (techAgg[e.employee_id] ||= { revenue: 0, cost: 0, sec: 0, billableSec: 0 });
+        a.sec += dur;
+        a.cost += (dur / 3600) * cost;
+        if (e.billable) {
+          a.billableSec += dur;
+          a.revenue += (dur / 3600) * bill;
+        }
+      }
+      const technicianPnl = Object.entries(techAgg)
+        .map(([id, v]) => {
+          const t = techMap.get(id);
+          const name =
+            t?.full_name ||
+            [t?.first_name, t?.last_name].filter(Boolean).join(" ") ||
+            id.slice(0, 8);
+          return { id, name, ...v, net: v.revenue - v.cost };
+        })
+        .sort((a, b) => b.net - a.net)
+        .slice(0, 10);
+
       return {
         totals: { invoiced, collected, outstanding, avgTicket, invValueRetail, invValueCost, lowStock, woOpen, woCompleted },
         woCounts,
         topCustomers,
         series,
         maxAmt,
+        technicianPnl,
       };
     },
   });
@@ -214,6 +248,30 @@ function ReportsPage() {
                   >
                     <span className="truncate">{c.name}</span>
                     <span className="font-mono">{peso(c.total)}</span>
+                  </Link>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card className="mt-6">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-base flex items-center gap-2"><Wrench className="h-4 w-4 text-primary" /> Contribution by technician</CardTitle>
+                <Button asChild size="sm" variant="ghost"><Link to="/shop/technicians">All technicians</Link></Button>
+              </CardHeader>
+              <CardContent className="space-y-1">
+                {(data.technicianPnl ?? []).length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No logged time in this range.</p>
+                ) : (data.technicianPnl ?? []).map((t: any) => (
+                  <Link
+                    key={t.id}
+                    to="/shop/reports/technician/$id"
+                    params={{ id: t.id }}
+                    className="flex items-center justify-between gap-3 rounded border p-2 text-sm hover:bg-muted/50"
+                  >
+                    <span className="truncate flex-1">{t.name}</span>
+                    <span className="text-xs text-muted-foreground tabular-nums">{(t.sec / 3600).toFixed(1)}h</span>
+                    <span className="text-xs text-muted-foreground tabular-nums">rev {peso(t.revenue)}</span>
+                    <span className={"font-mono tabular-nums " + (t.net >= 0 ? "text-emerald-600" : "text-rose-600")}>{peso(t.net)}</span>
                   </Link>
                 ))}
               </CardContent>

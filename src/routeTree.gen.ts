@@ -329,6 +329,7 @@ import { Route as ApiPublicPostbackNetworkRouteImport } from './routes/api/publi
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksSyncPartsFeedsRouteImport } from './routes/api/public/hooks/sync-parts-feeds'
 import { Route as ApiPublicHooksSignupFailureAlertsRouteImport } from './routes/api/public/hooks/signup-failure-alerts'
+import { Route as ApiPublicHooksShopAutomationRunRouteImport } from './routes/api/public/hooks/shop-automation-run'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicHooksRecomputeTiersRouteImport } from './routes/api/public/hooks/recompute-tiers'
 import { Route as ApiPublicHooksQuarterlyBonusesRouteImport } from './routes/api/public/hooks/quarterly-bonuses'
@@ -362,6 +363,7 @@ import { Route as AuthenticatedShopCustomersIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedShopAccountingPnlRouteImport } from './routes/_authenticated/shop.accounting.pnl'
 import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
+import { Route as AuthenticatedShopReportsTechnicianIdRouteImport } from './routes/_authenticated/shop.reports.technician.$id'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -2049,6 +2051,12 @@ const ApiPublicHooksSignupFailureAlertsRoute =
     path: '/api/public/hooks/signup-failure-alerts',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksShopAutomationRunRoute =
+  ApiPublicHooksShopAutomationRunRouteImport.update({
+    id: '/api/public/hooks/shop-automation-run',
+    path: '/api/public/hooks/shop-automation-run',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksRefreshLazadaRoute =
   ApiPublicHooksRefreshLazadaRouteImport.update({
     id: '/api/public/hooks/refresh-lazada',
@@ -2242,6 +2250,12 @@ const ApiPublicTrainingPartnersIdClickRoute =
     id: '/api/public/training-partners/$id/click',
     path: '/api/public/training-partners/$id/click',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedShopReportsTechnicianIdRoute =
+  AuthenticatedShopReportsTechnicianIdRouteImport.update({
+    id: '/technician/$id',
+    path: '/technician/$id',
+    getParentRoute: () => AuthenticatedShopReportsRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -2465,7 +2479,7 @@ export interface FileRoutesByFullPath {
   '/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
-  '/shop/reports': typeof AuthenticatedShopReportsRoute
+  '/shop/reports': typeof AuthenticatedShopReportsRouteWithChildren
   '/shop/scheduling': typeof AuthenticatedShopSchedulingRoute
   '/shop/segments': typeof AuthenticatedShopSegmentsRoute
   '/shop/service-reminders': typeof AuthenticatedShopServiceRemindersRoute
@@ -2569,6 +2583,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
+  '/api/public/hooks/shop-automation-run': typeof ApiPublicHooksShopAutomationRunRoute
   '/api/public/hooks/signup-failure-alerts': typeof ApiPublicHooksSignupFailureAlertsRoute
   '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -2596,6 +2611,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
   '/dashboard/business/$businessId/': typeof DashboardBusinessBusinessIdIndexRoute
+  '/shop/reports/technician/$id': typeof AuthenticatedShopReportsTechnicianIdRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRoutesByTo {
@@ -2809,7 +2825,7 @@ export interface FileRoutesByTo {
   '/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
-  '/shop/reports': typeof AuthenticatedShopReportsRoute
+  '/shop/reports': typeof AuthenticatedShopReportsRouteWithChildren
   '/shop/scheduling': typeof AuthenticatedShopSchedulingRoute
   '/shop/segments': typeof AuthenticatedShopSegmentsRoute
   '/shop/service-reminders': typeof AuthenticatedShopServiceRemindersRoute
@@ -2912,6 +2928,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
+  '/api/public/hooks/shop-automation-run': typeof ApiPublicHooksShopAutomationRunRoute
   '/api/public/hooks/signup-failure-alerts': typeof ApiPublicHooksSignupFailureAlertsRoute
   '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -2939,6 +2956,7 @@ export interface FileRoutesByTo {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdIndexRoute
+  '/shop/reports/technician/$id': typeof AuthenticatedShopReportsTechnicianIdRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRoutesById {
@@ -3164,7 +3182,7 @@ export interface FileRoutesById {
   '/_authenticated/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/_authenticated/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/_authenticated/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
-  '/_authenticated/shop/reports': typeof AuthenticatedShopReportsRoute
+  '/_authenticated/shop/reports': typeof AuthenticatedShopReportsRouteWithChildren
   '/_authenticated/shop/scheduling': typeof AuthenticatedShopSchedulingRoute
   '/_authenticated/shop/segments': typeof AuthenticatedShopSegmentsRoute
   '/_authenticated/shop/service-reminders': typeof AuthenticatedShopServiceRemindersRoute
@@ -3268,6 +3286,7 @@ export interface FileRoutesById {
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
   '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
+  '/api/public/hooks/shop-automation-run': typeof ApiPublicHooksShopAutomationRunRoute
   '/api/public/hooks/signup-failure-alerts': typeof ApiPublicHooksSignupFailureAlertsRoute
   '/api/public/hooks/sync-parts-feeds': typeof ApiPublicHooksSyncPartsFeedsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -3295,6 +3314,7 @@ export interface FileRoutesById {
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
   '/dashboard/business/$businessId/': typeof DashboardBusinessBusinessIdIndexRoute
+  '/_authenticated/shop/reports/technician/$id': typeof AuthenticatedShopReportsTechnicianIdRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRouteTypes {
@@ -3624,6 +3644,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/quarterly-bonuses'
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
+    | '/api/public/hooks/shop-automation-run'
     | '/api/public/hooks/signup-failure-alerts'
     | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
@@ -3651,6 +3672,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/parts/p/$network/$sku'
     | '/dashboard/business/$businessId/'
+    | '/shop/reports/technician/$id'
     | '/api/public/training-partners/$id/click'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -3967,6 +3989,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/quarterly-bonuses'
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
+    | '/api/public/hooks/shop-automation-run'
     | '/api/public/hooks/signup-failure-alerts'
     | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
@@ -3994,6 +4017,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/parts/p/$network/$sku'
     | '/dashboard/business/$businessId'
+    | '/shop/reports/technician/$id'
     | '/api/public/training-partners/$id/click'
   id:
     | '__root__'
@@ -4322,6 +4346,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/quarterly-bonuses'
     | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
+    | '/api/public/hooks/shop-automation-run'
     | '/api/public/hooks/signup-failure-alerts'
     | '/api/public/hooks/sync-parts-feeds'
     | '/api/public/payments/webhook'
@@ -4349,6 +4374,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/send'
     | '/parts/p/$network/$sku'
     | '/dashboard/business/$businessId/'
+    | '/_authenticated/shop/reports/technician/$id'
     | '/api/public/training-partners/$id/click'
   fileRoutesById: FileRoutesById
 }
@@ -4480,6 +4506,7 @@ export interface RootRouteChildren {
   ApiPublicHooksQuarterlyBonusesRoute: typeof ApiPublicHooksQuarterlyBonusesRoute
   ApiPublicHooksRecomputeTiersRoute: typeof ApiPublicHooksRecomputeTiersRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
+  ApiPublicHooksShopAutomationRunRoute: typeof ApiPublicHooksShopAutomationRunRoute
   ApiPublicHooksSignupFailureAlertsRoute: typeof ApiPublicHooksSignupFailureAlertsRoute
   ApiPublicHooksSyncPartsFeedsRoute: typeof ApiPublicHooksSyncPartsFeedsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -6740,6 +6767,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSignupFailureAlertsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/shop-automation-run': {
+      id: '/api/public/hooks/shop-automation-run'
+      path: '/api/public/hooks/shop-automation-run'
+      fullPath: '/api/public/hooks/shop-automation-run'
+      preLoaderRoute: typeof ApiPublicHooksShopAutomationRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/refresh-lazada': {
       id: '/api/public/hooks/refresh-lazada'
       path: '/api/public/hooks/refresh-lazada'
@@ -6971,6 +7005,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTrainingPartnersIdClickRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/shop/reports/technician/$id': {
+      id: '/_authenticated/shop/reports/technician/$id'
+      path: '/technician/$id'
+      fullPath: '/shop/reports/technician/$id'
+      preLoaderRoute: typeof AuthenticatedShopReportsTechnicianIdRouteImport
+      parentRoute: typeof AuthenticatedShopReportsRoute
+    }
   }
 }
 
@@ -7078,6 +7119,21 @@ const AuthenticatedShopQuotesRouteWithChildren =
     AuthenticatedShopQuotesRouteChildren,
   )
 
+interface AuthenticatedShopReportsRouteChildren {
+  AuthenticatedShopReportsTechnicianIdRoute: typeof AuthenticatedShopReportsTechnicianIdRoute
+}
+
+const AuthenticatedShopReportsRouteChildren: AuthenticatedShopReportsRouteChildren =
+  {
+    AuthenticatedShopReportsTechnicianIdRoute:
+      AuthenticatedShopReportsTechnicianIdRoute,
+  }
+
+const AuthenticatedShopReportsRouteWithChildren =
+  AuthenticatedShopReportsRoute._addFileChildren(
+    AuthenticatedShopReportsRouteChildren,
+  )
+
 interface AuthenticatedShopTechniciansRouteChildren {
   AuthenticatedShopTechniciansIdRoute: typeof AuthenticatedShopTechniciansIdRoute
 }
@@ -7152,7 +7208,7 @@ interface AuthenticatedShopRouteChildren {
   AuthenticatedShopLoyaltyRoute: typeof AuthenticatedShopLoyaltyRoute
   AuthenticatedShopPurchaseOrdersRoute: typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   AuthenticatedShopQuotesRoute: typeof AuthenticatedShopQuotesRouteWithChildren
-  AuthenticatedShopReportsRoute: typeof AuthenticatedShopReportsRoute
+  AuthenticatedShopReportsRoute: typeof AuthenticatedShopReportsRouteWithChildren
   AuthenticatedShopSchedulingRoute: typeof AuthenticatedShopSchedulingRoute
   AuthenticatedShopSegmentsRoute: typeof AuthenticatedShopSegmentsRoute
   AuthenticatedShopServiceRemindersRoute: typeof AuthenticatedShopServiceRemindersRoute
@@ -7183,7 +7239,7 @@ const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
   AuthenticatedShopPurchaseOrdersRoute:
     AuthenticatedShopPurchaseOrdersRouteWithChildren,
   AuthenticatedShopQuotesRoute: AuthenticatedShopQuotesRouteWithChildren,
-  AuthenticatedShopReportsRoute: AuthenticatedShopReportsRoute,
+  AuthenticatedShopReportsRoute: AuthenticatedShopReportsRouteWithChildren,
   AuthenticatedShopSchedulingRoute: AuthenticatedShopSchedulingRoute,
   AuthenticatedShopSegmentsRoute: AuthenticatedShopSegmentsRoute,
   AuthenticatedShopServiceRemindersRoute:
@@ -7950,6 +8006,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksQuarterlyBonusesRoute: ApiPublicHooksQuarterlyBonusesRoute,
   ApiPublicHooksRecomputeTiersRoute: ApiPublicHooksRecomputeTiersRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
+  ApiPublicHooksShopAutomationRunRoute: ApiPublicHooksShopAutomationRunRoute,
   ApiPublicHooksSignupFailureAlertsRoute:
     ApiPublicHooksSignupFailureAlertsRoute,
   ApiPublicHooksSyncPartsFeedsRoute: ApiPublicHooksSyncPartsFeedsRoute,
