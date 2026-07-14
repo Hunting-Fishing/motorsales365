@@ -262,10 +262,12 @@ import { Route as AdminAccountsBackfillRouteImport } from './routes/admin.accoun
 import { Route as AuthenticatedStaffAcademyRouteImport } from './routes/_authenticated/staff.academy'
 import { Route as AuthenticatedShopWorkOrdersRouteImport } from './routes/_authenticated/shop.work-orders'
 import { Route as AuthenticatedShopVehiclesRouteImport } from './routes/_authenticated/shop.vehicles'
+import { Route as AuthenticatedShopQuotesRouteImport } from './routes/_authenticated/shop.quotes'
 import { Route as AuthenticatedShopPurchaseOrdersRouteImport } from './routes/_authenticated/shop.purchase-orders'
 import { Route as AuthenticatedShopInvoicesRouteImport } from './routes/_authenticated/shop.invoices'
 import { Route as AuthenticatedShopInventoryRouteImport } from './routes/_authenticated/shop.inventory'
 import { Route as AuthenticatedShopCustomersRouteImport } from './routes/_authenticated/shop.customers'
+import { Route as AuthenticatedShopAppointmentsRouteImport } from './routes/_authenticated/shop.appointments'
 import { Route as AuthenticatedPartsMyRequestsRouteImport } from './routes/_authenticated/parts.my-requests'
 import { Route as AuthenticatedFranchiseStatusRouteImport } from './routes/_authenticated/franchise.status'
 import { Route as AuthenticatedFranchiseDashboardRouteImport } from './routes/_authenticated/franchise.dashboard'
@@ -327,6 +329,7 @@ import { Route as AuthenticatedStaffAcademySlugRouteImport } from './routes/_aut
 import { Route as AuthenticatedShopWorkOrdersNewRouteImport } from './routes/_authenticated/shop.work-orders.new'
 import { Route as AuthenticatedShopWorkOrdersIdRouteImport } from './routes/_authenticated/shop.work-orders.$id'
 import { Route as AuthenticatedShopVehiclesIdRouteImport } from './routes/_authenticated/shop.vehicles.$id'
+import { Route as AuthenticatedShopQuotesIdRouteImport } from './routes/_authenticated/shop.quotes.$id'
 import { Route as AuthenticatedShopPurchaseOrdersIdRouteImport } from './routes/_authenticated/shop.purchase-orders.$id'
 import { Route as AuthenticatedShopInvoicesIdRouteImport } from './routes/_authenticated/shop.invoices.$id'
 import { Route as AuthenticatedShopInventoryIdRouteImport } from './routes/_authenticated/shop.inventory.$id'
@@ -1632,6 +1635,11 @@ const AuthenticatedShopVehiclesRoute =
     path: '/vehicles',
     getParentRoute: () => AuthenticatedShopRoute,
   } as any)
+const AuthenticatedShopQuotesRoute = AuthenticatedShopQuotesRouteImport.update({
+  id: '/quotes',
+  path: '/quotes',
+  getParentRoute: () => AuthenticatedShopRoute,
+} as any)
 const AuthenticatedShopPurchaseOrdersRoute =
   AuthenticatedShopPurchaseOrdersRouteImport.update({
     id: '/purchase-orders',
@@ -1654,6 +1662,12 @@ const AuthenticatedShopCustomersRoute =
   AuthenticatedShopCustomersRouteImport.update({
     id: '/customers',
     path: '/customers',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
+const AuthenticatedShopAppointmentsRoute =
+  AuthenticatedShopAppointmentsRouteImport.update({
+    id: '/appointments',
+    path: '/appointments',
     getParentRoute: () => AuthenticatedShopRoute,
   } as any)
 const AuthenticatedPartsMyRequestsRoute =
@@ -2008,6 +2022,12 @@ const AuthenticatedShopVehiclesIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedShopVehiclesRoute,
   } as any)
+const AuthenticatedShopQuotesIdRoute =
+  AuthenticatedShopQuotesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedShopQuotesRoute,
+  } as any)
 const AuthenticatedShopPurchaseOrdersIdRoute =
   AuthenticatedShopPurchaseOrdersIdRouteImport.update({
     id: '/$id',
@@ -2255,10 +2275,12 @@ export interface FileRoutesByFullPath {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
+  '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
   '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
+  '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
   '/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
   '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
@@ -2328,6 +2350,7 @@ export interface FileRoutesByFullPath {
   '/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
   '/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
   '/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
+  '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
@@ -2571,10 +2594,12 @@ export interface FileRoutesByTo {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
+  '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
   '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
+  '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
   '/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
   '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
@@ -2643,6 +2668,7 @@ export interface FileRoutesByTo {
   '/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
   '/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
   '/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
+  '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
@@ -2898,10 +2924,12 @@ export interface FileRoutesById {
   '/_authenticated/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/_authenticated/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/_authenticated/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
+  '/_authenticated/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
   '/_authenticated/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/_authenticated/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/_authenticated/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
   '/_authenticated/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
+  '/_authenticated/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
   '/_authenticated/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
   '/_authenticated/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/_authenticated/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
@@ -2971,6 +2999,7 @@ export interface FileRoutesById {
   '/_authenticated/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
   '/_authenticated/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
   '/_authenticated/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
+  '/_authenticated/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/_authenticated/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/_authenticated/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/_authenticated/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
@@ -3226,10 +3255,12 @@ export interface FileRouteTypes {
     | '/franchise/dashboard'
     | '/franchise/status'
     | '/parts/my-requests'
+    | '/shop/appointments'
     | '/shop/customers'
     | '/shop/inventory'
     | '/shop/invoices'
     | '/shop/purchase-orders'
+    | '/shop/quotes'
     | '/shop/vehicles'
     | '/shop/work-orders'
     | '/staff/academy'
@@ -3299,6 +3330,7 @@ export interface FileRouteTypes {
     | '/shop/inventory/$id'
     | '/shop/invoices/$id'
     | '/shop/purchase-orders/$id'
+    | '/shop/quotes/$id'
     | '/shop/vehicles/$id'
     | '/shop/work-orders/$id'
     | '/shop/work-orders/new'
@@ -3542,10 +3574,12 @@ export interface FileRouteTypes {
     | '/franchise/dashboard'
     | '/franchise/status'
     | '/parts/my-requests'
+    | '/shop/appointments'
     | '/shop/customers'
     | '/shop/inventory'
     | '/shop/invoices'
     | '/shop/purchase-orders'
+    | '/shop/quotes'
     | '/shop/vehicles'
     | '/shop/work-orders'
     | '/staff/academy'
@@ -3614,6 +3648,7 @@ export interface FileRouteTypes {
     | '/shop/inventory/$id'
     | '/shop/invoices/$id'
     | '/shop/purchase-orders/$id'
+    | '/shop/quotes/$id'
     | '/shop/vehicles/$id'
     | '/shop/work-orders/$id'
     | '/shop/work-orders/new'
@@ -3868,10 +3903,12 @@ export interface FileRouteTypes {
     | '/_authenticated/franchise/dashboard'
     | '/_authenticated/franchise/status'
     | '/_authenticated/parts/my-requests'
+    | '/_authenticated/shop/appointments'
     | '/_authenticated/shop/customers'
     | '/_authenticated/shop/inventory'
     | '/_authenticated/shop/invoices'
     | '/_authenticated/shop/purchase-orders'
+    | '/_authenticated/shop/quotes'
     | '/_authenticated/shop/vehicles'
     | '/_authenticated/shop/work-orders'
     | '/_authenticated/staff/academy'
@@ -3941,6 +3978,7 @@ export interface FileRouteTypes {
     | '/_authenticated/shop/inventory/$id'
     | '/_authenticated/shop/invoices/$id'
     | '/_authenticated/shop/purchase-orders/$id'
+    | '/_authenticated/shop/quotes/$id'
     | '/_authenticated/shop/vehicles/$id'
     | '/_authenticated/shop/work-orders/$id'
     | '/_authenticated/shop/work-orders/new'
@@ -5909,6 +5947,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopVehiclesRouteImport
       parentRoute: typeof AuthenticatedShopRoute
     }
+    '/_authenticated/shop/quotes': {
+      id: '/_authenticated/shop/quotes'
+      path: '/quotes'
+      fullPath: '/shop/quotes'
+      preLoaderRoute: typeof AuthenticatedShopQuotesRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
     '/_authenticated/shop/purchase-orders': {
       id: '/_authenticated/shop/purchase-orders'
       path: '/purchase-orders'
@@ -5935,6 +5980,13 @@ declare module '@tanstack/react-router' {
       path: '/customers'
       fullPath: '/shop/customers'
       preLoaderRoute: typeof AuthenticatedShopCustomersRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
+    '/_authenticated/shop/appointments': {
+      id: '/_authenticated/shop/appointments'
+      path: '/appointments'
+      fullPath: '/shop/appointments'
+      preLoaderRoute: typeof AuthenticatedShopAppointmentsRouteImport
       parentRoute: typeof AuthenticatedShopRoute
     }
     '/_authenticated/parts/my-requests': {
@@ -6364,6 +6416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopVehiclesIdRouteImport
       parentRoute: typeof AuthenticatedShopVehiclesRoute
     }
+    '/_authenticated/shop/quotes/$id': {
+      id: '/_authenticated/shop/quotes/$id'
+      path: '/$id'
+      fullPath: '/shop/quotes/$id'
+      preLoaderRoute: typeof AuthenticatedShopQuotesIdRouteImport
+      parentRoute: typeof AuthenticatedShopQuotesRoute
+    }
     '/_authenticated/shop/purchase-orders/$id': {
       id: '/_authenticated/shop/purchase-orders/$id'
       path: '/$id'
@@ -6475,6 +6534,20 @@ const AuthenticatedShopPurchaseOrdersRouteWithChildren =
     AuthenticatedShopPurchaseOrdersRouteChildren,
   )
 
+interface AuthenticatedShopQuotesRouteChildren {
+  AuthenticatedShopQuotesIdRoute: typeof AuthenticatedShopQuotesIdRoute
+}
+
+const AuthenticatedShopQuotesRouteChildren: AuthenticatedShopQuotesRouteChildren =
+  {
+    AuthenticatedShopQuotesIdRoute: AuthenticatedShopQuotesIdRoute,
+  }
+
+const AuthenticatedShopQuotesRouteWithChildren =
+  AuthenticatedShopQuotesRoute._addFileChildren(
+    AuthenticatedShopQuotesRouteChildren,
+  )
+
 interface AuthenticatedShopVehiclesRouteChildren {
   AuthenticatedShopVehiclesIdRoute: typeof AuthenticatedShopVehiclesIdRoute
 }
@@ -6506,20 +6579,24 @@ const AuthenticatedShopWorkOrdersRouteWithChildren =
   )
 
 interface AuthenticatedShopRouteChildren {
+  AuthenticatedShopAppointmentsRoute: typeof AuthenticatedShopAppointmentsRoute
   AuthenticatedShopCustomersRoute: typeof AuthenticatedShopCustomersRouteWithChildren
   AuthenticatedShopInventoryRoute: typeof AuthenticatedShopInventoryRouteWithChildren
   AuthenticatedShopInvoicesRoute: typeof AuthenticatedShopInvoicesRouteWithChildren
   AuthenticatedShopPurchaseOrdersRoute: typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
+  AuthenticatedShopQuotesRoute: typeof AuthenticatedShopQuotesRouteWithChildren
   AuthenticatedShopVehiclesRoute: typeof AuthenticatedShopVehiclesRouteWithChildren
   AuthenticatedShopWorkOrdersRoute: typeof AuthenticatedShopWorkOrdersRouteWithChildren
 }
 
 const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
+  AuthenticatedShopAppointmentsRoute: AuthenticatedShopAppointmentsRoute,
   AuthenticatedShopCustomersRoute: AuthenticatedShopCustomersRouteWithChildren,
   AuthenticatedShopInventoryRoute: AuthenticatedShopInventoryRouteWithChildren,
   AuthenticatedShopInvoicesRoute: AuthenticatedShopInvoicesRouteWithChildren,
   AuthenticatedShopPurchaseOrdersRoute:
     AuthenticatedShopPurchaseOrdersRouteWithChildren,
+  AuthenticatedShopQuotesRoute: AuthenticatedShopQuotesRouteWithChildren,
   AuthenticatedShopVehiclesRoute: AuthenticatedShopVehiclesRouteWithChildren,
   AuthenticatedShopWorkOrdersRoute:
     AuthenticatedShopWorkOrdersRouteWithChildren,
