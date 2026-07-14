@@ -357,6 +357,7 @@ import { Route as AuthenticatedShopInvoicesIdRouteImport } from './routes/_authe
 import { Route as AuthenticatedShopInventoryIdRouteImport } from './routes/_authenticated/shop.inventory.$id'
 import { Route as AuthenticatedShopCustomersNewRouteImport } from './routes/_authenticated/shop.customers.new'
 import { Route as AuthenticatedShopCustomersIdRouteImport } from './routes/_authenticated/shop.customers.$id'
+import { Route as AuthenticatedShopAccountingPnlRouteImport } from './routes/_authenticated/shop.accounting.pnl'
 import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
@@ -2211,6 +2212,12 @@ const AuthenticatedShopCustomersIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedShopCustomersRoute,
   } as any)
+const AuthenticatedShopAccountingPnlRoute =
+  AuthenticatedShopAccountingPnlRouteImport.update({
+    id: '/pnl',
+    path: '/pnl',
+    getParentRoute: () => AuthenticatedShopAccountingRoute,
+  } as any)
 const AuthenticatedDashboardClubsIdRoute =
   AuthenticatedDashboardClubsIdRouteImport.update({
     id: '/dashboard/clubs_/$id',
@@ -2428,7 +2435,7 @@ export interface FileRoutesByFullPath {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/shop/accounting': typeof AuthenticatedShopAccountingRoute
+  '/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
   '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
   '/shop/automation': typeof AuthenticatedShopAutomationRoute
   '/shop/certificates': typeof AuthenticatedShopCertificatesRoute
@@ -2516,6 +2523,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/listing/$id/': typeof ListingIdIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
   '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
@@ -2769,7 +2777,7 @@ export interface FileRoutesByTo {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/shop/accounting': typeof AuthenticatedShopAccountingRoute
+  '/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
   '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
   '/shop/automation': typeof AuthenticatedShopAutomationRoute
   '/shop/certificates': typeof AuthenticatedShopCertificatesRoute
@@ -2856,6 +2864,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/listing/$id': typeof ListingIdIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
   '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
@@ -3121,7 +3130,7 @@ export interface FileRoutesById {
   '/_authenticated/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/_authenticated/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/_authenticated/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/_authenticated/shop/accounting': typeof AuthenticatedShopAccountingRoute
+  '/_authenticated/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
   '/_authenticated/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
   '/_authenticated/shop/automation': typeof AuthenticatedShopAutomationRoute
   '/_authenticated/shop/certificates': typeof AuthenticatedShopCertificatesRoute
@@ -3209,6 +3218,7 @@ export interface FileRoutesById {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/listing/$id/': typeof ListingIdIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/_authenticated/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
   '/_authenticated/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/_authenticated/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/_authenticated/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
@@ -3562,6 +3572,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/listing/$id/'
     | '/dashboard/clubs/$id'
+    | '/shop/accounting/pnl'
     | '/shop/customers/$id'
     | '/shop/customers/new'
     | '/shop/inventory/$id'
@@ -3902,6 +3913,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/listing/$id'
     | '/dashboard/clubs/$id'
+    | '/shop/accounting/pnl'
     | '/shop/customers/$id'
     | '/shop/customers/new'
     | '/shop/inventory/$id'
@@ -4254,6 +4266,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/listing/$id/'
     | '/_authenticated/dashboard/clubs_/$id'
+    | '/_authenticated/shop/accounting/pnl'
     | '/_authenticated/shop/customers/$id'
     | '/_authenticated/shop/customers/new'
     | '/_authenticated/shop/inventory/$id'
@@ -6897,6 +6910,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopCustomersIdRouteImport
       parentRoute: typeof AuthenticatedShopCustomersRoute
     }
+    '/_authenticated/shop/accounting/pnl': {
+      id: '/_authenticated/shop/accounting/pnl'
+      path: '/pnl'
+      fullPath: '/shop/accounting/pnl'
+      preLoaderRoute: typeof AuthenticatedShopAccountingPnlRouteImport
+      parentRoute: typeof AuthenticatedShopAccountingRoute
+    }
     '/_authenticated/dashboard/clubs_/$id': {
       id: '/_authenticated/dashboard/clubs_/$id'
       path: '/dashboard/clubs/$id'
@@ -6913,6 +6933,20 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedShopAccountingRouteChildren {
+  AuthenticatedShopAccountingPnlRoute: typeof AuthenticatedShopAccountingPnlRoute
+}
+
+const AuthenticatedShopAccountingRouteChildren: AuthenticatedShopAccountingRouteChildren =
+  {
+    AuthenticatedShopAccountingPnlRoute: AuthenticatedShopAccountingPnlRoute,
+  }
+
+const AuthenticatedShopAccountingRouteWithChildren =
+  AuthenticatedShopAccountingRoute._addFileChildren(
+    AuthenticatedShopAccountingRouteChildren,
+  )
 
 interface AuthenticatedShopCustomersRouteChildren {
   AuthenticatedShopCustomersIdRoute: typeof AuthenticatedShopCustomersIdRoute
@@ -7063,7 +7097,7 @@ const AuthenticatedShopWorkOrdersRouteWithChildren =
   )
 
 interface AuthenticatedShopRouteChildren {
-  AuthenticatedShopAccountingRoute: typeof AuthenticatedShopAccountingRoute
+  AuthenticatedShopAccountingRoute: typeof AuthenticatedShopAccountingRouteWithChildren
   AuthenticatedShopAppointmentsRoute: typeof AuthenticatedShopAppointmentsRoute
   AuthenticatedShopAutomationRoute: typeof AuthenticatedShopAutomationRoute
   AuthenticatedShopCertificatesRoute: typeof AuthenticatedShopCertificatesRoute
@@ -7092,7 +7126,8 @@ interface AuthenticatedShopRouteChildren {
 }
 
 const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
-  AuthenticatedShopAccountingRoute: AuthenticatedShopAccountingRoute,
+  AuthenticatedShopAccountingRoute:
+    AuthenticatedShopAccountingRouteWithChildren,
   AuthenticatedShopAppointmentsRoute: AuthenticatedShopAppointmentsRoute,
   AuthenticatedShopAutomationRoute: AuthenticatedShopAutomationRoute,
   AuthenticatedShopCertificatesRoute: AuthenticatedShopCertificatesRoute,
