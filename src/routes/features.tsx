@@ -17,9 +17,18 @@ import {
   type FeatureStatus,
 } from "@/data/features-catalog";
 import { SHOP_SOFTWARE_MATRIX, MARKETPLACE_MATRIX } from "@/data/competitors-shop-software";
+import { listLatestFeatureScreenshots } from "@/lib/feature-screenshots.functions";
 
 export const Route = createFileRoute("/features")({
   component: FeaturesPage,
+  loader: async () => {
+    try {
+      const { screenshots } = await listLatestFeatureScreenshots();
+      return { screenshots };
+    } catch {
+      return { screenshots: {} as Record<string, any> };
+    }
+  },
   head: () => ({
     meta: [
       { title: "Features — 365 Motor Sales" },
@@ -41,6 +50,7 @@ export const Route = createFileRoute("/features")({
   }),
 });
 
+
 const STATUS_FILTERS: { id: "all" | FeatureStatus; label: string }[] = [
   { id: "all", label: "All" },
   { id: "live", label: "Live" },
@@ -50,6 +60,7 @@ const STATUS_FILTERS: { id: "all" | FeatureStatus; label: string }[] = [
 ];
 
 function FeaturesPage() {
+  const { screenshots } = Route.useLoaderData();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | FeatureStatus>("all");
   const [activeModules, setActiveModules] = useState<Set<FeatureModule>>(new Set());
@@ -288,7 +299,7 @@ function FeaturesPage() {
                 className="animate-fade-in"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
-                <ModuleSection moduleId={m.id} features={liveByModule[m.id] ?? []} />
+                <ModuleSection moduleId={m.id} features={liveByModule[m.id] ?? []} screenshots={screenshots} />
               </div>
             ))}
           </div>
