@@ -22,12 +22,19 @@ function CellPill({ c }: { c: Cell }) {
   );
 }
 
+function fmtUsd(n: number) {
+  return n % 1 === 0 ? `$${n}` : `$${n.toFixed(2)}`;
+}
+
 function priceCell(c: Competitor) {
   const p = c.pricing;
   if (p.unit === "free") return { text: "Free", tone: "primary" as const };
-  if (p.startingUsd == null) return { text: "Custom", tone: "muted" as const };
-  const val = p.startingUsd % 1 === 0 ? `$${p.startingUsd}` : `$${p.startingUsd.toFixed(2)}`;
-  return { text: `${val}/${p.unit}`, tone: "muted" as const };
+  if (p.startingUsd == null) return { text: "Ask", tone: "muted" as const };
+  const start = fmtUsd(p.startingUsd);
+  if (p.topUsd != null && p.topUsd > p.startingUsd) {
+    return { text: `${start}–${fmtUsd(p.topUsd)}/${p.unit}`, tone: "muted" as const };
+  }
+  return { text: `${start}/${p.unit}`, tone: "muted" as const };
 }
 
 export function ComparisonTable({ matrix }: { matrix: CompetitorMatrix }) {
