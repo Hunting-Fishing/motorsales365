@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, Loader2, Wrench, Package, ListChecks, Plus, Trash2, Receipt } from "lucide-react";
+import { ArrowLeft, Loader2, Wrench, Package, ListChecks, Plus, Trash2, Receipt, ClipboardCheck } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,6 +35,7 @@ import {
 import { toast } from "sonner";
 import { smSupabase } from "@/lib/shop-manager/db";
 import { WorkOrderTimeEntries } from "@/components/shop-manager/work-order-time-entries";
+import { WorkOrderInspectionsCard } from "@/components/shop-manager/work-order-inspections-card";
 
 type WorkOrderDetail = {
   id: string;
@@ -543,6 +544,12 @@ function WorkOrderDetailPage() {
                   />
                 </CardContent>
               </Card>
+
+              <div className="md:col-span-2">
+                <WorkOrderInspectionsCard workOrderId={id} />
+              </div>
+
+
 
               <Card className="md:col-span-2">
                 <CardHeader className="flex-row items-center justify-between">
