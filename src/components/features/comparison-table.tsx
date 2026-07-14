@@ -22,12 +22,19 @@ function CellPill({ c }: { c: Cell }) {
   );
 }
 
+function fmtUsd(n: number) {
+  return n % 1 === 0 ? `$${n}` : `$${n.toFixed(2)}`;
+}
+
 function priceCell(c: Competitor) {
   const p = c.pricing;
   if (p.unit === "free") return { text: "Free", tone: "primary" as const };
-  if (p.startingUsd == null) return { text: "Custom", tone: "muted" as const };
-  const val = p.startingUsd % 1 === 0 ? `$${p.startingUsd}` : `$${p.startingUsd.toFixed(2)}`;
-  return { text: `${val}/${p.unit}`, tone: "muted" as const };
+  if (p.startingUsd == null) return { text: "Ask", tone: "muted" as const };
+  const start = fmtUsd(p.startingUsd);
+  if (p.topUsd != null && p.topUsd > p.startingUsd) {
+    return { text: `${start}–${fmtUsd(p.topUsd)}/${p.unit}`, tone: "muted" as const };
+  }
+  return { text: `${start}/${p.unit}`, tone: "muted" as const };
 }
 
 export function ComparisonTable({ matrix }: { matrix: CompetitorMatrix }) {
@@ -75,7 +82,7 @@ export function ComparisonTable({ matrix }: { matrix: CompetitorMatrix }) {
                 scope="row"
                 className="sticky left-0 z-10 border-b bg-secondary/50 p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground backdrop-blur"
               >
-                Starting price
+                Price range
               </th>
               {matrix.competitors.map((c) => {
                 const is365 = c.id === "365";

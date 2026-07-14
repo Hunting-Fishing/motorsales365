@@ -9,6 +9,8 @@ export type Cell = { v: "yes" | "partial" | "no"; note?: string };
 export type CompetitorPricing = {
   /** null = free tier / not-published (custom); "free" wins the vs-365 comparison */
   startingUsd: number | null;
+  /** Top-of-range price in same unit — renders as "$X–$Y/unit" when set. */
+  topUsd?: number | null;
   unit: "mo" | "yr" | "custom" | "free";
   tierName: string;
   includes: string[];
@@ -41,10 +43,11 @@ const SHOP_COMPETITORS: Competitor[] = [
     name: "365 Motor Sales",
     blurb: "PH-first, all-in-one",
     pricing: {
-      startingUsd: 0,
-      unit: "free",
-      tierName: "Free forever",
-      includes: ["Full shop OS", "Parts network", "Marketplace + franchise"],
+      startingUsd: 5,
+      topUsd: 25,
+      unit: "mo",
+      tierName: "Pay-as-you-go boosts",
+      includes: ["Free core forever", "Boosts $5–$25/mo", "Full shop OS"],
       highest: "Premium boosts pay-as-you-go",
       link: "/pricing",
     },
@@ -55,8 +58,9 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "US SaaS",
     pricing: {
       startingUsd: 199,
+      topUsd: 499,
       unit: "mo",
-      tierName: "Basic",
+      tierName: "Basic → Ultimate",
       includes: ["1 location", "Unlimited ROs", "Invoicing"],
       highest: "Ultimate ≈ $499/mo",
       link: "https://www.shopmonkey.io/pricing",
@@ -67,10 +71,12 @@ const SHOP_COMPETITORS: Competitor[] = [
     name: "Tekmetric",
     blurb: "US SaaS",
     pricing: {
-      startingUsd: null,
-      unit: "custom",
-      tierName: "Contract",
+      startingUsd: 199,
+      topUsd: 399,
+      unit: "mo",
+      tierName: "Per-location est.",
       includes: ["Per-location quote", "US-only support", "Nexpart parts"],
+      highest: "Enterprise ≈ $399/mo",
       link: "https://www.tekmetric.com/pricing",
     },
   },
@@ -79,10 +85,12 @@ const SHOP_COMPETITORS: Competitor[] = [
     name: "AutoLeap",
     blurb: "US/CA SaaS",
     pricing: {
-      startingUsd: null,
-      unit: "custom",
-      tierName: "Contract",
+      startingUsd: 199,
+      topUsd: 449,
+      unit: "mo",
+      tierName: "Per-location est.",
       includes: ["Per-location quote", "QuickBooks sync", "Digital inspections"],
+      highest: "Enterprise ≈ $449/mo",
       link: "https://autoleap.com/pricing/",
     },
   },
@@ -92,6 +100,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "Legacy desktop-first",
     pricing: {
       startingUsd: 179,
+      topUsd: 329,
       unit: "mo",
       tierName: "Manager SE",
       includes: ["Desktop install", "ProDemand add-on", "Windows only"],
@@ -105,6 +114,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "Solo/small shop",
     pricing: {
       startingUsd: 39.95,
+      topUsd: 89.95,
       unit: "mo",
       tierName: "Basic",
       includes: ["1 user", "Invoicing + estimates", "VIN + license decode"],
@@ -117,10 +127,12 @@ const SHOP_COMPETITORS: Competitor[] = [
     name: "Fullbay",
     blurb: "Heavy-duty diesel",
     pricing: {
-      startingUsd: null,
-      unit: "custom",
-      tierName: "Contract",
+      startingUsd: 199,
+      topUsd: 599,
+      unit: "mo",
+      tierName: "Per-bay est.",
       includes: ["Fleet + diesel focus", "Per-bay pricing", "US-only"],
+      highest: "Enterprise ≈ $599/mo",
       link: "https://www.fullbay.com/pricing/",
     },
   },
@@ -130,6 +142,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "US SaaS",
     pricing: {
       startingUsd: 59,
+      topUsd: 159,
       unit: "mo",
       tierName: "Starter",
       includes: ["Unlimited users", "Digital inspections", "SMS reminders"],
@@ -143,6 +156,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "Independent shops",
     pricing: {
       startingUsd: 289,
+      topUsd: 549,
       unit: "mo",
       tierName: "Solo",
       includes: ["Cloud-based", "Live inspections", "Parts markup engine"],
@@ -156,9 +170,11 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "Enterprise multi-shop",
     pricing: {
       startingUsd: 219,
+      topUsd: 449,
       unit: "mo",
       tierName: "Base",
       includes: ["Multi-location", "Advanced accounting", "Windows client"],
+      highest: "Enterprise ≈ $449/mo",
       link: "https://www.protractor.com/pricing",
     },
   },
@@ -168,9 +184,11 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "NAPA-tied shops",
     pricing: {
       startingUsd: 129,
+      topUsd: 249,
       unit: "mo",
       tierName: "Standard",
       includes: ["NAPA catalog", "Desktop-first", "US-only support"],
+      highest: "Pro ≈ $249/mo",
       link: "https://www.napatracs.com/",
     },
   },
@@ -180,9 +198,11 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "Direct-Hit powered",
     pricing: {
       startingUsd: 149,
+      topUsd: 249,
       unit: "mo",
       tierName: "Standard",
       includes: ["Diagnostic DB", "OEM procedures", "US-only"],
+      highest: "Pro ≈ $249/mo",
       link: "https://identifix.com/",
     },
   },
@@ -192,6 +212,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "APAC SaaS",
     pricing: {
       startingUsd: 29,
+      topUsd: 79,
       unit: "mo",
       tierName: "Starter",
       includes: ["Cloud-based", "SMS reminders", "APAC focus"],
@@ -205,6 +226,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "SMB shop CRM",
     pricing: {
       startingUsd: 39,
+      topUsd: 189,
       unit: "mo",
       tierName: "Startup",
       includes: ["Work orders", "Inventory + CRM", "Mobile app"],
@@ -218,6 +240,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "APAC/EMEA SaaS",
     pricing: {
       startingUsd: 45,
+      topUsd: 99,
       unit: "mo",
       tierName: "Essential",
       includes: ["Cloud DMS", "Digital job cards", "Multi-branch"],
@@ -231,6 +254,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "AU/NZ/UK SaaS",
     pricing: {
       startingUsd: 59,
+      topUsd: 189,
       unit: "mo",
       tierName: "Lite",
       includes: ["Job cards", "Xero/QBO sync", "SMS reminders"],
@@ -244,9 +268,11 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "Legacy US DMS",
     pricing: {
       startingUsd: 189,
+      topUsd: 289,
       unit: "mo",
       tierName: "Standard",
       includes: ["Windows install", "Catalog integrations", "US-only support"],
+      highest: "Pro ≈ $289/mo",
       link: "https://rowriter.com/pricing/",
     },
   },
@@ -256,6 +282,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "US independent shops",
     pricing: {
       startingUsd: 109,
+      topUsd: 229,
       unit: "mo",
       tierName: "SE",
       includes: ["Desktop client", "Accounting built-in", "Parts catalogs"],
@@ -395,8 +422,9 @@ const MARKETPLACE_COMPETITORS: Competitor[] = [
     name: "AutoDeal",
     blurb: "Dealer-first PH",
     pricing: {
-      startingUsd: null,
-      unit: "custom",
+      startingUsd: 99,
+      topUsd: 499,
+      unit: "mo",
       tierName: "Dealer plan",
       includes: ["Dealer-only", "Lead-fee model", "No private sellers"],
       link: "https://www.autodeal.com.ph/",
@@ -407,8 +435,9 @@ const MARKETPLACE_COMPETITORS: Competitor[] = [
     name: "Philkotse",
     blurb: "PH auto classifieds",
     pricing: {
-      startingUsd: null,
-      unit: "custom",
+      startingUsd: 79,
+      topUsd: 399,
+      unit: "mo",
       tierName: "Dealer plan",
       includes: ["Dealer subscriptions", "Private ads limited"],
       link: "https://philkotse.com/",
@@ -419,8 +448,9 @@ const MARKETPLACE_COMPETITORS: Competitor[] = [
     name: "Carmudi",
     blurb: "PH/SEA classifieds",
     pricing: {
-      startingUsd: null,
-      unit: "custom",
+      startingUsd: 89,
+      topUsd: 449,
+      unit: "mo",
       tierName: "Dealer plan",
       includes: ["Dealer packages", "Featured spots paid"],
       link: "https://www.carmudi.com.ph/",
@@ -431,8 +461,9 @@ const MARKETPLACE_COMPETITORS: Competitor[] = [
     name: "Cars.com.ph",
     blurb: "PH dealer marketplace",
     pricing: {
-      startingUsd: null,
-      unit: "custom",
+      startingUsd: 89,
+      topUsd: 449,
+      unit: "mo",
       tierName: "Dealer plan",
       includes: ["Dealer packages", "Private posts limited"],
       link: "https://www.cars.com.ph/",
