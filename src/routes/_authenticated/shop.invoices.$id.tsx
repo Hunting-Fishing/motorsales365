@@ -38,6 +38,7 @@ import { smSupabase } from "@/lib/shop-manager/db";
 type Invoice = {
   id: string;
   customer: string | null;
+  customer_id: string | null;
   customer_email: string | null;
   customer_address: string | null;
   description: string | null;
@@ -75,12 +76,13 @@ type PaymentRow = {
 async function fetchInvoice(id: string): Promise<Invoice | null> {
   const { data, error } = await (smSupabase as any)
     .from("invoices")
-    .select("id,customer,customer_email,customer_address,description,notes,date,due_date,status,work_order_id,subtotal,tax,total,payment_method")
+    .select("id,customer,customer_id,customer_email,customer_address,description,notes,date,due_date,status,work_order_id,subtotal,tax,total,payment_method")
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
   return (data as Invoice) ?? null;
 }
+
 
 async function fetchInvoiceItems(id: string): Promise<InvoiceItem[]> {
   const { data, error } = await (smSupabase as any)
