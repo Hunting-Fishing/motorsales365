@@ -8,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { FeaturePreview } from "./feature-preview";
 import type { Feature } from "@/data/features-catalog";
 
 export function FeatureRow({ f }: { f: Feature }) {
