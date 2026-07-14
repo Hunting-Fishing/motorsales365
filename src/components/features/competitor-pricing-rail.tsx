@@ -1,17 +1,14 @@
 import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, ExternalLink, Sparkles, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, Sparkles, Check, Globe } from "lucide-react";
 import type { Competitor } from "@/data/competitors-shop-software";
+import { detectRegionCurrency, formatMoney, type RegionCurrency } from "@/lib/region-currency";
 
-function fmtUsd(n: number) {
-  return n % 1 === 0 ? `$${n}` : `$${n.toFixed(2)}`;
-}
-
-function priceLabel(p: Competitor["pricing"]): { big: string; sub: string } {
+function priceLabel(p: Competitor["pricing"], ccy: RegionCurrency): { big: string; sub: string } {
   if (p.unit === "free") return { big: "Free", sub: p.tierName };
   if (p.startingUsd == null) return { big: "Ask", sub: p.tierName };
-  const start = fmtUsd(p.startingUsd);
+  const start = formatMoney(p.startingUsd, ccy);
   if (p.topUsd != null && p.topUsd > p.startingUsd) {
-    return { big: `${start}–${fmtUsd(p.topUsd)}`, sub: `/${p.unit} · ${p.tierName}` };
+    return { big: `${start}–${formatMoney(p.topUsd, ccy)}`, sub: `/${p.unit} · ${p.tierName}` };
   }
   return { big: start, sub: `/${p.unit} · ${p.tierName}` };
 }
