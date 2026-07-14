@@ -63,6 +63,7 @@ export function SiteFooter() {
     {
       title: "Sell",
       links: [
+        { to: "/features", label: "All features" },
         { to: "/start-selling", label: "How selling works" },
         { to: "/sell", label: "Post a listing" },
         { to: "/help/posting-etiquette", label: "Posting etiquette & guidelines" },
