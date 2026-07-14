@@ -35,6 +35,7 @@ import {
 import { toast } from "sonner";
 import { smSupabase } from "@/lib/shop-manager/db";
 import { WorkOrderTimeEntries } from "@/components/shop-manager/work-order-time-entries";
+import { WorkOrderInspectionsCard } from "@/components/shop-manager/work-order-inspections-card";
 
 type WorkOrderDetail = {
   id: string;
