@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Camera, Loader2, Pin, Trash2, Upload, CheckCircle2, AlertCircle } from "lucide-react";
+import { toJpeg } from "html-to-image";
+import { Camera, Loader2, Pin, Trash2, Upload, CheckCircle2, AlertCircle, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FEATURES } from "@/data/features-catalog";
 import {
-  captureFeatureScreenshot,
   deleteFeatureScreenshot,
   listLatestFeatureScreenshots,
   pinFeatureScreenshot,
@@ -23,14 +23,18 @@ export const Route = createFileRoute("/_authenticated/admin/feature-screenshots"
   head: () => ({ meta: [{ title: "Feature screenshots — Admin" }] }),
 });
 
-type Status = { kind: "idle" } | { kind: "busy" } | { kind: "ok"; msg: string } | { kind: "err"; msg: string };
+type Status = { kind: "idle" } | { kind: "busy"; step?: string } | { kind: "ok"; msg: string } | { kind: "err"; msg: string };
+
+const CAPTURE_WIDTH = 1440;
+const CAPTURE_HEIGHT = 900;
 
 function AdminFeatureScreenshotsPage() {
   const { screenshots: initial } = Route.useLoaderData();
   const [screenshots, setScreenshots] = useState(initial);
   const [status, setStatus] = useState<Record<string, Status>>({});
+  const [bulkRunning, setBulkRunning] = useState(false);
+  const stageRef = useRef<HTMLDivElement>(null);
 
-  const capture = useServerFn(captureFeatureScreenshot);
   const upload = useServerFn(uploadFeatureScreenshot);
   const remove = useServerFn(deleteFeatureScreenshot);
   const pin = useServerFn(pinFeatureScreenshot);
@@ -43,10 +47,70 @@ function AdminFeatureScreenshotsPage() {
 
   const setFeatureStatus = (id: string, s: Status) => setStatus((prev) => ({ ...prev, [id]: s }));
 
-  const runCapture = async (featureId: string, route: string) => {
-    setFeatureStatus(featureId, { kind: "busy" });
+  /**
+   * Capture a route in the admin's browser using an off-screen same-origin
+   * iframe rendered at 1440x900, then snapshot it with html-to-image.
+   */
+  const captureInBrowser = async (route: string): Promise<{ base64: string; contentType: string }> => {
+    const stage = stageRef.current;
+    if (!stage) throw new Error("Capture stage not ready");
+
+    const iframe = document.createElement("iframe");
+    iframe.style.width = `${CAPTURE_WIDTH}px`;
+    iframe.style.height = `${CAPTURE_HEIGHT}px`;
+    iframe.style.border = "0";
+    iframe.setAttribute("title", "capture-stage");
+    // Signal to the app that this is a screenshot render (can be used to hide banners).
+    iframe.src = `${route}${route.includes("?") ? "&" : "?"}__screenshot=1`;
+    stage.appendChild(iframe);
+
     try {
-      const r = await capture({ data: { featureId, route } });
+      // Wait for iframe load
+      await new Promise<void>((resolve, reject) => {
+        const to = setTimeout(() => reject(new Error("Iframe load timed out")), 20_000);
+        iframe.addEventListener(
+          "load",
+          () => {
+            clearTimeout(to);
+            resolve();
+          },
+          { once: true },
+        );
+      });
+
+      // Give the page a beat to hydrate + fetch data
+      await new Promise((r) => setTimeout(r, 2500));
+
+      const doc = iframe.contentDocument;
+      const win = iframe.contentWindow;
+      if (!doc || !win) throw new Error("Cannot access iframe document");
+      const target = doc.documentElement;
+
+      const dataUrl = await toJpeg(target, {
+        width: CAPTURE_WIDTH,
+        height: CAPTURE_HEIGHT,
+        pixelRatio: 1,
+        cacheBust: true,
+        quality: 0.85,
+        backgroundColor: "#ffffff",
+      });
+
+      const comma = dataUrl.indexOf(",");
+      return {
+        base64: dataUrl.slice(comma + 1),
+        contentType: "image/jpeg",
+      };
+    } finally {
+      stage.removeChild(iframe);
+    }
+  };
+
+  const runCapture = async (featureId: string, route: string) => {
+    setFeatureStatus(featureId, { kind: "busy", step: "Rendering page…" });
+    try {
+      const { base64, contentType } = await captureInBrowser(route);
+      setFeatureStatus(featureId, { kind: "busy", step: "Uploading…" });
+      const r = await upload({ data: { featureId, route, contentType, base64 } });
       setFeatureStatus(featureId, {
         kind: "ok",
         msg: (r as any)?.skipped ? "Unchanged" : "Captured",
@@ -58,7 +122,7 @@ function AdminFeatureScreenshotsPage() {
   };
 
   const runUpload = async (featureId: string, route: string, file: File) => {
-    setFeatureStatus(featureId, { kind: "busy" });
+    setFeatureStatus(featureId, { kind: "busy", step: "Uploading…" });
     try {
       const base64 = await fileToBase64(file);
       await upload({ data: { featureId, route, contentType: file.type, base64 } });
@@ -92,6 +156,18 @@ function AdminFeatureScreenshotsPage() {
     }
   };
 
+  const runCaptureAll = async () => {
+    setBulkRunning(true);
+    try {
+      for (const f of routable) {
+        // eslint-disable-next-line no-await-in-loop
+        await runCapture(f.id, f.route as string);
+      }
+    } finally {
+      setBulkRunning(false);
+    }
+  };
+
   const routable = FEATURES.filter((f) => !!f.route);
 
   return (
@@ -102,13 +178,36 @@ function AdminFeatureScreenshotsPage() {
           <h1 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
             Feature screenshots
           </h1>
-          <p className="mt-1 text-muted-foreground">
-            Auto-capture, upload, pin, and manage the app screenshots shown on
-            the public /features page. Captures are versioned — deletes are
-            permanent.
+          <p className="mt-1 max-w-2xl text-muted-foreground">
+            Capture the app's actual pages directly from your browser (no
+            external API needed). Screenshots are versioned — every capture is
+            saved so we can see how the app has evolved. Deletes are permanent.
           </p>
         </div>
+        <Button onClick={runCaptureAll} disabled={bulkRunning} size="lg">
+          {bulkRunning ? (
+            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+          ) : (
+            <PlayCircle className="mr-1 h-4 w-4" />
+          )}
+          Capture all
+        </Button>
       </div>
+
+      {/* Off-screen capture stage — iframe is mounted here during capture */}
+      <div
+        ref={stageRef}
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          left: "-99999px",
+          top: 0,
+          width: `${CAPTURE_WIDTH}px`,
+          height: `${CAPTURE_HEIGHT}px`,
+          overflow: "hidden",
+          pointerEvents: "none",
+        }}
+      />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {routable.map((f) => {
@@ -144,13 +243,18 @@ function AdminFeatureScreenshotsPage() {
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  <Button size="sm" variant="outline" onClick={() => runCapture(f.id, f.route as string)} disabled={s?.kind === "busy"}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => runCapture(f.id, f.route as string)}
+                    disabled={s?.kind === "busy" || bulkRunning}
+                  >
                     {s?.kind === "busy" ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     ) : (
                       <Camera className="h-3.5 w-3.5" />
                     )}
-                    <span className="ml-1">Auto</span>
+                    <span className="ml-1">Capture</span>
                   </Button>
 
                   <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border bg-card px-2.5 py-1 text-xs font-medium hover:bg-secondary">
@@ -205,7 +309,9 @@ function AdminFeatureScreenshotsPage() {
                     ) : (
                       <Loader2 className="h-3 w-3 animate-spin" />
                     )}
-                    <span className="line-clamp-1">{s.kind === "busy" ? "Working…" : s.msg}</span>
+                    <span className="line-clamp-1">
+                      {s.kind === "busy" ? s.step ?? "Working…" : s.msg}
+                    </span>
                   </div>
                 )}
               </div>
