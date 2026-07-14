@@ -213,9 +213,9 @@ function CompleteProfilePage() {
 
   return (
     <SiteLayout>
-      <div className="container mx-auto max-w-2xl px-4 py-12">
-        <header className="mb-8">
-          <h1 className="font-display text-3xl font-bold">Finish your account</h1>
+      <div className="container mx-auto max-w-2xl px-4 py-8 pb-40 md:py-12 md:pb-24">
+        <header className="mb-6 md:mb-8">
+          <h1 className="font-display text-2xl font-bold md:text-3xl">Finish your account</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Google signed you in, but we still need a few required details before you can
             continue. This is the same information every account provides at signup.
