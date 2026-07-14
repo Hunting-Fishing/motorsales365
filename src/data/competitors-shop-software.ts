@@ -240,6 +240,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "APAC/EMEA SaaS",
     pricing: {
       startingUsd: 45,
+      topUsd: 99,
       unit: "mo",
       tierName: "Essential",
       includes: ["Cloud DMS", "Digital job cards", "Multi-branch"],
