@@ -264,6 +264,7 @@ import { Route as AuthenticatedShopWorkOrdersRouteImport } from './routes/_authe
 import { Route as AuthenticatedShopVendorsRouteImport } from './routes/_authenticated/shop.vendors'
 import { Route as AuthenticatedShopVendorBillsRouteImport } from './routes/_authenticated/shop.vendor-bills'
 import { Route as AuthenticatedShopVehiclesRouteImport } from './routes/_authenticated/shop.vehicles'
+import { Route as AuthenticatedShopTechniciansRouteImport } from './routes/_authenticated/shop.technicians'
 import { Route as AuthenticatedShopReportsRouteImport } from './routes/_authenticated/shop.reports'
 import { Route as AuthenticatedShopQuotesRouteImport } from './routes/_authenticated/shop.quotes'
 import { Route as AuthenticatedShopPurchaseOrdersRouteImport } from './routes/_authenticated/shop.purchase-orders'
@@ -1652,6 +1653,12 @@ const AuthenticatedShopVehiclesRoute =
     path: '/vehicles',
     getParentRoute: () => AuthenticatedShopRoute,
   } as any)
+const AuthenticatedShopTechniciansRoute =
+  AuthenticatedShopTechniciansRouteImport.update({
+    id: '/technicians',
+    path: '/technicians',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
 const AuthenticatedShopReportsRoute =
   AuthenticatedShopReportsRouteImport.update({
     id: '/reports',
@@ -2317,6 +2324,7 @@ export interface FileRoutesByFullPath {
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
   '/shop/reports': typeof AuthenticatedShopReportsRoute
+  '/shop/technicians': typeof AuthenticatedShopTechniciansRoute
   '/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
   '/shop/vendor-bills': typeof AuthenticatedShopVendorBillsRouteWithChildren
   '/shop/vendors': typeof AuthenticatedShopVendorsRoute
@@ -2641,6 +2649,7 @@ export interface FileRoutesByTo {
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
   '/shop/reports': typeof AuthenticatedShopReportsRoute
+  '/shop/technicians': typeof AuthenticatedShopTechniciansRoute
   '/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
   '/shop/vendor-bills': typeof AuthenticatedShopVendorBillsRouteWithChildren
   '/shop/vendors': typeof AuthenticatedShopVendorsRoute
@@ -2976,6 +2985,7 @@ export interface FileRoutesById {
   '/_authenticated/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/_authenticated/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
   '/_authenticated/shop/reports': typeof AuthenticatedShopReportsRoute
+  '/_authenticated/shop/technicians': typeof AuthenticatedShopTechniciansRoute
   '/_authenticated/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
   '/_authenticated/shop/vendor-bills': typeof AuthenticatedShopVendorBillsRouteWithChildren
   '/_authenticated/shop/vendors': typeof AuthenticatedShopVendorsRoute
@@ -3312,6 +3322,7 @@ export interface FileRouteTypes {
     | '/shop/purchase-orders'
     | '/shop/quotes'
     | '/shop/reports'
+    | '/shop/technicians'
     | '/shop/vehicles'
     | '/shop/vendor-bills'
     | '/shop/vendors'
@@ -3636,6 +3647,7 @@ export interface FileRouteTypes {
     | '/shop/purchase-orders'
     | '/shop/quotes'
     | '/shop/reports'
+    | '/shop/technicians'
     | '/shop/vehicles'
     | '/shop/vendor-bills'
     | '/shop/vendors'
@@ -3970,6 +3982,7 @@ export interface FileRouteTypes {
     | '/_authenticated/shop/purchase-orders'
     | '/_authenticated/shop/quotes'
     | '/_authenticated/shop/reports'
+    | '/_authenticated/shop/technicians'
     | '/_authenticated/shop/vehicles'
     | '/_authenticated/shop/vendor-bills'
     | '/_authenticated/shop/vendors'
@@ -6026,6 +6039,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopVehiclesRouteImport
       parentRoute: typeof AuthenticatedShopRoute
     }
+    '/_authenticated/shop/technicians': {
+      id: '/_authenticated/shop/technicians'
+      path: '/technicians'
+      fullPath: '/shop/technicians'
+      preLoaderRoute: typeof AuthenticatedShopTechniciansRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
     '/_authenticated/shop/reports': {
       id: '/_authenticated/shop/reports'
       path: '/reports'
@@ -6702,6 +6722,7 @@ interface AuthenticatedShopRouteChildren {
   AuthenticatedShopPurchaseOrdersRoute: typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   AuthenticatedShopQuotesRoute: typeof AuthenticatedShopQuotesRouteWithChildren
   AuthenticatedShopReportsRoute: typeof AuthenticatedShopReportsRoute
+  AuthenticatedShopTechniciansRoute: typeof AuthenticatedShopTechniciansRoute
   AuthenticatedShopVehiclesRoute: typeof AuthenticatedShopVehiclesRouteWithChildren
   AuthenticatedShopVendorBillsRoute: typeof AuthenticatedShopVendorBillsRouteWithChildren
   AuthenticatedShopVendorsRoute: typeof AuthenticatedShopVendorsRoute
@@ -6717,6 +6738,7 @@ const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
     AuthenticatedShopPurchaseOrdersRouteWithChildren,
   AuthenticatedShopQuotesRoute: AuthenticatedShopQuotesRouteWithChildren,
   AuthenticatedShopReportsRoute: AuthenticatedShopReportsRoute,
+  AuthenticatedShopTechniciansRoute: AuthenticatedShopTechniciansRoute,
   AuthenticatedShopVehiclesRoute: AuthenticatedShopVehiclesRouteWithChildren,
   AuthenticatedShopVendorBillsRoute:
     AuthenticatedShopVendorBillsRouteWithChildren,

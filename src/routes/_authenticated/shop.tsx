@@ -12,6 +12,7 @@ import {
   Car,
   PackageSearch,
   Truck,
+  Users,
   Loader2,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
@@ -91,6 +92,7 @@ const QUICK_LINKS = [
   { title: "Calendar", icon: CalendarIcon, to: "/shop/appointments" as const },
   { title: "Vendors", icon: Truck, to: "/shop/vendors" as const },
   { title: "Vendor Bills", icon: Receipt, to: "/shop/vendor-bills" as const },
+  { title: "Technicians", icon: Users, to: "/shop/technicians" as const },
   { title: "Reports", icon: BarChart3, to: "/shop/reports" as const },
 ];
 

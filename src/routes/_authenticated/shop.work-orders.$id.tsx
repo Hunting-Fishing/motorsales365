@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 import { smSupabase } from "@/lib/shop-manager/db";
+import { WorkOrderTimeEntries } from "@/components/shop-manager/work-order-time-entries";
 
 type WorkOrderDetail = {
   id: string;
@@ -662,6 +663,8 @@ function WorkOrderDetailPage() {
                   )}
                 </CardContent>
               </Card>
+
+              <WorkOrderTimeEntries workOrderId={id} />
             </div>
           </>
         )}
