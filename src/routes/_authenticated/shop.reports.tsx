@@ -98,7 +98,7 @@ function ReportsPage() {
         if (!i.customer_id) continue;
         byCust[i.customer_id] = (byCust[i.customer_id] ?? 0) + Number(i.total ?? 0);
       }
-      const custName = new Map(customers.map((c: any) => [c.id, `${c.first_name ?? ""} ${c.last_name ?? ""}`.trim() || c.id.slice(0, 8)]));
+      const custName = new Map<string, string>(customers.map((c: any) => [c.id, `${c.first_name ?? ""} ${c.last_name ?? ""}`.trim() || c.id.slice(0, 8)]));
       const topCustomers = Object.entries(byCust)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 8)
