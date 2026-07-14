@@ -435,8 +435,9 @@ const MARKETPLACE_COMPETITORS: Competitor[] = [
     name: "Philkotse",
     blurb: "PH auto classifieds",
     pricing: {
-      startingUsd: null,
-      unit: "custom",
+      startingUsd: 79,
+      topUsd: 399,
+      unit: "mo",
       tierName: "Dealer plan",
       includes: ["Dealer subscriptions", "Private ads limited"],
       link: "https://philkotse.com/",
