@@ -461,8 +461,9 @@ const MARKETPLACE_COMPETITORS: Competitor[] = [
     name: "Cars.com.ph",
     blurb: "PH dealer marketplace",
     pricing: {
-      startingUsd: null,
-      unit: "custom",
+      startingUsd: 89,
+      topUsd: 449,
+      unit: "mo",
       tierName: "Dealer plan",
       includes: ["Dealer packages", "Private posts limited"],
       link: "https://www.cars.com.ph/",
