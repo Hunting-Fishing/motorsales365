@@ -178,13 +178,14 @@ function InventoryItemPage() {
                   </p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {low ? (
                   <Badge variant="destructive">Low stock</Badge>
                 ) : (
                   <Badge variant="outline">{data.status ?? "OK"}</Badge>
                 )}
                 {data.category ? <Badge variant="outline">{data.category}</Badge> : null}
+                <AdjustStockDialog itemId={id} currentQty={qty} />
               </div>
             </div>
 
