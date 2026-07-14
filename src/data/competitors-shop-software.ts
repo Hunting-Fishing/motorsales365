@@ -270,8 +270,8 @@ export const SHOP_SOFTWARE_MATRIX: CompetitorMatrix = {
 
   competitors: SHOP_COMPETITORS,
   rows: [
-    row("Work orders (RO lifecycle)", { "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: y, ari: y, fullbay: y, torque360: y, shopware: y, protractor: y, napatracs: y, identifix: y, garage360: y }),
-    row("Inventory with alerts", { "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: y, ari: y, fullbay: y, torque360: y, shopware: y, protractor: y, napatracs: y, identifix: p(), garage360: y }),
+    row("Work orders (RO lifecycle)", { "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: y, ari: y, fullbay: y, torque360: y, shopware: y, protractor: y, napatracs: y, identifix: y, garage360: y, orderry: y, garageplug: y, workshop: y, rowriter: y, maxxtraxx: y }),
+    row("Inventory with alerts", { "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: y, ari: y, fullbay: y, torque360: y, shopware: y, protractor: y, napatracs: y, identifix: p(), garage360: y, orderry: y, garageplug: y, workshop: y, rowriter: y, maxxtraxx: y }),
     row("Double-entry GL & P&L in-app", {
       "365": yy("Real ledger, not just KPIs"),
       shopmonkey: p("QuickBooks integration"),
@@ -286,10 +286,15 @@ export const SHOP_SOFTWARE_MATRIX: CompetitorMatrix = {
       napatracs: p(),
       identifix: p(),
       garage360: n,
+      orderry: p(),
+      garageplug: p("Tally/Xero"),
+      workshop: p("Xero/QBO"),
+      rowriter: p(),
+      maxxtraxx: y,
     }),
     row("Cross-shop live parts stock", {
       "365": yy("network_stock view, real-time"),
-      shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: p("NAPA-only"), identifix: n, garage360: n,
+      shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: p("NAPA-only"), identifix: n, garage360: n, orderry: n, garageplug: n, workshop: n, rowriter: n, maxxtraxx: n,
     }),
     row("VIN-based parts catalog", {
       "365": y,
@@ -305,39 +310,44 @@ export const SHOP_SOFTWARE_MATRIX: CompetitorMatrix = {
       napatracs: y,
       identifix: y,
       garage360: n,
+      orderry: p(),
+      garageplug: p(),
+      workshop: p(),
+      rowriter: y,
+      maxxtraxx: y,
     }),
     row("Public marketplace (buy/sell vehicles)", {
-      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: n, identifix: n, garage360: n,
+      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: n, identifix: n, garage360: n, orderry: n, garageplug: n, workshop: n, rowriter: n, maxxtraxx: n,
     }),
     row("Franchise / network program", {
-      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: p("NAPA AutoCare"), identifix: n, garage360: n,
+      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: p("NAPA AutoCare"), identifix: n, garage360: n, orderry: n, garageplug: n, workshop: n, rowriter: n, maxxtraxx: n,
     }),
     row("Loyalty & promo codes built-in", {
       "365": y,
       shopmonkey: p("Marketing add-on"),
       tekmetric: p(),
       autoleap: y,
-      mitchell1: n, ari: p(), fullbay: n, torque360: y, shopware: p(), protractor: n, napatracs: n, identifix: n, garage360: n,
+      mitchell1: n, ari: p(), fullbay: n, torque360: y, shopware: p(), protractor: n, napatracs: n, identifix: n, garage360: n, orderry: p(), garageplug: p(), workshop: p(), rowriter: n, maxxtraxx: n,
     }),
     row("HR / leave / certificates", {
-      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: p(), torque360: n, shopware: n, protractor: p(), napatracs: n, identifix: n, garage360: n,
+      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: p(), torque360: n, shopware: n, protractor: p(), napatracs: n, identifix: n, garage360: n, orderry: p(), garageplug: p(), workshop: n, rowriter: n, maxxtraxx: p(),
     }),
     row("Learning / courses in-app", {
       "365": y,
       shopmonkey: p("Shopmonkey University"),
-      tekmetric: n, autoleap: n, mitchell1: p("ProDemand"), ari: n, fullbay: p(), torque360: n, shopware: n, protractor: n, napatracs: n, identifix: y, garage360: n,
+      tekmetric: n, autoleap: n, mitchell1: p("ProDemand"), ari: n, fullbay: p(), torque360: n, shopware: n, protractor: n, napatracs: n, identifix: y, garage360: n, orderry: n, garageplug: p(), workshop: n, rowriter: n, maxxtraxx: n,
     }),
     row("Service-reminder automation", {
-      "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: p(), ari: y, fullbay: y, torque360: y, shopware: y, protractor: y, napatracs: p(), identifix: p(), garage360: p(),
+      "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: p(), ari: y, fullbay: y, torque360: y, shopware: y, protractor: y, napatracs: p(), identifix: p(), garage360: p(), orderry: y, garageplug: y, workshop: y, rowriter: p(), maxxtraxx: p(),
     }),
     row("PH-local pricing & payments (GCash)", {
-      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: n, identifix: n, garage360: p(),
+      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: n, identifix: n, garage360: p(), orderry: n, garageplug: p("APAC pricing"), workshop: n, rowriter: n, maxxtraxx: n,
     }),
     row("Mobile-first UI", {
-      "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: n, ari: y, fullbay: y, torque360: y, shopware: y, protractor: p(), napatracs: n, identifix: p(), garage360: y,
+      "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: n, ari: y, fullbay: y, torque360: y, shopware: y, protractor: p(), napatracs: n, identifix: p(), garage360: y, orderry: y, garageplug: y, workshop: p(), rowriter: n, maxxtraxx: n,
     }),
     row("Referral / affiliate program", {
-      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: n, identifix: n, garage360: n,
+      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: n, identifix: n, garage360: n, orderry: n, garageplug: n, workshop: n, rowriter: n, maxxtraxx: n,
     }),
   ],
 };
