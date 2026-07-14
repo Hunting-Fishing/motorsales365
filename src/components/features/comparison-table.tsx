@@ -1,6 +1,9 @@
-import { Check, Minus, X, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Check, Minus, X, Sparkles, Globe } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Cell, CompetitorMatrix, Competitor } from "@/data/competitors-shop-software";
+import { DragScrollArea } from "./drag-scroll-area";
+import { detectRegionCurrency, formatMoney, type RegionCurrency } from "@/lib/region-currency";
 
 function CellPill({ c }: { c: Cell }) {
   if (c.v === "yes")
@@ -22,135 +25,173 @@ function CellPill({ c }: { c: Cell }) {
   );
 }
 
-function fmtUsd(n: number) {
-  return n % 1 === 0 ? `$${n}` : `$${n.toFixed(2)}`;
-}
-
-function priceCell(c: Competitor) {
+function priceCell(c: Competitor, ccy: RegionCurrency) {
   const p = c.pricing;
   if (p.unit === "free") return { text: "Free", tone: "primary" as const };
   if (p.startingUsd == null) return { text: "Ask", tone: "muted" as const };
-  const start = fmtUsd(p.startingUsd);
+  const start = formatMoney(p.startingUsd, ccy);
   if (p.topUsd != null && p.topUsd > p.startingUsd) {
-    return { text: `${start}–${fmtUsd(p.topUsd)}/${p.unit}`, tone: "muted" as const };
+    return { text: `${start}–${formatMoney(p.topUsd, ccy)}/${p.unit}`, tone: "muted" as const };
   }
   return { text: `${start}/${p.unit}`, tone: "muted" as const };
 }
 
+// Feature score: yes=2, partial=1, else 0. Used to auto-sort competitors from
+// "closest to our features" → "less features than us".
+function scoreCompetitor(id: string, matrix: CompetitorMatrix): number {
+  let s = 0;
+  for (const r of matrix.rows) {
+    const cell = r.cells[id];
+    if (!cell) continue;
+    if (cell.v === "yes") s += 2;
+    else if (cell.v === "partial") s += 1;
+  }
+  return s;
+}
+
 export function ComparisonTable({ matrix }: { matrix: CompetitorMatrix }) {
-  // Widen min column width when many competitors — keep table readable, scroll horizontally.
-  const colCount = matrix.competitors.length;
+  const [ccy] = useState<RegionCurrency>(() => detectRegionCurrency());
+
+  // Auto-sort: keep 365 pinned at column 1; sort the rest by feature-parity DESC.
+  const sortedCompetitors = useMemo(() => {
+    const us = matrix.competitors.find((c) => c.id === "365");
+    const others = matrix.competitors
+      .filter((c) => c.id !== "365")
+      .map((c) => ({ c, score: scoreCompetitor(c.id, matrix) }))
+      .sort((a, b) => b.score - a.score)
+      .map((x) => x.c);
+    return us ? [us, ...others] : others;
+  }, [matrix]);
+
+  const colCount = sortedCompetitors.length;
   const minWidth = 220 + colCount * 140;
 
   return (
     <TooltipProvider delayDuration={150}>
-      <div className="overflow-x-auto rounded-2xl border bg-card shadow-sm">
-        <table
-          className="w-full border-separate border-spacing-0 text-sm"
-          style={{ minWidth: `${minWidth}px` }}
+      <div className="mb-2 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+        <span className="inline-flex items-center gap-1.5">
+          <Globe className="h-3.5 w-3.5" />
+          Prices in <span className="font-medium text-foreground">{ccy.code}</span>
+          {ccy.code !== "USD" && <span className="text-muted-foreground/80">(≈, from USD)</span>}
+        </span>
+        <span className="hidden sm:inline">
+          Sorted by feature parity · click &amp; drag / swipe to scroll →
+        </span>
+        <span className="inline sm:hidden">Swipe →</span>
+      </div>
+
+      <div className="rounded-2xl border bg-card shadow-sm">
+        <DragScrollArea
+          className="rounded-2xl"
+          ariaLabel="Feature comparison across competitors"
         >
-          <thead>
-            <tr className="bg-gradient-to-r from-secondary/60 via-secondary/40 to-secondary/60">
-              <th className="sticky left-0 z-20 min-w-[220px] border-b bg-secondary/60 p-3 text-left font-semibold backdrop-blur">
-                Capability
-              </th>
-              {matrix.competitors.map((c) => {
-                const is365 = c.id === "365";
-                return (
-                  <th
-                    key={c.id}
-                    className={`relative min-w-[140px] border-b p-3 text-center font-semibold ${
-                      is365 ? "bg-primary/10 text-primary" : ""
-                    }`}
-                  >
-                    {is365 && (
-                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground shadow">
-                        <Sparkles className="mr-0.5 inline h-2.5 w-2.5" /> You are here
-                      </span>
-                    )}
-                    <div>{c.name}</div>
-                    <div className={`text-xs font-normal ${is365 ? "text-primary/80" : "text-muted-foreground"}`}>
-                      {c.blurb}
-                    </div>
-                  </th>
-                );
-              })}
-            </tr>
-            {/* Starting price row */}
-            <tr className="bg-secondary/25">
-              <th
-                scope="row"
-                className="sticky left-0 z-10 border-b bg-secondary/50 p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground backdrop-blur"
-              >
-                Price range
-              </th>
-              {matrix.competitors.map((c) => {
-                const is365 = c.id === "365";
-                const pc = priceCell(c);
-                return (
-                  <td key={c.id} className={`border-b p-3 text-center ${is365 ? "bg-primary/5" : ""}`}>
-                    <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                        pc.tone === "primary"
-                          ? "bg-primary/15 text-primary"
-                          : "bg-muted text-foreground"
+          <table
+            className="w-full border-separate border-spacing-0 text-sm"
+            style={{ minWidth: `${minWidth}px` }}
+          >
+            <thead>
+              <tr className="bg-gradient-to-r from-secondary/60 via-secondary/40 to-secondary/60">
+                <th className="sticky left-0 z-20 min-w-[220px] border-b bg-secondary/60 p-3 text-left font-semibold backdrop-blur">
+                  Capability
+                </th>
+                {sortedCompetitors.map((c) => {
+                  const is365 = c.id === "365";
+                  return (
+                    <th
+                      key={c.id}
+                      className={`relative min-w-[140px] border-b p-3 text-center font-semibold ${
+                        is365 ? "bg-primary/10 text-primary" : ""
                       }`}
                     >
-                      {pc.text}
-                    </span>
-                    {c.pricing.highest && (
-                      <div className="mt-0.5 text-[10px] text-muted-foreground">up to {c.pricing.highest}</div>
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {matrix.rows.map((r, i) => (
-              <tr
-                key={r.capability}
-                className={`transition-colors hover:bg-secondary/30 ${i % 2 ? "bg-secondary/10" : ""}`}
-              >
-                <td
-                  className={`sticky left-0 z-10 border-b p-3 font-medium backdrop-blur ${
-                    i % 2 ? "bg-secondary/40" : "bg-card"
-                  }`}
+                      {is365 && (
+                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground shadow">
+                          <Sparkles className="mr-0.5 inline h-2.5 w-2.5" /> You are here
+                        </span>
+                      )}
+                      <div>{c.name}</div>
+                      <div className={`text-xs font-normal ${is365 ? "text-primary/80" : "text-muted-foreground"}`}>
+                        {c.blurb}
+                      </div>
+                    </th>
+                  );
+                })}
+              </tr>
+              {/* Price range row */}
+              <tr className="bg-secondary/25">
+                <th
+                  scope="row"
+                  className="sticky left-0 z-10 border-b bg-secondary/50 p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground backdrop-blur"
                 >
-                  {r.capability}
-                </td>
-                {matrix.competitors.map((c) => {
-                  const cell = r.cells[c.id];
+                  Price range
+                </th>
+                {sortedCompetitors.map((c) => {
                   const is365 = c.id === "365";
-                  if (!cell)
-                    return (
-                      <td key={c.id} className={`border-b p-3 text-center ${is365 ? "bg-primary/5" : ""}`}>
-                        —
-                      </td>
-                    );
-                  const inner = <CellPill c={cell} />;
+                  const pc = priceCell(c, ccy);
                   return (
-                    <td
-                      key={c.id}
-                      className={`border-b p-3 text-center ${is365 ? "bg-primary/5" : ""}`}
-                    >
-                      {cell.note ? (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="cursor-help">{inner}</span>
-                          </TooltipTrigger>
-                          <TooltipContent>{cell.note}</TooltipContent>
-                        </Tooltip>
-                      ) : (
-                        inner
+                    <td key={c.id} className={`border-b p-3 text-center ${is365 ? "bg-primary/5" : ""}`}>
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                          pc.tone === "primary"
+                            ? "bg-primary/15 text-primary"
+                            : "bg-muted text-foreground"
+                        }`}
+                      >
+                        {pc.text}
+                      </span>
+                      {c.pricing.highest && (
+                        <div className="mt-0.5 text-[10px] text-muted-foreground">up to {c.pricing.highest}</div>
                       )}
                     </td>
                   );
                 })}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {matrix.rows.map((r, i) => (
+                <tr
+                  key={r.capability}
+                  className={`transition-colors hover:bg-secondary/30 ${i % 2 ? "bg-secondary/10" : ""}`}
+                >
+                  <td
+                    className={`sticky left-0 z-10 border-b p-3 font-medium backdrop-blur ${
+                      i % 2 ? "bg-secondary/40" : "bg-card"
+                    }`}
+                  >
+                    {r.capability}
+                  </td>
+                  {sortedCompetitors.map((c) => {
+                    const cell = r.cells[c.id];
+                    const is365 = c.id === "365";
+                    if (!cell)
+                      return (
+                        <td key={c.id} className={`border-b p-3 text-center ${is365 ? "bg-primary/5" : ""}`}>
+                          —
+                        </td>
+                      );
+                    const inner = <CellPill c={cell} />;
+                    return (
+                      <td
+                        key={c.id}
+                        className={`border-b p-3 text-center ${is365 ? "bg-primary/5" : ""}`}
+                      >
+                        {cell.note ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="cursor-help">{inner}</span>
+                            </TooltipTrigger>
+                            <TooltipContent>{cell.note}</TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          inner
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </DragScrollArea>
       </div>
     </TooltipProvider>
   );
