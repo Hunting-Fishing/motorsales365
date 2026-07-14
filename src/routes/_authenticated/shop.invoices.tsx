@@ -177,7 +177,7 @@ function InvoicesList() {
         )}
 
         <div className="mt-6 text-sm text-muted-foreground">
-          Detail view, PDF export, and payment recording are next on the porting list.
+          PDF export and payment recording are next on the porting list.
         </div>
         <div className="mt-4">
           <Button asChild variant="ghost"><Link to="/shop">← Back to Shop Manager</Link></Button>
