@@ -329,6 +329,7 @@ import { Route as AuthenticatedStaffAcademySlugRouteImport } from './routes/_aut
 import { Route as AuthenticatedShopWorkOrdersNewRouteImport } from './routes/_authenticated/shop.work-orders.new'
 import { Route as AuthenticatedShopWorkOrdersIdRouteImport } from './routes/_authenticated/shop.work-orders.$id'
 import { Route as AuthenticatedShopVehiclesIdRouteImport } from './routes/_authenticated/shop.vehicles.$id'
+import { Route as AuthenticatedShopQuotesNewRouteImport } from './routes/_authenticated/shop.quotes.new'
 import { Route as AuthenticatedShopQuotesIdRouteImport } from './routes/_authenticated/shop.quotes.$id'
 import { Route as AuthenticatedShopPurchaseOrdersIdRouteImport } from './routes/_authenticated/shop.purchase-orders.$id'
 import { Route as AuthenticatedShopInvoicesIdRouteImport } from './routes/_authenticated/shop.invoices.$id'
@@ -2022,6 +2023,12 @@ const AuthenticatedShopVehiclesIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedShopVehiclesRoute,
   } as any)
+const AuthenticatedShopQuotesNewRoute =
+  AuthenticatedShopQuotesNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedShopQuotesRoute,
+  } as any)
 const AuthenticatedShopQuotesIdRoute =
   AuthenticatedShopQuotesIdRouteImport.update({
     id: '/$id',
@@ -2351,6 +2358,7 @@ export interface FileRoutesByFullPath {
   '/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
   '/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
   '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
+  '/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
   '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
@@ -2669,6 +2677,7 @@ export interface FileRoutesByTo {
   '/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
   '/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
   '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
+  '/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
   '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
@@ -3000,6 +3009,7 @@ export interface FileRoutesById {
   '/_authenticated/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
   '/_authenticated/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
   '/_authenticated/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
+  '/_authenticated/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
   '/_authenticated/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/_authenticated/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
   '/_authenticated/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
@@ -3331,6 +3341,7 @@ export interface FileRouteTypes {
     | '/shop/invoices/$id'
     | '/shop/purchase-orders/$id'
     | '/shop/quotes/$id'
+    | '/shop/quotes/new'
     | '/shop/vehicles/$id'
     | '/shop/work-orders/$id'
     | '/shop/work-orders/new'
@@ -3649,6 +3660,7 @@ export interface FileRouteTypes {
     | '/shop/invoices/$id'
     | '/shop/purchase-orders/$id'
     | '/shop/quotes/$id'
+    | '/shop/quotes/new'
     | '/shop/vehicles/$id'
     | '/shop/work-orders/$id'
     | '/shop/work-orders/new'
@@ -3979,6 +3991,7 @@ export interface FileRouteTypes {
     | '/_authenticated/shop/invoices/$id'
     | '/_authenticated/shop/purchase-orders/$id'
     | '/_authenticated/shop/quotes/$id'
+    | '/_authenticated/shop/quotes/new'
     | '/_authenticated/shop/vehicles/$id'
     | '/_authenticated/shop/work-orders/$id'
     | '/_authenticated/shop/work-orders/new'
@@ -6416,6 +6429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopVehiclesIdRouteImport
       parentRoute: typeof AuthenticatedShopVehiclesRoute
     }
+    '/_authenticated/shop/quotes/new': {
+      id: '/_authenticated/shop/quotes/new'
+      path: '/new'
+      fullPath: '/shop/quotes/new'
+      preLoaderRoute: typeof AuthenticatedShopQuotesNewRouteImport
+      parentRoute: typeof AuthenticatedShopQuotesRoute
+    }
     '/_authenticated/shop/quotes/$id': {
       id: '/_authenticated/shop/quotes/$id'
       path: '/$id'
@@ -6536,11 +6556,13 @@ const AuthenticatedShopPurchaseOrdersRouteWithChildren =
 
 interface AuthenticatedShopQuotesRouteChildren {
   AuthenticatedShopQuotesIdRoute: typeof AuthenticatedShopQuotesIdRoute
+  AuthenticatedShopQuotesNewRoute: typeof AuthenticatedShopQuotesNewRoute
 }
 
 const AuthenticatedShopQuotesRouteChildren: AuthenticatedShopQuotesRouteChildren =
   {
     AuthenticatedShopQuotesIdRoute: AuthenticatedShopQuotesIdRoute,
+    AuthenticatedShopQuotesNewRoute: AuthenticatedShopQuotesNewRoute,
   }
 
 const AuthenticatedShopQuotesRouteWithChildren =
