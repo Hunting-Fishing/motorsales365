@@ -354,6 +354,7 @@ import { Route as AuthenticatedShopWorkOrdersIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedShopVendorBillsIdRouteImport } from './routes/_authenticated/shop.vendor-bills.$id'
 import { Route as AuthenticatedShopVehiclesIdRouteImport } from './routes/_authenticated/shop.vehicles.$id'
 import { Route as AuthenticatedShopTechniciansIdRouteImport } from './routes/_authenticated/shop.technicians.$id'
+import { Route as AuthenticatedShopReportsPartsMarginRouteImport } from './routes/_authenticated/shop.reports.parts-margin'
 import { Route as AuthenticatedShopReportsLtvRouteImport } from './routes/_authenticated/shop.reports.ltv'
 import { Route as AuthenticatedShopQuotesNewRouteImport } from './routes/_authenticated/shop.quotes.new'
 import { Route as AuthenticatedShopQuotesIdRouteImport } from './routes/_authenticated/shop.quotes.$id'
@@ -2201,6 +2202,12 @@ const AuthenticatedShopTechniciansIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedShopTechniciansRoute,
   } as any)
+const AuthenticatedShopReportsPartsMarginRoute =
+  AuthenticatedShopReportsPartsMarginRouteImport.update({
+    id: '/parts-margin',
+    path: '/parts-margin',
+    getParentRoute: () => AuthenticatedShopReportsRoute,
+  } as any)
 const AuthenticatedShopReportsLtvRoute =
   AuthenticatedShopReportsLtvRouteImport.update({
     id: '/ltv',
@@ -2600,6 +2607,7 @@ export interface FileRoutesByFullPath {
   '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
   '/shop/reports/ltv': typeof AuthenticatedShopReportsLtvRoute
+  '/shop/reports/parts-margin': typeof AuthenticatedShopReportsPartsMarginRoute
   '/shop/technicians/$id': typeof AuthenticatedShopTechniciansIdRoute
   '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/shop/vendor-bills/$id': typeof AuthenticatedShopVendorBillsIdRoute
@@ -2950,6 +2958,7 @@ export interface FileRoutesByTo {
   '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
   '/shop/reports/ltv': typeof AuthenticatedShopReportsLtvRoute
+  '/shop/reports/parts-margin': typeof AuthenticatedShopReportsPartsMarginRoute
   '/shop/technicians/$id': typeof AuthenticatedShopTechniciansIdRoute
   '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/shop/vendor-bills/$id': typeof AuthenticatedShopVendorBillsIdRoute
@@ -3313,6 +3322,7 @@ export interface FileRoutesById {
   '/_authenticated/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/_authenticated/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
   '/_authenticated/shop/reports/ltv': typeof AuthenticatedShopReportsLtvRoute
+  '/_authenticated/shop/reports/parts-margin': typeof AuthenticatedShopReportsPartsMarginRoute
   '/_authenticated/shop/technicians/$id': typeof AuthenticatedShopTechniciansIdRoute
   '/_authenticated/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/_authenticated/shop/vendor-bills/$id': typeof AuthenticatedShopVendorBillsIdRoute
@@ -3676,6 +3686,7 @@ export interface FileRouteTypes {
     | '/shop/quotes/$id'
     | '/shop/quotes/new'
     | '/shop/reports/ltv'
+    | '/shop/reports/parts-margin'
     | '/shop/technicians/$id'
     | '/shop/vehicles/$id'
     | '/shop/vendor-bills/$id'
@@ -4026,6 +4037,7 @@ export interface FileRouteTypes {
     | '/shop/quotes/$id'
     | '/shop/quotes/new'
     | '/shop/reports/ltv'
+    | '/shop/reports/parts-margin'
     | '/shop/technicians/$id'
     | '/shop/vehicles/$id'
     | '/shop/vendor-bills/$id'
@@ -4388,6 +4400,7 @@ export interface FileRouteTypes {
     | '/_authenticated/shop/quotes/$id'
     | '/_authenticated/shop/quotes/new'
     | '/_authenticated/shop/reports/ltv'
+    | '/_authenticated/shop/reports/parts-margin'
     | '/_authenticated/shop/technicians/$id'
     | '/_authenticated/shop/vehicles/$id'
     | '/_authenticated/shop/vendor-bills/$id'
@@ -7006,6 +7019,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopTechniciansIdRouteImport
       parentRoute: typeof AuthenticatedShopTechniciansRoute
     }
+    '/_authenticated/shop/reports/parts-margin': {
+      id: '/_authenticated/shop/reports/parts-margin'
+      path: '/parts-margin'
+      fullPath: '/shop/reports/parts-margin'
+      preLoaderRoute: typeof AuthenticatedShopReportsPartsMarginRouteImport
+      parentRoute: typeof AuthenticatedShopReportsRoute
+    }
     '/_authenticated/shop/reports/ltv': {
       id: '/_authenticated/shop/reports/ltv'
       path: '/ltv'
@@ -7248,12 +7268,15 @@ const AuthenticatedShopQuotesRouteWithChildren =
 
 interface AuthenticatedShopReportsRouteChildren {
   AuthenticatedShopReportsLtvRoute: typeof AuthenticatedShopReportsLtvRoute
+  AuthenticatedShopReportsPartsMarginRoute: typeof AuthenticatedShopReportsPartsMarginRoute
   AuthenticatedShopReportsTechnicianIdRoute: typeof AuthenticatedShopReportsTechnicianIdRoute
 }
 
 const AuthenticatedShopReportsRouteChildren: AuthenticatedShopReportsRouteChildren =
   {
     AuthenticatedShopReportsLtvRoute: AuthenticatedShopReportsLtvRoute,
+    AuthenticatedShopReportsPartsMarginRoute:
+      AuthenticatedShopReportsPartsMarginRoute,
     AuthenticatedShopReportsTechnicianIdRoute:
       AuthenticatedShopReportsTechnicianIdRoute,
   }
