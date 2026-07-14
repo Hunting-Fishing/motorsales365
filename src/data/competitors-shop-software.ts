@@ -282,6 +282,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "US independent shops",
     pricing: {
       startingUsd: 109,
+      topUsd: 229,
       unit: "mo",
       tierName: "SE",
       includes: ["Desktop client", "Accounting built-in", "Parts catalogs"],
