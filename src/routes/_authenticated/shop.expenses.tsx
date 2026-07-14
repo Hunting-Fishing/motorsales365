@@ -157,8 +157,18 @@ function NewCategoryDialog({ onCreated }: { onCreated: () => void }) {
   );
 }
 
+async function openReceipt(path: string) {
+  // If a full URL, open directly; otherwise sign the storage path.
+  if (/^https?:\/\//.test(path)) { window.open(path, "_blank"); return; }
+  const { data, error } = await supabase.storage.from("shop-receipts").createSignedUrl(path, 60 * 10);
+  if (error) { toast.error("Could not open receipt"); return; }
+  window.open(data.signedUrl, "_blank");
+}
+
 function NewExpenseDialog({ categories, onCreated }: { categories: any[]; onCreated: () => void }) {
   const [open, setOpen] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState<any>({
     category_id: "",
     amount: "",
@@ -171,17 +181,35 @@ function NewExpenseDialog({ categories, onCreated }: { categories: any[]; onCrea
   });
   const create = useMutation({
     mutationFn: async () => {
+      let receipt_url: string | null = null;
+      if (file) {
+        setUploading(true);
+        const { data: userData } = await supabase.auth.getUser();
+        const uid = userData.user?.id ?? "anon";
+        const ext = file.name.split(".").pop() ?? "bin";
+        const path = `${uid}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error: upErr } = await supabase.storage.from("shop-receipts").upload(path, file, { upsert: false });
+        setUploading(false);
+        if (upErr) throw upErr;
+        receipt_url = path;
+      }
       const payload: any = {
         ...form,
         amount: Number(form.amount) || 0,
         tax_amount: Number(form.tax_amount) || 0,
         category_id: form.category_id || null,
+        receipt_url,
       };
       const { error } = await (smSupabase as any).from("expenses").insert(payload);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Expense recorded"); setOpen(false); onCreated(); setForm({ ...form, amount: "", tax_amount: "", description: "", notes: "", reference_number: "" }); },
-    onError: (e: any) => toast.error(e.message ?? "Failed"),
+    onSuccess: () => {
+      toast.success("Expense recorded");
+      setOpen(false); onCreated();
+      setForm({ ...form, amount: "", tax_amount: "", description: "", notes: "", reference_number: "" });
+      setFile(null);
+    },
+    onError: (e: any) => { setUploading(false); toast.error(e.message ?? "Failed"); },
   });
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -217,8 +245,17 @@ function NewExpenseDialog({ categories, onCreated }: { categories: any[]; onCrea
           </div>
           <div><Label>Description</Label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
           <div><Label>Notes</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} /></div>
+          <div>
+            <Label className="flex items-center gap-2"><Upload className="h-3.5 w-3.5" /> Receipt (optional)</Label>
+            <Input type="file" accept="image/*,application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            {file && <p className="text-xs text-muted-foreground mt-1">{file.name} · {(file.size / 1024).toFixed(0)} KB</p>}
+          </div>
         </div>
-        <DialogFooter><Button onClick={() => create.mutate()} disabled={!form.amount || create.isPending}>Record</Button></DialogFooter>
+        <DialogFooter>
+          <Button onClick={() => create.mutate()} disabled={!form.amount || create.isPending || uploading}>
+            {uploading ? "Uploading…" : create.isPending ? "Saving…" : "Record"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
