@@ -109,6 +109,11 @@ function AutomationPage() {
               <p className="text-muted-foreground">Auto-trigger service reminders by mileage or time.</p>
             </div>
           </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => runNow.mutate()} disabled={runNow.isPending}>
+              {runNow.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
+              Run rules now
+            </Button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild><Button><Plus className="mr-2 h-4 w-4" /> New Rule</Button></DialogTrigger>
             <DialogContent>
