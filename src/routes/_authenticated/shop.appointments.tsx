@@ -195,3 +195,148 @@ function AppointmentsPage() {
     </SiteLayout>
   );
 }
+
+type CustomerOpt = { id: string; first_name: string | null; last_name: string | null };
+type VehicleOpt = { id: string; customer_id: string | null; year: number | null; make: string | null; model: string | null };
+
+function NewAppointmentDialog() {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [customerId, setCustomerId] = useState("");
+  const [vehicleId, setVehicleId] = useState("");
+  const [date, setDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
+  const [time, setTime] = useState<string>("09:00");
+  const [duration, setDuration] = useState("60");
+  const [status, setStatus] = useState("scheduled");
+  const [notes, setNotes] = useState("");
+
+  const { data: customers = [] } = useQuery({
+    queryKey: ["shop-manager", "appointments", "new", "customers"],
+    enabled: open,
+    queryFn: async (): Promise<CustomerOpt[]> => {
+      const { data, error } = await (smSupabase as any)
+        .from("customers")
+        .select("id, first_name, last_name")
+        .order("last_name", { ascending: true })
+        .limit(500);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const { data: vehicles = [] } = useQuery({
+    queryKey: ["shop-manager", "appointments", "new", "vehicles", customerId],
+    enabled: open && !!customerId,
+    queryFn: async (): Promise<VehicleOpt[]> => {
+      const { data, error } = await (smSupabase as any)
+        .from("vehicles")
+        .select("id, customer_id, year, make, model")
+        .eq("customer_id", customerId)
+        .limit(200);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  useEffect(() => { setVehicleId(""); }, [customerId]);
+
+  const create = useMutation({
+    mutationFn: async () => {
+      if (!customerId) throw new Error("Pick a customer");
+      const dt = new Date(`${date}T${time}:00`);
+      if (isNaN(dt.getTime())) throw new Error("Invalid date/time");
+      const { error } = await (smSupabase as any).from("appointments").insert({
+        customer_id: customerId,
+        vehicle_id: vehicleId || null,
+        date: dt.toISOString(),
+        duration: Number(duration) || 60,
+        status,
+        notes: notes.trim() || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Appointment scheduled");
+      qc.invalidateQueries({ queryKey: ["shop-manager", "appointments"] });
+      setOpen(false);
+      setCustomerId(""); setVehicleId(""); setNotes("");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to create"),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm"><Plus className="mr-1 h-4 w-4" /> New Appointment</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>New appointment</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label>Customer *</Label>
+            <Select value={customerId} onValueChange={setCustomerId}>
+              <SelectTrigger><SelectValue placeholder="Pick a customer…" /></SelectTrigger>
+              <SelectContent>
+                {customers.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {`${c.first_name ?? ""} ${c.last_name ?? ""}`.trim() || c.id.slice(0, 8)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Vehicle</Label>
+            <Select value={vehicleId} onValueChange={setVehicleId} disabled={!customerId}>
+              <SelectTrigger><SelectValue placeholder={customerId ? "(optional)" : "Pick customer first"} /></SelectTrigger>
+              <SelectContent>
+                {vehicles.map((v) => (
+                  <SelectItem key={v.id} value={v.id}>
+                    {[v.year, v.make, v.model].filter(Boolean).join(" ") || v.id.slice(0, 8)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <Label>Date *</Label>
+              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            </div>
+            <div>
+              <Label>Time *</Label>
+              <Input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+            </div>
+            <div>
+              <Label>Duration (min)</Label>
+              <Input type="number" min="15" step="15" value={duration} onChange={(e) => setDuration(e.target.value)} />
+            </div>
+          </div>
+          <div>
+            <Label>Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
+                <SelectItem value="confirmed">Confirmed</SelectItem>
+                <SelectItem value="in_progress">In progress</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="no_show">No show</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Notes</Label>
+            <Textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={() => create.mutate()} disabled={create.isPending}>
+            {create.isPending ? "Saving…" : "Schedule"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
