@@ -166,6 +166,19 @@ function WorkOrderDetailPage() {
     queryKey: ["shop-manager", "work-orders", "detail", id],
     queryFn: () => fetchWorkOrder(id),
   });
+  const { data: jobLines = [] } = useQuery({
+    queryKey: ["shop-manager", "work-orders", "job-lines", id],
+    queryFn: () => fetchJobLines(id),
+  });
+  const { data: parts = [] } = useQuery({
+    queryKey: ["shop-manager", "work-orders", "parts", id],
+    queryFn: () => fetchWorkOrderParts(id),
+  });
+  const partsTotal = parts.reduce(
+    (s, p) => s + (Number(p.customer_price ?? 0) * Number(p.quantity ?? 0)),
+    0,
+  );
+  const laborTotal = jobLines.reduce((s, j) => s + Number(j.total_amount ?? 0), 0);
 
   return (
     <SiteLayout>
