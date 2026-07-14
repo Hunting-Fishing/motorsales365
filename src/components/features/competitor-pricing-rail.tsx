@@ -132,7 +132,7 @@ export function CompetitorPricingRail({
 
           {competitors.map((c) => {
             const is365 = c.id === "365";
-            const { big, sub } = priceLabel(c.pricing);
+            const { big, sub } = priceLabel(c.pricing, ccy);
             const vs = vsBadge(c.pricing, is365);
             const isExternal = c.pricing.link.startsWith("http");
             return (
