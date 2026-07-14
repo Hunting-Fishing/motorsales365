@@ -30,6 +30,7 @@ import {
   ChevronDown,
   LayoutDashboard,
   Handshake,
+  Sparkles,
 } from "lucide-react";
 import { useAuth, type SellerType, type AppRole } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
