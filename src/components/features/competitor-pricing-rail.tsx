@@ -143,6 +143,8 @@ export function CompetitorPricingRail({
                 href={c.pricing.link}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener" : undefined}
+                onClickCapture={onCardClickCapture}
+                draggable={false}
                 className={`group relative flex w-[240px] shrink-0 snap-start flex-col rounded-2xl border p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md ${
                   is365
                     ? "border-primary/40 bg-gradient-to-br from-primary/10 to-emerald-500/5 ring-1 ring-primary/30"
