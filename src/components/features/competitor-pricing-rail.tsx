@@ -38,7 +38,53 @@ export function CompetitorPricingRail({
   subtitle?: string;
 }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef<{ active: boolean; startX: number; startScroll: number; moved: boolean }>({
+    active: false,
+    startX: 0,
+    startScroll: 0,
+    moved: false,
+  });
+  const [isDragging, setIsDragging] = useState(false);
   const scrollBy = (dx: number) => scrollerRef.current?.scrollBy({ left: dx, behavior: "smooth" });
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Ignore right-click / middle-click
+    if (e.button !== 0) return;
+    const el = scrollerRef.current;
+    if (!el) return;
+    dragState.current = {
+      active: true,
+      startX: e.clientX,
+      startScroll: el.scrollLeft,
+      moved: false,
+    };
+    el.setPointerCapture(e.pointerId);
+    setIsDragging(true);
+  };
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const s = dragState.current;
+    if (!s.active) return;
+    const el = scrollerRef.current;
+    if (!el) return;
+    const dx = e.clientX - s.startX;
+    if (Math.abs(dx) > 4) s.moved = true;
+    el.scrollLeft = s.startScroll - dx;
+  };
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    const s = dragState.current;
+    if (!s.active) return;
+    s.active = false;
+    setIsDragging(false);
+    scrollerRef.current?.releasePointerCapture?.(e.pointerId);
+  };
+  // Prevent the card <a> from navigating when the user was dragging.
+  const onCardClickCapture = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (dragState.current.moved) {
+      e.preventDefault();
+      e.stopPropagation();
+      dragState.current.moved = false;
+    }
+  };
 
   return (
     <div className="relative">
@@ -46,6 +92,7 @@ export function CompetitorPricingRail({
         <div>
           <h3 className="font-display text-lg font-semibold tracking-tight">{title}</h3>
           {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+          <p className="mt-0.5 text-[11px] text-muted-foreground/80">Click &amp; drag to scroll →</p>
         </div>
         <div className="hidden gap-1 md:flex">
           <button
@@ -74,9 +121,17 @@ export function CompetitorPricingRail({
 
         <div
           ref={scrollerRef}
-          className="scrollbar-thin flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 pt-1"
-          style={{ scrollPaddingLeft: 4 }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onPointerLeave={endDrag}
+          className={`scrollbar-thin flex snap-x gap-3 overflow-x-auto pb-3 pt-1 select-none ${
+            isDragging ? "cursor-grabbing" : "cursor-grab"
+          }`}
+          style={{ scrollPaddingLeft: 4, touchAction: "pan-y" }}
         >
+
           {competitors.map((c) => {
             const is365 = c.id === "365";
             const { big, sub } = priceLabel(c.pricing);
