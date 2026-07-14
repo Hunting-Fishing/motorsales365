@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { FileText, Loader2, Search } from "lucide-react";
+import { FileText, Loader2, Plus, Search } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -87,12 +87,17 @@ function QuotesList() {
   return (
     <SiteLayout>
       <div className="mx-auto max-w-6xl px-4 py-10">
-        <div className="mb-6 flex items-center gap-3">
-          <FileText className="h-7 w-7 text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold">Quotes</h1>
-            <p className="text-muted-foreground">Estimates and proposals.</p>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <FileText className="h-7 w-7 text-primary" />
+            <div>
+              <h1 className="text-3xl font-bold">Quotes</h1>
+              <p className="text-muted-foreground">Estimates and proposals.</p>
+            </div>
           </div>
+          <Button asChild>
+            <Link to="/shop/quotes/new"><Plus className="mr-2 h-4 w-4" /> New Quote</Link>
+          </Button>
         </div>
 
         <div className="mb-4 relative max-w-md">
