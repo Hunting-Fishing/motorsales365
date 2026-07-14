@@ -119,7 +119,9 @@ const QUICK_LINKS = [
   { title: "Automation", icon: Sparkles, to: "/shop/automation" as const },
   { title: "Certificates", icon: Award, to: "/shop/certificates" as const },
   { title: "Leave", icon: CalendarDays, to: "/shop/leave" as const },
+  { title: "Leave Requests", icon: CalendarDays, to: "/shop/leave-requests" as const },
   { title: "General Ledger", icon: BookOpen, to: "/shop/journal" as const },
+  { title: "P&L Statement", icon: BookOpen, to: "/shop/accounting/pnl" as const },
   { title: "Settings", icon: Settings, to: "/shop/settings" as const },
 ];
 
