@@ -1,10 +1,29 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Loader2, Receipt } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { ArrowLeft, Loader2, Receipt, Plus } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -13,11 +32,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "sonner";
 import { smSupabase } from "@/lib/shop-manager/db";
 
 type Invoice = {
   id: string;
   customer: string | null;
+  customer_id: string | null;
   customer_email: string | null;
   customer_address: string | null;
   description: string | null;
@@ -55,12 +76,13 @@ type PaymentRow = {
 async function fetchInvoice(id: string): Promise<Invoice | null> {
   const { data, error } = await (smSupabase as any)
     .from("invoices")
-    .select("id,customer,customer_email,customer_address,description,notes,date,due_date,status,work_order_id,subtotal,tax,total,payment_method")
+    .select("id,customer,customer_id,customer_email,customer_address,description,notes,date,due_date,status,work_order_id,subtotal,tax,total,payment_method")
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
   return (data as Invoice) ?? null;
 }
+
 
 async function fetchInvoiceItems(id: string): Promise<InvoiceItem[]> {
   const { data, error } = await (smSupabase as any)
@@ -277,8 +299,13 @@ function InvoiceDetailPage() {
               </Card>
 
               <Card className="md:col-span-2">
-                <CardHeader>
+                <CardHeader className="flex-row items-center justify-between">
                   <CardTitle className="text-base">Payments ({payments.length})</CardTitle>
+                  <RecordPaymentDialog
+                    invoiceId={data.id}
+                    customerId={data.customer_id}
+                    outstanding={outstanding}
+                  />
                 </CardHeader>
                 <CardContent className="p-0">
                   {payments.length === 0 ? (
@@ -378,5 +405,125 @@ function Row({
         {value}
       </span>
     </div>
+  );
+}
+
+function RecordPaymentDialog({
+  invoiceId,
+  customerId,
+  outstanding,
+}: {
+  invoiceId: string;
+  customerId: string | null;
+  outstanding: number;
+}) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [amount, setAmount] = useState(outstanding > 0 ? String(outstanding) : "");
+  const [method, setMethod] = useState("cash");
+  const [reference, setReference] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const record = useMutation({
+    mutationFn: async () => {
+      const amt = Number(amount);
+      if (!amt || amt <= 0) throw new Error("Enter a positive amount");
+      if (!customerId) throw new Error("Invoice has no customer attached");
+
+      const { error: pErr } = await (smSupabase as any).from("payments").insert({
+        invoice_id: invoiceId,
+        customer_id: customerId,
+        amount: amt,
+        payment_type: method,
+        status: "completed",
+        transaction_date: new Date().toISOString(),
+        transaction_id: reference.trim() || null,
+        notes: notes.trim() || null,
+      });
+      if (pErr) throw pErr;
+
+      // If this payment covers the outstanding balance, mark invoice paid.
+      if (amt >= outstanding) {
+        await (smSupabase as any)
+          .from("invoices")
+          .update({ status: "paid", payment_method: method })
+          .eq("id", invoiceId);
+      }
+    },
+    onSuccess: () => {
+      toast.success("Payment recorded");
+      qc.invalidateQueries({ queryKey: ["shop-manager", "invoices"] });
+      setOpen(false);
+      setAmount("");
+      setReference("");
+      setNotes("");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to record payment"),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <Plus className="mr-1 h-4 w-4" /> Record payment
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Record payment</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Amount ₱ *</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+              <div className="mt-1 text-xs text-muted-foreground">
+                Outstanding: ₱{outstanding.toLocaleString()}
+              </div>
+            </div>
+            <div>
+              <Label>Method *</Label>
+              <Select value={method} onValueChange={setMethod}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="card">Card</SelectItem>
+                  <SelectItem value="bank_transfer">Bank transfer</SelectItem>
+                  <SelectItem value="gcash">GCash</SelectItem>
+                  <SelectItem value="check">Check</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            <Label>Reference / transaction #</Label>
+            <Input value={reference} onChange={(e) => setReference(e.target.value)} />
+          </div>
+          <div>
+            <Label>Notes</Label>
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!amount || record.isPending}
+            onClick={() => record.mutate()}
+          >
+            {record.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
