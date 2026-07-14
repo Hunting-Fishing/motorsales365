@@ -407,3 +407,123 @@ function Row({
     </div>
   );
 }
+
+function RecordPaymentDialog({
+  invoiceId,
+  customerId,
+  outstanding,
+}: {
+  invoiceId: string;
+  customerId: string | null;
+  outstanding: number;
+}) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [amount, setAmount] = useState(outstanding > 0 ? String(outstanding) : "");
+  const [method, setMethod] = useState("cash");
+  const [reference, setReference] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const record = useMutation({
+    mutationFn: async () => {
+      const amt = Number(amount);
+      if (!amt || amt <= 0) throw new Error("Enter a positive amount");
+      if (!customerId) throw new Error("Invoice has no customer attached");
+
+      const { error: pErr } = await (smSupabase as any).from("payments").insert({
+        invoice_id: invoiceId,
+        customer_id: customerId,
+        amount: amt,
+        payment_type: method,
+        status: "completed",
+        transaction_date: new Date().toISOString(),
+        transaction_id: reference.trim() || null,
+        notes: notes.trim() || null,
+      });
+      if (pErr) throw pErr;
+
+      // If this payment covers the outstanding balance, mark invoice paid.
+      if (amt >= outstanding) {
+        await (smSupabase as any)
+          .from("invoices")
+          .update({ status: "paid", payment_method: method })
+          .eq("id", invoiceId);
+      }
+    },
+    onSuccess: () => {
+      toast.success("Payment recorded");
+      qc.invalidateQueries({ queryKey: ["shop-manager", "invoices"] });
+      setOpen(false);
+      setAmount("");
+      setReference("");
+      setNotes("");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to record payment"),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <Plus className="mr-1 h-4 w-4" /> Record payment
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Record payment</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Amount ₱ *</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+              <div className="mt-1 text-xs text-muted-foreground">
+                Outstanding: ₱{outstanding.toLocaleString()}
+              </div>
+            </div>
+            <div>
+              <Label>Method *</Label>
+              <Select value={method} onValueChange={setMethod}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="card">Card</SelectItem>
+                  <SelectItem value="bank_transfer">Bank transfer</SelectItem>
+                  <SelectItem value="gcash">GCash</SelectItem>
+                  <SelectItem value="check">Check</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            <Label>Reference / transaction #</Label>
+            <Input value={reference} onChange={(e) => setReference(e.target.value)} />
+          </div>
+          <div>
+            <Label>Notes</Label>
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!amount || record.isPending}
+            onClick={() => record.mutate()}
+          >
+            {record.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
