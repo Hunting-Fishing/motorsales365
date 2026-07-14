@@ -120,12 +120,16 @@ function FeaturesPage() {
       {/* Aurora hero background */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] overflow-hidden"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[640px] overflow-hidden"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-secondary/40" />
-        <div className="absolute -left-32 -top-24 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute -right-32 top-10 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/50" />
+        <div className="absolute -left-40 -top-32 h-[28rem] w-[28rem] rounded-full bg-primary/25 blur-[120px]" />
+        <div className="absolute -right-40 top-10 h-[28rem] w-[28rem] rounded-full bg-emerald-500/20 blur-[120px]" />
+        <div className="absolute left-1/3 top-40 h-72 w-72 rounded-full bg-fuchsia-500/10 blur-[100px]" />
+        {/* Subtle grid */}
+        <div className="absolute inset-0 opacity-[0.04] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:48px_48px]" />
       </div>
+
 
       <div className="mx-auto max-w-6xl px-4 py-10 md:py-16">
         {/* Breadcrumb */}
