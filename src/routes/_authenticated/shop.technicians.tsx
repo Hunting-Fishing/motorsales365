@@ -110,22 +110,24 @@ function TechniciansPage() {
               const name = t.full_name || `${t.first_name ?? ""} ${t.last_name ?? ""}`.trim() || t.email || t.id.slice(0, 8);
               const h = hoursByTech[t.id];
               return (
-                <Card key={t.id}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3">
-                    <div>
-                      <CardTitle className="text-base">{name}</CardTitle>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {t.job_title ?? "—"}{t.department ? ` · ${t.department}` : ""}
-                        {t.email ? <> · {t.email}</> : null}
+                <Link key={t.id} to="/shop/technicians/$id" params={{ id: t.id }} className="block">
+                  <Card className="transition hover:border-primary/50 hover:shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3">
+                      <div>
+                        <CardTitle className="text-base">{name}</CardTitle>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {t.job_title ?? "—"}{t.department ? ` · ${t.department}` : ""}
+                          {t.email ? <> · {t.email}</> : null}
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right text-xs">
-                      <Badge variant="outline">30d</Badge>
-                      <div className="font-mono mt-1">{(h?.total ?? 0).toFixed(1)}h</div>
-                      <div className="text-muted-foreground">{(h?.billable ?? 0).toFixed(1)}h billable</div>
-                    </div>
-                  </CardHeader>
-                </Card>
+                      <div className="text-right text-xs">
+                        <Badge variant="outline">30d</Badge>
+                        <div className="font-mono mt-1">{(h?.total ?? 0).toFixed(1)}h</div>
+                        <div className="text-muted-foreground">{(h?.billable ?? 0).toFixed(1)}h billable</div>
+                      </div>
+                    </CardHeader>
+                  </Card>
+                </Link>
               );
             })}
           </div>

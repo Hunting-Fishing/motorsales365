@@ -97,6 +97,7 @@ const QUICK_LINKS = [
   { title: "Technicians", icon: Users, to: "/shop/technicians" as const },
   { title: "Expenses", icon: Receipt, to: "/shop/expenses" as const },
   { title: "Reports", icon: BarChart3, to: "/shop/reports" as const },
+  { title: "Accounting", icon: BarChart3, to: "/shop/accounting" as const },
   { title: "Settings", icon: Settings, to: "/shop/settings" as const },
 ];
 
