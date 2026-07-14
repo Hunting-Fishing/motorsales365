@@ -168,17 +168,34 @@ function CompleteProfilePage() {
     return out;
   };
 
+  const trackEvent = (name: string, params: Record<string, unknown>) => {
+    if (typeof window === "undefined") return;
+    const g = (window as any).gtag;
+    if (typeof g === "function") {
+      try {
+        g("event", name, params);
+      } catch {
+        /* ignore */
+      }
+    }
+  };
+
+  const invalidFields = (): string[] => {
+    const out: string[] = [];
+    if (needsPhone && !phoneValid) out.push("phone");
+    if (needsStreet && !isAddressValid(streetAddress)) out.push("street-address");
+    if (needsPostal && !isPostalValid(postalCode)) out.push("postal-code");
+    if (needsBizAddress && !isAddressValid(businessAddress)) out.push("business-address");
+    if (needsBizPostal && !isPostalValid(businessPostalCode)) out.push("business-postal-code");
+    return out;
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setServerMissing(null);
     if (!clientOk) {
-      const first =
-        (needsPhone && !phoneValid && "phone") ||
-        (needsStreet && !isAddressValid(streetAddress) && "street-address") ||
-        (needsPostal && !isPostalValid(postalCode) && "postal-code") ||
-        (needsBizAddress && !isAddressValid(businessAddress) && "business-address") ||
-        (needsBizPostal && !isPostalValid(businessPostalCode) && "business-postal-code") ||
-        null;
+      const invalid = invalidFields();
+      const first = (invalid[0] as string | undefined) ?? null;
       if (first) highlightField(first);
       const labels = missingLabels();
       toast.error(
@@ -186,6 +203,11 @@ function CompleteProfilePage() {
           ? `Still needed: ${labels.join(", ")}`
           : "Fix the highlighted fields to continue.",
       );
+      trackEvent("complete_profile_submit_failed", {
+        reason: "client_validation",
+        invalid_fields: invalid.join(","),
+        invalid_count: invalid.length,
+      });
       return;
     }
     setSubmitting(true);
@@ -201,6 +223,18 @@ function CompleteProfilePage() {
         },
       });
       if (res.ok && res.complete) {
+        trackEvent("complete_profile_saved", {
+          business_like: businessLike,
+          fields_saved: [
+            needsPhone && "phone",
+            needsStreet && "street-address",
+            needsPostal && "postal-code",
+            needsBizAddress && "business-address",
+            needsBizPostal && "business-postal-code",
+          ]
+            .filter(Boolean)
+            .join(","),
+        });
         toast.success("Profile completed.");
         const dest = search.redirect ?? "/dashboard";
         navigate({ to: dest as any, replace: true });
@@ -212,9 +246,19 @@ function CompleteProfilePage() {
       toast.error(
         `${res.missing.length} field${res.missing.length === 1 ? "" : "s"} still need${res.missing.length === 1 ? "s" : ""} attention.`,
       );
+      trackEvent("complete_profile_submit_failed", {
+        reason: "server_validation",
+        invalid_fields: res.missing.map((m) => m.field).join(","),
+        invalid_count: res.missing.length,
+      });
       void refetch();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      const message = err instanceof Error ? err.message : "Something went wrong.";
+      toast.error(message);
+      trackEvent("complete_profile_submit_failed", {
+        reason: "exception",
+        error_message: message.slice(0, 120),
+      });
     } finally {
       setSubmitting(false);
     }
