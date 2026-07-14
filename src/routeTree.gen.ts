@@ -337,7 +337,6 @@ import { Route as ApiPublicHooksOpsAlertsDigestRouteImport } from './routes/api/
 import { Route as ApiPublicHooksFlashcardsAutosyncRouteImport } from './routes/api/public/hooks/flashcards-autosync'
 import { Route as ApiPublicHooksDispatchExpandRouteImport } from './routes/api/public/hooks/dispatch-expand'
 import { Route as ApiPublicHooksDiscoverSyncRouteImport } from './routes/api/public/hooks/discover-sync'
-import { Route as ApiPublicHooksCaptureFeatureScreenshotsRouteImport } from './routes/api/public/hooks/capture-feature-screenshots'
 import { Route as ApiPublicHooksAnnualBonusesRouteImport } from './routes/api/public/hooks/annual-bonuses'
 import { Route as ApiPublicHealthRoutesRouteImport } from './routes/api/public/health/routes'
 import { Route as ApiPublicGoSlugRouteImport } from './routes/api/public/go.$slug'
@@ -2098,12 +2097,6 @@ const ApiPublicHooksDiscoverSyncRoute =
     path: '/api/public/hooks/discover-sync',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksCaptureFeatureScreenshotsRoute =
-  ApiPublicHooksCaptureFeatureScreenshotsRouteImport.update({
-    id: '/api/public/hooks/capture-feature-screenshots',
-    path: '/api/public/hooks/capture-feature-screenshots',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiPublicHooksAnnualBonusesRoute =
   ApiPublicHooksAnnualBonusesRouteImport.update({
     id: '/api/public/hooks/annual-bonuses',
@@ -2568,7 +2561,6 @@ export interface FileRoutesByFullPath {
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
   '/api/public/health/routes': typeof ApiPublicHealthRoutesRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
-  '/api/public/hooks/capture-feature-screenshots': typeof ApiPublicHooksCaptureFeatureScreenshotsRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/flashcards-autosync': typeof ApiPublicHooksFlashcardsAutosyncRoute
@@ -2912,7 +2904,6 @@ export interface FileRoutesByTo {
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
   '/api/public/health/routes': typeof ApiPublicHealthRoutesRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
-  '/api/public/hooks/capture-feature-screenshots': typeof ApiPublicHooksCaptureFeatureScreenshotsRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/flashcards-autosync': typeof ApiPublicHooksFlashcardsAutosyncRoute
@@ -3269,7 +3260,6 @@ export interface FileRoutesById {
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
   '/api/public/health/routes': typeof ApiPublicHealthRoutesRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
-  '/api/public/hooks/capture-feature-screenshots': typeof ApiPublicHooksCaptureFeatureScreenshotsRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/flashcards-autosync': typeof ApiPublicHooksFlashcardsAutosyncRoute
@@ -3626,7 +3616,6 @@ export interface FileRouteTypes {
     | '/api/public/go/$slug'
     | '/api/public/health/routes'
     | '/api/public/hooks/annual-bonuses'
-    | '/api/public/hooks/capture-feature-screenshots'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/flashcards-autosync'
@@ -3970,7 +3959,6 @@ export interface FileRouteTypes {
     | '/api/public/go/$slug'
     | '/api/public/health/routes'
     | '/api/public/hooks/annual-bonuses'
-    | '/api/public/hooks/capture-feature-screenshots'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/flashcards-autosync'
@@ -4326,7 +4314,6 @@ export interface FileRouteTypes {
     | '/api/public/go/$slug'
     | '/api/public/health/routes'
     | '/api/public/hooks/annual-bonuses'
-    | '/api/public/hooks/capture-feature-screenshots'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/flashcards-autosync'
@@ -4485,7 +4472,6 @@ export interface RootRouteChildren {
   ApiPublicGoSlugRoute: typeof ApiPublicGoSlugRoute
   ApiPublicHealthRoutesRoute: typeof ApiPublicHealthRoutesRoute
   ApiPublicHooksAnnualBonusesRoute: typeof ApiPublicHooksAnnualBonusesRoute
-  ApiPublicHooksCaptureFeatureScreenshotsRoute: typeof ApiPublicHooksCaptureFeatureScreenshotsRoute
   ApiPublicHooksDiscoverSyncRoute: typeof ApiPublicHooksDiscoverSyncRoute
   ApiPublicHooksDispatchExpandRoute: typeof ApiPublicHooksDispatchExpandRoute
   ApiPublicHooksFlashcardsAutosyncRoute: typeof ApiPublicHooksFlashcardsAutosyncRoute
@@ -6810,13 +6796,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksDiscoverSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/capture-feature-screenshots': {
-      id: '/api/public/hooks/capture-feature-screenshots'
-      path: '/api/public/hooks/capture-feature-screenshots'
-      fullPath: '/api/public/hooks/capture-feature-screenshots'
-      preLoaderRoute: typeof ApiPublicHooksCaptureFeatureScreenshotsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/hooks/annual-bonuses': {
       id: '/api/public/hooks/annual-bonuses'
       path: '/api/public/hooks/annual-bonuses'
@@ -7963,8 +7942,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicGoSlugRoute: ApiPublicGoSlugRoute,
   ApiPublicHealthRoutesRoute: ApiPublicHealthRoutesRoute,
   ApiPublicHooksAnnualBonusesRoute: ApiPublicHooksAnnualBonusesRoute,
-  ApiPublicHooksCaptureFeatureScreenshotsRoute:
-    ApiPublicHooksCaptureFeatureScreenshotsRoute,
   ApiPublicHooksDiscoverSyncRoute: ApiPublicHooksDiscoverSyncRoute,
   ApiPublicHooksDispatchExpandRoute: ApiPublicHooksDispatchExpandRoute,
   ApiPublicHooksFlashcardsAutosyncRoute: ApiPublicHooksFlashcardsAutosyncRoute,
