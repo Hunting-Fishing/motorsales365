@@ -448,8 +448,9 @@ const MARKETPLACE_COMPETITORS: Competitor[] = [
     name: "Carmudi",
     blurb: "PH/SEA classifieds",
     pricing: {
-      startingUsd: null,
-      unit: "custom",
+      startingUsd: 89,
+      topUsd: 449,
+      unit: "mo",
       tierName: "Dealer plan",
       includes: ["Dealer packages", "Featured spots paid"],
       link: "https://www.carmudi.com.ph/",
