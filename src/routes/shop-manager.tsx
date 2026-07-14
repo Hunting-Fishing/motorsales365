@@ -91,6 +91,9 @@ function ShopManagerPage() {
               <Button asChild size="lg" variant="outline">
                 <a href="#plans">See plans</a>
               </Button>
+              <Button asChild size="lg" variant="ghost">
+                <Link to="/features">Compare all features →</Link>
+              </Button>
             </div>
             {isActive && (
               <div className="mt-3 space-y-2 text-sm text-muted-foreground">

@@ -10,6 +10,7 @@ import {
   LifeBuoy,
   HelpCircle,
   ArrowRight,
+  Sparkles,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
@@ -191,12 +192,40 @@ function SupportHubPage() {
       </section>
 
       <div className="container mx-auto max-w-5xl px-4">
+        {/* Features callout */}
+        <section className="pt-8">
+          <Link
+            to="/features"
+            className="group flex flex-col gap-3 rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-background to-secondary/40 p-5 transition-all hover:border-primary/60 hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="flex items-start gap-4">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                <Sparkles className="h-5 w-5" />
+              </span>
+              <div>
+                <h3 className="text-base font-semibold sm:text-lg">
+                  Not sure what a feature does?
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Browse every 365 feature with screenshots, how it works, and how we compare to
+                  competitors.
+                </p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
+              Explore all features
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </Link>
+        </section>
+
         {/* Topic cards */}
         <section className="py-10 sm:py-14">
           <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Browse by topic</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Each guide has annotated screenshots and step-by-step instructions.
           </p>
+
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {TOPICS.map((t) => (
               <Link
