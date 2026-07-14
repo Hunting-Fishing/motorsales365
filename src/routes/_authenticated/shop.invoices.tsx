@@ -151,7 +151,11 @@ function InvoicesList() {
                 <TableBody>
                   {filtered.map((r) => (
                     <TableRow key={r.id}>
-                      <TableCell className="font-mono">{r.id}</TableCell>
+                      <TableCell className="font-mono">
+                        <Link to="/shop/invoices/$id" params={{ id: r.id }} className="text-primary hover:underline">
+                          {r.id}
+                        </Link>
+                      </TableCell>
                       <TableCell>{r.customer ?? r.customer_email ?? "—"}</TableCell>
                       <TableCell>{r.date ? new Date(r.date).toLocaleDateString() : "—"}</TableCell>
                       <TableCell>{r.due_date ? new Date(r.due_date).toLocaleDateString() : "—"}</TableCell>
