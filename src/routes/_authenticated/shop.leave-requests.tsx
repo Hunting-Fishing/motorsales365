@@ -188,7 +188,7 @@ function LeaveRequestsPage() {
             </TabsList>
             <TabsContent value="pending" className="space-y-3 pt-4">
               {pending.length === 0 && <Card><CardContent className="py-10 text-center text-sm text-muted-foreground">No pending requests.</CardContent></Card>}
-              {pending.map(r => <RequestRow key={r.id} r={r} types={data?.types ?? []} onReview={(status, notes) => review.mutate({ id: r.id, status, notes })} reviewable />)}
+              {pending.map(r => <RequestRow key={r.id} r={r} types={data?.types ?? []} onReview={(status, notes) => review.mutate({ id: r.id, status, notes })} reviewable={!!data?.canApprove && r.employee_id !== data?.currentUserId} />)}
             </TabsContent>
             <TabsContent value="history" className="space-y-3 pt-4">
               {decided.map(r => <RequestRow key={r.id} r={r} types={data?.types ?? []} onReview={() => {}} />)}
