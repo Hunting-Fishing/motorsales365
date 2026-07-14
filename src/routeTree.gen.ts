@@ -187,6 +187,7 @@ import { Route as AdminDiscoverBusinessesRouteImport } from './routes/admin.disc
 import { Route as AdminDiscountAuditsRouteImport } from './routes/admin.discount-audits'
 import { Route as AdminDiagnosticsRouteImport } from './routes/admin.diagnostics'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
+import { Route as AdminCronTokensRouteImport } from './routes/admin.cron-tokens'
 import { Route as AdminClubsRouteImport } from './routes/admin.clubs'
 import { Route as AdminClubDiscountRouteImport } from './routes/admin.club-discount'
 import { Route as AdminClaimsRouteImport } from './routes/admin.claims'
@@ -1258,6 +1259,11 @@ const AdminDiagnosticsRoute = AdminDiagnosticsRouteImport.update({
 const AdminCurrenciesRoute = AdminCurrenciesRouteImport.update({
   id: '/currencies',
   path: '/currencies',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCronTokensRoute = AdminCronTokensRouteImport.update({
+  id: '/cron-tokens',
+  path: '/cron-tokens',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminClubsRoute = AdminClubsRouteImport.update({
@@ -2338,6 +2344,7 @@ export interface FileRoutesByFullPath {
   '/admin/claims': typeof AdminClaimsRoute
   '/admin/club-discount': typeof AdminClubDiscountRoute
   '/admin/clubs': typeof AdminClubsRoute
+  '/admin/cron-tokens': typeof AdminCronTokensRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
@@ -2691,6 +2698,7 @@ export interface FileRoutesByTo {
   '/admin/claims': typeof AdminClaimsRoute
   '/admin/club-discount': typeof AdminClubDiscountRoute
   '/admin/clubs': typeof AdminClubsRoute
+  '/admin/cron-tokens': typeof AdminCronTokensRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
@@ -3047,6 +3055,7 @@ export interface FileRoutesById {
   '/admin/claims': typeof AdminClaimsRoute
   '/admin/club-discount': typeof AdminClubDiscountRoute
   '/admin/clubs': typeof AdminClubsRoute
+  '/admin/cron-tokens': typeof AdminCronTokensRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
@@ -3408,6 +3417,7 @@ export interface FileRouteTypes {
     | '/admin/claims'
     | '/admin/club-discount'
     | '/admin/clubs'
+    | '/admin/cron-tokens'
     | '/admin/currencies'
     | '/admin/diagnostics'
     | '/admin/discount-audits'
@@ -3761,6 +3771,7 @@ export interface FileRouteTypes {
     | '/admin/claims'
     | '/admin/club-discount'
     | '/admin/clubs'
+    | '/admin/cron-tokens'
     | '/admin/currencies'
     | '/admin/diagnostics'
     | '/admin/discount-audits'
@@ -4116,6 +4127,7 @@ export interface FileRouteTypes {
     | '/admin/claims'
     | '/admin/club-discount'
     | '/admin/clubs'
+    | '/admin/cron-tokens'
     | '/admin/currencies'
     | '/admin/diagnostics'
     | '/admin/discount-audits'
@@ -5810,6 +5822,13 @@ declare module '@tanstack/react-router' {
       path: '/currencies'
       fullPath: '/admin/currencies'
       preLoaderRoute: typeof AdminCurrenciesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/cron-tokens': {
+      id: '/admin/cron-tokens'
+      path: '/cron-tokens'
+      fullPath: '/admin/cron-tokens'
+      preLoaderRoute: typeof AdminCronTokensRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/clubs': {
@@ -7513,6 +7532,7 @@ interface AdminRouteChildren {
   AdminClaimsRoute: typeof AdminClaimsRoute
   AdminClubDiscountRoute: typeof AdminClubDiscountRoute
   AdminClubsRoute: typeof AdminClubsRoute
+  AdminCronTokensRoute: typeof AdminCronTokensRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
   AdminDiagnosticsRoute: typeof AdminDiagnosticsRoute
   AdminDiscountAuditsRoute: typeof AdminDiscountAuditsRoute
@@ -7568,6 +7588,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminClaimsRoute: AdminClaimsRoute,
   AdminClubDiscountRoute: AdminClubDiscountRoute,
   AdminClubsRoute: AdminClubsRoute,
+  AdminCronTokensRoute: AdminCronTokensRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
   AdminDiagnosticsRoute: AdminDiagnosticsRoute,
   AdminDiscountAuditsRoute: AdminDiscountAuditsRoute,
