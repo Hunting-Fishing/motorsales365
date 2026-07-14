@@ -208,7 +208,7 @@ function CompleteProfilePage() {
       }
       setServerMissing(res.missing);
       const firstServer = res.missing[0]?.field;
-      if (firstServer) scrollToField(firstServer);
+      if (firstServer) highlightField(firstServer);
       toast.error(
         `${res.missing.length} field${res.missing.length === 1 ? "" : "s"} still need${res.missing.length === 1 ? "s" : ""} attention.`,
       );
