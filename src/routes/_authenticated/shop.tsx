@@ -21,6 +21,9 @@ import {
   Ticket,
   CalendarClock,
   AlertTriangle,
+  Sparkles,
+  BookOpen,
+  CalendarDays,
 } from "lucide-react";
 
 
