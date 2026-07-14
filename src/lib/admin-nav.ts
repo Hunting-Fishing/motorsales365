@@ -1,5 +1,6 @@
 import {
   Settings,
+  KeyRound,
   ListChecks,
   Users,
   CreditCard,
