@@ -18,7 +18,11 @@ import {
   Tag,
   Bell,
   Award,
+  Ticket,
+  CalendarClock,
+  AlertTriangle,
 } from "lucide-react";
+
 
 
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
@@ -106,8 +110,12 @@ const QUICK_LINKS = [
   { title: "Segments", icon: Tag, to: "/shop/segments" as const },
   { title: "Service Reminders", icon: Bell, to: "/shop/service-reminders" as const },
   { title: "Loyalty", icon: Award, to: "/shop/loyalty" as const },
+  { title: "Discounts", icon: Ticket, to: "/shop/discounts" as const },
+  { title: "Scheduling", icon: CalendarClock, to: "/shop/scheduling" as const },
+  { title: "Stock Alerts", icon: AlertTriangle, to: "/shop/stock-alerts" as const },
   { title: "Settings", icon: Settings, to: "/shop/settings" as const },
 ];
+
 
 
 function ShopHome() {
