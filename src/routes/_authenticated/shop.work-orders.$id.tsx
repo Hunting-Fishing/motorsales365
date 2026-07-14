@@ -545,6 +545,12 @@ function WorkOrderDetailPage() {
                 </CardContent>
               </Card>
 
+              <div className="md:col-span-2">
+                <WorkOrderInspectionsCard workOrderId={id} />
+              </div>
+
+
+
               <Card className="md:col-span-2">
                 <CardHeader className="flex-row items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
