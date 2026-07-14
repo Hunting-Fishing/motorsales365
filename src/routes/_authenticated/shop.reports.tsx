@@ -77,7 +77,7 @@ function ReportsPage() {
         .filter((i: any) => !["paid", "void", "cancelled"].includes(String(i.status ?? "").toLowerCase()))
         .reduce((s: number, r: any) => s + Number(r.total ?? 0), 0);
 
-      const woCounts = workOrders.reduce((m: Record<string, number>, w: any) => {
+      const woCounts: Record<string, number> = workOrders.reduce((m: Record<string, number>, w: any) => {
         const s = String(w.status ?? "unknown").toLowerCase();
         m[s] = (m[s] ?? 0) + 1;
         return m;
