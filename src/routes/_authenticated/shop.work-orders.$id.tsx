@@ -1,10 +1,29 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Loader2, Wrench, Package, ListChecks } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { ArrowLeft, Loader2, Wrench, Package, ListChecks, Plus, Trash2 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -13,6 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "sonner";
 import { smSupabase } from "@/lib/shop-manager/db";
 
 type WorkOrderDetail = {
@@ -160,8 +180,18 @@ function statusVariant(status: string | null) {
   }
 }
 
+const WO_STATUSES = [
+  "pending",
+  "in_progress",
+  "on_hold",
+  "waiting_parts",
+  "completed",
+  "cancelled",
+] as const;
+
 function WorkOrderDetailPage() {
   const { id } = Route.useParams();
+  const qc = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["shop-manager", "work-orders", "detail", id],
     queryFn: () => fetchWorkOrder(id),
@@ -179,6 +209,51 @@ function WorkOrderDetailPage() {
     0,
   );
   const laborTotal = jobLines.reduce((s, j) => s + Number(j.total_amount ?? 0), 0);
+
+  const updateStatus = useMutation({
+    mutationFn: async (status: string) => {
+      const { error } = await (smSupabase as any)
+        .from("work_orders")
+        .update({ status })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Status updated");
+      qc.invalidateQueries({ queryKey: ["shop-manager", "work-orders"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to update"),
+  });
+
+  const deleteJobLine = useMutation({
+    mutationFn: async (jobId: string) => {
+      const { error } = await (smSupabase as any)
+        .from("work_order_job_lines")
+        .delete()
+        .eq("id", jobId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Job line removed");
+      qc.invalidateQueries({ queryKey: ["shop-manager", "work-orders", "job-lines", id] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+  });
+
+  const deletePart = useMutation({
+    mutationFn: async (partId: string) => {
+      const { error } = await (smSupabase as any)
+        .from("work_order_parts")
+        .delete()
+        .eq("id", partId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Part removed");
+      qc.invalidateQueries({ queryKey: ["shop-manager", "work-orders", "parts", id] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+  });
 
   return (
     <SiteLayout>
@@ -219,15 +294,27 @@ function WorkOrderDetailPage() {
                   </p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Badge variant={statusVariant(data.status)}>
                   {data.status ?? "unknown"}
                 </Badge>
+                <Select
+                  value={data.status ?? undefined}
+                  onValueChange={(v) => updateStatus.mutate(v)}
+                >
+                  <SelectTrigger className="h-8 w-[170px]">
+                    <SelectValue placeholder="Change status…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {WO_STATUSES.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s.replace("_", " ")}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {data.priority ? (
                   <Badge variant="outline">Priority: {data.priority}</Badge>
-                ) : null}
-                {data.urgency_level ? (
-                  <Badge variant="outline">Urgency: {data.urgency_level}</Badge>
                 ) : null}
               </div>
             </div>
@@ -378,10 +465,11 @@ function WorkOrderDetailPage() {
               </Card>
 
               <Card className="md:col-span-2">
-                <CardHeader>
+                <CardHeader className="flex-row items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
                     <ListChecks className="h-4 w-4" /> Job lines ({jobLines.length})
                   </CardTitle>
+                  <AddJobLineDialog workOrderId={id} nextOrder={jobLines.length} />
                 </CardHeader>
                 <CardContent className="p-0">
                   {jobLines.length === 0 ? (
@@ -398,6 +486,7 @@ function WorkOrderDetailPage() {
                           <TableHead className="text-right">Rate</TableHead>
                           <TableHead className="text-right">Total ₱</TableHead>
                           <TableHead>Status</TableHead>
+                          <TableHead></TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -415,6 +504,17 @@ function WorkOrderDetailPage() {
                             <TableCell>
                               <Badge variant="outline">{j.status ?? "—"}</Badge>
                             </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  if (confirm("Remove this job line?")) deleteJobLine.mutate(j.id);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -424,10 +524,11 @@ function WorkOrderDetailPage() {
               </Card>
 
               <Card className="md:col-span-2">
-                <CardHeader>
+                <CardHeader className="flex-row items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
                     <Package className="h-4 w-4" /> Parts ({parts.length})
                   </CardTitle>
+                  <AddPartDialog workOrderId={id} />
                 </CardHeader>
                 <CardContent className="p-0">
                   {parts.length === 0 ? (
@@ -445,6 +546,7 @@ function WorkOrderDetailPage() {
                           <TableHead className="text-right">Price ₱</TableHead>
                           <TableHead className="text-right">Total ₱</TableHead>
                           <TableHead>Status</TableHead>
+                          <TableHead></TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -461,6 +563,17 @@ function WorkOrderDetailPage() {
                               <TableCell className="text-right">{(qty * price).toLocaleString()}</TableCell>
                               <TableCell>
                                 <Badge variant="outline">{p.status ?? "—"}</Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    if (confirm("Remove this part?")) deletePart.mutate(p.id);
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </TableCell>
                             </TableRow>
                           );
@@ -492,5 +605,220 @@ function Field({ label, value }: { label: string; value: string | null }) {
         )}
       </div>
     </div>
+  );
+}
+
+function AddJobLineDialog({
+  workOrderId,
+  nextOrder,
+}: {
+  workOrderId: string;
+  nextOrder: number;
+}) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
+  const [hours, setHours] = useState("");
+  const [rate, setRate] = useState("");
+
+  const total =
+    (Number(hours) || 0) * (Number(rate) || 0);
+
+  const create = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        work_order_id: workOrderId,
+        name: name.trim(),
+        category: category.trim() || null,
+        description: description.trim() || null,
+        estimated_hours: hours ? Number(hours) : null,
+        labor_rate: rate ? Number(rate) : null,
+        total_amount: total || null,
+        display_order: nextOrder,
+        status: "pending",
+      };
+      const { error } = await (smSupabase as any)
+        .from("work_order_job_lines")
+        .insert(payload);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Job line added");
+      qc.invalidateQueries({ queryKey: ["shop-manager", "work-orders", "job-lines", workOrderId] });
+      setOpen(false);
+      setName("");
+      setCategory("");
+      setDescription("");
+      setHours("");
+      setRate("");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to add job line"),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <Plus className="mr-1 h-4 w-4" /> Add job line
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add job line</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label>Job name *</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Oil change" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Category</Label>
+              <Input value={category} onChange={(e) => setCategory(e.target.value)} />
+            </div>
+            <div>
+              <Label>Est. hours</Label>
+              <Input type="number" step="0.25" value={hours} onChange={(e) => setHours(e.target.value)} />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Labor rate ₱/hr</Label>
+              <Input type="number" step="0.01" value={rate} onChange={(e) => setRate(e.target.value)} />
+            </div>
+            <div>
+              <Label>Total ₱</Label>
+              <Input value={total ? total.toLocaleString() : ""} readOnly />
+            </div>
+          </div>
+          <div>
+            <Label>Description</Label>
+            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!name.trim() || create.isPending}
+            onClick={() => create.mutate()}
+          >
+            {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AddPartDialog({ workOrderId }: { workOrderId: string }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [partName, setPartName] = useState("");
+  const [partNumber, setPartNumber] = useState("");
+  const [supplier, setSupplier] = useState("");
+  const [qty, setQty] = useState("1");
+  const [price, setPrice] = useState("");
+  const [partType, setPartType] = useState("new");
+
+  const create = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        work_order_id: workOrderId,
+        part_name: partName.trim(),
+        part_number: partNumber.trim() || null,
+        supplier_name: supplier.trim() || null,
+        quantity: Number(qty) || 1,
+        customer_price: Number(price) || 0,
+        part_type: partType,
+        status: "pending",
+      };
+      const { error } = await (smSupabase as any)
+        .from("work_order_parts")
+        .insert(payload);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Part added");
+      qc.invalidateQueries({ queryKey: ["shop-manager", "work-orders", "parts", workOrderId] });
+      setOpen(false);
+      setPartName("");
+      setPartNumber("");
+      setSupplier("");
+      setQty("1");
+      setPrice("");
+      setPartType("new");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to add part"),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <Plus className="mr-1 h-4 w-4" /> Add part
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add part</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label>Part name *</Label>
+            <Input value={partName} onChange={(e) => setPartName(e.target.value)} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Part #</Label>
+              <Input value={partNumber} onChange={(e) => setPartNumber(e.target.value)} />
+            </div>
+            <div>
+              <Label>Supplier</Label>
+              <Input value={supplier} onChange={(e) => setSupplier(e.target.value)} />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <Label>Qty *</Label>
+              <Input type="number" min="1" value={qty} onChange={(e) => setQty(e.target.value)} />
+            </div>
+            <div>
+              <Label>Price ₱ *</Label>
+              <Input type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} />
+            </div>
+            <div>
+              <Label>Type</Label>
+              <Select value={partType} onValueChange={setPartType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new">New</SelectItem>
+                  <SelectItem value="used">Used</SelectItem>
+                  <SelectItem value="oem">OEM</SelectItem>
+                  <SelectItem value="aftermarket">Aftermarket</SelectItem>
+                  <SelectItem value="refurbished">Refurbished</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!partName.trim() || !price || create.isPending}
+            onClick={() => create.mutate()}
+          >
+            {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
