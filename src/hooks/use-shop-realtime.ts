@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
  * Subscribes to realtime changes on shop_manager tables and invalidates
  * the matching TanStack Query keys so UI reflects live updates.
  */
-export function useShopRealtime(tables: string[] = ["work_orders", "invoices", "expenses", "inventory_items", "customer_communications", "technician_schedules"]) {
+export function useShopRealtime(tables: string[] = ["work_orders", "invoices", "expenses", "inventory_items", "customer_communications", "technician_schedules", "customer_reminders"]) {
   const qc = useQueryClient();
   useEffect(() => {
     const channel = supabase.channel("shop-manager-live");
