@@ -144,13 +144,28 @@ function CompleteProfilePage() {
   const invalidCls = (field: string) =>
     errorFor(field) ? "border-destructive focus-visible:ring-destructive" : "";
 
-  const scrollToField = (field: string) => {
+  const highlightField = (field: string) => {
     if (typeof document === "undefined") return;
-    const el = document.getElementById(field);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-      (el as HTMLElement).focus?.();
+    const el = document.getElementById(field) as HTMLElement | null;
+    if (!el) return;
+    // Focus without scrolling — avoids the "it jumped me back to the phone
+    // field" surprise Jocelyn reported. Users stay at the Save button and
+    // read the toast listing what's still needed.
+    try {
+      el.focus({ preventScroll: true });
+    } catch {
+      el.focus?.();
     }
+  };
+
+  const missingLabels = () => {
+    const out: string[] = [];
+    if (needsPhone && !phoneValid) out.push("Mobile");
+    if (needsStreet && !isAddressValid(streetAddress)) out.push("Street address");
+    if (needsPostal && !isPostalValid(postalCode)) out.push("Postal / ZIP code");
+    if (needsBizAddress && !isAddressValid(businessAddress)) out.push("Business address");
+    if (needsBizPostal && !isPostalValid(businessPostalCode)) out.push("Business postal code");
+    return out;
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -164,8 +179,13 @@ function CompleteProfilePage() {
         (needsBizAddress && !isAddressValid(businessAddress) && "business-address") ||
         (needsBizPostal && !isPostalValid(businessPostalCode) && "business-postal-code") ||
         null;
-      if (first) scrollToField(first);
-      toast.error("Fix the highlighted fields to continue.");
+      if (first) highlightField(first);
+      const labels = missingLabels();
+      toast.error(
+        labels.length
+          ? `Still needed: ${labels.join(", ")}`
+          : "Fix the highlighted fields to continue.",
+      );
       return;
     }
     setSubmitting(true);
