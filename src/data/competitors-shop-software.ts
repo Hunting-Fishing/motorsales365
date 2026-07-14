@@ -212,6 +212,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "APAC SaaS",
     pricing: {
       startingUsd: 29,
+      topUsd: 79,
       unit: "mo",
       tierName: "Starter",
       includes: ["Cloud-based", "SMS reminders", "APAC focus"],
