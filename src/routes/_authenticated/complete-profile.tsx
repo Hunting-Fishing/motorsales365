@@ -384,11 +384,25 @@ function CompleteProfilePage() {
             </p>
           )}
 
-          <div className="flex items-center justify-between border-t pt-4">
+          {/* Sticky mobile action bar — sits above the bottom nav (bottom-20)
+              on phones and clears the floating help widget. On md+ it renders
+              inline at the bottom of the form. */}
+          <div
+            className={cn(
+              "z-30 flex flex-col-reverse gap-3 border-t bg-background/95 backdrop-blur",
+              "fixed inset-x-0 bottom-20 px-4 py-3 shadow-[0_-6px_16px_-8px_rgba(0,0,0,0.15)]",
+              "md:static md:bottom-auto md:flex-row md:items-center md:justify-between md:px-0 md:py-4 md:shadow-none md:backdrop-blur-none",
+            )}
+          >
             <p className="text-xs text-muted-foreground">
               You can't dismiss this step — the fields above are required for every account.
             </p>
-            <Button type="submit" disabled={!clientOk || submitting}>
+            <Button
+              type="submit"
+              disabled={!clientOk || submitting}
+              className="w-full md:w-auto"
+              size="lg"
+            >
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
