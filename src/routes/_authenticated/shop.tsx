@@ -24,6 +24,7 @@ import {
   Sparkles,
   BookOpen,
   CalendarDays,
+  ClipboardCheck,
 } from "lucide-react";
 
 
@@ -97,6 +98,7 @@ async function fetchDashboard() {
 
 const QUICK_LINKS = [
   { title: "Work Orders", icon: ClipboardList, to: "/shop/work-orders" as const },
+  { title: "Inspections", icon: ClipboardCheck, to: "/shop/inspections" as const },
   { title: "Customers", icon: Users2, to: "/shop/customers" as const },
   { title: "Vehicles", icon: Car, to: "/shop/vehicles" as const },
   { title: "Inventory", icon: Boxes, to: "/shop/inventory" as const },

@@ -280,6 +280,7 @@ import { Route as AuthenticatedShopLeaveRouteImport } from './routes/_authentica
 import { Route as AuthenticatedShopJournalRouteImport } from './routes/_authenticated/shop.journal'
 import { Route as AuthenticatedShopInvoicesRouteImport } from './routes/_authenticated/shop.invoices'
 import { Route as AuthenticatedShopInventoryRouteImport } from './routes/_authenticated/shop.inventory'
+import { Route as AuthenticatedShopInspectionsRouteImport } from './routes/_authenticated/shop.inspections'
 import { Route as AuthenticatedShopExpensesRouteImport } from './routes/_authenticated/shop.expenses'
 import { Route as AuthenticatedShopDiscountsRouteImport } from './routes/_authenticated/shop.discounts'
 import { Route as AuthenticatedShopCustomersRouteImport } from './routes/_authenticated/shop.customers'
@@ -1768,6 +1769,12 @@ const AuthenticatedShopInventoryRoute =
     path: '/inventory',
     getParentRoute: () => AuthenticatedShopRoute,
   } as any)
+const AuthenticatedShopInspectionsRoute =
+  AuthenticatedShopInspectionsRouteImport.update({
+    id: '/inspections',
+    path: '/inspections',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
 const AuthenticatedShopExpensesRoute =
   AuthenticatedShopExpensesRouteImport.update({
     id: '/expenses',
@@ -2478,6 +2485,7 @@ export interface FileRoutesByFullPath {
   '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/shop/discounts': typeof AuthenticatedShopDiscountsRoute
   '/shop/expenses': typeof AuthenticatedShopExpensesRoute
+  '/shop/inspections': typeof AuthenticatedShopInspectionsRoute
   '/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
   '/shop/journal': typeof AuthenticatedShopJournalRouteWithChildren
@@ -2825,6 +2833,7 @@ export interface FileRoutesByTo {
   '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/shop/discounts': typeof AuthenticatedShopDiscountsRoute
   '/shop/expenses': typeof AuthenticatedShopExpensesRoute
+  '/shop/inspections': typeof AuthenticatedShopInspectionsRoute
   '/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
   '/shop/journal': typeof AuthenticatedShopJournalRouteWithChildren
@@ -3183,6 +3192,7 @@ export interface FileRoutesById {
   '/_authenticated/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/_authenticated/shop/discounts': typeof AuthenticatedShopDiscountsRoute
   '/_authenticated/shop/expenses': typeof AuthenticatedShopExpensesRoute
+  '/_authenticated/shop/inspections': typeof AuthenticatedShopInspectionsRoute
   '/_authenticated/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/_authenticated/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
   '/_authenticated/shop/journal': typeof AuthenticatedShopJournalRouteWithChildren
@@ -3542,6 +3552,7 @@ export interface FileRouteTypes {
     | '/shop/customers'
     | '/shop/discounts'
     | '/shop/expenses'
+    | '/shop/inspections'
     | '/shop/inventory'
     | '/shop/invoices'
     | '/shop/journal'
@@ -3889,6 +3900,7 @@ export interface FileRouteTypes {
     | '/shop/customers'
     | '/shop/discounts'
     | '/shop/expenses'
+    | '/shop/inspections'
     | '/shop/inventory'
     | '/shop/invoices'
     | '/shop/journal'
@@ -4246,6 +4258,7 @@ export interface FileRouteTypes {
     | '/_authenticated/shop/customers'
     | '/_authenticated/shop/discounts'
     | '/_authenticated/shop/expenses'
+    | '/_authenticated/shop/inspections'
     | '/_authenticated/shop/inventory'
     | '/_authenticated/shop/invoices'
     | '/_authenticated/shop/journal'
@@ -6437,6 +6450,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopInventoryRouteImport
       parentRoute: typeof AuthenticatedShopRoute
     }
+    '/_authenticated/shop/inspections': {
+      id: '/_authenticated/shop/inspections'
+      path: '/inspections'
+      fullPath: '/shop/inspections'
+      preLoaderRoute: typeof AuthenticatedShopInspectionsRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
     '/_authenticated/shop/expenses': {
       id: '/_authenticated/shop/expenses'
       path: '/expenses'
@@ -7234,6 +7254,7 @@ interface AuthenticatedShopRouteChildren {
   AuthenticatedShopCustomersRoute: typeof AuthenticatedShopCustomersRouteWithChildren
   AuthenticatedShopDiscountsRoute: typeof AuthenticatedShopDiscountsRoute
   AuthenticatedShopExpensesRoute: typeof AuthenticatedShopExpensesRoute
+  AuthenticatedShopInspectionsRoute: typeof AuthenticatedShopInspectionsRoute
   AuthenticatedShopInventoryRoute: typeof AuthenticatedShopInventoryRouteWithChildren
   AuthenticatedShopInvoicesRoute: typeof AuthenticatedShopInvoicesRouteWithChildren
   AuthenticatedShopJournalRoute: typeof AuthenticatedShopJournalRouteWithChildren
@@ -7265,6 +7286,7 @@ const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
   AuthenticatedShopCustomersRoute: AuthenticatedShopCustomersRouteWithChildren,
   AuthenticatedShopDiscountsRoute: AuthenticatedShopDiscountsRoute,
   AuthenticatedShopExpensesRoute: AuthenticatedShopExpensesRoute,
+  AuthenticatedShopInspectionsRoute: AuthenticatedShopInspectionsRoute,
   AuthenticatedShopInventoryRoute: AuthenticatedShopInventoryRouteWithChildren,
   AuthenticatedShopInvoicesRoute: AuthenticatedShopInvoicesRouteWithChildren,
   AuthenticatedShopJournalRoute: AuthenticatedShopJournalRouteWithChildren,
@@ -8063,13 +8085,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
