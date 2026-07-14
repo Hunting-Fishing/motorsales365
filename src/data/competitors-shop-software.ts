@@ -254,6 +254,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "AU/NZ/UK SaaS",
     pricing: {
       startingUsd: 59,
+      topUsd: 189,
       unit: "mo",
       tierName: "Lite",
       includes: ["Job cards", "Xero/QBO sync", "SMS reminders"],
