@@ -274,6 +274,7 @@ import { Route as AuthenticatedShopReportsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedShopQuotesRouteImport } from './routes/_authenticated/shop.quotes'
 import { Route as AuthenticatedShopPurchaseOrdersRouteImport } from './routes/_authenticated/shop.purchase-orders'
 import { Route as AuthenticatedShopLoyaltyRouteImport } from './routes/_authenticated/shop.loyalty'
+import { Route as AuthenticatedShopLeaveRequestsRouteImport } from './routes/_authenticated/shop.leave-requests'
 import { Route as AuthenticatedShopLeaveRouteImport } from './routes/_authenticated/shop.leave'
 import { Route as AuthenticatedShopJournalRouteImport } from './routes/_authenticated/shop.journal'
 import { Route as AuthenticatedShopInvoicesRouteImport } from './routes/_authenticated/shop.invoices'
@@ -351,10 +352,12 @@ import { Route as AuthenticatedShopTechniciansIdRouteImport } from './routes/_au
 import { Route as AuthenticatedShopQuotesNewRouteImport } from './routes/_authenticated/shop.quotes.new'
 import { Route as AuthenticatedShopQuotesIdRouteImport } from './routes/_authenticated/shop.quotes.$id'
 import { Route as AuthenticatedShopPurchaseOrdersIdRouteImport } from './routes/_authenticated/shop.purchase-orders.$id'
+import { Route as AuthenticatedShopJournalAccountIdRouteImport } from './routes/_authenticated/shop.journal.$accountId'
 import { Route as AuthenticatedShopInvoicesIdRouteImport } from './routes/_authenticated/shop.invoices.$id'
 import { Route as AuthenticatedShopInventoryIdRouteImport } from './routes/_authenticated/shop.inventory.$id'
 import { Route as AuthenticatedShopCustomersNewRouteImport } from './routes/_authenticated/shop.customers.new'
 import { Route as AuthenticatedShopCustomersIdRouteImport } from './routes/_authenticated/shop.customers.$id'
+import { Route as AuthenticatedShopAccountingPnlRouteImport } from './routes/_authenticated/shop.accounting.pnl'
 import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
@@ -1726,6 +1729,12 @@ const AuthenticatedShopLoyaltyRoute =
     path: '/loyalty',
     getParentRoute: () => AuthenticatedShopRoute,
   } as any)
+const AuthenticatedShopLeaveRequestsRoute =
+  AuthenticatedShopLeaveRequestsRouteImport.update({
+    id: '/leave-requests',
+    path: '/leave-requests',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
 const AuthenticatedShopLeaveRoute = AuthenticatedShopLeaveRouteImport.update({
   id: '/leave',
   path: '/leave',
@@ -2173,6 +2182,12 @@ const AuthenticatedShopPurchaseOrdersIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedShopPurchaseOrdersRoute,
   } as any)
+const AuthenticatedShopJournalAccountIdRoute =
+  AuthenticatedShopJournalAccountIdRouteImport.update({
+    id: '/$accountId',
+    path: '/$accountId',
+    getParentRoute: () => AuthenticatedShopJournalRoute,
+  } as any)
 const AuthenticatedShopInvoicesIdRoute =
   AuthenticatedShopInvoicesIdRouteImport.update({
     id: '/$id',
@@ -2196,6 +2211,12 @@ const AuthenticatedShopCustomersIdRoute =
     id: '/$id',
     path: '/$id',
     getParentRoute: () => AuthenticatedShopCustomersRoute,
+  } as any)
+const AuthenticatedShopAccountingPnlRoute =
+  AuthenticatedShopAccountingPnlRouteImport.update({
+    id: '/pnl',
+    path: '/pnl',
+    getParentRoute: () => AuthenticatedShopAccountingRoute,
   } as any)
 const AuthenticatedDashboardClubsIdRoute =
   AuthenticatedDashboardClubsIdRouteImport.update({
@@ -2414,7 +2435,7 @@ export interface FileRoutesByFullPath {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/shop/accounting': typeof AuthenticatedShopAccountingRoute
+  '/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
   '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
   '/shop/automation': typeof AuthenticatedShopAutomationRoute
   '/shop/certificates': typeof AuthenticatedShopCertificatesRoute
@@ -2423,8 +2444,9 @@ export interface FileRoutesByFullPath {
   '/shop/expenses': typeof AuthenticatedShopExpensesRoute
   '/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
-  '/shop/journal': typeof AuthenticatedShopJournalRoute
+  '/shop/journal': typeof AuthenticatedShopJournalRouteWithChildren
   '/shop/leave': typeof AuthenticatedShopLeaveRoute
+  '/shop/leave-requests': typeof AuthenticatedShopLeaveRequestsRoute
   '/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
@@ -2501,10 +2523,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/listing/$id/': typeof ListingIdIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
   '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
   '/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
+  '/shop/journal/$accountId': typeof AuthenticatedShopJournalAccountIdRoute
   '/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
   '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
@@ -2753,7 +2777,7 @@ export interface FileRoutesByTo {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/shop/accounting': typeof AuthenticatedShopAccountingRoute
+  '/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
   '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
   '/shop/automation': typeof AuthenticatedShopAutomationRoute
   '/shop/certificates': typeof AuthenticatedShopCertificatesRoute
@@ -2762,8 +2786,9 @@ export interface FileRoutesByTo {
   '/shop/expenses': typeof AuthenticatedShopExpensesRoute
   '/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
-  '/shop/journal': typeof AuthenticatedShopJournalRoute
+  '/shop/journal': typeof AuthenticatedShopJournalRouteWithChildren
   '/shop/leave': typeof AuthenticatedShopLeaveRoute
+  '/shop/leave-requests': typeof AuthenticatedShopLeaveRequestsRoute
   '/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
@@ -2839,10 +2864,12 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/listing/$id': typeof ListingIdIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
   '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
   '/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
+  '/shop/journal/$accountId': typeof AuthenticatedShopJournalAccountIdRoute
   '/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
   '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
@@ -3103,7 +3130,7 @@ export interface FileRoutesById {
   '/_authenticated/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/_authenticated/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/_authenticated/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/_authenticated/shop/accounting': typeof AuthenticatedShopAccountingRoute
+  '/_authenticated/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
   '/_authenticated/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
   '/_authenticated/shop/automation': typeof AuthenticatedShopAutomationRoute
   '/_authenticated/shop/certificates': typeof AuthenticatedShopCertificatesRoute
@@ -3112,8 +3139,9 @@ export interface FileRoutesById {
   '/_authenticated/shop/expenses': typeof AuthenticatedShopExpensesRoute
   '/_authenticated/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
   '/_authenticated/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
-  '/_authenticated/shop/journal': typeof AuthenticatedShopJournalRoute
+  '/_authenticated/shop/journal': typeof AuthenticatedShopJournalRouteWithChildren
   '/_authenticated/shop/leave': typeof AuthenticatedShopLeaveRoute
+  '/_authenticated/shop/leave-requests': typeof AuthenticatedShopLeaveRequestsRoute
   '/_authenticated/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
   '/_authenticated/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   '/_authenticated/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
@@ -3190,10 +3218,12 @@ export interface FileRoutesById {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/listing/$id/': typeof ListingIdIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
+  '/_authenticated/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
   '/_authenticated/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/_authenticated/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/_authenticated/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
   '/_authenticated/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
+  '/_authenticated/shop/journal/$accountId': typeof AuthenticatedShopJournalAccountIdRoute
   '/_authenticated/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
   '/_authenticated/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/_authenticated/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
@@ -3465,6 +3495,7 @@ export interface FileRouteTypes {
     | '/shop/invoices'
     | '/shop/journal'
     | '/shop/leave'
+    | '/shop/leave-requests'
     | '/shop/loyalty'
     | '/shop/purchase-orders'
     | '/shop/quotes'
@@ -3541,10 +3572,12 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/listing/$id/'
     | '/dashboard/clubs/$id'
+    | '/shop/accounting/pnl'
     | '/shop/customers/$id'
     | '/shop/customers/new'
     | '/shop/inventory/$id'
     | '/shop/invoices/$id'
+    | '/shop/journal/$accountId'
     | '/shop/purchase-orders/$id'
     | '/shop/quotes/$id'
     | '/shop/quotes/new'
@@ -3804,6 +3837,7 @@ export interface FileRouteTypes {
     | '/shop/invoices'
     | '/shop/journal'
     | '/shop/leave'
+    | '/shop/leave-requests'
     | '/shop/loyalty'
     | '/shop/purchase-orders'
     | '/shop/quotes'
@@ -3879,10 +3913,12 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/listing/$id'
     | '/dashboard/clubs/$id'
+    | '/shop/accounting/pnl'
     | '/shop/customers/$id'
     | '/shop/customers/new'
     | '/shop/inventory/$id'
     | '/shop/invoices/$id'
+    | '/shop/journal/$accountId'
     | '/shop/purchase-orders/$id'
     | '/shop/quotes/$id'
     | '/shop/quotes/new'
@@ -4153,6 +4189,7 @@ export interface FileRouteTypes {
     | '/_authenticated/shop/invoices'
     | '/_authenticated/shop/journal'
     | '/_authenticated/shop/leave'
+    | '/_authenticated/shop/leave-requests'
     | '/_authenticated/shop/loyalty'
     | '/_authenticated/shop/purchase-orders'
     | '/_authenticated/shop/quotes'
@@ -4229,10 +4266,12 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/listing/$id/'
     | '/_authenticated/dashboard/clubs_/$id'
+    | '/_authenticated/shop/accounting/pnl'
     | '/_authenticated/shop/customers/$id'
     | '/_authenticated/shop/customers/new'
     | '/_authenticated/shop/inventory/$id'
     | '/_authenticated/shop/invoices/$id'
+    | '/_authenticated/shop/journal/$accountId'
     | '/_authenticated/shop/purchase-orders/$id'
     | '/_authenticated/shop/quotes/$id'
     | '/_authenticated/shop/quotes/new'
@@ -6290,6 +6329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopLoyaltyRouteImport
       parentRoute: typeof AuthenticatedShopRoute
     }
+    '/_authenticated/shop/leave-requests': {
+      id: '/_authenticated/shop/leave-requests'
+      path: '/leave-requests'
+      fullPath: '/shop/leave-requests'
+      preLoaderRoute: typeof AuthenticatedShopLeaveRequestsRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
     '/_authenticated/shop/leave': {
       id: '/_authenticated/shop/leave'
       path: '/leave'
@@ -6829,6 +6875,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopPurchaseOrdersIdRouteImport
       parentRoute: typeof AuthenticatedShopPurchaseOrdersRoute
     }
+    '/_authenticated/shop/journal/$accountId': {
+      id: '/_authenticated/shop/journal/$accountId'
+      path: '/$accountId'
+      fullPath: '/shop/journal/$accountId'
+      preLoaderRoute: typeof AuthenticatedShopJournalAccountIdRouteImport
+      parentRoute: typeof AuthenticatedShopJournalRoute
+    }
     '/_authenticated/shop/invoices/$id': {
       id: '/_authenticated/shop/invoices/$id'
       path: '/$id'
@@ -6857,6 +6910,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopCustomersIdRouteImport
       parentRoute: typeof AuthenticatedShopCustomersRoute
     }
+    '/_authenticated/shop/accounting/pnl': {
+      id: '/_authenticated/shop/accounting/pnl'
+      path: '/pnl'
+      fullPath: '/shop/accounting/pnl'
+      preLoaderRoute: typeof AuthenticatedShopAccountingPnlRouteImport
+      parentRoute: typeof AuthenticatedShopAccountingRoute
+    }
     '/_authenticated/dashboard/clubs_/$id': {
       id: '/_authenticated/dashboard/clubs_/$id'
       path: '/dashboard/clubs/$id'
@@ -6873,6 +6933,20 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedShopAccountingRouteChildren {
+  AuthenticatedShopAccountingPnlRoute: typeof AuthenticatedShopAccountingPnlRoute
+}
+
+const AuthenticatedShopAccountingRouteChildren: AuthenticatedShopAccountingRouteChildren =
+  {
+    AuthenticatedShopAccountingPnlRoute: AuthenticatedShopAccountingPnlRoute,
+  }
+
+const AuthenticatedShopAccountingRouteWithChildren =
+  AuthenticatedShopAccountingRoute._addFileChildren(
+    AuthenticatedShopAccountingRouteChildren,
+  )
 
 interface AuthenticatedShopCustomersRouteChildren {
   AuthenticatedShopCustomersIdRoute: typeof AuthenticatedShopCustomersIdRoute
@@ -6916,6 +6990,21 @@ const AuthenticatedShopInvoicesRouteChildren: AuthenticatedShopInvoicesRouteChil
 const AuthenticatedShopInvoicesRouteWithChildren =
   AuthenticatedShopInvoicesRoute._addFileChildren(
     AuthenticatedShopInvoicesRouteChildren,
+  )
+
+interface AuthenticatedShopJournalRouteChildren {
+  AuthenticatedShopJournalAccountIdRoute: typeof AuthenticatedShopJournalAccountIdRoute
+}
+
+const AuthenticatedShopJournalRouteChildren: AuthenticatedShopJournalRouteChildren =
+  {
+    AuthenticatedShopJournalAccountIdRoute:
+      AuthenticatedShopJournalAccountIdRoute,
+  }
+
+const AuthenticatedShopJournalRouteWithChildren =
+  AuthenticatedShopJournalRoute._addFileChildren(
+    AuthenticatedShopJournalRouteChildren,
   )
 
 interface AuthenticatedShopPurchaseOrdersRouteChildren {
@@ -7008,7 +7097,7 @@ const AuthenticatedShopWorkOrdersRouteWithChildren =
   )
 
 interface AuthenticatedShopRouteChildren {
-  AuthenticatedShopAccountingRoute: typeof AuthenticatedShopAccountingRoute
+  AuthenticatedShopAccountingRoute: typeof AuthenticatedShopAccountingRouteWithChildren
   AuthenticatedShopAppointmentsRoute: typeof AuthenticatedShopAppointmentsRoute
   AuthenticatedShopAutomationRoute: typeof AuthenticatedShopAutomationRoute
   AuthenticatedShopCertificatesRoute: typeof AuthenticatedShopCertificatesRoute
@@ -7017,8 +7106,9 @@ interface AuthenticatedShopRouteChildren {
   AuthenticatedShopExpensesRoute: typeof AuthenticatedShopExpensesRoute
   AuthenticatedShopInventoryRoute: typeof AuthenticatedShopInventoryRouteWithChildren
   AuthenticatedShopInvoicesRoute: typeof AuthenticatedShopInvoicesRouteWithChildren
-  AuthenticatedShopJournalRoute: typeof AuthenticatedShopJournalRoute
+  AuthenticatedShopJournalRoute: typeof AuthenticatedShopJournalRouteWithChildren
   AuthenticatedShopLeaveRoute: typeof AuthenticatedShopLeaveRoute
+  AuthenticatedShopLeaveRequestsRoute: typeof AuthenticatedShopLeaveRequestsRoute
   AuthenticatedShopLoyaltyRoute: typeof AuthenticatedShopLoyaltyRoute
   AuthenticatedShopPurchaseOrdersRoute: typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
   AuthenticatedShopQuotesRoute: typeof AuthenticatedShopQuotesRouteWithChildren
@@ -7036,7 +7126,8 @@ interface AuthenticatedShopRouteChildren {
 }
 
 const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
-  AuthenticatedShopAccountingRoute: AuthenticatedShopAccountingRoute,
+  AuthenticatedShopAccountingRoute:
+    AuthenticatedShopAccountingRouteWithChildren,
   AuthenticatedShopAppointmentsRoute: AuthenticatedShopAppointmentsRoute,
   AuthenticatedShopAutomationRoute: AuthenticatedShopAutomationRoute,
   AuthenticatedShopCertificatesRoute: AuthenticatedShopCertificatesRoute,
@@ -7045,8 +7136,9 @@ const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
   AuthenticatedShopExpensesRoute: AuthenticatedShopExpensesRoute,
   AuthenticatedShopInventoryRoute: AuthenticatedShopInventoryRouteWithChildren,
   AuthenticatedShopInvoicesRoute: AuthenticatedShopInvoicesRouteWithChildren,
-  AuthenticatedShopJournalRoute: AuthenticatedShopJournalRoute,
+  AuthenticatedShopJournalRoute: AuthenticatedShopJournalRouteWithChildren,
   AuthenticatedShopLeaveRoute: AuthenticatedShopLeaveRoute,
+  AuthenticatedShopLeaveRequestsRoute: AuthenticatedShopLeaveRequestsRoute,
   AuthenticatedShopLoyaltyRoute: AuthenticatedShopLoyaltyRoute,
   AuthenticatedShopPurchaseOrdersRoute:
     AuthenticatedShopPurchaseOrdersRouteWithChildren,
