@@ -170,9 +170,11 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "Enterprise multi-shop",
     pricing: {
       startingUsd: 219,
+      topUsd: 449,
       unit: "mo",
       tierName: "Base",
       includes: ["Multi-location", "Advanced accounting", "Windows client"],
+      highest: "Enterprise ≈ $449/mo",
       link: "https://www.protractor.com/pricing",
     },
   },
