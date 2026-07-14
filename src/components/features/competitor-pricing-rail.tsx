@@ -90,7 +90,10 @@ export function CompetitorPricingRail({
         <div>
           <h3 className="font-display text-lg font-semibold tracking-tight">{title}</h3>
           {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
-          <p className="mt-0.5 text-[11px] text-muted-foreground/80">Click &amp; drag to scroll →</p>
+          <p className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-muted-foreground/80">
+            <Globe className="h-3 w-3" />
+            {ccy.code}{ccy.code !== "USD" && " ≈"} · click &amp; drag / swipe →
+          </p>
         </div>
         <div className="hidden gap-1 md:flex">
           <button
