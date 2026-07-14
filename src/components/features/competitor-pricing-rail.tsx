@@ -30,7 +30,7 @@ function vsBadge(p: Competitor["pricing"], is365: boolean): { text: string; clas
 
 export function CompetitorPricingRail({
   competitors,
-  title = "Starting prices",
+  title = "Price ranges",
   subtitle,
 }: {
   competitors: Competitor[];
