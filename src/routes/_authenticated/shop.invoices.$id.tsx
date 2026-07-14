@@ -299,8 +299,13 @@ function InvoiceDetailPage() {
               </Card>
 
               <Card className="md:col-span-2">
-                <CardHeader>
+                <CardHeader className="flex-row items-center justify-between">
                   <CardTitle className="text-base">Payments ({payments.length})</CardTitle>
+                  <RecordPaymentDialog
+                    invoiceId={data.id}
+                    customerId={data.customer_id}
+                    outstanding={outstanding}
+                  />
                 </CardHeader>
                 <CardContent className="p-0">
                   {payments.length === 0 ? (
