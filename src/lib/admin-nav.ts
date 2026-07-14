@@ -104,5 +104,6 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { to: "/admin/feature-flags", label: "Payment & plan flags", Icon: Sparkles, roles: ["admin"], info: "Server-side toggles for payment rails, boost types and plans.", section: "Platform" },
   { to: "/admin/diagnostics", label: "Permission diagnostics", Icon: ShieldCheck, roles: ["admin"], info: "Inspect roles and permissions for any user.", section: "Platform" },
   { to: "/admin/permissions", label: "Role permissions", Icon: ShieldCheck, roles: ["admin"], info: "Toggle specific permissions per role without redeploying.", section: "Platform" },
+  { to: "/admin/cron-tokens", label: "Cron tokens & keys", Icon: KeyRound, roles: ["admin"], info: "Rotate internal cron tokens and webhook signing keys.", section: "Platform" },
   { to: "/admin/sandbox", label: "Sandbox", Icon: FlaskConical, roles: ["admin"], info: "Internal sandbox for testing flows.", section: "Platform" },
 ];
