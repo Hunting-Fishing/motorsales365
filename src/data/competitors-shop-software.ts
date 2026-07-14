@@ -422,8 +422,9 @@ const MARKETPLACE_COMPETITORS: Competitor[] = [
     name: "AutoDeal",
     blurb: "Dealer-first PH",
     pricing: {
-      startingUsd: null,
-      unit: "custom",
+      startingUsd: 99,
+      topUsd: 499,
+      unit: "mo",
       tierName: "Dealer plan",
       includes: ["Dealer-only", "Lead-fee model", "No private sellers"],
       link: "https://www.autodeal.com.ph/",
