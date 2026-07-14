@@ -114,6 +114,7 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "Solo/small shop",
     pricing: {
       startingUsd: 39.95,
+      topUsd: 89.95,
       unit: "mo",
       tierName: "Basic",
       includes: ["1 user", "Invoicing + estimates", "VIN + license decode"],
