@@ -279,6 +279,7 @@ import { Route as AuthenticatedShopInventoryRouteImport } from './routes/_authen
 import { Route as AuthenticatedShopExpensesRouteImport } from './routes/_authenticated/shop.expenses'
 import { Route as AuthenticatedShopDiscountsRouteImport } from './routes/_authenticated/shop.discounts'
 import { Route as AuthenticatedShopCustomersRouteImport } from './routes/_authenticated/shop.customers'
+import { Route as AuthenticatedShopAutomationRouteImport } from './routes/_authenticated/shop.automation'
 import { Route as AuthenticatedShopAppointmentsRouteImport } from './routes/_authenticated/shop.appointments'
 import { Route as AuthenticatedShopAccountingRouteImport } from './routes/_authenticated/shop.accounting'
 import { Route as AuthenticatedPartsMyRequestsRouteImport } from './routes/_authenticated/parts.my-requests'
@@ -1752,6 +1753,12 @@ const AuthenticatedShopCustomersRoute =
     path: '/customers',
     getParentRoute: () => AuthenticatedShopRoute,
   } as any)
+const AuthenticatedShopAutomationRoute =
+  AuthenticatedShopAutomationRouteImport.update({
+    id: '/automation',
+    path: '/automation',
+    getParentRoute: () => AuthenticatedShopRoute,
+  } as any)
 const AuthenticatedShopAppointmentsRoute =
   AuthenticatedShopAppointmentsRouteImport.update({
     id: '/appointments',
@@ -2389,6 +2396,7 @@ export interface FileRoutesByFullPath {
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/shop/accounting': typeof AuthenticatedShopAccountingRoute
   '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
+  '/shop/automation': typeof AuthenticatedShopAutomationRoute
   '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/shop/discounts': typeof AuthenticatedShopDiscountsRoute
   '/shop/expenses': typeof AuthenticatedShopExpensesRoute
@@ -2724,6 +2732,7 @@ export interface FileRoutesByTo {
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/shop/accounting': typeof AuthenticatedShopAccountingRoute
   '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
+  '/shop/automation': typeof AuthenticatedShopAutomationRoute
   '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/shop/discounts': typeof AuthenticatedShopDiscountsRoute
   '/shop/expenses': typeof AuthenticatedShopExpensesRoute
@@ -3070,6 +3079,7 @@ export interface FileRoutesById {
   '/_authenticated/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/_authenticated/shop/accounting': typeof AuthenticatedShopAccountingRoute
   '/_authenticated/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
+  '/_authenticated/shop/automation': typeof AuthenticatedShopAutomationRoute
   '/_authenticated/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/_authenticated/shop/discounts': typeof AuthenticatedShopDiscountsRoute
   '/_authenticated/shop/expenses': typeof AuthenticatedShopExpensesRoute
@@ -3417,6 +3427,7 @@ export interface FileRouteTypes {
     | '/parts/my-requests'
     | '/shop/accounting'
     | '/shop/appointments'
+    | '/shop/automation'
     | '/shop/customers'
     | '/shop/discounts'
     | '/shop/expenses'
@@ -3752,6 +3763,7 @@ export interface FileRouteTypes {
     | '/parts/my-requests'
     | '/shop/accounting'
     | '/shop/appointments'
+    | '/shop/automation'
     | '/shop/customers'
     | '/shop/discounts'
     | '/shop/expenses'
@@ -4097,6 +4109,7 @@ export interface FileRouteTypes {
     | '/_authenticated/parts/my-requests'
     | '/_authenticated/shop/accounting'
     | '/_authenticated/shop/appointments'
+    | '/_authenticated/shop/automation'
     | '/_authenticated/shop/customers'
     | '/_authenticated/shop/discounts'
     | '/_authenticated/shop/expenses'
@@ -6274,6 +6287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopCustomersRouteImport
       parentRoute: typeof AuthenticatedShopRoute
     }
+    '/_authenticated/shop/automation': {
+      id: '/_authenticated/shop/automation'
+      path: '/automation'
+      fullPath: '/shop/automation'
+      preLoaderRoute: typeof AuthenticatedShopAutomationRouteImport
+      parentRoute: typeof AuthenticatedShopRoute
+    }
     '/_authenticated/shop/appointments': {
       id: '/_authenticated/shop/appointments'
       path: '/appointments'
@@ -6931,6 +6951,7 @@ const AuthenticatedShopWorkOrdersRouteWithChildren =
 interface AuthenticatedShopRouteChildren {
   AuthenticatedShopAccountingRoute: typeof AuthenticatedShopAccountingRoute
   AuthenticatedShopAppointmentsRoute: typeof AuthenticatedShopAppointmentsRoute
+  AuthenticatedShopAutomationRoute: typeof AuthenticatedShopAutomationRoute
   AuthenticatedShopCustomersRoute: typeof AuthenticatedShopCustomersRouteWithChildren
   AuthenticatedShopDiscountsRoute: typeof AuthenticatedShopDiscountsRoute
   AuthenticatedShopExpensesRoute: typeof AuthenticatedShopExpensesRoute
@@ -6955,6 +6976,7 @@ interface AuthenticatedShopRouteChildren {
 const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
   AuthenticatedShopAccountingRoute: AuthenticatedShopAccountingRoute,
   AuthenticatedShopAppointmentsRoute: AuthenticatedShopAppointmentsRoute,
+  AuthenticatedShopAutomationRoute: AuthenticatedShopAutomationRoute,
   AuthenticatedShopCustomersRoute: AuthenticatedShopCustomersRouteWithChildren,
   AuthenticatedShopDiscountsRoute: AuthenticatedShopDiscountsRoute,
   AuthenticatedShopExpensesRoute: AuthenticatedShopExpensesRoute,
