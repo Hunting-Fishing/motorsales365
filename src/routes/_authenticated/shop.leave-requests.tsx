@@ -40,8 +40,8 @@ type Req = {
 
 async function fetchAll() {
   const [{ data: reqs }, { data: types }] = await Promise.all([
-    smSupabase.from("leave_requests").select("*").order("created_at", { ascending: false }),
-    smSupabase.from("leave_types").select("id,name,color").eq("is_active", true),
+    (smSupabase as any).from("leave_requests").select("*").order("created_at", { ascending: false }),
+    (smSupabase as any).from("leave_types").select("id,name,color").eq("is_active", true),
   ]);
   return { reqs: (reqs ?? []) as Req[], types: (types ?? []) as { id: string; name: string; color: string | null }[] };
 }
@@ -64,7 +64,7 @@ function LeaveRequestsPage() {
     mutationFn: async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Not signed in");
-      const { error } = await smSupabase.from("leave_requests").insert({
+      const { error } = await (smSupabase as any).from("leave_requests").insert({
         employee_id: u.user.id,
         leave_type_id: form.leave_type_id || null,
         start_date: form.start_date,
@@ -87,7 +87,7 @@ function LeaveRequestsPage() {
   const review = useMutation({
     mutationFn: async ({ id, status, notes }: { id: string; status: "approved" | "rejected"; notes?: string }) => {
       const { data: u } = await supabase.auth.getUser();
-      const { error } = await smSupabase.from("leave_requests").update({
+      const { error } = await (smSupabase as any).from("leave_requests").update({
         status, reviewed_by: u.user?.id ?? null, reviewed_at: new Date().toISOString(), review_notes: notes ?? null,
       }).eq("id", id);
       if (error) throw error;
@@ -96,11 +96,11 @@ function LeaveRequestsPage() {
       if (status === "approved") {
         const row = data?.reqs.find(r => r.id === id);
         if (row && row.leave_type_id) {
-          const { data: bal } = await smSupabase.from("employee_leave_balances")
+          const { data: bal } = await (smSupabase as any).from("employee_leave_balances")
             .select("id,used_hours,balance_hours")
             .eq("employee_id", row.employee_id).eq("leave_type_id", row.leave_type_id).maybeSingle();
           if (bal) {
-            await smSupabase.from("employee_leave_balances").update({
+            await (smSupabase as any).from("employee_leave_balances").update({
               used_hours: Number(bal.used_hours || 0) + Number(row.hours),
               balance_hours: Number(bal.balance_hours || 0) - Number(row.hours),
             }).eq("id", bal.id);
