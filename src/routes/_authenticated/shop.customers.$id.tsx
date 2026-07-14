@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { smSupabase } from "@/lib/shop-manager/db";
+import { CustomerCommunicationsLog } from "@/components/shop-manager/customer-communications-log";
 
 type Customer = {
   id: string;
@@ -280,6 +281,8 @@ function CustomerDetail() {
             <CardContent className="text-sm whitespace-pre-wrap">{c.notes}</CardContent>
           </Card>
         ) : null}
+
+        <CustomerCommunicationsLog customerId={c.id} />
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
