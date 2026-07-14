@@ -265,6 +265,9 @@ const SHOP_COMPETITORS: Competitor[] = [
   },
 ];
 
+export const SHOP_SOFTWARE_MATRIX: CompetitorMatrix = {
+
+
   competitors: SHOP_COMPETITORS,
   rows: [
     row("Work orders (RO lifecycle)", { "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: y, ari: y, fullbay: y, torque360: y, shopware: y, protractor: y, napatracs: y, identifix: y, garage360: y }),
