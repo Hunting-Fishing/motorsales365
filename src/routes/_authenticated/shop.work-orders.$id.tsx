@@ -192,6 +192,7 @@ const WO_STATUSES = [
 function WorkOrderDetailPage() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const { data, isLoading } = useQuery({
     queryKey: ["shop-manager", "work-orders", "detail", id],
     queryFn: () => fetchWorkOrder(id),
