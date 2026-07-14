@@ -707,6 +707,16 @@ export function SiteHeader() {
                   </Link>
                 </SheetClose>
 
+                <SheetClose asChild>
+                  <Link
+                    to="/features"
+                    className="mb-2 flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary hover:bg-primary/15"
+                  >
+                    <Sparkles className="h-4 w-4" /> Explore all features
+                  </Link>
+                </SheetClose>
+
+
                 <details open className="group/sec rounded-lg border overflow-hidden border-sky-300 bg-sky-100 dark:border-sky-500/40 dark:bg-sky-500/15 px-2 py-1.5">
                   <summary className="sticky top-0 z-10 -mx-2 -mt-1.5 mb-1 flex cursor-pointer list-none items-center justify-between rounded-t-lg bg-sky-100 dark:bg-sky-500/25 px-3 py-2 text-xs font-bold uppercase tracking-wider text-sky-800 dark:text-sky-200 shadow-sm">Browse<ChevronDown className="h-3.5 w-3.5 shrink-0 transition-transform group-open/sec:rotate-180" /></summary>
                   <div className="flex flex-col gap-0.5">
