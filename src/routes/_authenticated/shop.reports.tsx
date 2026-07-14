@@ -278,6 +278,8 @@ function ReportsPage() {
             </Card>
 
             <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild variant="outline" size="sm"><Link to="/shop/reports/ltv">Customer LTV</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/shop/reports/parts-margin">Parts margin</Link></Button>
               <Button asChild variant="outline" size="sm"><Link to="/shop/automation/logs">Automation health</Link></Button>
               <Button asChild variant="outline" size="sm"><Link to="/shop/accounting/pnl">P&amp;L drilldown</Link></Button>
               <Button asChild variant="outline" size="sm"><Link to="/shop/leave-requests">Leave requests</Link></Button>

@@ -187,6 +187,7 @@ import { Route as AdminDiscoverBusinessesRouteImport } from './routes/admin.disc
 import { Route as AdminDiscountAuditsRouteImport } from './routes/admin.discount-audits'
 import { Route as AdminDiagnosticsRouteImport } from './routes/admin.diagnostics'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
+import { Route as AdminCronTokensRouteImport } from './routes/admin.cron-tokens'
 import { Route as AdminClubsRouteImport } from './routes/admin.clubs'
 import { Route as AdminClubDiscountRouteImport } from './routes/admin.club-discount'
 import { Route as AdminClaimsRouteImport } from './routes/admin.claims'
@@ -353,6 +354,8 @@ import { Route as AuthenticatedShopWorkOrdersIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedShopVendorBillsIdRouteImport } from './routes/_authenticated/shop.vendor-bills.$id'
 import { Route as AuthenticatedShopVehiclesIdRouteImport } from './routes/_authenticated/shop.vehicles.$id'
 import { Route as AuthenticatedShopTechniciansIdRouteImport } from './routes/_authenticated/shop.technicians.$id'
+import { Route as AuthenticatedShopReportsPartsMarginRouteImport } from './routes/_authenticated/shop.reports.parts-margin'
+import { Route as AuthenticatedShopReportsLtvRouteImport } from './routes/_authenticated/shop.reports.ltv'
 import { Route as AuthenticatedShopQuotesNewRouteImport } from './routes/_authenticated/shop.quotes.new'
 import { Route as AuthenticatedShopQuotesIdRouteImport } from './routes/_authenticated/shop.quotes.$id'
 import { Route as AuthenticatedShopPurchaseOrdersIdRouteImport } from './routes/_authenticated/shop.purchase-orders.$id'
@@ -1258,6 +1261,11 @@ const AdminDiagnosticsRoute = AdminDiagnosticsRouteImport.update({
 const AdminCurrenciesRoute = AdminCurrenciesRouteImport.update({
   id: '/currencies',
   path: '/currencies',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCronTokensRoute = AdminCronTokensRouteImport.update({
+  id: '/cron-tokens',
+  path: '/cron-tokens',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminClubsRoute = AdminClubsRouteImport.update({
@@ -2194,6 +2202,18 @@ const AuthenticatedShopTechniciansIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedShopTechniciansRoute,
   } as any)
+const AuthenticatedShopReportsPartsMarginRoute =
+  AuthenticatedShopReportsPartsMarginRouteImport.update({
+    id: '/parts-margin',
+    path: '/parts-margin',
+    getParentRoute: () => AuthenticatedShopReportsRoute,
+  } as any)
+const AuthenticatedShopReportsLtvRoute =
+  AuthenticatedShopReportsLtvRouteImport.update({
+    id: '/ltv',
+    path: '/ltv',
+    getParentRoute: () => AuthenticatedShopReportsRoute,
+  } as any)
 const AuthenticatedShopQuotesNewRoute =
   AuthenticatedShopQuotesNewRouteImport.update({
     id: '/new',
@@ -2338,6 +2358,7 @@ export interface FileRoutesByFullPath {
   '/admin/claims': typeof AdminClaimsRoute
   '/admin/club-discount': typeof AdminClubDiscountRoute
   '/admin/clubs': typeof AdminClubsRoute
+  '/admin/cron-tokens': typeof AdminCronTokensRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
@@ -2585,6 +2606,8 @@ export interface FileRoutesByFullPath {
   '/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
   '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
+  '/shop/reports/ltv': typeof AuthenticatedShopReportsLtvRoute
+  '/shop/reports/parts-margin': typeof AuthenticatedShopReportsPartsMarginRoute
   '/shop/technicians/$id': typeof AuthenticatedShopTechniciansIdRoute
   '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/shop/vendor-bills/$id': typeof AuthenticatedShopVendorBillsIdRoute
@@ -2691,6 +2714,7 @@ export interface FileRoutesByTo {
   '/admin/claims': typeof AdminClaimsRoute
   '/admin/club-discount': typeof AdminClubDiscountRoute
   '/admin/clubs': typeof AdminClubsRoute
+  '/admin/cron-tokens': typeof AdminCronTokensRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
@@ -2933,6 +2957,8 @@ export interface FileRoutesByTo {
   '/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
   '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
+  '/shop/reports/ltv': typeof AuthenticatedShopReportsLtvRoute
+  '/shop/reports/parts-margin': typeof AuthenticatedShopReportsPartsMarginRoute
   '/shop/technicians/$id': typeof AuthenticatedShopTechniciansIdRoute
   '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/shop/vendor-bills/$id': typeof AuthenticatedShopVendorBillsIdRoute
@@ -3047,6 +3073,7 @@ export interface FileRoutesById {
   '/admin/claims': typeof AdminClaimsRoute
   '/admin/club-discount': typeof AdminClubDiscountRoute
   '/admin/clubs': typeof AdminClubsRoute
+  '/admin/cron-tokens': typeof AdminCronTokensRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/discount-audits': typeof AdminDiscountAuditsRoute
@@ -3294,6 +3321,8 @@ export interface FileRoutesById {
   '/_authenticated/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
   '/_authenticated/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
   '/_authenticated/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
+  '/_authenticated/shop/reports/ltv': typeof AuthenticatedShopReportsLtvRoute
+  '/_authenticated/shop/reports/parts-margin': typeof AuthenticatedShopReportsPartsMarginRoute
   '/_authenticated/shop/technicians/$id': typeof AuthenticatedShopTechniciansIdRoute
   '/_authenticated/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
   '/_authenticated/shop/vendor-bills/$id': typeof AuthenticatedShopVendorBillsIdRoute
@@ -3408,6 +3437,7 @@ export interface FileRouteTypes {
     | '/admin/claims'
     | '/admin/club-discount'
     | '/admin/clubs'
+    | '/admin/cron-tokens'
     | '/admin/currencies'
     | '/admin/diagnostics'
     | '/admin/discount-audits'
@@ -3655,6 +3685,8 @@ export interface FileRouteTypes {
     | '/shop/purchase-orders/$id'
     | '/shop/quotes/$id'
     | '/shop/quotes/new'
+    | '/shop/reports/ltv'
+    | '/shop/reports/parts-margin'
     | '/shop/technicians/$id'
     | '/shop/vehicles/$id'
     | '/shop/vendor-bills/$id'
@@ -3761,6 +3793,7 @@ export interface FileRouteTypes {
     | '/admin/claims'
     | '/admin/club-discount'
     | '/admin/clubs'
+    | '/admin/cron-tokens'
     | '/admin/currencies'
     | '/admin/diagnostics'
     | '/admin/discount-audits'
@@ -4003,6 +4036,8 @@ export interface FileRouteTypes {
     | '/shop/purchase-orders/$id'
     | '/shop/quotes/$id'
     | '/shop/quotes/new'
+    | '/shop/reports/ltv'
+    | '/shop/reports/parts-margin'
     | '/shop/technicians/$id'
     | '/shop/vehicles/$id'
     | '/shop/vendor-bills/$id'
@@ -4116,6 +4151,7 @@ export interface FileRouteTypes {
     | '/admin/claims'
     | '/admin/club-discount'
     | '/admin/clubs'
+    | '/admin/cron-tokens'
     | '/admin/currencies'
     | '/admin/diagnostics'
     | '/admin/discount-audits'
@@ -4363,6 +4399,8 @@ export interface FileRouteTypes {
     | '/_authenticated/shop/purchase-orders/$id'
     | '/_authenticated/shop/quotes/$id'
     | '/_authenticated/shop/quotes/new'
+    | '/_authenticated/shop/reports/ltv'
+    | '/_authenticated/shop/reports/parts-margin'
     | '/_authenticated/shop/technicians/$id'
     | '/_authenticated/shop/vehicles/$id'
     | '/_authenticated/shop/vendor-bills/$id'
@@ -5812,6 +5850,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCurrenciesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/cron-tokens': {
+      id: '/admin/cron-tokens'
+      path: '/cron-tokens'
+      fullPath: '/admin/cron-tokens'
+      preLoaderRoute: typeof AdminCronTokensRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/clubs': {
       id: '/admin/clubs'
       path: '/clubs'
@@ -6974,6 +7019,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopTechniciansIdRouteImport
       parentRoute: typeof AuthenticatedShopTechniciansRoute
     }
+    '/_authenticated/shop/reports/parts-margin': {
+      id: '/_authenticated/shop/reports/parts-margin'
+      path: '/parts-margin'
+      fullPath: '/shop/reports/parts-margin'
+      preLoaderRoute: typeof AuthenticatedShopReportsPartsMarginRouteImport
+      parentRoute: typeof AuthenticatedShopReportsRoute
+    }
+    '/_authenticated/shop/reports/ltv': {
+      id: '/_authenticated/shop/reports/ltv'
+      path: '/ltv'
+      fullPath: '/shop/reports/ltv'
+      preLoaderRoute: typeof AuthenticatedShopReportsLtvRouteImport
+      parentRoute: typeof AuthenticatedShopReportsRoute
+    }
     '/_authenticated/shop/quotes/new': {
       id: '/_authenticated/shop/quotes/new'
       path: '/new'
@@ -7208,11 +7267,16 @@ const AuthenticatedShopQuotesRouteWithChildren =
   )
 
 interface AuthenticatedShopReportsRouteChildren {
+  AuthenticatedShopReportsLtvRoute: typeof AuthenticatedShopReportsLtvRoute
+  AuthenticatedShopReportsPartsMarginRoute: typeof AuthenticatedShopReportsPartsMarginRoute
   AuthenticatedShopReportsTechnicianIdRoute: typeof AuthenticatedShopReportsTechnicianIdRoute
 }
 
 const AuthenticatedShopReportsRouteChildren: AuthenticatedShopReportsRouteChildren =
   {
+    AuthenticatedShopReportsLtvRoute: AuthenticatedShopReportsLtvRoute,
+    AuthenticatedShopReportsPartsMarginRoute:
+      AuthenticatedShopReportsPartsMarginRoute,
     AuthenticatedShopReportsTechnicianIdRoute:
       AuthenticatedShopReportsTechnicianIdRoute,
   }
@@ -7513,6 +7577,7 @@ interface AdminRouteChildren {
   AdminClaimsRoute: typeof AdminClaimsRoute
   AdminClubDiscountRoute: typeof AdminClubDiscountRoute
   AdminClubsRoute: typeof AdminClubsRoute
+  AdminCronTokensRoute: typeof AdminCronTokensRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
   AdminDiagnosticsRoute: typeof AdminDiagnosticsRoute
   AdminDiscountAuditsRoute: typeof AdminDiscountAuditsRoute
@@ -7568,6 +7633,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminClaimsRoute: AdminClaimsRoute,
   AdminClubDiscountRoute: AdminClubDiscountRoute,
   AdminClubsRoute: AdminClubsRoute,
+  AdminCronTokensRoute: AdminCronTokensRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
   AdminDiagnosticsRoute: AdminDiagnosticsRoute,
   AdminDiscountAuditsRoute: AdminDiscountAuditsRoute,
