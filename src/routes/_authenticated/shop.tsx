@@ -88,6 +88,7 @@ const QUICK_LINKS = [
   { title: "Invoices", icon: Receipt, to: "/shop/invoices" as const },
   { title: "Quotes", icon: FileText, to: "/shop/quotes" as const },
   { title: "Calendar", icon: CalendarIcon, to: "/shop/appointments" as const },
+  { title: "Reports", icon: BarChart3, to: "/shop/reports" as const },
 ];
 
 function ShopHome() {
