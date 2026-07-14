@@ -360,6 +360,7 @@ import { Route as AuthenticatedShopInvoicesIdRouteImport } from './routes/_authe
 import { Route as AuthenticatedShopInventoryIdRouteImport } from './routes/_authenticated/shop.inventory.$id'
 import { Route as AuthenticatedShopCustomersNewRouteImport } from './routes/_authenticated/shop.customers.new'
 import { Route as AuthenticatedShopCustomersIdRouteImport } from './routes/_authenticated/shop.customers.$id'
+import { Route as AuthenticatedShopAutomationLogsRouteImport } from './routes/_authenticated/shop.automation.logs'
 import { Route as AuthenticatedShopAccountingPnlRouteImport } from './routes/_authenticated/shop.accounting.pnl'
 import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
@@ -2233,6 +2234,12 @@ const AuthenticatedShopCustomersIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedShopCustomersRoute,
   } as any)
+const AuthenticatedShopAutomationLogsRoute =
+  AuthenticatedShopAutomationLogsRouteImport.update({
+    id: '/logs',
+    path: '/logs',
+    getParentRoute: () => AuthenticatedShopAutomationRoute,
+  } as any)
 const AuthenticatedShopAccountingPnlRoute =
   AuthenticatedShopAccountingPnlRouteImport.update({
     id: '/pnl',
@@ -2466,7 +2473,7 @@ export interface FileRoutesByFullPath {
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
   '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
-  '/shop/automation': typeof AuthenticatedShopAutomationRoute
+  '/shop/automation': typeof AuthenticatedShopAutomationRouteWithChildren
   '/shop/certificates': typeof AuthenticatedShopCertificatesRoute
   '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/shop/discounts': typeof AuthenticatedShopDiscountsRoute
@@ -2553,6 +2560,7 @@ export interface FileRoutesByFullPath {
   '/listing/$id/': typeof ListingIdIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
+  '/shop/automation/logs': typeof AuthenticatedShopAutomationLogsRoute
   '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
@@ -2812,7 +2820,7 @@ export interface FileRoutesByTo {
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
   '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
-  '/shop/automation': typeof AuthenticatedShopAutomationRoute
+  '/shop/automation': typeof AuthenticatedShopAutomationRouteWithChildren
   '/shop/certificates': typeof AuthenticatedShopCertificatesRoute
   '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/shop/discounts': typeof AuthenticatedShopDiscountsRoute
@@ -2898,6 +2906,7 @@ export interface FileRoutesByTo {
   '/listing/$id': typeof ListingIdIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
+  '/shop/automation/logs': typeof AuthenticatedShopAutomationLogsRoute
   '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
@@ -3169,7 +3178,7 @@ export interface FileRoutesById {
   '/_authenticated/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
   '/_authenticated/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
   '/_authenticated/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
-  '/_authenticated/shop/automation': typeof AuthenticatedShopAutomationRoute
+  '/_authenticated/shop/automation': typeof AuthenticatedShopAutomationRouteWithChildren
   '/_authenticated/shop/certificates': typeof AuthenticatedShopCertificatesRoute
   '/_authenticated/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
   '/_authenticated/shop/discounts': typeof AuthenticatedShopDiscountsRoute
@@ -3256,6 +3265,7 @@ export interface FileRoutesById {
   '/listing/$id/': typeof ListingIdIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
   '/_authenticated/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
+  '/_authenticated/shop/automation/logs': typeof AuthenticatedShopAutomationLogsRoute
   '/_authenticated/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
   '/_authenticated/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
   '/_authenticated/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
@@ -3614,6 +3624,7 @@ export interface FileRouteTypes {
     | '/listing/$id/'
     | '/dashboard/clubs/$id'
     | '/shop/accounting/pnl'
+    | '/shop/automation/logs'
     | '/shop/customers/$id'
     | '/shop/customers/new'
     | '/shop/inventory/$id'
@@ -3959,6 +3970,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/dashboard/clubs/$id'
     | '/shop/accounting/pnl'
+    | '/shop/automation/logs'
     | '/shop/customers/$id'
     | '/shop/customers/new'
     | '/shop/inventory/$id'
@@ -4316,6 +4328,7 @@ export interface FileRouteTypes {
     | '/listing/$id/'
     | '/_authenticated/dashboard/clubs_/$id'
     | '/_authenticated/shop/accounting/pnl'
+    | '/_authenticated/shop/automation/logs'
     | '/_authenticated/shop/customers/$id'
     | '/_authenticated/shop/customers/new'
     | '/_authenticated/shop/inventory/$id'
@@ -6984,6 +6997,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopCustomersIdRouteImport
       parentRoute: typeof AuthenticatedShopCustomersRoute
     }
+    '/_authenticated/shop/automation/logs': {
+      id: '/_authenticated/shop/automation/logs'
+      path: '/logs'
+      fullPath: '/shop/automation/logs'
+      preLoaderRoute: typeof AuthenticatedShopAutomationLogsRouteImport
+      parentRoute: typeof AuthenticatedShopAutomationRoute
+    }
     '/_authenticated/shop/accounting/pnl': {
       id: '/_authenticated/shop/accounting/pnl'
       path: '/pnl'
@@ -7027,6 +7047,20 @@ const AuthenticatedShopAccountingRouteChildren: AuthenticatedShopAccountingRoute
 const AuthenticatedShopAccountingRouteWithChildren =
   AuthenticatedShopAccountingRoute._addFileChildren(
     AuthenticatedShopAccountingRouteChildren,
+  )
+
+interface AuthenticatedShopAutomationRouteChildren {
+  AuthenticatedShopAutomationLogsRoute: typeof AuthenticatedShopAutomationLogsRoute
+}
+
+const AuthenticatedShopAutomationRouteChildren: AuthenticatedShopAutomationRouteChildren =
+  {
+    AuthenticatedShopAutomationLogsRoute: AuthenticatedShopAutomationLogsRoute,
+  }
+
+const AuthenticatedShopAutomationRouteWithChildren =
+  AuthenticatedShopAutomationRoute._addFileChildren(
+    AuthenticatedShopAutomationRouteChildren,
   )
 
 interface AuthenticatedShopCustomersRouteChildren {
@@ -7195,7 +7229,7 @@ const AuthenticatedShopWorkOrdersRouteWithChildren =
 interface AuthenticatedShopRouteChildren {
   AuthenticatedShopAccountingRoute: typeof AuthenticatedShopAccountingRouteWithChildren
   AuthenticatedShopAppointmentsRoute: typeof AuthenticatedShopAppointmentsRoute
-  AuthenticatedShopAutomationRoute: typeof AuthenticatedShopAutomationRoute
+  AuthenticatedShopAutomationRoute: typeof AuthenticatedShopAutomationRouteWithChildren
   AuthenticatedShopCertificatesRoute: typeof AuthenticatedShopCertificatesRoute
   AuthenticatedShopCustomersRoute: typeof AuthenticatedShopCustomersRouteWithChildren
   AuthenticatedShopDiscountsRoute: typeof AuthenticatedShopDiscountsRoute
@@ -7225,7 +7259,8 @@ const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
   AuthenticatedShopAccountingRoute:
     AuthenticatedShopAccountingRouteWithChildren,
   AuthenticatedShopAppointmentsRoute: AuthenticatedShopAppointmentsRoute,
-  AuthenticatedShopAutomationRoute: AuthenticatedShopAutomationRoute,
+  AuthenticatedShopAutomationRoute:
+    AuthenticatedShopAutomationRouteWithChildren,
   AuthenticatedShopCertificatesRoute: AuthenticatedShopCertificatesRoute,
   AuthenticatedShopCustomersRoute: AuthenticatedShopCustomersRouteWithChildren,
   AuthenticatedShopDiscountsRoute: AuthenticatedShopDiscountsRoute,

@@ -277,9 +277,16 @@ function ReportsPage() {
               </CardContent>
             </Card>
 
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild variant="outline" size="sm"><Link to="/shop/automation/logs">Automation health</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/shop/accounting/pnl">P&amp;L drilldown</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/shop/leave-requests">Leave requests</Link></Button>
+            </div>
+
             <p className="mt-6 text-xs text-muted-foreground">
               Totals reflect data scoped to your shop. Averages exclude cancelled or void records.
             </p>
+
           </>
         )}
       </div>

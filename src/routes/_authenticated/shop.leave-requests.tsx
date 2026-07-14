@@ -39,12 +39,33 @@ type Req = {
 };
 
 async function fetchAll() {
-  const [{ data: reqs }, { data: types }] = await Promise.all([
+  const [{ data: reqs }, { data: types }, { data: bals }, { data: userRes }] = await Promise.all([
     (smSupabase as any).from("leave_requests").select("*").order("created_at", { ascending: false }),
     (smSupabase as any).from("leave_types").select("id,name,color").eq("is_active", true),
+    (smSupabase as any).from("employee_leave_balances").select("id,employee_id,leave_type_id,used_hours,balance_hours,accrued_hours"),
+    supabase.auth.getUser(),
   ]);
-  return { reqs: (reqs ?? []) as Req[], types: (types ?? []) as { id: string; name: string; color: string | null }[] };
+  // Determine if current user can approve (manager/admin/owner in shop_manager.profiles or public.user_roles)
+  const uid = userRes?.user?.id ?? null;
+  let canApprove = false;
+  if (uid) {
+    const { data: prof } = await (smSupabase as any).from("profiles").select("role").eq("id", uid).maybeSingle();
+    const role = String(prof?.role ?? "").toLowerCase();
+    if (["owner", "admin", "manager"].includes(role)) canApprove = true;
+    if (!canApprove) {
+      const { data: pubRole } = await supabase.rpc("has_role", { _user_id: uid, _role: "admin" });
+      if (pubRole === true) canApprove = true;
+    }
+  }
+  return {
+    reqs: (reqs ?? []) as Req[],
+    types: (types ?? []) as { id: string; name: string; color: string | null }[],
+    balances: (bals ?? []) as { id: string; employee_id: string; leave_type_id: string; used_hours: number; balance_hours: number; accrued_hours: number }[],
+    currentUserId: uid,
+    canApprove,
+  };
 }
+
 
 function statusBadge(s: string) {
   if (s === "approved") return <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">Approved</Badge>;
@@ -86,25 +107,25 @@ function LeaveRequestsPage() {
 
   const review = useMutation({
     mutationFn: async ({ id, status, notes }: { id: string; status: "approved" | "rejected"; notes?: string }) => {
+      if (!data?.canApprove) throw new Error("You do not have permission to review leave requests");
+      const row = data.reqs.find(r => r.id === id);
+      if (row && row.employee_id === data.currentUserId) throw new Error("You cannot review your own request");
       const { data: u } = await supabase.auth.getUser();
       const { error } = await (smSupabase as any).from("leave_requests").update({
         status, reviewed_by: u.user?.id ?? null, reviewed_at: new Date().toISOString(), review_notes: notes ?? null,
       }).eq("id", id);
       if (error) throw error;
 
-      // On approve, add to used_hours in balance
-      if (status === "approved") {
-        const row = data?.reqs.find(r => r.id === id);
-        if (row && row.leave_type_id) {
-          const { data: bal } = await (smSupabase as any).from("employee_leave_balances")
-            .select("id,used_hours,balance_hours")
-            .eq("employee_id", row.employee_id).eq("leave_type_id", row.leave_type_id).maybeSingle();
-          if (bal) {
-            await (smSupabase as any).from("employee_leave_balances").update({
-              used_hours: Number(bal.used_hours || 0) + Number(row.hours),
-              balance_hours: Number(bal.balance_hours || 0) - Number(row.hours),
-            }).eq("id", bal.id);
-          }
+      // On approve, deduct from used_hours in balance
+      if (status === "approved" && row && row.leave_type_id) {
+        const { data: bal } = await (smSupabase as any).from("employee_leave_balances")
+          .select("id,used_hours,balance_hours")
+          .eq("employee_id", row.employee_id).eq("leave_type_id", row.leave_type_id).maybeSingle();
+        if (bal) {
+          await (smSupabase as any).from("employee_leave_balances").update({
+            used_hours: Number(bal.used_hours || 0) + Number(row.hours),
+            balance_hours: Number(bal.balance_hours || 0) - Number(row.hours),
+          }).eq("id", bal.id);
         }
       }
     },
@@ -114,6 +135,7 @@ function LeaveRequestsPage() {
     },
     onError: (e: any) => toast.error(e.message),
   });
+
 
   const reqs = data?.reqs ?? [];
   const pending = reqs.filter(r => r.status === "pending");
@@ -166,7 +188,7 @@ function LeaveRequestsPage() {
             </TabsList>
             <TabsContent value="pending" className="space-y-3 pt-4">
               {pending.length === 0 && <Card><CardContent className="py-10 text-center text-sm text-muted-foreground">No pending requests.</CardContent></Card>}
-              {pending.map(r => <RequestRow key={r.id} r={r} types={data?.types ?? []} onReview={(status, notes) => review.mutate({ id: r.id, status, notes })} reviewable />)}
+              {pending.map(r => <RequestRow key={r.id} r={r} types={data?.types ?? []} onReview={(status, notes) => review.mutate({ id: r.id, status, notes })} reviewable={!!data?.canApprove && r.employee_id !== data?.currentUserId} />)}
             </TabsContent>
             <TabsContent value="history" className="space-y-3 pt-4">
               {decided.map(r => <RequestRow key={r.id} r={r} types={data?.types ?? []} onReview={() => {}} />)}

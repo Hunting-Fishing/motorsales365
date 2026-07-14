@@ -51,6 +51,7 @@ export const Route = createFileRoute("/api/public/hooks/shop-automation-run")({
         let createdTotal = 0;
         let shopsProcessed = 0;
         const errors: string[] = [];
+        const runLogs: any[] = [];
 
         for (const [shopId, shopRules] of byShop) {
           shopsProcessed++;
@@ -60,7 +61,20 @@ export const Route = createFileRoute("/api/public/hooks/shop-automation-run")({
             .eq("shop_id", shopId)
             .limit(20000);
           const customerIds = (custs ?? []).map((c: any) => c.id);
-          if (customerIds.length === 0) continue;
+          const customersScanned = customerIds.length;
+          if (customerIds.length === 0) {
+            for (const rule of shopRules) {
+              runLogs.push({
+                shop_id: shopId,
+                rule_id: rule.id,
+                customers_scanned: 0,
+                vehicles_scanned: 0,
+                reminders_created: 0,
+                skipped_duplicate: 0,
+              });
+            }
+            continue;
+          }
 
           const { data: vehicles } = await sm
             .from("vehicles")
@@ -68,7 +82,20 @@ export const Route = createFileRoute("/api/public/hooks/shop-automation-run")({
             .in("customer_id", customerIds)
             .not("last_service_date", "is", null)
             .limit(20000);
-          if (!vehicles?.length) continue;
+          const vehiclesScanned = vehicles?.length ?? 0;
+          if (!vehicles?.length) {
+            for (const rule of shopRules) {
+              runLogs.push({
+                shop_id: shopId,
+                rule_id: rule.id,
+                customers_scanned: customersScanned,
+                vehicles_scanned: 0,
+                reminders_created: 0,
+                skipped_duplicate: 0,
+              });
+            }
+            continue;
+          }
 
           const vehicleIds = vehicles.map((v: any) => v.id);
           const { data: existing } = await sm
@@ -80,22 +107,38 @@ export const Route = createFileRoute("/api/public/hooks/shop-automation-run")({
           const seen = new Set(
             (existing ?? []).map((r: any) => `${r.vehicle_id}::${r.type}`),
           );
-          const toCreate: any[] = [];
 
           for (const rule of shopRules) {
             const cfg = rule.automation_config ?? {};
             const intervalDays = Number(cfg.interval_days) || 0;
-            if (!intervalDays) continue;
             const leadMs = (Number(cfg.lead_days) || 0) * 86_400_000;
+            const ruleToCreate: any[] = [];
+            let ruleSkipped = 0;
+
+            if (!intervalDays) {
+              runLogs.push({
+                shop_id: shopId,
+                rule_id: rule.id,
+                customers_scanned: customersScanned,
+                vehicles_scanned: vehiclesScanned,
+                reminders_created: 0,
+                skipped_duplicate: 0,
+                error: "missing interval_days in automation_config",
+              });
+              continue;
+            }
 
             for (const v of vehicles) {
               const key = `${v.id}::${rule.service_type}`;
-              if (seen.has(key)) continue;
+              if (seen.has(key)) {
+                ruleSkipped++;
+                continue;
+              }
               const last = new Date(v.last_service_date);
               const due = new Date(last);
               due.setDate(due.getDate() + intervalDays);
               if (due.getTime() - today.getTime() > leadMs) continue;
-              toCreate.push({
+              ruleToCreate.push({
                 vehicle_id: v.id,
                 customer_id: v.customer_id,
                 type: rule.service_type,
@@ -110,15 +153,33 @@ export const Route = createFileRoute("/api/public/hooks/shop-automation-run")({
               });
               seen.add(key);
             }
-          }
 
-          if (toCreate.length === 0) continue;
-          const { error } = await sm.from("service_reminders").insert(toCreate);
-          if (error) {
-            errors.push(`shop ${shopId}: ${error.message}`);
-            continue;
+            let ruleErr: string | null = null;
+            if (ruleToCreate.length > 0) {
+              const { error } = await sm.from("service_reminders").insert(ruleToCreate);
+              if (error) {
+                ruleErr = error.message;
+                errors.push(`shop ${shopId} rule ${rule.id}: ${error.message}`);
+              } else {
+                createdTotal += ruleToCreate.length;
+              }
+            }
+
+            runLogs.push({
+              shop_id: shopId,
+              rule_id: rule.id,
+              customers_scanned: customersScanned,
+              vehicles_scanned: vehiclesScanned,
+              reminders_created: ruleErr ? 0 : ruleToCreate.length,
+              skipped_duplicate: ruleSkipped,
+              error: ruleErr,
+            });
           }
-          createdTotal += toCreate.length;
+        }
+
+        if (runLogs.length > 0) {
+          const { error: logErr } = await sm.from("automation_run_logs").insert(runLogs);
+          if (logErr) console.error("[shop-automation] log insert failed:", logErr);
         }
 
         return Response.json({
@@ -128,6 +189,7 @@ export const Route = createFileRoute("/api/public/hooks/shop-automation-run")({
           created: createdTotal,
           errors: errors.length ? errors : undefined,
         });
+
       },
     },
   },
