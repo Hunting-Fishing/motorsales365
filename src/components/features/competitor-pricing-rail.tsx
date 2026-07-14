@@ -1,12 +1,19 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, ExternalLink, Sparkles, Check } from "lucide-react";
 import type { Competitor } from "@/data/competitors-shop-software";
 
+function fmtUsd(n: number) {
+  return n % 1 === 0 ? `$${n}` : `$${n.toFixed(2)}`;
+}
+
 function priceLabel(p: Competitor["pricing"]): { big: string; sub: string } {
   if (p.unit === "free") return { big: "Free", sub: p.tierName };
-  if (p.startingUsd == null) return { big: "Custom", sub: p.tierName };
-  const price = p.startingUsd % 1 === 0 ? `$${p.startingUsd}` : `$${p.startingUsd.toFixed(2)}`;
-  return { big: price, sub: `/${p.unit} · ${p.tierName}` };
+  if (p.startingUsd == null) return { big: "Ask", sub: p.tierName };
+  const start = fmtUsd(p.startingUsd);
+  if (p.topUsd != null && p.topUsd > p.startingUsd) {
+    return { big: `${start}–${fmtUsd(p.topUsd)}`, sub: `/${p.unit} · ${p.tierName}` };
+  }
+  return { big: start, sub: `/${p.unit} · ${p.tierName}` };
 }
 
 function vsBadge(p: Competitor["pricing"], is365: boolean): { text: string; className: string } | null {
