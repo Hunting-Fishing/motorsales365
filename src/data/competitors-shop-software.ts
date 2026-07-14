@@ -6,352 +6,400 @@
 
 export type Cell = { v: "yes" | "partial" | "no"; note?: string };
 
+export type CompetitorPricing = {
+  /** null = free tier / not-published (custom); "free" wins the vs-365 comparison */
+  startingUsd: number | null;
+  unit: "mo" | "yr" | "custom" | "free";
+  tierName: string;
+  includes: string[];
+  highest?: string;
+  link: string;
+};
+
+export type Competitor = {
+  id: string;
+  name: string;
+  blurb: string;
+  pricing: CompetitorPricing;
+};
+
 export type CompetitorMatrix = {
-  competitors: { id: string; name: string; blurb: string }[];
+  competitors: Competitor[];
   rows: { capability: string; cells: Record<string, Cell> }[];
 };
 
+// ---------- shared "Yes/No" builder ----------
+const y: Cell = { v: "yes" };
+const n: Cell = { v: "no" };
+const p = (note?: string): Cell => ({ v: "partial", note });
+const yy = (note?: string): Cell => ({ v: "yes", note });
+
+// ================= SHOP SOFTWARE =================
+const SHOP_COMPETITORS: Competitor[] = [
+  {
+    id: "365",
+    name: "365 Motor Sales",
+    blurb: "PH-first, all-in-one",
+    pricing: {
+      startingUsd: 0,
+      unit: "free",
+      tierName: "Free forever",
+      includes: ["Full shop OS", "Parts network", "Marketplace + franchise"],
+      highest: "Premium boosts pay-as-you-go",
+      link: "/pricing",
+    },
+  },
+  {
+    id: "shopmonkey",
+    name: "Shopmonkey",
+    blurb: "US SaaS",
+    pricing: {
+      startingUsd: 199,
+      unit: "mo",
+      tierName: "Basic",
+      includes: ["1 location", "Unlimited ROs", "Invoicing"],
+      highest: "Ultimate ≈ $499/mo",
+      link: "https://www.shopmonkey.io/pricing",
+    },
+  },
+  {
+    id: "tekmetric",
+    name: "Tekmetric",
+    blurb: "US SaaS",
+    pricing: {
+      startingUsd: null,
+      unit: "custom",
+      tierName: "Contract",
+      includes: ["Per-location quote", "US-only support", "Nexpart parts"],
+      link: "https://www.tekmetric.com/pricing",
+    },
+  },
+  {
+    id: "autoleap",
+    name: "AutoLeap",
+    blurb: "US/CA SaaS",
+    pricing: {
+      startingUsd: null,
+      unit: "custom",
+      tierName: "Contract",
+      includes: ["Per-location quote", "QuickBooks sync", "Digital inspections"],
+      link: "https://autoleap.com/pricing/",
+    },
+  },
+  {
+    id: "mitchell1",
+    name: "Mitchell 1 Manager SE",
+    blurb: "Legacy desktop-first",
+    pricing: {
+      startingUsd: 179,
+      unit: "mo",
+      tierName: "Manager SE",
+      includes: ["Desktop install", "ProDemand add-on", "Windows only"],
+      highest: "Bundle w/ ProDemand ≈ $329/mo",
+      link: "https://mitchell1.com/shop-management-software/",
+    },
+  },
+  {
+    id: "ari",
+    name: "ARI (Auto Repair Invoicing)",
+    blurb: "Solo/small shop",
+    pricing: {
+      startingUsd: 39.95,
+      unit: "mo",
+      tierName: "Basic",
+      includes: ["1 user", "Invoicing + estimates", "VIN + license decode"],
+      highest: "Premium ≈ $89.95/mo",
+      link: "https://arimotive.com/pricing/",
+    },
+  },
+  {
+    id: "fullbay",
+    name: "Fullbay",
+    blurb: "Heavy-duty diesel",
+    pricing: {
+      startingUsd: null,
+      unit: "custom",
+      tierName: "Contract",
+      includes: ["Fleet + diesel focus", "Per-bay pricing", "US-only"],
+      link: "https://www.fullbay.com/pricing/",
+    },
+  },
+  {
+    id: "torque360",
+    name: "Torque360",
+    blurb: "US SaaS",
+    pricing: {
+      startingUsd: 59,
+      unit: "mo",
+      tierName: "Starter",
+      includes: ["Unlimited users", "Digital inspections", "SMS reminders"],
+      highest: "Enterprise ≈ $159/mo",
+      link: "https://www.torque360.co/pricing",
+    },
+  },
+  {
+    id: "shopware",
+    name: "Shop-Ware",
+    blurb: "Independent shops",
+    pricing: {
+      startingUsd: 289,
+      unit: "mo",
+      tierName: "Solo",
+      includes: ["Cloud-based", "Live inspections", "Parts markup engine"],
+      highest: "Team from $549/mo",
+      link: "https://www.shop-ware.com/pricing/",
+    },
+  },
+  {
+    id: "protractor",
+    name: "Protractor",
+    blurb: "Enterprise multi-shop",
+    pricing: {
+      startingUsd: 219,
+      unit: "mo",
+      tierName: "Base",
+      includes: ["Multi-location", "Advanced accounting", "Windows client"],
+      link: "https://www.protractor.com/pricing",
+    },
+  },
+  {
+    id: "napatracs",
+    name: "NAPA TRACS",
+    blurb: "NAPA-tied shops",
+    pricing: {
+      startingUsd: 129,
+      unit: "mo",
+      tierName: "Standard",
+      includes: ["NAPA catalog", "Desktop-first", "US-only support"],
+      link: "https://www.napatracs.com/",
+    },
+  },
+  {
+    id: "identifix",
+    name: "Identifix Shop Manager",
+    blurb: "Direct-Hit powered",
+    pricing: {
+      startingUsd: 149,
+      unit: "mo",
+      tierName: "Standard",
+      includes: ["Diagnostic DB", "OEM procedures", "US-only"],
+      link: "https://identifix.com/",
+    },
+  },
+  {
+    id: "garage360",
+    name: "Garage360",
+    blurb: "APAC SaaS",
+    pricing: {
+      startingUsd: 29,
+      unit: "mo",
+      tierName: "Starter",
+      includes: ["Cloud-based", "SMS reminders", "APAC focus"],
+      highest: "Pro ≈ $79/mo",
+      link: "https://garage360.io/pricing",
+    },
+  },
+];
+
 export const SHOP_SOFTWARE_MATRIX: CompetitorMatrix = {
-  competitors: [
-    { id: "365", name: "365 Motor Sales", blurb: "PH-first, all-in-one" },
-    { id: "shopmonkey", name: "Shopmonkey", blurb: "US SaaS, $199+/mo" },
-    { id: "tekmetric", name: "Tekmetric", blurb: "US SaaS, contract pricing" },
-    { id: "mitchell1", name: "Mitchell 1", blurb: "Legacy desktop-first" },
-    { id: "autoleap", name: "AutoLeap", blurb: "US/CA SaaS" },
-    { id: "garage360", name: "Garage360", blurb: "APAC SaaS" },
-  ],
+  competitors: SHOP_COMPETITORS,
   rows: [
-    {
-      capability: "Work orders (RO lifecycle)",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "yes" },
-        tekmetric: { v: "yes" },
-        mitchell1: { v: "yes" },
-        autoleap: { v: "yes" },
-        garage360: { v: "yes" },
-      },
-    },
-    {
-      capability: "Inventory with alerts",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "yes" },
-        tekmetric: { v: "yes" },
-        mitchell1: { v: "yes" },
-        autoleap: { v: "yes" },
-        garage360: { v: "yes" },
-      },
-    },
-    {
-      capability: "Double-entry GL & P&L in-app",
-      cells: {
-        "365": { v: "yes", note: "Real ledger, not just KPIs" },
-        shopmonkey: { v: "partial", note: "Integrates with QuickBooks" },
-        tekmetric: { v: "partial", note: "QuickBooks integration" },
-        mitchell1: { v: "partial" },
-        autoleap: { v: "partial", note: "QuickBooks integration" },
-        garage360: { v: "no" },
-      },
-    },
-    {
-      capability: "Cross-shop live parts stock",
-      cells: {
-        "365": { v: "yes", note: "network_stock view, real-time" },
-        shopmonkey: { v: "no" },
-        tekmetric: { v: "no" },
-        mitchell1: { v: "no" },
-        autoleap: { v: "no" },
-        garage360: { v: "no" },
-      },
-    },
-    {
-      capability: "VIN-based parts catalog",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "partial", note: "Via 3rd-party" },
-        tekmetric: { v: "partial", note: "Via Nexpart" },
-        mitchell1: { v: "yes", note: "Native" },
-        autoleap: { v: "partial" },
-        garage360: { v: "no" },
-      },
-    },
-    {
-      capability: "Public marketplace (buy/sell vehicles)",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "no" },
-        tekmetric: { v: "no" },
-        mitchell1: { v: "no" },
-        autoleap: { v: "no" },
-        garage360: { v: "no" },
-      },
-    },
-    {
-      capability: "Franchise / network program",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "no" },
-        tekmetric: { v: "no" },
-        mitchell1: { v: "no" },
-        autoleap: { v: "no" },
-        garage360: { v: "no" },
-      },
-    },
-    {
-      capability: "Loyalty & promo codes built-in",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "partial", note: "Marketing add-on" },
-        tekmetric: { v: "partial" },
-        mitchell1: { v: "no" },
-        autoleap: { v: "yes" },
-        garage360: { v: "no" },
-      },
-    },
-    {
-      capability: "HR / leave / certificates",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "no" },
-        tekmetric: { v: "no" },
-        mitchell1: { v: "no" },
-        autoleap: { v: "no" },
-        garage360: { v: "no" },
-      },
-    },
-    {
-      capability: "Learning / courses in-app",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "partial", note: "Shopmonkey University" },
-        tekmetric: { v: "no" },
-        mitchell1: { v: "no" },
-        autoleap: { v: "no" },
-        garage360: { v: "no" },
-      },
-    },
-    {
-      capability: "Service-reminder automation",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "yes" },
-        tekmetric: { v: "yes" },
-        mitchell1: { v: "partial" },
-        autoleap: { v: "yes" },
-        garage360: { v: "partial" },
-      },
-    },
-    {
-      capability: "PH-local pricing & payments (GCash)",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "no" },
-        tekmetric: { v: "no" },
-        mitchell1: { v: "no" },
-        autoleap: { v: "no" },
-        garage360: { v: "partial" },
-      },
-    },
-    {
-      capability: "Mobile-first UI",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "yes" },
-        tekmetric: { v: "yes" },
-        mitchell1: { v: "no" },
-        autoleap: { v: "yes" },
-        garage360: { v: "yes" },
-      },
-    },
-    {
-      capability: "Referral / affiliate program",
-      cells: {
-        "365": { v: "yes" },
-        shopmonkey: { v: "no" },
-        tekmetric: { v: "no" },
-        mitchell1: { v: "no" },
-        autoleap: { v: "no" },
-        garage360: { v: "no" },
-      },
-    },
+    row("Work orders (RO lifecycle)", { "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: y, ari: y, fullbay: y, torque360: y, shopware: y, protractor: y, napatracs: y, identifix: y, garage360: y }),
+    row("Inventory with alerts", { "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: y, ari: y, fullbay: y, torque360: y, shopware: y, protractor: y, napatracs: y, identifix: p(), garage360: y }),
+    row("Double-entry GL & P&L in-app", {
+      "365": yy("Real ledger, not just KPIs"),
+      shopmonkey: p("QuickBooks integration"),
+      tekmetric: p("QuickBooks integration"),
+      autoleap: p("QuickBooks integration"),
+      mitchell1: p(),
+      ari: p(),
+      fullbay: p("QuickBooks integration"),
+      torque360: p(),
+      shopware: p("QuickBooks integration"),
+      protractor: y,
+      napatracs: p(),
+      identifix: p(),
+      garage360: n,
+    }),
+    row("Cross-shop live parts stock", {
+      "365": yy("network_stock view, real-time"),
+      shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: p("NAPA-only"), identifix: n, garage360: n,
+    }),
+    row("VIN-based parts catalog", {
+      "365": y,
+      shopmonkey: p("Via 3rd-party"),
+      tekmetric: p("Via Nexpart"),
+      autoleap: p(),
+      mitchell1: y,
+      ari: y,
+      fullbay: y,
+      torque360: p(),
+      shopware: p(),
+      protractor: p(),
+      napatracs: y,
+      identifix: y,
+      garage360: n,
+    }),
+    row("Public marketplace (buy/sell vehicles)", {
+      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: n, identifix: n, garage360: n,
+    }),
+    row("Franchise / network program", {
+      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: p("NAPA AutoCare"), identifix: n, garage360: n,
+    }),
+    row("Loyalty & promo codes built-in", {
+      "365": y,
+      shopmonkey: p("Marketing add-on"),
+      tekmetric: p(),
+      autoleap: y,
+      mitchell1: n, ari: p(), fullbay: n, torque360: y, shopware: p(), protractor: n, napatracs: n, identifix: n, garage360: n,
+    }),
+    row("HR / leave / certificates", {
+      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: p(), torque360: n, shopware: n, protractor: p(), napatracs: n, identifix: n, garage360: n,
+    }),
+    row("Learning / courses in-app", {
+      "365": y,
+      shopmonkey: p("Shopmonkey University"),
+      tekmetric: n, autoleap: n, mitchell1: p("ProDemand"), ari: n, fullbay: p(), torque360: n, shopware: n, protractor: n, napatracs: n, identifix: y, garage360: n,
+    }),
+    row("Service-reminder automation", {
+      "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: p(), ari: y, fullbay: y, torque360: y, shopware: y, protractor: y, napatracs: p(), identifix: p(), garage360: p(),
+    }),
+    row("PH-local pricing & payments (GCash)", {
+      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: n, identifix: n, garage360: p(),
+    }),
+    row("Mobile-first UI", {
+      "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: n, ari: y, fullbay: y, torque360: y, shopware: y, protractor: p(), napatracs: n, identifix: p(), garage360: y,
+    }),
+    row("Referral / affiliate program", {
+      "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: n, identifix: n, garage360: n,
+    }),
   ],
 };
 
+// ================= MARKETPLACES =================
+const MARKETPLACE_COMPETITORS: Competitor[] = [
+  {
+    id: "365",
+    name: "365 Motor Sales",
+    blurb: "PH-first, motor-focused",
+    pricing: {
+      startingUsd: 0,
+      unit: "free",
+      tierName: "Free forever",
+      includes: ["Free listings", "Boosts optional", "Full seller tools"],
+      link: "/pricing",
+    },
+  },
+  {
+    id: "carousell",
+    name: "Carousell",
+    blurb: "General C2C",
+    pricing: {
+      startingUsd: 0,
+      unit: "free",
+      tierName: "Free basic",
+      includes: ["Bumps paid", "Not vehicle-focused"],
+      link: "https://www.carousell.ph/",
+    },
+  },
+  {
+    id: "olx",
+    name: "OLX",
+    blurb: "General classifieds",
+    pricing: {
+      startingUsd: 0,
+      unit: "free",
+      tierName: "Free basic",
+      includes: ["Paid boosts", "No vehicle tools"],
+      link: "https://www.olx.ph/",
+    },
+  },
+  {
+    id: "autodeal",
+    name: "AutoDeal",
+    blurb: "Dealer-first PH",
+    pricing: {
+      startingUsd: null,
+      unit: "custom",
+      tierName: "Dealer plan",
+      includes: ["Dealer-only", "Lead-fee model", "No private sellers"],
+      link: "https://www.autodeal.com.ph/",
+    },
+  },
+  {
+    id: "philkotse",
+    name: "Philkotse",
+    blurb: "PH auto classifieds",
+    pricing: {
+      startingUsd: null,
+      unit: "custom",
+      tierName: "Dealer plan",
+      includes: ["Dealer subscriptions", "Private ads limited"],
+      link: "https://philkotse.com/",
+    },
+  },
+  {
+    id: "carmudi",
+    name: "Carmudi",
+    blurb: "PH/SEA classifieds",
+    pricing: {
+      startingUsd: null,
+      unit: "custom",
+      tierName: "Dealer plan",
+      includes: ["Dealer packages", "Featured spots paid"],
+      link: "https://www.carmudi.com.ph/",
+    },
+  },
+  {
+    id: "carsph",
+    name: "Cars.com.ph",
+    blurb: "PH dealer marketplace",
+    pricing: {
+      startingUsd: null,
+      unit: "custom",
+      tierName: "Dealer plan",
+      includes: ["Dealer packages", "Private posts limited"],
+      link: "https://www.cars.com.ph/",
+    },
+  },
+  {
+    id: "fb",
+    name: "Facebook Marketplace",
+    blurb: "Social classifieds",
+    pricing: {
+      startingUsd: 0,
+      unit: "free",
+      tierName: "Free",
+      includes: ["Unmoderated", "No vehicle tools", "Meta ads paid"],
+      link: "https://www.facebook.com/marketplace/",
+    },
+  },
+];
+
 export const MARKETPLACE_MATRIX: CompetitorMatrix = {
-  competitors: [
-    { id: "365", name: "365 Motor Sales", blurb: "PH-first, motor-focused" },
-    { id: "carousell", name: "Carousell", blurb: "General C2C marketplace" },
-    { id: "olx", name: "OLX", blurb: "General classifieds" },
-    { id: "autodeal", name: "AutoDeal", blurb: "Dealer-first PH" },
-    { id: "philkotse", name: "Philkotse", blurb: "PH auto classifieds" },
-    { id: "fb", name: "Facebook Marketplace", blurb: "Social classifieds" },
-  ],
+  competitors: MARKETPLACE_COMPETITORS,
   rows: [
-    {
-      capability: "Vehicle listings",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "yes" },
-        olx: { v: "yes" },
-        autodeal: { v: "yes" },
-        philkotse: { v: "yes" },
-        fb: { v: "yes" },
-      },
-    },
-    {
-      capability: "VIN decode on listing",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "partial" },
-        philkotse: { v: "no" },
-        fb: { v: "no" },
-      },
-    },
-    {
-      capability: "OR/CR verification",
-      cells: {
-        "365": { v: "yes", note: "AI-assisted LTO doc check" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "partial", note: "Manual dealer check" },
-        philkotse: { v: "no" },
-        fb: { v: "no" },
-      },
-    },
-    {
-      capability: "Draft auto-save on listing form",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "no" },
-        philkotse: { v: "no" },
-        fb: { v: "partial" },
-      },
-    },
-    {
-      capability: "Smart map with filters + sidebar",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "partial" },
-        autodeal: { v: "no" },
-        philkotse: { v: "no" },
-        fb: { v: "partial" },
-      },
-    },
-    {
-      capability: "Wanted listings board",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "no" },
-        philkotse: { v: "no" },
-        fb: { v: "no" },
-      },
-    },
-    {
-      capability: "Messenger inbox with folders + offers",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "partial" },
-        olx: { v: "partial" },
-        autodeal: { v: "no" },
-        philkotse: { v: "no" },
-        fb: { v: "partial" },
-      },
-    },
-    {
-      capability: "Seller tier rings on cards",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "no" },
-        philkotse: { v: "no" },
-        fb: { v: "no" },
-      },
-    },
-    {
-      capability: "Live cross-shop parts stock",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "no" },
-        philkotse: { v: "no" },
-        fb: { v: "no" },
-      },
-    },
-    {
-      capability: "Shop management for businesses",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "partial", note: "Dealer CRM" },
-        philkotse: { v: "no" },
-        fb: { v: "no" },
-      },
-    },
-    {
-      capability: "Franchise / partner shop program",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "no" },
-        philkotse: { v: "no" },
-        fb: { v: "no" },
-      },
-    },
-    {
-      capability: "Referral / QR attribution",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "no" },
-        philkotse: { v: "no" },
-        fb: { v: "no" },
-      },
-    },
-    {
-      capability: "Learning / driver ed hub",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "no" },
-        philkotse: { v: "partial", note: "Blog only" },
-        fb: { v: "no" },
-      },
-    },
-    {
-      capability: "Tow & dispatch",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "no" },
-        philkotse: { v: "no" },
-        fb: { v: "no" },
-      },
-    },
-    {
-      capability: "Accredited clubs directory",
-      cells: {
-        "365": { v: "yes" },
-        carousell: { v: "no" },
-        olx: { v: "no" },
-        autodeal: { v: "no" },
-        philkotse: { v: "no" },
-        fb: { v: "partial", note: "Unmoderated groups" },
-      },
-    },
+    row("Vehicle listings", { "365": y, carousell: y, olx: y, autodeal: y, philkotse: y, carmudi: y, carsph: y, fb: y }),
+    row("VIN decode on listing", { "365": y, carousell: n, olx: n, autodeal: p(), philkotse: n, carmudi: n, carsph: n, fb: n }),
+    row("OR/CR verification", {
+      "365": yy("AI-assisted LTO doc check"),
+      carousell: n, olx: n, autodeal: p("Manual dealer check"), philkotse: n, carmudi: p("Dealer only"), carsph: n, fb: n,
+    }),
+    row("Draft auto-save on listing form", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: p() }),
+    row("Smart map with filters + sidebar", { "365": y, carousell: n, olx: p(), autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: p() }),
+    row("Wanted listings board", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
+    row("Messenger inbox with folders + offers", { "365": y, carousell: p(), olx: p(), autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: p() }),
+    row("Seller tier rings on cards", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
+    row("Live cross-shop parts stock", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
+    row("Shop management for businesses", { "365": y, carousell: n, olx: n, autodeal: p("Dealer CRM"), philkotse: n, carmudi: p(), carsph: p(), fb: n }),
+    row("Franchise / partner shop program", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
+    row("Referral / QR attribution", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
+    row("Learning / driver ed hub", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: p("Blog only"), carmudi: p("Blog"), carsph: p("Blog"), fb: n }),
+    row("Tow & dispatch", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
+    row("Accredited clubs directory", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: p("Unmoderated groups") }),
   ],
 };
+
+function row(capability: string, cells: Record<string, Cell>) {
+  return { capability, cells };
+}

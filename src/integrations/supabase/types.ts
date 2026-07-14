@@ -5089,6 +5089,51 @@ export type Database = {
         }
         Relationships: []
       }
+      feature_screenshots: {
+        Row: {
+          captured_at: string
+          captured_by: string | null
+          created_at: string
+          feature_id: string
+          id: string
+          is_pinned: boolean
+          notes: string | null
+          route: string
+          sha256: string | null
+          storage_path: string | null
+          url: string
+          viewport: string
+        }
+        Insert: {
+          captured_at?: string
+          captured_by?: string | null
+          created_at?: string
+          feature_id: string
+          id?: string
+          is_pinned?: boolean
+          notes?: string | null
+          route: string
+          sha256?: string | null
+          storage_path?: string | null
+          url: string
+          viewport?: string
+        }
+        Update: {
+          captured_at?: string
+          captured_by?: string | null
+          created_at?: string
+          feature_id?: string
+          id?: string
+          is_pinned?: boolean
+          notes?: string | null
+          route?: string
+          sha256?: string | null
+          storage_path?: string | null
+          url?: string
+          viewport?: string
+        }
+        Relationships: []
+      }
       flashcard_content: {
         Row: {
           auto_sync_enabled: boolean

@@ -295,6 +295,7 @@ import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './route
 import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
 import { Route as AuthenticatedDashboardClubsRouteImport } from './routes/_authenticated/dashboard.clubs'
 import { Route as AuthenticatedDashboardClaimBusinessRouteImport } from './routes/_authenticated/dashboard.claim-business'
+import { Route as AuthenticatedAdminFeatureScreenshotsRouteImport } from './routes/_authenticated/admin.feature-screenshots'
 import { Route as AuthenticatedAdminClubDiscountPromotionsRouteImport } from './routes/_authenticated/admin.club-discount-promotions'
 import { Route as AuthenticatedAccountTrustScoreRouteImport } from './routes/_authenticated/account.trust-score'
 import { Route as AuthenticatedAccountRewardsRouteImport } from './routes/_authenticated/account.rewards'
@@ -336,6 +337,7 @@ import { Route as ApiPublicHooksOpsAlertsDigestRouteImport } from './routes/api/
 import { Route as ApiPublicHooksFlashcardsAutosyncRouteImport } from './routes/api/public/hooks/flashcards-autosync'
 import { Route as ApiPublicHooksDispatchExpandRouteImport } from './routes/api/public/hooks/dispatch-expand'
 import { Route as ApiPublicHooksDiscoverSyncRouteImport } from './routes/api/public/hooks/discover-sync'
+import { Route as ApiPublicHooksCaptureFeatureScreenshotsRouteImport } from './routes/api/public/hooks/capture-feature-screenshots'
 import { Route as ApiPublicHooksAnnualBonusesRouteImport } from './routes/api/public/hooks/annual-bonuses'
 import { Route as ApiPublicHealthRoutesRouteImport } from './routes/api/public/health/routes'
 import { Route as ApiPublicGoSlugRouteImport } from './routes/api/public/go.$slug'
@@ -1854,6 +1856,12 @@ const AuthenticatedDashboardClaimBusinessRoute =
     path: '/dashboard/claim-business',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminFeatureScreenshotsRoute =
+  AuthenticatedAdminFeatureScreenshotsRouteImport.update({
+    id: '/admin/feature-screenshots',
+    path: '/admin/feature-screenshots',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminClubDiscountPromotionsRoute =
   AuthenticatedAdminClubDiscountPromotionsRouteImport.update({
     id: '/admin/club-discount-promotions',
@@ -2088,6 +2096,12 @@ const ApiPublicHooksDiscoverSyncRoute =
   ApiPublicHooksDiscoverSyncRouteImport.update({
     id: '/api/public/hooks/discover-sync',
     path: '/api/public/hooks/discover-sync',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksCaptureFeatureScreenshotsRoute =
+  ApiPublicHooksCaptureFeatureScreenshotsRouteImport.update({
+    id: '/api/public/hooks/capture-feature-screenshots',
+    path: '/api/public/hooks/capture-feature-screenshots',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksAnnualBonusesRoute =
@@ -2434,6 +2448,7 @@ export interface FileRoutesByFullPath {
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/admin/club-discount-promotions': typeof AuthenticatedAdminClubDiscountPromotionsRoute
+  '/admin/feature-screenshots': typeof AuthenticatedAdminFeatureScreenshotsRoute
   '/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
   '/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
@@ -2553,6 +2568,7 @@ export interface FileRoutesByFullPath {
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
   '/api/public/health/routes': typeof ApiPublicHealthRoutesRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
+  '/api/public/hooks/capture-feature-screenshots': typeof ApiPublicHooksCaptureFeatureScreenshotsRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/flashcards-autosync': typeof ApiPublicHooksFlashcardsAutosyncRoute
@@ -2777,6 +2793,7 @@ export interface FileRoutesByTo {
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/admin/club-discount-promotions': typeof AuthenticatedAdminClubDiscountPromotionsRoute
+  '/admin/feature-screenshots': typeof AuthenticatedAdminFeatureScreenshotsRoute
   '/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
   '/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
@@ -2895,6 +2912,7 @@ export interface FileRoutesByTo {
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
   '/api/public/health/routes': typeof ApiPublicHealthRoutesRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
+  '/api/public/hooks/capture-feature-screenshots': typeof ApiPublicHooksCaptureFeatureScreenshotsRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/flashcards-autosync': typeof ApiPublicHooksFlashcardsAutosyncRoute
@@ -3131,6 +3149,7 @@ export interface FileRoutesById {
   '/_authenticated/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/_authenticated/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/_authenticated/admin/club-discount-promotions': typeof AuthenticatedAdminClubDiscountPromotionsRoute
+  '/_authenticated/admin/feature-screenshots': typeof AuthenticatedAdminFeatureScreenshotsRoute
   '/_authenticated/dashboard/claim-business': typeof AuthenticatedDashboardClaimBusinessRoute
   '/_authenticated/dashboard/clubs': typeof AuthenticatedDashboardClubsRoute
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
@@ -3250,6 +3269,7 @@ export interface FileRoutesById {
   '/api/public/go/$slug': typeof ApiPublicGoSlugRoute
   '/api/public/health/routes': typeof ApiPublicHealthRoutesRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
+  '/api/public/hooks/capture-feature-screenshots': typeof ApiPublicHooksCaptureFeatureScreenshotsRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/flashcards-autosync': typeof ApiPublicHooksFlashcardsAutosyncRoute
@@ -3486,6 +3506,7 @@ export interface FileRouteTypes {
     | '/account/rewards'
     | '/account/trust-score'
     | '/admin/club-discount-promotions'
+    | '/admin/feature-screenshots'
     | '/dashboard/claim-business'
     | '/dashboard/clubs'
     | '/dashboard/parts-wanted'
@@ -3605,6 +3626,7 @@ export interface FileRouteTypes {
     | '/api/public/go/$slug'
     | '/api/public/health/routes'
     | '/api/public/hooks/annual-bonuses'
+    | '/api/public/hooks/capture-feature-screenshots'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/flashcards-autosync'
@@ -3829,6 +3851,7 @@ export interface FileRouteTypes {
     | '/account/rewards'
     | '/account/trust-score'
     | '/admin/club-discount-promotions'
+    | '/admin/feature-screenshots'
     | '/dashboard/claim-business'
     | '/dashboard/clubs'
     | '/dashboard/parts-wanted'
@@ -3947,6 +3970,7 @@ export interface FileRouteTypes {
     | '/api/public/go/$slug'
     | '/api/public/health/routes'
     | '/api/public/hooks/annual-bonuses'
+    | '/api/public/hooks/capture-feature-screenshots'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/flashcards-autosync'
@@ -4182,6 +4206,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account/rewards'
     | '/_authenticated/account/trust-score'
     | '/_authenticated/admin/club-discount-promotions'
+    | '/_authenticated/admin/feature-screenshots'
     | '/_authenticated/dashboard/claim-business'
     | '/_authenticated/dashboard/clubs'
     | '/_authenticated/dashboard/parts-wanted'
@@ -4301,6 +4326,7 @@ export interface FileRouteTypes {
     | '/api/public/go/$slug'
     | '/api/public/health/routes'
     | '/api/public/hooks/annual-bonuses'
+    | '/api/public/hooks/capture-feature-screenshots'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/flashcards-autosync'
@@ -4459,6 +4485,7 @@ export interface RootRouteChildren {
   ApiPublicGoSlugRoute: typeof ApiPublicGoSlugRoute
   ApiPublicHealthRoutesRoute: typeof ApiPublicHealthRoutesRoute
   ApiPublicHooksAnnualBonusesRoute: typeof ApiPublicHooksAnnualBonusesRoute
+  ApiPublicHooksCaptureFeatureScreenshotsRoute: typeof ApiPublicHooksCaptureFeatureScreenshotsRoute
   ApiPublicHooksDiscoverSyncRoute: typeof ApiPublicHooksDiscoverSyncRoute
   ApiPublicHooksDispatchExpandRoute: typeof ApiPublicHooksDispatchExpandRoute
   ApiPublicHooksFlashcardsAutosyncRoute: typeof ApiPublicHooksFlashcardsAutosyncRoute
@@ -6489,6 +6516,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardClaimBusinessRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/feature-screenshots': {
+      id: '/_authenticated/admin/feature-screenshots'
+      path: '/admin/feature-screenshots'
+      fullPath: '/admin/feature-screenshots'
+      preLoaderRoute: typeof AuthenticatedAdminFeatureScreenshotsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/club-discount-promotions': {
       id: '/_authenticated/admin/club-discount-promotions'
       path: '/admin/club-discount-promotions'
@@ -6774,6 +6808,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/hooks/discover-sync'
       fullPath: '/api/public/hooks/discover-sync'
       preLoaderRoute: typeof ApiPublicHooksDiscoverSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/capture-feature-screenshots': {
+      id: '/api/public/hooks/capture-feature-screenshots'
+      path: '/api/public/hooks/capture-feature-screenshots'
+      fullPath: '/api/public/hooks/capture-feature-screenshots'
+      preLoaderRoute: typeof ApiPublicHooksCaptureFeatureScreenshotsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/annual-bonuses': {
@@ -7204,6 +7245,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRewardsRoute: typeof AuthenticatedAccountRewardsRoute
   AuthenticatedAccountTrustScoreRoute: typeof AuthenticatedAccountTrustScoreRoute
   AuthenticatedAdminClubDiscountPromotionsRoute: typeof AuthenticatedAdminClubDiscountPromotionsRoute
+  AuthenticatedAdminFeatureScreenshotsRoute: typeof AuthenticatedAdminFeatureScreenshotsRoute
   AuthenticatedDashboardClaimBusinessRoute: typeof AuthenticatedDashboardClaimBusinessRoute
   AuthenticatedDashboardClubsRoute: typeof AuthenticatedDashboardClubsRoute
   AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
@@ -7224,6 +7266,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountTrustScoreRoute: AuthenticatedAccountTrustScoreRoute,
   AuthenticatedAdminClubDiscountPromotionsRoute:
     AuthenticatedAdminClubDiscountPromotionsRoute,
+  AuthenticatedAdminFeatureScreenshotsRoute:
+    AuthenticatedAdminFeatureScreenshotsRoute,
   AuthenticatedDashboardClaimBusinessRoute:
     AuthenticatedDashboardClaimBusinessRoute,
   AuthenticatedDashboardClubsRoute: AuthenticatedDashboardClubsRoute,
@@ -7919,6 +7963,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicGoSlugRoute: ApiPublicGoSlugRoute,
   ApiPublicHealthRoutesRoute: ApiPublicHealthRoutesRoute,
   ApiPublicHooksAnnualBonusesRoute: ApiPublicHooksAnnualBonusesRoute,
+  ApiPublicHooksCaptureFeatureScreenshotsRoute:
+    ApiPublicHooksCaptureFeatureScreenshotsRoute,
   ApiPublicHooksDiscoverSyncRoute: ApiPublicHooksDiscoverSyncRoute,
   ApiPublicHooksDispatchExpandRoute: ApiPublicHooksDispatchExpandRoute,
   ApiPublicHooksFlashcardsAutosyncRoute: ApiPublicHooksFlashcardsAutosyncRoute,
@@ -7948,13 +7994,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

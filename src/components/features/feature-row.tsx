@@ -8,10 +8,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { FeaturePreview } from "./feature-preview";
+import { FeatureScreenshot, type LatestScreenshot } from "./feature-screenshot";
 import type { Feature } from "@/data/features-catalog";
 
-export function FeatureRow({ f }: { f: Feature }) {
+export function FeatureRow({ f, latestScreenshot }: { f: Feature; latestScreenshot?: LatestScreenshot }) {
   const [copied, setCopied] = useState(false);
   const copyLink = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,7 +44,12 @@ export function FeatureRow({ f }: { f: Feature }) {
       <AccordionContent>
         <div className="animate-fade-in space-y-5 px-2 pb-4 pt-1">
           {f.route && (
-            <FeaturePreview route={f.route} label={f.name} />
+            <FeatureScreenshot
+              featureId={f.id}
+              route={f.route}
+              label={f.name}
+              latest={latestScreenshot ?? null}
+            />
           )}
           <div className="grid gap-5 lg:grid-cols-3">
 

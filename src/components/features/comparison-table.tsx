@@ -1,6 +1,6 @@
 import { Check, Minus, X, Sparkles } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import type { Cell, CompetitorMatrix } from "@/data/competitors-shop-software";
+import type { Cell, CompetitorMatrix, Competitor } from "@/data/competitors-shop-software";
 
 function CellPill({ c }: { c: Cell }) {
   if (c.v === "yes")
@@ -22,11 +22,26 @@ function CellPill({ c }: { c: Cell }) {
   );
 }
 
+function priceCell(c: Competitor) {
+  const p = c.pricing;
+  if (p.unit === "free") return { text: "Free", tone: "primary" as const };
+  if (p.startingUsd == null) return { text: "Custom", tone: "muted" as const };
+  const val = p.startingUsd % 1 === 0 ? `$${p.startingUsd}` : `$${p.startingUsd.toFixed(2)}`;
+  return { text: `${val}/${p.unit}`, tone: "muted" as const };
+}
+
 export function ComparisonTable({ matrix }: { matrix: CompetitorMatrix }) {
+  // Widen min column width when many competitors — keep table readable, scroll horizontally.
+  const colCount = matrix.competitors.length;
+  const minWidth = 220 + colCount * 140;
+
   return (
     <TooltipProvider delayDuration={150}>
       <div className="overflow-x-auto rounded-2xl border bg-card shadow-sm">
-        <table className="w-full min-w-[720px] border-separate border-spacing-0 text-sm">
+        <table
+          className="w-full border-separate border-spacing-0 text-sm"
+          style={{ minWidth: `${minWidth}px` }}
+        >
           <thead>
             <tr className="bg-gradient-to-r from-secondary/60 via-secondary/40 to-secondary/60">
               <th className="sticky left-0 z-20 min-w-[220px] border-b bg-secondary/60 p-3 text-left font-semibold backdrop-blur">
@@ -37,7 +52,7 @@ export function ComparisonTable({ matrix }: { matrix: CompetitorMatrix }) {
                 return (
                   <th
                     key={c.id}
-                    className={`relative border-b p-3 text-center font-semibold ${
+                    className={`relative min-w-[140px] border-b p-3 text-center font-semibold ${
                       is365 ? "bg-primary/10 text-primary" : ""
                     }`}
                   >
@@ -51,6 +66,35 @@ export function ComparisonTable({ matrix }: { matrix: CompetitorMatrix }) {
                       {c.blurb}
                     </div>
                   </th>
+                );
+              })}
+            </tr>
+            {/* Starting price row */}
+            <tr className="bg-secondary/25">
+              <th
+                scope="row"
+                className="sticky left-0 z-10 border-b bg-secondary/50 p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground backdrop-blur"
+              >
+                Starting price
+              </th>
+              {matrix.competitors.map((c) => {
+                const is365 = c.id === "365";
+                const pc = priceCell(c);
+                return (
+                  <td key={c.id} className={`border-b p-3 text-center ${is365 ? "bg-primary/5" : ""}`}>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        pc.tone === "primary"
+                          ? "bg-primary/15 text-primary"
+                          : "bg-muted text-foreground"
+                      }`}
+                    >
+                      {pc.text}
+                    </span>
+                    {c.pricing.highest && (
+                      <div className="mt-0.5 text-[10px] text-muted-foreground">up to {c.pricing.highest}</div>
+                    )}
+                  </td>
                 );
               })}
             </tr>
