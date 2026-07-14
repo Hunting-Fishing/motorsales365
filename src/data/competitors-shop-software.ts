@@ -199,9 +199,72 @@ const SHOP_COMPETITORS: Competitor[] = [
       link: "https://garage360.io/pricing",
     },
   },
+  {
+    id: "orderry",
+    name: "Orderry",
+    blurb: "SMB shop CRM",
+    pricing: {
+      startingUsd: 39,
+      unit: "mo",
+      tierName: "Startup",
+      includes: ["Work orders", "Inventory + CRM", "Mobile app"],
+      highest: "Enterprise ≈ $189/mo",
+      link: "https://orderry.com/pricing/",
+    },
+  },
+  {
+    id: "garageplug",
+    name: "GaragePlug",
+    blurb: "APAC/EMEA SaaS",
+    pricing: {
+      startingUsd: 45,
+      unit: "mo",
+      tierName: "Essential",
+      includes: ["Cloud DMS", "Digital job cards", "Multi-branch"],
+      highest: "Premium ≈ $99/mo",
+      link: "https://garageplug.com/pricing",
+    },
+  },
+  {
+    id: "workshop",
+    name: "Workshop Software",
+    blurb: "AU/NZ/UK SaaS",
+    pricing: {
+      startingUsd: 59,
+      unit: "mo",
+      tierName: "Lite",
+      includes: ["Job cards", "Xero/QBO sync", "SMS reminders"],
+      highest: "Pro ≈ $189/mo",
+      link: "https://www.workshopsoftware.com/pricing/",
+    },
+  },
+  {
+    id: "rowriter",
+    name: "R.O. Writer",
+    blurb: "Legacy US DMS",
+    pricing: {
+      startingUsd: 189,
+      unit: "mo",
+      tierName: "Standard",
+      includes: ["Windows install", "Catalog integrations", "US-only support"],
+      link: "https://rowriter.com/pricing/",
+    },
+  },
+  {
+    id: "maxxtraxx",
+    name: "MaxxTraxx",
+    blurb: "US independent shops",
+    pricing: {
+      startingUsd: 109,
+      unit: "mo",
+      tierName: "SE",
+      includes: ["Desktop client", "Accounting built-in", "Parts catalogs"],
+      highest: "Enterprise ≈ $229/mo",
+      link: "https://www.scottsystems.com/pricing/",
+    },
+  },
 ];
 
-export const SHOP_SOFTWARE_MATRIX: CompetitorMatrix = {
   competitors: SHOP_COMPETITORS,
   rows: [
     row("Work orders (RO lifecycle)", { "365": y, shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: y, ari: y, fullbay: y, torque360: y, shopware: y, protractor: y, napatracs: y, identifix: y, garage360: y }),
