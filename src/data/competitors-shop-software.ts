@@ -184,9 +184,11 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "NAPA-tied shops",
     pricing: {
       startingUsd: 129,
+      topUsd: 249,
       unit: "mo",
       tierName: "Standard",
       includes: ["NAPA catalog", "Desktop-first", "US-only support"],
+      highest: "Pro ≈ $249/mo",
       link: "https://www.napatracs.com/",
     },
   },
