@@ -803,6 +803,14 @@ export function SiteHeader() {
                     </SheetClose>
                     <SheetClose asChild>
                       <Link
+                        to="/features"
+                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
+                      >
+                        Features
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
                         to="/pricing"
                         className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
                       >
