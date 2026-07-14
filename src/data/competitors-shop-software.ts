@@ -198,9 +198,11 @@ const SHOP_COMPETITORS: Competitor[] = [
     blurb: "Direct-Hit powered",
     pricing: {
       startingUsd: 149,
+      topUsd: 249,
       unit: "mo",
       tierName: "Standard",
       includes: ["Diagnostic DB", "OEM procedures", "US-only"],
+      highest: "Pro ≈ $249/mo",
       link: "https://identifix.com/",
     },
   },
