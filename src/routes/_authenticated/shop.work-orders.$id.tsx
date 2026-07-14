@@ -663,6 +663,8 @@ function WorkOrderDetailPage() {
                   )}
                 </CardContent>
               </Card>
+
+              <WorkOrderTimeEntries workOrderId={id} />
             </div>
           </>
         )}
