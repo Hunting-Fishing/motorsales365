@@ -10,6 +10,7 @@ import {
   LifeBuoy,
   HelpCircle,
   ArrowRight,
+  Sparkles,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
