@@ -37,12 +37,21 @@ export function FeatureRow({ f, latestScreenshot }: { f: Feature; latestScreensh
               <span className="font-semibold">{f.name}</span>
               <StatusBadge status={f.status} />
             </div>
-            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{f.pitch}</p>
+            {PLAIN_LANGUAGE[f.id] && (
+              <p className="mt-1 text-sm font-medium text-foreground/90">{PLAIN_LANGUAGE[f.id]}</p>
+            )}
+            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{f.pitch}</p>
           </div>
         </div>
       </AccordionTrigger>
       <AccordionContent>
         <div className="animate-fade-in space-y-5 px-2 pb-4 pt-1">
+          {PLAIN_LANGUAGE[f.id] && (
+            <div className="rounded-lg border-l-4 border-primary bg-primary/5 px-4 py-3">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-primary">In plain English</div>
+              <p className="mt-1 text-sm leading-relaxed">{PLAIN_LANGUAGE[f.id]}</p>
+            </div>
+          )}
           {f.route && (
             <FeatureScreenshot
               featureId={f.id}
