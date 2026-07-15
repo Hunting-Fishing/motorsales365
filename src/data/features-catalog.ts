@@ -108,6 +108,93 @@ export const MODULES: {
   },
 ];
 
+/**
+ * Plain-language ("what does this actually mean?") explanations, keyed by
+ * feature id. Rendered above the technical pitch on the /features page so
+ * non-technical readers understand each row before opening it.
+ */
+export const PLAIN_LANGUAGE: Record<string, string> = {
+  // Marketplace
+  "post-listing": "Post a car, bike, or part in a few steps — we auto-fill most details from the VIN so you don't have to type them.",
+  "smart-map": "See every listing near you on a map, filter by what you want, and click a pin to jump to the ad.",
+  "tier-rings": "The glow around each listing tells you at a glance who you're dealing with — verified shop, dealership, or private seller.",
+  "messenger-inbox": "A real inbox like Messenger, but built for buying and selling — separate tabs for your buys, sales, and saved chats.",
+  "wanted-listings": "Instead of hunting, post what you need and sellers come to you.",
+  "boosts": "Pay a small amount to push your listing to the top for a set number of days — you know exactly what you're paying for.",
+  "business-microsite": "Every verified business gets its own free page like 365motorsales.com/laoagtires — your listings, hours, map, and reviews all in one shareable link.",
+  "custom-domain": "Later, point your own domain (like laoagtires.com) at your 365 microsite for free.",
+  "slug-history": "If you rename your business page, the old link still works — no broken shares or dead QR codes.",
+
+  // Shop Manager
+  "work-orders": "One screen tracks every repair from drop-off to pickup — vehicle, jobs, parts, labor time, and the invoice at the end.",
+  "inventory": "Track every part on your shelf — cost, price, quantity — and get pinged before you run out.",
+  "invoices-quotes": "Give the customer a quote, and when they say yes, turn it into an invoice with one click.",
+  "accounting": "Every peso in and out is recorded twice so your books balance automatically. See sales, expenses, and 'am I making money?' on one page.",
+  "pnl-plain": "A one-page report that answers 'did I make money this month?' — sales, minus costs, equals profit. Nothing fancier.",
+  "gl-drilldown": "Click any number in a report and see the exact invoices, receipts, or expenses behind it — nothing hidden.",
+  "technicians": "See who's working today, who's overloaded, and how much billable work each tech finished this week.",
+  "expenses": "Snap the receipt, pick a category, done. It shows up in your P&L the same day.",
+  "loyalty-promos": "Reward repeat customers automatically and run 'first-visit 10% off' promos without any coupon site.",
+  "automation": "Send oil-change reminders to customers automatically based on mileage or months since last visit — set once, runs forever.",
+  "hr-leave": "Handle staff leave requests, balances, and certification expiries without a spreadsheet.",
+  "free-inventory": "Any verified business gets our full Shop Manager inventory module for free — no per-seat fee, no paywall. Competitors charge $199+/month.",
+  "invoice-from-inventory": "Pick parts from your shelf, click one button, and out comes a printable invoice — stock is subtracted and your books update themselves.",
+  "digital-inspections": "Instead of paper, technicians walk the car on a tablet, take photos of what they find, and text the customer a link to approve extra work.",
+
+  // Parts Network
+  "vin-parts": "Type in a plate or VIN and see every part that fits, in stock, across the whole network.",
+  "network-stock": "See which shop actually has the part on the shelf right now — no more calling five places.",
+  "inquiry-lifecycle": "Every parts request shows up as Pending → Accepted → Rejected so both sides know where it stands.",
+  "wanted-parts": "Post the part you need. Shops with it in stock reply with a price and ETA.",
+  "wash-sale": "Shops don't pay to list parts. We only earn a small margin when a part actually sells — so we're incentivized to help you sell, not to charge rent.",
+  "cross-shop-share": "If you don't have the part, another 365 shop probably does. Sell it to your customer anyway and split the margin.",
+
+  // Franchise
+  "franchise-tiers": "Two ways to join: keep your own brand (Partner) or co-brand with 365 (Franchise). Both get parts discounts and shared customers.",
+  "franchise-apply": "A clean application with document upload — no vague DMs, no back-channel deals.",
+  "shared-crm": "With the customer's OK, any partner shop can see prior service history — so nothing gets missed at the next visit.",
+
+  // Partner Program
+  "partner-apply": "Refer people to 365 with your own QR code and earn commissions on real activity. Independent contractor, no MLM, no downline.",
+  "partner-dashboard": "Every scan, signup, and commission in one dashboard — no guessing what you earned.",
+
+  // Clubs
+  "clubs-directory": "Real motoring clubs only — they submit LTO/SEC/DTI docs before they can list.",
+  "club-discount": "Verified club members get 5% off ads, boosts, and passport purchases — applied automatically at checkout.",
+
+  // Learning
+  "flashcards": "Bite-sized study cards for mechanics — engines, brakes, electrical, marine, ag — free to use, great for training new hires.",
+  "courses": "Structured video courses with progress tracking. Watch on any device; pick up where you left off.",
+
+  // Dispatch
+  "dispatch-tow": "One-tap tow request; local providers accept and you see ETA in real time.",
+  "rides": "Local ride and transport listings focused on motoring, not general Grab-style trips.",
+
+  // QR & Referrals
+  "qr-ads": "Print your QR on shirts, banners, or arm bands. Every scan is tracked back to you.",
+  "referral-attribution": "We track a QR scan all the way through signup and purchase — so partners get paid on real conversions, not just clicks.",
+
+  // Trust & Safety
+  "lto-verify": "Sellers upload their OR/CR. Our AI reads it and flags fakes before the ad goes live. Buyers see a green 'LTO Verified' badge.",
+  "safe-meet": "Every vehicle ad shows a short pre-meetup checklist — meet in daylight, verify OR/CR, bring someone with you.",
+  "reports-moderation": "Flag anything sketchy. Moderators review with real severity levels (including 'no penalty') and there's an appeals path.",
+  "realtime-everything": "Inventory, inquiries, messages, and stock update on your screen the moment they change — no refresh, no waiting.",
+  "ph-first": "Built for Philippine plates, roads, and payment habits (like GCash) first — not a US template forced to fit.",
+  "ad-free-buyers": "No third-party display ads on any listing page. What you see is what shops are actually selling.",
+
+  // Buyer Tools
+  "saved-favorites": "Star an ad you like. Save a search once, and we tell you when new matches show up or the price drops.",
+  "price-trends": "Every listing shows whether the asking price is above, at, or below what similar units nearby are going for.",
+
+  // Roadmap
+  "rm-driver-ed": "Coming soon: full driver-education courses tied to LTO renewal, with proof of completion stored on your profile.",
+  "rm-insurance": "Coming soon: compare CTPL and comprehensive insurance quotes side by side without calling five brokers.",
+  "rm-auctions": "Coming soon: live and timed bidding rooms for vehicles and parts.",
+  "rm-trade-in": "Coming soon: enter your car and get same-day binding offers from multiple dealers.",
+  "rm-vhistory": "Coming soon: accident, flood, and service history badges surfaced right on the listing.",
+  "rm-loans": "Coming soon: pre-qualify for a car loan in-app with partner banks — know your budget before you shop.",
+};
+
 export const FEATURES: Feature[] = [
   // ─────────────── Marketplace ───────────────
   {
@@ -881,5 +968,250 @@ export const FEATURES: Feature[] = [
     whyUseful: ["Know your budget before shopping", "Skip the branch visit"],
     vsCompetition: ["Comparable to eCompareMo, marketplace-embedded"],
     status: "roadmap",
+  },
+
+  // ─────────────── New differentiators ───────────────
+  {
+    id: "business-microsite",
+    module: "marketplace",
+    name: "Free hosted business microsite",
+    pitch: "Every verified business gets 365motorsales.com/<slug> — listings, hours, map, gallery, reviews.",
+    howItWorks:
+      "When a business is verified, its slug becomes a public page (e.g. /laoagtires) that aggregates all their listings, contact info, hours, staff, gallery, and reviews into one shareable link. Zero web-dev, zero hosting fees.",
+    whyUseful: [
+      "One link for cards, SMS, and social — no separate website to build",
+      "Automatically updated as you post listings",
+      "SEO-friendly URL that's easier to remember than a UUID",
+    ],
+    vsCompetition: [
+      "Shopify/Wix charge $30–$150/mo for the same reach",
+      "Facebook Pages aren't indexable the same way",
+      "Carousell/OLX don't give businesses a branded landing page",
+    ],
+    route: "/businesses",
+    status: "live",
+  },
+  {
+    id: "custom-domain",
+    module: "marketplace",
+    name: "Custom domain on your microsite",
+    pitch: "Point yourdomain.com at your 365 microsite — coming soon.",
+    howItWorks:
+      "Planned: verified businesses will be able to attach their own domain (e.g. laoagtires.com) to their microsite via CNAME, keeping the 365 features underneath.",
+    whyUseful: [
+      "Keep your brand while using 365's tools",
+      "No hosting, SSL, or maintenance to worry about",
+      "Move your domain in or out at any time",
+    ],
+    vsCompetition: [
+      "Most marketplaces trap you inside their subdomain forever",
+    ],
+    status: "roadmap",
+  },
+  {
+    id: "slug-history",
+    module: "marketplace",
+    name: "Business slug history & redirects",
+    pitch: "Rename your business page and old links still work.",
+    howItWorks:
+      "Every business slug change is recorded in business_slug_history, and old URLs 301-redirect to the current slug. Nothing you've printed or shared ever 404s.",
+    whyUseful: [
+      "Rebrand without losing SEO or QR codes",
+      "Old flyers and business cards keep working",
+      "Zero customer confusion",
+    ],
+    vsCompetition: [
+      "Facebook Pages break inbound links when renamed",
+      "Most marketplaces treat renames as brand-new pages",
+    ],
+    status: "live",
+  },
+  {
+    id: "free-inventory",
+    module: "shop-manager",
+    name: "Free Shop Manager inventory for businesses",
+    pitch: "Every verified business gets our full inventory module — free, no per-seat fee.",
+    howItWorks:
+      "Sign up as a business and you get the same inventory module our paid shops use: add parts, cost, price, quantity, alerts, movements, and receipt uploads — with no tier upgrade required.",
+    whyUseful: [
+      "Replace your spreadsheet at zero cost",
+      "Ready the moment you're verified",
+      "Same module the pros use — scales when you grow",
+    ],
+    vsCompetition: [
+      "Shopmonkey starts at $199/mo for the same thing",
+      "Tekmetric $199–$399/mo per location",
+      "Orderry $39–$189/mo",
+    ],
+    route: "/shop/inventory",
+    status: "live",
+  },
+  {
+    id: "invoice-from-inventory",
+    module: "shop-manager",
+    name: "Invoice directly from inventory",
+    pitch: "Pick parts from your shelf → invoice prints → stock and books update themselves.",
+    howItWorks:
+      "On any work order or standalone invoice, pick lines straight from inventory. Stock decrements automatically, COGS posts to the general ledger, and the invoice reflects live pricing — all in one click.",
+    whyUseful: [
+      "No double entry — inventory, invoice, and books move together",
+      "COGS is always right; margin reports are trustworthy",
+      "Cashier flow works on a phone or tablet",
+    ],
+    vsCompetition: [
+      "Shopmonkey has it — at $199+/mo",
+      "ARI has invoices but no auto-COGS to a real GL",
+      "Spreadsheet workflows can't do this at all",
+    ],
+    route: "/shop/invoices",
+    status: "live",
+  },
+  {
+    id: "cross-shop-share",
+    module: "shop-manager",
+    name: "Cross-shop stock visibility",
+    pitch: "Don't have the part? Another 365 shop probably does — sell it anyway.",
+    howItWorks:
+      "Your Shop Manager inventory can (with admin approval) be shared into the Parts Network. Other 365 shops see live counts and can quote your parts to their walk-ins — with margin split rules configured up front.",
+    whyUseful: [
+      "Turn stagnant stock into revenue",
+      "Serve customers even when you're out",
+      "Optional — you control what's shared and to whom",
+    ],
+    vsCompetition: [
+      "No other shop platform networks stock across independent shops",
+    ],
+    route: "/parts/network",
+    status: "live",
+  },
+  {
+    id: "digital-inspections",
+    module: "shop-manager",
+    name: "Digital vehicle inspections (DVI)",
+    pitch: "Tech walks the car on a tablet, snaps photos, customer approves extra work via link.",
+    howItWorks:
+      "Launch a DVI from any work order. Techs check off items, upload photos to a private bucket, and the customer gets a shareable link to review findings and approve additional work.",
+    whyUseful: [
+      "Fewer disputes — everything photographed and time-stamped",
+      "Higher approved-work rates when customers see the photos",
+      "Templates keep inspections consistent shop-wide",
+    ],
+    vsCompetition: [
+      "AutoLeap DVI is bundled in $199+/mo plans",
+      "Most PH shops still use paper checklists",
+    ],
+    route: "/shop",
+    status: "live",
+  },
+  {
+    id: "pnl-plain",
+    module: "shop-manager",
+    name: "Plain-English P&L statement",
+    pitch: "A one-page 'am I making money?' report — sales minus costs, month by month.",
+    howItWorks:
+      "Pick a date range (this month, last 30 days, YTD). We tally sales, expenses, vendor payments, and net cash. Every number is clickable — drill into the exact invoices behind it.",
+    whyUseful: [
+      "Understand your business without an accounting degree",
+      "Export to CSV for your bookkeeper",
+      "Drill down means you can always answer 'where did that number come from?'",
+    ],
+    vsCompetition: [
+      "Most shop tools stop at KPI tiles",
+      "QuickBooks costs extra and doesn't know your work orders",
+    ],
+    route: "/shop/accounting/pnl",
+    status: "live",
+  },
+  {
+    id: "gl-drilldown",
+    module: "shop-manager",
+    name: "General ledger drilldown",
+    pitch: "Click any number in any report and see the exact documents behind it.",
+    howItWorks:
+      "The general ledger and P&L are both clickable — every account row opens the journal entries, and every journal entry links to the source invoice, receipt, or expense.",
+    whyUseful: [
+      "Answer 'where did that number come from?' in two clicks",
+      "Audits and disputes become easy",
+      "Full trace from customer receipt → sale → ledger",
+    ],
+    vsCompetition: [
+      "Most shop tools show KPIs but hide the raw journal",
+    ],
+    route: "/shop/accounting",
+    status: "live",
+  },
+  {
+    id: "wash-sale",
+    module: "parts-network",
+    name: "Wash-sale margin (no listing fees for shops)",
+    pitch: "Shops don't pay to list. 365 earns only when a part actually sells.",
+    howItWorks:
+      "When a customer buys a networked part, 365 books the sale, pays the sourcing shop their agreed price, and keeps a small margin — the 'wash sale'. No SaaS fee, no per-listing fee.",
+    whyUseful: [
+      "Zero risk for shops to opt in",
+      "Aligns 365 with shops selling — not with charging rent",
+      "Predictable revenue without paywalls",
+    ],
+    vsCompetition: [
+      "Marketplaces charge listing or subscription fees regardless of sales",
+      "Facebook Marketplace has no revenue alignment at all",
+    ],
+    route: "/parts/network",
+    status: "live",
+  },
+  {
+    id: "realtime-everything",
+    module: "trust-safety",
+    name: "Real-time updates everywhere",
+    pitch: "Inventory, inquiries, messages, and stock update live — no refresh needed.",
+    howItWorks:
+      "Supabase Realtime channels power live updates across Shop Manager, the Parts Network, and Messenger. When a stock qty changes or a new inquiry arrives, every subscribed screen updates within a second.",
+    whyUseful: [
+      "Two staff on the same work order never overwrite each other",
+      "Buyers see stock changes as they happen",
+      "Feels like a native app, not a form-and-refresh site",
+    ],
+    vsCompetition: [
+      "Most PH tools are page-refresh workflows",
+    ],
+    route: "/shop",
+    status: "live",
+  },
+  {
+    id: "ph-first",
+    module: "trust-safety",
+    name: "PH-first, not a US template",
+    pitch: "Built for Philippine plates, roads, and payment habits — including GCash.",
+    howItWorks:
+      "Region-scoped listings, PHP-native pricing, GCash + Stripe payments, LTO/OR/CR verification, DTI/SEC/LGU-aware business docs, and PH regional maps out of the box.",
+    whyUseful: [
+      "Nothing to translate or 'work around' for local rules",
+      "Payments match how customers actually pay",
+      "Support and docs written for PH users",
+    ],
+    vsCompetition: [
+      "Shopmonkey / Tekmetric / AutoLeap are US-first",
+      "Carousell is generic C2C, not motor-specific",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "ad-free-buyers",
+    module: "trust-safety",
+    name: "Ad-free listing pages for buyers",
+    pitch: "No third-party display ads. What you see is what shops actually sell.",
+    howItWorks:
+      "Listing detail pages, browse pages, and the marketplace map never serve display ads from ad networks. Featured placements are always in-network 365 listings, clearly labeled.",
+    whyUseful: [
+      "No banner spam distracting from vehicle details",
+      "Faster page loads",
+      "No creepy tracking beacons",
+    ],
+    vsCompetition: [
+      "OLX/Carousell/Facebook are ad-first experiences",
+    ],
+    route: "/",
+    status: "live",
   },
 ];

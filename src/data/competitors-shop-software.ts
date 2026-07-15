@@ -376,6 +376,31 @@ export const SHOP_SOFTWARE_MATRIX: CompetitorMatrix = {
     row("Referral / affiliate program", {
       "365": y, shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: n, identifix: n, garage360: n, orderry: n, garageplug: n, workshop: n, rowriter: n, maxxtraxx: n,
     }),
+    row("Free inventory module for any business", {
+      "365": yy("Included, no per-seat fee"),
+      shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: p("Paid tier"), fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: n, identifix: n, garage360: n, orderry: n, garageplug: n, workshop: n, rowriter: n, maxxtraxx: n,
+    }),
+    row("Invoice from inventory (auto stock + COGS)", {
+      "365": y,
+      shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: p(), ari: p("Manual COGS"), fullbay: y, torque360: p(), shopware: y, protractor: y, napatracs: y, identifix: p(), garage360: p(), orderry: y, garageplug: y, workshop: y, rowriter: y, maxxtraxx: y,
+    }),
+    row("Free hosted business microsite", {
+      "365": yy("365motorsales.com/<slug>"),
+      shopmonkey: p("Booking widget"),
+      tekmetric: p(), autoleap: p("Booking page"), mitchell1: n, ari: n, fullbay: n, torque360: p(), shopware: n, protractor: n, napatracs: n, identifix: n, garage360: n, orderry: n, garageplug: p(), workshop: n, rowriter: n, maxxtraxx: n,
+    }),
+    row("Cross-shop stock sharing", {
+      "365": y,
+      shopmonkey: n, tekmetric: n, autoleap: n, mitchell1: n, ari: n, fullbay: n, torque360: n, shopware: n, protractor: n, napatracs: p("NAPA-only"), identifix: n, garage360: n, orderry: n, garageplug: n, workshop: n, rowriter: n, maxxtraxx: n,
+    }),
+    row("Digital vehicle inspections (DVI)", {
+      "365": y,
+      shopmonkey: y, tekmetric: y, autoleap: y, mitchell1: p(), ari: p(), fullbay: y, torque360: y, shopware: p(), protractor: p(), napatracs: n, identifix: n, garage360: p(), orderry: p(), garageplug: y, workshop: p(), rowriter: n, maxxtraxx: n,
+    }),
+    row("Plain-English P&L (drilldown to source docs)", {
+      "365": yy("Every number clickable"),
+      shopmonkey: p(), tekmetric: p(), autoleap: p(), mitchell1: n, ari: n, fullbay: p(), torque360: n, shopware: p(), protractor: y, napatracs: p(), identifix: n, garage360: n, orderry: p(), garageplug: p(), workshop: p(), rowriter: p(), maxxtraxx: y,
+    }),
   ],
 };
 
@@ -504,6 +529,9 @@ export const MARKETPLACE_MATRIX: CompetitorMatrix = {
     row("Learning / driver ed hub", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: p("Blog only"), carmudi: p("Blog"), carsph: p("Blog"), fb: n }),
     row("Tow & dispatch", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
     row("Accredited clubs directory", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: p("Unmoderated groups") }),
+    row("Free hosted business microsite", { "365": yy("365motorsales.com/<slug>"), carousell: n, olx: n, autodeal: p("Dealer profile"), philkotse: p(), carmudi: p(), carsph: p(), fb: p("FB Page") }),
+    row("Slug history keeps old links alive", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
+    row("Ad-free listing pages for buyers", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
   ],
 };
 
