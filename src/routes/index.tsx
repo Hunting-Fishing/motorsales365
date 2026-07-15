@@ -52,10 +52,7 @@ export const Route = createFileRoute("/")({
     try {
       const { business } = await resolveBusinessByHost({ data: { host: null } });
       if (business?.slug) {
-        throw (await import("@tanstack/react-router")).redirect({
-          to: "/businesses/$slug",
-          params: { slug: business.slug },
-        });
+        throw redirect({ to: "/businesses/$slug", params: { slug: business.slug } });
       }
     } catch (e: any) {
       if (e && (e.isRedirect || e.status === 307 || e.status === 308)) throw e;
