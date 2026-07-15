@@ -528,3 +528,167 @@ function RecordPaymentDialog({
     </Dialog>
   );
 }
+
+// ---------- Add from inventory ----------
+
+type InventoryPick = {
+  id: string;
+  name: string;
+  sku: string | null;
+  quantity: number | null;
+  sell_price_per_unit: number | null;
+  unit_price: number | null;
+  cost_per_unit: number | null;
+};
+
+function AddFromInventoryDialog({ invoiceId, invoiceStatus }: { invoiceId: string; invoiceStatus: string | null }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<InventoryPick | null>(null);
+  const [qty, setQty] = useState("1");
+  const [price, setPrice] = useState("");
+
+  const { data: results = [], isFetching } = useQuery({
+    queryKey: ["shop-manager", "inventory-pick", search],
+    enabled: open,
+    queryFn: async () => {
+      let q = (smSupabase as any)
+        .from("inventory_items")
+        .select("id,name,sku,quantity,sell_price_per_unit,unit_price,cost_per_unit")
+        .order("name")
+        .limit(25);
+      if (search.trim()) q = q.or(`name.ilike.%${search}%,sku.ilike.%${search}%,part_number.ilike.%${search}%`);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []) as InventoryPick[];
+    },
+  });
+
+  const pick = (row: InventoryPick) => {
+    setSelected(row);
+    setPrice(String(row.sell_price_per_unit ?? row.unit_price ?? ""));
+    if (!qty) setQty("1");
+  };
+
+  const add = useMutation({
+    mutationFn: async () => {
+      if (!selected) throw new Error("Pick an inventory item");
+      const q = Number(qty), p = Number(price);
+      if (!q || q <= 0) throw new Error("Enter a positive quantity");
+      if (!(p >= 0)) throw new Error("Enter a valid price");
+      if ((selected.quantity ?? 0) < q) throw new Error(`Only ${selected.quantity ?? 0} in stock`);
+      const { error } = await (smSupabase as any).from("invoice_items").insert({
+        invoice_id: invoiceId,
+        inventory_item_id: selected.id,
+        name: selected.name,
+        description: selected.sku ? `SKU ${selected.sku}` : null,
+        quantity: q,
+        price: p,
+        total: q * p,
+        unit_cost: selected.cost_per_unit ?? 0,
+        hours: false,
+      });
+      if (error) throw error;
+
+      // Refresh invoice totals from its line items
+      const { data: lines } = await (smSupabase as any)
+        .from("invoice_items").select("total").eq("invoice_id", invoiceId);
+      const subtotal = (lines ?? []).reduce((s: number, l: any) => s + Number(l.total ?? 0), 0);
+      const { data: inv } = await (smSupabase as any)
+        .from("invoices").select("tax").eq("id", invoiceId).maybeSingle();
+      const tax = Number(inv?.tax ?? 0);
+      await (smSupabase as any).from("invoices").update({ subtotal, total: subtotal + tax }).eq("id", invoiceId);
+    },
+    onSuccess: () => {
+      const posted = !["draft", "void", "cancelled"].includes((invoiceStatus ?? "").toLowerCase());
+      toast.success(posted ? "Added — stock deducted and COGS posted" : "Added — stock will deduct when invoice is posted");
+      qc.invalidateQueries({ queryKey: ["shop-manager", "invoices"] });
+      setOpen(false);
+      setSelected(null);
+      setQty("1");
+      setPrice("");
+      setSearch("");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to add"),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <Package className="mr-1 h-4 w-4" /> Add from inventory
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Add inventory item to invoice</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <Input
+            placeholder="Search inventory by name, SKU, or part #"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <div className="max-h-64 overflow-y-auto border rounded">
+            {isFetching ? (
+              <div className="p-4 text-sm text-muted-foreground">Searching…</div>
+            ) : results.length === 0 ? (
+              <div className="p-4 text-sm text-muted-foreground">No inventory found.</div>
+            ) : (
+              results.map((r) => (
+                <button
+                  type="button"
+                  key={r.id}
+                  onClick={() => pick(r)}
+                  className={
+                    "w-full text-left px-3 py-2 border-b last:border-0 hover:bg-muted flex justify-between items-center " +
+                    (selected?.id === r.id ? "bg-muted" : "")
+                  }
+                >
+                  <div>
+                    <div className="font-medium text-sm">{r.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {r.sku ?? "no SKU"} · in stock: {r.quantity ?? 0}
+                    </div>
+                  </div>
+                  <div className="text-right text-sm">
+                    <div>₱{Number(r.sell_price_per_unit ?? r.unit_price ?? 0).toLocaleString()}</div>
+                    <div className="text-xs text-muted-foreground">cost ₱{Number(r.cost_per_unit ?? 0).toLocaleString()}</div>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+          {selected ? (
+            <div className="grid grid-cols-2 gap-3 border-t pt-3">
+              <div>
+                <Label>Quantity *</Label>
+                <Input type="number" min="1" step="1" value={qty} onChange={(e) => setQty(e.target.value)} />
+                <div className="mt-1 text-xs text-muted-foreground">
+                  Available: {selected.quantity ?? 0}
+                </div>
+              </div>
+              <div>
+                <Label>Sell price ₱ *</Label>
+                <Input type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} />
+                <div className="mt-1 text-xs text-muted-foreground">
+                  Cost ₱{Number(selected.cost_per_unit ?? 0).toLocaleString()} · Line total ₱
+                  {(Number(qty || 0) * Number(price || 0)).toLocaleString()}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Pick an item above to set quantity and price.</p>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button disabled={!selected || add.isPending} onClick={() => add.mutate()}>
+            {add.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add to invoice"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
