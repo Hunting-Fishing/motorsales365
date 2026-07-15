@@ -78,7 +78,7 @@ function BusinessDomainPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center justify-between">
-        <Link to="/dashboard/businesses_/$id/edit" params={{ id }} className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-foreground">
+        <Link to="/dashboard/businesses/$id/edit" params={{ id }} className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-foreground">
           <ArrowLeft className="w-4 h-4" /> Back to business
         </Link>
         {biz?.slug ? (
