@@ -151,7 +151,12 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
         </Button>
         <h1 className="font-display text-xl font-bold md:text-2xl">{biz.name}</h1>
         <Badge variant="outline">{biz.status}</Badge>
-        <div className="ml-auto">
+        <div className="ml-auto flex gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/dashboard/businesses_/$id/domain" params={{ id: biz.id }}>
+              Custom domain
+            </Link>
+          </Button>
           <Button variant="outline" size="sm" asChild>
             <a href={`/businesses/${biz.slug}`} target="_blank" rel="noreferrer">
               <ExternalLink className="mr-1 h-4 w-4" />
