@@ -202,8 +202,46 @@ function FeaturesPage() {
           </div>
         </header>
 
+        {/* Competitive comparison — surfaced at the top so buyers can eyeball parity before the feature deep-dive */}
+        <section id="compare" className="mb-14 scroll-mt-32">
+          <div className="mb-6">
+            <Badge variant="outline" className="mb-2">
+              Head-to-head
+            </Badge>
+            <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
+              How we compare
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              Feature-by-feature checks against the tools shops and buyers actually
+              use today. Scroll past this for the full capability catalog.
+            </p>
+          </div>
+
+          <Tabs defaultValue="shop">
+            <TabsList>
+              <TabsTrigger value="shop">vs Shop software</TabsTrigger>
+              <TabsTrigger value="marketplace">vs Marketplaces</TabsTrigger>
+            </TabsList>
+            <TabsContent value="shop" className="mt-4">
+              <ComparisonTable matrix={SHOP_SOFTWARE_MATRIX} />
+              <p className="mt-3 text-xs text-muted-foreground">
+                Legend: ✓ full support · − partial · ✗ not available. Hover a cell
+                for detail where relevant. Sourced from each competitor's public
+                product pages.
+              </p>
+            </TabsContent>
+            <TabsContent value="marketplace" className="mt-4">
+              <ComparisonTable matrix={MARKETPLACE_MATRIX} />
+              <p className="mt-3 text-xs text-muted-foreground">
+                Compared with the classifieds and marketplaces PH buyers use most.
+              </p>
+            </TabsContent>
+          </Tabs>
+        </section>
+
         {/* Sticky filter bar */}
         <div className="sticky top-16 z-30 -mx-4 mb-8 border-y bg-background/85 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+
           <div className="flex flex-col gap-3">
             <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
               <div className="relative">
