@@ -316,6 +316,7 @@ import { Route as LearnSlugWatchLessonIdRouteImport } from './routes/learn_.$slu
 import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.team.leads_.$id'
 import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
 import { Route as DashboardBusinessesIdEditRouteImport } from './routes/dashboard.businesses_.$id.edit'
+import { Route as DashboardBusinessesIdDomainRouteImport } from './routes/dashboard.businesses_.$id.domain'
 import { Route as DashboardBusinessesIdAnalyticsRouteImport } from './routes/dashboard.businesses_.$id.analytics'
 import { Route as DashboardBusinessBusinessIdStaffRouteImport } from './routes/dashboard.business.$businessId.staff'
 import { Route as DashboardBusinessBusinessIdSettingsRouteImport } from './routes/dashboard.business.$businessId.settings'
@@ -1981,6 +1982,12 @@ const DashboardBusinessesIdEditRoute =
     path: '/businesses/$id/edit',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardBusinessesIdDomainRoute =
+  DashboardBusinessesIdDomainRouteImport.update({
+    id: '/businesses_/$id/domain',
+    path: '/businesses/$id/domain',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardBusinessesIdAnalyticsRoute =
   DashboardBusinessesIdAnalyticsRouteImport.update({
     id: '/businesses_/$id/analytics',
@@ -2654,6 +2661,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
+  '/dashboard/businesses/$id/domain': typeof DashboardBusinessesIdDomainRoute
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
@@ -3006,6 +3014,7 @@ export interface FileRoutesByTo {
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
+  '/dashboard/businesses/$id/domain': typeof DashboardBusinessesIdDomainRoute
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
@@ -3371,6 +3380,7 @@ export interface FileRoutesById {
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses_/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
+  '/dashboard/businesses_/$id/domain': typeof DashboardBusinessesIdDomainRoute
   '/dashboard/businesses_/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads_/$id': typeof DashboardTeamLeadsIdRoute
@@ -3736,6 +3746,7 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId/settings'
     | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses/$id/analytics'
+    | '/dashboard/businesses/$id/domain'
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
@@ -4088,6 +4099,7 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId/settings'
     | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses/$id/analytics'
+    | '/dashboard/businesses/$id/domain'
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
@@ -4452,6 +4464,7 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId/settings'
     | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses_/$id/analytics'
+    | '/dashboard/businesses_/$id/domain'
     | '/dashboard/businesses_/$id/edit'
     | '/dashboard/rides_/$id/edit'
     | '/dashboard/team/leads_/$id'
@@ -6766,6 +6779,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBusinessesIdEditRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/businesses_/$id/domain': {
+      id: '/dashboard/businesses_/$id/domain'
+      path: '/businesses/$id/domain'
+      fullPath: '/dashboard/businesses/$id/domain'
+      preLoaderRoute: typeof DashboardBusinessesIdDomainRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/businesses_/$id/analytics': {
       id: '/dashboard/businesses_/$id/analytics'
       path: '/businesses/$id/analytics'
@@ -7836,6 +7856,7 @@ interface DashboardRouteChildren {
   DashboardBusinessBusinessIdRoute: typeof DashboardBusinessBusinessIdRouteWithChildren
   DashboardRidesNewRoute: typeof DashboardRidesNewRoute
   DashboardBusinessesIdAnalyticsRoute: typeof DashboardBusinessesIdAnalyticsRoute
+  DashboardBusinessesIdDomainRoute: typeof DashboardBusinessesIdDomainRoute
   DashboardBusinessesIdEditRoute: typeof DashboardBusinessesIdEditRoute
   DashboardRidesIdEditRoute: typeof DashboardRidesIdEditRoute
 }
@@ -7873,6 +7894,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
     DashboardBusinessBusinessIdRouteWithChildren,
   DashboardRidesNewRoute: DashboardRidesNewRoute,
   DashboardBusinessesIdAnalyticsRoute: DashboardBusinessesIdAnalyticsRoute,
+  DashboardBusinessesIdDomainRoute: DashboardBusinessesIdDomainRoute,
   DashboardBusinessesIdEditRoute: DashboardBusinessesIdEditRoute,
   DashboardRidesIdEditRoute: DashboardRidesIdEditRoute,
 }
