@@ -108,6 +108,93 @@ export const MODULES: {
   },
 ];
 
+/**
+ * Plain-language ("what does this actually mean?") explanations, keyed by
+ * feature id. Rendered above the technical pitch on the /features page so
+ * non-technical readers understand each row before opening it.
+ */
+export const PLAIN_LANGUAGE: Record<string, string> = {
+  // Marketplace
+  "post-listing": "Post a car, bike, or part in a few steps — we auto-fill most details from the VIN so you don't have to type them.",
+  "smart-map": "See every listing near you on a map, filter by what you want, and click a pin to jump to the ad.",
+  "tier-rings": "The glow around each listing tells you at a glance who you're dealing with — verified shop, dealership, or private seller.",
+  "messenger-inbox": "A real inbox like Messenger, but built for buying and selling — separate tabs for your buys, sales, and saved chats.",
+  "wanted-listings": "Instead of hunting, post what you need and sellers come to you.",
+  "boosts": "Pay a small amount to push your listing to the top for a set number of days — you know exactly what you're paying for.",
+  "business-microsite": "Every verified business gets its own free page like 365motorsales.com/laoagtires — your listings, hours, map, and reviews all in one shareable link.",
+  "custom-domain": "Later, point your own domain (like laoagtires.com) at your 365 microsite for free.",
+  "slug-history": "If you rename your business page, the old link still works — no broken shares or dead QR codes.",
+
+  // Shop Manager
+  "work-orders": "One screen tracks every repair from drop-off to pickup — vehicle, jobs, parts, labor time, and the invoice at the end.",
+  "inventory": "Track every part on your shelf — cost, price, quantity — and get pinged before you run out.",
+  "invoices-quotes": "Give the customer a quote, and when they say yes, turn it into an invoice with one click.",
+  "accounting": "Every peso in and out is recorded twice so your books balance automatically. See sales, expenses, and 'am I making money?' on one page.",
+  "pnl-plain": "A one-page report that answers 'did I make money this month?' — sales, minus costs, equals profit. Nothing fancier.",
+  "gl-drilldown": "Click any number in a report and see the exact invoices, receipts, or expenses behind it — nothing hidden.",
+  "technicians": "See who's working today, who's overloaded, and how much billable work each tech finished this week.",
+  "expenses": "Snap the receipt, pick a category, done. It shows up in your P&L the same day.",
+  "loyalty-promos": "Reward repeat customers automatically and run 'first-visit 10% off' promos without any coupon site.",
+  "automation": "Send oil-change reminders to customers automatically based on mileage or months since last visit — set once, runs forever.",
+  "hr-leave": "Handle staff leave requests, balances, and certification expiries without a spreadsheet.",
+  "free-inventory": "Any verified business gets our full Shop Manager inventory module for free — no per-seat fee, no paywall. Competitors charge $199+/month.",
+  "invoice-from-inventory": "Pick parts from your shelf, click one button, and out comes a printable invoice — stock is subtracted and your books update themselves.",
+  "digital-inspections": "Instead of paper, technicians walk the car on a tablet, take photos of what they find, and text the customer a link to approve extra work.",
+
+  // Parts Network
+  "vin-parts": "Type in a plate or VIN and see every part that fits, in stock, across the whole network.",
+  "network-stock": "See which shop actually has the part on the shelf right now — no more calling five places.",
+  "inquiry-lifecycle": "Every parts request shows up as Pending → Accepted → Rejected so both sides know where it stands.",
+  "wanted-parts": "Post the part you need. Shops with it in stock reply with a price and ETA.",
+  "wash-sale": "Shops don't pay to list parts. We only earn a small margin when a part actually sells — so we're incentivized to help you sell, not to charge rent.",
+  "cross-shop-share": "If you don't have the part, another 365 shop probably does. Sell it to your customer anyway and split the margin.",
+
+  // Franchise
+  "franchise-tiers": "Two ways to join: keep your own brand (Partner) or co-brand with 365 (Franchise). Both get parts discounts and shared customers.",
+  "franchise-apply": "A clean application with document upload — no vague DMs, no back-channel deals.",
+  "shared-crm": "With the customer's OK, any partner shop can see prior service history — so nothing gets missed at the next visit.",
+
+  // Partner Program
+  "partner-apply": "Refer people to 365 with your own QR code and earn commissions on real activity. Independent contractor, no MLM, no downline.",
+  "partner-dashboard": "Every scan, signup, and commission in one dashboard — no guessing what you earned.",
+
+  // Clubs
+  "clubs-directory": "Real motoring clubs only — they submit LTO/SEC/DTI docs before they can list.",
+  "club-discount": "Verified club members get 5% off ads, boosts, and passport purchases — applied automatically at checkout.",
+
+  // Learning
+  "flashcards": "Bite-sized study cards for mechanics — engines, brakes, electrical, marine, ag — free to use, great for training new hires.",
+  "courses": "Structured video courses with progress tracking. Watch on any device; pick up where you left off.",
+
+  // Dispatch
+  "dispatch-tow": "One-tap tow request; local providers accept and you see ETA in real time.",
+  "rides": "Local ride and transport listings focused on motoring, not general Grab-style trips.",
+
+  // QR & Referrals
+  "qr-ads": "Print your QR on shirts, banners, or arm bands. Every scan is tracked back to you.",
+  "referral-attribution": "We track a QR scan all the way through signup and purchase — so partners get paid on real conversions, not just clicks.",
+
+  // Trust & Safety
+  "lto-verify": "Sellers upload their OR/CR. Our AI reads it and flags fakes before the ad goes live. Buyers see a green 'LTO Verified' badge.",
+  "safe-meet": "Every vehicle ad shows a short pre-meetup checklist — meet in daylight, verify OR/CR, bring someone with you.",
+  "reports-moderation": "Flag anything sketchy. Moderators review with real severity levels (including 'no penalty') and there's an appeals path.",
+  "realtime-everything": "Inventory, inquiries, messages, and stock update on your screen the moment they change — no refresh, no waiting.",
+  "ph-first": "Built for Philippine plates, roads, and payment habits (like GCash) first — not a US template forced to fit.",
+  "ad-free-buyers": "No third-party display ads on any listing page. What you see is what shops are actually selling.",
+
+  // Buyer Tools
+  "saved-favorites": "Star an ad you like. Save a search once, and we tell you when new matches show up or the price drops.",
+  "price-trends": "Every listing shows whether the asking price is above, at, or below what similar units nearby are going for.",
+
+  // Roadmap
+  "rm-driver-ed": "Coming soon: full driver-education courses tied to LTO renewal, with proof of completion stored on your profile.",
+  "rm-insurance": "Coming soon: compare CTPL and comprehensive insurance quotes side by side without calling five brokers.",
+  "rm-auctions": "Coming soon: live and timed bidding rooms for vehicles and parts.",
+  "rm-trade-in": "Coming soon: enter your car and get same-day binding offers from multiple dealers.",
+  "rm-vhistory": "Coming soon: accident, flood, and service history badges surfaced right on the listing.",
+  "rm-loans": "Coming soon: pre-qualify for a car loan in-app with partner banks — know your budget before you shop.",
+};
+
 export const FEATURES: Feature[] = [
   // ─────────────── Marketplace ───────────────
   {
