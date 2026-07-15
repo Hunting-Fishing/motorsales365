@@ -378,42 +378,8 @@ function FeaturesPage() {
           </section>
         )}
 
-        {/* Competitive comparison */}
-        <section id="compare" className="mt-24 scroll-mt-32">
-          <div className="mb-6">
-            <Badge variant="outline" className="mb-2">
-              Head-to-head
-            </Badge>
-            <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
-              How we compare
-            </h2>
-            <p className="mt-2 text-muted-foreground">
-              Feature-by-feature checks against the tools shops and buyers actually
-              use today.
-            </p>
-          </div>
 
-          <Tabs defaultValue="shop">
-            <TabsList>
-              <TabsTrigger value="shop">vs Shop software</TabsTrigger>
-              <TabsTrigger value="marketplace">vs Marketplaces</TabsTrigger>
-            </TabsList>
-            <TabsContent value="shop" className="mt-4">
-              <ComparisonTable matrix={SHOP_SOFTWARE_MATRIX} />
-              <p className="mt-3 text-xs text-muted-foreground">
-                Legend: ✓ full support · − partial · ✗ not available. Hover a cell
-                for detail where relevant. Sourced from each competitor's public
-                product pages.
-              </p>
-            </TabsContent>
-            <TabsContent value="marketplace" className="mt-4">
-              <ComparisonTable matrix={MARKETPLACE_MATRIX} />
-              <p className="mt-3 text-xs text-muted-foreground">
-                Compared with the classifieds and marketplaces PH buyers use most.
-              </p>
-            </TabsContent>
-          </Tabs>
-        </section>
+
 
         {/* CTA */}
         <section className="mt-24 overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/15 via-background to-emerald-500/10 p-8 text-center md:p-14">
