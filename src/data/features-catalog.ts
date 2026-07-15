@@ -1214,4 +1214,1176 @@ export const FEATURES: Feature[] = [
     route: "/",
     status: "live",
   },
+
+  // ─────────────── Expanded capabilities (v2) ───────────────
+  {
+    id: "vin-decoder",
+    module: "marketplace",
+    name: "Global VIN & plate decoder",
+    pitch: "Type a VIN or PH plate and auto-fill make, model, year, trim, and engine.",
+    howItWorks:
+      "Server-side decoder normalizes 17-char VINs (WMI/VDS/VIS), cross-references PH LTO plate patterns, and pre-fills the /sell form. Falls back to manual entry if decode fails.",
+    whyUseful: [
+      "Cuts listing time from minutes to seconds",
+      "Reduces typos in critical specs",
+      "Standardizes trims across sellers so search is accurate",
+    ],
+    vsCompetition: [
+      "Carousell/OLX have no VIN decode",
+      "Philkotse is dealer-form driven, no VIN handling",
+    ],
+    route: "/sell",
+    status: "live",
+  },
+  {
+    id: "multi-photo-video",
+    module: "marketplace",
+    name: "20 photos + walk-around video",
+    pitch: "Bulk-upload photos and a video with progress bars and auto-thumbnails.",
+    howItWorks:
+      "Chunked uploads to storage, client-side video frame extraction for a thumbnail, and reorderable gallery. Draft-safe — refresh doesn't lose media.",
+    whyUseful: [
+      "Buyers trust ads with real walk-around video",
+      "Auto-thumbnails so previews load fast",
+      "Reordering fixes accidental first-photo bloopers",
+    ],
+    vsCompetition: [
+      "Facebook Marketplace caps videos and drops uploads mid-way",
+      "OLX has no in-app video walk-around",
+    ],
+    route: "/sell",
+    status: "live",
+  },
+  {
+    id: "safe-drafts",
+    module: "marketplace",
+    name: "Safe drafts that never disappear",
+    pitch: "Every field autosaves to a private draft — close the tab and pick up later.",
+    howItWorks:
+      "Debounced writes to listing_drafts on every field change; drafts are RLS-scoped to the owner and can be resumed from /sell or the dashboard.",
+    whyUseful: [
+      "Peace of mind on flaky mobile connections",
+      "Come back the next day without retyping",
+      "One draft per listing — no confusion",
+    ],
+    vsCompetition: [
+      "Most marketplaces reset your form on refresh",
+    ],
+    route: "/sell",
+    status: "live",
+  },
+  {
+    id: "saved-searches",
+    module: "buyer-tools",
+    name: "Saved searches with alerts",
+    pitch: "Save a search once — get pinged when new matches or price drops appear.",
+    howItWorks:
+      "Persist filter combinations (make, model, region, price, tier). A background job diffs new listings against saved searches and sends in-app + email alerts.",
+    whyUseful: [
+      "Never miss a rare listing that lasts hours",
+      "Price-drop alerts on shortlisted units",
+      "Cuts constant refresh behavior",
+    ],
+    vsCompetition: [
+      "Carousell has no saved-search alerts for vehicles",
+    ],
+    route: "/dashboard/saved",
+    status: "live",
+  },
+  {
+    id: "compare-listings",
+    module: "buyer-tools",
+    name: "Side-by-side listing compare",
+    pitch: "Pin up to 4 listings and compare specs, prices, and seller trust.",
+    howItWorks:
+      "Add listings to a compare tray from the card or detail page. Compare view lines up specs, distance, tier badges, and price vs market.",
+    whyUseful: [
+      "Faster shortlist decisions",
+      "Highlights meaningful spec gaps",
+      "Great for parts too, not just vehicles",
+    ],
+    vsCompetition: [
+      "No PH marketplace ships a real compare view",
+    ],
+    route: "/compare",
+    status: "new",
+  },
+  {
+    id: "make-offer",
+    module: "marketplace",
+    name: "Make-offer with counter history",
+    pitch: "Structured offers — counter, accept, or decline with a full audit trail.",
+    howItWorks:
+      "Offers live inside the message thread. Each counter is timestamped and reversible until acceptance. Both sides see the full history.",
+    whyUseful: [
+      "No 'you said what?' arguments",
+      "Cleaner than DM back-and-forth",
+      "Attaches to the deal record if the sale completes",
+    ],
+    vsCompetition: [
+      "Carousell offers are one-shot; ours is a proper ladder",
+    ],
+    route: "/dashboard/messages",
+    status: "live",
+  },
+  {
+    id: "views-counter",
+    module: "marketplace",
+    name: "Accurate view counter",
+    pitch: "Every listing view is counted server-side — no inflated numbers.",
+    howItWorks:
+      "Unique-visitor counts with bot filtering. Sellers see today, week, and lifetime views per listing.",
+    whyUseful: [
+      "Real signal on which photo/title works",
+      "Helps price and boost decisions",
+      "Trusted metric for negotiations",
+    ],
+    vsCompetition: [
+      "Many sites inflate view counts to look busy",
+    ],
+    route: "/dashboard",
+    status: "live",
+  },
+  {
+    id: "buyer-safety-checklist",
+    module: "trust-safety",
+    name: "Buyer safety checklist on every ad",
+    pitch: "Meet-in-daylight, verify OR/CR, bring someone — printed on every vehicle ad.",
+    howItWorks:
+      "Rendered at the bottom of vehicle listing pages. Pulls localized tips for PH (LTO OR/CR checks, safe-meet zones near LGU halls, GCash escrow tips).",
+    whyUseful: [
+      "Reduces scam meet-ups",
+      "Educates first-time buyers",
+      "Cheap, high-impact trust signal",
+    ],
+    vsCompetition: [
+      "No PH marketplace bakes safety guidance into the listing itself",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "safe-meet-spots",
+    module: "trust-safety",
+    name: "Safe-meet spots directory",
+    pitch: "Curated LGU-adjacent meet-up spots with CCTV coverage.",
+    howItWorks:
+      "Verified locations (city halls, police precincts, mall parking) mapped by region. Suggested in the meet-up flow from a listing chat.",
+    whyUseful: [
+      "One-tap suggest a safe location",
+      "Independent list, not sponsored",
+      "Reduces buyer anxiety on high-value deals",
+    ],
+    vsCompetition: [
+      "Facebook Marketplace has this in the US only",
+    ],
+    route: "/safe-meet",
+    status: "beta",
+  },
+  {
+    id: "dispute-appeals",
+    module: "trust-safety",
+    name: "Dispute & appeals workflow",
+    pitch: "Every moderation action is appealable within 14 days.",
+    howItWorks:
+      "Sellers file a dispute per report; moderators review with severity tiers (including 'no penalty'). Overturns refund reputation points automatically.",
+    whyUseful: [
+      "Fair process, not black-box bans",
+      "Score refunds if we got it wrong",
+      "Filed and tracked from /account/disputes",
+    ],
+    vsCompetition: [
+      "Most classifieds have no formal appeal path",
+    ],
+    route: "/account/disputes",
+    status: "live",
+  },
+  {
+    id: "blocked-users",
+    module: "trust-safety",
+    name: "Block & mute controls",
+    pitch: "Block anyone from messaging or seeing your listings.",
+    howItWorks:
+      "Per-user block list enforced at RLS. Blocked users can't DM, can't offer, and don't see your listings surfaced.",
+    whyUseful: [
+      "Personal safety",
+      "Removes repeat lowballers",
+      "Silent — the other side isn't notified",
+    ],
+    vsCompetition: [
+      "Carousell block is soft; ours is enforced server-side",
+    ],
+    route: "/dashboard/blocked",
+    status: "live",
+  },
+  {
+    id: "seller-tiers",
+    module: "trust-safety",
+    name: "Seller tier badges",
+    pitch: "Verified, business, dealership, franchise, and caution badges.",
+    howItWorks:
+      "Tiers are earned from LTO/DTI/SEC docs, listing volume, and moderation history. Badges render on cards, chat, and profile.",
+    whyUseful: [
+      "At-a-glance trust",
+      "Rewards diligent sellers",
+      "Flags high-strike accounts",
+    ],
+    vsCompetition: [
+      "Carousell 'CarouPay' is limited; ours ties to real docs",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "profile-completeness",
+    module: "trust-safety",
+    name: "100% profile completion meter",
+    pitch: "Guided profile with a completeness bar — no missed fields.",
+    howItWorks:
+      "Every profile field maps to a completion percentage. Mobile-friendly sticky save bar, orange/green validation, and a resume-later save.",
+    whyUseful: [
+      "Higher-trust sellers show up first",
+      "Reduces support tickets for missing info",
+      "Better matches on wanted listings",
+    ],
+    vsCompetition: [
+      "Most marketplaces bury profile fields in settings",
+    ],
+    route: "/complete-profile",
+    status: "live",
+  },
+  {
+    id: "region-scoping",
+    module: "marketplace",
+    name: "Nationwide PH region scoping",
+    pitch: "Filter by region, province, or city with real centroids.",
+    howItWorks:
+      "PH region/province/city centroids power radius searches, map defaults, and 'listings near me' feeds.",
+    whyUseful: [
+      "Local-first browsing by default",
+      "Accurate distance calculations",
+      "Cross-region search when you want to travel for the right unit",
+    ],
+    vsCompetition: [
+      "Global marketplaces default to city-only search",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "gcash-stripe",
+    module: "shop-manager",
+    name: "GCash + Stripe payments",
+    pitch: "Take payment the way PH customers actually pay.",
+    howItWorks:
+      "Stripe checkout for cards and international; GCash rails for local. Payments post to the ledger and update invoice status automatically.",
+    whyUseful: [
+      "Match how customers already pay",
+      "One reconciliation view for both",
+      "Automatic AR aging",
+    ],
+    vsCompetition: [
+      "Shopmonkey/Tekmetric are card-first, US-centric",
+    ],
+    route: "/shop/invoices",
+    status: "live",
+  },
+  {
+    id: "ar-aging",
+    module: "shop-manager",
+    name: "A/R aging & receivables",
+    pitch: "Know exactly who owes you and how overdue they are.",
+    howItWorks:
+      "Buckets receivables into 0–30, 31–60, 61–90, 90+ days with per-customer drilldown to source invoices.",
+    whyUseful: [
+      "Faster collections",
+      "Cash-flow forecasting",
+      "Direct link to send a reminder or make a call",
+    ],
+    vsCompetition: [
+      "QuickBooks does this but doesn't integrate with your work orders",
+    ],
+    route: "/shop/accounting",
+    status: "live",
+  },
+  {
+    id: "chart-of-accounts",
+    module: "shop-manager",
+    name: "Editable chart of accounts",
+    pitch: "Standard chart preloaded; add or rename accounts to fit your books.",
+    howItWorks:
+      "Seeded 1000–6000 range chart with asset, liability, equity, revenue, and expense accounts. Rename, add, or archive without breaking postings.",
+    whyUseful: [
+      "Grows with the business",
+      "Accountant-friendly out of the box",
+      "Nothing hardcoded",
+    ],
+    vsCompetition: [
+      "Most shop tools hardcode account labels",
+    ],
+    route: "/shop/accounting",
+    status: "live",
+  },
+  {
+    id: "journal-drill",
+    module: "shop-manager",
+    name: "Journal-entry drilldown",
+    pitch: "Click any figure and see the exact DR/CR posting behind it.",
+    howItWorks:
+      "P&L and GL reports link every number down to the individual journal entries and source documents (invoice, payment, expense).",
+    whyUseful: [
+      "Full audit trail",
+      "Faster month-end close",
+      "Trust the numbers",
+    ],
+    vsCompetition: [
+      "Most shop KPI dashboards hide the source data",
+    ],
+    route: "/shop/accounting/pnl",
+    status: "live",
+  },
+  {
+    id: "estimates-to-work",
+    module: "shop-manager",
+    name: "Estimate approval → work order",
+    pitch: "Text the estimate, get customer approval, auto-open the WO.",
+    howItWorks:
+      "Estimates are sent via SMS/email link; customer taps approve/decline. Approved estimates convert to work orders with parts and labor pre-populated.",
+    whyUseful: [
+      "No verbal approvals to argue about later",
+      "Signed record for warranty",
+      "Reduces service-writer friction",
+    ],
+    vsCompetition: [
+      "Comparable to Tekmetric, at PH pricing",
+    ],
+    route: "/shop",
+    status: "live",
+  },
+  {
+    id: "tech-calendar",
+    module: "shop-manager",
+    name: "Technician calendar & bay scheduling",
+    pitch: "Drag-and-drop scheduler with tech workload and bay conflicts.",
+    howItWorks:
+      "Weekly and day views by technician and bay. Conflicts flagged in red; drag to reschedule; syncs to work-order status.",
+    whyUseful: [
+      "See who's over- or under-booked",
+      "No double-booked bays",
+      "Better promised-time estimates",
+    ],
+    vsCompetition: [
+      "AutoLeap has this — we ship it at PH price",
+    ],
+    route: "/shop/schedule",
+    status: "live",
+  },
+  {
+    id: "customer-portal",
+    module: "shop-manager",
+    name: "Customer portal for approvals & invoices",
+    pitch: "Customers view estimates, approve work, and pay online.",
+    howItWorks:
+      "Magic-link portal — no account needed. Shows estimate, approve/decline buttons, DVI photos, invoice, and pay-now.",
+    whyUseful: [
+      "No app install for customers",
+      "Faster approvals by SMS",
+      "Records every interaction on the WO",
+    ],
+    vsCompetition: [
+      "Shopmonkey does this at $199/mo; we include it",
+    ],
+    route: "/shop",
+    status: "live",
+  },
+  {
+    id: "reviews-ratings",
+    module: "trust-safety",
+    name: "Reviews & ratings",
+    pitch: "Post-transaction reviews on shops, sellers, and dispatch providers.",
+    howItWorks:
+      "Only verified transactions can review. Reviews cannot be deleted by the reviewee; disputes go through moderation.",
+    whyUseful: [
+      "Hard-earned trust signal",
+      "No pay-to-remove reviews",
+      "Featured on microsite and profile",
+    ],
+    vsCompetition: [
+      "Facebook lets pages hide reviews; we don't",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "microsite-hours",
+    module: "marketplace",
+    name: "Microsite hours, map, and contact",
+    pitch: "Each shop's page shows hours, a map pin, phone, and live listings.",
+    howItWorks:
+      "Business microsite (e.g., /laoagtires) renders hours, map, socials, current listings, reviews, and services in one shareable link.",
+    whyUseful: [
+      "Replaces needing a separate website",
+      "Free and always up to date",
+      "SEO-indexed by the platform",
+    ],
+    vsCompetition: [
+      "Most shops still rely on a Facebook page or nothing",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "slug-redirects",
+    module: "marketplace",
+    name: "Rename-safe slug history",
+    pitch: "Rename your shop slug — old QR codes and shared links still work.",
+    howItWorks:
+      "Every rename adds an entry to a slug-history table. Old URLs 301 to the new one automatically.",
+    whyUseful: [
+      "Rebrand without breaking prints",
+      "SEO-safe redirects",
+      "No dead QR codes",
+    ],
+    vsCompetition: [
+      "Most CMSs break links on rename",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "seo-json-ld",
+    module: "marketplace",
+    name: "SEO-ready pages with JSON-LD",
+    pitch: "Every listing and microsite ships with structured data for Google.",
+    howItWorks:
+      "Route-level head() sets unique title/description/og tags. Listings emit Vehicle/Product JSON-LD; shops emit LocalBusiness.",
+    whyUseful: [
+      "Better Google surfacing",
+      "Rich snippets in results",
+      "Free organic traffic to your listings",
+    ],
+    vsCompetition: [
+      "Carousell listings rank poorly in PH Google",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "pwa-offline",
+    module: "buyer-tools",
+    name: "Installable PWA with offline fallback",
+    pitch: "Add to home screen; keep browsing when the signal dies.",
+    howItWorks:
+      "Service worker caches shell + last-seen listings. offline.html renders when the network fails. manifest.webmanifest is installable on iOS/Android.",
+    whyUseful: [
+      "Feels like a native app without the App Store",
+      "Works in weak-signal areas",
+      "No install size penalty",
+    ],
+    vsCompetition: [
+      "Carousell/OLX apps are 100MB+ installs",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "notifications",
+    module: "buyer-tools",
+    name: "In-app notification center",
+    pitch: "One bell for messages, offers, inquiries, and status changes.",
+    howItWorks:
+      "Realtime notification stream with read/unread state, deep links, and a mobile-friendly panel. Grouped by type.",
+    whyUseful: [
+      "Nothing important slips through",
+      "No email overload",
+      "One-tap jump to the thread or listing",
+    ],
+    vsCompetition: [
+      "Most marketplaces rely on email only",
+    ],
+    route: "/dashboard",
+    status: "live",
+  },
+  {
+    id: "admin-console",
+    module: "trust-safety",
+    name: "Full admin console",
+    pitch: "Moderation queues, referrals, flags, and platform health in one place.",
+    howItWorks:
+      "Admin-scoped routes at /admin cover moderation, referrals, franchise tiers, QR analytics, and system flags — all RLS-enforced.",
+    whyUseful: [
+      "Ops team runs the platform without SQL",
+      "Auditable actions",
+      "Fast triage on abuse",
+    ],
+    vsCompetition: [
+      "Internal-only for us — but the depth beats what off-the-shelf marketplace platforms ship",
+    ],
+    route: "/admin",
+    status: "live",
+  },
+  {
+    id: "rls-security",
+    module: "trust-safety",
+    name: "Row-level security on every table",
+    pitch: "Your data can only be read by you and roles you allow.",
+    howItWorks:
+      "All public tables have RLS enabled with policies per role (anon, authenticated, service). Sensitive schemas (auth, shop_manager) never leak across shops.",
+    whyUseful: [
+      "Multi-tenant safety by design",
+      "Passes basic security audits",
+      "No accidental cross-shop leaks",
+    ],
+    vsCompetition: [
+      "Custom-built shop tools often skip proper multi-tenant isolation",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "ai-listing-assist",
+    module: "marketplace",
+    name: "AI listing description helper",
+    pitch: "Draft a compelling ad copy from your specs and photos.",
+    howItWorks:
+      "Uses Lovable AI Gateway to draft a 3–5 line description from make/model/year/mileage and detected condition. You edit, then post.",
+    whyUseful: [
+      "Faster listings",
+      "Better-written ads sell faster",
+      "Free for sellers",
+    ],
+    vsCompetition: [
+      "None of the PH marketplaces ship AI copy assistance",
+    ],
+    route: "/sell",
+    status: "beta",
+  },
+  {
+    id: "ai-doc-check",
+    module: "trust-safety",
+    name: "AI OR/CR document check",
+    pitch: "AI reads the uploaded document and flags likely fakes before it goes live.",
+    howItWorks:
+      "Server-side Gemini pass on the OR/CR image extracts fields, cross-checks the plate/VIN in the listing, and raises confidence flags for reviewers.",
+    whyUseful: [
+      "Catches obvious tampering",
+      "Green 'LTO Verified' badge on the ad",
+      "Doesn't replace human review — augments it",
+    ],
+    vsCompetition: [
+      "No PH marketplace runs AI on trust docs",
+    ],
+    route: "/lto-check",
+    status: "live",
+  },
+  {
+    id: "sms-email-notify",
+    module: "buyer-tools",
+    name: "Email + in-app notifications",
+    pitch: "Choose email, in-app, or both — per event type.",
+    howItWorks:
+      "Per-channel preferences (new message, offer, inquiry status, price drop). Emails render from templated MJML.",
+    whyUseful: [
+      "You get pinged where you actually look",
+      "Silence categories you don't care about",
+      "No spam",
+    ],
+    vsCompetition: [
+      "Most sites are all-or-nothing on emails",
+    ],
+    route: "/dashboard/settings",
+    status: "live",
+  },
+  {
+    id: "csv-export",
+    module: "shop-manager",
+    name: "CSV export everywhere it matters",
+    pitch: "Export P&L, GL, invoices, inventory, and customer lists to CSV.",
+    howItWorks:
+      "One-click CSV downloads from every report and list view. Encoded for Excel/Google Sheets/PH accountants.",
+    whyUseful: [
+      "Your accountant gets what they need",
+      "Backup insurance",
+      "No lock-in",
+    ],
+    vsCompetition: [
+      "Some tools gate exports behind higher tiers",
+    ],
+    route: "/shop/accounting",
+    status: "live",
+  },
+  {
+    id: "audit-logs",
+    module: "trust-safety",
+    name: "Audit logs on sensitive actions",
+    pitch: "Every price change, role grant, and moderation action is logged.",
+    howItWorks:
+      "DB-level audit triggers append immutable rows on changes to key tables. Admin console shows who did what, when.",
+    whyUseful: [
+      "Accountability across shop teams",
+      "Investigate suspicious activity",
+      "Regulatory posture",
+    ],
+    vsCompetition: [
+      "Rare in PH-focused SaaS at this price",
+    ],
+    route: "/admin",
+    status: "live",
+  },
+  {
+    id: "role-based-access",
+    module: "shop-manager",
+    name: "Role-based staff access",
+    pitch: "Owner, manager, service writer, technician, and viewer roles.",
+    howItWorks:
+      "Roles stored in a dedicated user_roles table (never on profiles) and enforced through security-definer functions in RLS.",
+    whyUseful: [
+      "Techs see their WOs, not the P&L",
+      "Managers approve refunds",
+      "Owner sees everything",
+    ],
+    vsCompetition: [
+      "Most PH shop tools have one 'admin' role",
+    ],
+    route: "/shop/staff",
+    status: "live",
+  },
+  {
+    id: "multi-location",
+    module: "shop-manager",
+    name: "Multi-location & multi-bay",
+    pitch: "Run several branches under one account with per-location inventory.",
+    howItWorks:
+      "Each location has its own inventory, staff, and P&L, rolled up to a group view for owners.",
+    whyUseful: [
+      "Franchise-ready from day one",
+      "Move stock between branches",
+      "Compare branch performance",
+    ],
+    vsCompetition: [
+      "Tekmetric charges heavily per additional location",
+    ],
+    route: "/shop",
+    status: "beta",
+  },
+  {
+    id: "loyalty-points",
+    module: "shop-manager",
+    name: "Loyalty points & repeat rewards",
+    pitch: "Auto-issue points on paid invoices; redeem on future service.",
+    howItWorks:
+      "Rules-based: X points per PHP spent, birthday bonuses, tier thresholds. Redemption applies as an invoice discount that posts cleanly to accounting.",
+    whyUseful: [
+      "Keeps customers coming back",
+      "No coupon printers or third-party apps",
+      "Books stay clean",
+    ],
+    vsCompetition: [
+      "Loyalty is a separate SaaS ($50/mo+) for most shops",
+    ],
+    route: "/shop/loyalty",
+    status: "live",
+  },
+  {
+    id: "campaigns",
+    module: "shop-manager",
+    name: "Marketing campaigns to your customer list",
+    pitch: "Segment customers and blast targeted SMS/email campaigns.",
+    howItWorks:
+      "Filters (last visit, vehicle age, total spend) build audiences. Templated messages send via provider, tracked to redemptions.",
+    whyUseful: [
+      "Reactivate lapsed customers",
+      "Fill slow days",
+      "Measurable ROI",
+    ],
+    vsCompetition: [
+      "Mailchimp doesn't know your service history; we do",
+    ],
+    route: "/shop/marketing",
+    status: "new",
+  },
+  {
+    id: "recall-lookups",
+    module: "shop-manager",
+    name: "OEM recall lookups by VIN",
+    pitch: "Warn customers about open recalls before you start service.",
+    howItWorks:
+      "VIN checked against public recall feeds. Flags shown on the work order and communicated via portal.",
+    whyUseful: [
+      "Safer service",
+      "Upsell opportunities on recall-adjacent work",
+      "Trust-building with customer",
+    ],
+    vsCompetition: [
+      "Enterprise DMSs have this; most PH shops don't",
+    ],
+    route: "/shop",
+    status: "roadmap",
+  },
+  {
+    id: "tire-treads-tracking",
+    module: "shop-manager",
+    name: "Tire tread depth & service history per vehicle",
+    pitch: "Track tread, brake pad, and fluid measurements over time.",
+    howItWorks:
+      "DVI captures readings per corner; charts show wear rate; predicts replacement date.",
+    whyUseful: [
+      "Data-driven upsells",
+      "Owner sees value in returning",
+      "Safety-relevant maintenance",
+    ],
+    vsCompetition: [
+      "Only US enterprise tools ship this today",
+    ],
+    route: "/shop",
+    status: "beta",
+  },
+  {
+    id: "warranty-tracking",
+    module: "shop-manager",
+    name: "Parts & labor warranty tracking",
+    pitch: "Log warranty terms per part; auto-honor within window.",
+    howItWorks:
+      "Warranty period stored per invoice line. Warranty-covered comebacks post to a warranty expense account, not COGS.",
+    whyUseful: [
+      "Honest 'is it still covered?' answers",
+      "Clean warranty P&L visibility",
+      "Reduces disputes",
+    ],
+    vsCompetition: [
+      "Rarely surfaced this cleanly outside enterprise",
+    ],
+    route: "/shop",
+    status: "live",
+  },
+  {
+    id: "purchase-orders",
+    module: "shop-manager",
+    name: "Purchase orders & vendor management",
+    pitch: "Raise POs to suppliers; receive stock; auto-post to A/P.",
+    howItWorks:
+      "PO → GRN (goods received note) → vendor bill flow. Received qty updates inventory; bills post to accounts payable.",
+    whyUseful: [
+      "Real supply chain, not spreadsheets",
+      "Cost visibility per supplier",
+      "Prevents phantom inventory",
+    ],
+    vsCompetition: [
+      "Purchase orders are a paid add-on in most shop tools",
+    ],
+    route: "/shop/purchasing",
+    status: "new",
+  },
+  {
+    id: "barcode-scanning",
+    module: "shop-manager",
+    name: "Barcode / QR scanning for inventory",
+    pitch: "Scan a part with your phone camera to check stock or add to invoice.",
+    howItWorks:
+      "Web-based scanner uses the phone camera. Scans open the SKU or line-adds it to the active invoice/WO.",
+    whyUseful: [
+      "Faster stock counts",
+      "Fewer typos on part numbers",
+      "Works on any modern phone",
+    ],
+    vsCompetition: [
+      "Barcode scanning is usually a paid tier upgrade",
+    ],
+    route: "/shop/inventory",
+    status: "beta",
+  },
+  {
+    id: "fleet-accounts",
+    module: "shop-manager",
+    name: "Fleet & corporate accounts",
+    pitch: "Bill an LGU, taxi op, or delivery fleet as one master account.",
+    howItWorks:
+      "Group vehicles under an org account with a monthly billing cycle and PO reference support.",
+    whyUseful: [
+      "Wins commercial customers",
+      "Cleaner invoicing for accounting departments",
+      "One relationship, many vehicles",
+    ],
+    vsCompetition: [
+      "Requires custom code in most PH shop tools",
+    ],
+    route: "/shop",
+    status: "beta",
+  },
+  {
+    id: "parts-cross-ref",
+    module: "parts-network",
+    name: "Cross-reference & OEM-to-aftermarket lookup",
+    pitch: "Type an OEM number, see every aftermarket equivalent in stock.",
+    howItWorks:
+      "Cross-reference table maps OEM ↔ aftermarket SKUs. Search returns fitment-verified equivalents across the network.",
+    whyUseful: [
+      "Faster quotes on obscure parts",
+      "Lower cost options for the customer",
+      "Grows organically as shops upload",
+    ],
+    vsCompetition: [
+      "PartSouq is the gold standard globally — this is our PH-first take",
+    ],
+    route: "/parts/network",
+    status: "beta",
+  },
+  {
+    id: "stock-reservations",
+    module: "parts-network",
+    name: "Short-window stock reservations",
+    pitch: "Lock a part for 1–168 hours while your customer decides.",
+    howItWorks:
+      "Reservation adjusts available_qty on the network view. Auto-expires; explicit cancel returns stock immediately.",
+    whyUseful: [
+      "No 'sorry, just sold' calls",
+      "Time-boxed so stock isn't hoarded",
+      "Fair to all shops",
+    ],
+    vsCompetition: [
+      "Facebook Marketplace has no concept of holds",
+    ],
+    route: "/parts/network",
+    status: "live",
+  },
+  {
+    id: "network-inquiries",
+    module: "parts-network",
+    name: "Inquiry lifecycle: Pending → Accepted → Rejected",
+    pitch: "Structured request/response so both sides know where things stand.",
+    howItWorks:
+      "Customer sends an inquiry; each shop can Accept with price/qty/ETA or Reject with a reason. Realtime updates on both dashboards.",
+    whyUseful: [
+      "Ends 'did they see my message?'",
+      "Comparable quotes side by side",
+      "Notifications drive fast responses",
+    ],
+    vsCompetition: [
+      "DIY messaging on Facebook is chaos",
+    ],
+    route: "/parts/network",
+    status: "live",
+  },
+  {
+    id: "exposure-approval",
+    module: "parts-network",
+    name: "Admin approval to expose inventory",
+    pitch: "Shops opt in — an admin reviews before their stock hits the network.",
+    howItWorks:
+      "Businesses toggle exposure; admins approve or revoke with audit history. Revocation is instant.",
+    whyUseful: [
+      "Quality bar for the public catalog",
+      "Reversible if a shop misbehaves",
+      "Clear paper trail",
+    ],
+    vsCompetition: [
+      "Networks like PartSouq are curated but slow; we're curated and fast",
+    ],
+    route: "/admin",
+    status: "live",
+  },
+  {
+    id: "franchise-directory",
+    module: "franchise",
+    name: "Franchise & partner directory",
+    pitch: "Public map of every partner and franchise shop.",
+    howItWorks:
+      "Directory of active partners with map, filters by service, and links to each microsite.",
+    whyUseful: [
+      "Customers find nearby trusted shops",
+      "Cross-shop referrals",
+      "Marketing lift for members",
+    ],
+    vsCompetition: [
+      "NAPA/independent PH networks aren't visible online in one place",
+    ],
+    route: "/franchise",
+    status: "live",
+  },
+  {
+    id: "franchise-messaging",
+    module: "franchise",
+    name: "In-app messaging with the franchise office",
+    pitch: "Application, docs, and follow-ups in one thread — no email chains.",
+    howItWorks:
+      "franchise_application_messages thread per applicant; RLS locks to owner + admins; email fallback where the applicant hasn't verified yet.",
+    whyUseful: [
+      "Nothing lost in email",
+      "Faster onboarding",
+      "Auditable process",
+    ],
+    vsCompetition: [
+      "Most franchise pitches are DM back-channels",
+    ],
+    route: "/franchise",
+    status: "live",
+  },
+  {
+    id: "partner-qr-codes",
+    module: "qr-referrals",
+    name: "Personal QR codes for every partner",
+    pitch: "One QR per partner — scan, sign up, and the partner gets credited.",
+    howItWorks:
+      "QR encodes canonical URL with attribution token. Full-funnel tracking from scan → signup → activity → commission.",
+    whyUseful: [
+      "Print on shirts, banners, business cards",
+      "No manual referral codes to remember",
+      "Fraud-resistant server-side attribution",
+    ],
+    vsCompetition: [
+      "MLM apps track shallow — ours goes to real conversions",
+    ],
+    route: "/promoter",
+    status: "live",
+  },
+  {
+    id: "qr-rescue",
+    module: "qr-referrals",
+    name: "QR rescue for legacy prints",
+    pitch: "If a printed QR points at an old URL, we still route the visitor correctly.",
+    howItWorks:
+      "Redirect table maps deprecated preview URLs to canonical production URLs so printed materials keep working.",
+    whyUseful: [
+      "No wasted print runs",
+      "Legacy shirts and banners still work",
+      "Immediate fix without reprints",
+    ],
+    vsCompetition: [
+      "Unique — most platforms just break the QR",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "referral-dashboard",
+    module: "qr-referrals",
+    name: "Referral & commission dashboard",
+    pitch: "Every scan, signup, and peso earned in one page.",
+    howItWorks:
+      "Daily and lifetime views of scans, activations, and commissions with drilldowns to individual referrals.",
+    whyUseful: [
+      "Transparent earnings",
+      "Motivates partners to promote",
+      "No 'trust me' — the numbers are visible",
+    ],
+    vsCompetition: [
+      "MLM tools obfuscate; we don't",
+    ],
+    route: "/promoter/dashboard",
+    status: "live",
+  },
+  {
+    id: "learning-cross-domain",
+    module: "learning",
+    name: "Cross-domain flashcards & courses",
+    pitch: "Automotive, motorcycle, marine, small engine, agricultural, industrial, EV.",
+    howItWorks:
+      "Categorized flashcards with images, taxonomy per system (engine, brakes, electrical), and progress tracking across devices.",
+    whyUseful: [
+      "Great for training new hires",
+      "Free for shop owners to use with staff",
+      "Grows as we add cards",
+    ],
+    vsCompetition: [
+      "Motor Age courses cost hundreds; ours is free to start",
+    ],
+    route: "/flashcards",
+    status: "live",
+  },
+  {
+    id: "learning-certifications",
+    module: "learning",
+    name: "Certifications & badges on profile",
+    pitch: "Earn badges by completing courses — displayed on your public profile.",
+    howItWorks:
+      "Completion issues a verifiable badge stored on the user's profile and shown on their microsite.",
+    whyUseful: [
+      "Distinguishes serious techs",
+      "Marketing signal for shops",
+      "Skills portfolio that follows the tech",
+    ],
+    vsCompetition: [
+      "LinkedIn learning isn't automotive-focused",
+    ],
+    route: "/flashcards",
+    status: "roadmap",
+  },
+  {
+    id: "dispatch-network",
+    module: "dispatch",
+    name: "Tow & delivery provider network",
+    pitch: "Local providers accept tow/delivery jobs in real time.",
+    howItWorks:
+      "Broadcast a job to nearby providers; first accept wins; live ETA and status back to the customer.",
+    whyUseful: [
+      "No calling five tow yards",
+      "Transparent pricing",
+      "Ratings pick the best",
+    ],
+    vsCompetition: [
+      "Grab doesn't do tows; local yards don't do apps",
+    ],
+    route: "/dispatch",
+    status: "beta",
+  },
+  {
+    id: "keyboard-shortcuts",
+    module: "buyer-tools",
+    name: "Keyboard shortcuts for power users",
+    pitch: "Navigate listings, inbox, and dashboards without touching the mouse.",
+    howItWorks:
+      "Common shortcuts (/ to search, j/k to move, e to edit) throughout Shop Manager and the marketplace inbox.",
+    whyUseful: [
+      "Faster ops for service writers",
+      "Power-user friendly",
+      "No learning curve — shows a cheat sheet",
+    ],
+    vsCompetition: [
+      "Almost no PH SaaS ships shortcuts",
+    ],
+    route: "/",
+    status: "beta",
+  },
+  {
+    id: "dark-mode",
+    module: "buyer-tools",
+    name: "Dark mode across the whole app",
+    pitch: "Consistent dark theme — including the Shop Manager screens.",
+    howItWorks:
+      "Semantic design tokens applied globally; images and badges tuned for both themes.",
+    whyUseful: [
+      "Easier on the eyes in the shop office",
+      "Battery-friendly on OLED phones",
+      "Consistent — no half-dark pages",
+    ],
+    vsCompetition: [
+      "Many shop tools have no dark mode at all",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "mobile-first",
+    module: "buyer-tools",
+    name: "True mobile-first UX",
+    pitch: "Sticky action bars, tap-friendly targets, and mobile-optimized layouts everywhere.",
+    howItWorks:
+      "Every high-friction flow (sell, complete profile, checkout, inquiry) is tested at mobile viewports first; sticky save bars replace hidden buttons.",
+    whyUseful: [
+      "Most PH users are on mobile",
+      "No pinch-and-zoom to hit a button",
+      "Higher completion rates",
+    ],
+    vsCompetition: [
+      "Shopmonkey/Tekmetric are desktop-first",
+    ],
+    route: "/",
+    status: "live",
+  },
+  {
+    id: "developer-mcp",
+    module: "shop-manager",
+    name: "MCP endpoint for developer integrations",
+    pitch: "Machine-readable tool interface at /.mcp for integrations and agents.",
+    howItWorks:
+      "OAuth-protected MCP server exposes a curated tool surface for AI agents and third-party integrations, with per-tool auth.",
+    whyUseful: [
+      "Future-proof integrations",
+      "Agent-ready data access",
+      "Curated, safe surface",
+    ],
+    vsCompetition: [
+      "Cutting-edge — few competitors ship MCP",
+    ],
+    route: "/",
+    status: "new",
+  },
+
+  // ─────────────── Roadmap additions ───────────────
+  {
+    id: "rm-obd-integration",
+    module: "shop-manager",
+    name: "OBD-II scanner integration",
+    pitch: "Coming soon: attach diagnostic codes and freeze frames to work orders.",
+    howItWorks:
+      "Pair a supported OBD dongle; codes and PID snapshots attach automatically to the WO.",
+    whyUseful: [
+      "Skip retyping DTCs",
+      "Evidence for warranty claims",
+      "Faster diagnosis",
+    ],
+    vsCompetition: [
+      "Enterprise-only today",
+    ],
+    status: "roadmap",
+  },
+  {
+    id: "rm-service-history-api",
+    module: "shop-manager",
+    name: "Portable customer service history",
+    pitch: "Coming soon: customers carry their service history across 365 shops.",
+    howItWorks:
+      "With customer consent, service history from one 365 shop is visible to the next — no duplicated diagnostic work.",
+    whyUseful: [
+      "Better care for the vehicle",
+      "Faster next-shop visits",
+      "Customer owns the data",
+    ],
+    vsCompetition: [
+      "Doesn't exist in PH today",
+    ],
+    status: "roadmap",
+  },
+  {
+    id: "rm-live-auctions",
+    module: "marketplace",
+    name: "Live auctions for vehicles & parts",
+    pitch: "Coming soon: timed and live-room bidding on select inventory.",
+    howItWorks:
+      "Auction rooms with anti-snipe extensions, deposit holds, and post-auction contract flows.",
+    whyUseful: [
+      "Discovers real market price",
+      "Great for dealers moving trade-ins",
+      "Excitement drives engagement",
+    ],
+    vsCompetition: [
+      "Copart is US-first and heavy; ours is PH-first",
+    ],
+    status: "roadmap",
+  },
+  {
+    id: "rm-vehicle-history",
+    module: "trust-safety",
+    name: "Vehicle history badges",
+    pitch: "Coming soon: accident, flood, and service history badges on listings.",
+    howItWorks:
+      "Aggregates 365 service history plus optional third-party feeds into public badges (green/yellow/red).",
+    whyUseful: [
+      "Buyer trust before the test drive",
+      "Sellers with clean history stand out",
+      "Cuts scammer supply",
+    ],
+    vsCompetition: [
+      "Carfax equivalent doesn't exist yet in PH",
+    ],
+    status: "roadmap",
+  },
+  {
+    id: "rm-loans",
+    module: "buyer-tools",
+    name: "Pre-qualify for car loans in-app",
+    pitch: "Coming soon: know your budget before you shop.",
+    howItWorks:
+      "Soft pre-qualification with partner banks; monthly payment calculators; connect to dealer inventory.",
+    whyUseful: [
+      "Realistic budgets",
+      "Faster deal closings",
+      "Less time wasted on unaffordable units",
+    ],
+    vsCompetition: [
+      "Bank websites make you leave the marketplace",
+    ],
+    status: "roadmap",
+  },
 ];
+
