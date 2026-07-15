@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { FeatureScreenshot, type LatestScreenshot } from "./feature-screenshot";
-import type { Feature } from "@/data/features-catalog";
+import { type Feature, PLAIN_LANGUAGE } from "@/data/features-catalog";
 
 export function FeatureRow({ f, latestScreenshot }: { f: Feature; latestScreenshot?: LatestScreenshot }) {
   const [copied, setCopied] = useState(false);
