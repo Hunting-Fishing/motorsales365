@@ -42,7 +42,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { resolveBusinessByHost } from "@/lib/business-domain.functions";
+
 export const Route = createFileRoute("/")({
+  // If a request arrives on a business's connected custom domain,
+  // route it to that business's microsite. The SEO-canonical URL
+  // (/businesses/<slug>) is preserved on 365motorsales.com.
+  beforeLoad: async () => {
+    try {
+      const { business } = await resolveBusinessByHost({ data: { host: null } });
+      if (business?.slug) {
+        throw (await import("@tanstack/react-router")).redirect({
+          to: "/businesses/$slug",
+          params: { slug: business.slug },
+        });
+      }
+    } catch (e: any) {
+      if (e && (e.isRedirect || e.status === 307 || e.status === 308)) throw e;
+      // Swallow lookup errors — never break the homepage over a domain probe.
+    }
+  },
   component: Index,
 });
 
