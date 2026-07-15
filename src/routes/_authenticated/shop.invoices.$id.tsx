@@ -254,8 +254,9 @@ function InvoiceDetailPage() {
               </Card>
 
               <Card className="md:col-span-2">
-                <CardHeader>
+                <CardHeader className="flex-row items-center justify-between">
                   <CardTitle className="text-base">Line items ({items.length})</CardTitle>
+                  <AddFromInventoryDialog invoiceId={data.id} invoiceStatus={data.status} />
                 </CardHeader>
                 <CardContent className="p-0">
                   {items.length === 0 ? (
