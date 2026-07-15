@@ -3113,6 +3113,10 @@ export type Database = {
           cover_url: string | null
           created_at: string
           cta_primary: string
+          custom_domain: string | null
+          custom_domain_status: string
+          custom_domain_verified_at: string | null
+          custom_domain_verify_token: string | null
           description: string | null
           email: string | null
           expose_inventory_to_network: boolean
@@ -3174,6 +3178,10 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           cta_primary?: string
+          custom_domain?: string | null
+          custom_domain_status?: string
+          custom_domain_verified_at?: string | null
+          custom_domain_verify_token?: string | null
           description?: string | null
           email?: string | null
           expose_inventory_to_network?: boolean
@@ -3235,6 +3243,10 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           cta_primary?: string
+          custom_domain?: string | null
+          custom_domain_status?: string
+          custom_domain_verified_at?: string | null
+          custom_domain_verify_token?: string | null
           description?: string | null
           email?: string | null
           expose_inventory_to_network?: boolean
@@ -13770,6 +13782,7 @@ export type Database = {
         }
         Returns: number
       }
+      normalize_business_domain: { Args: { v: string }; Returns: string }
       notify_user: {
         Args: {
           _body: string
