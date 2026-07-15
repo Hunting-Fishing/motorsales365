@@ -153,7 +153,7 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
         <Badge variant="outline">{biz.status}</Badge>
         <div className="ml-auto flex gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link to="/dashboard/businesses_/$id/domain" params={{ id: biz.id }}>
+            <Link to="/dashboard/businesses/$id/domain" params={{ id: biz.id }}>
               Custom domain
             </Link>
           </Button>
