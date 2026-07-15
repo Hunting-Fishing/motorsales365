@@ -529,6 +529,9 @@ export const MARKETPLACE_MATRIX: CompetitorMatrix = {
     row("Learning / driver ed hub", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: p("Blog only"), carmudi: p("Blog"), carsph: p("Blog"), fb: n }),
     row("Tow & dispatch", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
     row("Accredited clubs directory", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: p("Unmoderated groups") }),
+    row("Free hosted business microsite", { "365": yy("365motorsales.com/<slug>"), carousell: n, olx: n, autodeal: p("Dealer profile"), philkotse: p(), carmudi: p(), carsph: p(), fb: p("FB Page") }),
+    row("Slug history keeps old links alive", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
+    row("Ad-free listing pages for buyers", { "365": y, carousell: n, olx: n, autodeal: n, philkotse: n, carmudi: n, carsph: n, fb: n }),
   ],
 };
 
