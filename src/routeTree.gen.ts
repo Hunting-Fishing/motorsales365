@@ -53,6 +53,7 @@ import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disc
 import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WantedIndexRouteImport } from './routes/wanted.index'
@@ -589,6 +590,11 @@ const AdminRoute = AdminRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugRoute = SlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -2301,6 +2307,7 @@ const AuthenticatedShopReportsTechnicianIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/advertise': typeof AdvertiseRoute
@@ -2663,6 +2670,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRoute
   '/about': typeof AboutRoute
   '/advertise': typeof AdvertiseRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
@@ -3016,6 +3024,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/$slug': typeof SlugRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/advertise': typeof AdvertiseRoute
@@ -3380,6 +3389,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$slug'
     | '/about'
     | '/admin'
     | '/advertise'
@@ -3742,6 +3752,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/$slug'
     | '/about'
     | '/advertise'
     | '/affiliate-disclosure'
@@ -4094,6 +4105,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/$slug'
     | '/about'
     | '/admin'
     | '/advertise'
@@ -4458,6 +4470,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  SlugRoute: typeof SlugRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AdvertiseRoute: typeof AdvertiseRoute
@@ -4910,6 +4923,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug': {
+      id: '/$slug'
+      path: '/$slug'
+      fullPath: '/$slug'
+      preLoaderRoute: typeof SlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -8038,6 +8058,7 @@ const RCodeRouteWithChildren = RCodeRoute._addFileChildren(RCodeRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  SlugRoute: SlugRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AdvertiseRoute: AdvertiseRoute,
