@@ -10,6 +10,7 @@ import { AnalyticsGA } from "@/components/analytics-ga";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import { ConfirmDialogHost } from "@/components/ui/confirm-dialog";
 import { QrRescueDetector } from "@/components/qr-rescue-detector";
+import "@/lib/i18n";
 
 import appCss from "../styles.css?url";
 
