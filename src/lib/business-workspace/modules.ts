@@ -128,7 +128,7 @@ export function modulesForKind(kind: string | null | undefined): WorkspaceModule
   let ids: WorkspaceModuleId[];
   switch (k) {
     case "towing":
-      ids = ["overview", "dispatch", "fleet", "staff", "inventory", ...COMMON_END];
+      ids = ["overview", "dispatch", "fleet", "staff", "inventory", "invoices", ...COMMON_END];
       break;
     case "repair_shop":
     case "body_paint":
@@ -137,21 +137,22 @@ export function modulesForKind(kind: string | null | undefined): WorkspaceModule
     case "carwash":
     case "audio_tint":
     case "inspection":
-      ids = ["overview", "staff", "inventory", ...COMMON_END];
+      ids = ["overview", "staff", "inventory", "invoices", ...COMMON_END];
       break;
     case "parts_accessories":
     case "accessories":
-      ids = ["overview", "inventory", "staff", ...COMMON_END];
+      ids = ["overview", "inventory", "invoices", "staff", ...COMMON_END];
       break;
     case "dealership":
     case "used_dealership":
     case "motorcycle_shop":
     case "rental":
-      ids = ["overview", "fleet", "staff", ...COMMON_END];
+      ids = ["overview", "fleet", "staff", "invoices", ...COMMON_END];
       break;
     default:
-      ids = ["overview", "staff", ...COMMON_END];
+      ids = ["overview", "inventory", "invoices", "staff", ...COMMON_END];
   }
+
   return ids.map((id) => MODULES[id]);
 }
 
