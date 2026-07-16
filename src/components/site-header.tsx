@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 const NAV = [
   { category: "car", label: "Cars" },
@@ -286,6 +287,9 @@ export function SiteHeader() {
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5 bg-background/95 sm:gap-2">
+          {/* Language switcher — always visible */}
+          <LanguageSwitcher className="h-9 w-9" />
+
           {/* Help icon — desktop */}
           <Button
             asChild

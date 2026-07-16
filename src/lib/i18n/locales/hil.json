@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "home": "Puluy-an",
+    "browse": "Tan-awa",
+    "sell": "I-post ang listing",
+    "messages": "Mga Mensahe",
+    "dashboard": "Dashboard",
+    "signIn": "Sulod",
+    "signOut": "Gwa",
+    "support": "Bulig",
+    "admin": "Admin",
+    "language": "Hambal"
+  },
+  "common": {
+    "search": "Pangita",
+    "save": "I-save",
+    "cancel": "Kanselahon",
+    "loading": "Nagalo-load…",
+    "translate": "Badbara",
+    "showOriginal": "Ipakita ang orihinal",
+    "translating": "Ginabadbad…"
+  },
+  "home": {
+    "heroTitle": "Bakal kag baligya sang salakyan sa bug-os nga Pilipinas",
+    "heroSubtitle": "Salakyan, motor, baroto, eroplano, kag kagamitan — masaligan nga private kag business nga manugbaligya."
+  }
+}

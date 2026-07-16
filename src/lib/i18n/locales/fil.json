@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "home": "Home",
+    "browse": "Tumingin",
+    "sell": "Mag-post ng listing",
+    "messages": "Mga Mensahe",
+    "dashboard": "Dashboard",
+    "signIn": "Mag-sign in",
+    "signOut": "Mag-sign out",
+    "support": "Tulong at suporta",
+    "admin": "Admin",
+    "language": "Wika"
+  },
+  "common": {
+    "search": "Maghanap",
+    "save": "I-save",
+    "cancel": "Kanselahin",
+    "loading": "Naglo-load…",
+    "translate": "Isalin",
+    "showOriginal": "Ipakita ang orihinal",
+    "translating": "Isinasalin…"
+  },
+  "home": {
+    "heroTitle": "Bumili at magbenta ng sasakyan sa buong Pilipinas",
+    "heroSubtitle": "Kotse, motor, bangka, eroplano, at kagamitan — mapagkakatiwalaang private at business sellers."
+  }
+}

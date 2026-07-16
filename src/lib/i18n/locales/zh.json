@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "home": "首页",
+    "browse": "浏览",
+    "sell": "发布",
+    "messages": "消息",
+    "dashboard": "控制台",
+    "signIn": "登录",
+    "signOut": "退出",
+    "support": "帮助",
+    "admin": "管理",
+    "language": "语言"
+  },
+  "common": {
+    "search": "搜索",
+    "save": "保存",
+    "cancel": "取消",
+    "loading": "加载中…",
+    "translate": "翻译",
+    "showOriginal": "显示原文",
+    "translating": "翻译中…"
+  },
+  "home": {
+    "heroTitle": "在菲律宾买卖车辆",
+    "heroSubtitle": "汽车、摩托车、船只、飞机与设备 — 可信的个人与商家卖家。"
+  }
+}

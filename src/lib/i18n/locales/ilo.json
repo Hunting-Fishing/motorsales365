@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "home": "Pagtaengan",
+    "browse": "Kitaen",
+    "sell": "Mangipablaak",
+    "messages": "Dagiti Mensahe",
+    "dashboard": "Dashboard",
+    "signIn": "Sumrek",
+    "signOut": "Rummuar",
+    "support": "Tulong",
+    "admin": "Admin",
+    "language": "Pagsasao"
+  },
+  "common": {
+    "search": "Agbiruk",
+    "save": "Idulin",
+    "cancel": "Iwaksi",
+    "loading": "Aglo-load…",
+    "translate": "Ipatarus",
+    "showOriginal": "Ipakita ti orihinal",
+    "translating": "Maipatpatarus…"
+  },
+  "home": {
+    "heroTitle": "Gumatang ken aglako iti lugan iti intero a Filipinas",
+    "heroSubtitle": "Lugan, motor, bangka, eroplano, ken ekipo — mapagtalkan a private ken business a taga-lako."
+  }
+}
