@@ -2303,6 +2303,148 @@ export type Database = {
           },
         ]
       }
+      business_invoice_items: {
+        Row: {
+          business_id: string
+          created_at: string
+          deducted_qty: number
+          description: string
+          id: string
+          inventory_item_id: string | null
+          invoice_id: string
+          line_total: number
+          quantity: number
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          deducted_qty?: number
+          description: string
+          id?: string
+          inventory_item_id?: string | null
+          invoice_id: string
+          line_total?: number
+          quantity?: number
+          unit_price?: number
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          deducted_qty?: number
+          description?: string
+          id?: string
+          inventory_item_id?: string | null
+          invoice_id?: string
+          line_total?: number
+          quantity?: number
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_invoice_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_invoice_items_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "business_inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_invoice_items_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "network_stock"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "business_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_invoices: {
+        Row: {
+          business_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          due_date: string | null
+          id: string
+          invoice_number: string
+          issue_date: string
+          notes: string | null
+          status: string
+          subtotal: number
+          tax_amount: number
+          tax_rate: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_number: string
+          issue_date?: string
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_number?: string
+          issue_date?: string
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_invoices_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_location_corrections: {
         Row: {
           business_id: string
