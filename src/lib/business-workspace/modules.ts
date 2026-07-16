@@ -22,12 +22,14 @@ export type WorkspaceModuleId =
   | "fleet"
   | "staff"
   | "inventory"
+  | "invoices"
   | "listings"
   | "bookings"
   | "analytics"
   | "billing"
   | "settings"
   | "rates";
+
 
 export type WorkspaceModule = {
   id: WorkspaceModuleId;
