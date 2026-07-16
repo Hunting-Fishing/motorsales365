@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 const NAV = [
   { category: "car", label: "Cars" },
