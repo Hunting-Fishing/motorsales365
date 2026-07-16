@@ -371,6 +371,7 @@ import { Route as AuthenticatedShopCustomersIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedShopAutomationLogsRouteImport } from './routes/_authenticated/shop.automation.logs'
 import { Route as AuthenticatedShopAccountingPnlRouteImport } from './routes/_authenticated/shop.accounting.pnl'
 import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
+import { Route as DashboardBusinessBusinessIdInvoicesIdRouteImport } from './routes/dashboard.business.$businessId.invoices.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 import { Route as AuthenticatedShopReportsTechnicianIdRouteImport } from './routes/_authenticated/shop.reports.technician.$id'
 
@@ -2306,6 +2307,12 @@ const AuthenticatedDashboardClubsIdRoute =
     path: '/dashboard/clubs/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const DashboardBusinessBusinessIdInvoicesIdRoute =
+  DashboardBusinessBusinessIdInvoicesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => DashboardBusinessBusinessIdInvoicesRoute,
+  } as any)
 const ApiPublicTrainingPartnersIdClickRoute =
   ApiPublicTrainingPartnersIdClickRouteImport.update({
     id: '/api/public/training-partners/$id/click',
@@ -2665,7 +2672,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
-  '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRoute
+  '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRouteWithChildren
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
@@ -2683,6 +2690,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/business/$businessId/': typeof DashboardBusinessBusinessIdIndexRoute
   '/shop/reports/technician/$id': typeof AuthenticatedShopReportsTechnicianIdRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
+  '/dashboard/business/$businessId/invoices/$id': typeof DashboardBusinessBusinessIdInvoicesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -3019,7 +3027,7 @@ export interface FileRoutesByTo {
   '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
-  '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRoute
+  '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRouteWithChildren
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
@@ -3037,6 +3045,7 @@ export interface FileRoutesByTo {
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdIndexRoute
   '/shop/reports/technician/$id': typeof AuthenticatedShopReportsTechnicianIdRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
+  '/dashboard/business/$businessId/invoices/$id': typeof DashboardBusinessBusinessIdInvoicesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -3386,7 +3395,7 @@ export interface FileRoutesById {
   '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
-  '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRoute
+  '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRouteWithChildren
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses_/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
@@ -3404,6 +3413,7 @@ export interface FileRoutesById {
   '/dashboard/business/$businessId/': typeof DashboardBusinessBusinessIdIndexRoute
   '/_authenticated/shop/reports/technician/$id': typeof AuthenticatedShopReportsTechnicianIdRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
+  '/dashboard/business/$businessId/invoices/$id': typeof DashboardBusinessBusinessIdInvoicesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -3771,6 +3781,7 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId/'
     | '/shop/reports/technician/$id'
     | '/api/public/training-partners/$id/click'
+    | '/dashboard/business/$businessId/invoices/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -4125,6 +4136,7 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId'
     | '/shop/reports/technician/$id'
     | '/api/public/training-partners/$id/click'
+    | '/dashboard/business/$businessId/invoices/$id'
   id:
     | '__root__'
     | '/'
@@ -4491,6 +4503,7 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId/'
     | '/_authenticated/shop/reports/technician/$id'
     | '/api/public/training-partners/$id/click'
+    | '/dashboard/business/$businessId/invoices/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -7177,6 +7190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardClubsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/dashboard/business/$businessId/invoices/$id': {
+      id: '/dashboard/business/$businessId/invoices/$id'
+      path: '/$id'
+      fullPath: '/dashboard/business/$businessId/invoices/$id'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdInvoicesIdRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdInvoicesRoute
+    }
     '/api/public/training-partners/$id/click': {
       id: '/api/public/training-partners/$id/click'
       path: '/api/public/training-partners/$id/click'
@@ -7811,12 +7831,27 @@ const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
   DashboardTeamRouteChildren,
 )
 
+interface DashboardBusinessBusinessIdInvoicesRouteChildren {
+  DashboardBusinessBusinessIdInvoicesIdRoute: typeof DashboardBusinessBusinessIdInvoicesIdRoute
+}
+
+const DashboardBusinessBusinessIdInvoicesRouteChildren: DashboardBusinessBusinessIdInvoicesRouteChildren =
+  {
+    DashboardBusinessBusinessIdInvoicesIdRoute:
+      DashboardBusinessBusinessIdInvoicesIdRoute,
+  }
+
+const DashboardBusinessBusinessIdInvoicesRouteWithChildren =
+  DashboardBusinessBusinessIdInvoicesRoute._addFileChildren(
+    DashboardBusinessBusinessIdInvoicesRouteChildren,
+  )
+
 interface DashboardBusinessBusinessIdRouteChildren {
   DashboardBusinessBusinessIdBillingRoute: typeof DashboardBusinessBusinessIdBillingRoute
   DashboardBusinessBusinessIdDispatchRoute: typeof DashboardBusinessBusinessIdDispatchRoute
   DashboardBusinessBusinessIdFleetRoute: typeof DashboardBusinessBusinessIdFleetRoute
   DashboardBusinessBusinessIdInventoryRoute: typeof DashboardBusinessBusinessIdInventoryRoute
-  DashboardBusinessBusinessIdInvoicesRoute: typeof DashboardBusinessBusinessIdInvoicesRoute
+  DashboardBusinessBusinessIdInvoicesRoute: typeof DashboardBusinessBusinessIdInvoicesRouteWithChildren
   DashboardBusinessBusinessIdSettingsRoute: typeof DashboardBusinessBusinessIdSettingsRoute
   DashboardBusinessBusinessIdStaffRoute: typeof DashboardBusinessBusinessIdStaffRoute
   DashboardBusinessBusinessIdIndexRoute: typeof DashboardBusinessBusinessIdIndexRoute
@@ -7833,7 +7868,7 @@ const DashboardBusinessBusinessIdRouteChildren: DashboardBusinessBusinessIdRoute
     DashboardBusinessBusinessIdInventoryRoute:
       DashboardBusinessBusinessIdInventoryRoute,
     DashboardBusinessBusinessIdInvoicesRoute:
-      DashboardBusinessBusinessIdInvoicesRoute,
+      DashboardBusinessBusinessIdInvoicesRouteWithChildren,
     DashboardBusinessBusinessIdSettingsRoute:
       DashboardBusinessBusinessIdSettingsRoute,
     DashboardBusinessBusinessIdStaffRoute:
