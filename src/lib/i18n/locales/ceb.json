@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "home": "Panimalay",
+    "browse": "Tan-awa",
+    "sell": "I-post ang listing",
+    "messages": "Mga Mensahe",
+    "dashboard": "Dashboard",
+    "signIn": "Sulod",
+    "signOut": "Gawas",
+    "support": "Tabang",
+    "admin": "Admin",
+    "language": "Pinulongan"
+  },
+  "common": {
+    "search": "Pangita",
+    "save": "I-save",
+    "cancel": "Kanselahon",
+    "loading": "Ga-load…",
+    "translate": "Hubara",
+    "showOriginal": "Ipakita ang orihinal",
+    "translating": "Ginahubad…"
+  },
+  "home": {
+    "heroTitle": "Palit ug baligya og sakyanan sa Pilipinas",
+    "heroSubtitle": "Sakyanan, motor, bangka, eroplano, ug ekipo — kasaligan nga private ug business sellers."
+  }
+}

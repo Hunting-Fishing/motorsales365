@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "browse": "検索",
+    "sell": "出品する",
+    "messages": "メッセージ",
+    "dashboard": "ダッシュボード",
+    "signIn": "サインイン",
+    "signOut": "サインアウト",
+    "support": "ヘルプ",
+    "admin": "管理",
+    "language": "言語"
+  },
+  "common": {
+    "search": "検索",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "loading": "読み込み中…",
+    "translate": "翻訳",
+    "showOriginal": "原文を表示",
+    "translating": "翻訳中…"
+  },
+  "home": {
+    "heroTitle": "フィリピン全土で車両を売買",
+    "heroSubtitle": "自動車、バイク、ボート、航空機、機材 — 信頼できる個人・法人販売者。"
+  }
+}

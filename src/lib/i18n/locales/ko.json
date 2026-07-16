@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "home": "홈",
+    "browse": "둘러보기",
+    "sell": "판매 등록",
+    "messages": "메시지",
+    "dashboard": "대시보드",
+    "signIn": "로그인",
+    "signOut": "로그아웃",
+    "support": "고객지원",
+    "admin": "관리자",
+    "language": "언어"
+  },
+  "common": {
+    "search": "검색",
+    "save": "저장",
+    "cancel": "취소",
+    "loading": "불러오는 중…",
+    "translate": "번역",
+    "showOriginal": "원문 보기",
+    "translating": "번역 중…"
+  },
+  "home": {
+    "heroTitle": "필리핀 전역에서 차량 매매",
+    "heroSubtitle": "자동차, 오토바이, 보트, 항공기, 장비 — 신뢰할 수 있는 개인 및 사업자 판매자."
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "browse": "Parcourir",
+    "sell": "Publier une annonce",
+    "messages": "Messages",
+    "dashboard": "Tableau de bord",
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter",
+    "support": "Aide",
+    "admin": "Admin",
+    "language": "Langue"
+  },
+  "common": {
+    "search": "Rechercher",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "loading": "Chargement…",
+    "translate": "Traduire",
+    "showOriginal": "Afficher l'original",
+    "translating": "Traduction…"
+  },
+  "home": {
+    "heroTitle": "Achetez et vendez des véhicules aux Philippines",
+    "heroSubtitle": "Voitures, motos, bateaux, avions et équipements — vendeurs privés et professionnels de confiance."
+  }
+}

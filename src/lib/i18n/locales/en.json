@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "home": "Home",
+    "browse": "Browse",
+    "sell": "Post a listing",
+    "messages": "Messages",
+    "dashboard": "Dashboard",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "support": "Help & support",
+    "admin": "Admin",
+    "language": "Language"
+  },
+  "common": {
+    "search": "Search",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading…",
+    "translate": "Translate",
+    "showOriginal": "Show original",
+    "translating": "Translating…"
+  },
+  "home": {
+    "heroTitle": "Buy & sell vehicles across the Philippines",
+    "heroSubtitle": "Cars, motorcycles, boats, airplanes, and equipment — trusted private and business sellers."
+  }
+}
