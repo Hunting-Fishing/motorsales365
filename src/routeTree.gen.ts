@@ -320,6 +320,7 @@ import { Route as DashboardBusinessesIdDomainRouteImport } from './routes/dashbo
 import { Route as DashboardBusinessesIdAnalyticsRouteImport } from './routes/dashboard.businesses_.$id.analytics'
 import { Route as DashboardBusinessBusinessIdStaffRouteImport } from './routes/dashboard.business.$businessId.staff'
 import { Route as DashboardBusinessBusinessIdSettingsRouteImport } from './routes/dashboard.business.$businessId.settings'
+import { Route as DashboardBusinessBusinessIdInvoicesRouteImport } from './routes/dashboard.business.$businessId.invoices'
 import { Route as DashboardBusinessBusinessIdInventoryRouteImport } from './routes/dashboard.business.$businessId.inventory'
 import { Route as DashboardBusinessBusinessIdFleetRouteImport } from './routes/dashboard.business.$businessId.fleet'
 import { Route as DashboardBusinessBusinessIdDispatchRouteImport } from './routes/dashboard.business.$businessId.dispatch'
@@ -2006,6 +2007,12 @@ const DashboardBusinessBusinessIdSettingsRoute =
     path: '/settings',
     getParentRoute: () => DashboardBusinessBusinessIdRoute,
   } as any)
+const DashboardBusinessBusinessIdInvoicesRoute =
+  DashboardBusinessBusinessIdInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => DashboardBusinessBusinessIdRoute,
+  } as any)
 const DashboardBusinessBusinessIdInventoryRoute =
   DashboardBusinessBusinessIdInventoryRouteImport.update({
     id: '/inventory',
@@ -2658,6 +2665,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
+  '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRoute
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
@@ -3011,6 +3019,7 @@ export interface FileRoutesByTo {
   '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
+  '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRoute
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
@@ -3377,6 +3386,7 @@ export interface FileRoutesById {
   '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
+  '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRoute
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses_/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
@@ -3743,6 +3753,7 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId/dispatch'
     | '/dashboard/business/$businessId/fleet'
     | '/dashboard/business/$businessId/inventory'
+    | '/dashboard/business/$businessId/invoices'
     | '/dashboard/business/$businessId/settings'
     | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses/$id/analytics'
@@ -4096,6 +4107,7 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId/dispatch'
     | '/dashboard/business/$businessId/fleet'
     | '/dashboard/business/$businessId/inventory'
+    | '/dashboard/business/$businessId/invoices'
     | '/dashboard/business/$businessId/settings'
     | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses/$id/analytics'
@@ -4461,6 +4473,7 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId/dispatch'
     | '/dashboard/business/$businessId/fleet'
     | '/dashboard/business/$businessId/inventory'
+    | '/dashboard/business/$businessId/invoices'
     | '/dashboard/business/$businessId/settings'
     | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses_/$id/analytics'
@@ -6807,6 +6820,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBusinessBusinessIdSettingsRouteImport
       parentRoute: typeof DashboardBusinessBusinessIdRoute
     }
+    '/dashboard/business/$businessId/invoices': {
+      id: '/dashboard/business/$businessId/invoices'
+      path: '/invoices'
+      fullPath: '/dashboard/business/$businessId/invoices'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdInvoicesRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
     '/dashboard/business/$businessId/inventory': {
       id: '/dashboard/business/$businessId/inventory'
       path: '/inventory'
@@ -7796,6 +7816,7 @@ interface DashboardBusinessBusinessIdRouteChildren {
   DashboardBusinessBusinessIdDispatchRoute: typeof DashboardBusinessBusinessIdDispatchRoute
   DashboardBusinessBusinessIdFleetRoute: typeof DashboardBusinessBusinessIdFleetRoute
   DashboardBusinessBusinessIdInventoryRoute: typeof DashboardBusinessBusinessIdInventoryRoute
+  DashboardBusinessBusinessIdInvoicesRoute: typeof DashboardBusinessBusinessIdInvoicesRoute
   DashboardBusinessBusinessIdSettingsRoute: typeof DashboardBusinessBusinessIdSettingsRoute
   DashboardBusinessBusinessIdStaffRoute: typeof DashboardBusinessBusinessIdStaffRoute
   DashboardBusinessBusinessIdIndexRoute: typeof DashboardBusinessBusinessIdIndexRoute
@@ -7811,6 +7832,8 @@ const DashboardBusinessBusinessIdRouteChildren: DashboardBusinessBusinessIdRoute
       DashboardBusinessBusinessIdFleetRoute,
     DashboardBusinessBusinessIdInventoryRoute:
       DashboardBusinessBusinessIdInventoryRoute,
+    DashboardBusinessBusinessIdInvoicesRoute:
+      DashboardBusinessBusinessIdInvoicesRoute,
     DashboardBusinessBusinessIdSettingsRoute:
       DashboardBusinessBusinessIdSettingsRoute,
     DashboardBusinessBusinessIdStaffRoute:
