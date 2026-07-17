@@ -49,6 +49,7 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       active?: boolean;
       network_visible?: boolean;
       catalog_part_id?: string | null;
+      extra?: Record<string, any> | null;
     }) => {
       if (!d.name?.trim()) throw new Error("Name required");
       return d;
@@ -70,6 +71,22 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       }
     }
 
+    // Whitelist of extra columns the client may set through the multi-step form.
+    const EXTRA_COLS = new Set([
+      "barcode","manufacturer_part_number","main_category","status","manufacturer",
+      "supplier","description","markup_percentage","date_purchased","last_price_update",
+      "qty_on_hold","qty_on_order","min_stock_level","max_stock_level","weight_lbs",
+      "dimensions","color","material","model_year","oem_part_number","warranty_period",
+      "universal_part","tax_rate","environmental_fee","core_charge","hazmat_fee",
+      "tax_exempt","date_last_ordered","date_last_used","web_links",
+    ]);
+    const extra: Record<string, any> = {};
+    if (data.extra && typeof data.extra === "object") {
+      for (const [k, v] of Object.entries(data.extra)) {
+        if (EXTRA_COLS.has(k)) extra[k] = v;
+      }
+    }
+
     const payload = {
       id: data.id,
       business_id: data.businessId,
@@ -86,6 +103,7 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       active: data.active ?? true,
       network_visible: data.network_visible ?? true,
       catalog_part_id: data.catalog_part_id ?? null,
+      ...extra,
     };
     const { data: row, error } = await supabase
       .from("business_inventory_items")
