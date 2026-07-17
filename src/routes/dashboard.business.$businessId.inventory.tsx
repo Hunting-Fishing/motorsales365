@@ -233,115 +233,13 @@ function InventoryPage() {
         })}
       </Card>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editing ? "Edit item" : "Add inventory item"}</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2">
-              <Label>Name</Label>
-              <Input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Tow strap 3m"
-              />
-            </div>
-            <div>
-              <Label>SKU</Label>
-              <Input
-                value={form.sku}
-                onChange={(e) => setForm({ ...form, sku: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Category</Label>
-              <Input
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                placeholder="strap / dolly / fuel"
-              />
-            </div>
-            <div>
-              <Label>Brand</Label>
-              <Input
-                value={form.brand}
-                onChange={(e) => setForm({ ...form, brand: e.target.value })}
-                placeholder="Bosch / Denso / OEM"
-              />
-            </div>
-            <div>
-              <Label>Unit</Label>
-              <Input
-                value={form.unit}
-                onChange={(e) => setForm({ ...form, unit: e.target.value })}
-                placeholder="pc / L / kg"
-              />
-            </div>
-            <div>
-              <Label>On hand</Label>
-              <Input
-                type="number"
-                value={form.qty_on_hand}
-                onChange={(e) => setForm({ ...form, qty_on_hand: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Reorder at</Label>
-              <Input
-                type="number"
-                value={form.reorder_at}
-                onChange={(e) => setForm({ ...form, reorder_at: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Cost (₱)</Label>
-              <Input
-                type="number"
-                value={form.cost}
-                onChange={(e) => setForm({ ...form, cost: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Sell price (₱)</Label>
-              <Input
-                type="number"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-                placeholder="Shown to customers"
-              />
-            </div>
-            <div className="col-span-2">
-              <Label>Location</Label>
-              <Input
-                value={form.location}
-                onChange={(e) => setForm({ ...form, location: e.target.value })}
-                placeholder="Bay 2 shelf B"
-              />
-            </div>
-            <div className="col-span-2 flex items-center justify-between rounded-md border p-3">
-              <div>
-                <p className="text-sm font-medium">Show in network stock feed</p>
-                <p className="text-xs text-muted-foreground">
-                  Off = keep this item private to your shop.
-                </p>
-              </div>
-              <Switch
-                checked={!!form.network_visible}
-                onCheckedChange={(v) => setForm({ ...form, network_visible: v })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave} disabled={!form.name || saving}>
-              {saving ? "Saving…" : "Save"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <InventoryItemFormDialog
+        open={open}
+        onOpenChange={setOpen}
+        businessId={businessId}
+        editing={editing}
+        onSaved={() => qc.invalidateQueries({ queryKey: ["business-inventory", businessId] })}
+      />
     </div>
   );
 }
