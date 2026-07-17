@@ -101,77 +101,15 @@ function InventoryPage() {
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
-  const emptyForm = {
-    name: "",
-    sku: "",
-    category: "",
-    brand: "",
-    unit: "pc",
-    qty_on_hand: 0,
-    reorder_at: "",
-    cost: "",
-    price: "",
-    location: "",
-    network_visible: true,
-  };
-  const [form, setForm] = useState<any>(emptyForm);
-  const [saving, setSaving] = useState(false);
 
   function openNew() {
     setEditing(null);
-    setForm({ ...emptyForm });
     setOpen(true);
   }
 
   function openEdit(row: any) {
     setEditing(row);
-    setForm({
-      name: row.name,
-      sku: row.sku ?? "",
-      category: row.category ?? "",
-      brand: row.brand ?? "",
-      unit: row.unit ?? "pc",
-      qty_on_hand: row.qty_on_hand ?? 0,
-      reorder_at: row.reorder_at ?? "",
-      cost: row.cost ?? "",
-      price: row.price ?? "",
-      location: row.location ?? "",
-      network_visible: row.network_visible ?? true,
-    });
     setOpen(true);
-  }
-
-  async function handleSave() {
-    setSaving(true);
-    try {
-      const res: any = await upsertFn({
-        data: {
-          id: editing?.id,
-          businessId,
-          name: form.name,
-          sku: form.sku || null,
-          category: form.category || null,
-          brand: form.brand || null,
-          unit: form.unit,
-          qty_on_hand: Number(form.qty_on_hand) || 0,
-          reorder_at: form.reorder_at === "" ? null : Number(form.reorder_at),
-          cost: form.cost === "" ? null : Number(form.cost),
-          price: form.price === "" ? null : Number(form.price),
-          location: form.location || null,
-          network_visible: !!form.network_visible,
-        },
-      });
-      const { handlePlanLimitResult } = await import("@/lib/plan-limit-toast");
-      if (handlePlanLimitResult(res, { businessId })) return;
-      toast.success("Saved");
-      setOpen(false);
-      qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
-
-    } catch (e: any) {
-      toast.error(e?.message || "Failed");
-    } finally {
-      setSaving(false);
-    }
   }
 
 
