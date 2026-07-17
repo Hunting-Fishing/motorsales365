@@ -2173,63 +2173,153 @@ export type Database = {
       business_inventory_items: {
         Row: {
           active: boolean
+          barcode: string | null
           brand: string | null
           business_id: string
           catalog_part_id: string | null
           category: string | null
+          color: string | null
+          core_charge: number | null
           cost: number | null
           created_at: string
+          date_last_ordered: string | null
+          date_last_used: string | null
+          date_purchased: string | null
+          description: string | null
+          dimensions: string | null
+          environmental_fee: number | null
+          hazmat_fee: number | null
           id: string
+          last_price_update: string | null
           location: string | null
+          main_category: string | null
+          manufacturer: string | null
+          manufacturer_part_number: string | null
+          markup_percentage: number | null
+          material: string | null
+          max_stock_level: number | null
+          min_stock_level: number | null
+          model_year: number | null
           name: string
           network_visible: boolean
           notes: string | null
+          oem_part_number: string | null
           price: number | null
           qty_on_hand: number
+          qty_on_hold: number
+          qty_on_order: number
           reorder_at: number | null
           sku: string | null
+          status: string
+          supplier: string | null
+          tax_exempt: boolean
+          tax_rate: number | null
           unit: string
+          universal_part: boolean
           updated_at: string
+          warranty_period: string | null
+          web_links: Json
+          weight_lbs: number | null
         }
         Insert: {
           active?: boolean
+          barcode?: string | null
           brand?: string | null
           business_id: string
           catalog_part_id?: string | null
           category?: string | null
+          color?: string | null
+          core_charge?: number | null
           cost?: number | null
           created_at?: string
+          date_last_ordered?: string | null
+          date_last_used?: string | null
+          date_purchased?: string | null
+          description?: string | null
+          dimensions?: string | null
+          environmental_fee?: number | null
+          hazmat_fee?: number | null
           id?: string
+          last_price_update?: string | null
           location?: string | null
+          main_category?: string | null
+          manufacturer?: string | null
+          manufacturer_part_number?: string | null
+          markup_percentage?: number | null
+          material?: string | null
+          max_stock_level?: number | null
+          min_stock_level?: number | null
+          model_year?: number | null
           name: string
           network_visible?: boolean
           notes?: string | null
+          oem_part_number?: string | null
           price?: number | null
           qty_on_hand?: number
+          qty_on_hold?: number
+          qty_on_order?: number
           reorder_at?: number | null
           sku?: string | null
+          status?: string
+          supplier?: string | null
+          tax_exempt?: boolean
+          tax_rate?: number | null
           unit?: string
+          universal_part?: boolean
           updated_at?: string
+          warranty_period?: string | null
+          web_links?: Json
+          weight_lbs?: number | null
         }
         Update: {
           active?: boolean
+          barcode?: string | null
           brand?: string | null
           business_id?: string
           catalog_part_id?: string | null
           category?: string | null
+          color?: string | null
+          core_charge?: number | null
           cost?: number | null
           created_at?: string
+          date_last_ordered?: string | null
+          date_last_used?: string | null
+          date_purchased?: string | null
+          description?: string | null
+          dimensions?: string | null
+          environmental_fee?: number | null
+          hazmat_fee?: number | null
           id?: string
+          last_price_update?: string | null
           location?: string | null
+          main_category?: string | null
+          manufacturer?: string | null
+          manufacturer_part_number?: string | null
+          markup_percentage?: number | null
+          material?: string | null
+          max_stock_level?: number | null
+          min_stock_level?: number | null
+          model_year?: number | null
           name?: string
           network_visible?: boolean
           notes?: string | null
+          oem_part_number?: string | null
           price?: number | null
           qty_on_hand?: number
+          qty_on_hold?: number
+          qty_on_order?: number
           reorder_at?: number | null
           sku?: string | null
+          status?: string
+          supplier?: string | null
+          tax_exempt?: boolean
+          tax_rate?: number | null
           unit?: string
+          universal_part?: boolean
           updated_at?: string
+          warranty_period?: string | null
+          web_links?: Json
+          weight_lbs?: number | null
         }
         Relationships: [
           {

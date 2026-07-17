@@ -26,7 +26,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +35,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { InventoryItemFormDialog } from "@/components/business/inventory-item-form";
 
 export const Route = createFileRoute("/dashboard/business/$businessId/inventory")({
   component: InventoryPage,
@@ -101,77 +101,15 @@ function InventoryPage() {
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
-  const emptyForm = {
-    name: "",
-    sku: "",
-    category: "",
-    brand: "",
-    unit: "pc",
-    qty_on_hand: 0,
-    reorder_at: "",
-    cost: "",
-    price: "",
-    location: "",
-    network_visible: true,
-  };
-  const [form, setForm] = useState<any>(emptyForm);
-  const [saving, setSaving] = useState(false);
 
   function openNew() {
     setEditing(null);
-    setForm({ ...emptyForm });
     setOpen(true);
   }
 
   function openEdit(row: any) {
     setEditing(row);
-    setForm({
-      name: row.name,
-      sku: row.sku ?? "",
-      category: row.category ?? "",
-      brand: row.brand ?? "",
-      unit: row.unit ?? "pc",
-      qty_on_hand: row.qty_on_hand ?? 0,
-      reorder_at: row.reorder_at ?? "",
-      cost: row.cost ?? "",
-      price: row.price ?? "",
-      location: row.location ?? "",
-      network_visible: row.network_visible ?? true,
-    });
     setOpen(true);
-  }
-
-  async function handleSave() {
-    setSaving(true);
-    try {
-      const res: any = await upsertFn({
-        data: {
-          id: editing?.id,
-          businessId,
-          name: form.name,
-          sku: form.sku || null,
-          category: form.category || null,
-          brand: form.brand || null,
-          unit: form.unit,
-          qty_on_hand: Number(form.qty_on_hand) || 0,
-          reorder_at: form.reorder_at === "" ? null : Number(form.reorder_at),
-          cost: form.cost === "" ? null : Number(form.cost),
-          price: form.price === "" ? null : Number(form.price),
-          location: form.location || null,
-          network_visible: !!form.network_visible,
-        },
-      });
-      const { handlePlanLimitResult } = await import("@/lib/plan-limit-toast");
-      if (handlePlanLimitResult(res, { businessId })) return;
-      toast.success("Saved");
-      setOpen(false);
-      qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
-
-    } catch (e: any) {
-      toast.error(e?.message || "Failed");
-    } finally {
-      setSaving(false);
-    }
   }
 
 
@@ -295,115 +233,13 @@ function InventoryPage() {
         })}
       </Card>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editing ? "Edit item" : "Add inventory item"}</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2">
-              <Label>Name</Label>
-              <Input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Tow strap 3m"
-              />
-            </div>
-            <div>
-              <Label>SKU</Label>
-              <Input
-                value={form.sku}
-                onChange={(e) => setForm({ ...form, sku: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Category</Label>
-              <Input
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                placeholder="strap / dolly / fuel"
-              />
-            </div>
-            <div>
-              <Label>Brand</Label>
-              <Input
-                value={form.brand}
-                onChange={(e) => setForm({ ...form, brand: e.target.value })}
-                placeholder="Bosch / Denso / OEM"
-              />
-            </div>
-            <div>
-              <Label>Unit</Label>
-              <Input
-                value={form.unit}
-                onChange={(e) => setForm({ ...form, unit: e.target.value })}
-                placeholder="pc / L / kg"
-              />
-            </div>
-            <div>
-              <Label>On hand</Label>
-              <Input
-                type="number"
-                value={form.qty_on_hand}
-                onChange={(e) => setForm({ ...form, qty_on_hand: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Reorder at</Label>
-              <Input
-                type="number"
-                value={form.reorder_at}
-                onChange={(e) => setForm({ ...form, reorder_at: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Cost (₱)</Label>
-              <Input
-                type="number"
-                value={form.cost}
-                onChange={(e) => setForm({ ...form, cost: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Sell price (₱)</Label>
-              <Input
-                type="number"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-                placeholder="Shown to customers"
-              />
-            </div>
-            <div className="col-span-2">
-              <Label>Location</Label>
-              <Input
-                value={form.location}
-                onChange={(e) => setForm({ ...form, location: e.target.value })}
-                placeholder="Bay 2 shelf B"
-              />
-            </div>
-            <div className="col-span-2 flex items-center justify-between rounded-md border p-3">
-              <div>
-                <p className="text-sm font-medium">Show in network stock feed</p>
-                <p className="text-xs text-muted-foreground">
-                  Off = keep this item private to your shop.
-                </p>
-              </div>
-              <Switch
-                checked={!!form.network_visible}
-                onCheckedChange={(v) => setForm({ ...form, network_visible: v })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave} disabled={!form.name || saving}>
-              {saving ? "Saving…" : "Save"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <InventoryItemFormDialog
+        open={open}
+        onOpenChange={setOpen}
+        businessId={businessId}
+        editing={editing}
+        onSaved={() => qc.invalidateQueries({ queryKey: ["business-inventory", businessId] })}
+      />
     </div>
   );
 }
