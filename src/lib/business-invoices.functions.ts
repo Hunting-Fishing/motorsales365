@@ -284,3 +284,20 @@ export const deleteBusinessInvoiceItem = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+export const listBusinessServicesForInvoice = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { businessId: string }) => d)
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertMember(supabase, userId, data.businessId);
+    const { data: rows, error } = await supabase
+      .from("business_services")
+      .select("id,title,description,unit,price_php,max_price_php,active")
+      .eq("business_id", data.businessId)
+      .eq("active", true)
+      .order("sort_order", { ascending: true });
+    if (error) throw error;
+    return rows ?? [];
+  });
+
