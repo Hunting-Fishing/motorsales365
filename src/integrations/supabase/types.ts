@@ -2470,18 +2470,23 @@ export type Database = {
           created_at: string
           created_by: string | null
           currency: string
+          customer_address: string | null
           customer_email: string | null
           customer_name: string | null
           customer_phone: string | null
+          description: string | null
           due_date: string | null
           id: string
           invoice_number: string
           issue_date: string
           notes: string | null
+          payment_method: string | null
+          po_number: string | null
           status: string
           subtotal: number
           tax_amount: number
           tax_rate: number
+          terms: string | null
           total: number
           updated_at: string
         }
@@ -2490,18 +2495,23 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           currency?: string
+          customer_address?: string | null
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          description?: string | null
           due_date?: string | null
           id?: string
           invoice_number: string
           issue_date?: string
           notes?: string | null
+          payment_method?: string | null
+          po_number?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
           tax_rate?: number
+          terms?: string | null
           total?: number
           updated_at?: string
         }
@@ -2510,18 +2520,23 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           currency?: string
+          customer_address?: string | null
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          description?: string | null
           due_date?: string | null
           id?: string
           invoice_number?: string
           issue_date?: string
           notes?: string | null
+          payment_method?: string | null
+          po_number?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
           tax_rate?: number
+          terms?: string | null
           total?: number
           updated_at?: string
         }

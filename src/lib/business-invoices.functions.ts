@@ -84,6 +84,12 @@ export const createBusinessInvoice = createServerFn({ method: "POST" })
       customer_name?: string | null;
       customer_email?: string | null;
       customer_phone?: string | null;
+      customer_address?: string | null;
+      description?: string | null;
+      po_number?: string | null;
+      payment_method?: string | null;
+      terms?: string | null;
+      issue_date?: string | null;
       due_date?: string | null;
       tax_rate?: number;
       notes?: string | null;
@@ -93,19 +99,26 @@ export const createBusinessInvoice = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertManager(supabase, userId, data.businessId);
     const invoice_number = await nextInvoiceNumber(supabase, data.businessId);
+    const payload: any = {
+      business_id: data.businessId,
+      created_by: userId,
+      invoice_number,
+      customer_name: data.customer_name ?? null,
+      customer_email: data.customer_email ?? null,
+      customer_phone: data.customer_phone ?? null,
+      customer_address: data.customer_address ?? null,
+      description: data.description ?? null,
+      po_number: data.po_number ?? null,
+      payment_method: data.payment_method ?? null,
+      terms: data.terms ?? null,
+      due_date: data.due_date ?? null,
+      tax_rate: data.tax_rate ?? 0,
+      notes: data.notes ?? null,
+    };
+    if (data.issue_date) payload.issue_date = data.issue_date;
     const { data: row, error } = await supabase
       .from("business_invoices")
-      .insert({
-        business_id: data.businessId,
-        created_by: userId,
-        invoice_number,
-        customer_name: data.customer_name ?? null,
-        customer_email: data.customer_email ?? null,
-        customer_phone: data.customer_phone ?? null,
-        due_date: data.due_date ?? null,
-        tax_rate: data.tax_rate ?? 0,
-        notes: data.notes ?? null,
-      })
+      .insert(payload)
       .select("*")
       .single();
     if (error) throw error;
@@ -121,6 +134,12 @@ export const updateBusinessInvoice = createServerFn({ method: "POST" })
       customer_name?: string | null;
       customer_email?: string | null;
       customer_phone?: string | null;
+      customer_address?: string | null;
+      description?: string | null;
+      po_number?: string | null;
+      payment_method?: string | null;
+      terms?: string | null;
+      issue_date?: string | null;
       due_date?: string | null;
       status?: "draft" | "sent" | "paid" | "void";
       tax_rate?: number;
@@ -135,6 +154,12 @@ export const updateBusinessInvoice = createServerFn({ method: "POST" })
       "customer_name",
       "customer_email",
       "customer_phone",
+      "customer_address",
+      "description",
+      "po_number",
+      "payment_method",
+      "terms",
+      "issue_date",
       "due_date",
       "status",
       "tax_rate",
