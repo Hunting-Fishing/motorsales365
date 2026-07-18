@@ -7,22 +7,12 @@ import { Plus, Receipt, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   listBusinessInvoices,
-  createBusinessInvoice,
   deleteBusinessInvoice,
 } from "@/lib/business-invoices.functions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+import { InvoiceFormDialog } from "@/components/business/invoice-form-dialog";
 
 export const Route = createFileRoute("/dashboard/business/$businessId/invoices")({
   component: InvoicesPage,
@@ -42,7 +32,6 @@ function InvoicesPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const listFn = useServerFn(listBusinessInvoices);
-  const createFn = useServerFn(createBusinessInvoice);
   const delFn = useServerFn(deleteBusinessInvoice);
 
   const q = useQuery({
@@ -52,47 +41,6 @@ function InvoicesPage() {
   });
 
   const [open, setOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    customer_name: "",
-    customer_email: "",
-    customer_phone: "",
-    due_date: "",
-    tax_rate: "12",
-    notes: "",
-  });
-
-  async function handleCreate() {
-    setSaving(true);
-    try {
-      const row: any = await createFn({
-        data: {
-          businessId,
-          customer_name: form.customer_name || null,
-          customer_email: form.customer_email || null,
-          customer_phone: form.customer_phone || null,
-          due_date: form.due_date || null,
-          tax_rate: Number(form.tax_rate) || 0,
-          notes: form.notes || null,
-        },
-      });
-      toast.success(`Invoice ${row.invoice_number} created`);
-      setOpen(false);
-      setForm({
-        customer_name: "",
-        customer_email: "",
-        customer_phone: "",
-        due_date: "",
-        tax_rate: "12",
-        notes: "",
-      });
-      qc.invalidateQueries({ queryKey: ["business-invoices", businessId] });
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to create invoice");
-    } finally {
-      setSaving(false);
-    }
-  }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this invoice? Any inventory deducted by its lines will be returned to stock.")) return;
@@ -178,75 +126,11 @@ function InvoicesPage() {
         ))}
       </Card>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>New invoice</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2">
-              <Label>Customer name</Label>
-              <Input
-                value={form.customer_name}
-                onChange={(e) =>
-                  setForm({ ...form, customer_name: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <Label>Email</Label>
-              <Input
-                type="email"
-                value={form.customer_email}
-                onChange={(e) =>
-                  setForm({ ...form, customer_email: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <Label>Phone</Label>
-              <Input
-                value={form.customer_phone}
-                onChange={(e) =>
-                  setForm({ ...form, customer_phone: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <Label>Due date</Label>
-              <Input
-                type="date"
-                value={form.due_date}
-                onChange={(e) => setForm({ ...form, due_date: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Tax rate %</Label>
-              <Input
-                type="number"
-                value={form.tax_rate}
-                onChange={(e) => setForm({ ...form, tax_rate: e.target.value })}
-              />
-            </div>
-            <div className="col-span-2">
-              <Label>Notes</Label>
-              <Textarea
-                rows={2}
-                value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleCreate} disabled={saving}>
-              {saving ? "Creating…" : "Create draft"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <InvoiceFormDialog
+        businessId={businessId}
+        open={open}
+        onOpenChange={setOpen}
+      />
     </div>
   );
 }
