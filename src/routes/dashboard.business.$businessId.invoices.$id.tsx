@@ -3,13 +3,14 @@ import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ChevronLeft, Plus, Trash2, Package } from "lucide-react";
+import { ChevronLeft, Plus, Trash2, Package, Wrench } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   getBusinessInvoice,
   updateBusinessInvoice,
   addBusinessInvoiceItem,
   deleteBusinessInvoiceItem,
+  listBusinessServicesForInvoice,
 } from "@/lib/business-invoices.functions";
 import { listBusinessInventory } from "@/lib/business-inventory.functions";
 import { Card } from "@/components/ui/card";
@@ -17,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -25,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 
 export const Route = createFileRoute("/dashboard/business/$businessId/invoices/$id")({
   component: InvoiceDetail,
