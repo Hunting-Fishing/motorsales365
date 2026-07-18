@@ -200,32 +200,76 @@ function InvoiceDetail() {
         <p className="font-medium flex items-center gap-2">
           <Package className="h-4 w-4" /> Add line item
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-2">
-          <div className="md:col-span-2">
-            <Label className="text-xs">From inventory</Label>
+        <Tabs
+          value={tab}
+          onValueChange={(v) => {
+            const next = v as "item" | "service" | "custom";
+            setTab(next);
+            setLine({ inventory_item_id: "", service_id: "", description: "", quantity: "1", unit_price: "" });
+          }}
+        >
+          <TabsList>
+            <TabsTrigger value="item">
+              <Package className="h-3.5 w-3.5 mr-1" /> Inventory item
+            </TabsTrigger>
+            <TabsTrigger value="service">
+              <Wrench className="h-3.5 w-3.5 mr-1" /> Service / job
+            </TabsTrigger>
+            <TabsTrigger value="custom">Custom</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="item" className="pt-3">
+            <Label className="text-xs">Pick from inventory (auto-deducts stock)</Label>
             <Select
-              value={line.inventory_item_id || "none"}
-              onValueChange={(v) => (v === "none" ? setLine({ ...line, inventory_item_id: "" }) : onPickInventory(v))}
+              value={line.inventory_item_id || ""}
+              onValueChange={(v) => onPickInventory(v)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Custom line / choose item…" />
+                <SelectValue placeholder={inventory.length === 0 ? "No inventory yet — add items first" : "Choose an inventory item…"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Custom line (no stock deduction)</SelectItem>
                 {inventory.map((it: any) => (
                   <SelectItem key={it.id} value={it.id}>
                     {it.name} — {Number(it.qty_on_hand ?? 0)} {it.unit}
+                    {it.price != null ? ` · ₱${Number(it.price).toLocaleString()}` : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {selectedInv && (
               <p className="text-[11px] text-muted-foreground mt-1">
-                {Number(selectedInv.qty_on_hand ?? 0)} on hand
+                {Number(selectedInv.qty_on_hand ?? 0)} on hand · SKU {selectedInv.sku ?? "—"}
               </p>
             )}
-          </div>
-          <div className="md:col-span-2">
+          </TabsContent>
+
+          <TabsContent value="service" className="pt-3">
+            <Label className="text-xs">Pick a service / job from your catalog</Label>
+            <Select value={line.service_id || ""} onValueChange={(v) => onPickService(v)}>
+              <SelectTrigger>
+                <SelectValue placeholder={services.length === 0 ? "No services yet — add them in your business profile" : "Choose a service…"} />
+              </SelectTrigger>
+              <SelectContent>
+                {services.map((s: any) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.title}
+                    {s.price_php != null ? ` · ₱${Number(s.price_php).toLocaleString()}` : ""}
+                    {s.unit ? ` / ${s.unit}` : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </TabsContent>
+
+          <TabsContent value="custom" className="pt-3">
+            <p className="text-xs text-muted-foreground">
+              Type a custom description and price below — no stock will be deducted.
+            </p>
+          </TabsContent>
+        </Tabs>
+
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-2">
+          <div className="md:col-span-4">
             <Label className="text-xs">Description</Label>
             <Input
               value={line.description}
@@ -250,7 +294,14 @@ function InvoiceDetail() {
             />
           </div>
         </div>
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between">
+          <div className="text-xs text-muted-foreground">
+            Line total:{" "}
+            <span className="font-medium text-foreground">
+              {invoice.currency}{" "}
+              {(Number(line.quantity || 0) * Number(line.unit_price || 0)).toLocaleString()}
+            </span>
+          </div>
           <Button
             onClick={addLine}
             disabled={savingLine || !line.description || !line.quantity}
@@ -258,6 +309,7 @@ function InvoiceDetail() {
             <Plus className="h-4 w-4 mr-1" /> Add line
           </Button>
         </div>
+
       </Card>
 
       <Card className="divide-y">
