@@ -134,6 +134,12 @@ export const updateBusinessInvoice = createServerFn({ method: "POST" })
       customer_name?: string | null;
       customer_email?: string | null;
       customer_phone?: string | null;
+      customer_address?: string | null;
+      description?: string | null;
+      po_number?: string | null;
+      payment_method?: string | null;
+      terms?: string | null;
+      issue_date?: string | null;
       due_date?: string | null;
       status?: "draft" | "sent" | "paid" | "void";
       tax_rate?: number;
@@ -148,6 +154,12 @@ export const updateBusinessInvoice = createServerFn({ method: "POST" })
       "customer_name",
       "customer_email",
       "customer_phone",
+      "customer_address",
+      "description",
+      "po_number",
+      "payment_method",
+      "terms",
+      "issue_date",
       "due_date",
       "status",
       "tax_rate",
