@@ -45,6 +45,7 @@ function InvoiceDetail() {
   const addItemFn = useServerFn(addBusinessInvoiceItem);
   const delItemFn = useServerFn(deleteBusinessInvoiceItem);
   const invListFn = useServerFn(listBusinessInventory);
+  const svcListFn = useServerFn(listBusinessServicesForInvoice);
 
   const q = useQuery({
     queryKey: ["business-invoice", businessId, id],
@@ -58,8 +59,16 @@ function InvoiceDetail() {
     queryFn: () => invListFn({ data: { businessId } }),
   });
 
+  const servicesQ = useQuery({
+    queryKey: ["business-services-invoice", businessId],
+    enabled: !!user?.id,
+    queryFn: () => svcListFn({ data: { businessId } }),
+  });
+
+  const [tab, setTab] = useState<"item" | "service" | "custom">("item");
   const [line, setLine] = useState({
     inventory_item_id: "",
+    service_id: "",
     description: "",
     quantity: "1",
     unit_price: "",
@@ -67,6 +76,7 @@ function InvoiceDetail() {
   const [savingLine, setSavingLine] = useState(false);
 
   const inventory = inventoryQ.data ?? [];
+  const services = servicesQ.data ?? [];
   const selectedInv = useMemo(
     () => inventory.find((i: any) => i.id === line.inventory_item_id),
     [inventory, line.inventory_item_id],
@@ -76,11 +86,24 @@ function InvoiceDetail() {
     const it = inventory.find((i: any) => i.id === itemId);
     setLine({
       inventory_item_id: itemId,
+      service_id: "",
       description: it?.name ?? "",
       quantity: "1",
       unit_price: it?.price != null ? String(it.price) : "",
     });
   }
+
+  function onPickService(svcId: string) {
+    const s = services.find((x: any) => x.id === svcId);
+    setLine({
+      inventory_item_id: "",
+      service_id: svcId,
+      description: s?.title ?? "",
+      quantity: "1",
+      unit_price: s?.price_php != null ? String(s.price_php) : "",
+    });
+  }
+
 
   async function addLine() {
     setSavingLine(true);
