@@ -118,7 +118,7 @@ function InvoiceDetail() {
           unit_price: Number(line.unit_price) || 0,
         },
       });
-      setLine({ inventory_item_id: "", description: "", quantity: "1", unit_price: "" });
+      setLine({ inventory_item_id: "", service_id: "", description: "", quantity: "1", unit_price: "" });
       qc.invalidateQueries({ queryKey: ["business-invoice", businessId, id] });
       qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
       toast.success("Line added");
