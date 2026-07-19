@@ -32,6 +32,8 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { upsertBusinessInventoryItem } from "@/lib/business-inventory.functions";
 import { cn } from "@/lib/utils";
+import { mainCategoriesFor, subcategoriesFor } from "@/data/inventory-taxonomy";
+import { businessKindLabel } from "@/data/business-kinds";
 
 /**
  * Six-section inventory form matching the Shop Manager design:
@@ -108,11 +110,6 @@ const EMPTY: FormState = {
   network_visible: true,
 };
 
-const MAIN_CATEGORIES = [
-  "Parts", "Fluids & Chemicals", "Tools", "Consumables",
-  "Tires & Wheels", "Batteries", "Filters", "Accessories",
-  "Shop Supplies", "Other",
-];
 const UNITS = ["pc", "set", "pair", "L", "gal", "kg", "lb", "ft", "m", "box"];
 const LINK_TYPES = ["Manufacturer", "Manual (PDF)", "Video", "Datasheet", "Supplier", "Other"];
 
@@ -130,12 +127,14 @@ export function InventoryItemFormDialog({
   open,
   onOpenChange,
   businessId,
+  businessKind,
   editing,
   onSaved,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   businessId: string;
+  businessKind?: string | null;
   editing: any | null;
   onSaved: () => void;
 }) {
@@ -154,6 +153,13 @@ export function InventoryItemFormDialog({
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  // Category options tailored to this business's kind
+  const mainCategories = useMemo(() => mainCategoriesFor(businessKind), [businessKind]);
+  const subCategories = useMemo(
+    () => subcategoriesFor(businessKind, form.main_category),
+    [businessKind, form.main_category],
+  );
 
   // Section completion — used for the header progress + tab checks
   const done: Record<SectionKey, boolean> = {
@@ -338,11 +344,27 @@ export function InventoryItemFormDialog({
                 <Field label="Manufacturer Part Number">
                   <Input value={form.manufacturer_part_number} onChange={(e) => set("manufacturer_part_number", e.target.value)} placeholder="Enter manufacturer part number" />
                 </Field>
-                <Field label="Main Category" required>
-                  <Select value={form.main_category} onValueChange={(v) => set("main_category", v)}>
+                <Field
+                  label="Main Category"
+                  required
+                  hint={
+                    businessKind
+                      ? `Categories tailored to ${businessKindLabel(businessKind)}.`
+                      : "Business type not set — showing shared categories."
+                  }
+                >
+                  <Select
+                    value={form.main_category}
+                    onValueChange={(v) => {
+                      set("main_category", v);
+                      // Reset subcategory when main changes (unless it still matches)
+                      const subs = subcategoriesFor(businessKind, v);
+                      if (!subs.includes(form.category)) set("category", "");
+                    }}
+                  >
                     <SelectTrigger><SelectValue placeholder="Select main category" /></SelectTrigger>
                     <SelectContent>
-                      {MAIN_CATEGORIES.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
+                      {mainCategories.map((c: string) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
                     </SelectContent>
                   </Select>
                 </Field>
@@ -365,8 +387,37 @@ export function InventoryItemFormDialog({
                 <Field label="Brand">
                   <Input value={form.brand} onChange={(e) => set("brand", e.target.value)} placeholder="Bosch / Denso / OEM" />
                 </Field>
-                <Field label="Sub-category">
-                  <Input value={form.category} onChange={(e) => set("category", e.target.value)} placeholder="strap / dolly / fuel" />
+                <Field
+                  label="Sub-category"
+                  hint={
+                    form.main_category
+                      ? subCategories.length
+                        ? `Pick one under ${form.main_category}, or type a custom value.`
+                        : "No preset subcategories — type a custom value."
+                      : "Select a main category first."
+                  }
+                >
+                  {subCategories.length > 0 ? (
+                    <Select
+                      value={subCategories.includes(form.category) ? form.category : ""}
+                      onValueChange={(v) => set("category", v)}
+                      disabled={!form.main_category}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={form.main_category ? "Select subcategory" : "Select main category first"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subCategories.map((s: string) => (<SelectItem key={s} value={s}>{s}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      value={form.category}
+                      onChange={(e) => set("category", e.target.value)}
+                      placeholder="e.g. strap / dolly / fuel"
+                      disabled={!form.main_category}
+                    />
+                  )}
                 </Field>
               </Grid2>
               <Field label="Description">

@@ -57,6 +57,20 @@ function InventoryPage() {
     queryFn: () => loadFn({ data: { businessId } }),
   });
 
+  const businessMeta = useQuery({
+    queryKey: ["business-kind", businessId],
+    enabled: !!businessId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("businesses")
+        .select("type_slug")
+        .eq("id", businessId)
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.type_slug as string | null) ?? null;
+    },
+  });
+
 
   const inquiries = useQuery({
     queryKey: ["business-network-inquiries", businessId],
@@ -237,6 +251,7 @@ function InventoryPage() {
         open={open}
         onOpenChange={setOpen}
         businessId={businessId}
+        businessKind={businessMeta.data ?? null}
         editing={editing}
         onSaved={() => qc.invalidateQueries({ queryKey: ["business-inventory", businessId] })}
       />
