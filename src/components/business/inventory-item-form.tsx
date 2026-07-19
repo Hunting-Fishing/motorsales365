@@ -110,11 +110,6 @@ const EMPTY: FormState = {
   network_visible: true,
 };
 
-const MAIN_CATEGORIES = [
-  "Parts", "Fluids & Chemicals", "Tools", "Consumables",
-  "Tires & Wheels", "Batteries", "Filters", "Accessories",
-  "Shop Supplies", "Other",
-];
 const UNITS = ["pc", "set", "pair", "L", "gal", "kg", "lb", "ft", "m", "box"];
 const LINK_TYPES = ["Manufacturer", "Manual (PDF)", "Video", "Datasheet", "Supplier", "Other"];
 
