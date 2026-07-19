@@ -57,6 +57,20 @@ function InventoryPage() {
     queryFn: () => loadFn({ data: { businessId } }),
   });
 
+  const businessMeta = useQuery({
+    queryKey: ["business-kind", businessId],
+    enabled: !!businessId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("businesses")
+        .select("kind")
+        .eq("id", businessId)
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.kind as string | null) ?? null;
+    },
+  });
+
 
   const inquiries = useQuery({
     queryKey: ["business-network-inquiries", businessId],
