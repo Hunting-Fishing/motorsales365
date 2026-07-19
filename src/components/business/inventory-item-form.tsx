@@ -154,6 +154,13 @@ export function InventoryItemFormDialog({
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
 
+  // Category options tailored to this business's kind
+  const mainCategories = useMemo(() => mainCategoriesFor(businessKind), [businessKind]);
+  const subCategories = useMemo(
+    () => subcategoriesFor(businessKind, form.main_category),
+    [businessKind, form.main_category],
+  );
+
   // Section completion — used for the header progress + tab checks
   const done: Record<SectionKey, boolean> = {
     basic: !!form.name.trim() && !!form.main_category,
