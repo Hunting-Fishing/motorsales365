@@ -251,6 +251,7 @@ function InventoryPage() {
         open={open}
         onOpenChange={setOpen}
         businessId={businessId}
+        businessKind={businessMeta.data ?? null}
         editing={editing}
         onSaved={() => qc.invalidateQueries({ queryKey: ["business-inventory", businessId] })}
       />
