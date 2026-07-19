@@ -127,12 +127,14 @@ export function InventoryItemFormDialog({
   open,
   onOpenChange,
   businessId,
+  businessKind,
   editing,
   onSaved,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   businessId: string;
+  businessKind?: string | null;
   editing: any | null;
   onSaved: () => void;
 }) {
