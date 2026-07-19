@@ -63,11 +63,11 @@ function InventoryPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("businesses")
-        .select("kind")
+        .select("type_slug")
         .eq("id", businessId)
         .maybeSingle();
       if (error) throw error;
-      return (data?.kind as string | null) ?? null;
+      return (data?.type_slug as string | null) ?? null;
     },
   });
 
