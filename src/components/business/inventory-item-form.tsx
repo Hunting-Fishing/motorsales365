@@ -32,6 +32,8 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { upsertBusinessInventoryItem } from "@/lib/business-inventory.functions";
 import { cn } from "@/lib/utils";
+import { mainCategoriesFor, subcategoriesFor } from "@/data/inventory-taxonomy";
+import { businessKindLabel } from "@/data/business-kinds";
 
 /**
  * Six-section inventory form matching the Shop Manager design:
