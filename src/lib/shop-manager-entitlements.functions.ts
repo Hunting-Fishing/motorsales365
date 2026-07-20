@@ -233,13 +233,13 @@ export function computeLocalPrice(basePhp: number, pppMultiplier: number, fxToPh
   const adjustedPhp = basePhp * pppMultiplier;
   const local = adjustedPhp / (fxToPhp || 1);
   if (local <= 0) return 0;
-  // Round to nearest integer for large local amounts, or 2dp for tiny (USD-like).
-  const magnitude = Math.pow(10, Math.max(0, Math.floor(Math.log10(local)) - 1));
-  const rounded = Math.round(local / magnitude) * magnitude;
-  // Snap tail (e.g. 500 → 499) using endsIn digit.
+  // For small values (USD/EUR-like) keep two decimals; for larger, snap to nearest integer.
+  if (local < 100) return Math.round(local * 100) / 100;
+  const rounded = Math.round(local);
   const digit = parseInt(endsIn, 10);
   if (!Number.isFinite(digit)) return rounded;
-  const tail = rounded % 10;
-  if (tail === digit) return rounded;
-  return rounded - tail + digit - (tail > digit ? 0 : 10 * Number(tail < digit ? 0 : 0));
+  // Snap last digit to `digit` (e.g. 500 -> 499).
+  const base = Math.floor(rounded / 10) * 10;
+  const snapped = base + digit;
+  return snapped <= rounded ? snapped : Math.max(0, snapped - 10);
 }
