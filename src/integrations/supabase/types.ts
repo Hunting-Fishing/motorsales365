@@ -11282,6 +11282,87 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_manager_ai_usage: {
+        Row: {
+          business_id: string
+          calls_used: number
+          created_at: string
+          id: string
+          last_call_at: string | null
+          month_key: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          calls_used?: number
+          created_at?: string
+          id?: string
+          last_call_at?: string | null
+          month_key: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          calls_used?: number
+          created_at?: string
+          id?: string
+          last_call_at?: string | null
+          month_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      shop_manager_plans: {
+        Row: {
+          active: boolean
+          ai_ceiling: number
+          base_price_php: number
+          blurb: string | null
+          business_kind: string
+          created_at: string
+          features: Json
+          id: string
+          limits: Json
+          name: string
+          sort_order: number
+          tier: string
+          updated_at: string
+          yearly_discount_pct: number
+        }
+        Insert: {
+          active?: boolean
+          ai_ceiling?: number
+          base_price_php?: number
+          blurb?: string | null
+          business_kind: string
+          created_at?: string
+          features?: Json
+          id?: string
+          limits?: Json
+          name: string
+          sort_order?: number
+          tier: string
+          updated_at?: string
+          yearly_discount_pct?: number
+        }
+        Update: {
+          active?: boolean
+          ai_ceiling?: number
+          base_price_php?: number
+          blurb?: string | null
+          business_kind?: string
+          created_at?: string
+          features?: Json
+          id?: string
+          limits?: Json
+          name?: string
+          sort_order?: number
+          tier?: string
+          updated_at?: string
+          yearly_discount_pct?: number
+        }
+        Relationships: []
+      }
       shop_manager_provisioning: {
         Row: {
           created_at: string
@@ -11320,6 +11401,116 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      shop_manager_regional_pricing: {
+        Row: {
+          active: boolean
+          country_code: string
+          country_name: string
+          created_at: string
+          currency: string
+          currency_symbol: string
+          fx_to_php: number
+          id: string
+          ppp_multiplier: number
+          price_ends_in: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          country_code: string
+          country_name: string
+          created_at?: string
+          currency?: string
+          currency_symbol?: string
+          fx_to_php?: number
+          id?: string
+          ppp_multiplier?: number
+          price_ends_in?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          currency?: string
+          currency_symbol?: string
+          fx_to_php?: number
+          id?: string
+          ppp_multiplier?: number
+          price_ends_in?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      shop_manager_subscriptions: {
+        Row: {
+          auto_upgrade: boolean
+          business_id: string
+          cancel_at_period_end: boolean
+          country_code: string | null
+          created_at: string
+          current_period_end: string | null
+          effective_currency: string | null
+          effective_price_local: number | null
+          id: string
+          interval: string
+          plan_id: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_upgrade?: boolean
+          business_id: string
+          cancel_at_period_end?: boolean
+          country_code?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          effective_currency?: string | null
+          effective_price_local?: number | null
+          id?: string
+          interval?: string
+          plan_id?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_upgrade?: boolean
+          business_id?: string
+          cancel_at_period_end?: boolean
+          country_code?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          effective_currency?: string | null
+          effective_price_local?: number | null
+          id?: string
+          interval?: string
+          plan_id?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_manager_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "shop_manager_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shop_price_history: {
         Row: {

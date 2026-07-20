@@ -1,63 +1,92 @@
-## Goal
-Make `/features` genuinely useful to non-technical readers: every feature explained in plain English, plus add the differentiators that aren't currently listed (free business microsites, free Shop Manager inventory access, invoice-from-inventory, etc.).
 
-## Changes
+# Shop Manager Tiering & Global Pricing Strategy
 
-### 1. Rewrite every feature entry in plain language
-In `src/data/features-catalog.ts`, add a `plainLanguage` field to `Feature` and populate it for all ~30 entries. The row header will show it above the technical pitch so readers understand *what it means* before *what it does*.
+Ship a 4-tier Shop Manager plan structure (Free / Starter / Pro / Enterprise) per business type, with all-inclusive AI/API usage bundled into each paid tier, priced in PHP as the base and auto-adjusted per region using purchasing power parity (PPP). Free-tier users see the full app UI but with locked/greyed controls and upgrade CTAs.
 
-Examples:
-- **Double-entry GL** → "Every peso in and out is recorded twice, so your books balance automatically. If something's off, we tell you exactly where."
-- **P&L Statement** → "A one-page 'am I making money?' report — sales minus costs, month by month."
-- **Journal Drilldown** → "Click any number in a report and see the exact invoices, receipts, or expenses that make it up."
-- Similar rewrites for RLS, VIN decode, DVI, escrow, etc.
+## Strategy summary
 
-### 2. Add missing "why we're better" features (new catalog entries)
+- **4 tiers, per business type.** Each business kind (repair, fuel, dealership, tow, parts retailer, service shop, etc.) shares the same tier ladder but with tier caps tuned to its workload (e.g. a fuel station's SKU cap ≠ a dealership's listing cap).
+- **All-inclusive AI/API pricing** — no metering, no surprise bills. AI budget is baked into the monthly fee; abuse is contained by fair-use ceilings enforced server-side. Simpler sales pitch for global expansion.
+- **PPP regional pricing.** PH is the anchor; every other country is auto-priced from a PPP multiplier table (SEA ~0.9-1.1×, LatAm ~1.2×, EU ~2.5×, US ~3×, JP ~2.2×). One SKU per tier, price rendered in local currency at checkout.
+- **Free tier is a real product**, not a trial: 100 SKUs, 25 invoices/mo, 1 seat, basic P&L, no AI, 365 branding on microsite. Everything else is visible but greyed with a clear "Upgrade to unlock" affordance.
 
-**Marketplace / Business module**
-- **Free Business Microsite** — every verified business gets `365motorsales.com/<slug>` (e.g. `/laoagtires`) with their listings, hours, map, contact, gallery, reviews. No web-dev, no hosting fees. Competitors charge $30–$150/mo for a Shopify/Wix site.
-- **Custom Domain Attach** *(roadmap)* — point your own domain to the microsite.
-- **Business Slug History & SEO** — old slugs redirect, so shared links never break.
+## Tier matrix (base = PHP; see PPP note below)
 
-**Shop Manager module**
-- **Free Shop Manager Inventory (Business tier)** — any signed-up business gets the full Shop Manager inventory module free: add parts, track stock, set costs and prices. No per-seat fee. Competitors: Shopmonkey $199+/mo, Tekmetric $399+/mo.
-- **Invoice From Inventory** — one click turns stock lines into a customer invoice; stock auto-decrements, COGS auto-posts to the GL. Explain in one sentence: "Pick parts from your shelf → invoice prints → stock and books update themselves."
-- **Cross-Shop Stock Visibility** *(links to Parts Network)* — if you don't have it, another 365 shop probably does; sell it anyway.
+| Capability | Free (₱0) | Starter (₱499) | Pro (₱1,499) | Enterprise (₱4,999) |
+|---|---|---|---|---|
+| Inventory SKUs | 100 | 1,000 | 10,000 | Unlimited |
+| Invoices / month | 25 | 250 | 2,500 | Unlimited |
+| Team seats | 1 | 3 | 10 | Unlimited |
+| Business locations | 1 | 1 | 3 | Unlimited |
+| P&L / GL drilldown | Basic P&L only | Full P&L | Full P&L + GL | + Custom reports, exports |
+| Microsite | 365-branded slug | Custom slug | Custom domain | Multi-domain + white-label |
+| Marketplace listings | 5 active | 25 active | 100 active | Unlimited |
+| Network inventory sharing | — | Read-only | Read + write | Priority routing |
+| AI features (translate, doc-check, smart search, DVI) | — | Light bundle | Full bundle | Full + priority |
+| Fair-use ceiling (AI calls/mo) | 0 | 500 | 5,000 | 50,000 (soft) |
+| Support | Community | Email | Priority email | Dedicated + SLA |
+| Accounting (double-entry) | View-only | Full | Full + audit log | + Accountant seat |
+| Custom branding on invoices | — | ✓ | ✓ | ✓ + white-label PDFs |
 
-**Parts Network module**
-- **Wash-Sale Margin** — 365 buys from the shop that has the part, sells to the customer, and the difference funds the platform. Explain plainly: "Shops don't pay to list. We only earn when a part actually sells."
-- **VIN-Accurate Fitment** — customer types plate/VIN, sees only parts that fit.
+Above-ceiling AI usage is throttled rather than metered — user is prompted to upgrade the tier. This preserves the "all-inclusive" promise.
 
-**Trust & Safety**
-- **LTO/CR/OR Document Check** — plain: "Sellers upload their vehicle registration. AI reads it and flags fakes before the ad goes live."
-- **Buyer Safety Checklist** — plain: "A short pre-meetup checklist that shows up on every vehicle ad. Meet in daylight, verify OR/CR, etc."
+## PPP regional pricing
 
-**Other cross-cutting**
-- **Real-Time Everything** — one line: "Inventory, inquiries, messages, and stock update live, no refresh."
-- **Nationwide Coverage, PH-First** — one line: "Built for Philippine roads, plates, and payment habits first — not a US template."
-- **Ad-Free For Buyers** — no third-party display ads on listing pages.
+- Base prices above are PHP.
+- At checkout, price is computed as `base_php × ppp_multiplier[country]`, snapped to a clean local price point (e.g. ends in 9 or 99).
+- Admin-editable multipliers per country in a new `shop_manager_regional_pricing` table (country_code, ppp_multiplier, currency, display_format, active).
+- Initial multipliers seeded for: PH (1.0), ID/VN/TH (0.9-1.1), MY (1.2), SG (2.0), JP (2.2), KR (1.8), AU (2.6), EU (2.5), UK (2.6), US (3.0), CA (2.8), MX/BR/AR (1.2-1.5), IN (0.7), CN (1.4).
+- Currency conversion cached daily from a public FX source.
 
-### 3. Update comparison matrices
-In `comparison-table.tsx` data, add rows for the new bullets:
-- "Free business microsite (yourdomain.com/shop)" → 365: ✓, competitors: ✗
-- "Free inventory module for businesses" → 365: ✓, Shopmonkey/Tekmetric/Orderry: paid tier
-- "Invoice from inventory (auto-COGS)" → 365: ✓, ARI: ✗, Shopmonkey: ✓ (higher tier)
-- "Cross-shop stock sharing" → 365: ✓, all others: ✗
-- "Plain-language accounting UI" → 365: ✓, competitors: ✗
+## What gets built
 
-### 4. Row rendering
-Update `feature-row.tsx` (and/or `module-section.tsx`) to render the new `plainLanguage` line prominently under the feature name, in a slightly larger muted-foreground style, before the existing "How it works" accordion body. No layout overhaul — just an extra line and the new entries flow in automatically.
+### 1. Data model (migration)
+- `shop_manager_plans` — tier definitions per business kind: `id, business_kind, tier ('free'|'starter'|'pro'|'enterprise'), base_price_php, features (jsonb), limits (jsonb), ai_ceiling, active, sort_order`.
+- `shop_manager_regional_pricing` — country_code, ppp_multiplier, currency, active.
+- `shop_manager_subscriptions` — user_id, business_id, plan_id, tier, status, current_period_end, cancel_at_period_end, country_code, effective_price_local, effective_currency.
+- `shop_manager_ai_usage` — business_id, month_key, calls_used (for fair-use enforcement, not billing).
+- Seed rows for all current business kinds × 4 tiers. GRANTs + RLS per rules.
 
-### 5. Modules
-- Add short plain-English `subhead` under each module intro on the `/features` page (e.g. Shop Manager → "Everything a repair shop needs to run the front desk, back shop, and books — in one place.")
+### 2. Entitlement layer
+- `src/lib/shop-manager-entitlements.server.ts` — `getShopManagerTier(businessId)`, `checkFeature(businessId, featureKey)`, `checkLimit(businessId, limitKey, currentCount)`, `enforceAiCeiling(businessId)`. Auto-upgrade option preserved.
+- Client hook `useShopManagerTier(businessId)` returning `{ tier, features, limits, atLimit(key), pricing }`.
 
-## Out of scope
-- No backend changes. Microsite routing (`/business/<slug>`) already exists; this only surfaces it on `/features` as a documented benefit.
-- No pricing-rail changes beyond ensuring the new "free inventory" line lands in the comparison.
-- No screenshot regeneration required; existing placeholders continue to work.
+### 3. UI: grey-out pattern
+- New `<LockedFeature tier="pro" feature="ai-translate">…</LockedFeature>` wrapper: shows children with `opacity-50 pointer-events-none` overlay + a small "Pro" pill and click-to-upgrade CTA when the user's tier is below the required tier.
+- Retrofit inventory form, invoice form, P&L drilldown, microsite settings, DVI, translate button, custom domain, extra seats.
 
-## Files touched
-- `src/data/features-catalog.ts` — add `plainLanguage` field + ~10 new entries + rewrites
-- `src/components/features/feature-row.tsx` — render plain-language line
-- `src/components/features/comparison-table.tsx` — new comparison rows
-- `src/routes/features.tsx` — module subheads (small copy edit)
+### 4. Pricing page (`/shop-manager/pricing`)
+- 4-column comparison table, PPP-aware — auto-detect country from IP/browser, allow override.
+- Business-kind selector at top ("I run a…") so caps shown match their reality.
+- Toggle: Monthly / Yearly (yearly = 2 months free).
+- Prominent "How our AI pricing works" section explaining all-inclusive + fair-use.
+
+### 5. Admin console
+- `/admin/shop-manager/plans` — edit tier caps, features, base PHP prices per business kind.
+- `/admin/shop-manager/regional-pricing` — edit PPP multipliers, currencies.
+- `/admin/shop-manager/subscriptions` — list, filter by tier/country, force-tier for support cases.
+
+### 6. Checkout wiring
+- Reuse existing Stripe payments integration (already in project via `src/lib/stripe.server.ts`).
+- New server fn `createShopManagerCheckout({ businessId, tier, interval, country })` computes PPP-adjusted price, creates Stripe checkout session in local currency where supported.
+- Webhook updates `shop_manager_subscriptions.status` and `current_period_end`.
+
+### 7. Fair-use enforcement
+- Middleware wrapping AI server fns increments `shop_manager_ai_usage` and blocks past ceiling with "Upgrade to Pro" response — never a bill.
+
+## Rollout order
+
+1. Migration: plans, regional pricing, subscriptions, ai_usage tables + seeds.
+2. Entitlement server helpers + client hook.
+3. `<LockedFeature>` component + retrofit ~8 highest-value locks.
+4. `/shop-manager/pricing` page with PPP detection.
+5. Stripe checkout + webhook wiring.
+6. Admin plan/pricing/subscription screens.
+7. Fair-use AI middleware.
+8. Update `/features` page and Terms/Privacy to reflect tiers and all-inclusive AI billing (Terms sync rule).
+
+## Notes
+
+- Terms & Privacy pages must be updated with the new pricing, fair-use policy, and PPP language, and "Last updated" bumped (per project memory rules).
+- Existing `business_plans` / `business_subscriptions` tables are business-directory tiers, not Shop Manager — this plan adds Shop Manager-specific tables so the two products stay separable.
+- Free tier stays generous enough to be useful in emerging markets — this is the wedge for global entry.
