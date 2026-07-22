@@ -323,8 +323,15 @@ function ShopManagerPricingPage() {
                   className="mt-auto"
                   variant={p.tier === "pro" ? "default" : "outline"}
                   disabled={p.tier === "free"}
+                  onClick={() => handleChoose(p.tier)}
                 >
-                  {p.tier === "free" ? "Included by default" : `Choose ${p.name}`}
+                  {p.tier === "free"
+                    ? "Included by default"
+                    : !user
+                      ? `Sign in to choose ${p.name}`
+                      : !businessId
+                        ? `Create a business first`
+                        : `Choose ${p.name}`}
                 </Button>
               </Card>
             );
