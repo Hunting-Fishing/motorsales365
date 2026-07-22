@@ -80,6 +80,7 @@ import { Route as ShopCategoriesRouteImport } from './routes/shop.categories'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
 import { Route as ShopManagerPricingRouteImport } from './routes/shop-manager.pricing'
+import { Route as ShopManagerCheckoutRouteImport } from './routes/shop-manager.checkout'
 import { Route as ServicesInspectionRouteImport } from './routes/services.inspection'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
@@ -728,6 +729,11 @@ const ShopCategoryRoute = ShopCategoryRouteImport.update({
 const ShopManagerPricingRoute = ShopManagerPricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => ShopManagerRoute,
+} as any)
+const ShopManagerCheckoutRoute = ShopManagerCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => ShopManagerRoute,
 } as any)
 const ServicesInspectionRoute = ServicesInspectionRouteImport.update({
@@ -2502,6 +2508,7 @@ export interface FileRoutesByFullPath {
   '/s/$slug': typeof SSlugRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/inspection': typeof ServicesInspectionRoute
+  '/shop-manager/checkout': typeof ShopManagerCheckoutRoute
   '/shop-manager/pricing': typeof ShopManagerPricingRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/$slug': typeof ShopSlugRoute
@@ -2860,6 +2867,7 @@ export interface FileRoutesByTo {
   '/s/$slug': typeof SSlugRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/inspection': typeof ServicesInspectionRoute
+  '/shop-manager/checkout': typeof ShopManagerCheckoutRoute
   '/shop-manager/pricing': typeof ShopManagerPricingRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/$slug': typeof ShopSlugRoute
@@ -3227,6 +3235,7 @@ export interface FileRoutesById {
   '/s/$slug': typeof SSlugRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/inspection': typeof ServicesInspectionRoute
+  '/shop-manager/checkout': typeof ShopManagerCheckoutRoute
   '/shop-manager/pricing': typeof ShopManagerPricingRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/$slug': typeof ShopSlugRoute
@@ -3596,6 +3605,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/seller/$id'
     | '/services/inspection'
+    | '/shop-manager/checkout'
     | '/shop-manager/pricing'
     | '/shop/$category'
     | '/shop/$slug'
@@ -3954,6 +3964,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/seller/$id'
     | '/services/inspection'
+    | '/shop-manager/checkout'
     | '/shop-manager/pricing'
     | '/shop/$category'
     | '/shop/$slug'
@@ -4320,6 +4331,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/seller/$id'
     | '/services/inspection'
+    | '/shop-manager/checkout'
     | '/shop-manager/pricing'
     | '/shop/$category'
     | '/shop/$slug'
@@ -5163,6 +5175,13 @@ declare module '@tanstack/react-router' {
       path: '/pricing'
       fullPath: '/shop-manager/pricing'
       preLoaderRoute: typeof ShopManagerPricingRouteImport
+      parentRoute: typeof ShopManagerRoute
+    }
+    '/shop-manager/checkout': {
+      id: '/shop-manager/checkout'
+      path: '/checkout'
+      fullPath: '/shop-manager/checkout'
+      preLoaderRoute: typeof ShopManagerCheckoutRouteImport
       parentRoute: typeof ShopManagerRoute
     }
     '/services/inspection': {
@@ -8093,10 +8112,12 @@ const PaymentsRouteWithChildren = PaymentsRoute._addFileChildren(
 )
 
 interface ShopManagerRouteChildren {
+  ShopManagerCheckoutRoute: typeof ShopManagerCheckoutRoute
   ShopManagerPricingRoute: typeof ShopManagerPricingRoute
 }
 
 const ShopManagerRouteChildren: ShopManagerRouteChildren = {
+  ShopManagerCheckoutRoute: ShopManagerCheckoutRoute,
   ShopManagerPricingRoute: ShopManagerPricingRoute,
 }
 
