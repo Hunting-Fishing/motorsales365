@@ -199,6 +199,34 @@ function ShopManagerPricingPage() {
           </p>
         </div>
 
+        {/* Business selector (signed in only) */}
+        {user && businesses.length > 0 && (
+          <div className="mb-4">
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
+              Subscribe on behalf of
+            </label>
+            <Select
+              value={businessId}
+              onValueChange={(v) => {
+                setBusinessId(v);
+                const b = businesses.find((x) => x.id === v);
+                if (b?.type_slug) setBusinessKind(b.type_slug);
+              }}
+            >
+              <SelectTrigger className="w-full sm:w-96">
+                <SelectValue placeholder="Select a business" />
+              </SelectTrigger>
+              <SelectContent>
+                {businesses.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.name} · {b.my_role}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         {/* Controls */}
         <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div>
