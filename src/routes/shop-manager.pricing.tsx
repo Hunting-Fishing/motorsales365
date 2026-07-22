@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -20,6 +20,9 @@ import {
   listShopManagerRegions,
   computeLocalPrice,
 } from "@/lib/shop-manager-entitlements.functions";
+import { listMyWorkspaceBusinesses } from "@/lib/business-workspace.functions";
+import { useAuth } from "@/hooks/use-auth";
+
 
 const TITLE = "Shop Manager Pricing — 365 Motor Sales";
 const DESCRIPTION =
@@ -99,9 +102,12 @@ function detectCountry(): string {
 }
 
 function ShopManagerPricingPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [businessKind, setBusinessKind] = useState<string>("default");
   const [interval, setInterval] = useState<"month" | "year">("month");
   const [countryCode, setCountryCode] = useState<string>("PH");
+  const [businessId, setBusinessId] = useState<string>("");
 
   useEffect(() => {
     setCountryCode(detectCountry());
@@ -109,6 +115,7 @@ function ShopManagerPricingPage() {
 
   const loadPlans = useServerFn(listShopManagerPlans);
   const loadRegions = useServerFn(listShopManagerRegions);
+  const loadMyBiz = useServerFn(listMyWorkspaceBusinesses);
 
   const plansQuery = useQuery({
     queryKey: ["sm-plans", businessKind],
@@ -120,6 +127,26 @@ function ShopManagerPricingPage() {
     queryFn: () => loadRegions(),
     staleTime: 60 * 60_000,
   });
+  const myBizQuery = useQuery({
+    queryKey: ["sm-my-businesses", user?.id ?? "anon"],
+    queryFn: () => loadMyBiz(),
+    enabled: !!user,
+    staleTime: 60_000,
+  });
+
+  const businesses = (myBizQuery.data ?? []) as Array<{
+    id: string;
+    name: string;
+    type_slug: string | null;
+    my_role: string;
+  }>;
+
+  useEffect(() => {
+    if (!businessId && businesses.length > 0) {
+      setBusinessId(businesses[0].id);
+      if (businesses[0].type_slug) setBusinessKind(businesses[0].type_slug);
+    }
+  }, [businesses, businessId]);
 
   const region = useMemo(() => {
     const list = regionsQuery.data ?? [];
@@ -131,6 +158,29 @@ function ShopManagerPricingPage() {
   }, [regionsQuery.data, countryCode]);
 
   const plans = plansQuery.data ?? [];
+
+  function handleChoose(planTier: string) {
+    const tier = String(planTier || "").toLowerCase();
+    if (tier === "free") return;
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
+    if (!businessId) {
+      navigate({ to: "/dashboard/businesses" });
+      return;
+    }
+    if (!["starter", "pro", "enterprise"].includes(tier)) return;
+    navigate({
+      to: "/shop-manager/checkout",
+      search: {
+        businessId,
+        tier: tier as "starter" | "pro" | "enterprise",
+        interval,
+        countryCode,
+      },
+    });
+  }
 
   return (
     <SiteLayout>
@@ -148,6 +198,34 @@ function ShopManagerPricingPage() {
             Prices auto-adjust to your country using purchasing power parity so shops everywhere pay fairly.
           </p>
         </div>
+
+        {/* Business selector (signed in only) */}
+        {user && businesses.length > 0 && (
+          <div className="mb-4">
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
+              Subscribe on behalf of
+            </label>
+            <Select
+              value={businessId}
+              onValueChange={(v) => {
+                setBusinessId(v);
+                const b = businesses.find((x) => x.id === v);
+                if (b?.type_slug) setBusinessKind(b.type_slug);
+              }}
+            >
+              <SelectTrigger className="w-full sm:w-96">
+                <SelectValue placeholder="Select a business" />
+              </SelectTrigger>
+              <SelectContent>
+                {businesses.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.name} · {b.my_role}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         {/* Controls */}
         <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -273,8 +351,15 @@ function ShopManagerPricingPage() {
                   className="mt-auto"
                   variant={p.tier === "pro" ? "default" : "outline"}
                   disabled={p.tier === "free"}
+                  onClick={() => handleChoose(p.tier)}
                 >
-                  {p.tier === "free" ? "Included by default" : `Choose ${p.name}`}
+                  {p.tier === "free"
+                    ? "Included by default"
+                    : !user
+                      ? `Sign in to choose ${p.name}`
+                      : !businessId
+                        ? `Create a business first`
+                        : `Choose ${p.name}`}
                 </Button>
               </Card>
             );
