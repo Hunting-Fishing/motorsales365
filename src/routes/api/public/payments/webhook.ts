@@ -174,6 +174,93 @@ async function upsertDispatchSubscription(
 }
 
 
+async function upsertShopManagerSubscription(env: StripeEnv, sub: Stripe.Subscription) {
+  void env;
+  const userId = (sub.metadata?.userId as string | undefined) ?? null;
+  const businessId = (sub.metadata?.businessId as string | undefined) ?? null;
+  const tier = (sub.metadata?.tier as string | undefined) ?? null;
+  const interval = (sub.metadata?.interval as string | undefined) ?? "month";
+  const countryCode = (sub.metadata?.countryCode as string | undefined) ?? null;
+  if (!userId || !businessId || !tier) {
+    console.error("[webhook] shop-manager sub missing metadata", sub.id);
+    void alertOps("payments.shop_manager_sub.missing_metadata", {
+      subId: sub.id,
+      userId,
+      businessId,
+      tier,
+    });
+    return;
+  }
+
+  const item = sub.items.data[0];
+  const periodEnd = (item as any)?.current_period_end ?? (sub as any).current_period_end;
+  const isActive = sub.status === "active" || sub.status === "trialing";
+  const status = isActive ? "active" : sub.status;
+  const effectiveTier = isActive ? tier : "free";
+
+  // Look up the plan row for this (business_kind × tier). Fall back to default.
+  const { data: bizRow } = await supabaseAdmin
+    .from("businesses")
+    .select("type_slug")
+    .eq("id", businessId)
+    .maybeSingle();
+  const businessKind = ((bizRow as any)?.type_slug as string | null) ?? "default";
+
+  let planId: string | null = null;
+  const { data: exactPlan } = await supabaseAdmin
+    .from("shop_manager_plans")
+    .select("id")
+    .eq("business_kind", businessKind)
+    .eq("tier", effectiveTier)
+    .eq("active", true)
+    .maybeSingle();
+  planId = (exactPlan as any)?.id ?? null;
+  if (!planId) {
+    const { data: fallbackPlan } = await supabaseAdmin
+      .from("shop_manager_plans")
+      .select("id")
+      .eq("business_kind", "default")
+      .eq("tier", effectiveTier)
+      .eq("active", true)
+      .maybeSingle();
+    planId = (fallbackPlan as any)?.id ?? null;
+  }
+
+  const stripeCustomerId =
+    typeof sub.customer === "string" ? sub.customer : (sub.customer?.id ?? null);
+
+  const row = {
+    user_id: userId,
+    business_id: businessId,
+    plan_id: planId,
+    tier: effectiveTier,
+    status,
+    interval,
+    country_code: countryCode,
+    stripe_customer_id: stripeCustomerId,
+    stripe_subscription_id: sub.id,
+    current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+    cancel_at_period_end: !!sub.cancel_at_period_end,
+    updated_at: new Date().toISOString(),
+  } as any;
+
+  const { data: existing } = await supabaseAdmin
+    .from("shop_manager_subscriptions")
+    .select("id")
+    .eq("business_id", businessId)
+    .maybeSingle();
+
+  if (existing) {
+    await supabaseAdmin
+      .from("shop_manager_subscriptions")
+      .update(row)
+      .eq("id", (existing as any).id);
+  } else {
+    await supabaseAdmin.from("shop_manager_subscriptions").insert(row);
+  }
+}
+
+
 
 async function upsertBusinessSubscription(env: StripeEnv, sub: Stripe.Subscription) {
   const userId = (sub.metadata?.userId as string | undefined) ?? null;
