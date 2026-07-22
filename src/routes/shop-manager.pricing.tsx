@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -20,6 +20,9 @@ import {
   listShopManagerRegions,
   computeLocalPrice,
 } from "@/lib/shop-manager-entitlements.functions";
+import { listMyWorkspaceBusinesses } from "@/lib/business-workspace.functions";
+import { useAuth } from "@/hooks/use-auth";
+
 
 const TITLE = "Shop Manager Pricing — 365 Motor Sales";
 const DESCRIPTION =
