@@ -41,8 +41,15 @@ async function upsertSubscription(env: StripeEnv, sub: Stripe.Subscription) {
     await upsertBusinessSubscription(env, sub);
     return;
   }
+  // Shop Manager subscriptions live in shop_manager_subscriptions.
+  if (sub.metadata?.kind === "shop_manager") {
+    await upsertShopManagerSubscription(env, sub);
+    return;
+  }
   // Boost subscriptions are activated separately via checkout.session.completed.
   if (sub.metadata?.kind === "boost") return;
+
+
 
   const userId = (sub.metadata?.userId as string | undefined) ?? null;
   const lookupKey = (sub.metadata?.lookup_key as string | undefined) ?? null;
