@@ -102,9 +102,12 @@ function detectCountry(): string {
 }
 
 function ShopManagerPricingPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [businessKind, setBusinessKind] = useState<string>("default");
   const [interval, setInterval] = useState<"month" | "year">("month");
   const [countryCode, setCountryCode] = useState<string>("PH");
+  const [businessId, setBusinessId] = useState<string>("");
 
   useEffect(() => {
     setCountryCode(detectCountry());
@@ -112,6 +115,7 @@ function ShopManagerPricingPage() {
 
   const loadPlans = useServerFn(listShopManagerPlans);
   const loadRegions = useServerFn(listShopManagerRegions);
+  const loadMyBiz = useServerFn(listMyWorkspaceBusinesses);
 
   const plansQuery = useQuery({
     queryKey: ["sm-plans", businessKind],
@@ -123,6 +127,26 @@ function ShopManagerPricingPage() {
     queryFn: () => loadRegions(),
     staleTime: 60 * 60_000,
   });
+  const myBizQuery = useQuery({
+    queryKey: ["sm-my-businesses", user?.id ?? "anon"],
+    queryFn: () => loadMyBiz(),
+    enabled: !!user,
+    staleTime: 60_000,
+  });
+
+  const businesses = (myBizQuery.data ?? []) as Array<{
+    id: string;
+    name: string;
+    type_slug: string | null;
+    my_role: string;
+  }>;
+
+  useEffect(() => {
+    if (!businessId && businesses.length > 0) {
+      setBusinessId(businesses[0].id);
+      if (businesses[0].type_slug) setBusinessKind(businesses[0].type_slug);
+    }
+  }, [businesses, businessId]);
 
   const region = useMemo(() => {
     const list = regionsQuery.data ?? [];
@@ -134,6 +158,29 @@ function ShopManagerPricingPage() {
   }, [regionsQuery.data, countryCode]);
 
   const plans = plansQuery.data ?? [];
+
+  function handleChoose(planTier: string) {
+    const tier = String(planTier || "").toLowerCase();
+    if (tier === "free") return;
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
+    if (!businessId) {
+      navigate({ to: "/dashboard/businesses" });
+      return;
+    }
+    if (!["starter", "pro", "enterprise"].includes(tier)) return;
+    navigate({
+      to: "/shop-manager/checkout",
+      search: {
+        businessId,
+        tier: tier as "starter" | "pro" | "enterprise",
+        interval,
+        countryCode,
+      },
+    });
+  }
 
   return (
     <SiteLayout>
