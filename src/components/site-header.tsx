@@ -649,11 +649,18 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard/profile">Profile</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/features">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Features
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign out
                 </DropdownMenuItem>
+
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
