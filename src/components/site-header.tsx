@@ -1044,13 +1044,24 @@ export function SiteHeader() {
 
               <div className="border-t border-border p-3">
                 {user ? (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-center gap-2"
-                    onClick={handleSignOut}
-                  >
-                    <LogOut className="h-4 w-4" /> Sign out
-                  </Button>
+                  <>
+                    <SheetClose asChild>
+                      <Link
+                        to="/features"
+                        className="mb-2 flex items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-secondary"
+                      >
+                        <Sparkles className="h-4 w-4" /> Features
+                      </Link>
+                    </SheetClose>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center gap-2"
+                      onClick={handleSignOut}
+                    >
+                      <LogOut className="h-4 w-4" /> Sign out
+                    </Button>
+                  </>
+
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
                     <SheetClose asChild>
