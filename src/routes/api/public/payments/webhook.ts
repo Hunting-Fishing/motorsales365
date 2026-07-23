@@ -246,11 +246,25 @@ async function upsertShopManagerSubscription(env: StripeEnv, sub: Stripe.Subscri
 
   const { data: existing } = await supabaseAdmin
     .from("shop_manager_subscriptions")
-    .select("id")
+    .select("id, stripe_subscription_id")
     .eq("business_id", businessId)
     .maybeSingle();
 
   if (existing) {
+    const existingSubId = (existing as any).stripe_subscription_id as string | null;
+    // If a stale webhook arrives for a superseded subscription (different
+    // sub id than the current active row) AND it isn't itself active,
+    // ignore it — otherwise a cancellation of the old sub would silently
+    // downgrade the customer to "free" even though the new sub is billing.
+    if (existingSubId && existingSubId !== sub.id && !isActive) {
+      console.log(
+        "[webhook] ignoring stale shop-manager sub event",
+        sub.id,
+        "current=",
+        existingSubId,
+      );
+      return;
+    }
     await supabaseAdmin
       .from("shop_manager_subscriptions")
       .update(row)
