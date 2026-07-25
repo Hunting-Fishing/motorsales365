@@ -192,7 +192,7 @@ function LoginPage() {
             </div>
           </div>
           <Button type="submit" disabled={authBusy} aria-busy={submitting} className="w-full">
-            {submitting ? "Signing in…" : loading ? "Loading…" : "Sign in"}
+            {submitting ? "Signing in…" : "Sign in"}
           </Button>
         </form>
 
