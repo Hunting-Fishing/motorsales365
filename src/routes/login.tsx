@@ -41,10 +41,11 @@ function LoginPage() {
   const inFlightRef = useRef(false);
   const redirectTimerRef = useRef<number | null>(null);
 
-  // Disable all auth actions while: a request is in flight, the auth hook is
-  // still initializing (header shows the loading spinner), or we already have
-  // a session and are about to redirect.
-  const authBusy = submitting || googleSubmitting || loading || !!user;
+  // Disable auth actions only while a request is in flight or we already
+  // have a session and are about to redirect. We deliberately do NOT gate
+  // on the auth hook's `loading` flag — bootstrap can take a moment on
+  // slow networks, and signing in overrides whatever it finds anyway.
+  const authBusy = submitting || googleSubmitting || !!user;
 
   const goToPostLogin = () => {
     const dest = redirectTo || "/dashboard";
@@ -191,7 +192,7 @@ function LoginPage() {
             </div>
           </div>
           <Button type="submit" disabled={authBusy} aria-busy={submitting} className="w-full">
-            {submitting ? "Signing in…" : loading ? "Loading…" : "Sign in"}
+            {submitting ? "Signing in…" : "Sign in"}
           </Button>
         </form>
 
