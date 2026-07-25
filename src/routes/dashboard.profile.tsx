@@ -25,6 +25,8 @@ function buildChecklist(profile: any): ChecklistItem[] {
   const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
   const isStaff = profile?.seller_type === "staff";
   const has = (v: any) => (typeof v === "string" ? v.trim().length > 0 : !!v);
+  const nationwide = String(profile?.signup_region ?? "").trim() === "All Philippines";
+  const bizNationwide = String(profile?.business_region ?? "").trim() === "All Philippines";
   const items: ChecklistItem[] = [
     {
       label: "First & last name",
@@ -36,8 +38,19 @@ function buildChecklist(profile: any): ChecklistItem[] {
       done: has(profile?.phone) || has(profile?.phone_e164),
       required: true,
     },
+    {
+      label: "Personal email",
+      done: has(profile?.personal_email),
+      required: true,
+    },
+    {
+      label: nationwide ? "Region" : "Region / Province / City",
+      done:
+        has(profile?.signup_region) &&
+        (nationwide || (has(profile?.signup_province) && has(profile?.signup_city))),
+      required: true,
+    },
     { label: "Profile photo", done: has(profile?.avatar_url), required: false },
-    { label: "Two-factor authentication — coming soon", done: false, required: false },
   ];
 
   if (isBusiness) {
@@ -45,11 +58,13 @@ function buildChecklist(profile: any): ChecklistItem[] {
       { label: "Business name", done: has(profile?.business_name), required: true },
       { label: "Business address", done: has(profile?.business_address), required: true },
       {
-        label: "Business location (region/province/city)",
+        label: bizNationwide
+          ? "Business region"
+          : "Business location (region/province/city)",
         done:
           has(profile?.business_region) &&
-          has(profile?.business_province) &&
-          has(profile?.business_city),
+          (bizNationwide ||
+            (has(profile?.business_province) && has(profile?.business_city))),
         required: true,
       },
     );
@@ -482,23 +497,6 @@ function ProfilePage() {
         </div>
       </div>
 
-      {/* Security: two-factor authentication — coming soon */}
-      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="font-display text-lg font-bold">Security — Two-factor authentication</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Add an extra layer of security to your account with an authenticator app.
-            </p>
-          </div>
-          <span className="shrink-0 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Coming soon
-          </span>
-        </div>
-        <p className="mt-3 text-xs text-muted-foreground">
-          Two-factor authentication isn't required yet — we'll notify you here when setup is available.
-        </p>
-      </section>
 
     </div>
   );
