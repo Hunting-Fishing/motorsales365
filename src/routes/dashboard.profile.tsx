@@ -25,6 +25,8 @@ function buildChecklist(profile: any): ChecklistItem[] {
   const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
   const isStaff = profile?.seller_type === "staff";
   const has = (v: any) => (typeof v === "string" ? v.trim().length > 0 : !!v);
+  const nationwide = String(profile?.signup_region ?? "").trim() === "All Philippines";
+  const bizNationwide = String(profile?.business_region ?? "").trim() === "All Philippines";
   const items: ChecklistItem[] = [
     {
       label: "First & last name",
@@ -36,8 +38,19 @@ function buildChecklist(profile: any): ChecklistItem[] {
       done: has(profile?.phone) || has(profile?.phone_e164),
       required: true,
     },
+    {
+      label: "Personal email",
+      done: has(profile?.personal_email),
+      required: true,
+    },
+    {
+      label: nationwide ? "Region" : "Region / Province / City",
+      done:
+        has(profile?.signup_region) &&
+        (nationwide || (has(profile?.signup_province) && has(profile?.signup_city))),
+      required: true,
+    },
     { label: "Profile photo", done: has(profile?.avatar_url), required: false },
-    { label: "Two-factor authentication — coming soon", done: false, required: false },
   ];
 
   if (isBusiness) {
@@ -45,11 +58,13 @@ function buildChecklist(profile: any): ChecklistItem[] {
       { label: "Business name", done: has(profile?.business_name), required: true },
       { label: "Business address", done: has(profile?.business_address), required: true },
       {
-        label: "Business location (region/province/city)",
+        label: bizNationwide
+          ? "Business region"
+          : "Business location (region/province/city)",
         done:
           has(profile?.business_region) &&
-          has(profile?.business_province) &&
-          has(profile?.business_city),
+          (bizNationwide ||
+            (has(profile?.business_province) && has(profile?.business_city))),
         required: true,
       },
     );
