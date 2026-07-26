@@ -98,22 +98,18 @@ export const inviteOrgMember = createServerFn({ method: "POST" })
             process.env.VITE_SITE_URL ||
             "https://www.365motorsales.com"
           ).replace(/\/+$/, "");
-          await supabase.rpc(
-            "enqueue_email" as any,
-            {
-              queue_name: "transactional_emails",
-              payload: {
-                template: "team-invite",
-                to: data.email,
-                data: {
-                  org_name: (org as any)?.name ?? "a team",
-                  inviter_name: (inviter as any)?.full_name ?? "Your teammate",
-                  role: data.role,
-                  invite_url: `${origin}/invites/${token}`,
-                },
-              },
-            } as any,
-          );
+          const { enqueueTransactionalEmailServer } = await import("@/lib/email/server-enqueue.server");
+          await enqueueTransactionalEmailServer({
+            templateName: "team-invite",
+            recipientEmail: data.email,
+            idempotencyKey: `team-invite-${(invite as any).id}`,
+            templateData: {
+              org_name: (org as any)?.name ?? "a team",
+              inviter_name: (inviter as any)?.full_name ?? "Your teammate",
+              role: data.role,
+              invite_url: `${origin}/invites/${token}`,
+            },
+          });
         } catch {
           // swallow — surfaced via email_send_log in admin tooling
         }
