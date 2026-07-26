@@ -69,23 +69,22 @@ export const createServiceInquiry = createServerFn({ method: "POST" })
 
     // Fan-out to the staff queue. Fail-soft if email infra is down.
     try {
-      await supabaseAdmin.rpc("enqueue_email", {
-        queue_name: "transactional_emails",
-        payload: {
-          template: "service-inquiry-staff-notice",
-          to: "partners@365motorsales.com",
-          data: {
-            inquiry_id: (row as any).id,
-            inquiry_type: data.inquiryType,
-            contact_name: data.contactName,
-            email: data.email,
-            phone: data.phone ?? null,
-            vehicle_summary: data.vehicleSummary ?? null,
-            message: data.message ?? null,
-            source_url: data.sourceUrl ?? null,
-          },
+      const { enqueueTransactionalEmailServer } = await import("@/lib/email/server-enqueue.server");
+      await enqueueTransactionalEmailServer({
+        templateName: "service-inquiry-staff-notice",
+        recipientEmail: "partners@365motorsales.com",
+        idempotencyKey: `service-inquiry-staff-${(row as any).id}`,
+        templateData: {
+          inquiry_id: (row as any).id,
+          inquiry_type: data.inquiryType,
+          contact_name: data.contactName,
+          email: data.email,
+          phone: data.phone ?? null,
+          vehicle_summary: data.vehicleSummary ?? null,
+          message: data.message ?? null,
+          source_url: data.sourceUrl ?? null,
         },
-      } as any);
+      });
     } catch {
       // No-op; the row is already saved and visible to staff.
     }
