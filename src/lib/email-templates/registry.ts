@@ -40,6 +40,7 @@ import { template as opsAlertsDigest } from "./ops-alerts-digest";
 import { template as partsWantedMatch } from "./parts-wanted-match";
 import { template as clubDiscountEligible } from "./club-discount-eligible";
 import { template as clubDiscountApplied } from "./club-discount-applied";
+import { template as serviceInquiryStaffNotice } from "./service-inquiry-staff-notice";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "signup-welcome": signupWelcome,
@@ -73,4 +74,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "ad-creative-rejected": adCreativeRejected,
   "club-discount-eligible": clubDiscountEligible,
   "club-discount-applied": clubDiscountApplied,
+  "service-inquiry-staff-notice": serviceInquiryStaffNotice,
 };
