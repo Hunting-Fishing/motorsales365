@@ -272,7 +272,7 @@ export const getOrgPerformance = createServerFn({ method: "POST" })
           return {
             userId: m.user_id,
             role: m.role,
-            profile: m.profiles,
+            profile: profilesById.get(m.user_id) ?? null,
             total: mine.length,
             new: nw,
             in_progress: inProgress,
