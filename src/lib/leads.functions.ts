@@ -239,9 +239,7 @@ export const getOrgPerformance = createServerFn({ method: "POST" })
         const [{ data: members, error: e1 }, { data: leads, error: e2 }] = await Promise.all([
           supabase
             .from("organization_members")
-            .select(
-              "user_id, role, profiles:profiles!organization_members_user_id_fkey(id, full_name, avatar_url)",
-            )
+            .select("user_id, role")
             .eq("organization_id", data.orgId),
           supabase
             .from("leads")
@@ -251,6 +249,18 @@ export const getOrgPerformance = createServerFn({ method: "POST" })
         ]);
         if (e1) throw new Error(e1.message);
         if (e2) throw new Error(e2.message);
+
+        const memberIds = (members ?? []).map((m: any) => m.user_id);
+        let profilesById = new Map<string, any>();
+        if (memberIds.length) {
+          const { data: profs, error: pErr } = await supabase
+            .from("profiles")
+            .select("id, full_name, avatar_url")
+            .in("id", memberIds);
+          if (pErr) throw new Error(pErr.message);
+          profilesById = new Map((profs ?? []).map((p: any) => [p.id, p]));
+        }
+
 
         const rows = (members ?? []).map((m: any) => {
           const mine = (leads ?? []).filter((l) => l.assigned_to === m.user_id);
@@ -262,7 +272,7 @@ export const getOrgPerformance = createServerFn({ method: "POST" })
           return {
             userId: m.user_id,
             role: m.role,
-            profile: m.profiles,
+            profile: profilesById.get(m.user_id) ?? null,
             total: mine.length,
             new: nw,
             in_progress: inProgress,
