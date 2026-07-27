@@ -78,7 +78,9 @@ export const getShopManagerEntitlements = createServerFn({ method: "POST" })
     return d;
   })
   .handler(async ({ data, context }): Promise<ShopManagerEntitlements> => {
-    const { supabase, userId } = context;
+    const { supabase, userId, claims } = context;
+    const { isStaffClaims } = await import("@/lib/staff-domain");
+    const isStaff = isStaffClaims(claims as any);
 
     // Membership check — owner or staff of the business.
     const { data: biz } = await supabase
