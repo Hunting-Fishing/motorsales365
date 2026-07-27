@@ -147,6 +147,19 @@ export const getShopManagerEntitlements = createServerFn({ method: "POST" })
       ...(planRow?.limits ?? {}),
     };
 
+    if (isStaff) {
+      // Unlock everything for internal staff even if no enterprise plan row exists.
+      (Object.keys(features) as (keyof ShopManagerFeatures)[]).forEach((k) => {
+        features[k] = true;
+      });
+      limits.inventory_skus = null;
+      limits.invoices_per_month = null;
+      limits.team_seats = null;
+      limits.locations = null;
+      limits.listings = null;
+      limits.network_sharing = "priority";
+    }
+
     // Fair-use AI usage for the current UTC month.
     const { data: usage } = await supabase
       .from("shop_manager_ai_usage")
