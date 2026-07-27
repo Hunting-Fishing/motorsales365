@@ -98,7 +98,7 @@ export const getShopManagerEntitlements = createServerFn({ method: "POST" })
       });
       allowed = !!isMember;
     }
-    if (!allowed) throw new Error("Forbidden");
+    if (!allowed && !isStaff) throw new Error("Forbidden");
 
     const businessKind = ((biz as any).type_slug as string | null) ?? "default";
 
@@ -111,7 +111,11 @@ export const getShopManagerEntitlements = createServerFn({ method: "POST" })
       .eq("business_id", data.businessId)
       .maybeSingle();
 
-    const tier: ShopManagerTier = ((sub as any)?.tier as ShopManagerTier) || "free";
+    // Internal @365motorsales.com staff get complimentary top-tier access so
+    // they can dogfood and file bugs without paying.
+    const tier: ShopManagerTier = isStaff
+      ? "enterprise"
+      : ((sub as any)?.tier as ShopManagerTier) || "free";
 
     // Plan definition — try exact (kind, tier), fall back to (default, tier).
     let planRow: any = null;
@@ -154,12 +158,12 @@ export const getShopManagerEntitlements = createServerFn({ method: "POST" })
     return {
       tier,
       planId: planRow?.id ?? null,
-      planName: planRow?.name ?? "Free",
+      planName: isStaff ? `${planRow?.name ?? "Enterprise"} (365 Staff)` : (planRow?.name ?? "Free"),
       features,
       limits,
-      aiCeiling: planRow?.ai_ceiling ?? 0,
+      aiCeiling: isStaff ? Math.max(Number(planRow?.ai_ceiling ?? 0), 5000) : (planRow?.ai_ceiling ?? 0),
       aiUsed: (usage as any)?.calls_used ?? 0,
-      basePricePhp: Number(planRow?.base_price_php ?? 0),
+      basePricePhp: isStaff ? 0 : Number(planRow?.base_price_php ?? 0),
       status: ((sub as any)?.status as string) ?? "active",
       interval: ((sub as any)?.interval as "month" | "year") ?? "month",
       currentPeriodEnd: ((sub as any)?.current_period_end as string | null) ?? null,
