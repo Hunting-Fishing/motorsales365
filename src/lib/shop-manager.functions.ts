@@ -32,6 +32,18 @@ export type ShopManagerAccess = {
 export const getShopManagerAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ShopManagerAccess> => {
+    // Internal @365motorsales.com staff get complimentary Pro access.
+    const { isStaffClaims } = await import("@/lib/staff-domain");
+    if (isStaffClaims(context.claims as any)) {
+      return {
+        active: true,
+        tier: "pro",
+        status: "staff_comp",
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        provisionedAt: null,
+      };
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: plans } = await supabaseAdmin
       .from("subscription_plans")
