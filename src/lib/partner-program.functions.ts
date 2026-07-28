@@ -13,39 +13,175 @@ function publicClient() {
 }
 
 const ApplySchema = z.object({
-  full_name: z.string().trim().min(2).max(120),
+  first_name: z.string().trim().min(1).max(60),
+  last_name: z.string().trim().min(1).max(60),
   email: z.string().trim().email().max(200),
-  phone: z.string().trim().max(40).optional().nullable(),
+  phone: z.string().trim().min(6).max(40),
+  birth_date: z.string().trim().max(20).optional().nullable(),
+  occupation: z.string().trim().max(80).optional().nullable(),
+  school_or_company: z.string().trim().max(120).optional().nullable(),
+  address_line: z.string().trim().max(200).optional().nullable(),
   city: z.string().trim().max(80).optional().nullable(),
   region: z.string().trim().max(80).optional().nullable(),
+  postal_code: z.string().trim().max(20).optional().nullable(),
   channel_type: z.enum(["individual", "influencer", "shop", "community", "other"]),
   platforms: z.array(z.string().max(40)).max(10).default([]),
   audience_band: z.string().trim().max(40).optional().nullable(),
   pitch: z.string().trim().max(500).optional().nullable(),
+  payout_method: z.enum(["gcash", "maya", "bank_transfer", "cash"]),
+  payout_account_name: z.string().trim().max(120).optional().nullable(),
+  payout_account_number: z.string().trim().max(80).optional().nullable(),
+  wants_shop_manager: z.boolean().default(false),
   agreed_terms: z.literal(true),
   agreed_not_employee: z.literal(true),
+  agreed_early_release: z.literal(true),
 });
 
 export const submitPartnerProgramApplication = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ApplySchema.parse(d))
-  .handler(async ({ data }) => {
-    const sb = publicClient();
-    const { error } = await sb.from("partner_program_applications" as any).insert({
-      full_name: data.full_name,
+  .handler(async ({ data, context }) => {
+    const now = new Date().toISOString();
+    const { error } = await context.supabase.from("partner_program_applications" as any).insert({
+      user_id: context.userId,
+      full_name: `${data.first_name} ${data.last_name}`.trim(),
+      first_name: data.first_name,
+      last_name: data.last_name,
       email: data.email,
-      phone: data.phone || null,
+      phone: data.phone,
+      birth_date: data.birth_date || null,
+      occupation: data.occupation || null,
+      school_or_company: data.school_or_company || null,
+      address_line: data.address_line || null,
       city: data.city || null,
       region: data.region || null,
+      postal_code: data.postal_code || null,
       channel_type: data.channel_type,
       platforms: data.platforms,
       audience_band: data.audience_band || null,
       pitch: data.pitch || null,
+      payout_method: data.payout_method,
+      payout_account_name: data.payout_account_name || null,
+      payout_account_number: data.payout_account_number || null,
+      wants_shop_manager: data.wants_shop_manager,
       agreed_terms: true,
-      agreed_terms_at: new Date().toISOString(),
+      agreed_terms_at: now,
+      agreed_early_release: true,
+      agreed_early_release_at: now,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/**
+ * Approve an application and provision an active affiliate partner with a
+ * unique referral code, payout details and optional free Shop Manager access.
+ */
+export const adminApproveAffiliate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        applicationId: z.string().uuid(),
+        shopManagerAccess: z.boolean().default(false),
+        signupBounty: z.number().min(0).max(10000).default(2),
+        businessBounty: z.number().min(0).max(10000).default(10),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const sb = context.supabase;
+    const { data: app, error: appErr } = await sb
+      .from("partner_program_applications" as any)
+      .select("*")
+      .eq("id", data.applicationId)
+      .maybeSingle();
+    if (appErr) throw appErr;
+    if (!app) throw new Error("Application not found");
+
+    const { data: existing } = await sb
+      .from("partner_program_partners" as any)
+      .select("id, referral_code")
+      .eq("application_id", data.applicationId)
+      .maybeSingle();
+
+    const now = new Date().toISOString();
+    const patch = {
+      shop_manager_access: data.shopManagerAccess,
+      signup_bounty_php: data.signupBounty,
+      business_bounty_php: data.businessBounty,
+      payout_method: (app as any).payout_method ?? null,
+      payout_account_name: (app as any).payout_account_name ?? null,
+      payout_account_number: (app as any).payout_account_number ?? null,
+      active: true,
+    };
+
+    let referralCode: string;
+    if (existing) {
+      referralCode = (existing as any).referral_code;
+      const { error } = await sb
+        .from("partner_program_partners" as any)
+        .update(patch)
+        .eq("id", (existing as any).id);
+      if (error) throw error;
+    } else {
+      const base = `${(app as any).first_name ?? (app as any).full_name ?? "aff"}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "")
+        .slice(0, 10) || "aff";
+      referralCode = `${base}${Math.random().toString(36).slice(2, 6)}`;
+      const { error } = await sb.from("partner_program_partners" as any).insert({
+        ...patch,
+        user_id: (app as any).user_id,
+        application_id: data.applicationId,
+        referral_code: referralCode,
+        display_name: (app as any).full_name,
+        agreed_terms_at: now,
+        agreed_terms_version: "affiliate-v1",
+      });
+      if (error) throw error;
+    }
+
+    const { error: upErr } = await sb
+      .from("partner_program_applications" as any)
+      .update({ status: "approved", reviewed_at: now, reviewer_id: context.userId })
+      .eq("id", data.applicationId);
+    if (upErr) throw upErr;
+
+    return { ok: true, referralCode };
+  });
+
+/** Toggle affiliate flags (active, free Shop Manager access, bounty rates). */
+export const adminUpdateAffiliateFlags = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        partnerId: z.string().uuid(),
+        active: z.boolean().optional(),
+        shopManagerAccess: z.boolean().optional(),
+        signupBounty: z.number().min(0).max(10000).optional(),
+        businessBounty: z.number().min(0).max(10000).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const patch: Record<string, unknown> = {};
+    if (data.active !== undefined) patch.active = data.active;
+    if (data.shopManagerAccess !== undefined) patch.shop_manager_access = data.shopManagerAccess;
+    if (data.signupBounty !== undefined) patch.signup_bounty_php = data.signupBounty;
+    if (data.businessBounty !== undefined) patch.business_bounty_php = data.businessBounty;
+    if (Object.keys(patch).length === 0) return { ok: true };
+    const { error } = await context.supabase
+      .from("partner_program_partners" as any)
+      .update(patch)
+      .eq("id", data.partnerId);
+    if (error) throw error;
+    return { ok: true };
+  });
+
 
 async function ensureAdmin(ctx: { supabase: any; userId: string }) {
   const { data } = await ctx.supabase.rpc("has_role", {
