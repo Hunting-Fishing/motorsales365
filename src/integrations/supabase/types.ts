@@ -7740,67 +7740,109 @@ export type Database = {
       }
       partner_program_applications: {
         Row: {
+          address_line: string | null
           admin_notes: string | null
+          agreed_early_release: boolean
+          agreed_early_release_at: string | null
           agreed_terms: boolean
           agreed_terms_at: string | null
           audience_band: string | null
+          birth_date: string | null
           channel_type: string
           city: string | null
           created_at: string
           email: string
+          first_name: string | null
           full_name: string
           id: string
+          last_name: string | null
+          occupation: string | null
+          payout_account_name: string | null
+          payout_account_number: string | null
+          payout_details: Json
+          payout_method: string | null
           phone: string | null
           pitch: string | null
           platforms: string[]
+          postal_code: string | null
           region: string | null
           reviewed_at: string | null
           reviewer_id: string | null
+          school_or_company: string | null
           status: string
           updated_at: string
           user_id: string | null
+          wants_shop_manager: boolean
         }
         Insert: {
+          address_line?: string | null
           admin_notes?: string | null
+          agreed_early_release?: boolean
+          agreed_early_release_at?: string | null
           agreed_terms?: boolean
           agreed_terms_at?: string | null
           audience_band?: string | null
+          birth_date?: string | null
           channel_type: string
           city?: string | null
           created_at?: string
           email: string
+          first_name?: string | null
           full_name: string
           id?: string
+          last_name?: string | null
+          occupation?: string | null
+          payout_account_name?: string | null
+          payout_account_number?: string | null
+          payout_details?: Json
+          payout_method?: string | null
           phone?: string | null
           pitch?: string | null
           platforms?: string[]
+          postal_code?: string | null
           region?: string | null
           reviewed_at?: string | null
           reviewer_id?: string | null
+          school_or_company?: string | null
           status?: string
           updated_at?: string
           user_id?: string | null
+          wants_shop_manager?: boolean
         }
         Update: {
+          address_line?: string | null
           admin_notes?: string | null
+          agreed_early_release?: boolean
+          agreed_early_release_at?: string | null
           agreed_terms?: boolean
           agreed_terms_at?: string | null
           audience_band?: string | null
+          birth_date?: string | null
           channel_type?: string
           city?: string | null
           created_at?: string
           email?: string
+          first_name?: string | null
           full_name?: string
           id?: string
+          last_name?: string | null
+          occupation?: string | null
+          payout_account_name?: string | null
+          payout_account_number?: string | null
+          payout_details?: Json
+          payout_method?: string | null
           phone?: string | null
           pitch?: string | null
           platforms?: string[]
+          postal_code?: string | null
           region?: string | null
           reviewed_at?: string | null
           reviewer_id?: string | null
+          school_or_company?: string | null
           status?: string
           updated_at?: string
           user_id?: string | null
+          wants_shop_manager?: boolean
         }
         Relationships: []
       }
@@ -7888,12 +7930,17 @@ export type Database = {
           agreed_terms_at: string | null
           agreed_terms_version: string | null
           application_id: string | null
+          business_bounty_php: number
           created_at: string
           display_name: string
           id: string
+          payout_account_name: string | null
+          payout_account_number: string | null
           payout_details: Json
           payout_method: string | null
           referral_code: string
+          shop_manager_access: boolean
+          signup_bounty_php: number
           updated_at: string
           user_id: string | null
         }
@@ -7902,12 +7949,17 @@ export type Database = {
           agreed_terms_at?: string | null
           agreed_terms_version?: string | null
           application_id?: string | null
+          business_bounty_php?: number
           created_at?: string
           display_name: string
           id?: string
+          payout_account_name?: string | null
+          payout_account_number?: string | null
           payout_details?: Json
           payout_method?: string | null
           referral_code: string
+          shop_manager_access?: boolean
+          signup_bounty_php?: number
           updated_at?: string
           user_id?: string | null
         }
@@ -7916,12 +7968,17 @@ export type Database = {
           agreed_terms_at?: string | null
           agreed_terms_version?: string | null
           application_id?: string | null
+          business_bounty_php?: number
           created_at?: string
           display_name?: string
           id?: string
+          payout_account_name?: string | null
+          payout_account_number?: string | null
           payout_details?: Json
           payout_method?: string | null
           referral_code?: string
+          shop_manager_access?: boolean
+          signup_bounty_php?: number
           updated_at?: string
           user_id?: string | null
         }
@@ -14249,6 +14306,10 @@ export type Database = {
           referral_code: string
           staff_referral_id: string
         }[]
+      }
+      pp_award_bounty: {
+        Args: { _code: string; _event_type: string; _source_ref: string }
+        Returns: undefined
       }
       pp_recompute_payout_total: {
         Args: { _payout_id: string }
