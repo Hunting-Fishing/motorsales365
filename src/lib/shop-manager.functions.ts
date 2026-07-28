@@ -44,6 +44,28 @@ export const getShopManagerAccess = createServerFn({ method: "GET" })
         provisionedAt: null,
       };
     }
+    // Approved affiliates granted complimentary access by an admin.
+    {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: partner } = await supabaseAdmin
+        .from("partner_program_partners")
+        .select("id, active, shop_manager_access")
+        .eq("user_id", context.userId)
+        .eq("active", true)
+        .eq("shop_manager_access", true)
+        .maybeSingle();
+      if (partner) {
+        return {
+          active: true,
+          tier: "solo",
+          status: "affiliate_comp",
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+          provisionedAt: null,
+        };
+      }
+
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: plans } = await supabaseAdmin
       .from("subscription_plans")
