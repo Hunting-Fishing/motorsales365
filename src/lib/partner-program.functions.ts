@@ -238,7 +238,16 @@ export const getMyPartnerProgramProfile = createServerFn({ method: "GET" })
       .select("*")
       .eq("user_id", context.userId)
       .maybeSingle();
-    if (!partner) return { partner: null, events: [], totals: null };
+    if (!partner) {
+      const { data: application } = await context.supabase
+        .from("partner_program_applications" as any)
+        .select("id,status,created_at,reviewed_at,admin_notes")
+        .eq("user_id", context.userId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return { partner: null, events: [], totals: null, application: application ?? null };
+    }
     const { data: events } = await context.supabase
       .from("partner_program_commission_events" as any)
       .select("*")
@@ -258,7 +267,7 @@ export const getMyPartnerProgramProfile = createServerFn({ method: "GET" })
       .eq("partner_id", (partner as any).id)
       .order("created_at", { ascending: false })
       .limit(50);
-    return { partner, events: list, totals, payouts: (payouts as any[]) ?? [] };
+    return { partner, events: list, totals, payouts: (payouts as any[]) ?? [], application: null };
   });
 
 // ============================================================================
