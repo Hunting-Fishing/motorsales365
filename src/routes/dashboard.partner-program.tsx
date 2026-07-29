@@ -68,12 +68,46 @@ function PartnerDashboard() {
 
 
   if (!data?.partner) {
+    const application = (data as any)?.application ?? null;
+    const status = application?.status as "pending" | "approved" | "rejected" | undefined;
+
+    if (application && status !== "rejected") {
+      return (
+        <SiteLayout>
+          <div className="container mx-auto max-w-2xl px-4 py-10 text-center">
+            <h1 className="font-display text-3xl font-bold">Partner Program</h1>
+            <Badge className="mt-3 bg-amber-500 text-white hover:bg-amber-500">
+              Application received
+            </Badge>
+            <p className="mt-3 text-muted-foreground">
+              Thanks — your application was submitted
+              {application.created_at
+                ? ` on ${new Date(application.created_at).toLocaleDateString()}`
+                : ""}{" "}
+              and is now waiting for admin review. You don't need to apply again. Once approved,
+              your referral code and QR code will appear right here.
+            </p>
+            <div className="mt-6 flex justify-center gap-3">
+              <Button asChild variant="outline">
+                <Link to="/partner-program">Learn more</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/dashboard">Back to dashboard</Link>
+              </Button>
+            </div>
+          </div>
+        </SiteLayout>
+      );
+    }
+
     return (
       <SiteLayout>
         <div className="container mx-auto max-w-2xl px-4 py-10 text-center">
           <h1 className="font-display text-3xl font-bold">Partner Program</h1>
           <p className="mt-2 text-muted-foreground">
-            You're not an approved partner yet.
+            {status === "rejected"
+              ? "Your previous application wasn't approved. You're welcome to apply again with updated details."
+              : "You're not an approved partner yet."}
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Button asChild><Link to="/partner-program/apply">Apply now</Link></Button>
