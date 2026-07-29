@@ -267,7 +267,7 @@ export const getMyPartnerProgramProfile = createServerFn({ method: "GET" })
       .eq("partner_id", (partner as any).id)
       .order("created_at", { ascending: false })
       .limit(50);
-    return { partner, events: list, totals, payouts: (payouts as any[]) ?? [] };
+    return { partner, events: list, totals, payouts: (payouts as any[]) ?? [], application: null };
   });
 
 // ============================================================================
