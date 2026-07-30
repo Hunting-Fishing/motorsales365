@@ -283,6 +283,13 @@ export function SiteHeader() {
             >
               Export
             </Link>
+            <Link
+              to="/partner-program"
+              className="hidden shrink-0 whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1600px]:inline-flex"
+              activeProps={{ className: "bg-secondary text-foreground" }}
+            >
+              Earn with us
+            </Link>
           </nav>
         </div>
 
@@ -647,6 +654,18 @@ export function SiteHeader() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/partner-program">
+                    <Handshake className="mr-2 h-4 w-4" />
+                    Partner Program (earn)
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/partner-program">
+                    <Handshake className="mr-2 h-4 w-4" />
+                    My affiliate dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/dashboard/profile">Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -828,6 +847,22 @@ export function SiteHeader() {
                         className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
                       >
                         Partner training
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
+                        to="/partner-program"
+                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
+                      >
+                        Partner Program (earn)
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
+                        to="/partner-program/apply"
+                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
+                      >
+                        Become an affiliate
                       </Link>
                     </SheetClose>
                     <SheetClose asChild>

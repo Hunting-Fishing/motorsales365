@@ -85,6 +85,9 @@ export function SiteFooter() {
         { to: "/support", label: "Help & Support" },
         { to: "/report", label: "Report a scam" },
         { to: "/advertise", label: "Advertise / buy ad space" },
+        { to: "/partner-program", label: "Partner Program (earn commissions)" },
+        { to: "/partner-program/apply", label: "Become an affiliate" },
+        ...(user ? [{ to: "/dashboard/partner-program", label: "My affiliate dashboard" }] : []),
         { to: "/franchise", label: "Franchise & Partner Program" },
         { to: "/franchise/partners", label: "Our Partners" },
 
