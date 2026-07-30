@@ -842,123 +842,34 @@ export function SiteHeader() {
                   </div>
                 </details>
 
-                <details open className="group/sec rounded-lg border overflow-hidden border-emerald-300 bg-emerald-100 dark:border-emerald-500/40 dark:bg-emerald-500/15 px-2 py-1.5">
-                  <summary className="sticky top-0 z-10 -mx-2 -mt-1.5 mb-1 flex cursor-pointer list-none items-center justify-between rounded-t-lg bg-emerald-100 dark:bg-emerald-500/25 px-3 py-2 text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-200 shadow-sm">Marketplace<ChevronDown className="h-3.5 w-3.5 shrink-0 transition-transform group-open/sec:rotate-180" /></summary>
-                  <div className="flex flex-col gap-0.5">
-                    <SheetClose asChild>
-                      <Link
-                        to={BUSINESSES_LINK.to}
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        {BUSINESSES_LINK.label}
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to={RIDES_LINK.to}
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        {RIDES_LINK.label}
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/map"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Map
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/parts"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Parts
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/shop"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Shop
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/shop-manager"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Shop Manager
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/games"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Games
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/learn"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Learn
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/partner-training"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Partner training
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/partner-program"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Partner Program (earn)
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/partner-program/apply"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Become an affiliate
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/features"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Features
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/pricing"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Pricing
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/support"
-                        className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        <LifeBuoy className="h-4 w-4" /> Help &amp; Support
-                      </Link>
-                    </SheetClose>
-                  </div>
-                </details>
+                {MOBILE_SECTIONS.map((section) => (
+                  <details
+                    key={section.id}
+                    open={section.id === "marketplace"}
+                    className={`group/sec rounded-lg border overflow-hidden px-2 py-1.5 ${section.tone}`}
+                  >
+                    <summary
+                      className={`sticky top-0 z-10 -mx-2 -mt-1.5 mb-1 flex cursor-pointer list-none items-center justify-between rounded-t-lg px-3 py-2 text-xs font-bold uppercase tracking-wider shadow-sm ${section.summaryTone}`}
+                    >
+                      {section.label}
+                      <ChevronDown className="h-3.5 w-3.5 shrink-0 transition-transform group-open/sec:rotate-180" />
+                    </summary>
+                    <div className="flex flex-col gap-0.5">
+                      {section.links.map((l) => (
+                        <SheetClose asChild key={l.to}>
+                          <Link
+                            to={l.to}
+                            className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
+                            activeProps={{ className: "bg-background/70 text-foreground" }}
+                          >
+                            {l.icon === "support" && <LifeBuoy className="h-4 w-4" />}
+                            {l.label}
+                          </Link>
+                        </SheetClose>
+                      ))}
+                    </div>
+                  </details>
+                ))}
 
 
                 {user && (
