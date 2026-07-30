@@ -851,6 +851,22 @@ export function SiteHeader() {
                     </SheetClose>
                     <SheetClose asChild>
                       <Link
+                        to="/partner-program"
+                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
+                      >
+                        Partner Program (earn)
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
+                        to="/partner-program/apply"
+                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
+                      >
+                        Become an affiliate
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
                         to="/features"
                         className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
                       >
