@@ -91,7 +91,6 @@ const MOBILE_SECTIONS: MobileSection[] = [
     summaryTone: "bg-violet-100 dark:bg-violet-500/25 text-violet-800 dark:text-violet-200",
     links: [
       { to: "/rides", label: "Find a ride" },
-      { to: "/towing", label: "Tow & delivery" },
     ],
   },
   {
