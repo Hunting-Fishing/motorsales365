@@ -283,6 +283,13 @@ export function SiteHeader() {
             >
               Export
             </Link>
+            <Link
+              to="/partner-program"
+              className="hidden shrink-0 whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1600px]:inline-flex"
+              activeProps={{ className: "bg-secondary text-foreground" }}
+            >
+              Earn with us
+            </Link>
           </nav>
         </div>
 
