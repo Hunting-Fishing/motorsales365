@@ -63,6 +63,73 @@ const RIDES_LINK = { to: "/rides", label: "Rides" } as const;
 const WANTED_LINK = { to: "/wanted", label: "Wanted" } as const;
 const PARTS_WANTED_LINK = { to: "/wanted-parts", label: "Parts wanted" } as const;
 
+type MobileSection = {
+  id: string;
+  label: string;
+  tone: string;
+  summaryTone: string;
+  links: { to: string; label: string; icon?: "support" }[];
+};
+
+const MOBILE_SECTIONS: MobileSection[] = [
+  {
+    id: "marketplace",
+    label: "Marketplace",
+    tone: "border-emerald-300 bg-emerald-100 dark:border-emerald-500/40 dark:bg-emerald-500/15",
+    summaryTone: "bg-emerald-100 dark:bg-emerald-500/25 text-emerald-800 dark:text-emerald-200",
+    links: [
+      { to: "/businesses", label: "Businesses" },
+      { to: "/map", label: "Map" },
+      { to: "/parts", label: "Parts" },
+      { to: "/shop", label: "Shop" },
+    ],
+  },
+  {
+    id: "rides",
+    label: "Rides & travel",
+    tone: "border-violet-300 bg-violet-100 dark:border-violet-500/40 dark:bg-violet-500/15",
+    summaryTone: "bg-violet-100 dark:bg-violet-500/25 text-violet-800 dark:text-violet-200",
+    links: [
+      { to: "/rides", label: "Find a ride" },
+    ],
+  },
+  {
+    id: "shop-manager",
+    label: "Shop Manager",
+    tone: "border-blue-300 bg-blue-100 dark:border-blue-500/40 dark:bg-blue-500/15",
+    summaryTone: "bg-blue-100 dark:bg-blue-500/25 text-blue-800 dark:text-blue-200",
+    links: [
+      { to: "/shop-manager", label: "Overview" },
+      { to: "/shop-manager/pricing", label: "Plans & pricing" },
+      { to: "/features", label: "All features" },
+    ],
+  },
+  {
+    id: "earn",
+    label: "Earn with us",
+    tone: "border-orange-300 bg-orange-100 dark:border-orange-500/40 dark:bg-orange-500/15",
+    summaryTone: "bg-orange-100 dark:bg-orange-500/25 text-orange-800 dark:text-orange-200",
+    links: [
+      { to: "/partner-program", label: "Partner Program" },
+      { to: "/partner-program/apply", label: "Become an affiliate" },
+      { to: "/partner-training", label: "Partner training" },
+      { to: "/franchise", label: "Franchise & partners" },
+    ],
+  },
+  {
+    id: "learn",
+    label: "Learn & help",
+    tone: "border-slate-300 bg-slate-100 dark:border-slate-500/40 dark:bg-slate-500/15",
+    summaryTone: "bg-slate-100 dark:bg-slate-500/25 text-slate-800 dark:text-slate-200",
+    links: [
+      { to: "/learn", label: "Learn" },
+      { to: "/games", label: "Games" },
+      { to: "/pricing", label: "Pricing" },
+      { to: "/support", label: "Help & Support", icon: "support" },
+    ],
+  },
+];
+
 const SELLER_VIEW_OPTIONS: { value: SellerType; label: string }[] = [
   { value: "private", label: "Private seller" },
   { value: "dealer", label: "Dealer" },
@@ -774,123 +841,34 @@ export function SiteHeader() {
                   </div>
                 </details>
 
-                <details open className="group/sec rounded-lg border overflow-hidden border-emerald-300 bg-emerald-100 dark:border-emerald-500/40 dark:bg-emerald-500/15 px-2 py-1.5">
-                  <summary className="sticky top-0 z-10 -mx-2 -mt-1.5 mb-1 flex cursor-pointer list-none items-center justify-between rounded-t-lg bg-emerald-100 dark:bg-emerald-500/25 px-3 py-2 text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-200 shadow-sm">Marketplace<ChevronDown className="h-3.5 w-3.5 shrink-0 transition-transform group-open/sec:rotate-180" /></summary>
-                  <div className="flex flex-col gap-0.5">
-                    <SheetClose asChild>
-                      <Link
-                        to={BUSINESSES_LINK.to}
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        {BUSINESSES_LINK.label}
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to={RIDES_LINK.to}
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        {RIDES_LINK.label}
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/map"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Map
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/parts"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Parts
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/shop"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Shop
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/shop-manager"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Shop Manager
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/games"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Games
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/learn"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Learn
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/partner-training"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Partner training
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/partner-program"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Partner Program (earn)
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/partner-program/apply"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Become an affiliate
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/features"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Features
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/pricing"
-                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        Pricing
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/support"
-                        className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
-                      >
-                        <LifeBuoy className="h-4 w-4" /> Help &amp; Support
-                      </Link>
-                    </SheetClose>
-                  </div>
-                </details>
+                {MOBILE_SECTIONS.map((section) => (
+                  <details
+                    key={section.id}
+                    open={section.id === "marketplace"}
+                    className={`group/sec rounded-lg border overflow-hidden px-2 py-1.5 ${section.tone}`}
+                  >
+                    <summary
+                      className={`sticky top-0 z-10 -mx-2 -mt-1.5 mb-1 flex cursor-pointer list-none items-center justify-between rounded-t-lg px-3 py-2 text-xs font-bold uppercase tracking-wider shadow-sm ${section.summaryTone}`}
+                    >
+                      {section.label}
+                      <ChevronDown className="h-3.5 w-3.5 shrink-0 transition-transform group-open/sec:rotate-180" />
+                    </summary>
+                    <div className="flex flex-col gap-0.5">
+                      {section.links.map((l) => (
+                        <SheetClose asChild key={l.to}>
+                          <Link
+                            to={l.to}
+                            className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium hover:bg-background/60"
+                            activeProps={{ className: "bg-background/70 text-foreground" }}
+                          >
+                            {l.icon === "support" && <LifeBuoy className="h-4 w-4" />}
+                            {l.label}
+                          </Link>
+                        </SheetClose>
+                      ))}
+                    </div>
+                  </details>
+                ))}
 
 
                 {user && (
