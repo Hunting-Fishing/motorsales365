@@ -654,6 +654,18 @@ export function SiteHeader() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/partner-program">
+                    <Handshake className="mr-2 h-4 w-4" />
+                    Partner Program (earn)
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/partner-program">
+                    <Handshake className="mr-2 h-4 w-4" />
+                    My affiliate dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/dashboard/profile">Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
