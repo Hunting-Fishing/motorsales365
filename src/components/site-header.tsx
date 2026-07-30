@@ -63,6 +63,74 @@ const RIDES_LINK = { to: "/rides", label: "Rides" } as const;
 const WANTED_LINK = { to: "/wanted", label: "Wanted" } as const;
 const PARTS_WANTED_LINK = { to: "/wanted-parts", label: "Parts wanted" } as const;
 
+type MobileSection = {
+  id: string;
+  label: string;
+  tone: string;
+  summaryTone: string;
+  links: { to: string; label: string; icon?: "support" }[];
+};
+
+const MOBILE_SECTIONS: MobileSection[] = [
+  {
+    id: "marketplace",
+    label: "Marketplace",
+    tone: "border-emerald-300 bg-emerald-100 dark:border-emerald-500/40 dark:bg-emerald-500/15",
+    summaryTone: "bg-emerald-100 dark:bg-emerald-500/25 text-emerald-800 dark:text-emerald-200",
+    links: [
+      { to: "/businesses", label: "Businesses" },
+      { to: "/map", label: "Map" },
+      { to: "/parts", label: "Parts" },
+      { to: "/shop", label: "Shop" },
+    ],
+  },
+  {
+    id: "rides",
+    label: "Rides & travel",
+    tone: "border-violet-300 bg-violet-100 dark:border-violet-500/40 dark:bg-violet-500/15",
+    summaryTone: "bg-violet-100 dark:bg-violet-500/25 text-violet-800 dark:text-violet-200",
+    links: [
+      { to: "/rides", label: "Find a ride" },
+      { to: "/towing", label: "Tow & delivery" },
+    ],
+  },
+  {
+    id: "shop-manager",
+    label: "Shop Manager",
+    tone: "border-blue-300 bg-blue-100 dark:border-blue-500/40 dark:bg-blue-500/15",
+    summaryTone: "bg-blue-100 dark:bg-blue-500/25 text-blue-800 dark:text-blue-200",
+    links: [
+      { to: "/shop-manager", label: "Overview" },
+      { to: "/shop-manager/pricing", label: "Plans & pricing" },
+      { to: "/features", label: "All features" },
+    ],
+  },
+  {
+    id: "earn",
+    label: "Earn with us",
+    tone: "border-orange-300 bg-orange-100 dark:border-orange-500/40 dark:bg-orange-500/15",
+    summaryTone: "bg-orange-100 dark:bg-orange-500/25 text-orange-800 dark:text-orange-200",
+    links: [
+      { to: "/partner-program", label: "Partner Program" },
+      { to: "/partner-program/apply", label: "Become an affiliate" },
+      { to: "/partner-training", label: "Partner training" },
+      { to: "/franchise", label: "Franchise & partners" },
+    ],
+  },
+  {
+    id: "learn",
+    label: "Learn & help",
+    tone: "border-slate-300 bg-slate-100 dark:border-slate-500/40 dark:bg-slate-500/15",
+    summaryTone: "bg-slate-100 dark:bg-slate-500/25 text-slate-800 dark:text-slate-200",
+    links: [
+      { to: "/learn", label: "Learn" },
+      { to: "/games", label: "Games" },
+      { to: "/pricing", label: "Pricing" },
+      { to: "/support", label: "Help & Support", icon: "support" },
+    ],
+  },
+];
+
 const SELLER_VIEW_OPTIONS: { value: SellerType; label: string }[] = [
   { value: "private", label: "Private seller" },
   { value: "dealer", label: "Dealer" },
