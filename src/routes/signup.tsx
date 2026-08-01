@@ -195,6 +195,9 @@ function SignupPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const search = useSearch({ from: "/signup" });
+  const isAffiliateFlow = (search.redirect ?? "").startsWith("/partner-program");
+
+
 
   const [intent, setIntent] = useState<SignupIntent | null>(search.type ?? null);
   const [firstName, setFirstName] = useState("");
