@@ -21,9 +21,9 @@ import {
 import { submitPartnerProgramApplication } from "@/lib/partner-program.functions";
 import { supabase } from "@/integrations/supabase/client";
 
-const TITLE = "Apply — 365 Affiliate & Partner Program";
+const TITLE = "Promoter Program Application — 365 MotorSales";
 const DESCRIPTION =
-  "Apply to become an independent 365 Motor Sales affiliate. Get your own QR code and earn ₱2 per verified sign-up and ₱10 per business sign-up.";
+  "Apply to the limited, approval-only 365 MotorSales Promoter Program. Approved promoters get a personal QR code and referral link.";
 
 export const Route = createFileRoute("/partner-program/apply")({
   head: () => ({
