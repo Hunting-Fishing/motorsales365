@@ -723,13 +723,13 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/partner-program">
                     <Handshake className="mr-2 h-4 w-4" />
-                    Partner Program (earn)
+                    Promoter Program
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard/partner-program">
                     <Handshake className="mr-2 h-4 w-4" />
-                    My affiliate dashboard
+                    My promoter dashboard
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
