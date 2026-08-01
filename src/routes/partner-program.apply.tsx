@@ -44,7 +44,7 @@ export const Route = createFileRoute("/partner-program/apply")({
     if (!data.user) {
       throw redirect({
         to: "/signup",
-        search: { type: "business", redirect: location.pathname } as any,
+        search: { type: "buyer", redirect: location.pathname } as any,
       });
     }
   },

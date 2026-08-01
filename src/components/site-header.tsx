@@ -110,8 +110,8 @@ const MOBILE_SECTIONS: MobileSection[] = [
     tone: "border-orange-300 bg-orange-100 dark:border-orange-500/40 dark:bg-orange-500/15",
     summaryTone: "bg-orange-100 dark:bg-orange-500/25 text-orange-800 dark:text-orange-200",
     links: [
-      { to: "/partner-program", label: "Partner Program" },
-      { to: "/partner-program/apply", label: "Become an affiliate" },
+      { to: "/partner-program", label: "Partner Program (earn ₱)" },
+      { to: "/partner-program/apply", label: "Become an affiliate — apply" },
       { to: "/partner-training", label: "Partner training" },
       { to: "/franchise", label: "Franchise & partners" },
     ],
