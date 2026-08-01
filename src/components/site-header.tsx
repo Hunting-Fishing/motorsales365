@@ -110,8 +110,8 @@ const MOBILE_SECTIONS: MobileSection[] = [
     tone: "border-orange-300 bg-orange-100 dark:border-orange-500/40 dark:bg-orange-500/15",
     summaryTone: "bg-orange-100 dark:bg-orange-500/25 text-orange-800 dark:text-orange-200",
     links: [
-      { to: "/partner-program", label: "Partner Program (earn ₱)" },
-      { to: "/partner-program/apply", label: "Become an affiliate — apply" },
+      { to: "/partner-program", label: "Promoter Program" },
+      { to: "/partner-program/apply", label: "Apply to be a promoter" },
       { to: "/partner-training", label: "Partner training" },
       { to: "/franchise", label: "Franchise & partners" },
     ],
@@ -723,13 +723,13 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/partner-program">
                     <Handshake className="mr-2 h-4 w-4" />
-                    Partner Program (earn)
+                    Promoter Program
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard/partner-program">
                     <Handshake className="mr-2 h-4 w-4" />
-                    My affiliate dashboard
+                    My promoter dashboard
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
