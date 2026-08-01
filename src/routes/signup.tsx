@@ -1531,21 +1531,6 @@ function SignupPage() {
               </div>
             </form>
 
-            {!isAffiliateFlow && (
-              <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4 text-center">
-                <p className="text-sm font-semibold text-navy-900">Want to earn instead?</p>
-                <p className="mt-1 text-xs text-slate-600">
-                  Become a 365 affiliate — ₱2 per person sign-up, ₱10 per business sign-up, with your
-                  own QR code and referral link.
-                </p>
-                <Link
-                  to="/partner-program/apply"
-                  className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg bg-navy-900 px-4 text-sm font-semibold text-white hover:bg-navy-800"
-                >
-                  Sign up as an affiliate
-                </Link>
-              </div>
-            )}
           </div>
 
         </div>
