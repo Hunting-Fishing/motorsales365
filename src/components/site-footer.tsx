@@ -85,9 +85,9 @@ export function SiteFooter() {
         { to: "/support", label: "Help & Support" },
         { to: "/report", label: "Report a scam" },
         { to: "/advertise", label: "Advertise / buy ad space" },
-        { to: "/partner-program", label: "Partner Program (earn commissions)" },
-        { to: "/partner-program/apply", label: "Become an affiliate — sign up" },
-        ...(user ? [{ to: "/dashboard/partner-program", label: "My affiliate dashboard" }] : []),
+        { to: "/partner-program", label: "Promoter Program (approved promoters only)" },
+        { to: "/partner-program/apply", label: "Apply to be a promoter" },
+        ...(user ? [{ to: "/dashboard/partner-program", label: "My promoter dashboard" }] : []),
         { to: "/franchise", label: "Franchise & Partner Program" },
         { to: "/franchise/partners", label: "Our Partners" },
 
