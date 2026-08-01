@@ -139,10 +139,13 @@ function ApplyPage() {
   return (
     <SiteLayout>
       <div className="container mx-auto max-w-2xl px-4 py-10">
-        <h1 className="font-display text-3xl font-bold">Become a 365 affiliate</h1>
+        <h1 className="font-display text-3xl font-bold">Promoter Program application</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Get your own QR code and referral link. Earn <strong>₱2</strong> for every verified
-          personal sign-up and <strong>₱10</strong> for every business sign-up you bring in. Read the{" "}
+          The 365 Promoter Program is a limited, application-only program for people who actively
+          promote 365 MotorSales. It is not part of normal account sign-up. Approved promoters
+          receive a personal QR code and referral link, and are paid per verified referral at the
+          rates set by 365 on approval. Applications are reviewed individually and places are
+          limited. Please read the{" "}
           <Link to="/partner-program/terms" className="text-primary underline">
             Partner Terms
           </Link>{" "}
