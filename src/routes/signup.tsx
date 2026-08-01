@@ -934,6 +934,19 @@ function SignupPage() {
               </p>
             </header>
 
+            {isAffiliateFlow && (
+              <div className="mb-3 rounded-lg border border-orange-300 bg-orange-50 p-3 text-xs text-orange-900">
+                <p className="font-semibold">You're signing up to become a 365 affiliate</p>
+                <p className="mt-1">
+                  Create a free personal account first — we'll take you straight to the affiliate
+                  application. Earn ₱2 per person sign-up and ₱10 per business sign-up once an admin
+                  approves you.
+                </p>
+              </div>
+            )}
+
+
+
 
             {apiFailure && (
               <div
