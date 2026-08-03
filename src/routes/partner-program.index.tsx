@@ -25,7 +25,7 @@ const TITLE = "Promoter Program Application — 365 MotorSales";
 const DESCRIPTION =
   "Apply to the limited, approval-only 365 MotorSales Promoter Program. Approved promoters get a personal QR code and referral link.";
 
-export const Route = createFileRoute("/partner-program")({
+export const Route = createFileRoute("/partner-program/")({
   head: () => ({
     meta: [
       { title: TITLE },
