@@ -95,6 +95,7 @@ import { Route as PartsNetworkRouteImport } from './routes/parts.network'
 import { Route as PartsCategoriesRouteImport } from './routes/parts.categories'
 import { Route as PartnersPartsRouteImport } from './routes/partners.parts'
 import { Route as PartnerProgramTermsRouteImport } from './routes/partner-program.terms'
+import { Route as PartnerProgramInfoRouteImport } from './routes/partner-program.info'
 import { Route as PartnerProgramApplyRouteImport } from './routes/partner-program.apply'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
@@ -804,6 +805,11 @@ const PartnersPartsRoute = PartnersPartsRouteImport.update({
 const PartnerProgramTermsRoute = PartnerProgramTermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => PartnerProgramRoute,
+} as any)
+const PartnerProgramInfoRoute = PartnerProgramInfoRouteImport.update({
+  id: '/info',
+  path: '/info',
   getParentRoute: () => PartnerProgramRoute,
 } as any)
 const PartnerProgramApplyRoute = PartnerProgramApplyRouteImport.update({
@@ -2494,6 +2500,7 @@ export interface FileRoutesByFullPath {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partner-program/apply': typeof PartnerProgramApplyRoute
+  '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
@@ -2853,6 +2860,7 @@ export interface FileRoutesByTo {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partner-program/apply': typeof PartnerProgramApplyRoute
+  '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
@@ -3221,6 +3229,7 @@ export interface FileRoutesById {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partner-program/apply': typeof PartnerProgramApplyRoute
+  '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
@@ -3591,6 +3600,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/listing/checkout'
     | '/partner-program/apply'
+    | '/partner-program/info'
     | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
@@ -3950,6 +3960,7 @@ export interface FileRouteTypes {
     | '/learn/mechanics'
     | '/listing/checkout'
     | '/partner-program/apply'
+    | '/partner-program/info'
     | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
@@ -4317,6 +4328,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/listing/checkout'
     | '/partner-program/apply'
+    | '/partner-program/info'
     | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
@@ -5280,6 +5292,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/partner-program/terms'
       preLoaderRoute: typeof PartnerProgramTermsRouteImport
+      parentRoute: typeof PartnerProgramRoute
+    }
+    '/partner-program/info': {
+      id: '/partner-program/info'
+      path: '/info'
+      fullPath: '/partner-program/info'
+      preLoaderRoute: typeof PartnerProgramInfoRouteImport
       parentRoute: typeof PartnerProgramRoute
     }
     '/partner-program/apply': {
@@ -8069,11 +8088,13 @@ const FranchiseRouteWithChildren = FranchiseRoute._addFileChildren(
 
 interface PartnerProgramRouteChildren {
   PartnerProgramApplyRoute: typeof PartnerProgramApplyRoute
+  PartnerProgramInfoRoute: typeof PartnerProgramInfoRoute
   PartnerProgramTermsRoute: typeof PartnerProgramTermsRoute
 }
 
 const PartnerProgramRouteChildren: PartnerProgramRouteChildren = {
   PartnerProgramApplyRoute: PartnerProgramApplyRoute,
+  PartnerProgramInfoRoute: PartnerProgramInfoRoute,
   PartnerProgramTermsRoute: PartnerProgramTermsRoute,
 }
 
@@ -8339,13 +8360,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
