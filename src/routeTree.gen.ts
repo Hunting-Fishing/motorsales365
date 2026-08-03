@@ -60,6 +60,7 @@ import { Route as WantedIndexRouteImport } from './routes/wanted.index'
 import { Route as WantedPartsIndexRouteImport } from './routes/wanted-parts.index'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
+import { Route as PartnerProgramIndexRouteImport } from './routes/partner-program.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
 import { Route as FranchiseIndexRouteImport } from './routes/franchise.index'
@@ -95,6 +96,7 @@ import { Route as PartsNetworkRouteImport } from './routes/parts.network'
 import { Route as PartsCategoriesRouteImport } from './routes/parts.categories'
 import { Route as PartnersPartsRouteImport } from './routes/partners.parts'
 import { Route as PartnerProgramTermsRouteImport } from './routes/partner-program.terms'
+import { Route as PartnerProgramInfoRouteImport } from './routes/partner-program.info'
 import { Route as PartnerProgramApplyRouteImport } from './routes/partner-program.apply'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
@@ -631,6 +633,11 @@ const RidesIndexRoute = RidesIndexRouteImport.update({
   path: '/rides/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerProgramIndexRoute = PartnerProgramIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnerProgramRoute,
+} as any)
 const LearnIndexRoute = LearnIndexRouteImport.update({
   id: '/learn/',
   path: '/learn/',
@@ -804,6 +811,11 @@ const PartnersPartsRoute = PartnersPartsRouteImport.update({
 const PartnerProgramTermsRoute = PartnerProgramTermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => PartnerProgramRoute,
+} as any)
+const PartnerProgramInfoRoute = PartnerProgramInfoRouteImport.update({
+  id: '/info',
+  path: '/info',
   getParentRoute: () => PartnerProgramRoute,
 } as any)
 const PartnerProgramApplyRoute = PartnerProgramApplyRouteImport.update({
@@ -2494,6 +2506,7 @@ export interface FileRoutesByFullPath {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partner-program/apply': typeof PartnerProgramApplyRoute
+  '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
@@ -2529,6 +2542,7 @@ export interface FileRoutesByFullPath {
   '/franchise/': typeof FranchiseIndexRoute
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
+  '/partner-program/': typeof PartnerProgramIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
@@ -2727,7 +2741,6 @@ export interface FileRoutesByTo {
   '/map': typeof MapRoute
   '/mcp': typeof McpRoute
   '/my-qr': typeof MyQrRoute
-  '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
   '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
@@ -2853,6 +2866,7 @@ export interface FileRoutesByTo {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partner-program/apply': typeof PartnerProgramApplyRoute
+  '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
@@ -2888,6 +2902,7 @@ export interface FileRoutesByTo {
   '/franchise': typeof FranchiseIndexRoute
   '/games': typeof GamesIndexRoute
   '/learn': typeof LearnIndexRoute
+  '/partner-program': typeof PartnerProgramIndexRoute
   '/rides': typeof RidesIndexRoute
   '/wanted-parts': typeof WantedPartsIndexRoute
   '/wanted': typeof WantedIndexRoute
@@ -3221,6 +3236,7 @@ export interface FileRoutesById {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/partner-program/apply': typeof PartnerProgramApplyRoute
+  '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
@@ -3256,6 +3272,7 @@ export interface FileRoutesById {
   '/franchise/': typeof FranchiseIndexRoute
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
+  '/partner-program/': typeof PartnerProgramIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
@@ -3591,6 +3608,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/listing/checkout'
     | '/partner-program/apply'
+    | '/partner-program/info'
     | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
@@ -3626,6 +3644,7 @@ export interface FileRouteTypes {
     | '/franchise/'
     | '/games/'
     | '/learn/'
+    | '/partner-program/'
     | '/rides/'
     | '/shop/'
     | '/wanted-parts/'
@@ -3824,7 +3843,6 @@ export interface FileRouteTypes {
     | '/map'
     | '/mcp'
     | '/my-qr'
-    | '/partner-program'
     | '/partner-training'
     | '/parts'
     | '/payments'
@@ -3950,6 +3968,7 @@ export interface FileRouteTypes {
     | '/learn/mechanics'
     | '/listing/checkout'
     | '/partner-program/apply'
+    | '/partner-program/info'
     | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
@@ -3985,6 +4004,7 @@ export interface FileRouteTypes {
     | '/franchise'
     | '/games'
     | '/learn'
+    | '/partner-program'
     | '/rides'
     | '/wanted-parts'
     | '/wanted'
@@ -4317,6 +4337,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/listing/checkout'
     | '/partner-program/apply'
+    | '/partner-program/info'
     | '/partner-program/terms'
     | '/partners/parts'
     | '/parts/categories'
@@ -4352,6 +4373,7 @@ export interface FileRouteTypes {
     | '/franchise/'
     | '/games/'
     | '/learn/'
+    | '/partner-program/'
     | '/rides/'
     | '/shop/'
     | '/wanted-parts/'
@@ -5037,6 +5059,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RidesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partner-program/': {
+      id: '/partner-program/'
+      path: '/'
+      fullPath: '/partner-program/'
+      preLoaderRoute: typeof PartnerProgramIndexRouteImport
+      parentRoute: typeof PartnerProgramRoute
+    }
     '/learn/': {
       id: '/learn/'
       path: '/learn'
@@ -5280,6 +5309,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/partner-program/terms'
       preLoaderRoute: typeof PartnerProgramTermsRouteImport
+      parentRoute: typeof PartnerProgramRoute
+    }
+    '/partner-program/info': {
+      id: '/partner-program/info'
+      path: '/info'
+      fullPath: '/partner-program/info'
+      preLoaderRoute: typeof PartnerProgramInfoRouteImport
       parentRoute: typeof PartnerProgramRoute
     }
     '/partner-program/apply': {
@@ -8069,12 +8105,16 @@ const FranchiseRouteWithChildren = FranchiseRoute._addFileChildren(
 
 interface PartnerProgramRouteChildren {
   PartnerProgramApplyRoute: typeof PartnerProgramApplyRoute
+  PartnerProgramInfoRoute: typeof PartnerProgramInfoRoute
   PartnerProgramTermsRoute: typeof PartnerProgramTermsRoute
+  PartnerProgramIndexRoute: typeof PartnerProgramIndexRoute
 }
 
 const PartnerProgramRouteChildren: PartnerProgramRouteChildren = {
   PartnerProgramApplyRoute: PartnerProgramApplyRoute,
+  PartnerProgramInfoRoute: PartnerProgramInfoRoute,
   PartnerProgramTermsRoute: PartnerProgramTermsRoute,
+  PartnerProgramIndexRoute: PartnerProgramIndexRoute,
 }
 
 const PartnerProgramRouteWithChildren = PartnerProgramRoute._addFileChildren(

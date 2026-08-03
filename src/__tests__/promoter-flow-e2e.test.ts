@@ -44,13 +44,19 @@ const ROUTES: RouteContract[] = [
   {
     path: "/partner-program",
     files: ["src/routes/partner-program.tsx"],
-    maxDisclosures: 1,
+    maxDisclosures: 0,
+    personalized: false,
+  },
+  {
+    path: "/partner-program/info",
+    files: ["src/routes/partner-program.info.tsx"],
+    maxDisclosures: 0,
     personalized: false,
   },
   {
     path: "/partner-program/apply",
     files: ["src/routes/partner-program.apply.tsx"],
-    maxDisclosures: 1,
+    maxDisclosures: 0,
     personalized: false,
   },
   {

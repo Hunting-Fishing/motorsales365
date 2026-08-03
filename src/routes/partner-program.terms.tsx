@@ -133,8 +133,9 @@ function TermsPage() {
 
         <hr />
         <p className="text-sm">
-          Related: <Link to="/terms">Site Terms</Link> · <Link to="/privacy">Privacy Policy</Link>
-          {" "}· <Link to="/partner-program">Partner Program overview</Link>
+        Related: <Link to="/terms">Site Terms</Link> · <Link to="/privacy">Privacy Policy</Link>
+        {" "}· <Link to="/partner-program">Apply to the Partner Program</Link>
+        {" "}· <Link to="/partner-program/info">Partner Program overview</Link>
         </p>
       </article>
     </SiteLayout>

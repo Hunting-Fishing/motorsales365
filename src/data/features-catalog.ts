@@ -622,7 +622,7 @@ export const FEATURES: Feature[] = [
     name: "Commission-only affiliate program",
     pitch: "Independent contractors earning on tracked referrals.",
     howItWorks:
-      "Apply at /partner-program/apply. Approved partners get a unique QR code and a dashboard with referrals, commissions, and payouts.",
+      "Apply at /partner-program. Approved partners get a unique QR code and a dashboard with referrals, commissions, and payouts.",
     whyUseful: [
       "No wage-style pay — clean 1099-style terms",
       "No downline / no MLM structure",
