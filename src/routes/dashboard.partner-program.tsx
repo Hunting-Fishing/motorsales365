@@ -89,7 +89,7 @@ function PartnerDashboard() {
             </p>
             <div className="mt-6 flex justify-center gap-3">
               <Button asChild variant="outline">
-                <Link to="/partner-program">Apply now</Link>
+                <Link to="/dashboard">Back to dashboard</Link>
               </Button>
               <Button asChild variant="outline">
                 <Link to="/partner-program/info">Learn more</Link>
