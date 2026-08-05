@@ -395,7 +395,7 @@ function CompanyPage() {
               .
             </p>
             <p>
-              Some links in our <Link className="text-primary underline" to="/shop">
+              Some links in our <Link className="text-primary underline" to="/parts/partners">
                 Shop
               </Link>{" "}
               and{" "}

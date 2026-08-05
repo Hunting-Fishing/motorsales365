@@ -37,7 +37,7 @@ function ShopFavoritesPage() {
           </p>
         </div>
         <Button asChild variant="outline" size="sm">
-          <Link to="/shop">
+          <Link to="/parts/partners">
             <ShoppingBag className="mr-1 h-4 w-4" /> Browse shop
           </Link>
         </Button>
@@ -55,7 +55,7 @@ function ShopFavoritesPage() {
             When you find a part or tool you like, tap the heart to save it for later.
           </p>
           <Button asChild className="mt-4">
-            <Link to="/shop">Browse the shop</Link>
+            <Link to="/parts/partners">Browse the shop</Link>
           </Button>
         </div>
       ) : (
@@ -63,7 +63,7 @@ function ShopFavoritesPage() {
           {products.map((p) => (
             <div key={p.id} className="group relative">
               <ShopFavoriteButton productId={p.id} className="absolute right-2 top-2 z-10" />
-              <Link to="/shop/p/$slug" params={{ slug: p.slug }} className="block">
+              <Link to="/parts/partners/p/$slug" params={{ slug: p.slug }} className="block">
                 <Card className="overflow-hidden transition hover:shadow-lg">
                   {p.image_url ? (
                     <ImageWithSkeleton

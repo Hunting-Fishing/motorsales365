@@ -85,7 +85,7 @@ export function WorkOrderInspectionsCard({ workOrderId }: { workOrderId: string 
     },
     onSuccess: (id) => {
       qc.invalidateQueries({ queryKey: ["shop-manager", "wo-inspections", workOrderId] });
-      navigate({ to: "/shop/inspections/$id", params: { id } });
+      navigate({ to: "/workspace/inspections/$id", params: { id } });
     },
     onError: (e: any) => toast.error(e?.message ?? "Failed to start"),
     onSettled: () => setStarting(false),
@@ -120,7 +120,7 @@ export function WorkOrderInspectionsCard({ workOrderId }: { workOrderId: string 
             {data.map((i) => (
               <li key={i.id}>
                 <Link
-                  to="/shop/inspections/$id"
+                  to="/workspace/inspections/$id"
                   params={{ id: i.id }}
                   className="flex items-center justify-between rounded border p-2 hover:bg-accent"
                 >

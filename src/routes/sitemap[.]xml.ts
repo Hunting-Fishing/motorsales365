@@ -30,8 +30,8 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/businesses", changefreq: "daily", priority: "0.8" },
   { path: "/rides", changefreq: "daily", priority: "0.7" },
   { path: "/businesses/submit", changefreq: "monthly", priority: "0.5" },
-  { path: "/shop", changefreq: "daily", priority: "0.8" },
-  { path: "/shop/categories", changefreq: "weekly", priority: "0.6" },
+  { path: "/parts/partners", changefreq: "daily", priority: "0.8" },
+  { path: "/parts/partners/categories", changefreq: "weekly", priority: "0.6" },
   { path: "/learn", changefreq: "weekly", priority: "0.7" },
   { path: "/partner-training", changefreq: "weekly", priority: "0.5" },
   // /my-qr is user-private (noindex); excluded from sitemap.

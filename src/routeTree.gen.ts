@@ -19,6 +19,7 @@ import { Route as StartSellingRouteImport } from './routes/start-selling'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ShopManagerRouteImport } from './routes/shop-manager'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -59,7 +60,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as WantedIndexRouteImport } from './routes/wanted.index'
 import { Route as WantedPartsIndexRouteImport } from './routes/wanted-parts.index'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
+import { Route as ShopManagerIndexRouteImport } from './routes/shop-manager.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
+import { Route as PartsIndexRouteImport } from './routes/parts.index'
 import { Route as PartnerProgramIndexRouteImport } from './routes/partner-program.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
@@ -77,9 +80,6 @@ import { Route as SupportSellingRouteImport } from './routes/support_.selling'
 import { Route as SupportBuyingRouteImport } from './routes/support_.buying'
 import { Route as SupportBusinessRouteImport } from './routes/support_.business'
 import { Route as SupportAccountRouteImport } from './routes/support_.account'
-import { Route as ShopCategoriesRouteImport } from './routes/shop.categories'
-import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
-import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
 import { Route as ShopManagerPricingRouteImport } from './routes/shop-manager.pricing'
 import { Route as ShopManagerCheckoutRouteImport } from './routes/shop-manager.checkout'
 import { Route as ServicesInspectionRouteImport } from './routes/services.inspection'
@@ -202,21 +202,21 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as AdminAdvertisementsRouteImport } from './routes/admin.advertisements'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
-import { Route as AuthenticatedShopRouteImport } from './routes/_authenticated/shop'
+import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
 import { Route as AuthenticatedCompleteProfileRouteImport } from './routes/_authenticated/complete-profile'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as PartsPartnersIndexRouteImport } from './routes/parts.partners.index'
 import { Route as ListingIdIndexRouteImport } from './routes/listing.$id.index'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
 import { Route as DashboardPartnerIndexRouteImport } from './routes/dashboard.partner.index'
 import { Route as AdminStaffAcademyIndexRouteImport } from './routes/admin.staff-academy.index'
 import { Route as AdminAdvertisementsIndexRouteImport } from './routes/admin.advertisements.index'
-import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
-import { Route as ShopDepartmentSlugRouteImport } from './routes/shop.department.$slug'
-import { Route as ShopBrandSlugRouteImport } from './routes/shop.brand.$slug'
+import { Route as AuthenticatedWorkspaceIndexRouteImport } from './routes/_authenticated/workspace.index'
 import { Route as RCodeQrRouteImport } from './routes/r.$code.qr'
 import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
+import { Route as PartsPartnersCategoriesRouteImport } from './routes/parts.partners.categories'
 import { Route as PartsCSlugRouteImport } from './routes/parts.c.$slug'
 import { Route as PartnersPartsOnboardingRouteImport } from './routes/partners.parts.onboarding'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
@@ -266,34 +266,34 @@ import { Route as AdminAdvertisementsCampaignsRouteImport } from './routes/admin
 import { Route as AdminAdvertisementsApprovalsRouteImport } from './routes/admin.advertisements.approvals'
 import { Route as AdminAdvertisementsAnalyticsRouteImport } from './routes/admin.advertisements.analytics'
 import { Route as AdminAccountsBackfillRouteImport } from './routes/admin.accounts.backfill'
+import { Route as AuthenticatedWorkspaceWorkOrdersRouteImport } from './routes/_authenticated/workspace.work-orders'
+import { Route as AuthenticatedWorkspaceVendorsRouteImport } from './routes/_authenticated/workspace.vendors'
+import { Route as AuthenticatedWorkspaceVendorBillsRouteImport } from './routes/_authenticated/workspace.vendor-bills'
+import { Route as AuthenticatedWorkspaceVehiclesRouteImport } from './routes/_authenticated/workspace.vehicles'
+import { Route as AuthenticatedWorkspaceTechniciansRouteImport } from './routes/_authenticated/workspace.technicians'
+import { Route as AuthenticatedWorkspaceStockAlertsRouteImport } from './routes/_authenticated/workspace.stock-alerts'
+import { Route as AuthenticatedWorkspaceSettingsRouteImport } from './routes/_authenticated/workspace.settings'
+import { Route as AuthenticatedWorkspaceServiceRemindersRouteImport } from './routes/_authenticated/workspace.service-reminders'
+import { Route as AuthenticatedWorkspaceSegmentsRouteImport } from './routes/_authenticated/workspace.segments'
+import { Route as AuthenticatedWorkspaceSchedulingRouteImport } from './routes/_authenticated/workspace.scheduling'
+import { Route as AuthenticatedWorkspaceReportsRouteImport } from './routes/_authenticated/workspace.reports'
+import { Route as AuthenticatedWorkspaceQuotesRouteImport } from './routes/_authenticated/workspace.quotes'
+import { Route as AuthenticatedWorkspacePurchaseOrdersRouteImport } from './routes/_authenticated/workspace.purchase-orders'
+import { Route as AuthenticatedWorkspaceLoyaltyRouteImport } from './routes/_authenticated/workspace.loyalty'
+import { Route as AuthenticatedWorkspaceLeaveRequestsRouteImport } from './routes/_authenticated/workspace.leave-requests'
+import { Route as AuthenticatedWorkspaceLeaveRouteImport } from './routes/_authenticated/workspace.leave'
+import { Route as AuthenticatedWorkspaceJournalRouteImport } from './routes/_authenticated/workspace.journal'
+import { Route as AuthenticatedWorkspaceInvoicesRouteImport } from './routes/_authenticated/workspace.invoices'
+import { Route as AuthenticatedWorkspaceInventoryRouteImport } from './routes/_authenticated/workspace.inventory'
+import { Route as AuthenticatedWorkspaceInspectionsRouteImport } from './routes/_authenticated/workspace.inspections'
+import { Route as AuthenticatedWorkspaceExpensesRouteImport } from './routes/_authenticated/workspace.expenses'
+import { Route as AuthenticatedWorkspaceDiscountsRouteImport } from './routes/_authenticated/workspace.discounts'
+import { Route as AuthenticatedWorkspaceCustomersRouteImport } from './routes/_authenticated/workspace.customers'
+import { Route as AuthenticatedWorkspaceCertificatesRouteImport } from './routes/_authenticated/workspace.certificates'
+import { Route as AuthenticatedWorkspaceAutomationRouteImport } from './routes/_authenticated/workspace.automation'
+import { Route as AuthenticatedWorkspaceAppointmentsRouteImport } from './routes/_authenticated/workspace.appointments'
+import { Route as AuthenticatedWorkspaceAccountingRouteImport } from './routes/_authenticated/workspace.accounting'
 import { Route as AuthenticatedStaffAcademyRouteImport } from './routes/_authenticated/staff.academy'
-import { Route as AuthenticatedShopWorkOrdersRouteImport } from './routes/_authenticated/shop.work-orders'
-import { Route as AuthenticatedShopVendorsRouteImport } from './routes/_authenticated/shop.vendors'
-import { Route as AuthenticatedShopVendorBillsRouteImport } from './routes/_authenticated/shop.vendor-bills'
-import { Route as AuthenticatedShopVehiclesRouteImport } from './routes/_authenticated/shop.vehicles'
-import { Route as AuthenticatedShopTechniciansRouteImport } from './routes/_authenticated/shop.technicians'
-import { Route as AuthenticatedShopStockAlertsRouteImport } from './routes/_authenticated/shop.stock-alerts'
-import { Route as AuthenticatedShopSettingsRouteImport } from './routes/_authenticated/shop.settings'
-import { Route as AuthenticatedShopServiceRemindersRouteImport } from './routes/_authenticated/shop.service-reminders'
-import { Route as AuthenticatedShopSegmentsRouteImport } from './routes/_authenticated/shop.segments'
-import { Route as AuthenticatedShopSchedulingRouteImport } from './routes/_authenticated/shop.scheduling'
-import { Route as AuthenticatedShopReportsRouteImport } from './routes/_authenticated/shop.reports'
-import { Route as AuthenticatedShopQuotesRouteImport } from './routes/_authenticated/shop.quotes'
-import { Route as AuthenticatedShopPurchaseOrdersRouteImport } from './routes/_authenticated/shop.purchase-orders'
-import { Route as AuthenticatedShopLoyaltyRouteImport } from './routes/_authenticated/shop.loyalty'
-import { Route as AuthenticatedShopLeaveRequestsRouteImport } from './routes/_authenticated/shop.leave-requests'
-import { Route as AuthenticatedShopLeaveRouteImport } from './routes/_authenticated/shop.leave'
-import { Route as AuthenticatedShopJournalRouteImport } from './routes/_authenticated/shop.journal'
-import { Route as AuthenticatedShopInvoicesRouteImport } from './routes/_authenticated/shop.invoices'
-import { Route as AuthenticatedShopInventoryRouteImport } from './routes/_authenticated/shop.inventory'
-import { Route as AuthenticatedShopInspectionsRouteImport } from './routes/_authenticated/shop.inspections'
-import { Route as AuthenticatedShopExpensesRouteImport } from './routes/_authenticated/shop.expenses'
-import { Route as AuthenticatedShopDiscountsRouteImport } from './routes/_authenticated/shop.discounts'
-import { Route as AuthenticatedShopCustomersRouteImport } from './routes/_authenticated/shop.customers'
-import { Route as AuthenticatedShopCertificatesRouteImport } from './routes/_authenticated/shop.certificates'
-import { Route as AuthenticatedShopAutomationRouteImport } from './routes/_authenticated/shop.automation'
-import { Route as AuthenticatedShopAppointmentsRouteImport } from './routes/_authenticated/shop.appointments'
-import { Route as AuthenticatedShopAccountingRouteImport } from './routes/_authenticated/shop.accounting'
 import { Route as AuthenticatedPartsMyRequestsRouteImport } from './routes/_authenticated/parts.my-requests'
 import { Route as AuthenticatedFranchiseStatusRouteImport } from './routes/_authenticated/franchise.status'
 import { Route as AuthenticatedFranchiseDashboardRouteImport } from './routes/_authenticated/franchise.dashboard'
@@ -310,6 +310,11 @@ import { Route as AuthenticatedAccountDisputesRouteImport } from './routes/_auth
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as DashboardBusinessBusinessIdIndexRouteImport } from './routes/dashboard.business.$businessId.index'
+import { Route as PartsPartnersStoreSlugRouteImport } from './routes/parts.partners.store.$slug'
+import { Route as PartsPartnersPSlugRouteImport } from './routes/parts.partners.p.$slug'
+import { Route as PartsPartnersDepartmentSlugRouteImport } from './routes/parts.partners.department.$slug'
+import { Route as PartsPartnersCCategoryRouteImport } from './routes/parts.partners.c.$category'
+import { Route as PartsPartnersBrandSlugRouteImport } from './routes/parts.partners.brand.$slug'
 import { Route as PartsPNetworkSkuRouteImport } from './routes/parts.p.$network.$sku'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -355,29 +360,29 @@ import { Route as ApiPublicFlashcardsContentRouteImport } from './routes/api/pub
 import { Route as ApiPublicAuthSignupFailureLogRouteImport } from './routes/api/public/auth/signup-failure-log'
 import { Route as ApiPublicAuthSignupRouteImport } from './routes/api/public/auth/signup'
 import { Route as AdminAdvertisementsAnalyticsCodeRouteImport } from './routes/admin.advertisements.analytics.$code'
+import { Route as AuthenticatedWorkspaceWorkOrdersNewRouteImport } from './routes/_authenticated/workspace.work-orders.new'
+import { Route as AuthenticatedWorkspaceWorkOrdersIdRouteImport } from './routes/_authenticated/workspace.work-orders.$id'
+import { Route as AuthenticatedWorkspaceVendorBillsIdRouteImport } from './routes/_authenticated/workspace.vendor-bills.$id'
+import { Route as AuthenticatedWorkspaceVehiclesIdRouteImport } from './routes/_authenticated/workspace.vehicles.$id'
+import { Route as AuthenticatedWorkspaceTechniciansIdRouteImport } from './routes/_authenticated/workspace.technicians.$id'
+import { Route as AuthenticatedWorkspaceReportsPartsMarginRouteImport } from './routes/_authenticated/workspace.reports.parts-margin'
+import { Route as AuthenticatedWorkspaceReportsLtvRouteImport } from './routes/_authenticated/workspace.reports.ltv'
+import { Route as AuthenticatedWorkspaceQuotesNewRouteImport } from './routes/_authenticated/workspace.quotes.new'
+import { Route as AuthenticatedWorkspaceQuotesIdRouteImport } from './routes/_authenticated/workspace.quotes.$id'
+import { Route as AuthenticatedWorkspacePurchaseOrdersIdRouteImport } from './routes/_authenticated/workspace.purchase-orders.$id'
+import { Route as AuthenticatedWorkspaceJournalAccountIdRouteImport } from './routes/_authenticated/workspace.journal.$accountId'
+import { Route as AuthenticatedWorkspaceInvoicesIdRouteImport } from './routes/_authenticated/workspace.invoices.$id'
+import { Route as AuthenticatedWorkspaceInventoryIdRouteImport } from './routes/_authenticated/workspace.inventory.$id'
+import { Route as AuthenticatedWorkspaceInspectionsIdRouteImport } from './routes/_authenticated/workspace.inspections.$id'
+import { Route as AuthenticatedWorkspaceCustomersNewRouteImport } from './routes/_authenticated/workspace.customers.new'
+import { Route as AuthenticatedWorkspaceCustomersIdRouteImport } from './routes/_authenticated/workspace.customers.$id'
+import { Route as AuthenticatedWorkspaceAutomationLogsRouteImport } from './routes/_authenticated/workspace.automation.logs'
+import { Route as AuthenticatedWorkspaceAccountingPnlRouteImport } from './routes/_authenticated/workspace.accounting.pnl'
 import { Route as AuthenticatedStaffAcademySlugRouteImport } from './routes/_authenticated/staff.academy.$slug'
-import { Route as AuthenticatedShopWorkOrdersNewRouteImport } from './routes/_authenticated/shop.work-orders.new'
-import { Route as AuthenticatedShopWorkOrdersIdRouteImport } from './routes/_authenticated/shop.work-orders.$id'
-import { Route as AuthenticatedShopVendorBillsIdRouteImport } from './routes/_authenticated/shop.vendor-bills.$id'
-import { Route as AuthenticatedShopVehiclesIdRouteImport } from './routes/_authenticated/shop.vehicles.$id'
-import { Route as AuthenticatedShopTechniciansIdRouteImport } from './routes/_authenticated/shop.technicians.$id'
-import { Route as AuthenticatedShopReportsPartsMarginRouteImport } from './routes/_authenticated/shop.reports.parts-margin'
-import { Route as AuthenticatedShopReportsLtvRouteImport } from './routes/_authenticated/shop.reports.ltv'
-import { Route as AuthenticatedShopQuotesNewRouteImport } from './routes/_authenticated/shop.quotes.new'
-import { Route as AuthenticatedShopQuotesIdRouteImport } from './routes/_authenticated/shop.quotes.$id'
-import { Route as AuthenticatedShopPurchaseOrdersIdRouteImport } from './routes/_authenticated/shop.purchase-orders.$id'
-import { Route as AuthenticatedShopJournalAccountIdRouteImport } from './routes/_authenticated/shop.journal.$accountId'
-import { Route as AuthenticatedShopInvoicesIdRouteImport } from './routes/_authenticated/shop.invoices.$id'
-import { Route as AuthenticatedShopInventoryIdRouteImport } from './routes/_authenticated/shop.inventory.$id'
-import { Route as AuthenticatedShopInspectionsIdRouteImport } from './routes/_authenticated/shop.inspections.$id'
-import { Route as AuthenticatedShopCustomersNewRouteImport } from './routes/_authenticated/shop.customers.new'
-import { Route as AuthenticatedShopCustomersIdRouteImport } from './routes/_authenticated/shop.customers.$id'
-import { Route as AuthenticatedShopAutomationLogsRouteImport } from './routes/_authenticated/shop.automation.logs'
-import { Route as AuthenticatedShopAccountingPnlRouteImport } from './routes/_authenticated/shop.accounting.pnl'
 import { Route as AuthenticatedDashboardClubsIdRouteImport } from './routes/_authenticated/dashboard.clubs_.$id'
 import { Route as DashboardBusinessBusinessIdInvoicesIdRouteImport } from './routes/dashboard.business.$businessId.invoices.$id'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
-import { Route as AuthenticatedShopReportsTechnicianIdRouteImport } from './routes/_authenticated/shop.reports.technician.$id'
+import { Route as AuthenticatedWorkspaceReportsTechnicianIdRouteImport } from './routes/_authenticated/workspace.reports.technician.$id'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -427,6 +432,11 @@ const SignupRoute = SignupRouteImport.update({
 const ShopManagerRoute = ShopManagerRouteImport.update({
   id: '/shop-manager',
   path: '/shop-manager',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SellRoute = SellRouteImport.update({
@@ -624,14 +634,24 @@ const WantedPartsIndexRoute = WantedPartsIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopIndexRoute = ShopIndexRouteImport.update({
-  id: '/shop/',
-  path: '/shop/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopManagerIndexRoute = ShopManagerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShopManagerRoute,
 } as any)
 const RidesIndexRoute = RidesIndexRouteImport.update({
   id: '/rides/',
   path: '/rides/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PartsIndexRoute = PartsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartsRoute,
 } as any)
 const PartnerProgramIndexRoute = PartnerProgramIndexRouteImport.update({
   id: '/',
@@ -716,21 +736,6 @@ const SupportBusinessRoute = SupportBusinessRouteImport.update({
 const SupportAccountRoute = SupportAccountRouteImport.update({
   id: '/support_/account',
   path: '/support/account',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopCategoriesRoute = ShopCategoriesRouteImport.update({
-  id: '/shop/categories',
-  path: '/shop/categories',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopSlugRoute = ShopSlugRouteImport.update({
-  id: '/shop/$slug',
-  path: '/shop/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopCategoryRoute = ShopCategoryRouteImport.update({
-  id: '/shop/$category',
-  path: '/shop/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopManagerPricingRoute = ShopManagerPricingRouteImport.update({
@@ -1346,9 +1351,9 @@ const AdminAccountsRoute = AdminAccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => AdminRoute,
 } as any)
-const AuthenticatedShopRoute = AuthenticatedShopRouteImport.update({
-  id: '/shop',
-  path: '/shop',
+const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCompleteProfileRoute =
@@ -1369,6 +1374,11 @@ const Char91DotmcpChar93ListToolsRoute =
     path: '/.mcp/list-tools',
     getParentRoute: () => rootRouteImport,
   } as any)
+const PartsPartnersIndexRoute = PartsPartnersIndexRouteImport.update({
+  id: '/partners/',
+  path: '/partners/',
+  getParentRoute: () => PartsRoute,
+} as any)
 const ListingIdIndexRoute = ListingIdIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -1395,21 +1405,12 @@ const AdminAdvertisementsIndexRoute =
     path: '/',
     getParentRoute: () => AdminAdvertisementsRoute,
   } as any)
-const ShopPSlugRoute = ShopPSlugRouteImport.update({
-  id: '/shop/p/$slug',
-  path: '/shop/p/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopDepartmentSlugRoute = ShopDepartmentSlugRouteImport.update({
-  id: '/shop/department/$slug',
-  path: '/shop/department/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopBrandSlugRoute = ShopBrandSlugRouteImport.update({
-  id: '/shop/brand/$slug',
-  path: '/shop/brand/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedWorkspaceIndexRoute =
+  AuthenticatedWorkspaceIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
 const RCodeQrRoute = RCodeQrRouteImport.update({
   id: '/qr',
   path: '/qr',
@@ -1424,6 +1425,11 @@ const PaymentsIdReceiptRoute = PaymentsIdReceiptRouteImport.update({
   id: '/$id/receipt',
   path: '/$id/receipt',
   getParentRoute: () => PaymentsRoute,
+} as any)
+const PartsPartnersCategoriesRoute = PartsPartnersCategoriesRouteImport.update({
+  id: '/partners/categories',
+  path: '/partners/categories',
+  getParentRoute: () => PartsRoute,
 } as any)
 const PartsCSlugRoute = PartsCSlugRouteImport.update({
   id: '/c/$slug',
@@ -1693,171 +1699,173 @@ const AdminAccountsBackfillRoute = AdminAccountsBackfillRouteImport.update({
   path: '/backfill',
   getParentRoute: () => AdminAccountsRoute,
 } as any)
+const AuthenticatedWorkspaceWorkOrdersRoute =
+  AuthenticatedWorkspaceWorkOrdersRouteImport.update({
+    id: '/work-orders',
+    path: '/work-orders',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceVendorsRoute =
+  AuthenticatedWorkspaceVendorsRouteImport.update({
+    id: '/vendors',
+    path: '/vendors',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceVendorBillsRoute =
+  AuthenticatedWorkspaceVendorBillsRouteImport.update({
+    id: '/vendor-bills',
+    path: '/vendor-bills',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceVehiclesRoute =
+  AuthenticatedWorkspaceVehiclesRouteImport.update({
+    id: '/vehicles',
+    path: '/vehicles',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceTechniciansRoute =
+  AuthenticatedWorkspaceTechniciansRouteImport.update({
+    id: '/technicians',
+    path: '/technicians',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceStockAlertsRoute =
+  AuthenticatedWorkspaceStockAlertsRouteImport.update({
+    id: '/stock-alerts',
+    path: '/stock-alerts',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceSettingsRoute =
+  AuthenticatedWorkspaceSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceServiceRemindersRoute =
+  AuthenticatedWorkspaceServiceRemindersRouteImport.update({
+    id: '/service-reminders',
+    path: '/service-reminders',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceSegmentsRoute =
+  AuthenticatedWorkspaceSegmentsRouteImport.update({
+    id: '/segments',
+    path: '/segments',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceSchedulingRoute =
+  AuthenticatedWorkspaceSchedulingRouteImport.update({
+    id: '/scheduling',
+    path: '/scheduling',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceReportsRoute =
+  AuthenticatedWorkspaceReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceQuotesRoute =
+  AuthenticatedWorkspaceQuotesRouteImport.update({
+    id: '/quotes',
+    path: '/quotes',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspacePurchaseOrdersRoute =
+  AuthenticatedWorkspacePurchaseOrdersRouteImport.update({
+    id: '/purchase-orders',
+    path: '/purchase-orders',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceLoyaltyRoute =
+  AuthenticatedWorkspaceLoyaltyRouteImport.update({
+    id: '/loyalty',
+    path: '/loyalty',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceLeaveRequestsRoute =
+  AuthenticatedWorkspaceLeaveRequestsRouteImport.update({
+    id: '/leave-requests',
+    path: '/leave-requests',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceLeaveRoute =
+  AuthenticatedWorkspaceLeaveRouteImport.update({
+    id: '/leave',
+    path: '/leave',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceJournalRoute =
+  AuthenticatedWorkspaceJournalRouteImport.update({
+    id: '/journal',
+    path: '/journal',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceInvoicesRoute =
+  AuthenticatedWorkspaceInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceInventoryRoute =
+  AuthenticatedWorkspaceInventoryRouteImport.update({
+    id: '/inventory',
+    path: '/inventory',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceInspectionsRoute =
+  AuthenticatedWorkspaceInspectionsRouteImport.update({
+    id: '/inspections',
+    path: '/inspections',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceExpensesRoute =
+  AuthenticatedWorkspaceExpensesRouteImport.update({
+    id: '/expenses',
+    path: '/expenses',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceDiscountsRoute =
+  AuthenticatedWorkspaceDiscountsRouteImport.update({
+    id: '/discounts',
+    path: '/discounts',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceCustomersRoute =
+  AuthenticatedWorkspaceCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceCertificatesRoute =
+  AuthenticatedWorkspaceCertificatesRouteImport.update({
+    id: '/certificates',
+    path: '/certificates',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceAutomationRoute =
+  AuthenticatedWorkspaceAutomationRouteImport.update({
+    id: '/automation',
+    path: '/automation',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceAppointmentsRoute =
+  AuthenticatedWorkspaceAppointmentsRouteImport.update({
+    id: '/appointments',
+    path: '/appointments',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceAccountingRoute =
+  AuthenticatedWorkspaceAccountingRouteImport.update({
+    id: '/accounting',
+    path: '/accounting',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
 const AuthenticatedStaffAcademyRoute =
   AuthenticatedStaffAcademyRouteImport.update({
     id: '/staff/academy',
     path: '/staff/academy',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedShopWorkOrdersRoute =
-  AuthenticatedShopWorkOrdersRouteImport.update({
-    id: '/work-orders',
-    path: '/work-orders',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopVendorsRoute =
-  AuthenticatedShopVendorsRouteImport.update({
-    id: '/vendors',
-    path: '/vendors',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopVendorBillsRoute =
-  AuthenticatedShopVendorBillsRouteImport.update({
-    id: '/vendor-bills',
-    path: '/vendor-bills',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopVehiclesRoute =
-  AuthenticatedShopVehiclesRouteImport.update({
-    id: '/vehicles',
-    path: '/vehicles',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopTechniciansRoute =
-  AuthenticatedShopTechniciansRouteImport.update({
-    id: '/technicians',
-    path: '/technicians',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopStockAlertsRoute =
-  AuthenticatedShopStockAlertsRouteImport.update({
-    id: '/stock-alerts',
-    path: '/stock-alerts',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopSettingsRoute =
-  AuthenticatedShopSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopServiceRemindersRoute =
-  AuthenticatedShopServiceRemindersRouteImport.update({
-    id: '/service-reminders',
-    path: '/service-reminders',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopSegmentsRoute =
-  AuthenticatedShopSegmentsRouteImport.update({
-    id: '/segments',
-    path: '/segments',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopSchedulingRoute =
-  AuthenticatedShopSchedulingRouteImport.update({
-    id: '/scheduling',
-    path: '/scheduling',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopReportsRoute =
-  AuthenticatedShopReportsRouteImport.update({
-    id: '/reports',
-    path: '/reports',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopQuotesRoute = AuthenticatedShopQuotesRouteImport.update({
-  id: '/quotes',
-  path: '/quotes',
-  getParentRoute: () => AuthenticatedShopRoute,
-} as any)
-const AuthenticatedShopPurchaseOrdersRoute =
-  AuthenticatedShopPurchaseOrdersRouteImport.update({
-    id: '/purchase-orders',
-    path: '/purchase-orders',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopLoyaltyRoute =
-  AuthenticatedShopLoyaltyRouteImport.update({
-    id: '/loyalty',
-    path: '/loyalty',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopLeaveRequestsRoute =
-  AuthenticatedShopLeaveRequestsRouteImport.update({
-    id: '/leave-requests',
-    path: '/leave-requests',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopLeaveRoute = AuthenticatedShopLeaveRouteImport.update({
-  id: '/leave',
-  path: '/leave',
-  getParentRoute: () => AuthenticatedShopRoute,
-} as any)
-const AuthenticatedShopJournalRoute =
-  AuthenticatedShopJournalRouteImport.update({
-    id: '/journal',
-    path: '/journal',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopInvoicesRoute =
-  AuthenticatedShopInvoicesRouteImport.update({
-    id: '/invoices',
-    path: '/invoices',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopInventoryRoute =
-  AuthenticatedShopInventoryRouteImport.update({
-    id: '/inventory',
-    path: '/inventory',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopInspectionsRoute =
-  AuthenticatedShopInspectionsRouteImport.update({
-    id: '/inspections',
-    path: '/inspections',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopExpensesRoute =
-  AuthenticatedShopExpensesRouteImport.update({
-    id: '/expenses',
-    path: '/expenses',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopDiscountsRoute =
-  AuthenticatedShopDiscountsRouteImport.update({
-    id: '/discounts',
-    path: '/discounts',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopCustomersRoute =
-  AuthenticatedShopCustomersRouteImport.update({
-    id: '/customers',
-    path: '/customers',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopCertificatesRoute =
-  AuthenticatedShopCertificatesRouteImport.update({
-    id: '/certificates',
-    path: '/certificates',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopAutomationRoute =
-  AuthenticatedShopAutomationRouteImport.update({
-    id: '/automation',
-    path: '/automation',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopAppointmentsRoute =
-  AuthenticatedShopAppointmentsRouteImport.update({
-    id: '/appointments',
-    path: '/appointments',
-    getParentRoute: () => AuthenticatedShopRoute,
-  } as any)
-const AuthenticatedShopAccountingRoute =
-  AuthenticatedShopAccountingRouteImport.update({
-    id: '/accounting',
-    path: '/accounting',
-    getParentRoute: () => AuthenticatedShopRoute,
   } as any)
 const AuthenticatedPartsMyRequestsRoute =
   AuthenticatedPartsMyRequestsRouteImport.update({
@@ -1954,6 +1962,32 @@ const DashboardBusinessBusinessIdIndexRoute =
     path: '/',
     getParentRoute: () => DashboardBusinessBusinessIdRoute,
   } as any)
+const PartsPartnersStoreSlugRoute = PartsPartnersStoreSlugRouteImport.update({
+  id: '/partners/store/$slug',
+  path: '/partners/store/$slug',
+  getParentRoute: () => PartsRoute,
+} as any)
+const PartsPartnersPSlugRoute = PartsPartnersPSlugRouteImport.update({
+  id: '/partners/p/$slug',
+  path: '/partners/p/$slug',
+  getParentRoute: () => PartsRoute,
+} as any)
+const PartsPartnersDepartmentSlugRoute =
+  PartsPartnersDepartmentSlugRouteImport.update({
+    id: '/partners/department/$slug',
+    path: '/partners/department/$slug',
+    getParentRoute: () => PartsRoute,
+  } as any)
+const PartsPartnersCCategoryRoute = PartsPartnersCCategoryRouteImport.update({
+  id: '/partners/c/$category',
+  path: '/partners/c/$category',
+  getParentRoute: () => PartsRoute,
+} as any)
+const PartsPartnersBrandSlugRoute = PartsPartnersBrandSlugRouteImport.update({
+  id: '/partners/brand/$slug',
+  path: '/partners/brand/$slug',
+  getParentRoute: () => PartsRoute,
+} as any)
 const PartsPNetworkSkuRoute = PartsPNetworkSkuRouteImport.update({
   id: '/p/$network/$sku',
   path: '/p/$network/$sku',
@@ -2211,119 +2245,119 @@ const AdminAdvertisementsAnalyticsCodeRoute =
     path: '/$code',
     getParentRoute: () => AdminAdvertisementsAnalyticsRoute,
   } as any)
+const AuthenticatedWorkspaceWorkOrdersNewRoute =
+  AuthenticatedWorkspaceWorkOrdersNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedWorkspaceWorkOrdersRoute,
+  } as any)
+const AuthenticatedWorkspaceWorkOrdersIdRoute =
+  AuthenticatedWorkspaceWorkOrdersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedWorkspaceWorkOrdersRoute,
+  } as any)
+const AuthenticatedWorkspaceVendorBillsIdRoute =
+  AuthenticatedWorkspaceVendorBillsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedWorkspaceVendorBillsRoute,
+  } as any)
+const AuthenticatedWorkspaceVehiclesIdRoute =
+  AuthenticatedWorkspaceVehiclesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedWorkspaceVehiclesRoute,
+  } as any)
+const AuthenticatedWorkspaceTechniciansIdRoute =
+  AuthenticatedWorkspaceTechniciansIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedWorkspaceTechniciansRoute,
+  } as any)
+const AuthenticatedWorkspaceReportsPartsMarginRoute =
+  AuthenticatedWorkspaceReportsPartsMarginRouteImport.update({
+    id: '/parts-margin',
+    path: '/parts-margin',
+    getParentRoute: () => AuthenticatedWorkspaceReportsRoute,
+  } as any)
+const AuthenticatedWorkspaceReportsLtvRoute =
+  AuthenticatedWorkspaceReportsLtvRouteImport.update({
+    id: '/ltv',
+    path: '/ltv',
+    getParentRoute: () => AuthenticatedWorkspaceReportsRoute,
+  } as any)
+const AuthenticatedWorkspaceQuotesNewRoute =
+  AuthenticatedWorkspaceQuotesNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedWorkspaceQuotesRoute,
+  } as any)
+const AuthenticatedWorkspaceQuotesIdRoute =
+  AuthenticatedWorkspaceQuotesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedWorkspaceQuotesRoute,
+  } as any)
+const AuthenticatedWorkspacePurchaseOrdersIdRoute =
+  AuthenticatedWorkspacePurchaseOrdersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedWorkspacePurchaseOrdersRoute,
+  } as any)
+const AuthenticatedWorkspaceJournalAccountIdRoute =
+  AuthenticatedWorkspaceJournalAccountIdRouteImport.update({
+    id: '/$accountId',
+    path: '/$accountId',
+    getParentRoute: () => AuthenticatedWorkspaceJournalRoute,
+  } as any)
+const AuthenticatedWorkspaceInvoicesIdRoute =
+  AuthenticatedWorkspaceInvoicesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedWorkspaceInvoicesRoute,
+  } as any)
+const AuthenticatedWorkspaceInventoryIdRoute =
+  AuthenticatedWorkspaceInventoryIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
+  } as any)
+const AuthenticatedWorkspaceInspectionsIdRoute =
+  AuthenticatedWorkspaceInspectionsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedWorkspaceInspectionsRoute,
+  } as any)
+const AuthenticatedWorkspaceCustomersNewRoute =
+  AuthenticatedWorkspaceCustomersNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedWorkspaceCustomersRoute,
+  } as any)
+const AuthenticatedWorkspaceCustomersIdRoute =
+  AuthenticatedWorkspaceCustomersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedWorkspaceCustomersRoute,
+  } as any)
+const AuthenticatedWorkspaceAutomationLogsRoute =
+  AuthenticatedWorkspaceAutomationLogsRouteImport.update({
+    id: '/logs',
+    path: '/logs',
+    getParentRoute: () => AuthenticatedWorkspaceAutomationRoute,
+  } as any)
+const AuthenticatedWorkspaceAccountingPnlRoute =
+  AuthenticatedWorkspaceAccountingPnlRouteImport.update({
+    id: '/pnl',
+    path: '/pnl',
+    getParentRoute: () => AuthenticatedWorkspaceAccountingRoute,
+  } as any)
 const AuthenticatedStaffAcademySlugRoute =
   AuthenticatedStaffAcademySlugRouteImport.update({
     id: '/$slug',
     path: '/$slug',
     getParentRoute: () => AuthenticatedStaffAcademyRoute,
-  } as any)
-const AuthenticatedShopWorkOrdersNewRoute =
-  AuthenticatedShopWorkOrdersNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthenticatedShopWorkOrdersRoute,
-  } as any)
-const AuthenticatedShopWorkOrdersIdRoute =
-  AuthenticatedShopWorkOrdersIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedShopWorkOrdersRoute,
-  } as any)
-const AuthenticatedShopVendorBillsIdRoute =
-  AuthenticatedShopVendorBillsIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedShopVendorBillsRoute,
-  } as any)
-const AuthenticatedShopVehiclesIdRoute =
-  AuthenticatedShopVehiclesIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedShopVehiclesRoute,
-  } as any)
-const AuthenticatedShopTechniciansIdRoute =
-  AuthenticatedShopTechniciansIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedShopTechniciansRoute,
-  } as any)
-const AuthenticatedShopReportsPartsMarginRoute =
-  AuthenticatedShopReportsPartsMarginRouteImport.update({
-    id: '/parts-margin',
-    path: '/parts-margin',
-    getParentRoute: () => AuthenticatedShopReportsRoute,
-  } as any)
-const AuthenticatedShopReportsLtvRoute =
-  AuthenticatedShopReportsLtvRouteImport.update({
-    id: '/ltv',
-    path: '/ltv',
-    getParentRoute: () => AuthenticatedShopReportsRoute,
-  } as any)
-const AuthenticatedShopQuotesNewRoute =
-  AuthenticatedShopQuotesNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthenticatedShopQuotesRoute,
-  } as any)
-const AuthenticatedShopQuotesIdRoute =
-  AuthenticatedShopQuotesIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedShopQuotesRoute,
-  } as any)
-const AuthenticatedShopPurchaseOrdersIdRoute =
-  AuthenticatedShopPurchaseOrdersIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedShopPurchaseOrdersRoute,
-  } as any)
-const AuthenticatedShopJournalAccountIdRoute =
-  AuthenticatedShopJournalAccountIdRouteImport.update({
-    id: '/$accountId',
-    path: '/$accountId',
-    getParentRoute: () => AuthenticatedShopJournalRoute,
-  } as any)
-const AuthenticatedShopInvoicesIdRoute =
-  AuthenticatedShopInvoicesIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedShopInvoicesRoute,
-  } as any)
-const AuthenticatedShopInventoryIdRoute =
-  AuthenticatedShopInventoryIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedShopInventoryRoute,
-  } as any)
-const AuthenticatedShopInspectionsIdRoute =
-  AuthenticatedShopInspectionsIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedShopInspectionsRoute,
-  } as any)
-const AuthenticatedShopCustomersNewRoute =
-  AuthenticatedShopCustomersNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthenticatedShopCustomersRoute,
-  } as any)
-const AuthenticatedShopCustomersIdRoute =
-  AuthenticatedShopCustomersIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedShopCustomersRoute,
-  } as any)
-const AuthenticatedShopAutomationLogsRoute =
-  AuthenticatedShopAutomationLogsRouteImport.update({
-    id: '/logs',
-    path: '/logs',
-    getParentRoute: () => AuthenticatedShopAutomationRoute,
-  } as any)
-const AuthenticatedShopAccountingPnlRoute =
-  AuthenticatedShopAccountingPnlRouteImport.update({
-    id: '/pnl',
-    path: '/pnl',
-    getParentRoute: () => AuthenticatedShopAccountingRoute,
   } as any)
 const AuthenticatedDashboardClubsIdRoute =
   AuthenticatedDashboardClubsIdRouteImport.update({
@@ -2343,11 +2377,11 @@ const ApiPublicTrainingPartnersIdClickRoute =
     path: '/api/public/training-partners/$id/click',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AuthenticatedShopReportsTechnicianIdRoute =
-  AuthenticatedShopReportsTechnicianIdRouteImport.update({
+const AuthenticatedWorkspaceReportsTechnicianIdRoute =
+  AuthenticatedWorkspaceReportsTechnicianIdRouteImport.update({
     id: '/technician/$id',
     path: '/technician/$id',
-    getParentRoute: () => AuthenticatedShopReportsRoute,
+    getParentRoute: () => AuthenticatedWorkspaceReportsRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -2387,6 +2421,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sell': typeof SellRoute
+  '/shop': typeof ShopRouteWithChildren
   '/shop-manager': typeof ShopManagerRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -2400,7 +2435,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/complete-profile': typeof AuthenticatedCompleteProfileRoute
-  '/shop': typeof AuthenticatedShopRouteWithChildren
+  '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
@@ -2523,9 +2558,6 @@ export interface FileRoutesByFullPath {
   '/services/inspection': typeof ServicesInspectionRoute
   '/shop-manager/checkout': typeof ShopManagerCheckoutRoute
   '/shop-manager/pricing': typeof ShopManagerPricingRoute
-  '/shop/$category': typeof ShopCategoryRoute
-  '/shop/$slug': typeof ShopSlugRoute
-  '/shop/categories': typeof ShopCategoriesRoute
   '/support/account': typeof SupportAccountRoute
   '/support/business': typeof SupportBusinessRoute
   '/support/buying': typeof SupportBuyingRoute
@@ -2543,7 +2575,9 @@ export interface FileRoutesByFullPath {
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/partner-program/': typeof PartnerProgramIndexRoute
+  '/parts/': typeof PartsIndexRoute
   '/rides/': typeof RidesIndexRoute
+  '/shop-manager/': typeof ShopManagerIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
@@ -2562,34 +2596,34 @@ export interface FileRoutesByFullPath {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
-  '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
-  '/shop/automation': typeof AuthenticatedShopAutomationRouteWithChildren
-  '/shop/certificates': typeof AuthenticatedShopCertificatesRoute
-  '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
-  '/shop/discounts': typeof AuthenticatedShopDiscountsRoute
-  '/shop/expenses': typeof AuthenticatedShopExpensesRoute
-  '/shop/inspections': typeof AuthenticatedShopInspectionsRouteWithChildren
-  '/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
-  '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
-  '/shop/journal': typeof AuthenticatedShopJournalRouteWithChildren
-  '/shop/leave': typeof AuthenticatedShopLeaveRoute
-  '/shop/leave-requests': typeof AuthenticatedShopLeaveRequestsRoute
-  '/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
-  '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
-  '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
-  '/shop/reports': typeof AuthenticatedShopReportsRouteWithChildren
-  '/shop/scheduling': typeof AuthenticatedShopSchedulingRoute
-  '/shop/segments': typeof AuthenticatedShopSegmentsRoute
-  '/shop/service-reminders': typeof AuthenticatedShopServiceRemindersRoute
-  '/shop/settings': typeof AuthenticatedShopSettingsRoute
-  '/shop/stock-alerts': typeof AuthenticatedShopStockAlertsRoute
-  '/shop/technicians': typeof AuthenticatedShopTechniciansRouteWithChildren
-  '/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
-  '/shop/vendor-bills': typeof AuthenticatedShopVendorBillsRouteWithChildren
-  '/shop/vendors': typeof AuthenticatedShopVendorsRoute
-  '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
+  '/workspace/accounting': typeof AuthenticatedWorkspaceAccountingRouteWithChildren
+  '/workspace/appointments': typeof AuthenticatedWorkspaceAppointmentsRoute
+  '/workspace/automation': typeof AuthenticatedWorkspaceAutomationRouteWithChildren
+  '/workspace/certificates': typeof AuthenticatedWorkspaceCertificatesRoute
+  '/workspace/customers': typeof AuthenticatedWorkspaceCustomersRouteWithChildren
+  '/workspace/discounts': typeof AuthenticatedWorkspaceDiscountsRoute
+  '/workspace/expenses': typeof AuthenticatedWorkspaceExpensesRoute
+  '/workspace/inspections': typeof AuthenticatedWorkspaceInspectionsRouteWithChildren
+  '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRouteWithChildren
+  '/workspace/invoices': typeof AuthenticatedWorkspaceInvoicesRouteWithChildren
+  '/workspace/journal': typeof AuthenticatedWorkspaceJournalRouteWithChildren
+  '/workspace/leave': typeof AuthenticatedWorkspaceLeaveRoute
+  '/workspace/leave-requests': typeof AuthenticatedWorkspaceLeaveRequestsRoute
+  '/workspace/loyalty': typeof AuthenticatedWorkspaceLoyaltyRoute
+  '/workspace/purchase-orders': typeof AuthenticatedWorkspacePurchaseOrdersRouteWithChildren
+  '/workspace/quotes': typeof AuthenticatedWorkspaceQuotesRouteWithChildren
+  '/workspace/reports': typeof AuthenticatedWorkspaceReportsRouteWithChildren
+  '/workspace/scheduling': typeof AuthenticatedWorkspaceSchedulingRoute
+  '/workspace/segments': typeof AuthenticatedWorkspaceSegmentsRoute
+  '/workspace/service-reminders': typeof AuthenticatedWorkspaceServiceRemindersRoute
+  '/workspace/settings': typeof AuthenticatedWorkspaceSettingsRoute
+  '/workspace/stock-alerts': typeof AuthenticatedWorkspaceStockAlertsRoute
+  '/workspace/technicians': typeof AuthenticatedWorkspaceTechniciansRouteWithChildren
+  '/workspace/vehicles': typeof AuthenticatedWorkspaceVehiclesRouteWithChildren
+  '/workspace/vendor-bills': typeof AuthenticatedWorkspaceVendorBillsRouteWithChildren
+  '/workspace/vendors': typeof AuthenticatedWorkspaceVendorsRoute
+  '/workspace/work-orders': typeof AuthenticatedWorkspaceWorkOrdersRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
@@ -2639,37 +2673,37 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/parts/c/$slug': typeof PartsCSlugRoute
+  '/parts/partners/categories': typeof PartsPartnersCategoriesRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/r/$code/qr': typeof RCodeQrRoute
-  '/shop/brand/$slug': typeof ShopBrandSlugRoute
-  '/shop/department/$slug': typeof ShopDepartmentSlugRoute
-  '/shop/p/$slug': typeof ShopPSlugRoute
+  '/workspace/': typeof AuthenticatedWorkspaceIndexRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/admin/staff-academy/': typeof AdminStaffAcademyIndexRoute
   '/dashboard/partner/': typeof DashboardPartnerIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/listing/$id/': typeof ListingIdIndexRoute
+  '/parts/partners/': typeof PartsPartnersIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
-  '/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
-  '/shop/automation/logs': typeof AuthenticatedShopAutomationLogsRoute
-  '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
-  '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
-  '/shop/inspections/$id': typeof AuthenticatedShopInspectionsIdRoute
-  '/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
-  '/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
-  '/shop/journal/$accountId': typeof AuthenticatedShopJournalAccountIdRoute
-  '/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
-  '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
-  '/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
-  '/shop/reports/ltv': typeof AuthenticatedShopReportsLtvRoute
-  '/shop/reports/parts-margin': typeof AuthenticatedShopReportsPartsMarginRoute
-  '/shop/technicians/$id': typeof AuthenticatedShopTechniciansIdRoute
-  '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
-  '/shop/vendor-bills/$id': typeof AuthenticatedShopVendorBillsIdRoute
-  '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
-  '/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
+  '/workspace/accounting/pnl': typeof AuthenticatedWorkspaceAccountingPnlRoute
+  '/workspace/automation/logs': typeof AuthenticatedWorkspaceAutomationLogsRoute
+  '/workspace/customers/$id': typeof AuthenticatedWorkspaceCustomersIdRoute
+  '/workspace/customers/new': typeof AuthenticatedWorkspaceCustomersNewRoute
+  '/workspace/inspections/$id': typeof AuthenticatedWorkspaceInspectionsIdRoute
+  '/workspace/inventory/$id': typeof AuthenticatedWorkspaceInventoryIdRoute
+  '/workspace/invoices/$id': typeof AuthenticatedWorkspaceInvoicesIdRoute
+  '/workspace/journal/$accountId': typeof AuthenticatedWorkspaceJournalAccountIdRoute
+  '/workspace/purchase-orders/$id': typeof AuthenticatedWorkspacePurchaseOrdersIdRoute
+  '/workspace/quotes/$id': typeof AuthenticatedWorkspaceQuotesIdRoute
+  '/workspace/quotes/new': typeof AuthenticatedWorkspaceQuotesNewRoute
+  '/workspace/reports/ltv': typeof AuthenticatedWorkspaceReportsLtvRoute
+  '/workspace/reports/parts-margin': typeof AuthenticatedWorkspaceReportsPartsMarginRoute
+  '/workspace/technicians/$id': typeof AuthenticatedWorkspaceTechniciansIdRoute
+  '/workspace/vehicles/$id': typeof AuthenticatedWorkspaceVehiclesIdRoute
+  '/workspace/vendor-bills/$id': typeof AuthenticatedWorkspaceVendorBillsIdRoute
+  '/workspace/work-orders/$id': typeof AuthenticatedWorkspaceWorkOrdersIdRoute
+  '/workspace/work-orders/new': typeof AuthenticatedWorkspaceWorkOrdersNewRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/auth/signup-failure-log': typeof ApiPublicAuthSignupFailureLogRoute
@@ -2715,8 +2749,13 @@ export interface FileRoutesByFullPath {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
+  '/parts/partners/brand/$slug': typeof PartsPartnersBrandSlugRoute
+  '/parts/partners/c/$category': typeof PartsPartnersCCategoryRoute
+  '/parts/partners/department/$slug': typeof PartsPartnersDepartmentSlugRoute
+  '/parts/partners/p/$slug': typeof PartsPartnersPSlugRoute
+  '/parts/partners/store/$slug': typeof PartsPartnersStoreSlugRoute
   '/dashboard/business/$businessId/': typeof DashboardBusinessBusinessIdIndexRoute
-  '/shop/reports/technician/$id': typeof AuthenticatedShopReportsTechnicianIdRoute
+  '/workspace/reports/technician/$id': typeof AuthenticatedWorkspaceReportsTechnicianIdRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
   '/dashboard/business/$businessId/invoices/$id': typeof DashboardBusinessBusinessIdInvoicesIdRoute
 }
@@ -2742,7 +2781,6 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/my-qr': typeof MyQrRoute
   '/partner-training': typeof PartnerTrainingRoute
-  '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -2751,7 +2789,6 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sell': typeof SellRoute
-  '/shop-manager': typeof ShopManagerRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/start-selling': typeof StartSellingRoute
@@ -2764,7 +2801,6 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/complete-profile': typeof AuthenticatedCompleteProfileRoute
-  '/shop': typeof ShopIndexRoute
   '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -2883,9 +2919,6 @@ export interface FileRoutesByTo {
   '/services/inspection': typeof ServicesInspectionRoute
   '/shop-manager/checkout': typeof ShopManagerCheckoutRoute
   '/shop-manager/pricing': typeof ShopManagerPricingRoute
-  '/shop/$category': typeof ShopCategoryRoute
-  '/shop/$slug': typeof ShopSlugRoute
-  '/shop/categories': typeof ShopCategoriesRoute
   '/support/account': typeof SupportAccountRoute
   '/support/business': typeof SupportBusinessRoute
   '/support/buying': typeof SupportBuyingRoute
@@ -2903,7 +2936,10 @@ export interface FileRoutesByTo {
   '/games': typeof GamesIndexRoute
   '/learn': typeof LearnIndexRoute
   '/partner-program': typeof PartnerProgramIndexRoute
+  '/parts': typeof PartsIndexRoute
   '/rides': typeof RidesIndexRoute
+  '/shop-manager': typeof ShopManagerIndexRoute
+  '/shop': typeof ShopIndexRoute
   '/wanted-parts': typeof WantedPartsIndexRoute
   '/wanted': typeof WantedIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -2921,34 +2957,34 @@ export interface FileRoutesByTo {
   '/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
-  '/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
-  '/shop/automation': typeof AuthenticatedShopAutomationRouteWithChildren
-  '/shop/certificates': typeof AuthenticatedShopCertificatesRoute
-  '/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
-  '/shop/discounts': typeof AuthenticatedShopDiscountsRoute
-  '/shop/expenses': typeof AuthenticatedShopExpensesRoute
-  '/shop/inspections': typeof AuthenticatedShopInspectionsRouteWithChildren
-  '/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
-  '/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
-  '/shop/journal': typeof AuthenticatedShopJournalRouteWithChildren
-  '/shop/leave': typeof AuthenticatedShopLeaveRoute
-  '/shop/leave-requests': typeof AuthenticatedShopLeaveRequestsRoute
-  '/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
-  '/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
-  '/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
-  '/shop/reports': typeof AuthenticatedShopReportsRouteWithChildren
-  '/shop/scheduling': typeof AuthenticatedShopSchedulingRoute
-  '/shop/segments': typeof AuthenticatedShopSegmentsRoute
-  '/shop/service-reminders': typeof AuthenticatedShopServiceRemindersRoute
-  '/shop/settings': typeof AuthenticatedShopSettingsRoute
-  '/shop/stock-alerts': typeof AuthenticatedShopStockAlertsRoute
-  '/shop/technicians': typeof AuthenticatedShopTechniciansRouteWithChildren
-  '/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
-  '/shop/vendor-bills': typeof AuthenticatedShopVendorBillsRouteWithChildren
-  '/shop/vendors': typeof AuthenticatedShopVendorsRoute
-  '/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
+  '/workspace/accounting': typeof AuthenticatedWorkspaceAccountingRouteWithChildren
+  '/workspace/appointments': typeof AuthenticatedWorkspaceAppointmentsRoute
+  '/workspace/automation': typeof AuthenticatedWorkspaceAutomationRouteWithChildren
+  '/workspace/certificates': typeof AuthenticatedWorkspaceCertificatesRoute
+  '/workspace/customers': typeof AuthenticatedWorkspaceCustomersRouteWithChildren
+  '/workspace/discounts': typeof AuthenticatedWorkspaceDiscountsRoute
+  '/workspace/expenses': typeof AuthenticatedWorkspaceExpensesRoute
+  '/workspace/inspections': typeof AuthenticatedWorkspaceInspectionsRouteWithChildren
+  '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRouteWithChildren
+  '/workspace/invoices': typeof AuthenticatedWorkspaceInvoicesRouteWithChildren
+  '/workspace/journal': typeof AuthenticatedWorkspaceJournalRouteWithChildren
+  '/workspace/leave': typeof AuthenticatedWorkspaceLeaveRoute
+  '/workspace/leave-requests': typeof AuthenticatedWorkspaceLeaveRequestsRoute
+  '/workspace/loyalty': typeof AuthenticatedWorkspaceLoyaltyRoute
+  '/workspace/purchase-orders': typeof AuthenticatedWorkspacePurchaseOrdersRouteWithChildren
+  '/workspace/quotes': typeof AuthenticatedWorkspaceQuotesRouteWithChildren
+  '/workspace/reports': typeof AuthenticatedWorkspaceReportsRouteWithChildren
+  '/workspace/scheduling': typeof AuthenticatedWorkspaceSchedulingRoute
+  '/workspace/segments': typeof AuthenticatedWorkspaceSegmentsRoute
+  '/workspace/service-reminders': typeof AuthenticatedWorkspaceServiceRemindersRoute
+  '/workspace/settings': typeof AuthenticatedWorkspaceSettingsRoute
+  '/workspace/stock-alerts': typeof AuthenticatedWorkspaceStockAlertsRoute
+  '/workspace/technicians': typeof AuthenticatedWorkspaceTechniciansRouteWithChildren
+  '/workspace/vehicles': typeof AuthenticatedWorkspaceVehiclesRouteWithChildren
+  '/workspace/vendor-bills': typeof AuthenticatedWorkspaceVendorBillsRouteWithChildren
+  '/workspace/vendors': typeof AuthenticatedWorkspaceVendorsRoute
+  '/workspace/work-orders': typeof AuthenticatedWorkspaceWorkOrdersRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
@@ -2997,37 +3033,37 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/parts/c/$slug': typeof PartsCSlugRoute
+  '/parts/partners/categories': typeof PartsPartnersCategoriesRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/r/$code/qr': typeof RCodeQrRoute
-  '/shop/brand/$slug': typeof ShopBrandSlugRoute
-  '/shop/department/$slug': typeof ShopDepartmentSlugRoute
-  '/shop/p/$slug': typeof ShopPSlugRoute
+  '/workspace': typeof AuthenticatedWorkspaceIndexRoute
   '/admin/advertisements': typeof AdminAdvertisementsIndexRoute
   '/admin/staff-academy': typeof AdminStaffAcademyIndexRoute
   '/dashboard/partner': typeof DashboardPartnerIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/listing/$id': typeof ListingIdIndexRoute
+  '/parts/partners': typeof PartsPartnersIndexRoute
   '/dashboard/clubs/$id': typeof AuthenticatedDashboardClubsIdRoute
-  '/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
-  '/shop/automation/logs': typeof AuthenticatedShopAutomationLogsRoute
-  '/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
-  '/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
-  '/shop/inspections/$id': typeof AuthenticatedShopInspectionsIdRoute
-  '/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
-  '/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
-  '/shop/journal/$accountId': typeof AuthenticatedShopJournalAccountIdRoute
-  '/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
-  '/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
-  '/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
-  '/shop/reports/ltv': typeof AuthenticatedShopReportsLtvRoute
-  '/shop/reports/parts-margin': typeof AuthenticatedShopReportsPartsMarginRoute
-  '/shop/technicians/$id': typeof AuthenticatedShopTechniciansIdRoute
-  '/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
-  '/shop/vendor-bills/$id': typeof AuthenticatedShopVendorBillsIdRoute
-  '/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
-  '/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
   '/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
+  '/workspace/accounting/pnl': typeof AuthenticatedWorkspaceAccountingPnlRoute
+  '/workspace/automation/logs': typeof AuthenticatedWorkspaceAutomationLogsRoute
+  '/workspace/customers/$id': typeof AuthenticatedWorkspaceCustomersIdRoute
+  '/workspace/customers/new': typeof AuthenticatedWorkspaceCustomersNewRoute
+  '/workspace/inspections/$id': typeof AuthenticatedWorkspaceInspectionsIdRoute
+  '/workspace/inventory/$id': typeof AuthenticatedWorkspaceInventoryIdRoute
+  '/workspace/invoices/$id': typeof AuthenticatedWorkspaceInvoicesIdRoute
+  '/workspace/journal/$accountId': typeof AuthenticatedWorkspaceJournalAccountIdRoute
+  '/workspace/purchase-orders/$id': typeof AuthenticatedWorkspacePurchaseOrdersIdRoute
+  '/workspace/quotes/$id': typeof AuthenticatedWorkspaceQuotesIdRoute
+  '/workspace/quotes/new': typeof AuthenticatedWorkspaceQuotesNewRoute
+  '/workspace/reports/ltv': typeof AuthenticatedWorkspaceReportsLtvRoute
+  '/workspace/reports/parts-margin': typeof AuthenticatedWorkspaceReportsPartsMarginRoute
+  '/workspace/technicians/$id': typeof AuthenticatedWorkspaceTechniciansIdRoute
+  '/workspace/vehicles/$id': typeof AuthenticatedWorkspaceVehiclesIdRoute
+  '/workspace/vendor-bills/$id': typeof AuthenticatedWorkspaceVendorBillsIdRoute
+  '/workspace/work-orders/$id': typeof AuthenticatedWorkspaceWorkOrdersIdRoute
+  '/workspace/work-orders/new': typeof AuthenticatedWorkspaceWorkOrdersNewRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/auth/signup-failure-log': typeof ApiPublicAuthSignupFailureLogRoute
@@ -3073,8 +3109,13 @@ export interface FileRoutesByTo {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
+  '/parts/partners/brand/$slug': typeof PartsPartnersBrandSlugRoute
+  '/parts/partners/c/$category': typeof PartsPartnersCCategoryRoute
+  '/parts/partners/department/$slug': typeof PartsPartnersDepartmentSlugRoute
+  '/parts/partners/p/$slug': typeof PartsPartnersPSlugRoute
+  '/parts/partners/store/$slug': typeof PartsPartnersStoreSlugRoute
   '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdIndexRoute
-  '/shop/reports/technician/$id': typeof AuthenticatedShopReportsTechnicianIdRoute
+  '/workspace/reports/technician/$id': typeof AuthenticatedWorkspaceReportsTechnicianIdRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
   '/dashboard/business/$businessId/invoices/$id': typeof DashboardBusinessBusinessIdInvoicesIdRoute
 }
@@ -3117,6 +3158,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sell': typeof SellRoute
+  '/shop': typeof ShopRouteWithChildren
   '/shop-manager': typeof ShopManagerRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -3130,7 +3172,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/complete-profile': typeof AuthenticatedCompleteProfileRoute
-  '/_authenticated/shop': typeof AuthenticatedShopRouteWithChildren
+  '/_authenticated/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
@@ -3253,9 +3295,6 @@ export interface FileRoutesById {
   '/services/inspection': typeof ServicesInspectionRoute
   '/shop-manager/checkout': typeof ShopManagerCheckoutRoute
   '/shop-manager/pricing': typeof ShopManagerPricingRoute
-  '/shop/$category': typeof ShopCategoryRoute
-  '/shop/$slug': typeof ShopSlugRoute
-  '/shop/categories': typeof ShopCategoriesRoute
   '/support_/account': typeof SupportAccountRoute
   '/support_/business': typeof SupportBusinessRoute
   '/support_/buying': typeof SupportBuyingRoute
@@ -3273,7 +3312,9 @@ export interface FileRoutesById {
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/partner-program/': typeof PartnerProgramIndexRoute
+  '/parts/': typeof PartsIndexRoute
   '/rides/': typeof RidesIndexRoute
+  '/shop-manager/': typeof ShopManagerIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
@@ -3292,34 +3333,34 @@ export interface FileRoutesById {
   '/_authenticated/franchise/dashboard': typeof AuthenticatedFranchiseDashboardRoute
   '/_authenticated/franchise/status': typeof AuthenticatedFranchiseStatusRoute
   '/_authenticated/parts/my-requests': typeof AuthenticatedPartsMyRequestsRoute
-  '/_authenticated/shop/accounting': typeof AuthenticatedShopAccountingRouteWithChildren
-  '/_authenticated/shop/appointments': typeof AuthenticatedShopAppointmentsRoute
-  '/_authenticated/shop/automation': typeof AuthenticatedShopAutomationRouteWithChildren
-  '/_authenticated/shop/certificates': typeof AuthenticatedShopCertificatesRoute
-  '/_authenticated/shop/customers': typeof AuthenticatedShopCustomersRouteWithChildren
-  '/_authenticated/shop/discounts': typeof AuthenticatedShopDiscountsRoute
-  '/_authenticated/shop/expenses': typeof AuthenticatedShopExpensesRoute
-  '/_authenticated/shop/inspections': typeof AuthenticatedShopInspectionsRouteWithChildren
-  '/_authenticated/shop/inventory': typeof AuthenticatedShopInventoryRouteWithChildren
-  '/_authenticated/shop/invoices': typeof AuthenticatedShopInvoicesRouteWithChildren
-  '/_authenticated/shop/journal': typeof AuthenticatedShopJournalRouteWithChildren
-  '/_authenticated/shop/leave': typeof AuthenticatedShopLeaveRoute
-  '/_authenticated/shop/leave-requests': typeof AuthenticatedShopLeaveRequestsRoute
-  '/_authenticated/shop/loyalty': typeof AuthenticatedShopLoyaltyRoute
-  '/_authenticated/shop/purchase-orders': typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
-  '/_authenticated/shop/quotes': typeof AuthenticatedShopQuotesRouteWithChildren
-  '/_authenticated/shop/reports': typeof AuthenticatedShopReportsRouteWithChildren
-  '/_authenticated/shop/scheduling': typeof AuthenticatedShopSchedulingRoute
-  '/_authenticated/shop/segments': typeof AuthenticatedShopSegmentsRoute
-  '/_authenticated/shop/service-reminders': typeof AuthenticatedShopServiceRemindersRoute
-  '/_authenticated/shop/settings': typeof AuthenticatedShopSettingsRoute
-  '/_authenticated/shop/stock-alerts': typeof AuthenticatedShopStockAlertsRoute
-  '/_authenticated/shop/technicians': typeof AuthenticatedShopTechniciansRouteWithChildren
-  '/_authenticated/shop/vehicles': typeof AuthenticatedShopVehiclesRouteWithChildren
-  '/_authenticated/shop/vendor-bills': typeof AuthenticatedShopVendorBillsRouteWithChildren
-  '/_authenticated/shop/vendors': typeof AuthenticatedShopVendorsRoute
-  '/_authenticated/shop/work-orders': typeof AuthenticatedShopWorkOrdersRouteWithChildren
   '/_authenticated/staff/academy': typeof AuthenticatedStaffAcademyRouteWithChildren
+  '/_authenticated/workspace/accounting': typeof AuthenticatedWorkspaceAccountingRouteWithChildren
+  '/_authenticated/workspace/appointments': typeof AuthenticatedWorkspaceAppointmentsRoute
+  '/_authenticated/workspace/automation': typeof AuthenticatedWorkspaceAutomationRouteWithChildren
+  '/_authenticated/workspace/certificates': typeof AuthenticatedWorkspaceCertificatesRoute
+  '/_authenticated/workspace/customers': typeof AuthenticatedWorkspaceCustomersRouteWithChildren
+  '/_authenticated/workspace/discounts': typeof AuthenticatedWorkspaceDiscountsRoute
+  '/_authenticated/workspace/expenses': typeof AuthenticatedWorkspaceExpensesRoute
+  '/_authenticated/workspace/inspections': typeof AuthenticatedWorkspaceInspectionsRouteWithChildren
+  '/_authenticated/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRouteWithChildren
+  '/_authenticated/workspace/invoices': typeof AuthenticatedWorkspaceInvoicesRouteWithChildren
+  '/_authenticated/workspace/journal': typeof AuthenticatedWorkspaceJournalRouteWithChildren
+  '/_authenticated/workspace/leave': typeof AuthenticatedWorkspaceLeaveRoute
+  '/_authenticated/workspace/leave-requests': typeof AuthenticatedWorkspaceLeaveRequestsRoute
+  '/_authenticated/workspace/loyalty': typeof AuthenticatedWorkspaceLoyaltyRoute
+  '/_authenticated/workspace/purchase-orders': typeof AuthenticatedWorkspacePurchaseOrdersRouteWithChildren
+  '/_authenticated/workspace/quotes': typeof AuthenticatedWorkspaceQuotesRouteWithChildren
+  '/_authenticated/workspace/reports': typeof AuthenticatedWorkspaceReportsRouteWithChildren
+  '/_authenticated/workspace/scheduling': typeof AuthenticatedWorkspaceSchedulingRoute
+  '/_authenticated/workspace/segments': typeof AuthenticatedWorkspaceSegmentsRoute
+  '/_authenticated/workspace/service-reminders': typeof AuthenticatedWorkspaceServiceRemindersRoute
+  '/_authenticated/workspace/settings': typeof AuthenticatedWorkspaceSettingsRoute
+  '/_authenticated/workspace/stock-alerts': typeof AuthenticatedWorkspaceStockAlertsRoute
+  '/_authenticated/workspace/technicians': typeof AuthenticatedWorkspaceTechniciansRouteWithChildren
+  '/_authenticated/workspace/vehicles': typeof AuthenticatedWorkspaceVehiclesRouteWithChildren
+  '/_authenticated/workspace/vendor-bills': typeof AuthenticatedWorkspaceVendorBillsRouteWithChildren
+  '/_authenticated/workspace/vendors': typeof AuthenticatedWorkspaceVendorsRoute
+  '/_authenticated/workspace/work-orders': typeof AuthenticatedWorkspaceWorkOrdersRouteWithChildren
   '/admin/accounts/backfill': typeof AdminAccountsBackfillRoute
   '/admin/advertisements/analytics': typeof AdminAdvertisementsAnalyticsRouteWithChildren
   '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
@@ -3369,37 +3410,37 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/parts/c/$slug': typeof PartsCSlugRoute
+  '/parts/partners/categories': typeof PartsPartnersCategoriesRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/r/$code/qr': typeof RCodeQrRoute
-  '/shop/brand/$slug': typeof ShopBrandSlugRoute
-  '/shop/department/$slug': typeof ShopDepartmentSlugRoute
-  '/shop/p/$slug': typeof ShopPSlugRoute
+  '/_authenticated/workspace/': typeof AuthenticatedWorkspaceIndexRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/admin/staff-academy/': typeof AdminStaffAcademyIndexRoute
   '/dashboard/partner/': typeof DashboardPartnerIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/listing/$id/': typeof ListingIdIndexRoute
+  '/parts/partners/': typeof PartsPartnersIndexRoute
   '/_authenticated/dashboard/clubs_/$id': typeof AuthenticatedDashboardClubsIdRoute
-  '/_authenticated/shop/accounting/pnl': typeof AuthenticatedShopAccountingPnlRoute
-  '/_authenticated/shop/automation/logs': typeof AuthenticatedShopAutomationLogsRoute
-  '/_authenticated/shop/customers/$id': typeof AuthenticatedShopCustomersIdRoute
-  '/_authenticated/shop/customers/new': typeof AuthenticatedShopCustomersNewRoute
-  '/_authenticated/shop/inspections/$id': typeof AuthenticatedShopInspectionsIdRoute
-  '/_authenticated/shop/inventory/$id': typeof AuthenticatedShopInventoryIdRoute
-  '/_authenticated/shop/invoices/$id': typeof AuthenticatedShopInvoicesIdRoute
-  '/_authenticated/shop/journal/$accountId': typeof AuthenticatedShopJournalAccountIdRoute
-  '/_authenticated/shop/purchase-orders/$id': typeof AuthenticatedShopPurchaseOrdersIdRoute
-  '/_authenticated/shop/quotes/$id': typeof AuthenticatedShopQuotesIdRoute
-  '/_authenticated/shop/quotes/new': typeof AuthenticatedShopQuotesNewRoute
-  '/_authenticated/shop/reports/ltv': typeof AuthenticatedShopReportsLtvRoute
-  '/_authenticated/shop/reports/parts-margin': typeof AuthenticatedShopReportsPartsMarginRoute
-  '/_authenticated/shop/technicians/$id': typeof AuthenticatedShopTechniciansIdRoute
-  '/_authenticated/shop/vehicles/$id': typeof AuthenticatedShopVehiclesIdRoute
-  '/_authenticated/shop/vendor-bills/$id': typeof AuthenticatedShopVendorBillsIdRoute
-  '/_authenticated/shop/work-orders/$id': typeof AuthenticatedShopWorkOrdersIdRoute
-  '/_authenticated/shop/work-orders/new': typeof AuthenticatedShopWorkOrdersNewRoute
   '/_authenticated/staff/academy/$slug': typeof AuthenticatedStaffAcademySlugRoute
+  '/_authenticated/workspace/accounting/pnl': typeof AuthenticatedWorkspaceAccountingPnlRoute
+  '/_authenticated/workspace/automation/logs': typeof AuthenticatedWorkspaceAutomationLogsRoute
+  '/_authenticated/workspace/customers/$id': typeof AuthenticatedWorkspaceCustomersIdRoute
+  '/_authenticated/workspace/customers/new': typeof AuthenticatedWorkspaceCustomersNewRoute
+  '/_authenticated/workspace/inspections/$id': typeof AuthenticatedWorkspaceInspectionsIdRoute
+  '/_authenticated/workspace/inventory/$id': typeof AuthenticatedWorkspaceInventoryIdRoute
+  '/_authenticated/workspace/invoices/$id': typeof AuthenticatedWorkspaceInvoicesIdRoute
+  '/_authenticated/workspace/journal/$accountId': typeof AuthenticatedWorkspaceJournalAccountIdRoute
+  '/_authenticated/workspace/purchase-orders/$id': typeof AuthenticatedWorkspacePurchaseOrdersIdRoute
+  '/_authenticated/workspace/quotes/$id': typeof AuthenticatedWorkspaceQuotesIdRoute
+  '/_authenticated/workspace/quotes/new': typeof AuthenticatedWorkspaceQuotesNewRoute
+  '/_authenticated/workspace/reports/ltv': typeof AuthenticatedWorkspaceReportsLtvRoute
+  '/_authenticated/workspace/reports/parts-margin': typeof AuthenticatedWorkspaceReportsPartsMarginRoute
+  '/_authenticated/workspace/technicians/$id': typeof AuthenticatedWorkspaceTechniciansIdRoute
+  '/_authenticated/workspace/vehicles/$id': typeof AuthenticatedWorkspaceVehiclesIdRoute
+  '/_authenticated/workspace/vendor-bills/$id': typeof AuthenticatedWorkspaceVendorBillsIdRoute
+  '/_authenticated/workspace/work-orders/$id': typeof AuthenticatedWorkspaceWorkOrdersIdRoute
+  '/_authenticated/workspace/work-orders/new': typeof AuthenticatedWorkspaceWorkOrdersNewRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/auth/signup-failure-log': typeof ApiPublicAuthSignupFailureLogRoute
@@ -3445,8 +3486,13 @@ export interface FileRoutesById {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
+  '/parts/partners/brand/$slug': typeof PartsPartnersBrandSlugRoute
+  '/parts/partners/c/$category': typeof PartsPartnersCCategoryRoute
+  '/parts/partners/department/$slug': typeof PartsPartnersDepartmentSlugRoute
+  '/parts/partners/p/$slug': typeof PartsPartnersPSlugRoute
+  '/parts/partners/store/$slug': typeof PartsPartnersStoreSlugRoute
   '/dashboard/business/$businessId/': typeof DashboardBusinessBusinessIdIndexRoute
-  '/_authenticated/shop/reports/technician/$id': typeof AuthenticatedShopReportsTechnicianIdRoute
+  '/_authenticated/workspace/reports/technician/$id': typeof AuthenticatedWorkspaceReportsTechnicianIdRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
   '/dashboard/business/$businessId/invoices/$id': typeof DashboardBusinessBusinessIdInvoicesIdRoute
 }
@@ -3489,6 +3535,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/robots.txt'
     | '/sell'
+    | '/shop'
     | '/shop-manager'
     | '/signup'
     | '/sitemap.xml'
@@ -3502,7 +3549,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/complete-profile'
-    | '/shop'
+    | '/workspace'
     | '/admin/accounts'
     | '/admin/advertisements'
     | '/admin/alerts'
@@ -3625,9 +3672,6 @@ export interface FileRouteTypes {
     | '/services/inspection'
     | '/shop-manager/checkout'
     | '/shop-manager/pricing'
-    | '/shop/$category'
-    | '/shop/$slug'
-    | '/shop/categories'
     | '/support/account'
     | '/support/business'
     | '/support/buying'
@@ -3645,7 +3689,9 @@ export interface FileRouteTypes {
     | '/games/'
     | '/learn/'
     | '/partner-program/'
+    | '/parts/'
     | '/rides/'
+    | '/shop-manager/'
     | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
@@ -3664,34 +3710,34 @@ export interface FileRouteTypes {
     | '/franchise/dashboard'
     | '/franchise/status'
     | '/parts/my-requests'
-    | '/shop/accounting'
-    | '/shop/appointments'
-    | '/shop/automation'
-    | '/shop/certificates'
-    | '/shop/customers'
-    | '/shop/discounts'
-    | '/shop/expenses'
-    | '/shop/inspections'
-    | '/shop/inventory'
-    | '/shop/invoices'
-    | '/shop/journal'
-    | '/shop/leave'
-    | '/shop/leave-requests'
-    | '/shop/loyalty'
-    | '/shop/purchase-orders'
-    | '/shop/quotes'
-    | '/shop/reports'
-    | '/shop/scheduling'
-    | '/shop/segments'
-    | '/shop/service-reminders'
-    | '/shop/settings'
-    | '/shop/stock-alerts'
-    | '/shop/technicians'
-    | '/shop/vehicles'
-    | '/shop/vendor-bills'
-    | '/shop/vendors'
-    | '/shop/work-orders'
     | '/staff/academy'
+    | '/workspace/accounting'
+    | '/workspace/appointments'
+    | '/workspace/automation'
+    | '/workspace/certificates'
+    | '/workspace/customers'
+    | '/workspace/discounts'
+    | '/workspace/expenses'
+    | '/workspace/inspections'
+    | '/workspace/inventory'
+    | '/workspace/invoices'
+    | '/workspace/journal'
+    | '/workspace/leave'
+    | '/workspace/leave-requests'
+    | '/workspace/loyalty'
+    | '/workspace/purchase-orders'
+    | '/workspace/quotes'
+    | '/workspace/reports'
+    | '/workspace/scheduling'
+    | '/workspace/segments'
+    | '/workspace/service-reminders'
+    | '/workspace/settings'
+    | '/workspace/stock-alerts'
+    | '/workspace/technicians'
+    | '/workspace/vehicles'
+    | '/workspace/vendor-bills'
+    | '/workspace/vendors'
+    | '/workspace/work-orders'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
     | '/admin/advertisements/approvals'
@@ -3741,37 +3787,37 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
     | '/parts/c/$slug'
+    | '/parts/partners/categories'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/r/$code/qr'
-    | '/shop/brand/$slug'
-    | '/shop/department/$slug'
-    | '/shop/p/$slug'
+    | '/workspace/'
     | '/admin/advertisements/'
     | '/admin/staff-academy/'
     | '/dashboard/partner/'
     | '/dashboard/team/'
     | '/listing/$id/'
+    | '/parts/partners/'
     | '/dashboard/clubs/$id'
-    | '/shop/accounting/pnl'
-    | '/shop/automation/logs'
-    | '/shop/customers/$id'
-    | '/shop/customers/new'
-    | '/shop/inspections/$id'
-    | '/shop/inventory/$id'
-    | '/shop/invoices/$id'
-    | '/shop/journal/$accountId'
-    | '/shop/purchase-orders/$id'
-    | '/shop/quotes/$id'
-    | '/shop/quotes/new'
-    | '/shop/reports/ltv'
-    | '/shop/reports/parts-margin'
-    | '/shop/technicians/$id'
-    | '/shop/vehicles/$id'
-    | '/shop/vendor-bills/$id'
-    | '/shop/work-orders/$id'
-    | '/shop/work-orders/new'
     | '/staff/academy/$slug'
+    | '/workspace/accounting/pnl'
+    | '/workspace/automation/logs'
+    | '/workspace/customers/$id'
+    | '/workspace/customers/new'
+    | '/workspace/inspections/$id'
+    | '/workspace/inventory/$id'
+    | '/workspace/invoices/$id'
+    | '/workspace/journal/$accountId'
+    | '/workspace/purchase-orders/$id'
+    | '/workspace/quotes/$id'
+    | '/workspace/quotes/new'
+    | '/workspace/reports/ltv'
+    | '/workspace/reports/parts-margin'
+    | '/workspace/technicians/$id'
+    | '/workspace/vehicles/$id'
+    | '/workspace/vendor-bills/$id'
+    | '/workspace/work-orders/$id'
+    | '/workspace/work-orders/new'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
     | '/api/public/auth/signup-failure-log'
@@ -3817,8 +3863,13 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
     | '/parts/p/$network/$sku'
+    | '/parts/partners/brand/$slug'
+    | '/parts/partners/c/$category'
+    | '/parts/partners/department/$slug'
+    | '/parts/partners/p/$slug'
+    | '/parts/partners/store/$slug'
     | '/dashboard/business/$businessId/'
-    | '/shop/reports/technician/$id'
+    | '/workspace/reports/technician/$id'
     | '/api/public/training-partners/$id/click'
     | '/dashboard/business/$businessId/invoices/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -3844,7 +3895,6 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/my-qr'
     | '/partner-training'
-    | '/parts'
     | '/payments'
     | '/pricing'
     | '/privacy'
@@ -3853,7 +3903,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/robots.txt'
     | '/sell'
-    | '/shop-manager'
     | '/signup'
     | '/sitemap.xml'
     | '/start-selling'
@@ -3866,7 +3915,6 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/complete-profile'
-    | '/shop'
     | '/admin/accounts'
     | '/admin/alerts'
     | '/admin/analytics'
@@ -3985,9 +4033,6 @@ export interface FileRouteTypes {
     | '/services/inspection'
     | '/shop-manager/checkout'
     | '/shop-manager/pricing'
-    | '/shop/$category'
-    | '/shop/$slug'
-    | '/shop/categories'
     | '/support/account'
     | '/support/business'
     | '/support/buying'
@@ -4005,7 +4050,10 @@ export interface FileRouteTypes {
     | '/games'
     | '/learn'
     | '/partner-program'
+    | '/parts'
     | '/rides'
+    | '/shop-manager'
+    | '/shop'
     | '/wanted-parts'
     | '/wanted'
     | '/.lovable/oauth/consent'
@@ -4023,34 +4071,34 @@ export interface FileRouteTypes {
     | '/franchise/dashboard'
     | '/franchise/status'
     | '/parts/my-requests'
-    | '/shop/accounting'
-    | '/shop/appointments'
-    | '/shop/automation'
-    | '/shop/certificates'
-    | '/shop/customers'
-    | '/shop/discounts'
-    | '/shop/expenses'
-    | '/shop/inspections'
-    | '/shop/inventory'
-    | '/shop/invoices'
-    | '/shop/journal'
-    | '/shop/leave'
-    | '/shop/leave-requests'
-    | '/shop/loyalty'
-    | '/shop/purchase-orders'
-    | '/shop/quotes'
-    | '/shop/reports'
-    | '/shop/scheduling'
-    | '/shop/segments'
-    | '/shop/service-reminders'
-    | '/shop/settings'
-    | '/shop/stock-alerts'
-    | '/shop/technicians'
-    | '/shop/vehicles'
-    | '/shop/vendor-bills'
-    | '/shop/vendors'
-    | '/shop/work-orders'
     | '/staff/academy'
+    | '/workspace/accounting'
+    | '/workspace/appointments'
+    | '/workspace/automation'
+    | '/workspace/certificates'
+    | '/workspace/customers'
+    | '/workspace/discounts'
+    | '/workspace/expenses'
+    | '/workspace/inspections'
+    | '/workspace/inventory'
+    | '/workspace/invoices'
+    | '/workspace/journal'
+    | '/workspace/leave'
+    | '/workspace/leave-requests'
+    | '/workspace/loyalty'
+    | '/workspace/purchase-orders'
+    | '/workspace/quotes'
+    | '/workspace/reports'
+    | '/workspace/scheduling'
+    | '/workspace/segments'
+    | '/workspace/service-reminders'
+    | '/workspace/settings'
+    | '/workspace/stock-alerts'
+    | '/workspace/technicians'
+    | '/workspace/vehicles'
+    | '/workspace/vendor-bills'
+    | '/workspace/vendors'
+    | '/workspace/work-orders'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
     | '/admin/advertisements/approvals'
@@ -4099,37 +4147,37 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
     | '/parts/c/$slug'
+    | '/parts/partners/categories'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/r/$code/qr'
-    | '/shop/brand/$slug'
-    | '/shop/department/$slug'
-    | '/shop/p/$slug'
+    | '/workspace'
     | '/admin/advertisements'
     | '/admin/staff-academy'
     | '/dashboard/partner'
     | '/dashboard/team'
     | '/listing/$id'
+    | '/parts/partners'
     | '/dashboard/clubs/$id'
-    | '/shop/accounting/pnl'
-    | '/shop/automation/logs'
-    | '/shop/customers/$id'
-    | '/shop/customers/new'
-    | '/shop/inspections/$id'
-    | '/shop/inventory/$id'
-    | '/shop/invoices/$id'
-    | '/shop/journal/$accountId'
-    | '/shop/purchase-orders/$id'
-    | '/shop/quotes/$id'
-    | '/shop/quotes/new'
-    | '/shop/reports/ltv'
-    | '/shop/reports/parts-margin'
-    | '/shop/technicians/$id'
-    | '/shop/vehicles/$id'
-    | '/shop/vendor-bills/$id'
-    | '/shop/work-orders/$id'
-    | '/shop/work-orders/new'
     | '/staff/academy/$slug'
+    | '/workspace/accounting/pnl'
+    | '/workspace/automation/logs'
+    | '/workspace/customers/$id'
+    | '/workspace/customers/new'
+    | '/workspace/inspections/$id'
+    | '/workspace/inventory/$id'
+    | '/workspace/invoices/$id'
+    | '/workspace/journal/$accountId'
+    | '/workspace/purchase-orders/$id'
+    | '/workspace/quotes/$id'
+    | '/workspace/quotes/new'
+    | '/workspace/reports/ltv'
+    | '/workspace/reports/parts-margin'
+    | '/workspace/technicians/$id'
+    | '/workspace/vehicles/$id'
+    | '/workspace/vendor-bills/$id'
+    | '/workspace/work-orders/$id'
+    | '/workspace/work-orders/new'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
     | '/api/public/auth/signup-failure-log'
@@ -4175,8 +4223,13 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
     | '/parts/p/$network/$sku'
+    | '/parts/partners/brand/$slug'
+    | '/parts/partners/c/$category'
+    | '/parts/partners/department/$slug'
+    | '/parts/partners/p/$slug'
+    | '/parts/partners/store/$slug'
     | '/dashboard/business/$businessId'
-    | '/shop/reports/technician/$id'
+    | '/workspace/reports/technician/$id'
     | '/api/public/training-partners/$id/click'
     | '/dashboard/business/$businessId/invoices/$id'
   id:
@@ -4218,6 +4271,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/robots.txt'
     | '/sell'
+    | '/shop'
     | '/shop-manager'
     | '/signup'
     | '/sitemap.xml'
@@ -4231,7 +4285,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/complete-profile'
-    | '/_authenticated/shop'
+    | '/_authenticated/workspace'
     | '/admin/accounts'
     | '/admin/advertisements'
     | '/admin/alerts'
@@ -4354,9 +4408,6 @@ export interface FileRouteTypes {
     | '/services/inspection'
     | '/shop-manager/checkout'
     | '/shop-manager/pricing'
-    | '/shop/$category'
-    | '/shop/$slug'
-    | '/shop/categories'
     | '/support_/account'
     | '/support_/business'
     | '/support_/buying'
@@ -4374,7 +4425,9 @@ export interface FileRouteTypes {
     | '/games/'
     | '/learn/'
     | '/partner-program/'
+    | '/parts/'
     | '/rides/'
+    | '/shop-manager/'
     | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
@@ -4393,34 +4446,34 @@ export interface FileRouteTypes {
     | '/_authenticated/franchise/dashboard'
     | '/_authenticated/franchise/status'
     | '/_authenticated/parts/my-requests'
-    | '/_authenticated/shop/accounting'
-    | '/_authenticated/shop/appointments'
-    | '/_authenticated/shop/automation'
-    | '/_authenticated/shop/certificates'
-    | '/_authenticated/shop/customers'
-    | '/_authenticated/shop/discounts'
-    | '/_authenticated/shop/expenses'
-    | '/_authenticated/shop/inspections'
-    | '/_authenticated/shop/inventory'
-    | '/_authenticated/shop/invoices'
-    | '/_authenticated/shop/journal'
-    | '/_authenticated/shop/leave'
-    | '/_authenticated/shop/leave-requests'
-    | '/_authenticated/shop/loyalty'
-    | '/_authenticated/shop/purchase-orders'
-    | '/_authenticated/shop/quotes'
-    | '/_authenticated/shop/reports'
-    | '/_authenticated/shop/scheduling'
-    | '/_authenticated/shop/segments'
-    | '/_authenticated/shop/service-reminders'
-    | '/_authenticated/shop/settings'
-    | '/_authenticated/shop/stock-alerts'
-    | '/_authenticated/shop/technicians'
-    | '/_authenticated/shop/vehicles'
-    | '/_authenticated/shop/vendor-bills'
-    | '/_authenticated/shop/vendors'
-    | '/_authenticated/shop/work-orders'
     | '/_authenticated/staff/academy'
+    | '/_authenticated/workspace/accounting'
+    | '/_authenticated/workspace/appointments'
+    | '/_authenticated/workspace/automation'
+    | '/_authenticated/workspace/certificates'
+    | '/_authenticated/workspace/customers'
+    | '/_authenticated/workspace/discounts'
+    | '/_authenticated/workspace/expenses'
+    | '/_authenticated/workspace/inspections'
+    | '/_authenticated/workspace/inventory'
+    | '/_authenticated/workspace/invoices'
+    | '/_authenticated/workspace/journal'
+    | '/_authenticated/workspace/leave'
+    | '/_authenticated/workspace/leave-requests'
+    | '/_authenticated/workspace/loyalty'
+    | '/_authenticated/workspace/purchase-orders'
+    | '/_authenticated/workspace/quotes'
+    | '/_authenticated/workspace/reports'
+    | '/_authenticated/workspace/scheduling'
+    | '/_authenticated/workspace/segments'
+    | '/_authenticated/workspace/service-reminders'
+    | '/_authenticated/workspace/settings'
+    | '/_authenticated/workspace/stock-alerts'
+    | '/_authenticated/workspace/technicians'
+    | '/_authenticated/workspace/vehicles'
+    | '/_authenticated/workspace/vendor-bills'
+    | '/_authenticated/workspace/vendors'
+    | '/_authenticated/workspace/work-orders'
     | '/admin/accounts/backfill'
     | '/admin/advertisements/analytics'
     | '/admin/advertisements/approvals'
@@ -4470,37 +4523,37 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/partners/parts/onboarding'
     | '/parts/c/$slug'
+    | '/parts/partners/categories'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/r/$code/qr'
-    | '/shop/brand/$slug'
-    | '/shop/department/$slug'
-    | '/shop/p/$slug'
+    | '/_authenticated/workspace/'
     | '/admin/advertisements/'
     | '/admin/staff-academy/'
     | '/dashboard/partner/'
     | '/dashboard/team/'
     | '/listing/$id/'
+    | '/parts/partners/'
     | '/_authenticated/dashboard/clubs_/$id'
-    | '/_authenticated/shop/accounting/pnl'
-    | '/_authenticated/shop/automation/logs'
-    | '/_authenticated/shop/customers/$id'
-    | '/_authenticated/shop/customers/new'
-    | '/_authenticated/shop/inspections/$id'
-    | '/_authenticated/shop/inventory/$id'
-    | '/_authenticated/shop/invoices/$id'
-    | '/_authenticated/shop/journal/$accountId'
-    | '/_authenticated/shop/purchase-orders/$id'
-    | '/_authenticated/shop/quotes/$id'
-    | '/_authenticated/shop/quotes/new'
-    | '/_authenticated/shop/reports/ltv'
-    | '/_authenticated/shop/reports/parts-margin'
-    | '/_authenticated/shop/technicians/$id'
-    | '/_authenticated/shop/vehicles/$id'
-    | '/_authenticated/shop/vendor-bills/$id'
-    | '/_authenticated/shop/work-orders/$id'
-    | '/_authenticated/shop/work-orders/new'
     | '/_authenticated/staff/academy/$slug'
+    | '/_authenticated/workspace/accounting/pnl'
+    | '/_authenticated/workspace/automation/logs'
+    | '/_authenticated/workspace/customers/$id'
+    | '/_authenticated/workspace/customers/new'
+    | '/_authenticated/workspace/inspections/$id'
+    | '/_authenticated/workspace/inventory/$id'
+    | '/_authenticated/workspace/invoices/$id'
+    | '/_authenticated/workspace/journal/$accountId'
+    | '/_authenticated/workspace/purchase-orders/$id'
+    | '/_authenticated/workspace/quotes/$id'
+    | '/_authenticated/workspace/quotes/new'
+    | '/_authenticated/workspace/reports/ltv'
+    | '/_authenticated/workspace/reports/parts-margin'
+    | '/_authenticated/workspace/technicians/$id'
+    | '/_authenticated/workspace/vehicles/$id'
+    | '/_authenticated/workspace/vendor-bills/$id'
+    | '/_authenticated/workspace/work-orders/$id'
+    | '/_authenticated/workspace/work-orders/new'
     | '/admin/advertisements/analytics/$code'
     | '/api/public/auth/signup'
     | '/api/public/auth/signup-failure-log'
@@ -4546,8 +4599,13 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
     | '/parts/p/$network/$sku'
+    | '/parts/partners/brand/$slug'
+    | '/parts/partners/c/$category'
+    | '/parts/partners/department/$slug'
+    | '/parts/partners/p/$slug'
+    | '/parts/partners/store/$slug'
     | '/dashboard/business/$businessId/'
-    | '/_authenticated/shop/reports/technician/$id'
+    | '/_authenticated/workspace/reports/technician/$id'
     | '/api/public/training-partners/$id/click'
     | '/dashboard/business/$businessId/invoices/$id'
   fileRoutesById: FileRoutesById
@@ -4590,6 +4648,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SellRoute: typeof SellRoute
+  ShopRoute: typeof ShopRouteWithChildren
   ShopManagerRoute: typeof ShopManagerRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -4635,9 +4694,6 @@ export interface RootRouteChildren {
   SSlugRoute: typeof SSlugRoute
   SellerIdRoute: typeof SellerIdRoute
   ServicesInspectionRoute: typeof ServicesInspectionRoute
-  ShopCategoryRoute: typeof ShopCategoryRoute
-  ShopSlugRoute: typeof ShopSlugRoute
-  ShopCategoriesRoute: typeof ShopCategoriesRoute
   SupportAccountRoute: typeof SupportAccountRoute
   SupportBusinessRoute: typeof SupportBusinessRoute
   SupportBuyingRoute: typeof SupportBuyingRoute
@@ -4650,7 +4706,6 @@ export interface RootRouteChildren {
   GamesIndexRoute: typeof GamesIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
-  ShopIndexRoute: typeof ShopIndexRoute
   WantedPartsIndexRoute: typeof WantedPartsIndexRoute
   WantedIndexRoute: typeof WantedIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -4663,9 +4718,6 @@ export interface RootRouteChildren {
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   ApiPublicReverseGeocodeRoute: typeof ApiPublicReverseGeocodeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
-  ShopBrandSlugRoute: typeof ShopBrandSlugRoute
-  ShopDepartmentSlugRoute: typeof ShopDepartmentSlugRoute
-  ShopPSlugRoute: typeof ShopPSlugRoute
   ApiPublicAuthSignupRoute: typeof ApiPublicAuthSignupRoute
   ApiPublicAuthSignupFailureLogRoute: typeof ApiPublicAuthSignupFailureLogRoute
   ApiPublicFlashcardsContentRoute: typeof ApiPublicFlashcardsContentRoute
@@ -4770,6 +4822,13 @@ declare module '@tanstack/react-router' {
       path: '/shop-manager'
       fullPath: '/shop-manager'
       preLoaderRoute: typeof ShopManagerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sell': {
@@ -5047,10 +5106,17 @@ declare module '@tanstack/react-router' {
     }
     '/shop/': {
       id: '/shop/'
-      path: '/shop'
+      path: '/'
       fullPath: '/shop/'
       preLoaderRoute: typeof ShopIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop-manager/': {
+      id: '/shop-manager/'
+      path: '/'
+      fullPath: '/shop-manager/'
+      preLoaderRoute: typeof ShopManagerIndexRouteImport
+      parentRoute: typeof ShopManagerRoute
     }
     '/rides/': {
       id: '/rides/'
@@ -5058,6 +5124,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/rides/'
       preLoaderRoute: typeof RidesIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/parts/': {
+      id: '/parts/'
+      path: '/'
+      fullPath: '/parts/'
+      preLoaderRoute: typeof PartsIndexRouteImport
+      parentRoute: typeof PartsRoute
     }
     '/partner-program/': {
       id: '/partner-program/'
@@ -5176,27 +5249,6 @@ declare module '@tanstack/react-router' {
       path: '/support/account'
       fullPath: '/support/account'
       preLoaderRoute: typeof SupportAccountRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shop/categories': {
-      id: '/shop/categories'
-      path: '/shop/categories'
-      fullPath: '/shop/categories'
-      preLoaderRoute: typeof ShopCategoriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shop/$slug': {
-      id: '/shop/$slug'
-      path: '/shop/$slug'
-      fullPath: '/shop/$slug'
-      preLoaderRoute: typeof ShopSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shop/$category': {
-      id: '/shop/$category'
-      path: '/shop/$category'
-      fullPath: '/shop/$category'
-      preLoaderRoute: typeof ShopCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shop-manager/pricing': {
@@ -6053,11 +6105,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAccountsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/_authenticated/shop': {
-      id: '/_authenticated/shop'
-      path: '/shop'
-      fullPath: '/shop'
-      preLoaderRoute: typeof AuthenticatedShopRouteImport
+    '/_authenticated/workspace': {
+      id: '/_authenticated/workspace'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof AuthenticatedWorkspaceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/complete-profile': {
@@ -6080,6 +6132,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/.mcp/list-tools'
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/parts/partners/': {
+      id: '/parts/partners/'
+      path: '/partners'
+      fullPath: '/parts/partners/'
+      preLoaderRoute: typeof PartsPartnersIndexRouteImport
+      parentRoute: typeof PartsRoute
     }
     '/listing/$id/': {
       id: '/listing/$id/'
@@ -6116,26 +6175,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisementsIndexRouteImport
       parentRoute: typeof AdminAdvertisementsRoute
     }
-    '/shop/p/$slug': {
-      id: '/shop/p/$slug'
-      path: '/shop/p/$slug'
-      fullPath: '/shop/p/$slug'
-      preLoaderRoute: typeof ShopPSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shop/department/$slug': {
-      id: '/shop/department/$slug'
-      path: '/shop/department/$slug'
-      fullPath: '/shop/department/$slug'
-      preLoaderRoute: typeof ShopDepartmentSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shop/brand/$slug': {
-      id: '/shop/brand/$slug'
-      path: '/shop/brand/$slug'
-      fullPath: '/shop/brand/$slug'
-      preLoaderRoute: typeof ShopBrandSlugRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/workspace/': {
+      id: '/_authenticated/workspace/'
+      path: '/'
+      fullPath: '/workspace/'
+      preLoaderRoute: typeof AuthenticatedWorkspaceIndexRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
     }
     '/r/$code/qr': {
       id: '/r/$code/qr'
@@ -6157,6 +6202,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/payments/$id/receipt'
       preLoaderRoute: typeof PaymentsIdReceiptRouteImport
       parentRoute: typeof PaymentsRoute
+    }
+    '/parts/partners/categories': {
+      id: '/parts/partners/categories'
+      path: '/partners/categories'
+      fullPath: '/parts/partners/categories'
+      preLoaderRoute: typeof PartsPartnersCategoriesRouteImport
+      parentRoute: typeof PartsRoute
     }
     '/parts/c/$slug': {
       id: '/parts/c/$slug'
@@ -6501,201 +6553,201 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAccountsBackfillRouteImport
       parentRoute: typeof AdminAccountsRoute
     }
+    '/_authenticated/workspace/work-orders': {
+      id: '/_authenticated/workspace/work-orders'
+      path: '/work-orders'
+      fullPath: '/workspace/work-orders'
+      preLoaderRoute: typeof AuthenticatedWorkspaceWorkOrdersRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/vendors': {
+      id: '/_authenticated/workspace/vendors'
+      path: '/vendors'
+      fullPath: '/workspace/vendors'
+      preLoaderRoute: typeof AuthenticatedWorkspaceVendorsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/vendor-bills': {
+      id: '/_authenticated/workspace/vendor-bills'
+      path: '/vendor-bills'
+      fullPath: '/workspace/vendor-bills'
+      preLoaderRoute: typeof AuthenticatedWorkspaceVendorBillsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/vehicles': {
+      id: '/_authenticated/workspace/vehicles'
+      path: '/vehicles'
+      fullPath: '/workspace/vehicles'
+      preLoaderRoute: typeof AuthenticatedWorkspaceVehiclesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/technicians': {
+      id: '/_authenticated/workspace/technicians'
+      path: '/technicians'
+      fullPath: '/workspace/technicians'
+      preLoaderRoute: typeof AuthenticatedWorkspaceTechniciansRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/stock-alerts': {
+      id: '/_authenticated/workspace/stock-alerts'
+      path: '/stock-alerts'
+      fullPath: '/workspace/stock-alerts'
+      preLoaderRoute: typeof AuthenticatedWorkspaceStockAlertsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/settings': {
+      id: '/_authenticated/workspace/settings'
+      path: '/settings'
+      fullPath: '/workspace/settings'
+      preLoaderRoute: typeof AuthenticatedWorkspaceSettingsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/service-reminders': {
+      id: '/_authenticated/workspace/service-reminders'
+      path: '/service-reminders'
+      fullPath: '/workspace/service-reminders'
+      preLoaderRoute: typeof AuthenticatedWorkspaceServiceRemindersRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/segments': {
+      id: '/_authenticated/workspace/segments'
+      path: '/segments'
+      fullPath: '/workspace/segments'
+      preLoaderRoute: typeof AuthenticatedWorkspaceSegmentsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/scheduling': {
+      id: '/_authenticated/workspace/scheduling'
+      path: '/scheduling'
+      fullPath: '/workspace/scheduling'
+      preLoaderRoute: typeof AuthenticatedWorkspaceSchedulingRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/reports': {
+      id: '/_authenticated/workspace/reports'
+      path: '/reports'
+      fullPath: '/workspace/reports'
+      preLoaderRoute: typeof AuthenticatedWorkspaceReportsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/quotes': {
+      id: '/_authenticated/workspace/quotes'
+      path: '/quotes'
+      fullPath: '/workspace/quotes'
+      preLoaderRoute: typeof AuthenticatedWorkspaceQuotesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/purchase-orders': {
+      id: '/_authenticated/workspace/purchase-orders'
+      path: '/purchase-orders'
+      fullPath: '/workspace/purchase-orders'
+      preLoaderRoute: typeof AuthenticatedWorkspacePurchaseOrdersRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/loyalty': {
+      id: '/_authenticated/workspace/loyalty'
+      path: '/loyalty'
+      fullPath: '/workspace/loyalty'
+      preLoaderRoute: typeof AuthenticatedWorkspaceLoyaltyRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/leave-requests': {
+      id: '/_authenticated/workspace/leave-requests'
+      path: '/leave-requests'
+      fullPath: '/workspace/leave-requests'
+      preLoaderRoute: typeof AuthenticatedWorkspaceLeaveRequestsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/leave': {
+      id: '/_authenticated/workspace/leave'
+      path: '/leave'
+      fullPath: '/workspace/leave'
+      preLoaderRoute: typeof AuthenticatedWorkspaceLeaveRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/journal': {
+      id: '/_authenticated/workspace/journal'
+      path: '/journal'
+      fullPath: '/workspace/journal'
+      preLoaderRoute: typeof AuthenticatedWorkspaceJournalRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/invoices': {
+      id: '/_authenticated/workspace/invoices'
+      path: '/invoices'
+      fullPath: '/workspace/invoices'
+      preLoaderRoute: typeof AuthenticatedWorkspaceInvoicesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/inventory': {
+      id: '/_authenticated/workspace/inventory'
+      path: '/inventory'
+      fullPath: '/workspace/inventory'
+      preLoaderRoute: typeof AuthenticatedWorkspaceInventoryRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/inspections': {
+      id: '/_authenticated/workspace/inspections'
+      path: '/inspections'
+      fullPath: '/workspace/inspections'
+      preLoaderRoute: typeof AuthenticatedWorkspaceInspectionsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/expenses': {
+      id: '/_authenticated/workspace/expenses'
+      path: '/expenses'
+      fullPath: '/workspace/expenses'
+      preLoaderRoute: typeof AuthenticatedWorkspaceExpensesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/discounts': {
+      id: '/_authenticated/workspace/discounts'
+      path: '/discounts'
+      fullPath: '/workspace/discounts'
+      preLoaderRoute: typeof AuthenticatedWorkspaceDiscountsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/customers': {
+      id: '/_authenticated/workspace/customers'
+      path: '/customers'
+      fullPath: '/workspace/customers'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCustomersRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/certificates': {
+      id: '/_authenticated/workspace/certificates'
+      path: '/certificates'
+      fullPath: '/workspace/certificates'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCertificatesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/automation': {
+      id: '/_authenticated/workspace/automation'
+      path: '/automation'
+      fullPath: '/workspace/automation'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAutomationRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/appointments': {
+      id: '/_authenticated/workspace/appointments'
+      path: '/appointments'
+      fullPath: '/workspace/appointments'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAppointmentsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/accounting': {
+      id: '/_authenticated/workspace/accounting'
+      path: '/accounting'
+      fullPath: '/workspace/accounting'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAccountingRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
     '/_authenticated/staff/academy': {
       id: '/_authenticated/staff/academy'
       path: '/staff/academy'
       fullPath: '/staff/academy'
       preLoaderRoute: typeof AuthenticatedStaffAcademyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/shop/work-orders': {
-      id: '/_authenticated/shop/work-orders'
-      path: '/work-orders'
-      fullPath: '/shop/work-orders'
-      preLoaderRoute: typeof AuthenticatedShopWorkOrdersRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/vendors': {
-      id: '/_authenticated/shop/vendors'
-      path: '/vendors'
-      fullPath: '/shop/vendors'
-      preLoaderRoute: typeof AuthenticatedShopVendorsRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/vendor-bills': {
-      id: '/_authenticated/shop/vendor-bills'
-      path: '/vendor-bills'
-      fullPath: '/shop/vendor-bills'
-      preLoaderRoute: typeof AuthenticatedShopVendorBillsRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/vehicles': {
-      id: '/_authenticated/shop/vehicles'
-      path: '/vehicles'
-      fullPath: '/shop/vehicles'
-      preLoaderRoute: typeof AuthenticatedShopVehiclesRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/technicians': {
-      id: '/_authenticated/shop/technicians'
-      path: '/technicians'
-      fullPath: '/shop/technicians'
-      preLoaderRoute: typeof AuthenticatedShopTechniciansRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/stock-alerts': {
-      id: '/_authenticated/shop/stock-alerts'
-      path: '/stock-alerts'
-      fullPath: '/shop/stock-alerts'
-      preLoaderRoute: typeof AuthenticatedShopStockAlertsRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/settings': {
-      id: '/_authenticated/shop/settings'
-      path: '/settings'
-      fullPath: '/shop/settings'
-      preLoaderRoute: typeof AuthenticatedShopSettingsRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/service-reminders': {
-      id: '/_authenticated/shop/service-reminders'
-      path: '/service-reminders'
-      fullPath: '/shop/service-reminders'
-      preLoaderRoute: typeof AuthenticatedShopServiceRemindersRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/segments': {
-      id: '/_authenticated/shop/segments'
-      path: '/segments'
-      fullPath: '/shop/segments'
-      preLoaderRoute: typeof AuthenticatedShopSegmentsRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/scheduling': {
-      id: '/_authenticated/shop/scheduling'
-      path: '/scheduling'
-      fullPath: '/shop/scheduling'
-      preLoaderRoute: typeof AuthenticatedShopSchedulingRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/reports': {
-      id: '/_authenticated/shop/reports'
-      path: '/reports'
-      fullPath: '/shop/reports'
-      preLoaderRoute: typeof AuthenticatedShopReportsRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/quotes': {
-      id: '/_authenticated/shop/quotes'
-      path: '/quotes'
-      fullPath: '/shop/quotes'
-      preLoaderRoute: typeof AuthenticatedShopQuotesRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/purchase-orders': {
-      id: '/_authenticated/shop/purchase-orders'
-      path: '/purchase-orders'
-      fullPath: '/shop/purchase-orders'
-      preLoaderRoute: typeof AuthenticatedShopPurchaseOrdersRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/loyalty': {
-      id: '/_authenticated/shop/loyalty'
-      path: '/loyalty'
-      fullPath: '/shop/loyalty'
-      preLoaderRoute: typeof AuthenticatedShopLoyaltyRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/leave-requests': {
-      id: '/_authenticated/shop/leave-requests'
-      path: '/leave-requests'
-      fullPath: '/shop/leave-requests'
-      preLoaderRoute: typeof AuthenticatedShopLeaveRequestsRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/leave': {
-      id: '/_authenticated/shop/leave'
-      path: '/leave'
-      fullPath: '/shop/leave'
-      preLoaderRoute: typeof AuthenticatedShopLeaveRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/journal': {
-      id: '/_authenticated/shop/journal'
-      path: '/journal'
-      fullPath: '/shop/journal'
-      preLoaderRoute: typeof AuthenticatedShopJournalRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/invoices': {
-      id: '/_authenticated/shop/invoices'
-      path: '/invoices'
-      fullPath: '/shop/invoices'
-      preLoaderRoute: typeof AuthenticatedShopInvoicesRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/inventory': {
-      id: '/_authenticated/shop/inventory'
-      path: '/inventory'
-      fullPath: '/shop/inventory'
-      preLoaderRoute: typeof AuthenticatedShopInventoryRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/inspections': {
-      id: '/_authenticated/shop/inspections'
-      path: '/inspections'
-      fullPath: '/shop/inspections'
-      preLoaderRoute: typeof AuthenticatedShopInspectionsRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/expenses': {
-      id: '/_authenticated/shop/expenses'
-      path: '/expenses'
-      fullPath: '/shop/expenses'
-      preLoaderRoute: typeof AuthenticatedShopExpensesRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/discounts': {
-      id: '/_authenticated/shop/discounts'
-      path: '/discounts'
-      fullPath: '/shop/discounts'
-      preLoaderRoute: typeof AuthenticatedShopDiscountsRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/customers': {
-      id: '/_authenticated/shop/customers'
-      path: '/customers'
-      fullPath: '/shop/customers'
-      preLoaderRoute: typeof AuthenticatedShopCustomersRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/certificates': {
-      id: '/_authenticated/shop/certificates'
-      path: '/certificates'
-      fullPath: '/shop/certificates'
-      preLoaderRoute: typeof AuthenticatedShopCertificatesRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/automation': {
-      id: '/_authenticated/shop/automation'
-      path: '/automation'
-      fullPath: '/shop/automation'
-      preLoaderRoute: typeof AuthenticatedShopAutomationRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/appointments': {
-      id: '/_authenticated/shop/appointments'
-      path: '/appointments'
-      fullPath: '/shop/appointments'
-      preLoaderRoute: typeof AuthenticatedShopAppointmentsRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
-    }
-    '/_authenticated/shop/accounting': {
-      id: '/_authenticated/shop/accounting'
-      path: '/accounting'
-      fullPath: '/shop/accounting'
-      preLoaderRoute: typeof AuthenticatedShopAccountingRouteImport
-      parentRoute: typeof AuthenticatedShopRoute
     }
     '/_authenticated/parts/my-requests': {
       id: '/_authenticated/parts/my-requests'
@@ -6808,6 +6860,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/business/$businessId/'
       preLoaderRoute: typeof DashboardBusinessBusinessIdIndexRouteImport
       parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/parts/partners/store/$slug': {
+      id: '/parts/partners/store/$slug'
+      path: '/partners/store/$slug'
+      fullPath: '/parts/partners/store/$slug'
+      preLoaderRoute: typeof PartsPartnersStoreSlugRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/parts/partners/p/$slug': {
+      id: '/parts/partners/p/$slug'
+      path: '/partners/p/$slug'
+      fullPath: '/parts/partners/p/$slug'
+      preLoaderRoute: typeof PartsPartnersPSlugRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/parts/partners/department/$slug': {
+      id: '/parts/partners/department/$slug'
+      path: '/partners/department/$slug'
+      fullPath: '/parts/partners/department/$slug'
+      preLoaderRoute: typeof PartsPartnersDepartmentSlugRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/parts/partners/c/$category': {
+      id: '/parts/partners/c/$category'
+      path: '/partners/c/$category'
+      fullPath: '/parts/partners/c/$category'
+      preLoaderRoute: typeof PartsPartnersCCategoryRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/parts/partners/brand/$slug': {
+      id: '/parts/partners/brand/$slug'
+      path: '/partners/brand/$slug'
+      fullPath: '/parts/partners/brand/$slug'
+      preLoaderRoute: typeof PartsPartnersBrandSlugRouteImport
+      parentRoute: typeof PartsRoute
     }
     '/parts/p/$network/$sku': {
       id: '/parts/p/$network/$sku'
@@ -7124,138 +7211,138 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisementsAnalyticsCodeRouteImport
       parentRoute: typeof AdminAdvertisementsAnalyticsRoute
     }
+    '/_authenticated/workspace/work-orders/new': {
+      id: '/_authenticated/workspace/work-orders/new'
+      path: '/new'
+      fullPath: '/workspace/work-orders/new'
+      preLoaderRoute: typeof AuthenticatedWorkspaceWorkOrdersNewRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceWorkOrdersRoute
+    }
+    '/_authenticated/workspace/work-orders/$id': {
+      id: '/_authenticated/workspace/work-orders/$id'
+      path: '/$id'
+      fullPath: '/workspace/work-orders/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceWorkOrdersIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceWorkOrdersRoute
+    }
+    '/_authenticated/workspace/vendor-bills/$id': {
+      id: '/_authenticated/workspace/vendor-bills/$id'
+      path: '/$id'
+      fullPath: '/workspace/vendor-bills/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceVendorBillsIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceVendorBillsRoute
+    }
+    '/_authenticated/workspace/vehicles/$id': {
+      id: '/_authenticated/workspace/vehicles/$id'
+      path: '/$id'
+      fullPath: '/workspace/vehicles/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceVehiclesIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceVehiclesRoute
+    }
+    '/_authenticated/workspace/technicians/$id': {
+      id: '/_authenticated/workspace/technicians/$id'
+      path: '/$id'
+      fullPath: '/workspace/technicians/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceTechniciansIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceTechniciansRoute
+    }
+    '/_authenticated/workspace/reports/parts-margin': {
+      id: '/_authenticated/workspace/reports/parts-margin'
+      path: '/parts-margin'
+      fullPath: '/workspace/reports/parts-margin'
+      preLoaderRoute: typeof AuthenticatedWorkspaceReportsPartsMarginRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceReportsRoute
+    }
+    '/_authenticated/workspace/reports/ltv': {
+      id: '/_authenticated/workspace/reports/ltv'
+      path: '/ltv'
+      fullPath: '/workspace/reports/ltv'
+      preLoaderRoute: typeof AuthenticatedWorkspaceReportsLtvRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceReportsRoute
+    }
+    '/_authenticated/workspace/quotes/new': {
+      id: '/_authenticated/workspace/quotes/new'
+      path: '/new'
+      fullPath: '/workspace/quotes/new'
+      preLoaderRoute: typeof AuthenticatedWorkspaceQuotesNewRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceQuotesRoute
+    }
+    '/_authenticated/workspace/quotes/$id': {
+      id: '/_authenticated/workspace/quotes/$id'
+      path: '/$id'
+      fullPath: '/workspace/quotes/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceQuotesIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceQuotesRoute
+    }
+    '/_authenticated/workspace/purchase-orders/$id': {
+      id: '/_authenticated/workspace/purchase-orders/$id'
+      path: '/$id'
+      fullPath: '/workspace/purchase-orders/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspacePurchaseOrdersIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspacePurchaseOrdersRoute
+    }
+    '/_authenticated/workspace/journal/$accountId': {
+      id: '/_authenticated/workspace/journal/$accountId'
+      path: '/$accountId'
+      fullPath: '/workspace/journal/$accountId'
+      preLoaderRoute: typeof AuthenticatedWorkspaceJournalAccountIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceJournalRoute
+    }
+    '/_authenticated/workspace/invoices/$id': {
+      id: '/_authenticated/workspace/invoices/$id'
+      path: '/$id'
+      fullPath: '/workspace/invoices/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceInvoicesIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceInvoicesRoute
+    }
+    '/_authenticated/workspace/inventory/$id': {
+      id: '/_authenticated/workspace/inventory/$id'
+      path: '/$id'
+      fullPath: '/workspace/inventory/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceInventoryIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
+    }
+    '/_authenticated/workspace/inspections/$id': {
+      id: '/_authenticated/workspace/inspections/$id'
+      path: '/$id'
+      fullPath: '/workspace/inspections/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceInspectionsIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceInspectionsRoute
+    }
+    '/_authenticated/workspace/customers/new': {
+      id: '/_authenticated/workspace/customers/new'
+      path: '/new'
+      fullPath: '/workspace/customers/new'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCustomersNewRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCustomersRoute
+    }
+    '/_authenticated/workspace/customers/$id': {
+      id: '/_authenticated/workspace/customers/$id'
+      path: '/$id'
+      fullPath: '/workspace/customers/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCustomersIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCustomersRoute
+    }
+    '/_authenticated/workspace/automation/logs': {
+      id: '/_authenticated/workspace/automation/logs'
+      path: '/logs'
+      fullPath: '/workspace/automation/logs'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAutomationLogsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAutomationRoute
+    }
+    '/_authenticated/workspace/accounting/pnl': {
+      id: '/_authenticated/workspace/accounting/pnl'
+      path: '/pnl'
+      fullPath: '/workspace/accounting/pnl'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAccountingPnlRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAccountingRoute
+    }
     '/_authenticated/staff/academy/$slug': {
       id: '/_authenticated/staff/academy/$slug'
       path: '/$slug'
       fullPath: '/staff/academy/$slug'
       preLoaderRoute: typeof AuthenticatedStaffAcademySlugRouteImport
       parentRoute: typeof AuthenticatedStaffAcademyRoute
-    }
-    '/_authenticated/shop/work-orders/new': {
-      id: '/_authenticated/shop/work-orders/new'
-      path: '/new'
-      fullPath: '/shop/work-orders/new'
-      preLoaderRoute: typeof AuthenticatedShopWorkOrdersNewRouteImport
-      parentRoute: typeof AuthenticatedShopWorkOrdersRoute
-    }
-    '/_authenticated/shop/work-orders/$id': {
-      id: '/_authenticated/shop/work-orders/$id'
-      path: '/$id'
-      fullPath: '/shop/work-orders/$id'
-      preLoaderRoute: typeof AuthenticatedShopWorkOrdersIdRouteImport
-      parentRoute: typeof AuthenticatedShopWorkOrdersRoute
-    }
-    '/_authenticated/shop/vendor-bills/$id': {
-      id: '/_authenticated/shop/vendor-bills/$id'
-      path: '/$id'
-      fullPath: '/shop/vendor-bills/$id'
-      preLoaderRoute: typeof AuthenticatedShopVendorBillsIdRouteImport
-      parentRoute: typeof AuthenticatedShopVendorBillsRoute
-    }
-    '/_authenticated/shop/vehicles/$id': {
-      id: '/_authenticated/shop/vehicles/$id'
-      path: '/$id'
-      fullPath: '/shop/vehicles/$id'
-      preLoaderRoute: typeof AuthenticatedShopVehiclesIdRouteImport
-      parentRoute: typeof AuthenticatedShopVehiclesRoute
-    }
-    '/_authenticated/shop/technicians/$id': {
-      id: '/_authenticated/shop/technicians/$id'
-      path: '/$id'
-      fullPath: '/shop/technicians/$id'
-      preLoaderRoute: typeof AuthenticatedShopTechniciansIdRouteImport
-      parentRoute: typeof AuthenticatedShopTechniciansRoute
-    }
-    '/_authenticated/shop/reports/parts-margin': {
-      id: '/_authenticated/shop/reports/parts-margin'
-      path: '/parts-margin'
-      fullPath: '/shop/reports/parts-margin'
-      preLoaderRoute: typeof AuthenticatedShopReportsPartsMarginRouteImport
-      parentRoute: typeof AuthenticatedShopReportsRoute
-    }
-    '/_authenticated/shop/reports/ltv': {
-      id: '/_authenticated/shop/reports/ltv'
-      path: '/ltv'
-      fullPath: '/shop/reports/ltv'
-      preLoaderRoute: typeof AuthenticatedShopReportsLtvRouteImport
-      parentRoute: typeof AuthenticatedShopReportsRoute
-    }
-    '/_authenticated/shop/quotes/new': {
-      id: '/_authenticated/shop/quotes/new'
-      path: '/new'
-      fullPath: '/shop/quotes/new'
-      preLoaderRoute: typeof AuthenticatedShopQuotesNewRouteImport
-      parentRoute: typeof AuthenticatedShopQuotesRoute
-    }
-    '/_authenticated/shop/quotes/$id': {
-      id: '/_authenticated/shop/quotes/$id'
-      path: '/$id'
-      fullPath: '/shop/quotes/$id'
-      preLoaderRoute: typeof AuthenticatedShopQuotesIdRouteImport
-      parentRoute: typeof AuthenticatedShopQuotesRoute
-    }
-    '/_authenticated/shop/purchase-orders/$id': {
-      id: '/_authenticated/shop/purchase-orders/$id'
-      path: '/$id'
-      fullPath: '/shop/purchase-orders/$id'
-      preLoaderRoute: typeof AuthenticatedShopPurchaseOrdersIdRouteImport
-      parentRoute: typeof AuthenticatedShopPurchaseOrdersRoute
-    }
-    '/_authenticated/shop/journal/$accountId': {
-      id: '/_authenticated/shop/journal/$accountId'
-      path: '/$accountId'
-      fullPath: '/shop/journal/$accountId'
-      preLoaderRoute: typeof AuthenticatedShopJournalAccountIdRouteImport
-      parentRoute: typeof AuthenticatedShopJournalRoute
-    }
-    '/_authenticated/shop/invoices/$id': {
-      id: '/_authenticated/shop/invoices/$id'
-      path: '/$id'
-      fullPath: '/shop/invoices/$id'
-      preLoaderRoute: typeof AuthenticatedShopInvoicesIdRouteImport
-      parentRoute: typeof AuthenticatedShopInvoicesRoute
-    }
-    '/_authenticated/shop/inventory/$id': {
-      id: '/_authenticated/shop/inventory/$id'
-      path: '/$id'
-      fullPath: '/shop/inventory/$id'
-      preLoaderRoute: typeof AuthenticatedShopInventoryIdRouteImport
-      parentRoute: typeof AuthenticatedShopInventoryRoute
-    }
-    '/_authenticated/shop/inspections/$id': {
-      id: '/_authenticated/shop/inspections/$id'
-      path: '/$id'
-      fullPath: '/shop/inspections/$id'
-      preLoaderRoute: typeof AuthenticatedShopInspectionsIdRouteImport
-      parentRoute: typeof AuthenticatedShopInspectionsRoute
-    }
-    '/_authenticated/shop/customers/new': {
-      id: '/_authenticated/shop/customers/new'
-      path: '/new'
-      fullPath: '/shop/customers/new'
-      preLoaderRoute: typeof AuthenticatedShopCustomersNewRouteImport
-      parentRoute: typeof AuthenticatedShopCustomersRoute
-    }
-    '/_authenticated/shop/customers/$id': {
-      id: '/_authenticated/shop/customers/$id'
-      path: '/$id'
-      fullPath: '/shop/customers/$id'
-      preLoaderRoute: typeof AuthenticatedShopCustomersIdRouteImport
-      parentRoute: typeof AuthenticatedShopCustomersRoute
-    }
-    '/_authenticated/shop/automation/logs': {
-      id: '/_authenticated/shop/automation/logs'
-      path: '/logs'
-      fullPath: '/shop/automation/logs'
-      preLoaderRoute: typeof AuthenticatedShopAutomationLogsRouteImport
-      parentRoute: typeof AuthenticatedShopAutomationRoute
-    }
-    '/_authenticated/shop/accounting/pnl': {
-      id: '/_authenticated/shop/accounting/pnl'
-      path: '/pnl'
-      fullPath: '/shop/accounting/pnl'
-      preLoaderRoute: typeof AuthenticatedShopAccountingPnlRouteImport
-      parentRoute: typeof AuthenticatedShopAccountingRoute
     }
     '/_authenticated/dashboard/clubs_/$id': {
       id: '/_authenticated/dashboard/clubs_/$id'
@@ -7278,296 +7365,326 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTrainingPartnersIdClickRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/shop/reports/technician/$id': {
-      id: '/_authenticated/shop/reports/technician/$id'
+    '/_authenticated/workspace/reports/technician/$id': {
+      id: '/_authenticated/workspace/reports/technician/$id'
       path: '/technician/$id'
-      fullPath: '/shop/reports/technician/$id'
-      preLoaderRoute: typeof AuthenticatedShopReportsTechnicianIdRouteImport
-      parentRoute: typeof AuthenticatedShopReportsRoute
+      fullPath: '/workspace/reports/technician/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceReportsTechnicianIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceReportsRoute
     }
   }
 }
 
-interface AuthenticatedShopAccountingRouteChildren {
-  AuthenticatedShopAccountingPnlRoute: typeof AuthenticatedShopAccountingPnlRoute
+interface AuthenticatedWorkspaceAccountingRouteChildren {
+  AuthenticatedWorkspaceAccountingPnlRoute: typeof AuthenticatedWorkspaceAccountingPnlRoute
 }
 
-const AuthenticatedShopAccountingRouteChildren: AuthenticatedShopAccountingRouteChildren =
+const AuthenticatedWorkspaceAccountingRouteChildren: AuthenticatedWorkspaceAccountingRouteChildren =
   {
-    AuthenticatedShopAccountingPnlRoute: AuthenticatedShopAccountingPnlRoute,
+    AuthenticatedWorkspaceAccountingPnlRoute:
+      AuthenticatedWorkspaceAccountingPnlRoute,
   }
 
-const AuthenticatedShopAccountingRouteWithChildren =
-  AuthenticatedShopAccountingRoute._addFileChildren(
-    AuthenticatedShopAccountingRouteChildren,
+const AuthenticatedWorkspaceAccountingRouteWithChildren =
+  AuthenticatedWorkspaceAccountingRoute._addFileChildren(
+    AuthenticatedWorkspaceAccountingRouteChildren,
   )
 
-interface AuthenticatedShopAutomationRouteChildren {
-  AuthenticatedShopAutomationLogsRoute: typeof AuthenticatedShopAutomationLogsRoute
+interface AuthenticatedWorkspaceAutomationRouteChildren {
+  AuthenticatedWorkspaceAutomationLogsRoute: typeof AuthenticatedWorkspaceAutomationLogsRoute
 }
 
-const AuthenticatedShopAutomationRouteChildren: AuthenticatedShopAutomationRouteChildren =
+const AuthenticatedWorkspaceAutomationRouteChildren: AuthenticatedWorkspaceAutomationRouteChildren =
   {
-    AuthenticatedShopAutomationLogsRoute: AuthenticatedShopAutomationLogsRoute,
+    AuthenticatedWorkspaceAutomationLogsRoute:
+      AuthenticatedWorkspaceAutomationLogsRoute,
   }
 
-const AuthenticatedShopAutomationRouteWithChildren =
-  AuthenticatedShopAutomationRoute._addFileChildren(
-    AuthenticatedShopAutomationRouteChildren,
+const AuthenticatedWorkspaceAutomationRouteWithChildren =
+  AuthenticatedWorkspaceAutomationRoute._addFileChildren(
+    AuthenticatedWorkspaceAutomationRouteChildren,
   )
 
-interface AuthenticatedShopCustomersRouteChildren {
-  AuthenticatedShopCustomersIdRoute: typeof AuthenticatedShopCustomersIdRoute
-  AuthenticatedShopCustomersNewRoute: typeof AuthenticatedShopCustomersNewRoute
+interface AuthenticatedWorkspaceCustomersRouteChildren {
+  AuthenticatedWorkspaceCustomersIdRoute: typeof AuthenticatedWorkspaceCustomersIdRoute
+  AuthenticatedWorkspaceCustomersNewRoute: typeof AuthenticatedWorkspaceCustomersNewRoute
 }
 
-const AuthenticatedShopCustomersRouteChildren: AuthenticatedShopCustomersRouteChildren =
+const AuthenticatedWorkspaceCustomersRouteChildren: AuthenticatedWorkspaceCustomersRouteChildren =
   {
-    AuthenticatedShopCustomersIdRoute: AuthenticatedShopCustomersIdRoute,
-    AuthenticatedShopCustomersNewRoute: AuthenticatedShopCustomersNewRoute,
+    AuthenticatedWorkspaceCustomersIdRoute:
+      AuthenticatedWorkspaceCustomersIdRoute,
+    AuthenticatedWorkspaceCustomersNewRoute:
+      AuthenticatedWorkspaceCustomersNewRoute,
   }
 
-const AuthenticatedShopCustomersRouteWithChildren =
-  AuthenticatedShopCustomersRoute._addFileChildren(
-    AuthenticatedShopCustomersRouteChildren,
+const AuthenticatedWorkspaceCustomersRouteWithChildren =
+  AuthenticatedWorkspaceCustomersRoute._addFileChildren(
+    AuthenticatedWorkspaceCustomersRouteChildren,
   )
 
-interface AuthenticatedShopInspectionsRouteChildren {
-  AuthenticatedShopInspectionsIdRoute: typeof AuthenticatedShopInspectionsIdRoute
+interface AuthenticatedWorkspaceInspectionsRouteChildren {
+  AuthenticatedWorkspaceInspectionsIdRoute: typeof AuthenticatedWorkspaceInspectionsIdRoute
 }
 
-const AuthenticatedShopInspectionsRouteChildren: AuthenticatedShopInspectionsRouteChildren =
+const AuthenticatedWorkspaceInspectionsRouteChildren: AuthenticatedWorkspaceInspectionsRouteChildren =
   {
-    AuthenticatedShopInspectionsIdRoute: AuthenticatedShopInspectionsIdRoute,
+    AuthenticatedWorkspaceInspectionsIdRoute:
+      AuthenticatedWorkspaceInspectionsIdRoute,
   }
 
-const AuthenticatedShopInspectionsRouteWithChildren =
-  AuthenticatedShopInspectionsRoute._addFileChildren(
-    AuthenticatedShopInspectionsRouteChildren,
+const AuthenticatedWorkspaceInspectionsRouteWithChildren =
+  AuthenticatedWorkspaceInspectionsRoute._addFileChildren(
+    AuthenticatedWorkspaceInspectionsRouteChildren,
   )
 
-interface AuthenticatedShopInventoryRouteChildren {
-  AuthenticatedShopInventoryIdRoute: typeof AuthenticatedShopInventoryIdRoute
+interface AuthenticatedWorkspaceInventoryRouteChildren {
+  AuthenticatedWorkspaceInventoryIdRoute: typeof AuthenticatedWorkspaceInventoryIdRoute
 }
 
-const AuthenticatedShopInventoryRouteChildren: AuthenticatedShopInventoryRouteChildren =
+const AuthenticatedWorkspaceInventoryRouteChildren: AuthenticatedWorkspaceInventoryRouteChildren =
   {
-    AuthenticatedShopInventoryIdRoute: AuthenticatedShopInventoryIdRoute,
+    AuthenticatedWorkspaceInventoryIdRoute:
+      AuthenticatedWorkspaceInventoryIdRoute,
   }
 
-const AuthenticatedShopInventoryRouteWithChildren =
-  AuthenticatedShopInventoryRoute._addFileChildren(
-    AuthenticatedShopInventoryRouteChildren,
+const AuthenticatedWorkspaceInventoryRouteWithChildren =
+  AuthenticatedWorkspaceInventoryRoute._addFileChildren(
+    AuthenticatedWorkspaceInventoryRouteChildren,
   )
 
-interface AuthenticatedShopInvoicesRouteChildren {
-  AuthenticatedShopInvoicesIdRoute: typeof AuthenticatedShopInvoicesIdRoute
+interface AuthenticatedWorkspaceInvoicesRouteChildren {
+  AuthenticatedWorkspaceInvoicesIdRoute: typeof AuthenticatedWorkspaceInvoicesIdRoute
 }
 
-const AuthenticatedShopInvoicesRouteChildren: AuthenticatedShopInvoicesRouteChildren =
+const AuthenticatedWorkspaceInvoicesRouteChildren: AuthenticatedWorkspaceInvoicesRouteChildren =
   {
-    AuthenticatedShopInvoicesIdRoute: AuthenticatedShopInvoicesIdRoute,
+    AuthenticatedWorkspaceInvoicesIdRoute:
+      AuthenticatedWorkspaceInvoicesIdRoute,
   }
 
-const AuthenticatedShopInvoicesRouteWithChildren =
-  AuthenticatedShopInvoicesRoute._addFileChildren(
-    AuthenticatedShopInvoicesRouteChildren,
+const AuthenticatedWorkspaceInvoicesRouteWithChildren =
+  AuthenticatedWorkspaceInvoicesRoute._addFileChildren(
+    AuthenticatedWorkspaceInvoicesRouteChildren,
   )
 
-interface AuthenticatedShopJournalRouteChildren {
-  AuthenticatedShopJournalAccountIdRoute: typeof AuthenticatedShopJournalAccountIdRoute
+interface AuthenticatedWorkspaceJournalRouteChildren {
+  AuthenticatedWorkspaceJournalAccountIdRoute: typeof AuthenticatedWorkspaceJournalAccountIdRoute
 }
 
-const AuthenticatedShopJournalRouteChildren: AuthenticatedShopJournalRouteChildren =
+const AuthenticatedWorkspaceJournalRouteChildren: AuthenticatedWorkspaceJournalRouteChildren =
   {
-    AuthenticatedShopJournalAccountIdRoute:
-      AuthenticatedShopJournalAccountIdRoute,
+    AuthenticatedWorkspaceJournalAccountIdRoute:
+      AuthenticatedWorkspaceJournalAccountIdRoute,
   }
 
-const AuthenticatedShopJournalRouteWithChildren =
-  AuthenticatedShopJournalRoute._addFileChildren(
-    AuthenticatedShopJournalRouteChildren,
+const AuthenticatedWorkspaceJournalRouteWithChildren =
+  AuthenticatedWorkspaceJournalRoute._addFileChildren(
+    AuthenticatedWorkspaceJournalRouteChildren,
   )
 
-interface AuthenticatedShopPurchaseOrdersRouteChildren {
-  AuthenticatedShopPurchaseOrdersIdRoute: typeof AuthenticatedShopPurchaseOrdersIdRoute
+interface AuthenticatedWorkspacePurchaseOrdersRouteChildren {
+  AuthenticatedWorkspacePurchaseOrdersIdRoute: typeof AuthenticatedWorkspacePurchaseOrdersIdRoute
 }
 
-const AuthenticatedShopPurchaseOrdersRouteChildren: AuthenticatedShopPurchaseOrdersRouteChildren =
+const AuthenticatedWorkspacePurchaseOrdersRouteChildren: AuthenticatedWorkspacePurchaseOrdersRouteChildren =
   {
-    AuthenticatedShopPurchaseOrdersIdRoute:
-      AuthenticatedShopPurchaseOrdersIdRoute,
+    AuthenticatedWorkspacePurchaseOrdersIdRoute:
+      AuthenticatedWorkspacePurchaseOrdersIdRoute,
   }
 
-const AuthenticatedShopPurchaseOrdersRouteWithChildren =
-  AuthenticatedShopPurchaseOrdersRoute._addFileChildren(
-    AuthenticatedShopPurchaseOrdersRouteChildren,
+const AuthenticatedWorkspacePurchaseOrdersRouteWithChildren =
+  AuthenticatedWorkspacePurchaseOrdersRoute._addFileChildren(
+    AuthenticatedWorkspacePurchaseOrdersRouteChildren,
   )
 
-interface AuthenticatedShopQuotesRouteChildren {
-  AuthenticatedShopQuotesIdRoute: typeof AuthenticatedShopQuotesIdRoute
-  AuthenticatedShopQuotesNewRoute: typeof AuthenticatedShopQuotesNewRoute
+interface AuthenticatedWorkspaceQuotesRouteChildren {
+  AuthenticatedWorkspaceQuotesIdRoute: typeof AuthenticatedWorkspaceQuotesIdRoute
+  AuthenticatedWorkspaceQuotesNewRoute: typeof AuthenticatedWorkspaceQuotesNewRoute
 }
 
-const AuthenticatedShopQuotesRouteChildren: AuthenticatedShopQuotesRouteChildren =
+const AuthenticatedWorkspaceQuotesRouteChildren: AuthenticatedWorkspaceQuotesRouteChildren =
   {
-    AuthenticatedShopQuotesIdRoute: AuthenticatedShopQuotesIdRoute,
-    AuthenticatedShopQuotesNewRoute: AuthenticatedShopQuotesNewRoute,
+    AuthenticatedWorkspaceQuotesIdRoute: AuthenticatedWorkspaceQuotesIdRoute,
+    AuthenticatedWorkspaceQuotesNewRoute: AuthenticatedWorkspaceQuotesNewRoute,
   }
 
-const AuthenticatedShopQuotesRouteWithChildren =
-  AuthenticatedShopQuotesRoute._addFileChildren(
-    AuthenticatedShopQuotesRouteChildren,
+const AuthenticatedWorkspaceQuotesRouteWithChildren =
+  AuthenticatedWorkspaceQuotesRoute._addFileChildren(
+    AuthenticatedWorkspaceQuotesRouteChildren,
   )
 
-interface AuthenticatedShopReportsRouteChildren {
-  AuthenticatedShopReportsLtvRoute: typeof AuthenticatedShopReportsLtvRoute
-  AuthenticatedShopReportsPartsMarginRoute: typeof AuthenticatedShopReportsPartsMarginRoute
-  AuthenticatedShopReportsTechnicianIdRoute: typeof AuthenticatedShopReportsTechnicianIdRoute
+interface AuthenticatedWorkspaceReportsRouteChildren {
+  AuthenticatedWorkspaceReportsLtvRoute: typeof AuthenticatedWorkspaceReportsLtvRoute
+  AuthenticatedWorkspaceReportsPartsMarginRoute: typeof AuthenticatedWorkspaceReportsPartsMarginRoute
+  AuthenticatedWorkspaceReportsTechnicianIdRoute: typeof AuthenticatedWorkspaceReportsTechnicianIdRoute
 }
 
-const AuthenticatedShopReportsRouteChildren: AuthenticatedShopReportsRouteChildren =
+const AuthenticatedWorkspaceReportsRouteChildren: AuthenticatedWorkspaceReportsRouteChildren =
   {
-    AuthenticatedShopReportsLtvRoute: AuthenticatedShopReportsLtvRoute,
-    AuthenticatedShopReportsPartsMarginRoute:
-      AuthenticatedShopReportsPartsMarginRoute,
-    AuthenticatedShopReportsTechnicianIdRoute:
-      AuthenticatedShopReportsTechnicianIdRoute,
+    AuthenticatedWorkspaceReportsLtvRoute:
+      AuthenticatedWorkspaceReportsLtvRoute,
+    AuthenticatedWorkspaceReportsPartsMarginRoute:
+      AuthenticatedWorkspaceReportsPartsMarginRoute,
+    AuthenticatedWorkspaceReportsTechnicianIdRoute:
+      AuthenticatedWorkspaceReportsTechnicianIdRoute,
   }
 
-const AuthenticatedShopReportsRouteWithChildren =
-  AuthenticatedShopReportsRoute._addFileChildren(
-    AuthenticatedShopReportsRouteChildren,
+const AuthenticatedWorkspaceReportsRouteWithChildren =
+  AuthenticatedWorkspaceReportsRoute._addFileChildren(
+    AuthenticatedWorkspaceReportsRouteChildren,
   )
 
-interface AuthenticatedShopTechniciansRouteChildren {
-  AuthenticatedShopTechniciansIdRoute: typeof AuthenticatedShopTechniciansIdRoute
+interface AuthenticatedWorkspaceTechniciansRouteChildren {
+  AuthenticatedWorkspaceTechniciansIdRoute: typeof AuthenticatedWorkspaceTechniciansIdRoute
 }
 
-const AuthenticatedShopTechniciansRouteChildren: AuthenticatedShopTechniciansRouteChildren =
+const AuthenticatedWorkspaceTechniciansRouteChildren: AuthenticatedWorkspaceTechniciansRouteChildren =
   {
-    AuthenticatedShopTechniciansIdRoute: AuthenticatedShopTechniciansIdRoute,
+    AuthenticatedWorkspaceTechniciansIdRoute:
+      AuthenticatedWorkspaceTechniciansIdRoute,
   }
 
-const AuthenticatedShopTechniciansRouteWithChildren =
-  AuthenticatedShopTechniciansRoute._addFileChildren(
-    AuthenticatedShopTechniciansRouteChildren,
+const AuthenticatedWorkspaceTechniciansRouteWithChildren =
+  AuthenticatedWorkspaceTechniciansRoute._addFileChildren(
+    AuthenticatedWorkspaceTechniciansRouteChildren,
   )
 
-interface AuthenticatedShopVehiclesRouteChildren {
-  AuthenticatedShopVehiclesIdRoute: typeof AuthenticatedShopVehiclesIdRoute
+interface AuthenticatedWorkspaceVehiclesRouteChildren {
+  AuthenticatedWorkspaceVehiclesIdRoute: typeof AuthenticatedWorkspaceVehiclesIdRoute
 }
 
-const AuthenticatedShopVehiclesRouteChildren: AuthenticatedShopVehiclesRouteChildren =
+const AuthenticatedWorkspaceVehiclesRouteChildren: AuthenticatedWorkspaceVehiclesRouteChildren =
   {
-    AuthenticatedShopVehiclesIdRoute: AuthenticatedShopVehiclesIdRoute,
+    AuthenticatedWorkspaceVehiclesIdRoute:
+      AuthenticatedWorkspaceVehiclesIdRoute,
   }
 
-const AuthenticatedShopVehiclesRouteWithChildren =
-  AuthenticatedShopVehiclesRoute._addFileChildren(
-    AuthenticatedShopVehiclesRouteChildren,
+const AuthenticatedWorkspaceVehiclesRouteWithChildren =
+  AuthenticatedWorkspaceVehiclesRoute._addFileChildren(
+    AuthenticatedWorkspaceVehiclesRouteChildren,
   )
 
-interface AuthenticatedShopVendorBillsRouteChildren {
-  AuthenticatedShopVendorBillsIdRoute: typeof AuthenticatedShopVendorBillsIdRoute
+interface AuthenticatedWorkspaceVendorBillsRouteChildren {
+  AuthenticatedWorkspaceVendorBillsIdRoute: typeof AuthenticatedWorkspaceVendorBillsIdRoute
 }
 
-const AuthenticatedShopVendorBillsRouteChildren: AuthenticatedShopVendorBillsRouteChildren =
+const AuthenticatedWorkspaceVendorBillsRouteChildren: AuthenticatedWorkspaceVendorBillsRouteChildren =
   {
-    AuthenticatedShopVendorBillsIdRoute: AuthenticatedShopVendorBillsIdRoute,
+    AuthenticatedWorkspaceVendorBillsIdRoute:
+      AuthenticatedWorkspaceVendorBillsIdRoute,
   }
 
-const AuthenticatedShopVendorBillsRouteWithChildren =
-  AuthenticatedShopVendorBillsRoute._addFileChildren(
-    AuthenticatedShopVendorBillsRouteChildren,
+const AuthenticatedWorkspaceVendorBillsRouteWithChildren =
+  AuthenticatedWorkspaceVendorBillsRoute._addFileChildren(
+    AuthenticatedWorkspaceVendorBillsRouteChildren,
   )
 
-interface AuthenticatedShopWorkOrdersRouteChildren {
-  AuthenticatedShopWorkOrdersIdRoute: typeof AuthenticatedShopWorkOrdersIdRoute
-  AuthenticatedShopWorkOrdersNewRoute: typeof AuthenticatedShopWorkOrdersNewRoute
+interface AuthenticatedWorkspaceWorkOrdersRouteChildren {
+  AuthenticatedWorkspaceWorkOrdersIdRoute: typeof AuthenticatedWorkspaceWorkOrdersIdRoute
+  AuthenticatedWorkspaceWorkOrdersNewRoute: typeof AuthenticatedWorkspaceWorkOrdersNewRoute
 }
 
-const AuthenticatedShopWorkOrdersRouteChildren: AuthenticatedShopWorkOrdersRouteChildren =
+const AuthenticatedWorkspaceWorkOrdersRouteChildren: AuthenticatedWorkspaceWorkOrdersRouteChildren =
   {
-    AuthenticatedShopWorkOrdersIdRoute: AuthenticatedShopWorkOrdersIdRoute,
-    AuthenticatedShopWorkOrdersNewRoute: AuthenticatedShopWorkOrdersNewRoute,
+    AuthenticatedWorkspaceWorkOrdersIdRoute:
+      AuthenticatedWorkspaceWorkOrdersIdRoute,
+    AuthenticatedWorkspaceWorkOrdersNewRoute:
+      AuthenticatedWorkspaceWorkOrdersNewRoute,
   }
 
-const AuthenticatedShopWorkOrdersRouteWithChildren =
-  AuthenticatedShopWorkOrdersRoute._addFileChildren(
-    AuthenticatedShopWorkOrdersRouteChildren,
+const AuthenticatedWorkspaceWorkOrdersRouteWithChildren =
+  AuthenticatedWorkspaceWorkOrdersRoute._addFileChildren(
+    AuthenticatedWorkspaceWorkOrdersRouteChildren,
   )
 
-interface AuthenticatedShopRouteChildren {
-  AuthenticatedShopAccountingRoute: typeof AuthenticatedShopAccountingRouteWithChildren
-  AuthenticatedShopAppointmentsRoute: typeof AuthenticatedShopAppointmentsRoute
-  AuthenticatedShopAutomationRoute: typeof AuthenticatedShopAutomationRouteWithChildren
-  AuthenticatedShopCertificatesRoute: typeof AuthenticatedShopCertificatesRoute
-  AuthenticatedShopCustomersRoute: typeof AuthenticatedShopCustomersRouteWithChildren
-  AuthenticatedShopDiscountsRoute: typeof AuthenticatedShopDiscountsRoute
-  AuthenticatedShopExpensesRoute: typeof AuthenticatedShopExpensesRoute
-  AuthenticatedShopInspectionsRoute: typeof AuthenticatedShopInspectionsRouteWithChildren
-  AuthenticatedShopInventoryRoute: typeof AuthenticatedShopInventoryRouteWithChildren
-  AuthenticatedShopInvoicesRoute: typeof AuthenticatedShopInvoicesRouteWithChildren
-  AuthenticatedShopJournalRoute: typeof AuthenticatedShopJournalRouteWithChildren
-  AuthenticatedShopLeaveRoute: typeof AuthenticatedShopLeaveRoute
-  AuthenticatedShopLeaveRequestsRoute: typeof AuthenticatedShopLeaveRequestsRoute
-  AuthenticatedShopLoyaltyRoute: typeof AuthenticatedShopLoyaltyRoute
-  AuthenticatedShopPurchaseOrdersRoute: typeof AuthenticatedShopPurchaseOrdersRouteWithChildren
-  AuthenticatedShopQuotesRoute: typeof AuthenticatedShopQuotesRouteWithChildren
-  AuthenticatedShopReportsRoute: typeof AuthenticatedShopReportsRouteWithChildren
-  AuthenticatedShopSchedulingRoute: typeof AuthenticatedShopSchedulingRoute
-  AuthenticatedShopSegmentsRoute: typeof AuthenticatedShopSegmentsRoute
-  AuthenticatedShopServiceRemindersRoute: typeof AuthenticatedShopServiceRemindersRoute
-  AuthenticatedShopSettingsRoute: typeof AuthenticatedShopSettingsRoute
-  AuthenticatedShopStockAlertsRoute: typeof AuthenticatedShopStockAlertsRoute
-  AuthenticatedShopTechniciansRoute: typeof AuthenticatedShopTechniciansRouteWithChildren
-  AuthenticatedShopVehiclesRoute: typeof AuthenticatedShopVehiclesRouteWithChildren
-  AuthenticatedShopVendorBillsRoute: typeof AuthenticatedShopVendorBillsRouteWithChildren
-  AuthenticatedShopVendorsRoute: typeof AuthenticatedShopVendorsRoute
-  AuthenticatedShopWorkOrdersRoute: typeof AuthenticatedShopWorkOrdersRouteWithChildren
+interface AuthenticatedWorkspaceRouteChildren {
+  AuthenticatedWorkspaceAccountingRoute: typeof AuthenticatedWorkspaceAccountingRouteWithChildren
+  AuthenticatedWorkspaceAppointmentsRoute: typeof AuthenticatedWorkspaceAppointmentsRoute
+  AuthenticatedWorkspaceAutomationRoute: typeof AuthenticatedWorkspaceAutomationRouteWithChildren
+  AuthenticatedWorkspaceCertificatesRoute: typeof AuthenticatedWorkspaceCertificatesRoute
+  AuthenticatedWorkspaceCustomersRoute: typeof AuthenticatedWorkspaceCustomersRouteWithChildren
+  AuthenticatedWorkspaceDiscountsRoute: typeof AuthenticatedWorkspaceDiscountsRoute
+  AuthenticatedWorkspaceExpensesRoute: typeof AuthenticatedWorkspaceExpensesRoute
+  AuthenticatedWorkspaceInspectionsRoute: typeof AuthenticatedWorkspaceInspectionsRouteWithChildren
+  AuthenticatedWorkspaceInventoryRoute: typeof AuthenticatedWorkspaceInventoryRouteWithChildren
+  AuthenticatedWorkspaceInvoicesRoute: typeof AuthenticatedWorkspaceInvoicesRouteWithChildren
+  AuthenticatedWorkspaceJournalRoute: typeof AuthenticatedWorkspaceJournalRouteWithChildren
+  AuthenticatedWorkspaceLeaveRoute: typeof AuthenticatedWorkspaceLeaveRoute
+  AuthenticatedWorkspaceLeaveRequestsRoute: typeof AuthenticatedWorkspaceLeaveRequestsRoute
+  AuthenticatedWorkspaceLoyaltyRoute: typeof AuthenticatedWorkspaceLoyaltyRoute
+  AuthenticatedWorkspacePurchaseOrdersRoute: typeof AuthenticatedWorkspacePurchaseOrdersRouteWithChildren
+  AuthenticatedWorkspaceQuotesRoute: typeof AuthenticatedWorkspaceQuotesRouteWithChildren
+  AuthenticatedWorkspaceReportsRoute: typeof AuthenticatedWorkspaceReportsRouteWithChildren
+  AuthenticatedWorkspaceSchedulingRoute: typeof AuthenticatedWorkspaceSchedulingRoute
+  AuthenticatedWorkspaceSegmentsRoute: typeof AuthenticatedWorkspaceSegmentsRoute
+  AuthenticatedWorkspaceServiceRemindersRoute: typeof AuthenticatedWorkspaceServiceRemindersRoute
+  AuthenticatedWorkspaceSettingsRoute: typeof AuthenticatedWorkspaceSettingsRoute
+  AuthenticatedWorkspaceStockAlertsRoute: typeof AuthenticatedWorkspaceStockAlertsRoute
+  AuthenticatedWorkspaceTechniciansRoute: typeof AuthenticatedWorkspaceTechniciansRouteWithChildren
+  AuthenticatedWorkspaceVehiclesRoute: typeof AuthenticatedWorkspaceVehiclesRouteWithChildren
+  AuthenticatedWorkspaceVendorBillsRoute: typeof AuthenticatedWorkspaceVendorBillsRouteWithChildren
+  AuthenticatedWorkspaceVendorsRoute: typeof AuthenticatedWorkspaceVendorsRoute
+  AuthenticatedWorkspaceWorkOrdersRoute: typeof AuthenticatedWorkspaceWorkOrdersRouteWithChildren
+  AuthenticatedWorkspaceIndexRoute: typeof AuthenticatedWorkspaceIndexRoute
 }
 
-const AuthenticatedShopRouteChildren: AuthenticatedShopRouteChildren = {
-  AuthenticatedShopAccountingRoute:
-    AuthenticatedShopAccountingRouteWithChildren,
-  AuthenticatedShopAppointmentsRoute: AuthenticatedShopAppointmentsRoute,
-  AuthenticatedShopAutomationRoute:
-    AuthenticatedShopAutomationRouteWithChildren,
-  AuthenticatedShopCertificatesRoute: AuthenticatedShopCertificatesRoute,
-  AuthenticatedShopCustomersRoute: AuthenticatedShopCustomersRouteWithChildren,
-  AuthenticatedShopDiscountsRoute: AuthenticatedShopDiscountsRoute,
-  AuthenticatedShopExpensesRoute: AuthenticatedShopExpensesRoute,
-  AuthenticatedShopInspectionsRoute:
-    AuthenticatedShopInspectionsRouteWithChildren,
-  AuthenticatedShopInventoryRoute: AuthenticatedShopInventoryRouteWithChildren,
-  AuthenticatedShopInvoicesRoute: AuthenticatedShopInvoicesRouteWithChildren,
-  AuthenticatedShopJournalRoute: AuthenticatedShopJournalRouteWithChildren,
-  AuthenticatedShopLeaveRoute: AuthenticatedShopLeaveRoute,
-  AuthenticatedShopLeaveRequestsRoute: AuthenticatedShopLeaveRequestsRoute,
-  AuthenticatedShopLoyaltyRoute: AuthenticatedShopLoyaltyRoute,
-  AuthenticatedShopPurchaseOrdersRoute:
-    AuthenticatedShopPurchaseOrdersRouteWithChildren,
-  AuthenticatedShopQuotesRoute: AuthenticatedShopQuotesRouteWithChildren,
-  AuthenticatedShopReportsRoute: AuthenticatedShopReportsRouteWithChildren,
-  AuthenticatedShopSchedulingRoute: AuthenticatedShopSchedulingRoute,
-  AuthenticatedShopSegmentsRoute: AuthenticatedShopSegmentsRoute,
-  AuthenticatedShopServiceRemindersRoute:
-    AuthenticatedShopServiceRemindersRoute,
-  AuthenticatedShopSettingsRoute: AuthenticatedShopSettingsRoute,
-  AuthenticatedShopStockAlertsRoute: AuthenticatedShopStockAlertsRoute,
-  AuthenticatedShopTechniciansRoute:
-    AuthenticatedShopTechniciansRouteWithChildren,
-  AuthenticatedShopVehiclesRoute: AuthenticatedShopVehiclesRouteWithChildren,
-  AuthenticatedShopVendorBillsRoute:
-    AuthenticatedShopVendorBillsRouteWithChildren,
-  AuthenticatedShopVendorsRoute: AuthenticatedShopVendorsRoute,
-  AuthenticatedShopWorkOrdersRoute:
-    AuthenticatedShopWorkOrdersRouteWithChildren,
-}
+const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
+  {
+    AuthenticatedWorkspaceAccountingRoute:
+      AuthenticatedWorkspaceAccountingRouteWithChildren,
+    AuthenticatedWorkspaceAppointmentsRoute:
+      AuthenticatedWorkspaceAppointmentsRoute,
+    AuthenticatedWorkspaceAutomationRoute:
+      AuthenticatedWorkspaceAutomationRouteWithChildren,
+    AuthenticatedWorkspaceCertificatesRoute:
+      AuthenticatedWorkspaceCertificatesRoute,
+    AuthenticatedWorkspaceCustomersRoute:
+      AuthenticatedWorkspaceCustomersRouteWithChildren,
+    AuthenticatedWorkspaceDiscountsRoute: AuthenticatedWorkspaceDiscountsRoute,
+    AuthenticatedWorkspaceExpensesRoute: AuthenticatedWorkspaceExpensesRoute,
+    AuthenticatedWorkspaceInspectionsRoute:
+      AuthenticatedWorkspaceInspectionsRouteWithChildren,
+    AuthenticatedWorkspaceInventoryRoute:
+      AuthenticatedWorkspaceInventoryRouteWithChildren,
+    AuthenticatedWorkspaceInvoicesRoute:
+      AuthenticatedWorkspaceInvoicesRouteWithChildren,
+    AuthenticatedWorkspaceJournalRoute:
+      AuthenticatedWorkspaceJournalRouteWithChildren,
+    AuthenticatedWorkspaceLeaveRoute: AuthenticatedWorkspaceLeaveRoute,
+    AuthenticatedWorkspaceLeaveRequestsRoute:
+      AuthenticatedWorkspaceLeaveRequestsRoute,
+    AuthenticatedWorkspaceLoyaltyRoute: AuthenticatedWorkspaceLoyaltyRoute,
+    AuthenticatedWorkspacePurchaseOrdersRoute:
+      AuthenticatedWorkspacePurchaseOrdersRouteWithChildren,
+    AuthenticatedWorkspaceQuotesRoute:
+      AuthenticatedWorkspaceQuotesRouteWithChildren,
+    AuthenticatedWorkspaceReportsRoute:
+      AuthenticatedWorkspaceReportsRouteWithChildren,
+    AuthenticatedWorkspaceSchedulingRoute:
+      AuthenticatedWorkspaceSchedulingRoute,
+    AuthenticatedWorkspaceSegmentsRoute: AuthenticatedWorkspaceSegmentsRoute,
+    AuthenticatedWorkspaceServiceRemindersRoute:
+      AuthenticatedWorkspaceServiceRemindersRoute,
+    AuthenticatedWorkspaceSettingsRoute: AuthenticatedWorkspaceSettingsRoute,
+    AuthenticatedWorkspaceStockAlertsRoute:
+      AuthenticatedWorkspaceStockAlertsRoute,
+    AuthenticatedWorkspaceTechniciansRoute:
+      AuthenticatedWorkspaceTechniciansRouteWithChildren,
+    AuthenticatedWorkspaceVehiclesRoute:
+      AuthenticatedWorkspaceVehiclesRouteWithChildren,
+    AuthenticatedWorkspaceVendorBillsRoute:
+      AuthenticatedWorkspaceVendorBillsRouteWithChildren,
+    AuthenticatedWorkspaceVendorsRoute: AuthenticatedWorkspaceVendorsRoute,
+    AuthenticatedWorkspaceWorkOrdersRoute:
+      AuthenticatedWorkspaceWorkOrdersRouteWithChildren,
+    AuthenticatedWorkspaceIndexRoute: AuthenticatedWorkspaceIndexRoute,
+  }
 
-const AuthenticatedShopRouteWithChildren =
-  AuthenticatedShopRoute._addFileChildren(AuthenticatedShopRouteChildren)
+const AuthenticatedWorkspaceRouteWithChildren =
+  AuthenticatedWorkspaceRoute._addFileChildren(
+    AuthenticatedWorkspaceRouteChildren,
+  )
 
 interface AuthenticatedStaffAcademyRouteChildren {
   AuthenticatedStaffAcademySlugRoute: typeof AuthenticatedStaffAcademySlugRoute
@@ -7585,7 +7702,7 @@ const AuthenticatedStaffAcademyRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCompleteProfileRoute: typeof AuthenticatedCompleteProfileRoute
-  AuthenticatedShopRoute: typeof AuthenticatedShopRouteWithChildren
+  AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRouteWithChildren
   AuthenticatedAccountDisputesRoute: typeof AuthenticatedAccountDisputesRoute
   AuthenticatedAccountRewardsRoute: typeof AuthenticatedAccountRewardsRoute
   AuthenticatedAccountTrustScoreRoute: typeof AuthenticatedAccountTrustScoreRoute
@@ -7605,7 +7722,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCompleteProfileRoute: AuthenticatedCompleteProfileRoute,
-  AuthenticatedShopRoute: AuthenticatedShopRouteWithChildren,
+  AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRouteWithChildren,
   AuthenticatedAccountDisputesRoute: AuthenticatedAccountDisputesRoute,
   AuthenticatedAccountRewardsRoute: AuthenticatedAccountRewardsRoute,
   AuthenticatedAccountTrustScoreRoute: AuthenticatedAccountTrustScoreRoute,
@@ -8125,16 +8242,32 @@ interface PartsRouteChildren {
   PartsCategoriesRoute: typeof PartsCategoriesRoute
   PartsNetworkRoute: typeof PartsNetworkRoute
   PartsSearchRoute: typeof PartsSearchRoute
+  PartsIndexRoute: typeof PartsIndexRoute
   PartsCSlugRoute: typeof PartsCSlugRoute
+  PartsPartnersCategoriesRoute: typeof PartsPartnersCategoriesRoute
+  PartsPartnersIndexRoute: typeof PartsPartnersIndexRoute
   PartsPNetworkSkuRoute: typeof PartsPNetworkSkuRoute
+  PartsPartnersBrandSlugRoute: typeof PartsPartnersBrandSlugRoute
+  PartsPartnersCCategoryRoute: typeof PartsPartnersCCategoryRoute
+  PartsPartnersDepartmentSlugRoute: typeof PartsPartnersDepartmentSlugRoute
+  PartsPartnersPSlugRoute: typeof PartsPartnersPSlugRoute
+  PartsPartnersStoreSlugRoute: typeof PartsPartnersStoreSlugRoute
 }
 
 const PartsRouteChildren: PartsRouteChildren = {
   PartsCategoriesRoute: PartsCategoriesRoute,
   PartsNetworkRoute: PartsNetworkRoute,
   PartsSearchRoute: PartsSearchRoute,
+  PartsIndexRoute: PartsIndexRoute,
   PartsCSlugRoute: PartsCSlugRoute,
+  PartsPartnersCategoriesRoute: PartsPartnersCategoriesRoute,
+  PartsPartnersIndexRoute: PartsPartnersIndexRoute,
   PartsPNetworkSkuRoute: PartsPNetworkSkuRoute,
+  PartsPartnersBrandSlugRoute: PartsPartnersBrandSlugRoute,
+  PartsPartnersCCategoryRoute: PartsPartnersCCategoryRoute,
+  PartsPartnersDepartmentSlugRoute: PartsPartnersDepartmentSlugRoute,
+  PartsPartnersPSlugRoute: PartsPartnersPSlugRoute,
+  PartsPartnersStoreSlugRoute: PartsPartnersStoreSlugRoute,
 }
 
 const PartsRouteWithChildren = PartsRoute._addFileChildren(PartsRouteChildren)
@@ -8151,14 +8284,26 @@ const PaymentsRouteWithChildren = PaymentsRoute._addFileChildren(
   PaymentsRouteChildren,
 )
 
+interface ShopRouteChildren {
+  ShopIndexRoute: typeof ShopIndexRoute
+}
+
+const ShopRouteChildren: ShopRouteChildren = {
+  ShopIndexRoute: ShopIndexRoute,
+}
+
+const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
+
 interface ShopManagerRouteChildren {
   ShopManagerCheckoutRoute: typeof ShopManagerCheckoutRoute
   ShopManagerPricingRoute: typeof ShopManagerPricingRoute
+  ShopManagerIndexRoute: typeof ShopManagerIndexRoute
 }
 
 const ShopManagerRouteChildren: ShopManagerRouteChildren = {
   ShopManagerCheckoutRoute: ShopManagerCheckoutRoute,
   ShopManagerPricingRoute: ShopManagerPricingRoute,
+  ShopManagerIndexRoute: ShopManagerIndexRoute,
 }
 
 const ShopManagerRouteWithChildren = ShopManagerRoute._addFileChildren(
@@ -8265,6 +8410,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SellRoute: SellRoute,
+  ShopRoute: ShopRouteWithChildren,
   ShopManagerRoute: ShopManagerRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -8311,9 +8457,6 @@ const rootRouteChildren: RootRouteChildren = {
   SSlugRoute: SSlugRoute,
   SellerIdRoute: SellerIdRoute,
   ServicesInspectionRoute: ServicesInspectionRoute,
-  ShopCategoryRoute: ShopCategoryRoute,
-  ShopSlugRoute: ShopSlugRoute,
-  ShopCategoriesRoute: ShopCategoriesRoute,
   SupportAccountRoute: SupportAccountRoute,
   SupportBusinessRoute: SupportBusinessRoute,
   SupportBuyingRoute: SupportBuyingRoute,
@@ -8326,7 +8469,6 @@ const rootRouteChildren: RootRouteChildren = {
   GamesIndexRoute: GamesIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
-  ShopIndexRoute: ShopIndexRoute,
   WantedPartsIndexRoute: WantedPartsIndexRoute,
   WantedIndexRoute: WantedIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
@@ -8339,9 +8481,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   ApiPublicReverseGeocodeRoute: ApiPublicReverseGeocodeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
-  ShopBrandSlugRoute: ShopBrandSlugRoute,
-  ShopDepartmentSlugRoute: ShopDepartmentSlugRoute,
-  ShopPSlugRoute: ShopPSlugRoute,
   ApiPublicAuthSignupRoute: ApiPublicAuthSignupRoute,
   ApiPublicAuthSignupFailureLogRoute: ApiPublicAuthSignupFailureLogRoute,
   ApiPublicFlashcardsContentRoute: ApiPublicFlashcardsContentRoute,

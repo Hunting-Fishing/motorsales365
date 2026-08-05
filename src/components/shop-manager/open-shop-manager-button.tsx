@@ -23,7 +23,7 @@ export function OpenShopManagerButton({
   return (
     <Button asChild size={size} className={className}>
       <Link
-        to="/shop"
+        to="/workspace"
         search={returnPath ? ({ next: returnPath } as any) : undefined}
       >
         {label}

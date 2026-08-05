@@ -9,8 +9,12 @@ export function ShopBreadcrumbs({ trail }: { trail: BreadcrumbItem[] }) {
       aria-label="Breadcrumb"
       className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground"
     >
-      <Link to="/shop" className="hover:text-foreground">
-        Shop
+      <Link to="/parts" className="hover:text-foreground">
+        Parts
+      </Link>
+      <ChevronRight className="h-3.5 w-3.5 opacity-60" />
+      <Link to="/parts/partners" className="hover:text-foreground">
+        Partner links
       </Link>
       {trail.map((item, i) => {
         const last = i === trail.length - 1;
@@ -24,7 +28,7 @@ export function ShopBreadcrumbs({ trail }: { trail: BreadcrumbItem[] }) {
               <span className="text-foreground">{item.name}</span>
             ) : isDept && deptSlug ? (
               <Link
-                to="/shop/department/$slug"
+                to="/parts/partners/department/$slug"
                 params={{ slug: deptSlug }}
                 className="hover:text-foreground"
               >
@@ -32,7 +36,7 @@ export function ShopBreadcrumbs({ trail }: { trail: BreadcrumbItem[] }) {
               </Link>
             ) : (
               <Link
-                to="/shop/$category"
+                to="/parts/partners/c/$category"
                 params={{ category: item.slug }}
                 className="hover:text-foreground"
               >

@@ -332,7 +332,7 @@ export const FEATURES: Feature[] = [
       "Tekmetric — US-only, no PH parts network integration",
       "Mitchell1 — powerful but heavy, desktop-first",
     ],
-    route: "/shop",
+    route: "/workspace",
     status: "live",
   },
   {
@@ -351,7 +351,7 @@ export const FEATURES: Feature[] = [
       "AutoLeap has inventory but no cross-shop network",
       "Mitchell1 inventory is enterprise-priced",
     ],
-    route: "/shop/inventory",
+    route: "/workspace/inventory",
     status: "live",
   },
   {
@@ -369,7 +369,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Comparable to Shopmonkey/Tekmetric — at a PH-friendly price",
     ],
-    route: "/shop/invoices",
+    route: "/workspace/invoices",
     status: "live",
   },
   {
@@ -388,7 +388,7 @@ export const FEATURES: Feature[] = [
       "Most shop tools stop at KPIs — ours has a real GL",
       "QuickBooks would cost extra and doesn't integrate",
     ],
-    route: "/shop/accounting",
+    route: "/workspace/accounting",
     status: "live",
   },
   {
@@ -406,7 +406,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Shopmonkey has staff — ours adds shift templates and swap requests",
     ],
-    route: "/shop/technicians",
+    route: "/workspace/technicians",
     status: "live",
   },
   {
@@ -424,7 +424,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Most PH shops use spreadsheets — this is a step-change",
     ],
-    route: "/shop/expenses",
+    route: "/workspace/expenses",
     status: "live",
   },
   {
@@ -442,7 +442,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "AutoLeap and Shopmonkey have loyalty add-ons that cost extra",
     ],
-    route: "/shop/loyalty",
+    route: "/workspace/loyalty",
     status: "live",
   },
   {
@@ -460,7 +460,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Comparable to Shopmonkey's Marketing Suite — included, not add-on",
     ],
-    route: "/shop/automations",
+    route: "/workspace/automations",
     status: "live",
   },
   {
@@ -478,7 +478,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "None of the US shop tools include PH-friendly HR",
     ],
-    route: "/shop/hr",
+    route: "/workspace/hr",
     status: "live",
   },
 
@@ -1043,7 +1043,7 @@ export const FEATURES: Feature[] = [
       "Tekmetric $199–$399/mo per location",
       "Orderry $39–$189/mo",
     ],
-    route: "/shop/inventory",
+    route: "/workspace/inventory",
     status: "live",
   },
   {
@@ -1063,7 +1063,7 @@ export const FEATURES: Feature[] = [
       "ARI has invoices but no auto-COGS to a real GL",
       "Spreadsheet workflows can't do this at all",
     ],
-    route: "/shop/invoices",
+    route: "/workspace/invoices",
     status: "live",
   },
   {
@@ -1100,7 +1100,7 @@ export const FEATURES: Feature[] = [
       "AutoLeap DVI is bundled in $199+/mo plans",
       "Most PH shops still use paper checklists",
     ],
-    route: "/shop",
+    route: "/workspace",
     status: "live",
   },
   {
@@ -1119,7 +1119,7 @@ export const FEATURES: Feature[] = [
       "Most shop tools stop at KPI tiles",
       "QuickBooks costs extra and doesn't know your work orders",
     ],
-    route: "/shop/accounting/pnl",
+    route: "/workspace/accounting/pnl",
     status: "live",
   },
   {
@@ -1137,7 +1137,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Most shop tools show KPIs but hide the raw journal",
     ],
-    route: "/shop/accounting",
+    route: "/workspace/accounting",
     status: "live",
   },
   {
@@ -1174,7 +1174,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Most PH tools are page-refresh workflows",
     ],
-    route: "/shop",
+    route: "/workspace",
     status: "live",
   },
   {
@@ -1485,7 +1485,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Shopmonkey/Tekmetric are card-first, US-centric",
     ],
-    route: "/shop/invoices",
+    route: "/workspace/invoices",
     status: "live",
   },
   {
@@ -1503,7 +1503,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "QuickBooks does this but doesn't integrate with your work orders",
     ],
-    route: "/shop/accounting",
+    route: "/workspace/accounting",
     status: "live",
   },
   {
@@ -1521,7 +1521,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Most shop tools hardcode account labels",
     ],
-    route: "/shop/accounting",
+    route: "/workspace/accounting",
     status: "live",
   },
   {
@@ -1539,7 +1539,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Most shop KPI dashboards hide the source data",
     ],
-    route: "/shop/accounting/pnl",
+    route: "/workspace/accounting/pnl",
     status: "live",
   },
   {
@@ -1557,7 +1557,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Comparable to Tekmetric, at PH pricing",
     ],
-    route: "/shop",
+    route: "/workspace",
     status: "live",
   },
   {
@@ -1575,7 +1575,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "AutoLeap has this — we ship it at PH price",
     ],
-    route: "/shop/schedule",
+    route: "/workspace/schedule",
     status: "live",
   },
   {
@@ -1593,7 +1593,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Shopmonkey does this at $199/mo; we include it",
     ],
-    route: "/shop",
+    route: "/workspace",
     status: "live",
   },
   {
@@ -1809,7 +1809,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Some tools gate exports behind higher tiers",
     ],
-    route: "/shop/accounting",
+    route: "/workspace/accounting",
     status: "live",
   },
   {
@@ -1845,7 +1845,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Most PH shop tools have one 'admin' role",
     ],
-    route: "/shop/staff",
+    route: "/workspace/staff",
     status: "live",
   },
   {
@@ -1863,7 +1863,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Tekmetric charges heavily per additional location",
     ],
-    route: "/shop",
+    route: "/workspace",
     status: "beta",
   },
   {
@@ -1881,7 +1881,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Loyalty is a separate SaaS ($50/mo+) for most shops",
     ],
-    route: "/shop/loyalty",
+    route: "/workspace/loyalty",
     status: "live",
   },
   {
@@ -1899,7 +1899,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Mailchimp doesn't know your service history; we do",
     ],
-    route: "/shop/marketing",
+    route: "/workspace/marketing",
     status: "new",
   },
   {
@@ -1917,7 +1917,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Enterprise DMSs have this; most PH shops don't",
     ],
-    route: "/shop",
+    route: "/workspace",
     status: "roadmap",
   },
   {
@@ -1935,7 +1935,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Only US enterprise tools ship this today",
     ],
-    route: "/shop",
+    route: "/workspace",
     status: "beta",
   },
   {
@@ -1953,7 +1953,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Rarely surfaced this cleanly outside enterprise",
     ],
-    route: "/shop",
+    route: "/workspace",
     status: "live",
   },
   {
@@ -1971,7 +1971,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Purchase orders are a paid add-on in most shop tools",
     ],
-    route: "/shop/purchasing",
+    route: "/workspace/purchasing",
     status: "new",
   },
   {
@@ -1989,7 +1989,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Barcode scanning is usually a paid tier upgrade",
     ],
-    route: "/shop/inventory",
+    route: "/workspace/inventory",
     status: "beta",
   },
   {
@@ -2007,7 +2007,7 @@ export const FEATURES: Feature[] = [
     vsCompetition: [
       "Requires custom code in most PH shop tools",
     ],
-    route: "/shop",
+    route: "/workspace",
     status: "beta",
   },
   {

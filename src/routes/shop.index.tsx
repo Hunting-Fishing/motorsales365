@@ -1,461 +1,91 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
-import { z } from "zod";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Shirt, Package, Wrench, ArrowRight } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
-import { AdCarousel } from "@/components/ads/ad-carousel";
-import {
-  listShopCategories,
-  listShopProducts,
-  listShopBrands,
-  listShopDepartments,
-} from "@/lib/shop.functions";
-import { ImageWithSkeleton } from "@/components/image-with-skeleton";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { VehicleFitmentPicker } from "@/components/shop/vehicle-fitment-picker";
-import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
-import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
-import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
-import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
-import { ShopSortBar, type ShopSort, type ShopNetwork } from "@/components/shop/shop-sort-bar";
-
-import { useGarage, formatVehicle, type GarageVehicle } from "@/lib/garage";
-import { X } from "lucide-react";
-
-const shopSearch = z.object({
-  make: fallback(z.string(), "").default(""),
-  model: fallback(z.string(), "").default(""),
-  year: fallback(z.number().optional(), undefined).default(undefined),
-  engine: fallback(z.string(), "").default(""),
-  transmission: fallback(z.string(), "").default(""),
-  brand: fallback(z.string(), "").default(""),
-  category: fallback(z.string(), "").default(""),
-  sort: fallback(
-    z.enum(["featured", "price_asc", "price_desc", "popular", "newest"]),
-    "featured",
-  ).default("featured"),
-  network: fallback(z.enum(["", "shopee", "lazada", "aliexpress"]), "").default(""),
-});
 
 export const Route = createFileRoute("/shop/")({
-  component: ShopIndex,
-  validateSearch: zodValidator(shopSearch),
   head: () => ({
     meta: [
-      { title: "Shop — Car detailing, tools & parts | 365 MotorSales" },
+      { title: "365 Store — Official 365 MotorSales merch & gear" },
       {
         name: "description",
         content:
-          "Curated car detailing products, mechanic tools, parts and accessories. Search by your vehicle's make and model to find parts that fit.",
+          "Official 365 MotorSales gear: sun shades, poker chips, shirts, stickers and garage accessories. Shipped from the Philippines.",
       },
-      { property: "og:title", content: "365 MotorSales Shop" },
+      { property: "og:title", content: "365 Store — Official merch & gear" },
       {
         property: "og:description",
-        content: "Detailing, tools, parts and accessories — best prices from top PH marketplaces.",
+        content: "Sun shades, poker chips, shirts and garage gear from 365 MotorSales.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://www.365motorsales.com/shop" }],
   }),
+  component: StorePage,
 });
 
-function ShopIndex() {
-  const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/shop/" });
-  const [garage, setGarageState] = useGarage();
-
-  // Sync URL <-> garage
-  const activeVehicle =
-    search.make && search.model
-      ? {
-          category: "car" as const,
-          make: search.make,
-          model: search.model,
-          year: search.year,
-          engine: search.engine || undefined,
-          transmission: search.transmission || undefined,
-        }
-      : garage;
-
-  const { data: catData } = useQuery({
-    queryKey: ["shop-cats"],
-    queryFn: () => listShopCategories(),
-  });
-  const { data: depData } = useQuery({
-    queryKey: ["shop-deps"],
-    queryFn: () => listShopDepartments(),
-  });
-  const { data: brandData } = useQuery({
-    queryKey: ["shop-brands", search.category],
-    queryFn: () =>
-      listShopBrands({ data: search.category ? { categorySlug: search.category } : {} }),
-  });
-  const filterArgs = {
-    ...(activeVehicle
-      ? {
-          make: activeVehicle.make,
-          model: activeVehicle.model,
-          year: activeVehicle.year,
-          engine: activeVehicle.engine,
-          transmission: activeVehicle.transmission,
-        }
-      : {}),
-    ...(search.brand ? { brand: search.brand } : {}),
-    ...(search.category ? { categorySlug: search.category } : {}),
-    ...(search.network ? { network: search.network } : {}),
-  };
-  const { data: featData } = useQuery({
-    queryKey: ["shop-featured", filterArgs],
-    queryFn: () => listShopProducts({ data: { featured: true, limit: 12, ...filterArgs } }),
-  });
-  const { data: latestData } = useQuery({
-    queryKey: ["shop-latest", filterArgs, search.sort],
-    queryFn: () => listShopProducts({ data: { limit: 24, sort: search.sort, ...filterArgs } }),
-  });
-  const { data: dealsData } = useQuery({
-    queryKey: ["shop-deals", filterArgs],
-    queryFn: () =>
-      listShopProducts({ data: { dealsOnly: true, limit: 12, sort: "popular", ...filterArgs } }),
-  });
-
-  const cats = catData?.categories ?? [];
-  const departments = depData?.departments ?? [];
-  const brands = brandData?.brands ?? [];
-  const featured = featData?.products ?? [];
-  const latest = latestData?.products ?? [];
-  const deals = dealsData?.products ?? [];
-
-  const onPickVehicle = (v: GarageVehicle) => {
-    setGarageState(v);
-    navigate({
-      search: (prev: any) => ({
-        ...prev,
-        make: v.make,
-        model: v.model,
-        year: v.year,
-        engine: v.engine ?? "",
-        transmission: v.transmission ?? "",
-      }),
-    });
-  };
-
-  const clearVehicle = () => {
-    setGarageState(null);
-    navigate({
-      search: (prev: any) => ({
-        ...prev,
-        make: "",
-        model: "",
-        year: undefined,
-        engine: "",
-        transmission: "",
-      }),
-    });
-  };
-
-  const onApplyFilters = (next: {
-    categorySlug: string;
-    brand: string;
-    vehicle: typeof activeVehicle;
-  }) => {
-    if (next.vehicle) setGarageState(next.vehicle);
-    else setGarageState(null);
-    navigate({
-      search: (prev: any) => ({
-        ...prev,
-        category: next.categorySlug,
-        brand: next.brand,
-        make: next.vehicle?.make ?? "",
-        model: next.vehicle?.model ?? "",
-        year: next.vehicle?.year,
-        engine: next.vehicle?.engine ?? "",
-        transmission: next.vehicle?.transmission ?? "",
-      }),
-    });
-  };
-
-  const setSort = (s: ShopSort) =>
-    navigate({ search: (prev: any) => ({ ...prev, sort: s }) });
-  const setNetwork = (n: ShopNetwork) =>
-    navigate({ search: (prev: any) => ({ ...prev, network: n }) });
-
-  const hasAnyFilter = !!(search.brand || search.category || activeVehicle || search.network);
-
+function StorePage() {
   return (
     <SiteLayout>
       <section className="border-b bg-gradient-to-b from-primary/10 to-background">
-        <div className="container mx-auto px-4 py-10 md:py-14">
-          <Badge className="mb-3">Shop</Badge>
-          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight">
-            Tools, parts &amp; detailing
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <Badge className="mb-3">365 Store</Badge>
+          <h1 className="font-display text-3xl tracking-tight sm:text-4xl md:text-5xl">
+            Official 365 gear
           </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Curated picks from Shopee, Lazada and AliExpress. Buy direct from the seller — we earn a
-            small commission so the site stays free for you.
+            Our own merch — sun shades, poker chips, shirts, stickers and garage accessories.
+            Designed by us, shipped by us. Checkout is coming online shortly.
           </p>
-
-          <div className="mt-6 hidden rounded-xl border bg-card p-4 shadow-sm md:block">
-            <p className="mb-3 text-sm font-semibold">🔧 Shop by your vehicle</p>
-            <VehicleFitmentPicker initial={activeVehicle} onSubmit={onPickVehicle} />
-            {activeVehicle && (
-              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-                <Badge variant="secondary" className="max-w-full gap-1">
-                  <span className="truncate">
-                    Showing parts for: <strong>{formatVehicle(activeVehicle)}</strong>
-                  </span>
-                </Badge>
-                <Button size="sm" variant="ghost" onClick={clearVehicle}>
-                  <X className="h-4 w-4" /> Clear
-                </Button>
-              </div>
-            )}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button asChild variant="outline">
+              <Link to="/parts">
+                Looking for parts? <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Sticky mobile filter bar */}
-      <div className="sticky top-14 z-30 border-b bg-background/95 backdrop-blur md:hidden">
-        <div className="container mx-auto flex items-center gap-2 px-4 py-2">
-          <ShopFilterDrawer
-            categories={cats}
-            brands={brands}
-            value={{ categorySlug: search.category, brand: search.brand, vehicle: activeVehicle }}
-            onApply={onApplyFilters}
-            triggerClassName="flex-1 justify-center"
-          />
-          {hasAnyFilter && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setGarageState(null);
-                navigate({
-                  search: () => ({
-                    make: "",
-                    model: "",
-                    year: undefined,
-                    engine: "",
-                    transmission: "",
-                    brand: "",
-                    category: "",
-                  }),
-                });
-              }}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-        {hasAnyFilter && (
-          <div className="container mx-auto flex flex-wrap gap-1.5 px-4 pb-2">
-            {search.category && (
-              <Badge variant="secondary" className="text-[10px]">
-                {cats.find((c) => c.slug === search.category)?.name ?? search.category}
-              </Badge>
-            )}
-            {search.brand && (
-              <Badge variant="secondary" className="text-[10px]">
-                {search.brand}
-              </Badge>
-            )}
-            {activeVehicle && (
-              <Badge variant="secondary" className="text-[10px]">
-                {formatVehicle(activeVehicle)}
-              </Badge>
-            )}
-          </div>
-        )}
+      <div className="container mx-auto grid gap-4 px-4 py-10 sm:grid-cols-3">
+        {[
+          { icon: Shirt, title: "Apparel", desc: "Tees, caps and crew gear with the 365 mark." },
+          {
+            icon: Package,
+            title: "Garage goods",
+            desc: "Sun shades, poker chips, plates, stickers and desk pieces.",
+          },
+          {
+            icon: Wrench,
+            title: "Tools & care",
+            desc: "365-branded detailing kits and workshop essentials.",
+          },
+        ].map((c) => (
+          <Card key={c.title}>
+            <CardContent className="p-5">
+              <c.icon className="h-5 w-5 text-primary" />
+              <p className="mt-3 font-semibold">{c.title}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{c.desc}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      <div className="container mx-auto px-4 py-8 space-y-12">
-        <ShopifyStoreBanner />
-        <AdCarousel placement="shop_top" />
-
-        {departments.length > 0 && (
-          <section>
-            <div className="mb-4 flex items-end justify-between gap-3">
-              <h2 className="text-xl font-semibold">Shop by department</h2>
-              <Link
-                to="/shop/categories"
-                className="text-sm text-muted-foreground hover:text-primary"
-              >
-                All categories →
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {departments.map((d: any) => (
-                <Link
-                  key={d.slug}
-                  to="/shop/department/$slug"
-                  params={{ slug: d.slug }}
-                  className="group flex flex-col overflow-hidden rounded-xl border bg-card transition hover:border-primary hover:shadow-md"
-                >
-                  {d.hero_image_url && (
-                    <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
-                      <img
-                        src={d.hero_image_url}
-                        alt={d.name}
-                        loading="lazy"
-                        width={768}
-                        height={576}
-                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                      />
-                    </div>
-                  )}
-                  <div className="flex flex-1 flex-col p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="font-semibold group-hover:text-primary">{d.name}</p>
-                      {d.product_count > 0 && (
-                        <Badge variant="secondary" className="text-[10px]">
-                          {d.product_count}
-                        </Badge>
-                      )}
-                    </div>
-                    {d.categories?.length > 0 && (
-                      <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
-                        {d.categories
-                          .slice(0, 4)
-                          .map((c: any) => c.name)
-                          .join(" · ")}
-                      </p>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {deals.length > 0 && (
-          <section>
-            <div className="mb-4 flex items-end justify-between gap-3">
-              <h2 className="text-xl font-semibold">🔥 Hot deals</h2>
-              <span className="text-xs text-muted-foreground">Auto-refreshed every 6 hours</span>
-            </div>
-            <ProductGrid products={deals} vehicle={activeVehicle} />
-          </section>
-        )}
-
-        {featured.length > 0 && (
-          <section>
-            <h2 className="mb-4 text-xl font-semibold">Featured</h2>
-            <ProductGrid products={featured} vehicle={activeVehicle} />
-          </section>
-        )}
-
-        <section>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-xl font-semibold">
-              {activeVehicle ? "Matching products" : "Latest products"}
-            </h2>
-            <ShopSortBar
-              sort={search.sort}
-              network={search.network}
-              onSortChange={setSort}
-              onNetworkChange={setNetwork}
-              className="w-full sm:w-auto"
-            />
-          </div>
-          {latest.length === 0 ? (
-            <p className="text-muted-foreground">
-              {hasAnyFilter
-                ? "No products match your filters. Try clearing some."
-                : "No products yet — check back soon."}
-            </p>
-          ) : (
-            <ProductGrid products={latest} vehicle={activeVehicle} />
-          )}
-        </section>
-
-        <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
-          Disclosure: 365 MotorSales earns a commission on qualifying purchases. Prices and
-          availability are set by the seller.
-        </p>
-      </div>
-
-      <ShopMobileCtaBar
-        vehicle={activeVehicle}
-        onPickVehicle={onPickVehicle}
-        onClearVehicle={clearVehicle}
-      />
-    </SiteLayout>
-  );
-}
-
-export function ProductGrid({
-  products,
-  vehicle,
-}: {
-  products: any[];
-  vehicle?: { make: string; model: string; year?: number } | null;
-}) {
-  return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-      {products.map((p) => {
-        const list = p.price_php != null ? Number(p.price_php) : null;
-        const deal = p.deal_price_php != null ? Number(p.deal_price_php) : null;
-        const hasDrop = deal != null && list != null && deal < list;
-        const pctOff = hasDrop ? Math.round((1 - deal / list) * 100) : null;
-        const effective = deal ?? list;
-        return (
-          <div key={p.id} className="group relative">
-            <ShopFavoriteButton
-              productId={p.id}
-              className="absolute right-2 top-2 z-10"
-              size="md"
-            />
-            {hasDrop && (
-              <Badge className="absolute left-2 top-2 z-10 bg-green-600 hover:bg-green-700">
-                -{pctOff}%
-              </Badge>
-            )}
-            <Link to="/shop/p/$slug" params={{ slug: p.slug }} className="block">
-              <Card className="overflow-hidden transition hover:shadow-lg">
-                {p.image_url ? (
-                  <ImageWithSkeleton
-                    src={p.image_url}
-                    alt={p.title}
-                    className="aspect-square w-full object-cover transition-transform group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="aspect-square w-full bg-muted" />
-                )}
-                <CardContent className="p-3">
-                  <p className="line-clamp-2 text-sm font-medium group-hover:text-primary">
-                    {p.title}
-                  </p>
-                  {p.brand && <p className="text-xs text-muted-foreground">{p.brand}</p>}
-                  <div className="mt-1 flex items-center justify-between gap-1">
-                    <div className="flex items-baseline gap-1">
-                      {effective != null ? (
-                        <p className="text-sm font-bold">₱{effective.toLocaleString()}</p>
-                      ) : (
-                        <span />
-                      )}
-                      {hasDrop && (
-                        <p className="text-[11px] text-muted-foreground line-through">
-                          ₱{list!.toLocaleString()}
-                        </p>
-                      )}
-                    </div>
-                    {vehicle && !p.universal_fit && (
-                      <Badge variant="secondary" className="text-[10px]">
-                        Fits {vehicle.model}
-                      </Badge>
-                    )}
-                    {p.universal_fit && (
-                      <Badge variant="outline" className="text-[10px]">
-                        Universal
-                      </Badge>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+      <div className="container mx-auto px-4 pb-14">
+        <div className="rounded-xl border bg-card p-6">
+          <p className="text-sm font-semibold">Third-party parts and accessories moved</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Marketplace and affiliate listings now live under{" "}
+            <Link to="/parts/partners" className="text-primary underline">
+              Parts → Partner links
             </Link>
-          </div>
-        );
-      })}
-    </div>
+            . The 365 Store only carries products we make ourselves.
+          </p>
+        </div>
+      </div>
+    </SiteLayout>
   );
 }

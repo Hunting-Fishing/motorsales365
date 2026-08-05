@@ -66,7 +66,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
 
   // Pages that need a clean, solid background (watermark would bleed through content).
   const cleanBg =
-    pathname.startsWith("/shop") || /\/checkout(\/|$)/.test(pathname);
+    pathname.startsWith("/workspace") || /\/checkout(\/|$)/.test(pathname);
   return (
     <div className="flex min-h-dvh flex-col pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">
       <PaymentTestModeBanner />
