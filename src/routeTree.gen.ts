@@ -58,6 +58,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WantedIndexRouteImport } from './routes/wanted.index'
 import { Route as WantedPartsIndexRouteImport } from './routes/wanted-parts.index'
+import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as ShopManagerIndexRouteImport } from './routes/shop-manager.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as PartsIndexRouteImport } from './routes/parts.index'
@@ -624,6 +625,11 @@ const WantedIndexRoute = WantedIndexRouteImport.update({
 const WantedPartsIndexRoute = WantedPartsIndexRouteImport.update({
   id: '/wanted-parts/',
   path: '/wanted-parts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopIndexRoute = ShopIndexRouteImport.update({
+  id: '/shop/',
+  path: '/shop/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopManagerIndexRoute = ShopManagerIndexRouteImport.update({
@@ -2565,6 +2571,7 @@ export interface FileRoutesByFullPath {
   '/parts/': typeof PartsIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop-manager/': typeof ShopManagerIndexRoute
+  '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -2925,6 +2932,7 @@ export interface FileRoutesByTo {
   '/parts': typeof PartsIndexRoute
   '/rides': typeof RidesIndexRoute
   '/shop-manager': typeof ShopManagerIndexRoute
+  '/shop': typeof ShopIndexRoute
   '/wanted-parts': typeof WantedPartsIndexRoute
   '/wanted': typeof WantedIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -3299,6 +3307,7 @@ export interface FileRoutesById {
   '/parts/': typeof PartsIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop-manager/': typeof ShopManagerIndexRoute
+  '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -3674,6 +3683,7 @@ export interface FileRouteTypes {
     | '/parts/'
     | '/rides/'
     | '/shop-manager/'
+    | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
     | '/.lovable/oauth/consent'
@@ -4034,6 +4044,7 @@ export interface FileRouteTypes {
     | '/parts'
     | '/rides'
     | '/shop-manager'
+    | '/shop'
     | '/wanted-parts'
     | '/wanted'
     | '/.lovable/oauth/consent'
@@ -4407,6 +4418,7 @@ export interface FileRouteTypes {
     | '/parts/'
     | '/rides/'
     | '/shop-manager/'
+    | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
     | '/.lovable/oauth/consent'
@@ -4683,6 +4695,7 @@ export interface RootRouteChildren {
   GamesIndexRoute: typeof GamesIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
+  ShopIndexRoute: typeof ShopIndexRoute
   WantedPartsIndexRoute: typeof WantedPartsIndexRoute
   WantedIndexRoute: typeof WantedIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -5072,6 +5085,13 @@ declare module '@tanstack/react-router' {
       path: '/wanted-parts'
       fullPath: '/wanted-parts/'
       preLoaderRoute: typeof WantedPartsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop/': {
+      id: '/shop/'
+      path: '/shop'
+      fullPath: '/shop/'
+      preLoaderRoute: typeof ShopIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shop-manager/': {
@@ -8421,6 +8441,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamesIndexRoute: GamesIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
+  ShopIndexRoute: ShopIndexRoute,
   WantedPartsIndexRoute: WantedPartsIndexRoute,
   WantedIndexRoute: WantedIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
