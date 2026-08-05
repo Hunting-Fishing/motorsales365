@@ -19,6 +19,30 @@ The recommended product is a new shared platform capability called the **365 Rep
 
 This makes the growing body of verified repair knowledge a permanent 365 asset and avoids making the business dependent on one data vendor.
 
+### 1.1 Binding product decision: four first-class purchasable repair domains
+
+365 will not use Automotive as the parent product for every repair market. The platform will sell four independent first-class repair domains on one shared Shop Manager foundation:
+
+| Product domain/module | Included market | Domain-owned identity and workflows | May be purchased without the other repair modules |
+|---|---|---|---:|
+| **365 Automotive Repair** (`repair_automotive`) | Passenger cars, SUVs, pickups, vans and eligible light commercial vehicles | VIN/chassis and powertrain identity, automotive inspections, OBD/light-vehicle diagnostics, automotive labour/repair/parts providers | Yes |
+| **365 Motorcycle & Powersports** (`repair_motorcycle`) | Motorcycles, scooters, underbones, mopeds, tricycles, ATV/UTV and electric two/three-wheelers | Frame/model/engine identity, motorcycle inspections, motorcycle connectors/diagnostics, motorcycle labour/repair/parts providers | Yes |
+| **365 Heavy Truck & Fleet** (`repair_heavy_truck`) | Medium/heavy trucks, tractor units, buses, coaches, vocational trucks, trailers and semi-trailers | Chassis-plus-component identity, fleet PM, air-brake/aftertreatment/trailer workflows, commercial diagnostic and labour/parts providers | Yes |
+| **365 Marine & Watercraft** (`repair_marine`) | Outboards, inboards, sterndrives/pods, PWC, recreational/commercial vessels and onboard systems | Vessel-plus-installation identity, hours/sea trials/haul-out, marine diagnostics, parts fiches and marine labour/manual sources | Yes |
+
+**365 Shop Manager Core** is the shared operational backbone—not a fifth repair-data domain. It supplies accounts, customers, staff, work orders, quotes, parts/inventory, technician time, invoices, payments, files, reminders and audit infrastructure. Each repair module owns its technical identity, templates, provider adapters, searches, coverage claims, diagnostic rules, safety policy and user experience.
+
+Binding rules:
+
+- No repair module is a prerequisite for another; Core plus any one domain is a valid subscription.
+- Purchasing Automotive never unlocks Motorcycle, Heavy Truck or Marine data.
+- Provider/OEM licences, diagnostic packs and territory data passes are attached to one domain unless the signed contract expressly spans several.
+- Cross-domain bundles may discount several modules, but the entitlements, usage metering, provider costs and data-access logs remain separate.
+- A shared customer, part, technician or invoice record does not make the technical domains merged.
+- Cross-domain search is an optional entitled federated view. It queries each domain separately and may never use one domain's applicability as a fallback for another.
+- Personal watercraft belong to Marine, not Motorcycle/Powersports. Medium/heavy trucks, buses and trailers belong to Heavy Truck & Fleet, not Automotive.
+- Light commercial vehicles are routed by exact platform, weight/class, braking/diagnostic architecture and provider contract. Ambiguous assets require an explicit domain decision; the UI cannot silently route them as cars or heavy trucks.
+
 ## 2. Repository findings
 
 ### 2.1 What already exists
@@ -54,7 +78,8 @@ The current application is substantially further along than the older `docs/SHOP
 The repository does not yet provide a complete Repair Knowledge Network. The following are required:
 
 - A shared, global repair-knowledge schema separated from private shop records.
-- A generalized service-asset and component model for motorcycles, three-wheelers, trucks, buses, trailers and future off-highway/marine equipment.
+- A shared service-asset kernel with separate Automotive, Motorcycle, Heavy Truck and Marine identity profiles; none may inherit Automotive fields or provider matches by default.
+- A module catalogue, shop entitlements, route guards, provider-pack entitlements, usage metering and billing records so each domain can be purchased and operated independently.
 - A capability-level market coverage registry and gap queue so unsupported variants are never silently matched to another region.
 - Source and licence tracking for every imported or contributed record.
 - Government-data import jobs with refresh logs, deduplication, and failure handling.
@@ -289,11 +314,11 @@ Request written answers and contract language for:
 9. Add MOTOR when Motorsales365 expands North American coverage or services North American-spec imports.
 10. Continue building the 365-owned knowledge and benchmark network so commercial providers enhance rather than control the platform.
 
-## 3.5 Motorcycle, heavy-truck and worldwide market coverage
+## 3.5 Motorcycle and Heavy Truck first-class domains
 
 ### Decision
 
-Motorsales365 must not treat motorcycles or heavy trucks as passenger cars with different body styles. They have different identity systems, component structures, diagnostic connectors, labour operations, parts catalogues, safety controls and commercial data providers.
+Motorcycle & Powersports and Heavy Truck & Fleet are separate bounded product domains. Neither is a child category, filter, plan tier or feature flag inside Automotive. They have independent identity systems, component structures, workspace entry points, inspection libraries, diagnostic connectors, labour operations, parts catalogues, safety controls, provider contracts, usage metering and purchasable entitlements.
 
 The required provider strategy is:
 
@@ -303,21 +328,21 @@ The required provider strategy is:
 
 “Worldwide coverage” must mean that the platform can correctly represent, route and report every market and asset class. It must not mean pretending that a single provider contains every model. Unsupported models must enter a visible coverage-gap workflow.
 
-### 3.5.1 Supported asset taxonomy
+### 3.5.1 Supported asset taxonomy and ownership
 
-The canonical asset model must support these classes even if some are delivered after the first release:
+The shared asset kernel provides only common ownership, location, files and service-history references. Every technical asset is owned by exactly one repair domain at a time:
 
-| Domain | Asset types | Important distinctions |
+| Purchasable domain | Asset types | Important distinctions |
 |---|---|---|
-| Light road vehicles | Passenger car, SUV, pickup, van and light commercial vehicle | Market, body, engine, transmission, drive type, emissions and trim |
-| Powered two-wheelers | Motorcycle, scooter, underbone, moped and electric motorcycle/scooter | Frame/chassis number, engine number, model code, displacement, fuel/EV, transmission/CVT, ABS and regional variant |
-| Powered three-wheelers | Motorized tricycle, tuk-tuk, cargo trike and electric three-wheeler | Base motorcycle/vehicle, sidecar or body builder, passenger/cargo configuration, engine and final drive |
-| Powersports | ATV, UTV/side-by-side, off-road bike, snowmobile and personal watercraft | Off-road/marine use, engine family, drive system and proprietary diagnostic connector |
-| Commercial road vehicles | Medium truck, heavy rigid truck, tractor unit, vocational truck, bus, coach and minibus | Cab/chassis plus independently sourced engine, transmission, axles, brakes, aftertreatment, body and upfit |
-| Towed assets | Trailer and semi-trailer | VIN/chassis, axle/brake configuration, refrigeration/hydraulics and body builder |
-| Future adjacent markets | Agricultural, construction/off-highway, material handling, stationary engine and marine | Separate provider licences, diagnostic cables, safety rules and work-order templates |
+| Automotive Repair | Passenger car, SUV, pickup, van and an explicitly classified light commercial vehicle | Market, body, engine, transmission, drive type, emissions and trim |
+| Motorcycle & Powersports | Motorcycle, scooter, underbone, moped, electric motorcycle/scooter, motorized tricycle, tuk-tuk and cargo/electric three-wheeler | Frame/chassis number, engine number, model code, sidecar/body builder, displacement, fuel/EV, transmission/CVT, ABS and regional variant |
+| Motorcycle & Powersports | ATV, UTV/side-by-side, off-road bike and snowmobile | Off-road use, engine family, drive system and proprietary diagnostic connector |
+| Heavy Truck & Fleet | Medium truck, heavy rigid truck, tractor unit, vocational truck, bus, coach and commercial minibus | Cab/chassis plus independently sourced engine, transmission, axles, brakes, aftertreatment, body and upfit |
+| Heavy Truck & Fleet | Trailer and semi-trailer | VIN/chassis, axle/brake configuration, refrigeration/hydraulics and body builder |
+| Marine & Watercraft | Personal watercraft and every vessel/propulsion type defined in Section 3.6 | Vessel, installed component, position, serial range, propulsion and onboard systems |
+| Future separately sold domains | Agricultural, construction/off-highway, material handling and stationary engines | Separate identity profiles, provider licences, diagnostic cables, safety rules and work-order templates |
 
-Each asset has an independent `country_market`, `original_market`, `current_country`, `asset_domain`, `asset_type` and `identity_confidence`. A vehicle imported into the Philippines retains its original market and configuration.
+Each asset has an independent `module_key`, `country_market`, `original_market`, `current_country`, `asset_domain`, `asset_type` and `identity_confidence`. A vehicle imported into the Philippines retains its original market and configuration. Moving an asset between domains is an audited reclassification—not an automatic provider fallback.
 
 ### 3.5.2 Motorcycle repair, labour and diagnostic providers
 
@@ -487,21 +512,27 @@ The admin coverage dashboard should report by country and asset class:
 
 A public statement such as “covers the Philippine motorcycle market” or “all-makes trucks” is permitted only when the corresponding coverage score and limitations are displayed.
 
-### 3.5.10 Shop Manager changes
+### 3.5.10 Separate module experiences on the shared Shop Manager core
 
-Add class-aware behavior without duplicating the entire work-order system:
+Build separate module entry points and domain services while reusing the proven transaction engine:
 
-- Shop settings select supported domains: auto/LCV, motorcycle/powersports, truck/bus/trailer and future adjacent markets.
-- Extend the existing vehicle record through an `AssetIdentityCard` rather than creating separate customer/work-order/invoice products.
-- Motorcycle identity forms support frame number, engine number, model code, displacement, transmission/CVT, ABS and electric battery/motor data.
-- Truck identity forms support chassis plus a component configuration card for engine, transmission, axles, brakes, aftertreatment, body/upfit and trailers.
-- Work orders snapshot the exact asset/component configuration used for all provider lookups.
-- Search and provider badges show exact market, asset class, component and verification level.
-- Inspection templates become class-aware: motorcycle safety/drive/tires/brakes; truck DOT/fleet/preventive maintenance/air-brake/aftertreatment; trailer and bus-specific templates.
-- Labour selection shows provider time, shop estimate, billed time and actual time separately.
-- Scan reports support multiple assets/components and retain the diagnostic tool, VCI, cable, protocol, software version and source file.
-- Parts searches distinguish chassis parts, component parts, body/upfit parts and universal consumables.
-- Add `/admin/repair-knowledge/coverage` for provider tests, coverage gaps and correction tickets.
+- `/workspace/automotive` is owned by Automotive Repair.
+- `/workspace/motorcycles` is owned by Motorcycle & Powersports.
+- `/workspace/heavy-trucks` is owned by Heavy Truck & Fleet.
+- Module entitlements—not a generic “vehicle type” setting—control routes, navigation, search, provider calls, templates and paid data.
+- Keep shared customers, staff, inventory, work-order totals, quotes, invoices, payments and reminders in Shop Manager Core.
+- Every work order stores `module_key`, the domain asset ID and an immutable domain-specific configuration revision.
+- Each module supplies its own `AssetIdentityCard`, inspection/template registry, `RepairKnowledgeCard`, provider router, parts resolver and diagnostic report parser.
+- Motorcycle identity supports frame number, engine number, model code, displacement, transmission/CVT, ABS and electric battery/motor data.
+- Heavy Truck identity supports chassis plus engine, transmission, axles, brakes, aftertreatment, body/upfit and trailer configurations.
+- Motorcycle and Heavy Truck knowledge search uses separate indexes and applicability rules. An optional federated search returns grouped, domain-labelled results only to shops entitled to each domain.
+- Inspection templates remain domain-owned: motorcycle safety/drive/tires/brakes; truck fleet/preventive maintenance/air-brake/aftertreatment; trailer and bus-specific templates.
+- Labour selection shows domain provider time, shop estimate, billed time and actual time separately.
+- Scan reports retain the owning domain, asset/component, diagnostic tool, VCI, cable, protocol, software version and source file.
+- Parts searches use the owning module's catalogue adapters and distinguish chassis, component, body/upfit and universal consumables.
+- `/admin/repair-knowledge/coverage` filters and audits provider tests, coverage gaps and correction tickets by module.
+
+This separation prevents technical leakage without creating four copies of accounting and customer management.
 
 ### 3.5.11 Worldwide rollout order
 
@@ -515,26 +546,39 @@ Add class-aware behavior without duplicating the entire work-order system:
 
 Parallel to every stage, 365 continues collecting consented actual times and original technician procedures to reduce dependence on commercial coverage.
 
-### 3.5.12 Product packaging and revenue
+### 3.5.12 Product packaging, independent purchase and revenue
 
-Keep the operational Shop Manager affordable while making expensive data modular:
+Keep Shop Manager Core affordable and sell technical domains independently:
 
-| Product | Included value |
-|---|---|
-| 365 Shop Manager Core | Customer/assets, work orders, inspections, manual shop estimates, technician time, invoices, service history and 365-owned/free knowledge |
-| 365 Motorbike Pro | Licensed motorcycle maintenance/repair/labour coverage, class-specific inspections and supported diagnostic report integration |
-| 365 Fleet & Truck Pro | Component-based fleet assets, preventive maintenance, licensed truck labour/repair data, trailer/bus support and fleet analytics |
-| Provider/OEM Data Pass | Pass-through entitlement for a territory, OEM or commercial dataset where the contract requires separate billing |
-| Diagnostic Connect | Approved companion/report integration, device setup, scan history and provider launch links |
-| 365 Network Intelligence | Verified community benchmarks, common-failure analytics, parts demand and multi-location performance with privacy thresholds |
+| Product/SKU | Included value | Purchase rule |
+|---|---|---|
+| **365 Shop Manager Core** (`shop_manager_core`) | Customers, staff, work orders, manual estimates, technician time, common inventory, quotes, invoices, payments, reminders and private service history | Required operational backbone; contains no paid domain-provider entitlement |
+| **365 Automotive Repair Pro** (`repair_automotive`) | Automotive identity, inspections, repair knowledge, automotive provider routing, eligible light-vehicle diagnostics and labour/parts integrations | Independent module |
+| **365 Motorcycle & Powersports Pro** (`repair_motorcycle`) | Motorcycle/tricycle/powersports identity, inspections, repair/labour coverage, parts adapters and supported diagnostic reports | Independent module; Automotive not required |
+| **365 Heavy Truck & Fleet Pro** (`repair_heavy_truck`) | Component-based fleet assets, truck/bus/trailer PM and inspections, commercial labour/repair/parts data, diagnostics and fleet analytics | Independent module; Automotive not required |
+| **365 Marine & Watercraft Pro** (`repair_marine`) | Vessel/component identity, marine work orders, parts fiches, hours, labour models, diagnostics, sea trials and marine maintenance | Independent module; no road-vehicle module required |
+| **Domain Provider/OEM Data Pass** | Territory-, provider- or OEM-specific licensed data | Added to exactly one module unless the provider contract explicitly spans domains |
+| **Domain Diagnostic Connect** | Approved companion/report integration, device setup, scan history and provider launch links | Purchased and metered per domain/device/provider |
+| **365 Network Intelligence** | Verified community benchmarks, common-failure analytics, parts demand and multi-location performance with privacy thresholds | Add-on limited to the subscribed domains |
+| **Multi-Domain Bundle** | Two or more independently entitled repair modules with a commercial discount | Convenience pricing only; does not merge data, providers or permissions |
 
-Provider costs must be matched to the shops that use the licensed module. The proprietary coverage registry, local vehicle mappings, field-validated procedures and anonymized benchmarks remain 365 assets.
+Billing and access rules:
+
+- A motorcycle-only, heavy-truck-only or marine-only business pays for Core plus its chosen domain; it does not subsidize Automotive provider fees.
+- Each invoice/subscription line stores a stable SKU, `module_key`, billing interval, quantity metric, territory and provider pass where applicable.
+- Trials, grace periods, cancellations, seat counts, location counts, API quotas and overages are module-scoped.
+- Server-side route and API guards enforce entitlements; hiding a navigation item is not access control.
+- Global search, exports, AI retrieval and reports filter by active module/provider entitlements before any content is returned.
+- Provider usage and cost of goods sold are measured per shop, module, provider, capability and territory.
+- Package prices are finalized only after provider minimums, per-user/API charges, taxes and target gross margin are known.
+
+Provider costs must be matched to the shops that use the licensed module. The proprietary coverage registry, local asset mappings, field-validated procedures and anonymized benchmarks remain 365 assets.
 
 ## 3.6 Marine and watercraft coverage
 
 ### Decision
 
-Marine must be a first-class service domain in the 365 Repair Knowledge Network. It cannot be treated as a car with a different body type.
+Marine must be a first-class, separately purchasable service domain in the 365 Repair Knowledge Network. It cannot be treated as a car with a different body type, inherited from Automotive, or unlocked by a Motorcycle or Heavy Truck subscription.
 
 There is no single legitimate worldwide “Chilton for boats” that supplies every outboard, inboard, sterndrive, pod drive, personal watercraft, generator, hull system, parts diagram, repair manual and labour operation through one commercial API. The correct architecture is:
 
@@ -767,7 +811,7 @@ Results must be stored at capability level. A provider that returns a parts fich
 
 ### 3.6.9 Shop Manager marine changes
 
-Add a Marine & Watercraft workspace profile rather than duplicating the entire Shop Manager.
+Add a separately entitled Marine & Watercraft workspace module on the shared Shop Manager Core. It has its own routes, vessel/component identity, templates, provider adapters, search and coverage registry; it is not an Automotive subsection.
 
 Required additions:
 
@@ -861,20 +905,42 @@ Advertising or supplier commissions must never change safety instructions, speci
 
 ## 5. Architecture
 
-### 5.1 Separation of concerns
+### 5.1 Shared core with separate bounded repair domains
 
-Use two connected data domains:
+Use a layered modular architecture:
 
-| Domain | Purpose | Visibility |
+| Bounded context | Purpose | Visibility/entitlement |
 |---|---|---|
-| `shop_manager` | Customers, vehicles, work orders, private diagnostic notes, inspections, photos, job lines, parts, time, quotes, invoices and payments | Shop-scoped through existing membership/RLS rules |
-| `repair_knowledge` | Published and reviewable shared sources, recalls, communications, procedures, steps, DTC knowledge, diagnostic trees, tools and vehicle applicability | Published reads across authorized users; controlled contributor/reviewer/admin writes |
+| `shop_manager` shared core | Accounts, memberships, customers, technicians, common parts/inventory, work-order financials, quotes, invoices, payments, files, reminders and audit events | Shop-scoped through existing membership/RLS rules |
+| `repair_knowledge` governance core | Sources/licences, immutable revisions, contributor review, safety classes, provider contracts, coverage evidence and common publishing tools | Published/entitled reads; controlled contributor/reviewer/admin writes |
+| Automotive Repair domain | Automotive profiles, applicability, inspections, OBD/light-vehicle reports, automotive providers, labour and parts routing | Requires `repair_automotive` |
+| Motorcycle & Powersports domain | Motorcycle/tricycle/powersports profiles, inspections, connectors, scan formats, providers, labour and parts routing | Requires `repair_motorcycle` |
+| Heavy Truck & Fleet domain | Chassis/component graphs, fleet PM, bus/trailer templates, commercial diagnostics, providers, labour and parts routing | Requires `repair_heavy_truck` |
+| Marine & Watercraft domain | Vessel/component installations, hour-based maintenance, parts fiches, sea trials, marine diagnostics and providers | Requires `repair_marine` |
+| Entitlement and metering layer | Module catalogue, shop subscriptions, provider/OEM data passes, diagnostic packs, quotas, access logs and cost attribution | Server-side enforcement by shop, module, user/location, territory and contract |
 
-Do not copy the full global knowledge record into every shop. Link it to the work order by immutable knowledge revision ID, then store the shop's execution notes and measured results privately.
+These are logical bounded contexts. They may initially live in the existing Supabase project and share infrastructure, but tables, services, routes, search indexes, cache keys, storage paths and RLS policies must carry `module_key` or an equivalent enforceable boundary.
+
+Do not create four copies of customer accounting. A common work order header and invoice engine may be reused, but every technical child record is owned by one module and one immutable domain asset/configuration revision.
+
+Do not copy the full global knowledge record into every shop. Link it to the work order by immutable knowledge revision ID, then store the shop's execution notes and measured results privately. Federated reporting may join authorized domain outputs; it does not erase their boundaries.
 
 ### 5.2 Proposed database tables
 
 Create a dedicated `repair_knowledge` schema after confirming that Lovable/Supabase exposes it through the generated types and API configuration.
+
+#### Product modules, subscriptions and entitlements
+
+| Table | Purpose | Essential fields |
+|---|---|---|
+| `module_catalog` | Stable catalogue of first-class products | `module_key`, `name`, `domain`, `status`, `route_prefix`, `default_features`, `version`; seed `shop_manager_core`, `repair_automotive`, `repair_motorcycle`, `repair_heavy_truck`, `repair_marine` |
+| `shop_module_entitlements` | Authoritative module access per shop/subscription | `id`, `shop_id`, `module_key`, `subscription_item_id`, `status`, `starts_at`, `grace_ends_at`, `expires_at`, `seat_limit`, `location_limit`, `territories` |
+| `module_addons` | Provider/OEM data passes, diagnostic packs and Network Intelligence | `addon_key`, `module_key`, `provider_id`, `capabilities`, `territories`, `billing_metric`, `active` |
+| `shop_addon_entitlements` | Shop access to a module-specific add-on | `id`, `shop_id`, `module_key`, `addon_key`, `subscription_item_id`, `quota`, `used`, `resets_at`, `starts_at`, `expires_at`, `status` |
+| `module_usage_events` | Meter provider/API/device usage and calculate cost of goods sold | `id`, `shop_id`, `user_id`, `module_key`, `addon_key`, `provider_id`, `capability`, `quantity`, `unit`, `territory`, `cost_amount`, `currency`, `occurred_at` |
+| `asset_domain_reclassifications` | Audited correction of an asset assigned to the wrong module | `id`, `asset_id`, `from_module_key`, `to_module_key`, `reason`, `approved_by`, `created_at` |
+
+Entitlement status must be checked by server functions and RLS before provider lookup, knowledge retrieval, export, AI retrieval or diagnostic access. Subscription webhooks update entitlements idempotently; client-side navigation state is never the authority.
 
 #### Provenance and imports
 
@@ -892,7 +958,7 @@ Create a dedicated `repair_knowledge` schema after confirming that Lovable/Supab
 |---|---|---|
 | `vehicle_platforms` | Normalized global vehicle/platform identity | `id`, `make`, `model`, `generation`, `platform_code`, `market`, `year_from`, `year_to` |
 | `powertrains` | Engine, transmission, fuel/hybrid/EV variants | `id`, `platform_id`, `engine_code`, `engine_family`, `displacement`, `fuel_type`, `transmission_code`, `drive_type` |
-| `applicability_rules` | Join knowledge to compatible vehicles | `id`, `knowledge_revision_id`, `platform_id`, `powertrain_id`, `market`, `vin_pattern`, `chassis_code`, `year_from`, `year_to`, `include_exclude`, `confidence`, `review_status` |
+| `applicability_rules` | Join knowledge to compatible assets inside one module | `id`, `module_key`, `knowledge_revision_id`, `platform_id`, `powertrain_id`, `asset_profile_id`, `component_pattern`, `market`, `vin_frame_chassis_pattern`, `year_from`, `year_to`, `include_exclude`, `confidence`, `review_status` |
 
 Never assume US make/model/year applicability equals a Philippines, Japanese, Chinese, Canadian, or European variant.
 
@@ -901,11 +967,11 @@ Never assume US make/model/year applicability equals a Philippines, Japanese, Ch
 | Table | Purpose | Essential fields |
 |---|---|---|
 | `providers` | Commercial/partner provider registry | `id`, `name`, `provider_type`, `territories`, `capabilities`, `status`, `terms_reviewed_at` |
-| `provider_entitlements` | Control provider access by plan, shop, user and territory | `id`, `provider_id`, `shop_id`, `plan_key`, `country`, `user_limit`, `starts_at`, `expires_at`, `status` |
+| `provider_entitlements` | Control provider access by module, add-on, shop, user and territory | `id`, `provider_id`, `shop_id`, `module_key`, `addon_key`, `subscription_item_id`, `country`, `user_limit`, `starts_at`, `expires_at`, `status` |
 | `provider_vehicle_mappings` | Map the canonical 365 vehicle to vendor identifiers | `id`, `provider_id`, `vehicle_platform_id`, `powertrain_id`, `provider_vehicle_id`, `market`, `match_method`, `confidence`, `verified_at` |
 | `provider_cache_entries` | Contract-aware response cache | `id`, `provider_id`, `request_key`, `record_type`, `payload_or_reference`, `retrieved_at`, `expires_at`, `storage_permission`, `purge_required` |
-| `labour_operations` | Normalized licensed/community/shop labour operation snapshots | `id`, `provider_id`, `provider_operation_id`, `vehicle_mapping_id`, `description`, `hours`, `time_source_type`, `overlap_group`, `effective_at`, `expires_at` |
-| `provider_access_logs` | Contract, billing and security audit | `id`, `provider_id`, `shop_id`, `user_id`, `capability`, `provider_record_id`, `country`, `requested_at`, `cache_hit`, `result_status` |
+| `labour_operations` | Normalized licensed/community/shop labour operation snapshots owned by one module | `id`, `module_key`, `provider_id`, `provider_operation_id`, `asset_or_component_mapping_id`, `description`, `hours`, `time_source_type`, `overlap_group`, `effective_at`, `expires_at` |
+| `provider_access_logs` | Contract, billing and security audit | `id`, `provider_id`, `shop_id`, `user_id`, `module_key`, `addon_key`, `capability`, `provider_record_id`, `country`, `requested_at`, `cache_hit`, `result_status` |
 
 Do not place commercial-provider API secrets or reusable access tokens in these tables as plain text. Store secrets in the platform's server-side secret manager and retain only key identifiers/rotation metadata in the database.
 
@@ -913,16 +979,20 @@ Do not place commercial-provider API secrets or reusable access tokens in these 
 
 | Table | Purpose | Essential fields |
 |---|---|---|
-| `service_assets` | Canonical identity across cars, motorcycles, trucks, buses, trailers, equipment and vessels | `id`, `asset_domain`, `asset_type`, `make`, `model`, `series`, `model_code`, `year`, `original_market`, `current_country`, `identity_confidence` |
+| `service_assets` | Shared non-technical asset header across the four repair domains | `id`, `module_key`, `asset_domain`, `asset_type`, `make`, `model`, `series`, `model_code`, `year`, `original_market`, `current_country`, `identity_confidence`; exactly one active owning module |
 | `asset_identifiers` | Multiple identifiers without assuming a 17-character VIN | `id`, `asset_id`, `identifier_type`, `value`, `issuer_or_make`, `country`, `verified_at`; types include VIN, chassis, frame, HIN/CIN, vessel registration, official/IMO number, engine/component serial and fleet number |
 | `asset_components` | Installed truck, motorcycle, trailer, vessel-propulsion and onboard systems | `id`, `asset_id`, `parent_component_id`, `component_type`, `manufacturer`, `model`, `serial_number`, `rating`, `software_or_calibration`, `installed_from`, `installed_to` |
 | `asset_configuration_revisions` | Immutable snapshots used by work orders/provider lookups | `id`, `asset_id`, `revision_number`, `configuration_json`, `verified_by`, `verified_at` |
 | `provider_component_mappings` | Map provider records to the whole asset or a component | `id`, `provider_id`, `asset_id`, `component_id`, `provider_type_id`, `market`, `match_level`, `confidence`, `verified_at` |
-| `coverage_claims` | Capability-level provider coverage registry | `id`, `provider_id`, `contract_version`, `country`, `asset_domain`, `asset_type`, `make`, `model_pattern`, `year_from`, `year_to`, `component_pattern`, `capability`, `status`, `expires_at` |
+| `coverage_claims` | Capability-level provider coverage registry | `id`, `provider_id`, `module_key`, `contract_version`, `country`, `asset_domain`, `asset_type`, `make`, `model_pattern`, `year_from`, `year_to`, `component_pattern`, `capability`, `status`, `expires_at` |
 | `coverage_test_runs` | Evidence from sandbox and production validation | `id`, `coverage_claim_id`, `asset_id`, `tested_at`, `environment`, `match_level`, `result`, `provider_reference`, `notes` |
 | `coverage_gaps` | Demand-weighted unsupported or incorrect matches | `id`, `asset_id`, `requested_capability`, `country`, `occurrence_count`, `first_seen_at`, `last_seen_at`, `status`, `provider_ticket`, `resolution` |
-| `diagnostic_connector_profiles` | Known connector/protocol/tool requirements | `id`, `asset_or_platform_id`, `connector_type`, `location`, `protocols`, `required_vci`, `required_cable`, `supported_functions`, `safety_notes` |
-| `marine_vessel_profiles` | Hull, registration and operating identity | `asset_id`, `hin_cin`, `registration_number`, `issuing_authority`, `official_number`, `imo_number`, `hull_material`, `length_overall`, `beam`, `draft`, `use_class`, `home_port` |
+| `diagnostic_connector_profiles` | Known connector/protocol/tool requirements scoped to one module | `id`, `module_key`, `asset_or_platform_id`, `connector_type`, `location`, `protocols`, `required_vci`, `required_cable`, `supported_functions`, `safety_notes` |
+| `automotive_asset_profiles` | Automotive-only VIN/platform/powertrain/emissions configuration | `asset_id`, `vin`, `platform_id`, `powertrain_id`, `body`, `drive_type`, `emissions_family`, `trim` |
+| `motorcycle_asset_profiles` | Motorcycle/powersports identity without car-field assumptions | `asset_id`, `frame_number`, `engine_number`, `model_code`, `displacement`, `transmission_type`, `abs_type`, `sidecar_or_body_builder`, `battery_motor_configuration` |
+| `heavy_truck_asset_profiles` | Truck/bus/tractor chassis and fleet identity | `asset_id`, `chassis_number`, `cab_series`, `wheelbase`, `axle_layout`, `gvwr_class`, `fleet_number`, `body_upfit`, `brake_architecture`, `emissions_level` |
+| `trailer_asset_profiles` | Trailer identity owned by Heavy Truck & Fleet | `asset_id`, `vin_or_chassis`, `trailer_type`, `axle_configuration`, `brake_system`, `refrigeration_unit`, `liftgate_or_auxiliary_systems` |
+| `marine_vessel_profiles` | Hull, registration and operating identity owned by Marine | `asset_id`, `hin_cin`, `registration_number`, `issuing_authority`, `official_number`, `imo_number`, `hull_material`, `length_overall`, `beam`, `draft`, `use_class`, `home_port` |
 | `marine_component_installations` | Position and configuration of propulsion/auxiliary systems over time | `asset_id`, `component_id`, `position`, `role`, `drive_type`, `gear_ratio`, `rotation`, `propeller_spec`, `installed_from`, `installed_to`, `evidence` |
 | `marine_hour_readings` | Auditable engine/generator hours from gauges, scans or telemetry | `asset_id`, `component_id`, `hours`, `recorded_at`, `source_type`, `source_reference`, `work_order_id`, `confidence` |
 | `marine_telemetry_consents` | Owner authorization and scope for vessel data ingestion | `asset_id`, `owner_id`, `gateway_id`, `allowed_paths`, `read_write_mode`, `purpose`, `granted_at`, `revoked_at` |
@@ -933,7 +1003,7 @@ The existing Shop Manager vehicle table can remain the transactional reference d
 
 | Table | Purpose | Essential fields |
 |---|---|---|
-| `knowledge_items` | Stable identity for a procedure, diagnostic tree, DTC article, specification note, recall or communication | `id`, `kind`, `slug`, `title`, `summary`, `safety_class`, `current_revision_id`, `visibility`, `status` |
+| `knowledge_items` | Stable identity for a procedure, diagnostic tree, DTC article, specification note, recall or communication | `id`, `module_key`, `kind`, `slug`, `title`, `summary`, `safety_class`, `current_revision_id`, `visibility`, `status`; a cross-domain concept is represented by separately reviewed module records |
 | `knowledge_revisions` | Immutable versioned content | `id`, `knowledge_item_id`, `revision_number`, `source_id`, `author_id`, `body`, `change_summary`, `licence`, `review_status`, `published_at`, `supersedes_id` |
 | `procedure_steps` | Ordered executable instructions | `id`, `revision_id`, `step_number`, `instruction`, `warning`, `expected_result`, `estimated_minutes`, `requires_verification` |
 | `specifications` | Structured values with conditions | `id`, `revision_id`, `name`, `value_numeric`, `value_text`, `unit`, `condition`, `source_record_id`, `confidence` |
@@ -947,12 +1017,12 @@ Torque, fluid, alignment, pressure, voltage, resistance, temperature, clearance,
 
 | Table | Purpose | Essential fields |
 |---|---|---|
-| `dtc_definitions` | Legally reusable or original DTC knowledge | `id`, `code`, `system`, `manufacturer_scope`, `title`, `description`, `source_id`, `review_status` |
-| `diagnostic_trees` | Structured guided testing | `id`, `knowledge_item_id`, `entry_conditions`, `safety_class`, `revision_id` |
+| `dtc_definitions` | Legally reusable or original DTC knowledge | `id`, `module_key`, `code`, `system`, `manufacturer_scope`, `title`, `description`, `source_id`, `review_status` |
+| `diagnostic_trees` | Structured guided testing | `id`, `module_key`, `knowledge_item_id`, `entry_conditions`, `safety_class`, `revision_id` |
 | `diagnostic_nodes` | Question/test/action/result nodes | `id`, `tree_id`, `node_type`, `instruction`, `measurement_type`, `unit`, `expected_min`, `expected_max`, `next_pass_id`, `next_fail_id` |
 | `recalls` | Normalized campaign metadata | `id`, `source_record_id`, `campaign_number`, `manufacturer`, `title`, `risk`, `remedy`, `report_date`, `source_url` |
 | `manufacturer_communications` | TSB/communication metadata and permitted content/link | `id`, `source_record_id`, `communication_number`, `title`, `summary`, `published_at`, `source_url`, `document_storage_allowed` |
-| `scan_reports` | Shop-private scan session header | In `shop_manager`: `id`, `shop_id`, `work_order_id`, `vehicle_id`, `scanner`, `protocol`, `started_at`, `completed_at`, `raw_file_path`, `consent_status` |
+| `scan_reports` | Shop-private, module-owned scan session header | In `shop_manager`: `id`, `shop_id`, `module_key`, `work_order_id`, `asset_id`, `component_id`, `scanner`, `protocol`, `started_at`, `completed_at`, `raw_file_path`, `consent_status` |
 | `scan_report_codes` | Codes recorded during a scan | In `shop_manager`: `scan_report_id`, `code`, `module`, `status`, `description_snapshot`, `freeze_frame` |
 | `scan_report_pids` | Selected live/freeze-frame measurements | In `shop_manager`: `scan_report_id`, `pid`, `name`, `value`, `unit`, `captured_at`, `capture_type` |
 
@@ -998,7 +1068,11 @@ Publication rules:
 
 | Route | Purpose | MVP status |
 |---|---|---|
-| `/workspace/repair-knowledge` | Search by VIN/vehicle, DTC, symptom, procedure, recall or bulletin | Build in MVP |
+| `/workspace/automotive` | Automotive module home, automotive assets/jobs, coverage and entitled technical search | Module shell/guard in MVP |
+| `/workspace/motorcycles` | Motorcycle & Powersports module home, assets, jobs, templates, diagnostics and coverage | Separate module shell; domain build follows acceptance fleet |
+| `/workspace/heavy-trucks` | Heavy Truck & Fleet module home, fleets, chassis/components, PM, trailers, diagnostics and coverage | Separate module shell; domain build follows acceptance fleet |
+| `/workspace/marine` | Marine & Watercraft module home, vessels/components, hours, parts, diagnostics and coverage | Separate module shell; domain build follows acceptance fleet |
+| `/workspace/repair-knowledge` | Federated search over only the modules/provider packs currently entitled to the shop; results remain grouped by domain | Build shared search shell in MVP |
 | `/workspace/repair-knowledge/$slug` | Published article/procedure with applicability and revision/source labels | Build in MVP |
 | `/workspace/scan-reports` | List scan reports for the shop | MVP can start with manual/file import |
 | `/workspace/scan-reports/new` | Create or upload a scan report and attach it to vehicle/work order | Build in MVP |
@@ -1054,51 +1128,59 @@ For failed/attention items:
 
 ## 7. Zero-cost MVP
 
-The zero-cost MVP should prove the closed loop from vehicle → knowledge → work order → result without pretending to have complete OEM coverage.
+The zero-cost MVP should prove the closed loop from domain-owned service asset → knowledge → work order → result without pretending to have complete OEM coverage.
 
 ### 7.1 MVP scope
 
-1. **Repair Knowledge schema and provenance**
+The first MVP may populate Automotive content first because the existing Shop Manager is automotive-oriented, but the product boundary must exist before content expansion. Motorcycle, Heavy Truck and Marine cannot be delivered later as Automotive feature flags.
+
+1. **Product module and entitlement foundation**
+   - Seed `shop_manager_core`, `repair_automotive`, `repair_motorcycle`, `repair_heavy_truck` and `repair_marine`.
+   - Add module/add-on entitlements, server-side route/API guards and domain-labelled navigation.
+   - Add `module_key` to asset, work-order knowledge attachment, provider access and usage records.
+   - Prove that a shop can hold Motorcycle or Heavy Truck without Automotive and cannot retrieve an unsubscribed domain through URL, API, search, export or AI retrieval.
+
+2. **Repair Knowledge schema and provenance**
    - Create sources, import runs, source records, knowledge items/revisions, applicability, procedure steps, recalls and communication metadata.
    - Add generated Supabase types and strict RLS.
 
-2. **NHTSA integration**
+3. **NHTSA integration**
    - Reuse the existing VIN decoder.
    - Add recall lookup/import with campaign/source links.
    - Add manufacturer-communication metadata lookup.
    - Cache results and show source/update timestamps.
 
-3. **Transport Canada recalls**
+4. **Transport Canada recalls**
    - Add a scheduled importer for the open dataset after recording its exact licence and attribution requirements in `sources`.
 
-4. **Search**
+5. **Search**
    - PostgreSQL full-text search across title, summary, DTC, symptoms, procedures and official metadata.
    - Filters for vehicle, engine/chassis, market, knowledge type, safety class and verification state.
 
-5. **Work-order integration**
+6. **Work-order integration**
    - Add the knowledge card to work-order detail.
    - Attach immutable knowledge revisions.
    - Convert selected procedure time/tasks to job lines only after technician confirmation.
 
-6. **Vehicle integration**
+7. **Automotive asset integration**
    - Add possible recall and bulletin panels.
    - Clearly label a match as `possible`, `vehicle-level`, or `VIN-confirmed`.
 
-7. **Scan-report MVP**
+8. **Scan-report MVP**
    - Manual entry and JSON/CSV upload first.
    - Store DTCs, modules, statuses and selected freeze-frame/live values.
    - Direct Bluetooth/USB scanning is a later companion-app project because a cloud web application cannot reliably access every scanner/vehicle across browsers and mobile platforms.
 
-8. **Original starter content**
+9. **Original starter content**
    - Publish a small, reviewed set of procedures written specifically for 365.
    - Start with common low/medium-risk jobs and diagnostic fundamentals.
    - Include applicability, tools, estimated time, specifications with sources, inspection checkpoints and post-repair verification.
 
-9. **Basic contribution workflow**
+10. **Basic contribution workflow**
    - Draft, submit, review, publish, supersede and report.
    - Verified technicians only for the initial pilot.
 
-10. **Testing and monitoring**
+11. **Testing and monitoring**
     - Import idempotency tests.
     - RLS tests separating global published content, drafts/reviews and shop-private records.
     - Applicability matching tests.
@@ -1140,6 +1222,9 @@ The zero-cost MVP should prove the closed loop from vehicle → knowledge → wo
 - Identify legacy tables that exist only in the old database/table snapshots.
 - Fix inconsistent route references in feature copy (`/shop/*` vs active `/workspace/*`).
 - Add automated smoke coverage for the work-order → inspection → invoice lifecycle.
+- Define the four stable repair-module keys, product catalogue, module-specific route ownership and domain boundary rules.
+- Confirm subscription items/webhooks can grant Motorcycle, Heavy Truck or Marine without Automotive.
+- Add security tests proving unsubscribed domain data cannot leak through direct URLs, APIs, search, exports or AI retrieval.
 
 **Exit condition:** the current Shop Manager foundation is reproducible from migrations and safe across two test shops.
 
@@ -1172,9 +1257,10 @@ The zero-cost MVP should prove the closed loop from vehicle → knowledge → wo
 
 **Exit condition:** 365 can publish original, reviewed, attributable content with a complete audit trail.
 
-### Phase 4 — multi-domain diagnostic companion and measurement intelligence
+### Phase 4 — domain-specific diagnostic companions and measurement intelligence
 
-- Replace the passenger-car-only OBD assumption with supported profiles for car/LCV, motorcycle/powersports, truck/bus, trailer, off-highway and marine.
+- Replace the passenger-car-only OBD assumption with separately entitled diagnostic profiles for Automotive, Motorcycle & Powersports, Heavy Truck & Fleet and Marine & Watercraft.
+- Keep each module's connectors, report parsers, provider licences, supported functions, safety controls and device entitlements isolated behind a common signed companion transport.
 - Choose supported VCI/adapter families, protocols and exact vehicle cables.
 - Build a signed Windows/Android companion or approved provider bridge for scanner communication.
 - Import generic OBD-II data where applicable plus provider-approved motorcycle, heavy-truck and marine reports; keep NMEA/Signal K telemetry separate from factory diagnostic reports.
@@ -1205,7 +1291,9 @@ The zero-cost MVP should prove the closed loop from vehicle → knowledge → wo
 - Run the Philippines coverage acceptance test before choosing or promoting a provider.
 - Add providers through adapters so one vendor can be replaced without rewriting Shop Manager.
 - Gate licensed content according to provider territory, user, display, translation, AI-processing, storage, print/export and retention rules.
-- Add advanced analytics, licensed coverage, multi-location benchmarking and contributor rewards to paid tiers.
+- Publish Automotive, Motorcycle, Heavy Truck and Marine as separate subscription SKUs with independent trials, cancellation, seats/locations, territories, quotas and cost attribution.
+- Offer multi-domain bundles only as discounts over separate entitlements; never make Automotive a hidden prerequisite.
+- Add advanced analytics, licensed coverage, multi-location benchmarking and contributor rewards to paid module/add-on tiers.
 - Preserve the 365-owned knowledge network and anonymized benchmarks as the long-term defensible asset.
 
 **Exit condition:** at least one commercial provider passes the local coverage/licensing test and licensed data adds value without contaminating or controlling 365-owned knowledge.
@@ -1218,9 +1306,15 @@ The zero-cost MVP should prove the closed loop from vehicle → knowledge → wo
 - [ ] Confirm production schema and RLS for all current work-order, inspection, time, parts, quote, invoice and vehicle tables.
 - [ ] Add a documented data-rights policy: allowed, link-only, metadata-only and prohibited sources.
 - [ ] Add terminology rule: `shop estimate`, `365 community benchmark`, and `licensed flat-rate time` must never be mixed.
+- [ ] Approve the four stable repair-module keys and asset ownership boundary, including the light-commercial routing rule and PWC ownership by Marine.
+- [ ] Add a threat model for cross-module entitlement leakage through routes, APIs, database policies, caches, search, exports and AI retrieval.
 
 ### P1 — first usable release
 
+- [ ] Migration: module catalogue, shop module/add-on entitlements, module usage events and audited asset-domain reclassification.
+- [ ] Subscription webhook mapping and server-side route/API/RLS guards for all four repair modules.
+- [ ] Independent-module test fixture: Motorcycle-only and Heavy-Truck-only shops with no Automotive entitlement.
+- [ ] Domain-owned workspace shells and navigation for Automotive, Motorcycle, Heavy Truck and Marine.
 - [ ] Migration: `repair_knowledge` provenance, vehicle applicability, knowledge revision, recall and communication tables.
 - [ ] Migration: Shop Manager scan-report and knowledge-attachment tables.
 - [ ] Supabase grants/RLS/storage policies and generated TypeScript types.
@@ -1248,9 +1342,12 @@ The zero-cost MVP should prove the closed loop from vehicle → knowledge → wo
 ### P3 — later integrations
 
 - [ ] Android/Windows OBD companion proof of concept.
-- [ ] Generalized service-asset, identifier, component and configuration-revision schema.
-- [ ] Motorcycle, scooter, underbone, tricycle, ATV/UTV and electric two/three-wheeler identity forms.
-- [ ] Truck, bus and trailer component-configuration forms.
+- [ ] Shared service-asset kernel plus separate Automotive, Motorcycle, Heavy Truck and Marine profile tables.
+- [ ] Motorcycle & Powersports module: its own assets, routes, identity forms, inspections, search index, providers, diagnostics, coverage and subscription/add-on entitlements.
+- [ ] Heavy Truck & Fleet module: its own assets, routes, chassis/component forms, PM/inspection templates, search index, providers, diagnostics, coverage and subscription/add-on entitlements.
+- [ ] Domain-specific cache keys, storage paths, provider logs, usage metering and cost-of-goods reporting.
+- [ ] Cross-module bundle checkout that grants separate underlying entitlements.
+- [ ] Federated search that returns grouped results only from entitled modules and never performs cross-domain applicability fallback.
 - [ ] Marine vessel, registration/HIN/manual-identity and multi-engine component forms.
 - [ ] Marine installation history for engines, gears, drives, propellers, generators, controls and electronics.
 - [ ] Marine hour readings, date/hour maintenance triggers, sea-trial records and telemetry consent.
@@ -1326,6 +1423,10 @@ A source is not production-ready until all answers are recorded:
 12. **Marine identity is component-based.** A vessel, each engine, drive, gear, generator and major onboard system retain separate identity and installation history.
 13. **Same horsepower is not fitment.** Marine parts/procedures require exact model, serial range, installation position and configuration.
 14. **Telemetry is not diagnosis.** Signal K/NMEA data may support trends and evidence but does not replace factory diagnostic information or authorize vessel control.
+15. **Automotive is not the parent domain.** Motorcycle, Heavy Truck and Marine are independent purchasable modules with their own technical bounded contexts.
+16. **Shared transactions do not merge technical data.** Customers, accounting, inventory and invoices may be reused through Shop Manager Core while identity, applicability, providers, diagnostics and templates remain module-owned.
+17. **Entitlements are enforced before retrieval.** Routes, APIs, RLS, caches, search, exports, AI retrieval and provider calls must reject unsubscribed domains server-side.
+18. **Bundles preserve boundaries.** A discount can combine modules, but provider contracts, quotas, costs, access logs and technical results remain separately attributed.
 
 ## 13. Recommended first build slice
 
