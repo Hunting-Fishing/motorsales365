@@ -747,7 +747,7 @@ No country adapter may claim another country's data coverage.
 
 ## 17. Outreach package
 
-Use [the Vehicle History Partner Outreach Pack](./vehicle-history-outreach/README.md) and [Partner Tracker](./vehicle-history-outreach/365_VEHICLE_HISTORY_PARTNER_TRACKER.csv).
+Use the complete [Vehicle History Partner Outreach Pack](./vehicle-history-outreach/README.md), [Master Outreach Playbook](./vehicle-history-outreach/365_MASTER_OUTREACH_PLAYBOOK.md), [Government Pilot Concept Note](./vehicle-history-outreach/365_GOVERNMENT_PILOT_CONCEPT_NOTE.md), [Security and Privacy Assurance](./vehicle-history-outreach/365_SECURITY_PRIVACY_ASSURANCE.md), [Buyer/Seller Safety Playbook](./vehicle-history-outreach/365_BUYER_SELLER_SAFETY_PLAYBOOK.md), [Partner RFI](./vehicle-history-outreach/365_PARTNER_RFI_AND_DUE_DILIGENCE.md), [Readiness Checklist](./vehicle-history-outreach/365_PRE_OUTREACH_READINESS_CHECKLIST.csv), [Field Matrix](./vehicle-history-outreach/365_DATA_SHARING_FIELD_MATRIX.csv), [Pilot KPI Scorecard](./vehicle-history-outreach/365_PILOT_KPI_SCORECARD.csv), [Risk Register](./vehicle-history-outreach/365_RISK_REGISTER.csv) and [Partner Tracker](./vehicle-history-outreach/365_VEHICLE_HISTORY_PARTNER_TRACKER.csv).
 
 Before sending:
 
@@ -911,7 +911,7 @@ This sequence creates a valuable asset immediately, proves the workflow with rea
 - [LTO Data Privacy Notice](https://lto.gov.ph/data-privacy-notice/)
 - [LTO contact information](https://lto.gov.ph/contact-us/)
 - [National Privacy Commission: Data Privacy Act IRR](https://privacy.gov.ph/implementing-rules-regulations-data-privacy-act-2012/)
-- [NPC Circular 2016-02: government data-sharing agreements](https://privacy.gov.ph/wp-content/uploads/2022/01/Sgd-NPC-Circular-16-02-Data-Sharing-Agreements-Involving-Government-Agencies.pdf)
+- [NPC Circular 2020-03: Data Sharing Agreements](https://privacy.gov.ph/wp-content/uploads/2021/01/Circular-Data-Sharing-Agreement-amending-16-02-21-Dec-2020-clean-copy-FINAL-LYA-and-JDN-signed-minor-edit.pdf)
 - [NPC PIC/PIP and data-processing-system registration FAQ](https://privacy.gov.ph/pips-and-pics/faqs/)
 - [Korea KIDI CarHistory sample/limitations](https://www.carhistory.kr/guide/sample.page?lang=en)
 - [Singapore LTA OneMotoring digital services](https://onemotoring.lta.gov.sg/content/onemotoring/home/digitalservices.html)
