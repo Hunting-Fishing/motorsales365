@@ -1,0 +1,13 @@
+test_case_id,module_key,region,country,language,asset_class,manufacturer,model,model_year,market_variant,vin_hin_frame_chassis,engine_make,engine_model,engine_code,engine_serial,transmission_or_drive,emissions_system,brake_system,provider_vehicle_id,identity_exact,labour_times_available,procedures_available,wiring_available,dtc_guided_tests_available,maintenance_available,parts_catalog_available,illustrations_available,live_price_available,inventory_available,order_api_available,diagnostic_coverage_available,programming_available,content_language,source_update_date,response_latency_ms,coverage_result,confidence,evidence_reference,provider_notes,365_reviewer,verified_at
+PH-AUTO-001,repair_automotive,Asia-Pacific,Philippines,en,passenger_vehicle,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
+PH-MOTO-001,repair_motorcycle,Asia-Pacific,Philippines,en,motorcycle,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
+PH-TRUCK-001,repair_heavy_truck,Asia-Pacific,Philippines,en,heavy_truck,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
+PH-MARINE-001,repair_marine,Asia-Pacific,Philippines,en,outboard,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
+EU-AUTO-001,repair_automotive,Europe,To be selected,en,passenger_vehicle,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
+EU-MOTO-001,repair_motorcycle,Europe,To be selected,en,motorcycle,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
+EU-TRUCK-001,repair_heavy_truck,Europe,To be selected,en,heavy_truck,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
+EU-MARINE-001,repair_marine,Europe,To be selected,en,inboard,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
+NA-AUTO-001,repair_automotive,North America,United States,en,passenger_vehicle,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
+NA-MOTO-001,repair_motorcycle,North America,United States,en,motorcycle,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
+NA-TRUCK-001,repair_heavy_truck,North America,United States,en,heavy_truck,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
+NA-MARINE-001,repair_marine,North America,United States,en,outboard,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,not_tested,,,,
