@@ -3,7 +3,8 @@
 **Repository:** `Hunting-Fishing/motorsales365`  
 **Primary integration surface:** Shop Manager (`/workspace`)  
 **Status:** Implementation plan based on repository inspection  
-**Prepared:** 2026-08-05
+**Prepared:** 2026-08-05  
+**Last expanded:** 2026-08-06 — global provider acquisition and vendor outreach
 
 ## 1. Executive decision
 
@@ -871,6 +872,195 @@ Monetization must never depend on hiding safety information or steering a techni
 - An unsupported lookup must be shown as unsupported; never substitute a similar outboard, automotive base engine or different serial range.
 
 
+
+## 3.7 Global provider access and acquisition strategy
+
+### Decision
+
+365 will launch from the Philippines but acquire data rights using a global three-region structure:
+
+1. **Asia-Pacific launch pack** — Philippines first, then Southeast Asia, Japan, Korea, China, India and Oceania.
+2. **Europe/UK pack** — EEA/UK vehicle variants, European OEM repair information, multilingual content and region-specific security access.
+3. **North America pack** — United States and Canada vehicle identity, parts standards, repair/labour content and commercial-truck coverage.
+
+A provider may serve more than one region, but its contract and coverage result must be recorded independently for each repair module, territory and capability. “Global coverage” in marketing material is not evidence that a particular Philippine, European, American or Canadian configuration is supported.
+
+The detailed procurement materials, contact routes, email drafts, request-for-information questionnaire and evaluation scorecard live in [365 Repair Data Vendor Outreach Pack](./vendor-outreach/README.md).
+
+### 3.7.1 Six access types that must not be confused
+
+| Access type | What 365 receives | Appropriate use | Contract requirement |
+|---|---|---|---|
+| **API or data feed** | Structured vehicle, labour, repair, parts or diagnostic data | Native Shop Manager integration | Explicit multi-tenant SaaS, territory, display, cache, user and customer-facing rights |
+| **Embedded provider viewer** | Provider-controlled screen or component inside 365 | Licensed content without bulk replication | White-label/embedded rights, SSO rules, allowed users and branding requirements |
+| **Deep link / launch integration** | Contextual link into a provider or OEM portal | Exact vehicle/job hand-off for separately licensed users | Approved link format, authentication method and prohibition on session-token sharing |
+| **Professional portal subscription** | Human technician access to a website or desktop product | Shop use when no integration right exists | Per-user/site terms; never scraped, proxied or resold by 365 |
+| **Diagnostic-device/report bridge** | Scan reports, measurements and supported actions from a VCI ecosystem | Attach source-labelled evidence to an asset and work order | Approved export/SDK/API, hardware ownership, device licence, cable/vehicle coverage and safety limits |
+| **OEM/business-partner API** | Dealer, distributor or authorised-partner parts, campaign, publication, pricing or ordering services | Strategic OEM/distributor workflows | Business-partner status, market appointment, data-processing terms and OEM-specific entitlements |
+
+The procurement team must ask the provider which type is actually offered. A demo login or dealership subscription is not an API licence.
+
+### 3.7.2 Regional stack by independently purchasable repair module
+
+| Module | Asia-Pacific launch stack | Europe/UK stack | North America stack |
+|---|---|---|---|
+| **Automotive** | TecAlliance APAC/TecDoc/TecRMI/TecCom; Infomedia VIN/Parts/OMNI; Autodata fallback; direct Japanese, Korean and Chinese OEM/distributor agreements | TecAlliance/TecRMI/TecDoc; HaynesPro/Infopro Digital Automotive; Autodata; individual OEM RMI/SERMI access for authorised shop functions | MOTOR DaaS for repair/labour; Auto Care ACES/PIES plus Epicor Catalog for parts; Infomedia where OEM-authorised; Mitchell integration evaluation |
+| **Motorcycle & Powersports** | Autodata Motorcycle and HaynesPro coverage test; TEXA Bike; direct Honda/Yamaha/Suzuki/Kawasaki and regional distributor relationships; TecAlliance/ARI parts where exact coverage exists | HaynesPro/Autodata; TEXA Bike; OEM RMI/authorised networks; ARI powersports catalogues where licensed | Autodata/HaynesPro; ARI powersports eCatalogues; NCM/Spader powersports flat-rate evaluation; direct OEM and specialist manual-provider negotiations |
+| **Heavy Truck & Fleet** | TecRMI Truck/TecDoc Truck and HaynesPro Truck; Jaltest/TEXA/Bosch diagnostics; direct Isuzu/Hino/Fuso/UD and Chinese/Korean/Indian OEM/component systems | TecRMI Truck/HaynesPro Truck; Jaltest/TEXA/Bosch; direct Daimler Truck, Volvo/Renault, Scania, MAN, DAF, Iveco and component-OEM access | MOTOR FleetCross/DaaS, Mitchell TruckSeries integration, Diesel Repair and Noregon JPRO; Auto Care heavy-duty data standards; OEM/component systems |
+| **Marine & Watercraft** | ARI/Dealer Spike catalogue coverage test; Volvo Penta business-partner APIs; Jaltest/TEXA; direct Yamaha/Suzuki/Honda/Tohatsu/Mercury and diesel OEM/distributor agreements | ARI plus Volvo Penta APIs; Jaltest/TEXA; European engine/drive OEM business-partner systems; OEM portal access | ARI PartStream/DataSmart; NCM/Spader marine flat rates; MOTOR does not replace marine data; Jaltest/TEXA and direct Mercury/Volvo Penta/Cummins/Yamaha/BRP relationships |
+
+### 3.7.3 Newly confirmed provider paths
+
+#### Infomedia API family
+
+Infomedia must be evaluated as more than Microcat. Its current [API directory](https://www.infomedia.com.au/apis/) includes:
+
+- VIN API;
+- Parts API and parts supersessions;
+- VIN & Parts Ecommerce API with catalogue hierarchy;
+- Parts Validation API;
+- Service & Repairs (OMNI) API for VIN-specific service and repair operations;
+- Order and appointment integration.
+
+These APIs are positioned for OEMs, dealers and authorised partners. The first discussion must establish whether an independent multi-tenant marketplace and Shop Manager can qualify, which OEMs/territories are available, and whether customer-facing parts lookup and ordering are permitted.
+
+#### Volvo Penta business-partner APIs
+
+The official [Volvo Penta API portal](https://developer.volvopenta.com/volvopenta/ext/api) lists business-partner services for parts lists, publications, spare parts, supersessions, product-correction campaigns, prices, inventory and shop/order workflows. This is a priority Marine OEM approach because it can potentially join exact product identity, service information, parts and commerce.
+
+Access is not assumed to be public. 365 must apply through the [Volvo Penta API Products](https://developer.volvopenta.com/volvopenta/ext/product) business-partner route and request Philippine/APAC eligibility, sandbox access and downstream-display rights.
+
+#### North American parts foundation
+
+[Auto Care ACES and PIES](https://www.autocare.org/data-standards) are standards and supporting subscription databases—not a complete product catalogue and not repair manuals. They provide the North American vehicle/product vocabulary needed to receive supplier catalogues. PIES also supports light, medium and heavy duty, powersports and off-highway product information. 365 should evaluate the software/solution-provider licence rather than assuming a shop subscription is sufficient.
+
+[Epicor Catalog for Automotive](https://www.epicor.com/en-us/products/digital-commerce/catalog-for-automotive/) exposes a catalogue API for custom applications and is a North American parts candidate for the United States, Canada and Mexico. It must be compared with distributor-direct inventory/order feeds; catalogue fitment alone does not prove that an item is available to fulfil.
+
+#### European OEM RMI access
+
+EU rules require manufacturers to make OBD and repair/maintenance information available to independent operators, including time- or transaction-based access. This gives qualified European shops a legitimate route to OEM portals, but it does **not** automatically grant 365 the right to reproduce, translate, index, AI-process or resell the information. See [Regulation (EU) 2018/858, Articles 61–63](https://eur-lex.europa.eu/eli/reg/2018/858/oj/eng).
+
+365 must therefore treat European OEM RMI as a professional portal/deep-link path unless the manufacturer separately grants API, publisher or SaaS redistribution rights. Security-related functions must also follow the applicable SERMI/OEM accreditation and technician identity process.
+
+### 3.7.4 Global procurement waves
+
+| Wave | Purpose | Providers/paths | Required result before advancing |
+|---:|---|---|---|
+| **0** | Prepare evidence | 365 company profile, architecture summary, privacy/security answers, coverage CSV, module boundaries and pilot design | One consistent outreach package approved internally |
+| **1** | Highest-leverage structured data | TecAlliance APAC, Autodata API, Infomedia APIs, HaynesPro Web Services, MOTOR DaaS, ARI/Dealer Spike, Volvo Penta API Products, Auto Care data standards | Written response identifying products, territories, business model and next sales/technical owner |
+| **2** | Labour and diagnostic specialisation | NCM/Spader, Mitchell 1 integration, Jaltest, TEXA, Bosch, Noregon JPRO, Diesel Repair, Epicor Catalog | Demonstration plus exact export/API/launch rights and coverage files |
+| **3** | OEM and distributor access | High-volume Philippine/Asian automotive, motorcycle, truck and marine OEMs/distributors; Cummins and component OEMs | Business-partner route, local-authorisation requirements and supported integration type |
+| **4** | Regional expansion | European OEM RMI/publisher agreements; US/Canadian suppliers and fleets; Japan/China/India market programmes | Territory-specific contracts and acceptance-fleet results |
+| **5** | Pilot and negotiate | Best one or two providers per capability | Sandbox, 30–45 day pilot, price model, support SLA, data rights schedule and exit/export terms |
+| **6** | Production approval | Only providers that pass legal, technical, coverage and unit-economics gates | Signed contract, security review, billing controls, monitoring and rollback path |
+
+### 3.7.5 Mandatory vendor evidence package
+
+Every candidate receives the same core package, tailored by module:
+
+- concise 365 Motor Sales and Shop Manager overview;
+- statement that 365 is launching in the Philippines and is planning Asia, Europe and North America;
+- four independently purchasable repair modules and the exact module being discussed;
+- requested integration type and capabilities;
+- coverage-test CSV containing exact local assets, engines, components and serials;
+- expected pilot scope without invented customer or transaction volumes;
+- technical architecture summary: multi-tenant SaaS, server-side provider gateway, Supabase/PostgreSQL, audit logs and entitlement controls;
+- data-rights questionnaire;
+- security/privacy questionnaire;
+- desired commercial model and request for startup/pilot pricing;
+- proposed 30–45 day sandbox pilot and decision date.
+
+Do not claim active shop counts, order volume, revenue or geographic coverage that 365 has not verified. Present the opportunity honestly: a Philippines-first repair/shop/marketplace network designed to expand through modular regional data packs.
+
+### 3.7.6 Contract schedule required from every provider
+
+The commercial agreement or attached data-rights schedule must answer:
+
+- permitted repair module(s);
+- countries and languages;
+- allowed shop types, customers, technicians, fleets and public users;
+- API, feed, viewer, deep-link, device or partner-portal method;
+- precise data fields and provider/OEM coverage;
+- storage, cache duration, backups and deletion;
+- screenshots, print, PDF, email and customer estimate/invoice display;
+- indexing, search, translation, summarisation and AI processing;
+- derived data, analytics, technician notes and community benchmarks;
+- parts pricing, availability, order placement, cancellations, returns and warranty;
+- rate limits, concurrency, batch access and expected latency;
+- sandbox, test data and production certification;
+- uptime, support hours, incident notice and escalation;
+- update frequency, supersessions, correction and withdrawal;
+- subcontractors, hosting locations and cross-border data transfers;
+- security standards, breach obligations and audit rights;
+- pricing by territory, module, shop, location, seat, asset, lookup, call or order;
+- minimum commitments, implementation fees, annual increases and currency;
+- renewal, termination, wind-down access, customer migration and deletion evidence;
+- brand attribution, marketing approval and reference-customer restrictions;
+- liability, warranty, indemnity and governing law.
+
+### 3.7.7 Coverage and commercial decision gates
+
+A provider cannot enter production merely because its API works.
+
+| Gate | Pass condition |
+|---|---|
+| **Legal rights** | Written multi-tenant rights match the intended module, territory, user and display method |
+| **Exact identity** | Test assets resolve by the correct VIN/chassis/frame/HIN/serial/component identity—not a similar foreign-market model |
+| **Capability** | The specific paid capability exists: labour, procedure, wiring, parts illustration, order, scan/report or protected function |
+| **Coverage quality** | Acceptance-fleet score meets the module threshold and unsupported results are explicit |
+| **Freshness** | Update, supersession, recall/campaign and withdrawal mechanisms are documented |
+| **Technical fit** | Stable authentication, sandbox, rate limits, observability, support and error behaviour are acceptable |
+| **Unit economics** | Provider cost can be allocated to the module/add-on with a sustainable gross margin |
+| **Exit safety** | 365 can disable the provider, remove expired content and preserve its own shop records without contract contamination |
+
+Suggested minimum acceptance thresholds for the first paid pilot:
+
+- 95% exact identity on the submitted test set;
+- 90% of the contracted capability present for exact matches;
+- 0 silent cross-market or cross-domain substitutions;
+- 100% source/provider labelling;
+- 100% unsupported lookups returned explicitly;
+- confirmed production rights before any customer-facing launch.
+
+### 3.7.8 Information still missing and now explicitly tracked
+
+The following were under-specified and must become procurement fields or future product decisions:
+
+- regional language availability and whether 365 may translate content;
+- EV/high-voltage, hybrid, hydrogen, ADAS calibration and battery-repair coverage;
+- secure-gateway, programming, key/immobiliser and SERMI/OEM accreditation requirements;
+- component-level truck coverage and multi-stage body/upfit information;
+- motorcycle frame/model identities, tricycles, underbones and regional electric two/three-wheelers;
+- marine installation history, multi-engine position and serial-range applicability;
+- illustrated parts rights versus part-number data only;
+- supplier inventory, landed cost, shipping, cancellation, returns, warranty and fulfilment—not only fitment;
+- offline/low-bandwidth behaviour for field and island operations;
+- local currencies, taxes, labour multipliers and regional price-display restrictions;
+- accessibility, customer-language output and technician-language output;
+- data residency, privacy, cross-border processing and subcontractors;
+- provider corrections, withdrawn procedures, recalls/campaigns and parts supersessions;
+- AI/search/indexing rights and whether provider content may be used in generated diagnostic plans;
+- collision/body repair, agricultural/off-highway and RV scope, which are not silently included in the four launch modules and require separate future product decisions.
+
+### 3.7.9 Outreach ownership and recordkeeping
+
+The vendor tracker is a business record, not a collection of emails. For each provider record:
+
+- one internal owner;
+- one module and primary capability;
+- official contact route and named representative once assigned;
+- date contacted and next follow-up;
+- NDA status;
+- documents sent;
+- promised coverage file/sandbox/demo;
+- legal, technical and pricing owners;
+- open questions and blockers;
+- scorecard version;
+- decision and reason;
+- contract renewal/review date.
+
+Use [the prepared contact tracker](./vendor-outreach/365_VENDOR_CONTACT_TRACKER.csv), [coverage-test template](./vendor-outreach/365_VENDOR_COVERAGE_TEST_TEMPLATE.csv) and [evaluation scorecard](./vendor-outreach/365_VENDOR_EVALUATION_SCORECARD.csv). No credentials, API keys, private price sheets or signed contracts belong in the public repository.
+
 ## 4. The opportunity: 365 Repair Knowledge Network
 
 ### 4.1 Product promise
@@ -1274,6 +1464,9 @@ The first MVP may populate Automotive content first because the existing Shop Ma
 
 ### Phase 5 — commercial data and monetization
 
+- Use [the vendor outreach pack](./vendor-outreach/README.md) as the controlled RFI, coverage-test and scoring process.
+- Run Wave 1 outreach across Asia-Pacific, Europe/UK and North America without combining the four module licences.
+
 - Request coverage, sandbox, pricing and multi-tenant licensing terms from TecAlliance Southeast Asia, Autodata and Infomedia first.
 - Request separate motorcycle and truck datasets; do not assume the passenger-car licence includes them.
 - Request ARI PartStream/DataSmart marine coverage, sandbox, pricing and multi-tenant catalogue/diagram rights.
@@ -1340,6 +1533,14 @@ The first MVP may populate Automotive content first because the existing Shop Ma
 - [ ] Contributor reputation and reward rules.
 
 ### P3 — later integrations
+
+- [ ] Assign an owner and next action to every Wave 1 provider in `docs/vendor-outreach/365_VENDOR_CONTACT_TRACKER.csv`.
+- [ ] Populate at least 25 exact assets per module and region in the coverage-test template before requesting production pricing.
+- [ ] Complete the same weighted evaluation scorecard for every shortlisted provider.
+- [ ] Evaluate Infomedia's current VIN, Parts, Parts Validation, VIN & Parts Ecommerce, Service & Repairs, Appointment and Order APIs.
+- [ ] Apply through Volvo Penta's business-partner API route for Marine parts lists, publications, campaigns, supersessions, pricing and commerce eligibility.
+- [ ] Evaluate Auto Care software/solution-provider ACES/PIES licensing and Epicor Catalog API for the North American parts layer.
+- [ ] Record European OEM RMI/SERMI access as portal/deep-link only unless separate publisher/SaaS rights are signed.
 
 - [ ] Android/Windows OBD companion proof of concept.
 - [ ] Shared service-asset kernel plus separate Automotive, Motorcycle, Heavy Truck and Marine profile tables.
