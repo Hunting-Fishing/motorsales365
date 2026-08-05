@@ -60,7 +60,7 @@ function ShopCategoriesIndex() {
               <section key={department.slug} className="space-y-4">
                 <div className="flex items-end justify-between gap-3 border-b pb-2">
                   <Link
-                    to="/shop/department/$slug"
+                    to="/workspace/department/$slug"
                     params={{ slug: department.slug }}
                     className="group"
                   >
@@ -69,7 +69,7 @@ function ShopCategoriesIndex() {
                     </h2>
                   </Link>
                   <Link
-                    to="/shop/department/$slug"
+                    to="/workspace/department/$slug"
                     params={{ slug: department.slug }}
                     className="text-sm text-muted-foreground hover:text-primary"
                   >
@@ -81,7 +81,7 @@ function ShopCategoriesIndex() {
                     <div key={parent.id} className="rounded-xl border bg-card p-5">
                       <div className="flex items-start justify-between gap-3">
                         <Link
-                          to="/shop/$category"
+                          to="/workspace/$category"
                           params={{ category: parent.slug }}
                           className="group"
                         >
@@ -95,7 +95,7 @@ function ShopCategoriesIndex() {
                       </div>
                       {parent.hero_image_url && (
                         <Link
-                          to="/shop/$category"
+                          to="/workspace/$category"
                           params={{ category: parent.slug }}
                           className="mt-3 block overflow-hidden rounded-lg"
                         >
@@ -116,7 +116,7 @@ function ShopCategoriesIndex() {
                           {parent.children.map((child: any) => (
                             <Link
                               key={child.id}
-                              to="/shop/$category"
+                              to="/workspace/$category"
                               params={{ category: child.slug }}
                               className="rounded-full border bg-background px-2.5 py-1 text-xs hover:border-primary hover:text-primary"
                             >
@@ -144,7 +144,7 @@ function ShopCategoriesIndex() {
               {ungrouped.map((parent: any) => (
                 <Link
                   key={parent.id}
-                  to="/shop/$category"
+                  to="/workspace/$category"
                   params={{ category: parent.slug }}
                   className="rounded-xl border bg-card p-5 hover:border-primary"
                 >

@@ -58,7 +58,7 @@ function AutomationLogsPage() {
     <SiteLayout>
       <div className="mx-auto max-w-6xl px-4 py-8">
         <div className="mb-4">
-          <Link to="/shop/automation" className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-foreground">
+          <Link to="/workspace/automation" className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-foreground">
             <ArrowLeft className="h-4 w-4" /> Back to Automation
           </Link>
         </div>

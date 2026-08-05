@@ -167,7 +167,7 @@ function VehicleDetail() {
       <SiteLayout>
         <div className="mx-auto max-w-4xl px-4 py-10 space-y-4">
           <Button asChild variant="ghost" size="sm">
-            <Link to="/shop/customers">
+            <Link to="/workspace/customers">
               <ArrowLeft className="h-4 w-4 mr-1" /> Back
             </Link>
           </Button>
@@ -188,18 +188,18 @@ function VehicleDetail() {
         <div className="flex items-center justify-between gap-2">
           <Button asChild variant="ghost" size="sm">
             {v.customer_id ? (
-              <Link to="/shop/customers/$id" params={{ id: v.customer_id }}>
+              <Link to="/workspace/customers/$id" params={{ id: v.customer_id }}>
                 <ArrowLeft className="h-4 w-4 mr-1" /> Customer
               </Link>
             ) : (
-              <Link to="/shop/customers">
+              <Link to="/workspace/customers">
                 <ArrowLeft className="h-4 w-4 mr-1" /> Customers
               </Link>
             )}
           </Button>
           <Button asChild size="sm">
             <Link
-              to="/shop/work-orders/new"
+              to="/workspace/work-orders/new"
               search={{ customerId: v.customer_id ?? undefined, vehicleId: v.id } as any}
             >
               <Wrench className="h-4 w-4 mr-1" /> New work order
@@ -218,7 +218,7 @@ function VehicleDetail() {
             <p className="text-sm text-muted-foreground mt-1">
               Owner:{" "}
               <Link
-                to="/shop/customers/$id"
+                to="/workspace/customers/$id"
                 params={{ id: v.customer_id }}
                 className="text-primary hover:underline"
               >
@@ -301,7 +301,7 @@ function VehicleDetail() {
                     <TableRow key={w.id}>
                       <TableCell>
                         <Link
-                          to="/shop/work-orders/$id"
+                          to="/workspace/work-orders/$id"
                           params={{ id: w.id }}
                           className="text-primary hover:underline font-medium"
                         >

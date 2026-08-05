@@ -62,7 +62,7 @@ export const Route = createFileRoute("/parts/partners/")({
 
 function ShopIndex() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/shop/" });
+  const navigate = useNavigate({ from: "/workspace/" });
   const [garage, setGarageState] = useGarage();
 
   // Sync URL <-> garage
@@ -277,7 +277,7 @@ function ShopIndex() {
             <div className="mb-4 flex items-end justify-between gap-3">
               <h2 className="text-xl font-semibold">Shop by department</h2>
               <Link
-                to="/shop/categories"
+                to="/workspace/categories"
                 className="text-sm text-muted-foreground hover:text-primary"
               >
                 All categories →
@@ -287,7 +287,7 @@ function ShopIndex() {
               {departments.map((d: any) => (
                 <Link
                   key={d.slug}
-                  to="/shop/department/$slug"
+                  to="/workspace/department/$slug"
                   params={{ slug: d.slug }}
                   className="group flex flex-col overflow-hidden rounded-xl border bg-card transition hover:border-primary hover:shadow-md"
                 >
@@ -410,7 +410,7 @@ export function ProductGrid({
                 -{pctOff}%
               </Badge>
             )}
-            <Link to="/shop/p/$slug" params={{ slug: p.slug }} className="block">
+            <Link to="/workspace/p/$slug" params={{ slug: p.slug }} className="block">
               <Card className="overflow-hidden transition hover:shadow-lg">
                 {p.image_url ? (
                   <ImageWithSkeleton

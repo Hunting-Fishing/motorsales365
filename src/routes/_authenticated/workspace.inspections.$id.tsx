@@ -206,7 +206,7 @@ function InspectionDetail() {
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Button asChild variant="ghost" size="sm">
-              <Link to="/shop/inspections"><ArrowLeft className="h-4 w-4" /> Back</Link>
+              <Link to="/workspace/inspections"><ArrowLeft className="h-4 w-4" /> Back</Link>
             </Button>
             <ClipboardCheck className="h-7 w-7 text-primary" />
             <div>
@@ -217,7 +217,7 @@ function InspectionDetail() {
                   <>
                     {" · "}
                     <Link
-                      to="/shop/work-orders/$id"
+                      to="/workspace/work-orders/$id"
                       params={{ id: data.inspection.work_order_id }}
                       className="underline"
                     >

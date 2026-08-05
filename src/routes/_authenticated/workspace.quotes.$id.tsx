@@ -166,7 +166,7 @@ function QuoteDetail() {
       toast.success("Quote converted to work order");
       qc.invalidateQueries({ queryKey: ["shop-manager", "quote", id] });
       qc.invalidateQueries({ queryKey: ["shop-manager", "quotes", "list"] });
-      navigate({ to: "/shop/work-orders/$id", params: { id: woId } });
+      navigate({ to: "/workspace/work-orders/$id", params: { id: woId } });
     },
     onError: (e: any) => toast.error(e?.message ?? "Failed to convert"),
   });
@@ -209,7 +209,7 @@ function QuoteDetail() {
             {converted ? (
               <Button asChild variant="outline">
                 <Link
-                  to="/shop/work-orders/$id"
+                  to="/workspace/work-orders/$id"
                   params={{ id: quote.converted_to_work_order_id! }}
                 >
                   Open Work Order →
@@ -293,7 +293,7 @@ function QuoteDetail() {
 
         <div className="mt-6">
           <Button asChild variant="ghost">
-            <Link to="/shop/quotes">← Back to Quotes</Link>
+            <Link to="/workspace/quotes">← Back to Quotes</Link>
           </Button>
         </div>
       </div>

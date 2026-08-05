@@ -143,7 +143,7 @@ function InventoryItemPage() {
     <SiteLayout>
       <div className="mx-auto max-w-5xl px-4 py-10">
         <Button asChild variant="ghost" size="sm" className="mb-4">
-          <Link to="/shop/inventory">
+          <Link to="/workspace/inventory">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to inventory
           </Link>
         </Button>

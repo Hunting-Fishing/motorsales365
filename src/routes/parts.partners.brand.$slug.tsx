@@ -44,7 +44,7 @@ export const Route = createFileRoute("/parts/partners/brand/$slug")({
 function BrandPage() {
   const { slug } = Route.useParams();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/shop/brand/$slug" });
+  const navigate = useNavigate({ from: "/workspace/brand/$slug" });
   const [garage] = useGarage();
   const brandName = slugToName(slug);
 
@@ -119,7 +119,7 @@ function BrandPage() {
         {products.length === 0 ? (
           <p className="text-muted-foreground">
             No {brandName} products found right now.{" "}
-            <Link to="/shop" className="underline">
+            <Link to="/workspace" className="underline">
               Browse all shop
             </Link>
             .

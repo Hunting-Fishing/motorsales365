@@ -134,7 +134,7 @@ function POList() {
                     <TableRow key={p.id}>
                       <TableCell className="font-medium">
                         <Link
-                          to="/shop/purchase-orders/$id"
+                          to="/workspace/purchase-orders/$id"
                           params={{ id: p.id }}
                           className="text-primary hover:underline"
                         >
@@ -165,7 +165,7 @@ function POList() {
 
         <div className="mt-6">
           <Button asChild variant="ghost">
-            <Link to="/shop">← Back to Shop Manager</Link>
+            <Link to="/workspace">← Back to Shop Manager</Link>
           </Button>
         </div>
       </div>

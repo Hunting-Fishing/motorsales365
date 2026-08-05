@@ -122,7 +122,7 @@ function BillDetail() {
       <div className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Button asChild variant="ghost" size="sm"><Link to="/shop/vendor-bills"><ArrowLeft className="mr-1 h-4 w-4" /> Bills</Link></Button>
+            <Button asChild variant="ghost" size="sm"><Link to="/workspace/vendor-bills"><ArrowLeft className="mr-1 h-4 w-4" /> Bills</Link></Button>
             <Receipt className="h-6 w-6 text-primary" />
             <div>
               <h1 className="text-2xl font-bold font-mono">{bill.bill_number ?? bill.id.slice(0, 8)}</h1>

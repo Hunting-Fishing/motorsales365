@@ -67,7 +67,7 @@ function VendorsPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button asChild variant="outline" size="sm"><Link to="/shop/vendor-bills">Bills</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link to="/workspace/vendor-bills">Bills</Link></Button>
             <NewVendorDialog />
           </div>
         </div>

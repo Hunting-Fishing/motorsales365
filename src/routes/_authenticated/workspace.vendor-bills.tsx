@@ -77,7 +77,7 @@ function BillsPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button asChild variant="outline" size="sm"><Link to="/shop/vendors">Vendors</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link to="/workspace/vendors">Vendors</Link></Button>
             <NewBillDialog />
           </div>
         </div>
@@ -99,7 +99,7 @@ function BillsPage() {
         ) : (
           <div className="grid gap-2">
             {filtered.map((b: any) => (
-              <Link key={b.id} to="/shop/vendor-bills/$id" params={{ id: b.id }}>
+              <Link key={b.id} to="/workspace/vendor-bills/$id" params={{ id: b.id }}>
                 <Card className="hover:border-primary/50 transition">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3">
                     <div>

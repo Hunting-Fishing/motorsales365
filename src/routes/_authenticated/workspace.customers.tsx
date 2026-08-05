@@ -118,7 +118,7 @@ function CustomersList() {
               />
             </div>
             <Button asChild>
-              <Link to="/shop/customers/new">
+              <Link to="/workspace/customers/new">
                 <Plus className="mr-2 h-4 w-4" /> New
               </Link>
             </Button>
@@ -157,7 +157,7 @@ function CustomersList() {
                     <TableRow key={c.id}>
                       <TableCell>
                         <Link
-                          to="/shop/customers/$id"
+                          to="/workspace/customers/$id"
                           params={{ id: c.id }}
                           className="font-medium text-primary hover:underline"
                         >

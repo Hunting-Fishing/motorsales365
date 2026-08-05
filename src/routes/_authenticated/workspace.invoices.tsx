@@ -152,7 +152,7 @@ function InvoicesList() {
                   {filtered.map((r) => (
                     <TableRow key={r.id}>
                       <TableCell className="font-mono">
-                        <Link to="/shop/invoices/$id" params={{ id: r.id }} className="text-primary hover:underline">
+                        <Link to="/workspace/invoices/$id" params={{ id: r.id }} className="text-primary hover:underline">
                           {r.id}
                         </Link>
                       </TableCell>
@@ -163,7 +163,7 @@ function InvoicesList() {
                       <TableCell className="text-right">{typeof r.total === "number" ? r.total.toLocaleString() : "—"}</TableCell>
                       <TableCell>
                         {r.work_order_id ? (
-                          <Link to="/shop/work-orders/$id" params={{ id: r.work_order_id }} className="text-primary hover:underline">
+                          <Link to="/workspace/work-orders/$id" params={{ id: r.work_order_id }} className="text-primary hover:underline">
                             open
                           </Link>
                         ) : "—"}
@@ -180,7 +180,7 @@ function InvoicesList() {
           PDF export and payment recording are next on the porting list.
         </div>
         <div className="mt-4">
-          <Button asChild variant="ghost"><Link to="/shop">← Back to Shop Manager</Link></Button>
+          <Button asChild variant="ghost"><Link to="/workspace">← Back to Shop Manager</Link></Button>
         </div>
       </div>
     </SiteLayout>

@@ -129,7 +129,7 @@ function VehiclesList() {
                     <TableRow key={v.id}>
                       <TableCell className="font-medium">
                         <Link
-                          to="/shop/vehicles/$id"
+                          to="/workspace/vehicles/$id"
                           params={{ id: v.id }}
                           className="text-primary hover:underline"
                         >
@@ -154,7 +154,7 @@ function VehiclesList() {
 
         <div className="mt-6">
           <Button asChild variant="ghost">
-            <Link to="/shop">← Back to Shop Manager</Link>
+            <Link to="/workspace">← Back to Shop Manager</Link>
           </Button>
         </div>
       </div>

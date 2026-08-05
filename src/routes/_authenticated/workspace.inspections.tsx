@@ -103,7 +103,7 @@ function InspectionsPage() {
       <div className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Button asChild variant="ghost" size="sm"><Link to="/shop"><ArrowLeft className="h-4 w-4" /> Shop</Link></Button>
+            <Button asChild variant="ghost" size="sm"><Link to="/workspace"><ArrowLeft className="h-4 w-4" /> Shop</Link></Button>
             <ClipboardCheck className="h-7 w-7 text-primary" />
             <div>
               <h1 className="text-3xl font-bold">Digital Inspections</h1>
@@ -130,7 +130,7 @@ function InspectionsPage() {
               {data.map((i) => (
                 <Link
                   key={i.id}
-                  to="/shop/inspections/$id"
+                  to="/workspace/inspections/$id"
                   params={{ id: i.id }}
                   className="flex items-center justify-between rounded border p-3 hover:bg-accent"
                 >
@@ -215,7 +215,7 @@ function NewInspectionDialog({ workOrderId }: { workOrderId?: string } = {}) {
       qc.invalidateQueries({ queryKey: ["shop-manager", "inspections"] });
       setOpen(false);
       toast.success("Inspection started");
-      navigate({ to: "/shop/inspections/$id", params: { id } });
+      navigate({ to: "/workspace/inspections/$id", params: { id } });
     },
     onError: (e: any) => toast.error(e?.message ?? "Failed to start inspection"),
   });

@@ -133,7 +133,7 @@ function InventoryList() {
                     return (
                       <TableRow key={i.id}>
                         <TableCell className="font-medium">
-                          <Link to="/shop/inventory/$id" params={{ id: i.id }} className="text-primary hover:underline">
+                          <Link to="/workspace/inventory/$id" params={{ id: i.id }} className="text-primary hover:underline">
                             {i.name ?? "—"}
                           </Link>
                         </TableCell>
@@ -166,7 +166,7 @@ function InventoryList() {
           Item detail, adjustments, and purchase orders are next on the porting list — for full functionality, use the legacy screens under <code className="rounded bg-muted px-1">src/shop-manager/pages</code>.
         </div>
         <div className="mt-4">
-          <Button asChild variant="ghost"><Link to="/shop">← Back to Shop Manager</Link></Button>
+          <Button asChild variant="ghost"><Link to="/workspace">← Back to Shop Manager</Link></Button>
         </div>
       </div>
     </SiteLayout>

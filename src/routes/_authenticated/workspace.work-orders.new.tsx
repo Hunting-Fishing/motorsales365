@@ -154,11 +154,11 @@ function NewWorkOrderPage() {
       const id = (data as any)?.id;
       if (id) {
         router.navigate({
-          to: "/shop/work-orders/$id",
+          to: "/workspace/work-orders/$id",
           params: { id },
         });
       } else {
-        router.navigate({ to: "/shop/work-orders" });
+        router.navigate({ to: "/workspace/work-orders" });
       }
     } catch (err: any) {
       toast.error(err?.message ?? "Failed to create work order.");
@@ -171,7 +171,7 @@ function NewWorkOrderPage() {
     <SiteLayout>
       <div className="mx-auto max-w-3xl px-4 py-10">
         <Button asChild variant="ghost" size="sm" className="mb-4">
-          <Link to="/shop/work-orders">
+          <Link to="/workspace/work-orders">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to work orders
           </Link>
         </Button>
@@ -211,7 +211,7 @@ function NewWorkOrderPage() {
                   </SelectContent>
                 </Select>
                 <div className="mt-1 text-xs text-muted-foreground">
-                  <Link to="/shop/customers/new" className="underline">
+                  <Link to="/workspace/customers/new" className="underline">
                     + Add a new customer
                   </Link>
                 </div>
@@ -339,7 +339,7 @@ function NewWorkOrderPage() {
 
           <div className="flex justify-end gap-2">
             <Button asChild variant="ghost" type="button">
-              <Link to="/shop/work-orders">Cancel</Link>
+              <Link to="/workspace/work-orders">Cancel</Link>
             </Button>
             <Button type="submit" disabled={saving}>
               {saving ? (

@@ -234,7 +234,7 @@ function ReportsPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-base flex items-center gap-2"><Users2 className="h-4 w-4 text-primary" /> Top customers by invoiced</CardTitle>
-                <Button asChild size="sm" variant="ghost"><Link to="/shop/customers">All customers</Link></Button>
+                <Button asChild size="sm" variant="ghost"><Link to="/workspace/customers">All customers</Link></Button>
               </CardHeader>
               <CardContent className="space-y-1">
                 {data.topCustomers.length === 0 ? (
@@ -242,7 +242,7 @@ function ReportsPage() {
                 ) : data.topCustomers.map((c) => (
                   <Link
                     key={c.id}
-                    to="/shop/customers/$id"
+                    to="/workspace/customers/$id"
                     params={{ id: c.id }}
                     className="flex items-center justify-between rounded border p-2 text-sm hover:bg-muted/50"
                   >
@@ -256,7 +256,7 @@ function ReportsPage() {
             <Card className="mt-6">
               <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-base flex items-center gap-2"><Wrench className="h-4 w-4 text-primary" /> Contribution by technician</CardTitle>
-                <Button asChild size="sm" variant="ghost"><Link to="/shop/technicians">All technicians</Link></Button>
+                <Button asChild size="sm" variant="ghost"><Link to="/workspace/technicians">All technicians</Link></Button>
               </CardHeader>
               <CardContent className="space-y-1">
                 {(data.technicianPnl ?? []).length === 0 ? (
@@ -264,7 +264,7 @@ function ReportsPage() {
                 ) : (data.technicianPnl ?? []).map((t: any) => (
                   <Link
                     key={t.id}
-                    to="/shop/reports/technician/$id"
+                    to="/workspace/reports/technician/$id"
                     params={{ id: t.id }}
                     className="flex items-center justify-between gap-3 rounded border p-2 text-sm hover:bg-muted/50"
                   >
@@ -278,11 +278,11 @@ function ReportsPage() {
             </Card>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild variant="outline" size="sm"><Link to="/shop/reports/ltv">Customer LTV</Link></Button>
-              <Button asChild variant="outline" size="sm"><Link to="/shop/reports/parts-margin">Parts margin</Link></Button>
-              <Button asChild variant="outline" size="sm"><Link to="/shop/automation/logs">Automation health</Link></Button>
-              <Button asChild variant="outline" size="sm"><Link to="/shop/accounting/pnl">P&amp;L drilldown</Link></Button>
-              <Button asChild variant="outline" size="sm"><Link to="/shop/leave-requests">Leave requests</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/workspace/reports/ltv">Customer LTV</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/workspace/reports/parts-margin">Parts margin</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/workspace/automation/logs">Automation health</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/workspace/accounting/pnl">P&amp;L drilldown</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/workspace/leave-requests">Leave requests</Link></Button>
             </div>
 
             <p className="mt-6 text-xs text-muted-foreground">

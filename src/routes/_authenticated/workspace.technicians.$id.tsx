@@ -151,7 +151,7 @@ function TechnicianSchedulePage() {
     <SiteLayout>
       <div className="mx-auto max-w-5xl px-4 py-8 space-y-6">
         <Button asChild variant="ghost" size="sm">
-          <Link to="/shop/technicians"><ArrowLeft className="h-4 w-4 mr-1" /> Technicians</Link>
+          <Link to="/workspace/technicians"><ArrowLeft className="h-4 w-4 mr-1" /> Technicians</Link>
         </Button>
 
         <div>
@@ -243,7 +243,7 @@ function TechDayCalendar({ technicianId, schedules }: { technicianId: string; sc
         ) : (
           <div className="space-y-2">
             {(wosQ.data ?? []).map((wo: any) => (
-              <Link key={wo.id} to="/shop/work-orders/$id" params={{ id: wo.id }} className="block">
+              <Link key={wo.id} to="/workspace/work-orders/$id" params={{ id: wo.id }} className="block">
                 <div className="rounded border p-3 hover:bg-muted/40 transition">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-mono text-xs">

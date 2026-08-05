@@ -191,7 +191,7 @@ function LoyaltyPage() {
                   return (
                     <div key={r.id} className="flex flex-wrap items-center gap-3 rounded border p-2 text-sm">
                       <div className="flex-1 min-w-0">
-                        <Link to="/shop/customers/$id" params={{ id: r.customer_id }} className="font-medium hover:underline">{name}</Link>
+                        <Link to="/workspace/customers/$id" params={{ id: r.customer_id }} className="font-medium hover:underline">{name}</Link>
                       </div>
                       <Badge className={`${tierColor(r.tier)} text-white`}>{r.tier ?? "bronze"}</Badge>
                       <div className="text-xs text-muted-foreground">{(r.current_points ?? 0).toLocaleString()} pts</div>

@@ -92,7 +92,7 @@ function TechniciansPage() {
               <p className="text-muted-foreground">Roster and last 30 days of logged time.</p>
             </div>
           </div>
-          <Button asChild variant="outline" size="sm"><Link to="/shop">Back to Shop</Link></Button>
+          <Button asChild variant="outline" size="sm"><Link to="/workspace">Back to Shop</Link></Button>
         </div>
 
         <div className="mb-4 relative max-w-sm">
@@ -110,7 +110,7 @@ function TechniciansPage() {
               const name = t.full_name || `${t.first_name ?? ""} ${t.last_name ?? ""}`.trim() || t.email || t.id.slice(0, 8);
               const h = hoursByTech[t.id];
               return (
-                <Link key={t.id} to="/shop/technicians/$id" params={{ id: t.id }} className="block">
+                <Link key={t.id} to="/workspace/technicians/$id" params={{ id: t.id }} className="block">
                   <Card className="transition hover:border-primary/50 hover:shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3">
                       <div>

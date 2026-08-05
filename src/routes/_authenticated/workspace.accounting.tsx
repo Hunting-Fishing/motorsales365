@@ -115,7 +115,7 @@ function AccountingPage() {
     <SiteLayout>
       <div className="mx-auto max-w-6xl px-4 py-8 space-y-6">
         <Button asChild variant="ghost" size="sm">
-          <Link to="/shop"><ArrowLeft className="h-4 w-4 mr-1" /> Shop</Link>
+          <Link to="/workspace"><ArrowLeft className="h-4 w-4 mr-1" /> Shop</Link>
         </Button>
 
         <div className="flex items-center justify-between gap-3 flex-wrap">

@@ -165,7 +165,7 @@ function NewQuotePage() {
       }
 
       toast.success("Quote created");
-      navigate({ to: "/shop/quotes/$id", params: { id: quote.id } });
+      navigate({ to: "/workspace/quotes/$id", params: { id: quote.id } });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to create quote");
     } finally {
@@ -295,7 +295,7 @@ function NewQuotePage() {
 
         <div className="flex items-center gap-2">
           <Button variant="ghost" asChild>
-            <Link to="/shop/quotes"><ArrowLeft className="mr-1 h-4 w-4" /> Cancel</Link>
+            <Link to="/workspace/quotes"><ArrowLeft className="mr-1 h-4 w-4" /> Cancel</Link>
           </Button>
           <Button onClick={submit} disabled={saving}>
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

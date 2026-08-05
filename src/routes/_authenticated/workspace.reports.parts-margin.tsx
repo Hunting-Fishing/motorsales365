@@ -176,7 +176,7 @@ function PartsMargin() {
       <div className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-4">
           <Button asChild variant="ghost" size="sm">
-            <Link to="/shop/reports"><ArrowLeft className="mr-1 h-4 w-4" /> Back to reports</Link>
+            <Link to="/workspace/reports"><ArrowLeft className="mr-1 h-4 w-4" /> Back to reports</Link>
           </Button>
         </div>
         <div className="mb-6 flex items-center gap-3">
@@ -247,7 +247,7 @@ function PartsMargin() {
                     {filtered.slice(0, 300).map((r) => (
                       <TableRow key={r.id}>
                         <TableCell>
-                          <Link to="/shop/inventory" className="hover:underline">
+                          <Link to="/workspace/inventory" className="hover:underline">
                             {r.name}
                           </Link>
                           {r.sku && <div className="text-xs text-muted-foreground font-mono">{r.sku}</div>}

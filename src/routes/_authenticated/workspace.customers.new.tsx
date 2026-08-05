@@ -87,7 +87,7 @@ function NewCustomerPage() {
 
       toast.success("Customer created.");
       router.navigate({
-        to: "/shop/customers",
+        to: "/workspace/customers",
         search: { new: (data as any)?.id },
       } as any);
     } catch (err: any) {
@@ -101,7 +101,7 @@ function NewCustomerPage() {
     <SiteLayout>
       <div className="mx-auto max-w-3xl px-4 py-10">
         <Button asChild variant="ghost" size="sm" className="mb-4">
-          <Link to="/shop/customers">
+          <Link to="/workspace/customers">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to customers
           </Link>
         </Button>
@@ -248,7 +248,7 @@ function NewCustomerPage() {
 
           <div className="flex justify-end gap-2">
             <Button asChild variant="ghost" type="button">
-              <Link to="/shop/customers">Cancel</Link>
+              <Link to="/workspace/customers">Cancel</Link>
             </Button>
             <Button type="submit" disabled={saving}>
               {saving ? (

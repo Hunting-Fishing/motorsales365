@@ -87,7 +87,7 @@ function StockAlertsPage() {
         <Card className="mb-6">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">Open</CardTitle>
-            <Button asChild size="sm" variant="outline"><Link to="/shop/purchase-orders">Create PO</Link></Button>
+            <Button asChild size="sm" variant="outline"><Link to="/workspace/purchase-orders">Create PO</Link></Button>
           </CardHeader>
           <CardContent>
             {q.isLoading ? (
@@ -100,7 +100,7 @@ function StockAlertsPage() {
                   <div key={a.id} className={`flex flex-wrap items-center gap-3 rounded border p-2 text-sm ${(a.current_quantity ?? 0) === 0 ? "border-destructive/50 bg-destructive/5" : ""}`}>
                     <div className="flex-1 min-w-0">
                       {a.source === "derived" ? (
-                        <Link to="/shop/inventory/$id" params={{ id: a.product_id }} className="font-medium hover:underline">{a.product_name ?? a.product_id}</Link>
+                        <Link to="/workspace/inventory/$id" params={{ id: a.product_id }} className="font-medium hover:underline">{a.product_name ?? a.product_id}</Link>
                       ) : (
                         <span className="font-mono text-xs">{a.product_id}</span>
                       )}

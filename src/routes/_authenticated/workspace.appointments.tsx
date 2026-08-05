@@ -161,7 +161,7 @@ function AppointmentsPage() {
                         <Badge variant="outline">{a.status ?? "scheduled"}</Badge>
                         {a.vehicle_id ? (
                           <Link
-                            to="/shop/vehicles/$id"
+                            to="/workspace/vehicles/$id"
                             params={{ id: a.vehicle_id }}
                             className="text-primary text-xs hover:underline"
                           >
@@ -170,7 +170,7 @@ function AppointmentsPage() {
                         ) : null}
                         {a.customer_id ? (
                           <Link
-                            to="/shop/customers/$id"
+                            to="/workspace/customers/$id"
                             params={{ id: a.customer_id }}
                             className="text-primary text-xs hover:underline"
                           >
@@ -188,7 +188,7 @@ function AppointmentsPage() {
 
         <div className="mt-6">
           <Button asChild variant="ghost">
-            <Link to="/shop">← Back to Shop Manager</Link>
+            <Link to="/workspace">← Back to Shop Manager</Link>
           </Button>
         </div>
       </div>

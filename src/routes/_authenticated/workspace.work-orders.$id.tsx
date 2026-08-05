@@ -272,7 +272,7 @@ function WorkOrderDetailPage() {
     onSuccess: (invoiceId) => {
       toast.success("Invoice created");
       qc.invalidateQueries({ queryKey: ["shop-manager", "invoices"] });
-      navigate({ to: "/shop/invoices/$id", params: { id: invoiceId } });
+      navigate({ to: "/workspace/invoices/$id", params: { id: invoiceId } });
     },
     onError: (e: any) => toast.error(e?.message ?? "Failed to generate invoice"),
   });
@@ -327,7 +327,7 @@ function WorkOrderDetailPage() {
     <SiteLayout>
       <div className="mx-auto max-w-5xl px-4 py-10">
         <Button asChild variant="ghost" size="sm" className="mb-4">
-          <Link to="/shop/work-orders">
+          <Link to="/workspace/work-orders">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to work orders
           </Link>
         </Button>
@@ -410,7 +410,7 @@ function WorkOrderDetailPage() {
                     <>
                       <div className="font-medium">
                         <Link
-                          to="/shop/customers/$id"
+                          to="/workspace/customers/$id"
                           params={{ id: data.customer_id }}
                           className="text-primary hover:underline"
                         >
@@ -442,7 +442,7 @@ function WorkOrderDetailPage() {
                     <>
                       <div className="font-medium">
                         <Link
-                          to="/shop/vehicles/$id"
+                          to="/workspace/vehicles/$id"
                           params={{ id: data.vehicle_id }}
                           className="text-primary hover:underline"
                         >

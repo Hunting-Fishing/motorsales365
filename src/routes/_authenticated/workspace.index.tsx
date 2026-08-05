@@ -97,34 +97,34 @@ async function fetchDashboard() {
 }
 
 const QUICK_LINKS = [
-  { title: "Work Orders", icon: ClipboardList, to: "/shop/work-orders" as const },
-  { title: "Inspections", icon: ClipboardCheck, to: "/shop/inspections" as const },
-  { title: "Customers", icon: Users2, to: "/shop/customers" as const },
-  { title: "Vehicles", icon: Car, to: "/shop/vehicles" as const },
-  { title: "Inventory", icon: Boxes, to: "/shop/inventory" as const },
-  { title: "Purchase Orders", icon: PackageSearch, to: "/shop/purchase-orders" as const },
-  { title: "Invoices", icon: Receipt, to: "/shop/invoices" as const },
-  { title: "Quotes", icon: FileText, to: "/shop/quotes" as const },
-  { title: "Calendar", icon: CalendarIcon, to: "/shop/appointments" as const },
-  { title: "Vendors", icon: Truck, to: "/shop/vendors" as const },
-  { title: "Vendor Bills", icon: Receipt, to: "/shop/vendor-bills" as const },
-  { title: "Technicians", icon: Users, to: "/shop/technicians" as const },
-  { title: "Expenses", icon: Receipt, to: "/shop/expenses" as const },
-  { title: "Reports", icon: BarChart3, to: "/shop/reports" as const },
-  { title: "Accounting", icon: BarChart3, to: "/shop/accounting" as const },
-  { title: "Segments", icon: Tag, to: "/shop/segments" as const },
-  { title: "Service Reminders", icon: Bell, to: "/shop/service-reminders" as const },
-  { title: "Loyalty", icon: Award, to: "/shop/loyalty" as const },
-  { title: "Discounts", icon: Ticket, to: "/shop/discounts" as const },
-  { title: "Scheduling", icon: CalendarClock, to: "/shop/scheduling" as const },
-  { title: "Stock Alerts", icon: AlertTriangle, to: "/shop/stock-alerts" as const },
-  { title: "Automation", icon: Sparkles, to: "/shop/automation" as const },
-  { title: "Certificates", icon: Award, to: "/shop/certificates" as const },
-  { title: "Leave", icon: CalendarDays, to: "/shop/leave" as const },
-  { title: "Leave Requests", icon: CalendarDays, to: "/shop/leave-requests" as const },
-  { title: "General Ledger", icon: BookOpen, to: "/shop/journal" as const },
-  { title: "P&L Statement", icon: BookOpen, to: "/shop/accounting/pnl" as const },
-  { title: "Settings", icon: Settings, to: "/shop/settings" as const },
+  { title: "Work Orders", icon: ClipboardList, to: "/workspace/work-orders" as const },
+  { title: "Inspections", icon: ClipboardCheck, to: "/workspace/inspections" as const },
+  { title: "Customers", icon: Users2, to: "/workspace/customers" as const },
+  { title: "Vehicles", icon: Car, to: "/workspace/vehicles" as const },
+  { title: "Inventory", icon: Boxes, to: "/workspace/inventory" as const },
+  { title: "Purchase Orders", icon: PackageSearch, to: "/workspace/purchase-orders" as const },
+  { title: "Invoices", icon: Receipt, to: "/workspace/invoices" as const },
+  { title: "Quotes", icon: FileText, to: "/workspace/quotes" as const },
+  { title: "Calendar", icon: CalendarIcon, to: "/workspace/appointments" as const },
+  { title: "Vendors", icon: Truck, to: "/workspace/vendors" as const },
+  { title: "Vendor Bills", icon: Receipt, to: "/workspace/vendor-bills" as const },
+  { title: "Technicians", icon: Users, to: "/workspace/technicians" as const },
+  { title: "Expenses", icon: Receipt, to: "/workspace/expenses" as const },
+  { title: "Reports", icon: BarChart3, to: "/workspace/reports" as const },
+  { title: "Accounting", icon: BarChart3, to: "/workspace/accounting" as const },
+  { title: "Segments", icon: Tag, to: "/workspace/segments" as const },
+  { title: "Service Reminders", icon: Bell, to: "/workspace/service-reminders" as const },
+  { title: "Loyalty", icon: Award, to: "/workspace/loyalty" as const },
+  { title: "Discounts", icon: Ticket, to: "/workspace/discounts" as const },
+  { title: "Scheduling", icon: CalendarClock, to: "/workspace/scheduling" as const },
+  { title: "Stock Alerts", icon: AlertTriangle, to: "/workspace/stock-alerts" as const },
+  { title: "Automation", icon: Sparkles, to: "/workspace/automation" as const },
+  { title: "Certificates", icon: Award, to: "/workspace/certificates" as const },
+  { title: "Leave", icon: CalendarDays, to: "/workspace/leave" as const },
+  { title: "Leave Requests", icon: CalendarDays, to: "/workspace/leave-requests" as const },
+  { title: "General Ledger", icon: BookOpen, to: "/workspace/journal" as const },
+  { title: "P&L Statement", icon: BookOpen, to: "/workspace/accounting/pnl" as const },
+  { title: "Settings", icon: Settings, to: "/workspace/settings" as const },
 ];
 
 
@@ -149,17 +149,17 @@ function ShopHome() {
         ) : (
           <>
             <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <KpiCard icon={ClipboardList} label="Open Work Orders" value={data.counts.openWO} to="/shop/work-orders" sub={`${data.counts.workOrders} total`} />
-              <KpiCard icon={Users2} label="Customers" value={data.counts.customers} to="/shop/customers" />
-              <KpiCard icon={Boxes} label="Inventory Items" value={data.counts.inventory} to="/shop/inventory" sub={data.lowStock.length ? `${data.lowStock.length} low-stock` : "healthy"} />
-              <KpiCard icon={Receipt} label="Invoiced" value={`₱${data.counts.invoiceTotal.toLocaleString()}`} to="/shop/invoices" sub={`${data.counts.outstandingInvoices} outstanding`} />
+              <KpiCard icon={ClipboardList} label="Open Work Orders" value={data.counts.openWO} to="/workspace/work-orders" sub={`${data.counts.workOrders} total`} />
+              <KpiCard icon={Users2} label="Customers" value={data.counts.customers} to="/workspace/customers" />
+              <KpiCard icon={Boxes} label="Inventory Items" value={data.counts.inventory} to="/workspace/inventory" sub={data.lowStock.length ? `${data.lowStock.length} low-stock` : "healthy"} />
+              <KpiCard icon={Receipt} label="Invoiced" value={`₱${data.counts.invoiceTotal.toLocaleString()}`} to="/workspace/invoices" sub={`${data.counts.outstandingInvoices} outstanding`} />
             </div>
 
             <div className="mb-8 grid gap-6 lg:grid-cols-3">
               <Card className="lg:col-span-2">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="text-base flex items-center gap-2"><BarChart3 className="h-4 w-4 text-primary" /> Recent Work Orders</CardTitle>
-                  <Button asChild size="sm" variant="ghost"><Link to="/shop/work-orders">View all</Link></Button>
+                  <Button asChild size="sm" variant="ghost"><Link to="/workspace/work-orders">View all</Link></Button>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {data.recent.length === 0 ? (
@@ -167,7 +167,7 @@ function ShopHome() {
                   ) : data.recent.map((w: any) => (
                     <Link
                       key={w.id}
-                      to="/shop/work-orders/$id"
+                      to="/workspace/work-orders/$id"
                       params={{ id: w.id }}
                       className="flex items-center justify-between rounded border p-2 text-sm hover:bg-muted/50"
                     >
@@ -184,7 +184,7 @@ function ShopHome() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="text-base">Low Stock</CardTitle>
-                  <Button asChild size="sm" variant="ghost"><Link to="/shop/inventory">Inventory</Link></Button>
+                  <Button asChild size="sm" variant="ghost"><Link to="/workspace/inventory">Inventory</Link></Button>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {data.lowStock.length === 0 ? (

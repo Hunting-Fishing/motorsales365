@@ -217,7 +217,7 @@ function RemindersPage() {
                       <div className="flex-1 min-w-0">
                         <div className="font-medium truncate">{r.title}</div>
                         <div className="text-xs text-muted-foreground">
-                          <Link to="/shop/customers/$id" params={{ id: r.customer_id }} className="hover:underline">{name}</Link>
+                          <Link to="/workspace/customers/$id" params={{ id: r.customer_id }} className="hover:underline">{name}</Link>
                           {vehicle ? ` • ${vehicle}` : ""} • {r.type}
                         </div>
                       </div>

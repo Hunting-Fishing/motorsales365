@@ -102,7 +102,7 @@ function PnLPage() {
         {items.length === 0 && <div className="text-sm text-muted-foreground">No activity in period.</div>}
         {items.map((a: any) => (
           <div key={a.id} className="flex justify-between text-sm py-1 border-b last:border-0">
-            <Link to="/shop/journal/$accountId" params={{ accountId: a.id }} className="hover:underline">
+            <Link to="/workspace/journal/$accountId" params={{ accountId: a.id }} className="hover:underline">
               <span className="font-mono text-xs mr-2 text-muted-foreground">{a.code}</span>{a.name}
             </Link>
             <span className="tabular-nums">{fmt(a.amount)}</span>
@@ -119,7 +119,7 @@ function PnLPage() {
     <SiteLayout>
       <div className="mx-auto max-w-4xl px-4 py-8">
         <div className="mb-4">
-          <Link to="/shop/accounting" className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-foreground">
+          <Link to="/workspace/accounting" className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-foreground">
             <ArrowLeft className="h-4 w-4" /> Back to Accounting
           </Link>
         </div>

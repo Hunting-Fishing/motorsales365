@@ -240,7 +240,7 @@ function SegmentsPage() {
                     const name = c ? `${c.first_name ?? ""} ${c.last_name ?? ""}`.trim() || c.email : m.customer_id.slice(0, 8);
                     return (
                       <div key={m.id} className="flex items-center justify-between rounded border p-2 text-sm">
-                        <Link to="/shop/customers/$id" params={{ id: m.customer_id }} className="flex items-center gap-2 hover:underline">
+                        <Link to="/workspace/customers/$id" params={{ id: m.customer_id }} className="flex items-center gap-2 hover:underline">
                           <Users2 className="h-4 w-4 text-muted-foreground" /> {name}
                           {m.is_automatic ? <Badge variant="secondary" className="text-[10px]">auto</Badge> : null}
                         </Link>

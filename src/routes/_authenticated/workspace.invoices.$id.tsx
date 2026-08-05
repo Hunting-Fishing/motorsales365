@@ -181,7 +181,7 @@ function InvoiceDetailPage() {
     <SiteLayout>
       <div className="mx-auto max-w-5xl px-4 py-10">
         <Button asChild variant="ghost" size="sm" className="mb-4">
-          <Link to="/shop/invoices">
+          <Link to="/workspace/invoices">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to invoices
           </Link>
         </Button>
@@ -215,7 +215,7 @@ function InvoiceDetailPage() {
                 {data.work_order_id ? (
                   <Button asChild size="sm" variant="outline">
                     <Link
-                      to="/shop/work-orders/$id"
+                      to="/workspace/work-orders/$id"
                       params={{ id: data.work_order_id }}
                     >
                       View work order

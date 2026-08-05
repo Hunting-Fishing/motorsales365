@@ -170,7 +170,7 @@ function TechnicianPnlPage() {
       <div className="mx-auto max-w-5xl px-4 py-8">
         <div className="mb-4">
           <Link
-            to="/shop/reports"
+            to="/workspace/reports"
             className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" /> Back to Reports

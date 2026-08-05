@@ -96,7 +96,7 @@ function QuotesList() {
             </div>
           </div>
           <Button asChild>
-            <Link to="/shop/quotes/new"><Plus className="mr-2 h-4 w-4" /> New Quote</Link>
+            <Link to="/workspace/quotes/new"><Plus className="mr-2 h-4 w-4" /> New Quote</Link>
           </Button>
         </div>
 
@@ -139,7 +139,7 @@ function QuotesList() {
                     <TableRow key={x.id}>
                       <TableCell className="font-medium">
                         <Link
-                          to="/shop/quotes/$id"
+                          to="/workspace/quotes/$id"
                           params={{ id: x.id }}
                           className="text-primary hover:underline"
                         >
@@ -161,7 +161,7 @@ function QuotesList() {
                       <TableCell>
                         {x.converted_to_work_order_id ? (
                           <Link
-                            to="/shop/work-orders/$id"
+                            to="/workspace/work-orders/$id"
                             params={{ id: x.converted_to_work_order_id }}
                             className="text-primary hover:underline text-sm"
                           >
@@ -181,7 +181,7 @@ function QuotesList() {
 
         <div className="mt-6">
           <Button asChild variant="ghost">
-            <Link to="/shop">← Back to Shop Manager</Link>
+            <Link to="/workspace">← Back to Shop Manager</Link>
           </Button>
         </div>
       </div>

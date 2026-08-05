@@ -224,7 +224,7 @@ function PODetail() {
 
         <div className="mt-6">
           <Button asChild variant="ghost">
-            <Link to="/shop/purchase-orders">← Back to POs</Link>
+            <Link to="/workspace/purchase-orders">← Back to POs</Link>
           </Button>
         </div>
       </div>
