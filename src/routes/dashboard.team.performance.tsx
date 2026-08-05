@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const searchSchema = z.object({ orgId: z.string().uuid() });
+const searchSchema = z.object({ orgId: z.string().uuid().optional() });
 
 export const Route = createFileRoute("/dashboard/team/performance")({
   validateSearch: searchSchema,

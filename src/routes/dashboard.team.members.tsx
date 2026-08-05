@@ -24,7 +24,7 @@ import { InternalStaffView } from "@/components/internal-staff/InternalStaffView
 import { StaffInfoPopover } from "@/components/internal-staff/StaffInfoPopover";
 
 
-const searchSchema = z.object({ orgId: z.string().uuid() });
+const searchSchema = z.object({ orgId: z.string().uuid().optional() });
 
 export const Route = createFileRoute("/dashboard/team/members")({
   validateSearch: searchSchema,
