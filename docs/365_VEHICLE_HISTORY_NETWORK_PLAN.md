@@ -376,7 +376,7 @@ Subject to consent, law and the final agreement:
 4. Data inventory, data-flow diagram and privacy impact assessment.
 5. Purpose, lawful-basis and consumer-notice analysis.
 6. Non-exclusive pilot MOA/MOU as LTO and counsel determine.
-7. Data Sharing Agreement compliant with the Data Privacy Act and NPC rules, including NPC Circular 2016-02 as amended.
+7. Data Sharing Agreement compliant with the Data Privacy Act and NPC rules, including NPC Circular 2020-03 and any later applicable guidance.
 8. Security architecture, incident response, breach notification, retention and destruction schedule.
 9. Controlled middleware/API specification with LTO retaining control of online access.
 10. Service levels, query logging, audit rights and suspension/termination controls.
