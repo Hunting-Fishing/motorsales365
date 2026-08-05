@@ -18,6 +18,24 @@ This pack prepares 365 to request legitimate, commercial access to vehicle ident
 
 Each provider request must name one or more modules explicitly. Rights and prices are not assumed to transfer from Automotive to Motorcycle, Heavy Truck or Marine.
 
+
+### 1.1 Complete before sending outreach
+
+Fill and approve these sender facts once; then use them consistently in every form, email, NDA and contract:
+
+- legal contracting entity and incorporation jurisdiction;
+- registered address and billing/tax details;
+- sender's full name, title, company email and phone;
+- commercial decision owner, technical owner and legal/privacy owner;
+- exact first-pilot country, module and intended user type;
+- realistic pilot shops, seats, assets, monthly lookups and orders as ranges—not promises;
+- desired sandbox start and target production window;
+- data hosting regions and current security/privacy documentation;
+- whether 365 will contract directly, through a regional entity or through a local distributor;
+- approved one-page company overview and architecture/security summary.
+
+Until these are confirmed, use the messages as drafts and request only an exploratory call, coverage information and pilot requirements. Do not sign an NDA, order form, reseller agreement or minimum-volume commitment under an entity name that has not been approved.
+
 ## 2. Short company description for vendor forms
 
 365 Motor Sales is building a Philippines-first automotive and mobility marketplace with a multi-tenant Shop Manager for independent repair businesses, fleets and specialist service providers. Shop Manager already supports customers, assets, work orders, inspections, labour, parts, technician time, quotes, invoices, payments, inventory, reminders and service history.
