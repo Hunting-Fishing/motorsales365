@@ -1430,13 +1430,16 @@ A source is not production-ready until all answers are recorded:
 
 ## 13. Recommended first build slice
 
-The first engineering slice should be deliberately narrow:
+The first engineering slice should establish the product boundaries before expanding technical content:
 
-1. Create `repair_knowledge.sources`, `source_records`, `import_runs`, `recalls`, `manufacturer_communications`, `knowledge_items`, `knowledge_revisions`, `applicability_rules`, and `procedure_steps`.
-2. Create `shop_manager.scan_reports`, `scan_report_codes`, and `work_order_knowledge_links`.
-3. Add NHTSA recall matching to the existing vehicle detail page.
-4. Add a work-order Repair Knowledge card supporting manual DTC entry and procedure attachment.
-5. Seed 10–20 original, fully reviewed 365 procedures rather than importing questionable material.
-6. Test the complete flow on two shops and multiple vehicle markets.
+1. Seed `shop_manager_core`, `repair_automotive`, `repair_motorcycle`, `repair_heavy_truck` and `repair_marine` in `module_catalog`.
+2. Create shop module/add-on entitlements, subscription-item mapping, server-side route/API/RLS guards, usage events and `module_key` ownership on technical records.
+3. Add independent workspace shells for Automotive, Motorcycle, Heavy Truck and Marine; prove Core + Motorcycle and Core + Heavy Truck work without Automotive.
+4. Create `repair_knowledge.sources`, `source_records`, `import_runs`, `recalls`, `manufacturer_communications`, module-owned `knowledge_items`, `knowledge_revisions`, `applicability_rules`, and `procedure_steps`.
+5. Create module-owned `shop_manager.scan_reports`, `scan_report_codes`, and `work_order_knowledge_links`.
+6. Add NHTSA recall matching to the Automotive asset detail page without making NHTSA or VIN decoding the shared identity model for the other domains.
+7. Add a domain-resolved work-order Repair Knowledge card supporting manual DTC entry and procedure attachment.
+8. Seed 10–20 original, fully reviewed 365 Automotive procedures while leaving the other modules empty-but-valid until their acceptance fleets and sources are ready.
+9. Test two shops across at least four entitlement states: Core only, Core + Automotive, Core + Motorcycle without Automotive, and Core + Heavy Truck without Automotive. Include direct URL, API, search, export and AI-retrieval denial tests for unsubscribed modules.
 
-This slice creates real customer value, remains within a near-zero data budget, and establishes the legal/technical foundation needed before larger imports or AI search are attempted.
+This slice creates real customer value, remains within a near-zero data budget, and establishes the commercial, legal and technical boundaries needed before larger imports, paid providers or AI search are attempted.
