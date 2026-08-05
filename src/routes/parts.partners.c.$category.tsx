@@ -10,7 +10,7 @@ import {
   listShopBrands,
   getShopBreadcrumb,
 } from "@/lib/shop.functions";
-import { ProductGrid } from "./shop.index";
+import { ProductGrid } from "@/components/shop/product-grid";
 import { useGarage, formatVehicle } from "@/lib/garage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

@@ -4,7 +4,7 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { SiteLayout } from "@/components/site-layout";
 import { listShopProducts, listShopCategories } from "@/lib/shop.functions";
-import { ProductGrid } from "./shop.index";
+import { ProductGrid } from "@/components/shop/product-grid";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
 import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 import { Badge } from "@/components/ui/badge";

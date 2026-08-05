@@ -5,7 +5,7 @@ import { z } from "zod";
 import { SiteLayout } from "@/components/site-layout";
 import { AdCarousel } from "@/components/ads/ad-carousel";
 import { getShopDepartment, listShopProducts, listShopBrands } from "@/lib/shop.functions";
-import { ProductGrid } from "./shop.index";
+import { ProductGrid } from "@/components/shop/product-grid";
 import { useGarage, formatVehicle } from "@/lib/garage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
