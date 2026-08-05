@@ -70,7 +70,7 @@ export function RidePicker({ value, onSelect }: Props) {
           Use a vehicle from My Rides
         </span>
         <Link
-          to="/dashboard/rides_/new"
+          to="/dashboard/rides/new"
           className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
         >
           <Plus className="h-3 w-3" /> Add a ride

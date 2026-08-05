@@ -18,7 +18,7 @@ export const Route = createFileRoute("/franchise/apply")({
     ],
     links: [{ rel: "canonical", href: URL }],
   }),
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: Record<string, unknown>): { tier?: "partner" | "franchise" } => ({
     tier: (s.tier === "franchise" ? "franchise" : "partner") as "partner" | "franchise",
   }),
   component: ApplyPage,

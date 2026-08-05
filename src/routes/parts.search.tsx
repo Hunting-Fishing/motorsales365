@@ -15,7 +15,9 @@ const DESCRIPTION =
 const URL = "https://www.365motorsales.com/parts/search";
 
 export const Route = createFileRoute("/parts/search")({
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (
+    s: Record<string, unknown>,
+  ): { vin?: string; mk?: string; md?: string; yr?: number; q?: string } => ({
     vin: (s.vin as string) || undefined,
     mk: (s.mk as string) || undefined,
     md: (s.md as string) || undefined,

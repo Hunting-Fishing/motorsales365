@@ -570,7 +570,7 @@ function MyBusinessesPage() {
                     </Link>
                   </Button>
                   <Button size="sm" variant="outline" asChild>
-                    <Link to="/dashboard/businesses_/$id/analytics" params={{ id: b.id }}>
+                    <Link to="/dashboard/businesses/$id/analytics" params={{ id: b.id }}>
                       Analytics
                     </Link>
                   </Button>

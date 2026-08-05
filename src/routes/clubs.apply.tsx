@@ -37,7 +37,15 @@ export const Route = createFileRoute("/clubs/apply")({
     ],
     links: [{ rel: "canonical", href: "https://www.365motorsales.com/clubs/apply" }],
   }),
-  validateSearch: (s: Record<string, unknown>) => {
+  validateSearch: (
+    s: Record<string, unknown>,
+  ): {
+    type?: string;
+    name?: string;
+    description?: string;
+    region?: string;
+    city?: string;
+  } => {
     const str = (v: unknown, max: number) =>
       typeof v === "string" && v.trim().length > 0 ? v.slice(0, max) : undefined;
     // Return the raw `type` string (even if not in the enum) so TanStack Router
