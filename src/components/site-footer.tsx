@@ -70,7 +70,7 @@ export function SiteFooter() {
         { to: "/wanted", label: "Wanted board (buyer requests)" },
         { to: "/pricing", label: "Pricing & plans" },
         { to: "/payments", label: "Payment methods" },
-        { to: "/shop", label: "Shop" },
+        { to: "/parts/partners", label: "Partner links" },
       ],
     },
     {

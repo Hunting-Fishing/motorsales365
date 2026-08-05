@@ -12,7 +12,7 @@ export const Route = createFileRoute("/go/$productId")({
       data: { productId: params.productId, networkSlug, visitorId },
     });
 
-    if (!url) throw redirect({ to: "/shop" });
+    if (!url) throw redirect({ to: "/parts/partners" });
     throw redirect({ href: url });
   },
   component: () => null,

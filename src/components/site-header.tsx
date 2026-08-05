@@ -81,7 +81,7 @@ const MOBILE_SECTIONS: MobileSection[] = [
       { to: "/businesses", label: "Businesses" },
       { to: "/map", label: "Map" },
       { to: "/parts", label: "Parts" },
-      { to: "/shop", label: "Shop" },
+      { to: "/parts/partners", label: "Partner links" },
     ],
   },
   {
@@ -315,11 +315,11 @@ export function SiteHeader() {
               Features
             </Link>
             <Link
-              to="/shop"
+              to="/workspace"
               className="hidden shrink-0 whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[2100px]:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
-              Shop
+              Workspace
             </Link>
             <Link
               to="/learn"

@@ -99,7 +99,7 @@ function classifySource(): { source: string; query: string | null; referrer: str
       if (p === "/businesses" || p === "/businesses/")
         return { source: "directory", query: q, referrer };
       if (p.startsWith("/businesses")) return { source: "relevant_search", query: q, referrer };
-      if (p.startsWith("/shop") || p.startsWith("/listing"))
+      if (p.startsWith("/parts") || p.startsWith("/listing"))
         return { source: "listing", query: q, referrer };
       if (p.startsWith("/advertise") || p.startsWith("/r/"))
         return { source: "ads", query: q, referrer };

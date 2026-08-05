@@ -72,7 +72,7 @@ export function RouteNotFound({ message }: { message?: string } = {}) {
           </Link>
         </Button>
         <Button asChild variant="outline">
-          <Link to="/shop">Browse listings</Link>
+          <Link to="/parts/partners">Browse listings</Link>
         </Button>
       </div>
     </main>
