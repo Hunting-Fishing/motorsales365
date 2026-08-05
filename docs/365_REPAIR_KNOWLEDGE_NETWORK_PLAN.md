@@ -54,6 +54,8 @@ The current application is substantially further along than the older `docs/SHOP
 The repository does not yet provide a complete Repair Knowledge Network. The following are required:
 
 - A shared, global repair-knowledge schema separated from private shop records.
+- A generalized service-asset and component model for motorcycles, three-wheelers, trucks, buses, trailers and future off-highway/marine equipment.
+- A capability-level market coverage registry and gap queue so unsupported variants are never silently matched to another region.
 - Source and licence tracking for every imported or contributed record.
 - Government-data import jobs with refresh logs, deduplication, and failure handling.
 - Recall and manufacturer-communication matching on vehicle/work-order pages.
@@ -287,6 +289,247 @@ Request written answers and contract language for:
 9. Add MOTOR when Motorsales365 expands North American coverage or services North American-spec imports.
 10. Continue building the 365-owned knowledge and benchmark network so commercial providers enhance rather than control the platform.
 
+## 3.5 Motorcycle, heavy-truck and worldwide market coverage
+
+### Decision
+
+Motorsales365 must not treat motorcycles or heavy trucks as passenger cars with different body styles. They have different identity systems, component structures, diagnostic connectors, labour operations, parts catalogues, safety controls and commercial data providers.
+
+The required provider strategy is:
+
+> **Motorcycles:** Autodata/HaynesPro repair and labour data → TecAlliance identity/parts where verified → TEXA diagnostics → direct Asian OEM agreements → 365 original knowledge and benchmarks.
+
+> **Medium/heavy trucks:** TecRMI Truck/HaynesPro Truck repair and labour data → Jaltest/TEXA/Bosch diagnostics → direct Asian OEM systems → MOTOR/Mitchell/Diesel Repair/JPRO for North American configurations → 365 original knowledge and benchmarks.
+
+“Worldwide coverage” must mean that the platform can correctly represent, route and report every market and asset class. It must not mean pretending that a single provider contains every model. Unsupported models must enter a visible coverage-gap workflow.
+
+### 3.5.1 Supported asset taxonomy
+
+The canonical asset model must support these classes even if some are delivered after the first release:
+
+| Domain | Asset types | Important distinctions |
+|---|---|---|
+| Light road vehicles | Passenger car, SUV, pickup, van and light commercial vehicle | Market, body, engine, transmission, drive type, emissions and trim |
+| Powered two-wheelers | Motorcycle, scooter, underbone, moped and electric motorcycle/scooter | Frame/chassis number, engine number, model code, displacement, fuel/EV, transmission/CVT, ABS and regional variant |
+| Powered three-wheelers | Motorized tricycle, tuk-tuk, cargo trike and electric three-wheeler | Base motorcycle/vehicle, sidecar or body builder, passenger/cargo configuration, engine and final drive |
+| Powersports | ATV, UTV/side-by-side, off-road bike, snowmobile and personal watercraft | Off-road/marine use, engine family, drive system and proprietary diagnostic connector |
+| Commercial road vehicles | Medium truck, heavy rigid truck, tractor unit, vocational truck, bus, coach and minibus | Cab/chassis plus independently sourced engine, transmission, axles, brakes, aftertreatment, body and upfit |
+| Towed assets | Trailer and semi-trailer | VIN/chassis, axle/brake configuration, refrigeration/hydraulics and body builder |
+| Future adjacent markets | Agricultural, construction/off-highway, material handling, stationary engine and marine | Separate provider licences, diagnostic cables, safety rules and work-order templates |
+
+Each asset has an independent `country_market`, `original_market`, `current_country`, `asset_domain`, `asset_type` and `identity_confidence`. A vehicle imported into the Philippines retains its original market and configuration.
+
+### 3.5.2 Motorcycle repair, labour and diagnostic providers
+
+| Provider | Verified product capability | Proposed 365 role | Coverage caution |
+|---|---|---|---|
+| [Autodata Motorcycles](https://www.autodata-group.com/us/motorcycles/) | Service information, specifications, tightening torques, DTC/symptom information, repair times and an estimate calculator | Primary motorcycle repair/labour candidate; request B2B API and multi-tenant rights | Autodata advertises broad motorcycle coverage, but its published regional bundle references Australia, Europe and the US. Philippine, ASEAN, Indian and Chinese model variants require an exact coverage file. |
+| [HaynesPro](https://www.infopro-digital-automotive.com/haynespro/) Motorcycle data and Web Services | OEM-based maintenance, repair methods, labour times, electronics, wiring and web-service integration for cars, motorcycles and trucks | Primary/secondary embedded motorcycle data candidate | HaynesPro describes itself as pan-European. Test Philippine underbones, scooters, work bikes, Asian electric bikes and local model codes before purchase. |
+| [TecAlliance](https://tecrmi-services.tecalliance.net/docs/ServiceRest.html) vehicle services and [TecDoc](https://www.tecalliance.net/solutions/tecdoc) | TecAlliance vehicle services distinguish car, truck and motorbike classes and expose module-availability flags; TecDoc provides structured parts/vehicle linkages | Motorcycle identity, aftermarket parts and technical modules only when the exact bike reports availability | A motorbike class in the vehicle tree does not prove that labour, manuals, wiring or Philippine parts exist for a particular bike. Test every required module. |
+| [TEXA IDC6 BIKE](https://www.texa.com/solutions/bike/) | Multi-brand diagnostic environment for motorcycles and wider powersports; current product material also covers e-bikes, PWCs and side-by-side/ATV classes | Preferred motorcycle diagnostic-hardware pilot and possible scan-report/launch integration | This is a hardware/software workshop ecosystem, not automatically a white-label data API. Confirm report export, SDK/API and Philippines distributor/support. |
+| Direct OEM/distributor programs | Dealer repair manuals, service bulletins, diagnostic tools, parts EPCs and reprogramming for the exact regional product | Required path for high-volume ASEAN, Indian, Chinese and electric models not covered exactly by commercial aggregators | Access, translation, caching and customer display require written OEM/distributor permission. |
+| 365 technician network | Original procedures, diagnostic trees, actual times, parts used and field validation | Fill legitimate gaps and create a proprietary Philippines-focused knowledge asset | Never label community data as OEM or licensed guide time. Require minimum samples, review and safety controls. |
+
+### 3.5.3 Motorcycle regional coverage map
+
+| Region/market | Makes and vehicle families the coverage test must represent | Acquisition route |
+|---|---|---|
+| Philippines and Southeast Asia | Honda, Yamaha, Suzuki and Kawasaki underbones/scooters/work bikes; Kymco, SYM, Bajaj, TVS, Vespa/Piaggio, CFMoto and local/distributor brands; gasoline and electric tricycles | Autodata, HaynesPro and TecAlliance sandbox tests plus direct Philippine distributor/OEM agreements |
+| Japan/JDM imports | Honda, Yamaha, Suzuki and Kawasaki frame/model-code variants not necessarily sold in the destination market | Exact frame/model-code mapping and Japanese OEM/JASPA partnership; no substitution with an export model |
+| China | CFMoto, QJMotor/Benelli, Loncin, Zongshen, Lifan, Yadea, NIU, Sunra and other electric two/three-wheelers | TecAlliance China where applicable, TEXA coverage, and direct OEM/distributor data contracts |
+| India | Bajaj, TVS, Hero, Royal Enfield, Honda India, Yamaha India and Suzuki India; motorcycles and three-wheelers | Direct manufacturer/distributor relationships plus provider coverage validation |
+| South Korea and Taiwan | Kymco, SYM, Hyosung and electric mobility brands | Provider coverage plus direct OEM/distributor data |
+| Europe/UK | BMW Motorrad, Ducati, KTM/Husqvarna/GasGas, Triumph, Piaggio/Vespa, Aprilia and Moto Guzzi | HaynesPro/Autodata/TEXA followed by OEM access where needed |
+| North America | Harley-Davidson, Indian, Can-Am/BRP, Polaris and regional Japanese/European variants | Autodata/HaynesPro/TEXA and direct powersports/OEM relationships |
+| Australia/New Zealand | Road, off-road and agricultural-use motorcycles/ATVs with local specifications | Autodata/HaynesPro/TEXA regional products and local distributor testing |
+| Latin America, Middle East and Africa | Region-specific commuter bikes, three-wheelers, Chinese/Indian imports and locally assembled variants | Country-by-country provider scorecard and distributor/OEM partnerships |
+
+The first Philippines motorcycle acceptance fleet should include exact year/variant samples from:
+
+- Honda Click 125/160, BeAT, Wave, XRM, TMX, PCX and ADV.
+- Yamaha Mio families, NMAX, Aerox and Sniper.
+- Suzuki Smash, Raider, Burgman Street and Avenis.
+- Kawasaki Barako plus Kawasaki-distributed Rouser/Dominar families where applicable.
+- Bajaj RE/Maxima passenger and cargo three-wheelers.
+- Representative Kymco, SYM, TVS, CFMoto, Vespa/Piaggio, Motorstar/Rusi and other locally serviced brands.
+- Yadea, NIU, Sunra and other electric two/three-wheelers entering the Philippine market.
+- At least one JDM/grey-import unit identified by frame number rather than a conventional 17-character VIN.
+
+For each test bike, validate identity, maintenance, repair times, torque/specification data, wiring/diagnostics, parts linkage, market applicability and legal display rights separately.
+
+### 3.5.4 Heavy-truck repair, labour, parts and diagnostic providers
+
+| Provider | Verified product capability | Proposed 365 role | Geographic/contract caution |
+|---|---|---|---|
+| [TecRMI Truck](https://tecrmi-services.tecalliance.net/) plus TecDoc Truck | TecRMI Truck exposes Adjust, Maintenance, Manuals and Times; TecDoc supports commercial-vehicle parts and vehicle linkages | First global/Asian commercial-data candidate for repair, labour and parts | Obtain a make/model/component coverage file for Philippine/Japanese/Chinese/Korean/Indian trucks. Truck support in the product does not prove a specific local chassis. |
+| [HaynesPro](https://www.infopro-digital-automotive.com/haynespro/) Truck data/Web Services | Repair, maintenance, labour times, wiring, fault management and web-service integration for trucks | Secondary global repair/labour provider and possible embedded data service | Strong European positioning; test Asian cab/chassis, engines and aftertreatment configurations. |
+| [Jaltest CV](https://www.jaltest.com/en/diagnostics/jaltest-cv-commercial-vehicle/) | Diagnostics and technical information for trucks, trailers, buses and light commercial vehicles, including guided troubleshooting and advanced service functions | Priority multi-brand truck diagnostic pilot outside a North-America-only strategy | Hardware/licence ecosystem. Obtain exact Asian coverage, report export/API terms, cables and Philippines support. |
+| [TEXA IDC6](https://www.texa.com/idc6-software/) TRUCK | Diagnostics and technical information for trucks, buses/coaches, trailers/semi-trailers, light commercial vehicles and powertrain systems | Multi-domain diagnostic alternative; attractive because the same ecosystem can cover bike, truck, off-highway and marine | Confirm exact regional coverage and whether 365 may import reports or launch the application. |
+| [Bosch ESI\[tronic\] Truck/OHW](https://ap.boschaftermarket.com/th/en/equipment/ecu-diagnostic/esitronic-program/) | Commercial-vehicle, bus, agricultural and construction diagnostics plus licensed maintenance, wiring and repair information; Bosch explicitly markets Truck coverage across Asia-Pacific and other regions | Strong Asia-capable workshop-tool candidate and potential partner | No public white-label API is established. Treat it as a tool/deep-link/report integration until Bosch contracts otherwise. |
+| [MOTOR FleetCross](https://www.motor.com/products-services/software-applications/fleetcross/) | Class 4–8 repair procedures, VMRS-coded labour, DTCs, wiring and parts cross-references | North American truck pack and US/Canada expansion | MOTOR lists major North American makes. Require proof before using its times on an Asian-market truck. |
+| [Mitchell 1 TruckSeries](https://mitchell1.com/truckseries/) | Class 4–8 repair, diagnostics and standardized labour estimating; the official site provides a third-party integration request route | North American repair/labour alternative and integration candidate | US/Canada-oriented. Do not use for Philippine configurations without an exact match. |
+| [Diesel Repair](https://repair.diesellaptops.com/) | Truck repair documents, fault codes, wiring, VIN-aware labour ranges, component/parts cross-reference and an advertised partner API platform | API candidate for North American parts/repair/fault-code coverage and selected Japanese-brand US models | Published labour examples are mainly North American configurations and model years. Run exact coverage tests and negotiate storage/display rights. |
+| [Noregon JPRO](https://www.noregon.com/jpro/) | All-makes Class 3–8 and selected off-highway diagnostics, guided troubleshooting, reports, bidirectional functions and OEM-app launching | North American diagnostic option and fleet report import candidate | Primarily a Windows diagnostic ecosystem with US-based support; not a substitute for Asian OEM repair data. |
+| Direct OEM/component systems | Exact chassis, engine, transmission, brake, aftertreatment, bus-body and programming information | Mandatory fallback for Asian configurations and protected functions | Separate agreements may be required for the chassis OEM, engine OEM, transmission and braking-system supplier. |
+
+### 3.5.5 Heavy-truck worldwide coverage map
+
+Heavy trucks must be routed by both geography and installed components:
+
+| Region/market | Chassis/OEM groups the test fleet must represent | Additional component families |
+|---|---|---|
+| Philippines/SEA and Japan | Isuzu, Hino, Mitsubishi Fuso and UD; Hyundai commercial vehicles; regional Foton, JAC and other Chinese imports | Isuzu/Hino/Fuso/UD engines, Allison/Eaton/ZF/Aisin transmissions where fitted, WABCO/Knorr-Bremse/Bendix braking, local bus/cargo bodies |
+| China | Foton, JAC, Dongfeng, FAW, Sinotruk/HOWO, Shacman, Yutong and King Long | Weichai, Yuchai, Cummins China and other engine/aftertreatment combinations; Chinese transmissions, axles and ECUs |
+| India/South Asia | Tata, Ashok Leyland, BharatBenz and Eicher/Volvo Eicher | Cummins India and regional engines/transmissions, buses and vocational bodies |
+| South Korea | Hyundai Truck & Bus, Kia commercial and Daewoo Trucks | Regional engines, transmissions, brakes and electronics |
+| Europe | Mercedes-Benz Trucks, Volvo/Renault Trucks, Scania, MAN, DAF and Iveco | ZF, Knorr-Bremse, WABCO and European emissions/ADAS systems |
+| North America | Freightliner/Western Star/Detroit, Kenworth/Peterbilt/PACCAR, International, Mack/Volvo and other Class 3–8 platforms | Cummins, Detroit, PACCAR, International and Volvo/Mack engines; Allison/Eaton transmissions; Bendix/WABCO/Meritor systems |
+| Australia/New Zealand | Mixed Japanese, European, North American and vocational trucks | Road-train/multi-trailer combinations and local bodies/configurations |
+| Latin America | Regional Mercedes-Benz, Volkswagen/MAN, Iveco, Volvo/Scania and imported Asian/North-American products | Local production variants, engines and emissions packages |
+| Middle East/Africa | Mixed European, Japanese, Indian and Chinese fleets | Market-specific cooling, filtration, emissions and body configurations |
+
+The first Philippines commercial acceptance fleet should include:
+
+- Isuzu N-Series/Forward and representative heavier Isuzu chassis.
+- Hino 200/300/500/700 families represented by exact local chassis.
+- Mitsubishi Fuso Canter, Fighter and Super Great families.
+- UD Kuzer/Croner/Quester families.
+- Hyundai Mighty and Xcient families where locally supported.
+- Foton Tornado/Auman, JAC, HOWO/Sinotruk, Shacman, FAW and Dongfeng examples.
+- At least one bus/coach, one refrigerated body, one dump/vocational body, one tractor/semi-trailer and one trailer with electronic braking.
+- One imported North American powertrain and one European tractor configuration to verify regional routing.
+
+### 3.5.6 Component-based heavy-truck identity
+
+A heavy truck is an assembly of separately supported systems. The platform must identify and map:
+
+- Chassis manufacturer, series, model, cab, wheelbase, axle count/layout, GVWR/class and original market.
+- Body/upfit manufacturer and body type.
+- Engine manufacturer, marketing model, build family, serial number, displacement, rating, emissions family and ECU/calibration where permitted.
+- Transmission manufacturer, model, serial and control unit.
+- Front/rear axles, final-drive ratios, steering and suspension.
+- Brake system manufacturer/type, ABS/EBS controller and air/hydraulic configuration.
+- Aftertreatment manufacturer/configuration, emissions level and applicable market rules.
+- Trailer/semi-trailer identity, axles, braking, refrigeration, liftgate and auxiliary systems.
+- Diagnostic connector, protocol families and required adapter/cable.
+
+Provider matching may occur at the whole-vehicle level or at an individual component level. A valid Cummins engine procedure does not prove that a chassis labour time, wiring diagram or aftertreatment procedure applies.
+
+### 3.5.7 Motorcycle and truck diagnostic architecture
+
+The current OBD concept must become a **multi-domain diagnostic companion**:
+
+| Domain | Connection reality | 365 requirement |
+|---|---|---|
+| Passenger car/light vehicle | OBD-II plus manufacturer-specific diagnostics and newer security gateways | Retain generic OBD mode, then add approved provider/OEM extensions |
+| Motorcycle/powersports | Many proprietary connectors, cables and manufacturer protocols; connector and feature coverage vary substantially by make/year | Store diagnostic-connector profiles and supported-function matrices; do not advertise universal Bluetooth OBD motorcycle support |
+| Heavy truck/bus | J1939, older J1708/J1587, RP1210-style interfaces, CAN/CAN-FD, DoIP and manufacturer-specific systems may coexist | Use a supported VCI/Windows or Android bridge, identify every module/component and record adapter/driver/software version |
+| Trailer | Separate ABS/EBS/refrigeration and auxiliary controllers, often requiring dedicated cables | Treat the trailer as its own asset and scan session linked to the towing vehicle/work order |
+| Off-highway/agricultural/marine | Highly varied connectors, component ECUs and vendor licences | Separate diagnostic packs and safety policies; never infer support from the road-vehicle licence |
+
+Diagnostic integration levels must be recorded separately:
+
+1. **Launch/deep link** — 365 opens the licensed provider application with available vehicle context.
+2. **Report import** — technician exports a provider report and attaches it to the correct work order.
+3. **Approved SDK/API** — 365 receives normalized scan data under a partner contract.
+4. **Local companion control** — 365's signed companion communicates with approved hardware.
+5. **Bidirectional/reprogramming** — restricted future capability requiring technician authorization, voltage support, OEM/security access, audit logs and provider approval.
+
+A browser-only web application must not attempt protected programming, injector coding, DPF regeneration, immobilizer work or other bidirectional controls without the approved local tool and safety workflow.
+
+### 3.5.8 Coverage registry and no-false-match rules
+
+Create an auditable coverage registry with these statuses:
+
+`untested → provider_claimed → sandbox_verified → production_verified`
+
+Additional terminal/routing statuses:
+
+`deep_link_only | direct_oem_required | community_only | unsupported | withdrawn`
+
+Coverage is tracked by:
+
+- Provider and contract version.
+- Country/territory and language.
+- Asset domain/type.
+- Make, model/series, model code, year range and market.
+- Engine, transmission and major component configuration.
+- Capability: identity, maintenance, labour, manual, specification, wiring, DTC, guided diagnostic, parts, ordering, scan or programming.
+- Match level: exact VIN/frame/chassis, exact component serial/model, exact market variant, family-level only or generic.
+- Evidence: coverage file, sandbox result, technician validation and last successful production lookup.
+- Licence permissions and expiry.
+- Known gaps, incorrect matches and provider correction ticket.
+
+Rules:
+
+- The coverage router returns only exact supported results by default.
+- A different-market or family-level result is hidden unless a technician explicitly opens it as a labelled reference.
+- Labour and specifications cannot fall back across markets automatically.
+- “No exact data” is a valid, visible result.
+- Every unsupported lookup increments the coverage-gap register.
+- Coverage claims expire and must be retested after provider/database or vehicle-model updates.
+- Provider performance is measured against the real anonymized 365 shop fleet, not advertised database totals.
+
+### 3.5.9 Coverage KPIs
+
+The admin coverage dashboard should report by country and asset class:
+
+- Percentage of active assets with exact identity.
+- Percentage with verified maintenance schedules.
+- Percentage with licensed labour operations.
+- Percentage with repair procedures/specifications.
+- Percentage with wiring and diagnostic coverage.
+- Percentage with OE and aftermarket parts mapping.
+- Percentage with a supported scan path.
+- Top unsupported makes/models/components weighted by actual shop demand.
+- Provider lookup success, incorrect-match reports, response time and cost per successful lookup.
+- Coverage age and contracts approaching expiry.
+
+A public statement such as “covers the Philippine motorcycle market” or “all-makes trucks” is permitted only when the corresponding coverage score and limitations are displayed.
+
+### 3.5.10 Shop Manager changes
+
+Add class-aware behavior without duplicating the entire work-order system:
+
+- Shop settings select supported domains: auto/LCV, motorcycle/powersports, truck/bus/trailer and future adjacent markets.
+- Extend the existing vehicle record through an `AssetIdentityCard` rather than creating separate customer/work-order/invoice products.
+- Motorcycle identity forms support frame number, engine number, model code, displacement, transmission/CVT, ABS and electric battery/motor data.
+- Truck identity forms support chassis plus a component configuration card for engine, transmission, axles, brakes, aftertreatment, body/upfit and trailers.
+- Work orders snapshot the exact asset/component configuration used for all provider lookups.
+- Search and provider badges show exact market, asset class, component and verification level.
+- Inspection templates become class-aware: motorcycle safety/drive/tires/brakes; truck DOT/fleet/preventive maintenance/air-brake/aftertreatment; trailer and bus-specific templates.
+- Labour selection shows provider time, shop estimate, billed time and actual time separately.
+- Scan reports support multiple assets/components and retain the diagnostic tool, VCI, cable, protocol, software version and source file.
+- Parts searches distinguish chassis parts, component parts, body/upfit parts and universal consumables.
+- Add `/admin/repair-knowledge/coverage` for provider tests, coverage gaps and correction tickets.
+
+### 3.5.11 Worldwide rollout order
+
+1. **Philippines motorcycle pilot:** exact local identity forms, manual estimates, Autodata/HaynesPro/TecAlliance coverage trials and a TEXA diagnostic demonstration.
+2. **Philippines commercial pilot:** component-based truck identity, TecRMI Truck/HaynesPro trials and Jaltest/TEXA/Bosch demonstrations.
+3. **Direct Asian OEM outreach:** Honda/Yamaha/Suzuki/Kawasaki and high-volume motorcycle distributors; Isuzu/Hino/Fuso/UD plus Chinese/Korean/Indian truck distributors.
+4. **North American pack:** MOTOR FleetCross, Mitchell TruckSeries, Diesel Repair API and JPRO evaluation for US/Canada and imported North American assets.
+5. **Europe/Oceania pack:** HaynesPro/TecAlliance plus TEXA/Jaltest/Bosch, validated against local fleets.
+6. **China/India/local-manufacturer packs:** direct licensed data and provider mappings for high-volume uncovered assets.
+7. **Adjacent equipment packs:** agriculture, construction, material handling and marine using separate Jaltest/TEXA/Bosch/OEM licences.
+
+Parallel to every stage, 365 continues collecting consented actual times and original technician procedures to reduce dependence on commercial coverage.
+
+### 3.5.12 Product packaging and revenue
+
+Keep the operational Shop Manager affordable while making expensive data modular:
+
+| Product | Included value |
+|---|---|
+| 365 Shop Manager Core | Customer/assets, work orders, inspections, manual shop estimates, technician time, invoices, service history and 365-owned/free knowledge |
+| 365 Motorbike Pro | Licensed motorcycle maintenance/repair/labour coverage, class-specific inspections and supported diagnostic report integration |
+| 365 Fleet & Truck Pro | Component-based fleet assets, preventive maintenance, licensed truck labour/repair data, trailer/bus support and fleet analytics |
+| Provider/OEM Data Pass | Pass-through entitlement for a territory, OEM or commercial dataset where the contract requires separate billing |
+| Diagnostic Connect | Approved companion/report integration, device setup, scan history and provider launch links |
+| 365 Network Intelligence | Verified community benchmarks, common-failure analytics, parts demand and multi-location performance with privacy thresholds |
+
+Provider costs must be matched to the shops that use the licensed module. The proprietary coverage registry, local vehicle mappings, field-validated procedures and anonymized benchmarks remain 365 assets.
+
 ## 4. The opportunity: 365 Repair Knowledge Network
 
 ### 4.1 Product promise
@@ -369,6 +612,22 @@ Never assume US make/model/year applicability equals a Philippines, Japanese, Ch
 
 Do not place commercial-provider API secrets or reusable access tokens in these tables as plain text. Store secrets in the platform's server-side secret manager and retain only key identifiers/rotation metadata in the database.
 
+#### Multi-domain asset identity and coverage
+
+| Table | Purpose | Essential fields |
+|---|---|---|
+| `service_assets` | Canonical identity across cars, motorcycles, trucks, buses, trailers and future equipment | `id`, `asset_domain`, `asset_type`, `make`, `model`, `series`, `model_code`, `year`, `original_market`, `current_country`, `identity_confidence` |
+| `asset_identifiers` | Multiple identifiers without assuming a 17-character VIN | `id`, `asset_id`, `identifier_type`, `value`, `issuer_or_make`, `country`, `verified_at`; types include VIN, chassis, frame, engine serial, registration and fleet number |
+| `asset_components` | Installed truck/motorcycle/trailer systems | `id`, `asset_id`, `parent_component_id`, `component_type`, `manufacturer`, `model`, `serial_number`, `rating`, `software_or_calibration`, `installed_from`, `installed_to` |
+| `asset_configuration_revisions` | Immutable snapshots used by work orders/provider lookups | `id`, `asset_id`, `revision_number`, `configuration_json`, `verified_by`, `verified_at` |
+| `provider_component_mappings` | Map provider records to the whole asset or a component | `id`, `provider_id`, `asset_id`, `component_id`, `provider_type_id`, `market`, `match_level`, `confidence`, `verified_at` |
+| `coverage_claims` | Capability-level provider coverage registry | `id`, `provider_id`, `contract_version`, `country`, `asset_domain`, `asset_type`, `make`, `model_pattern`, `year_from`, `year_to`, `component_pattern`, `capability`, `status`, `expires_at` |
+| `coverage_test_runs` | Evidence from sandbox and production validation | `id`, `coverage_claim_id`, `asset_id`, `tested_at`, `environment`, `match_level`, `result`, `provider_reference`, `notes` |
+| `coverage_gaps` | Demand-weighted unsupported or incorrect matches | `id`, `asset_id`, `requested_capability`, `country`, `occurrence_count`, `first_seen_at`, `last_seen_at`, `status`, `provider_ticket`, `resolution` |
+| `diagnostic_connector_profiles` | Known connector/protocol/tool requirements | `id`, `asset_or_platform_id`, `connector_type`, `location`, `protocols`, `required_vci`, `required_cable`, `supported_functions`, `safety_notes` |
+
+The existing Shop Manager vehicle table can remain the transactional reference during migration. New generalized identities should link to it so current work orders, invoices and service history are not broken.
+
 #### Knowledge content
 
 | Table | Purpose | Essential fields |
@@ -446,6 +705,7 @@ Publication rules:
 | `/workspace/contribute` | Create original knowledge drafts | Phase 2 |
 | `/workspace/review` | Qualified reviewer queue | Phase 2 |
 | `/admin/repair-knowledge/sources` | Source/licence/import administration | Build with importer |
+| `/admin/repair-knowledge/coverage` | Provider capability tests, regional scorecards, unsupported assets and correction tickets | Build before commercial-provider rollout |
 | `/admin/repair-knowledge/moderation` | Content, safety and copyright reports | Phase 2 |
 
 ### 6.2 Existing pages to extend
@@ -611,19 +871,27 @@ The zero-cost MVP should prove the closed loop from vehicle → knowledge → wo
 
 **Exit condition:** 365 can publish original, reviewed, attributable content with a complete audit trail.
 
-### Phase 4 — OBD companion and measurement intelligence
+### Phase 4 — multi-domain diagnostic companion and measurement intelligence
 
-- Choose supported adapter families and protocols.
-- Build a Windows/Android companion or local bridge for scanner communication.
-- Import generic OBD-II codes, freeze frame and selected PIDs.
+- Replace the passenger-car-only OBD assumption with supported profiles for car/LCV, motorcycle/powersports, truck/bus, trailer and later off-highway/marine.
+- Choose supported VCI/adapter families, protocols and exact vehicle cables.
+- Build a signed Windows/Android companion or approved provider bridge for scanner communication.
+- Import generic OBD-II data where applicable plus provider-approved motorcycle and heavy-truck reports.
+- Support truck component/module identity, J1939 and legacy/proprietary protocol profiles without claiming universal coverage.
+- Record VCI, cable, driver/software version, protocol, tool provider and vehicle/component identity with every scan.
 - Add explicit user consent, encryption, device pairing and raw-file retention rules.
-- Keep bidirectional tests/programming outside scope until safety, device and licensing requirements are satisfied.
+- Pilot TEXA for motorcycles/multi-domain coverage and Jaltest/TEXA/Bosch for commercial vehicles; evaluate JPRO for North American trucks.
+- Keep bidirectional tests, protected gateways and programming outside scope until safety, device, OEM-security and licensing requirements are satisfied.
 
-**Exit condition:** a supported device can reliably create a normalized scan report attached to the correct vehicle and work order.
+**Exit condition:** supported devices can reliably create normalized, source-labelled scan reports for at least one Philippine motorcycle fleet and one mixed commercial-truck fleet, attached to the correct asset/component and work order.
 
 ### Phase 5 — commercial data and monetization
 
 - Request coverage, sandbox, pricing and multi-tenant licensing terms from TecAlliance Southeast Asia, Autodata and Infomedia first.
+- Request separate motorcycle and truck datasets; do not assume the passenger-car licence includes them.
+- Evaluate Autodata Motorcycle, HaynesPro Motorcycle/Truck and TecRMI Truck/TecDoc commercial-vehicle/motorbike capabilities against the Philippine acceptance fleets.
+- Evaluate Jaltest, TEXA and Bosch as diagnostic ecosystems; record whether each supports launch links, report export, SDK/API access or only standalone use.
+- Evaluate MOTOR FleetCross, Mitchell TruckSeries, Diesel Repair APIs and JPRO as a separate North American commercial-vehicle pack.
 - Evaluate HaynesPro where it adds proven Philippines/ASEAN coverage.
 - Negotiate approved API, embedded-viewer or deep-link relationships with JASPA/FAINES, Chinese OEMs and Bosch; do not scrape their systems.
 - Add MOTOR and other providers for North American-spec vehicles and later US/Canada expansion.
@@ -674,6 +942,16 @@ The zero-cost MVP should prove the closed loop from vehicle → knowledge → wo
 ### P3 — later integrations
 
 - [ ] Android/Windows OBD companion proof of concept.
+- [ ] Generalized service-asset, identifier, component and configuration-revision schema.
+- [ ] Motorcycle, scooter, underbone, tricycle, ATV/UTV and electric two/three-wheeler identity forms.
+- [ ] Truck, bus and trailer component-configuration forms.
+- [ ] Capability-level coverage registry, test runner, gap queue and admin dashboard.
+- [ ] Autodata/HaynesPro/TecAlliance motorcycle coverage evaluation.
+- [ ] TecRMI Truck/HaynesPro Truck commercial-data evaluation.
+- [ ] Jaltest/TEXA/Bosch Philippines diagnostic demonstrations and report/API review.
+- [ ] MOTOR/Mitchell/Diesel Repair/JPRO North American truck-pack evaluation.
+- [ ] Philippines motorcycle and commercial-truck acceptance fleets.
+- [ ] Multi-domain diagnostic connector/protocol profiles.
 - [ ] Provider-independent vehicle, labour-time, repair-information, parts-catalogue and order interfaces.
 - [ ] TecAlliance SEA/TecRMI/TecDoc/TecCom coverage and licensing evaluation.
 - [ ] Autodata API coverage-fallback evaluation.
@@ -726,6 +1004,9 @@ A source is not production-ready until all answers are recorded:
 6. **Applicability is a claim requiring evidence.** Similar-looking vehicles are not assumed identical across markets.
 7. **Commercial content stays isolated.** Provider-specific storage, display and expiry rules are enforced by the adapter and entitlement layer.
 8. **Safety overrides monetization.** Advertising, affiliate revenue and parts availability never alter technical conclusions.
+9. **No silent cross-market fallback.** A family-level or different-market motorcycle/truck result is never presented as an exact match.
+10. **Truck configuration is component-based.** Chassis, engine, transmission, brakes, aftertreatment, body and trailer mappings retain separate provenance.
+11. **Coverage gaps are product data.** Unsupported lookups are recorded, demand-ranked and used for provider/OEM outreach.
 
 ## 13. Recommended first build slice
 
