@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type GiphyItem = {
   id: string;
@@ -57,6 +58,7 @@ async function callGiphy(path: string, params: Record<string, string>): Promise<
 }
 
 export const giphyTrending = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: { offset?: number; limit?: number }) => d)
   .handler(async ({ data }) => {
     return callGiphy("trending", {
@@ -66,6 +68,7 @@ export const giphyTrending = createServerFn({ method: "POST" })
   });
 
 export const giphySearch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: { q: string; offset?: number; limit?: number }) => d)
   .handler(async ({ data }) => {
     const q = (data.q ?? "").trim();

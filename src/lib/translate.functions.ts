@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
 
@@ -10,6 +11,7 @@ const codes = SUPPORTED_LANGUAGES.map((l) => l.code) as [string, ...string[]];
  * injects credentials on Cloudflare Workers.
  */
 export const translateText = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: { text: string; target: string }) =>
     z
       .object({

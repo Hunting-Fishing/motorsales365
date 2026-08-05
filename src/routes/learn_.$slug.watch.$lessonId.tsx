@@ -174,7 +174,7 @@ function Watch() {
                 {next && (
                   <Button asChild variant="outline">
                     <Link
-                      to="/learn_/$slug/watch/$lessonId"
+                      to="/learn/$slug/watch/$lessonId"
                       params={{ slug: params.slug, lessonId: next.id }}
                     >
                       Next lesson →
@@ -210,7 +210,7 @@ function Watch() {
                         {mLessons.map((l) => (
                           <li key={l.id}>
                             <Link
-                              to="/learn_/$slug/watch/$lessonId"
+                              to="/learn/$slug/watch/$lessonId"
                               params={{ slug: params.slug, lessonId: l.id }}
                               className={`flex items-center gap-2 rounded px-2 py-1 hover:bg-secondary ${l.id === params.lessonId ? "bg-secondary font-medium" : ""}`}
                             >

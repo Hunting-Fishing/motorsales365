@@ -26,7 +26,7 @@ import {
 import { PlacementPreview } from "@/components/advertise/placement-preview";
 
 export const Route = createFileRoute("/advertise")({
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: Record<string, unknown>): { section?: string } => ({
     section: typeof s.section === "string" ? s.section : undefined,
   }),
   head: () => ({

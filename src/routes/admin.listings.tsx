@@ -45,7 +45,7 @@ import {
 } from "@/lib/admin-listings.functions";
 
 export const Route = createFileRoute("/admin/listings")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { status?: string } => ({
     status: typeof search.status === "string" ? (search.status as string) : undefined,
   }),
   component: AdminListings,

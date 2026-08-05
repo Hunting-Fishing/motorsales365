@@ -22,6 +22,10 @@ const lenientUrl = (max = 500) =>
       }
     });
 
+// Public-safe columns for the anonymous mini-site payload. Excludes domain
+// verification secrets, moderation notes, and import provenance fields.
+const PUBLIC_BUSINESS_COLUMNS = "id,owner_id,slug,name,type_slug,description,logo_url,cover_url,photos,phone,email,website,messenger_url,hours,region,province,city,barangay,street_address,lat,lng,status,featured,rating_avg,rating_count,created_at,updated_at,postal_code,brands_carried,price_label,price_updated_at,subscription_tier,featured_until,organization_id,tagline,theme_color,show_services,show_products,show_posts,cta_primary,show_gallery,show_contact,featured_video_url,featured_video_provider,vanity_slug,facebook_url,whatsapp_number,expose_inventory_to_network,network_exposure_status,custom_domain,custom_domain_status";
+
 const HIDDEN_BUSINESS_STATUSES = ["archived", "hidden", "removed", "banned"] as const;
 
 export const resolveBusinessMiniSiteSlug = createServerFn({ method: "GET" })
@@ -79,7 +83,7 @@ export const getBusinessPage = createServerFn({ method: "GET" })
     const lookup = data.slug.toLowerCase();
     const { data: initialBiz, error } = await supabaseAdmin
       .from("businesses")
-      .select("*")
+      .select(PUBLIC_BUSINESS_COLUMNS)
       .or(`slug.eq.${lookup},vanity_slug.eq.${lookup}`)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -95,7 +99,7 @@ export const getBusinessPage = createServerFn({ method: "GET" })
       if (hist) {
         const { data: b2 } = await supabaseAdmin
           .from("businesses")
-          .select("*")
+          .select(PUBLIC_BUSINESS_COLUMNS)
           .eq("id", (hist as any).business_id)
           .maybeSingle();
         biz = b2 ?? null;

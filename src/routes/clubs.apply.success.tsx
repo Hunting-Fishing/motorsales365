@@ -53,7 +53,7 @@ export const Route = createFileRoute("/clubs/apply/success")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>) => {
+  validateSearch: (s: Record<string, unknown>): { club?: string; name?: string } => {
     const str = (v: unknown, max: number) =>
       typeof v === "string" && v.trim().length > 0 ? v.slice(0, max) : undefined;
     return {
@@ -271,7 +271,7 @@ function ClubApplySuccessPage() {
               className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <Link
-                to="/dashboard/clubs_/$id"
+                to="/dashboard/clubs/$id"
                 params={{ id: club }}
                 aria-label="Open your club in the dashboard"
               >
@@ -444,7 +444,7 @@ function ResubmitDocumentsPanel({
       <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
         <Button asChild variant="ghost" size="sm">
           <Link
-            to="/dashboard/clubs_/$id"
+            to="/dashboard/clubs/$id"
             params={{ id: clubId }}
             aria-label="Open club in dashboard for a full edit"
           >
@@ -657,7 +657,7 @@ function TimelineRows({ data, clubId }: { data: StatusData; clubId?: string }) {
       title: "Add logo, cover & first post",
       sub: clubId ? (
         <Link
-          to="/dashboard/clubs_/$id"
+          to="/dashboard/clubs/$id"
           params={{ id: clubId }}
           className="text-primary underline-offset-4 hover:underline"
         >
