@@ -108,6 +108,185 @@ Do not promise free comprehensive coverage for:
 
 Random manual-download sites, copied PDFs, scraped subscription databases, and unattributed GitHub datasets must not enter the production database. A public URL is not proof of permission to redistribute commercially.
 
+## 3.4 Asian-market commercial provider strategy
+
+### Decision
+
+For the Philippines and the wider Asian market, the preferred first commercial stack is:
+
+> **TecDoc + TecRMI + TecCom → Autodata fallback → Infomedia OEM/dealer connections → 365 community benchmarks for uncovered vehicles**
+
+TecRMI is the closest identified equivalent to MOTOR labour and repair information for the Southeast Asian market. TecDoc supplies the complementary parts catalogue and fitment layer, while TecCom can support later ordering and fulfilment connections.
+
+No supplier should be treated as having universal Asian coverage. The Philippines contains ASEAN-market vehicles, Japanese and Korean platforms, Chinese vehicles, North American imports, European imports, grey-market/JDM units, motorcycles, light commercial vehicles and heavy equipment. Motorsales365 must use provider adapters and coverage routing rather than hard-coding the platform to one catalogue.
+
+### 3.4.1 Provider priority matrix
+
+| Priority | Provider | Primary value | Labour/repair information | Parts/ordering information | Intended 365 use | Important limitation |
+|---:|---|---|---|---|---|---|
+| 1 | [TecAlliance Southeast Asia](https://www.tecalliance-sea.com/) — TecRMI, TecDoc and TecCom | Strongest combined Southeast Asian starting point | TecRMI provides manufacturer-compliant repair times, labour values, intelligent overlap calculations, maintenance, specifications, diagnostics and step-by-step instructions | TecDoc supplies vehicle/part identification and OE/aftermarket references; TecCom supports ordering and returns | First commercial integration candidate for vehicle identity, labour operations, technical data, parts fitment and later partner ordering | Exact Philippines, JDM, motorcycle and commercial-vehicle coverage must be proven. TecAlliance notes that some manufacturer data may be restricted or unavailable in some regions. |
+| 2 | [Autodata API](https://developer.autodata-group.com/) | Broad independent-workshop technical data delivered through a structured API | Repair times, service schedules, procedures, wiring and technical specifications, subject to the licensed product and market | Not a replacement for a comprehensive TecDoc-style Asian parts network | Secondary repair-information provider and coverage fallback | Require a Philippines/ASEAN coverage export. Coverage of Japanese/Korean brands in other territories does not prove coverage of Philippine engines and trims. |
+| 3 | [Infomedia](https://www.infomedia.com.au/apis/) — Microcat, Superservice and OMNI | Genuine OEM parts and dealer-grade service/repair workflows with Asia-Pacific operations | Superservice/OMNI can support VIN-specific service and repair quoting, including estimated labour | [Microcat EPC](https://www.infomedia.com.au/products/parts/microcat-epc/) provides VIN-specific OEM catalogues; Parts and Order APIs can connect ordering workflows | Strategic OEM/dealer integration and genuine-parts fulfilment layer | Likely an enterprise/OEM agreement rather than a low-cost general aftermarket subscription. Confirm independent-marketplace, multi-tenant and Philippines rights. |
+| 4 | [HaynesPro](https://www.haynespro.com/) Web Services | Mature maintenance, repair, diagnostics and wiring platform | Repair times, maintenance, repair procedures, diagnostics and wiring through web-service products | Secondary rather than primary Asian parts-catalogue option | Additional coverage provider when its exact local vehicle match is stronger | Product positioning is substantially European. It must pass the same Philippines/JDM coverage audit before use. |
+| 5 | [JASPA FAINES](https://faines.jaspa.or.jp/enduser/static/menu/guide) | Authoritative Japanese repair information, especially relevant to JDM vehicles | Repair manuals, fault examples, technical/service data, troubleshooting, wiring and standard work points | Not a general commercial parts API | JDM research, controlled external access, or a future negotiated JASPA/Japanese partner integration | Japanese-language paid system; no public commercial API or redistribution right has been identified. Do not scrape or copy it. |
+| 6 | Chinese manufacturer repair-information portals under the official [China repair-information disclosure policy](https://www.mee.gov.cn/xxgk/hjyw/201510/t20151008_310706.shtml) | Direct-market Chinese OEM manuals, wiring, diagnostics, service information, bulletins and recalls | Potentially strong manufacturer-specific technical content | Manufacturer-specific catalogues and references may be available | Controlled deep links, technician reference and OEM partnership negotiations | Chinese policy also protects intellectual property and restricts unauthorized resale, publication, disclosure and commercial reuse. Public access is not permission to ingest or republish. |
+| 7 | [Bosch ESI\[tronic\]](https://www.boschaftermarket.com/) | Workshop diagnostics, guided troubleshooting and Bosch component ecosystem | Control-unit diagnosis, troubleshooting and repair/component information depending on the subscribed package | Bosch parts/component information | Optional shop-tool launch/deep-link integration and future Bosch partnership | No public white-label repair-data API has been confirmed. Do not design the core platform around a desktop subscription without partner terms. |
+| Regional extension | [MOTOR](https://www.motor.com/products-services/manuals/) | Strong North American repair and labour information | OEM labour times and repair/diagnostic data through products such as TruTech and FleetCross | North American parts/service context | Later provider for North American-spec imports and a US/Canada expansion | It should not be the primary source for Philippine/ASEAN variants unless MOTOR supplies a coverage file proving those vehicles. |
+
+Commercial API pricing is generally quote-based. The selection must be based on licensed territory, vehicle coverage and SaaS redistribution rights—not the largest advertised global vehicle count.
+
+### 3.4.2 TecAlliance product roles
+
+TecAlliance should be evaluated as several connected capabilities rather than one undifferentiated database:
+
+| Product | 365 capability | Proposed Shop Manager use |
+|---|---|---|
+| [TecRMI Repair and Maintenance](https://www.tecalliance-sea.com/en/rm) | Labour operations, overlap logic, maintenance, specifications, diagnostics, procedures, related parts and special tools | Build an estimate from technician-selected licensed labour operations; open licensed instructions from the work order; match required parts and tools |
+| [TecRMI REST services](https://tecrmi-services.tecalliance.net/docs/ServiceRest.html) | Vehicle capability checks, work lists and maintenance availability | Server-side provider adapter and coverage routing |
+| [TecDoc Catalogue](https://www.tecalliance-sea.com/en/tc) | Aftermarket parts identification, fitment and OE cross-reference | Search work-order and inventory parts by verified vehicle identity |
+| TecCom | Business-to-business parts ordering, availability and returns | Later connection between participating 365 shops, distributors and warehouses |
+| [TecAlliance China API](https://developer.tecalliance.cn/en/) | China-specific and worldwide vehicle/part data, including VIN, kType and ChinaID workflows | Chinese-vehicle resolution and parts matching without forcing a European or North American vehicle identity |
+
+### 3.4.3 Integration roles by data layer
+
+| Data layer | Primary candidate | Secondary/fallback | Rule |
+|---|---|---|---|
+| Vehicle identity and provider mapping | Existing 365 VIN/chassis decoder plus TecAlliance IDs | OEM VIN/chassis mapping and Infomedia | Preserve the original VIN/chassis and every provider-specific ID; never overwrite the canonical vehicle record with one vendor ID |
+| Licensed labour operations | TecRMI | Autodata, Infomedia Superservice, then HaynesPro where licensed | Use only an exact supported market/engine/transmission match |
+| Repair and maintenance procedures | TecRMI | Autodata, HaynesPro, licensed OEM programs | Display source, territory, update timestamp and access entitlement |
+| Aftermarket parts fitment | TecDoc | Contracted distributor catalogues | A description or keyword match is not a fitment guarantee |
+| Genuine OEM parts | Infomedia Microcat or direct OEM agreement | Licensed manufacturer portals | Retain VIN/chassis match and supersession chain |
+| Ordering and fulfilment | TecCom and Infomedia ordering products | Direct distributor APIs and the future 365 Parts Partner Network | Separate catalogue truth, seller stock, price, shipping and order status |
+| JDM technical reference | Negotiated FAINES/JASPA access | Provider coverage verified by chassis/engine | No scraping, copied PDFs or unlicensed translation |
+| Chinese-market technical reference | Direct OEM agreement and TecAlliance China | Controlled official deep links | Respect OEM territory, storage and redistribution restrictions |
+| Workshop diagnostics | Bosch ESI[tronic] or supported scan-tool partner | 365 OBD companion | A launch/deep-link integration is different from a licensed data-ingestion API |
+| North American coverage | MOTOR plus existing NHTSA sources | Autodata/TecRMI where coverage is proven | Keep North American operations isolated from Philippine look-alike variants |
+
+### 3.4.4 Provider-independent adapter contract
+
+The application should define capability interfaces before selecting a vendor:
+
+```ts
+interface VehicleResolver {
+  resolveVehicle(input: VehicleIdentityInput): Promise<ProviderVehicleMatch[]>
+}
+
+interface LabourTimeProvider {
+  hasCoverage(vehicle: ProviderVehicleMatch): Promise<CoverageResult>
+  listOperations(vehicle: ProviderVehicleMatch, query?: string): Promise<LabourOperation[]>
+  getOperation(operationId: string): Promise<LabourOperationDetail>
+}
+
+interface RepairInfoProvider {
+  search(vehicle: ProviderVehicleMatch, query: RepairQuery): Promise<RepairInfoResult[]>
+  getDocument(documentId: string): Promise<EntitledRepairDocument>
+}
+
+interface PartsCatalogProvider {
+  searchParts(vehicle: ProviderVehicleMatch, query: PartsQuery): Promise<PartFitmentResult[]>
+  getSupersessions(partId: string): Promise<PartSupersession[]>
+}
+
+interface PartsOrderProvider {
+  getAvailability(partIds: string[], destination: OrderDestination): Promise<StockOffer[]>
+  submitOrder(order: ProviderOrder): Promise<ProviderOrderResult>
+}
+```
+
+Provider responses must be normalized for Shop Manager while retaining:
+
+- Provider name, provider vehicle ID and provider record/operation ID.
+- Market, model year, chassis, engine and transmission identity used for the match.
+- Match method and confidence.
+- Data type and provenance.
+- Licence territory and user entitlement.
+- Retrieved, updated and expiry timestamps.
+- Whether 365 may cache, display, transform, translate, print or retain the response.
+- Source attribution and provider deep link when required.
+- Raw payload only when the provider contract expressly permits its storage.
+
+API keys must remain server-side. The browser should call a 365 server function that checks shop membership, subscription entitlement, provider territory, rate limits and permitted caching before requesting commercial data.
+
+### 3.4.5 Labour-time provenance and UI rules
+
+Shop Manager must keep these time types distinct:
+
+| Internal type | UI label | Meaning |
+|---|---|---|
+| `licensed_oem_time` | Licensed OEM time | A manufacturer/OEM time supplied under a contract that permits this display |
+| `licensed_aftermarket_time` | Licensed guide time | A commercial provider's repair/labour time |
+| `365_community_benchmark` | 365 verified benchmark | An anonymized, statistically valid benchmark based on consented shop outcomes |
+| `shop_estimate` | Shop estimate | The shop's own expected or quoted time |
+| `actual_time` | Actual technician time | Time recorded by Shop Manager during execution |
+
+A quoted job may retain several values—for example, provider guide time, shop-estimated time, billed time and actual time—but the UI and invoice audit trail must preserve which one was used.
+
+Labour-operation overlap must be calculated only by a provider that supplies overlap rules or by a documented 365 rule. It must never be guessed by an AI model.
+
+### 3.4.6 Philippines and Asia coverage acceptance test
+
+Before selecting a provider, obtain an API sandbox or provider-generated coverage file for exact engines, transmissions, model years and Philippine market variants. The evaluation fleet should include at least:
+
+- Toyota Vios, Wigo, Innova, Fortuner, Hilux and Hiace.
+- Mitsubishi Mirage, Xpander, Montero Sport and Strada/Triton.
+- Isuzu D-Max and MU-X.
+- Nissan Navara, Terra and Urvan.
+- Suzuki Ertiga, Dzire, S-Presso and Carry.
+- Honda City, Brio and CR-V.
+- Hyundai Accent, Stargazer and Tucson; Kia Soluto and other high-volume local models.
+- Geely Coolray, MG ZS, Chery Tiggo, GAC GS3 and current BYD vehicles.
+- Foton, JAC, Great Wall/Haval and other light-commercial Chinese vehicles.
+- Representative JDM chassis-code and grey-import vehicles.
+- Separate samples for motorcycles, medium/heavy trucks, agricultural equipment and marine engines; these must not be assumed to share passenger-car coverage.
+
+For each vehicle, score:
+
+1. Exact VIN or chassis resolution.
+2. Correct Philippine/ASEAN market, engine and transmission.
+3. Maintenance schedules.
+4. Labour operations and overlap behavior.
+5. Repair procedures, specifications and wiring coverage.
+6. OE and aftermarket parts references.
+7. Update freshness and supersession handling.
+8. API response, availability and rate limits.
+9. Right to display the result to third-party shops in a multi-tenant 365 SaaS product.
+10. Cost per shop, user, vehicle lookup, API request and country.
+
+A provider passes only when exact local variants are identifiable. A visually similar US, European or Japanese model is not an acceptable substitute.
+
+### 3.4.7 Vendor questions required before contract
+
+Request written answers and contract language for:
+
+- Which Philippines/ASEAN models, engines, transmissions and years are covered?
+- Are JDM chassis-code, grey-import, motorcycle, heavy-truck, equipment and marine products separate?
+- Is access supplied through API, bulk delivery, embedded viewer, portal launch/deep link, or some combination?
+- May Motorsales365 display the data inside a white-label, multi-tenant SaaS used by unrelated repair shops?
+- Are marketplace resale, sublicensing, print/export and customer-facing quote rights included?
+- What are the country/territory restrictions?
+- May 365 cache responses, for how long, and what must be deleted when a subscription or contract ends?
+- May 365 store provider IDs and derived operational facts after the licensed document expires?
+- Are translation, summarization, search indexing, AI retrieval and model processing allowed?
+- Are labour overlaps, included operations and related parts/tools supplied?
+- Is parts fitment VIN-specific, chassis-specific or only make/model/year?
+- How are corrections, updates, supersessions and withdrawn records delivered?
+- Is a sandbox and machine-readable coverage endpoint/file available?
+- What uptime, support, rate-limit and data-breach obligations apply?
+- What is the complete pricing model by shop, user, country, API call and data module?
+
+### 3.4.8 Commercial-provider rollout
+
+1. Contact TecAlliance Southeast Asia, Autodata and Infomedia concurrently.
+2. Send the same Philippines vehicle coverage workbook and licensing questionnaire to all three.
+3. Run real API/coverage tests; do not score marketing totals.
+4. Select the first provider by exact local coverage, legal rights and total cost of ownership.
+5. Implement TecAlliance first if it wins; add Autodata as a coverage fallback rather than duplicating every request.
+6. Pursue Infomedia separately for genuine OEM parts and dealer ordering relationships.
+7. Evaluate HaynesPro only where it adds proven local coverage.
+8. Approach JASPA/FAINES, Chinese OEMs and Bosch for partnership or approved deep-link/API terms.
+9. Add MOTOR when Motorsales365 expands North American coverage or services North American-spec imports.
+10. Continue building the 365-owned knowledge and benchmark network so commercial providers enhance rather than control the platform.
+
 ## 4. The opportunity: 365 Repair Knowledge Network
 
 ### 4.1 Product promise
@@ -176,6 +355,19 @@ Create a dedicated `repair_knowledge` schema after confirming that Lovable/Supab
 | `applicability_rules` | Join knowledge to compatible vehicles | `id`, `knowledge_revision_id`, `platform_id`, `powertrain_id`, `market`, `vin_pattern`, `chassis_code`, `year_from`, `year_to`, `include_exclude`, `confidence`, `review_status` |
 
 Never assume US make/model/year applicability equals a Philippines, Japanese, Chinese, Canadian, or European variant.
+
+#### Commercial-provider integrations
+
+| Table | Purpose | Essential fields |
+|---|---|---|
+| `providers` | Commercial/partner provider registry | `id`, `name`, `provider_type`, `territories`, `capabilities`, `status`, `terms_reviewed_at` |
+| `provider_entitlements` | Control provider access by plan, shop, user and territory | `id`, `provider_id`, `shop_id`, `plan_key`, `country`, `user_limit`, `starts_at`, `expires_at`, `status` |
+| `provider_vehicle_mappings` | Map the canonical 365 vehicle to vendor identifiers | `id`, `provider_id`, `vehicle_platform_id`, `powertrain_id`, `provider_vehicle_id`, `market`, `match_method`, `confidence`, `verified_at` |
+| `provider_cache_entries` | Contract-aware response cache | `id`, `provider_id`, `request_key`, `record_type`, `payload_or_reference`, `retrieved_at`, `expires_at`, `storage_permission`, `purge_required` |
+| `labour_operations` | Normalized licensed/community/shop labour operation snapshots | `id`, `provider_id`, `provider_operation_id`, `vehicle_mapping_id`, `description`, `hours`, `time_source_type`, `overlap_group`, `effective_at`, `expires_at` |
+| `provider_access_logs` | Contract, billing and security audit | `id`, `provider_id`, `shop_id`, `user_id`, `capability`, `provider_record_id`, `country`, `requested_at`, `cache_hit`, `result_status` |
+
+Do not place commercial-provider API secrets or reusable access tokens in these tables as plain text. Store secrets in the platform's server-side secret manager and retain only key identifiers/rotation metadata in the database.
 
 #### Knowledge content
 
@@ -431,12 +623,18 @@ The zero-cost MVP should prove the closed loop from vehicle → knowledge → wo
 
 ### Phase 5 — commercial data and monetization
 
-- Request commercial API/data-feed terms from Gale/Cengage, MOTOR, HaynesPro, TecAlliance and relevant OEMs.
+- Request coverage, sandbox, pricing and multi-tenant licensing terms from TecAlliance Southeast Asia, Autodata and Infomedia first.
+- Evaluate HaynesPro where it adds proven Philippines/ASEAN coverage.
+- Negotiate approved API, embedded-viewer or deep-link relationships with JASPA/FAINES, Chinese OEMs and Bosch; do not scrape their systems.
+- Add MOTOR and other providers for North American-spec vehicles and later US/Canada expansion.
+- Implement the provider-independent vehicle, labour, repair-information, parts-catalogue and ordering adapters.
+- Run the Philippines coverage acceptance test before choosing or promoting a provider.
 - Add providers through adapters so one vendor can be replaced without rewriting Shop Manager.
-- Gate licensed content according to provider territory, user, display, storage and retention rules.
+- Gate licensed content according to provider territory, user, display, translation, AI-processing, storage, print/export and retention rules.
 - Add advanced analytics, licensed coverage, multi-location benchmarking and contributor rewards to paid tiers.
+- Preserve the 365-owned knowledge network and anonymized benchmarks as the long-term defensible asset.
 
-**Exit condition:** licensed data adds value without contaminating or controlling 365-owned knowledge.
+**Exit condition:** at least one commercial provider passes the local coverage/licensing test and licensed data adds value without contaminating or controlling 365-owned knowledge.
 
 ## 9. Initial implementation backlog
 
@@ -476,7 +674,15 @@ The zero-cost MVP should prove the closed loop from vehicle → knowledge → wo
 ### P3 — later integrations
 
 - [ ] Android/Windows OBD companion proof of concept.
-- [ ] Paid repair-data provider adapter interface.
+- [ ] Provider-independent vehicle, labour-time, repair-information, parts-catalogue and order interfaces.
+- [ ] TecAlliance SEA/TecRMI/TecDoc/TecCom coverage and licensing evaluation.
+- [ ] Autodata API coverage-fallback evaluation.
+- [ ] Infomedia Microcat/Superservice/OEM dealer-network evaluation.
+- [ ] HaynesPro local-coverage evaluation.
+- [ ] JASPA/FAINES, Chinese OEM and Bosch partnership/deep-link review.
+- [ ] MOTOR North American extension review.
+- [ ] Philippines vehicle coverage test and provider scorecard.
+- [ ] Commercial-provider entitlement, mapping, cache-expiry and access-audit tables.
 - [ ] OEM/commercial data contract administration.
 - [ ] Advanced search/AI limited to owned, open or specifically licensed content.
 - [ ] Multi-shop anonymized labour/outcome benchmarks with minimum cohort/privacy thresholds.
