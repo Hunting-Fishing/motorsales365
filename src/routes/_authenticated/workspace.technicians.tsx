@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/technicians")({
+export const Route = createFileRoute("/_authenticated/workspace/technicians")({
   head: () => ({
     meta: [
       { title: "Technicians — Shop Manager" },

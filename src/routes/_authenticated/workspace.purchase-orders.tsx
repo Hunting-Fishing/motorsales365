@@ -37,7 +37,7 @@ async function fetchPOs(): Promise<PO[]> {
   return (data ?? []) as PO[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/purchase-orders")({
+export const Route = createFileRoute("/_authenticated/workspace/purchase-orders")({
   head: () => ({
     meta: [
       { title: "Purchase Orders — Shop Manager" },

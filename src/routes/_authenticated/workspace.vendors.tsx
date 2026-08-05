@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/vendors")({
+export const Route = createFileRoute("/_authenticated/workspace/vendors")({
   head: () => ({
     meta: [
       { title: "Vendors — Shop Manager" },

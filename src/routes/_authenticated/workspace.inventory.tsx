@@ -41,7 +41,7 @@ async function fetchInventory(): Promise<InvItem[]> {
   return (data ?? []) as InvItem[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/inventory")({
+export const Route = createFileRoute("/_authenticated/workspace/inventory")({
   head: () => ({
     meta: [
       { title: "Inventory — Shop Manager" },

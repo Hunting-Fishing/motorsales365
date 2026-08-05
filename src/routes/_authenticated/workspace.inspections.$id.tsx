@@ -91,7 +91,7 @@ async function fetchDetail(id: string) {
   };
 }
 
-export const Route = createFileRoute("/_authenticated/shop/inspections/$id")({
+export const Route = createFileRoute("/_authenticated/workspace/inspections/$id")({
   head: () => ({
     meta: [
       { title: "Inspection — Shop Manager" },

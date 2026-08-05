@@ -7,7 +7,7 @@ import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
 import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 
-export const Route = createFileRoute("/shop/categories")({
+export const Route = createFileRoute("/parts/partners/categories")({
   component: ShopCategoriesIndex,
   head: () => ({
     meta: [

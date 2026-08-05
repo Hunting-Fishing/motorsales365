@@ -94,7 +94,7 @@ async function fetchWorkOrders(customerId: string): Promise<WorkOrder[]> {
   return (data ?? []) as WorkOrder[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/customers/$id")({
+export const Route = createFileRoute("/_authenticated/workspace/customers/$id")({
   head: () => ({
     meta: [
       { title: "Customer — Shop Manager" },

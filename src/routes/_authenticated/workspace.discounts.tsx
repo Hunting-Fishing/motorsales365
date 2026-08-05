@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/discounts")({
+export const Route = createFileRoute("/_authenticated/workspace/discounts")({
   head: () => ({ meta: [{ title: "Discount Codes — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: DiscountsPage,
   errorComponent: ({ error, reset }) => (

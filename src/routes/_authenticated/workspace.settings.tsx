@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/settings")({
+export const Route = createFileRoute("/_authenticated/workspace/settings")({
   head: () => ({
     meta: [
       { title: "Shop Settings — Shop Manager" },

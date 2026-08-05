@@ -104,7 +104,7 @@ async function fetchInvoicePayments(id: string): Promise<PaymentRow[]> {
   return (data ?? []) as PaymentRow[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/invoices/$id")({
+export const Route = createFileRoute("/_authenticated/workspace/invoices/$id")({
   head: () => ({
     meta: [
       { title: "Invoice — Shop Manager" },

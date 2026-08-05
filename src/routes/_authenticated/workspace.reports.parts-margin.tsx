@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/reports/parts-margin")({
+export const Route = createFileRoute("/_authenticated/workspace/reports/parts-margin")({
   head: () => ({
     meta: [
       { title: "Parts margin — Shop Manager" },

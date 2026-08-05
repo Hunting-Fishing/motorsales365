@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { smSupabase, supabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/leave-requests")({
+export const Route = createFileRoute("/_authenticated/workspace/leave-requests")({
   head: () => ({ meta: [{ title: "Leave Requests — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: LeaveRequestsPage,
   errorComponent: ({ error, reset }) => (

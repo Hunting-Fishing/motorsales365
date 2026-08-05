@@ -40,7 +40,7 @@ async function fetchCustomers(): Promise<CustomerRow[]> {
   return (data ?? []) as CustomerRow[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/customers")({
+export const Route = createFileRoute("/_authenticated/workspace/customers")({
   head: () => ({
     meta: [
       { title: "Customers — Shop Manager" },

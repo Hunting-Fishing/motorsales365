@@ -39,7 +39,7 @@ const shopSearch = z.object({
   network: fallback(z.enum(["", "shopee", "lazada", "aliexpress"]), "").default(""),
 });
 
-export const Route = createFileRoute("/shop/")({
+export const Route = createFileRoute("/parts/partners/")({
   component: ShopIndex,
   validateSearch: zodValidator(shopSearch),
   head: () => ({

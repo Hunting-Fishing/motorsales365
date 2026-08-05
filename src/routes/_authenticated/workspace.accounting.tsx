@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/accounting")({
+export const Route = createFileRoute("/_authenticated/workspace/accounting")({
   head: () => ({
     meta: [
       { title: "Accounting — Shop Manager" },

@@ -38,7 +38,7 @@ async function fetchVehicles(): Promise<V[]> {
   return (data ?? []) as V[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/vehicles")({
+export const Route = createFileRoute("/_authenticated/workspace/vehicles")({
   head: () => ({
     meta: [
       { title: "Vehicles — Shop Manager" },

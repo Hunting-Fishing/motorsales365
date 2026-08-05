@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/automation")({
+export const Route = createFileRoute("/_authenticated/workspace/automation")({
   head: () => ({ meta: [{ title: "Automation Rules — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: AutomationPage,
   errorComponent: ({ error, reset }) => (

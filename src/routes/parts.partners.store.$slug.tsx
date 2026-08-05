@@ -4,7 +4,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { getPartnerStorefront } from "@/lib/partner-applications.functions";
 
-export const Route = createFileRoute("/shop/$slug")({
+export const Route = createFileRoute("/parts/partners/store/$slug")({
   loader: async ({ params }) => {
     const sf = await getPartnerStorefront({ data: { slug: params.slug } });
     if (!sf) throw notFound();

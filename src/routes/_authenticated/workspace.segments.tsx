@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/segments")({
+export const Route = createFileRoute("/_authenticated/workspace/segments")({
   head: () => ({ meta: [{ title: "Customer Segments — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: SegmentsPage,
   errorComponent: ({ error, reset }) => (

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/journal/$accountId")({
+export const Route = createFileRoute("/_authenticated/workspace/journal/$accountId")({
   head: () => ({ meta: [{ title: "Account Ledger — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: AccountLedgerPage,
   errorComponent: ({ error, reset }) => (

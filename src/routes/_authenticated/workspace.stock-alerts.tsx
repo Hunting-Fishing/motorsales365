@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/stock-alerts")({
+export const Route = createFileRoute("/_authenticated/workspace/stock-alerts")({
   head: () => ({ meta: [{ title: "Stock Alerts — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: StockAlertsPage,
   errorComponent: ({ error, reset }) => (

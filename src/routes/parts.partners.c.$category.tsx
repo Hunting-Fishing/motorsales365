@@ -35,7 +35,7 @@ const catSearch = z.object({
   network: fallback(z.enum(["", "shopee", "lazada", "aliexpress"]), "").default(""),
 });
 
-export const Route = createFileRoute("/shop/$category")({
+export const Route = createFileRoute("/parts/partners/c/$category")({
   component: ShopCategory,
   validateSearch: zodValidator(catSearch),
   head: ({ params }) => ({

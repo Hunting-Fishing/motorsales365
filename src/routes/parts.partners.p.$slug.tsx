@@ -23,7 +23,7 @@ function getVisitorId(): string {
   return v;
 }
 
-export const Route = createFileRoute("/shop/p/$slug")({
+export const Route = createFileRoute("/parts/partners/p/$slug")({
   component: ProductPage,
   head: ({ params }) => ({
     meta: [

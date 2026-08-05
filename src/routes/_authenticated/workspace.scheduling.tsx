@@ -16,7 +16,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/scheduling")({
+export const Route = createFileRoute("/_authenticated/workspace/scheduling")({
   head: () => ({ meta: [{ title: "Scheduling — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: SchedulingPage,
   errorComponent: ({ error, reset }) => (

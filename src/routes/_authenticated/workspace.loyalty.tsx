@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/loyalty")({
+export const Route = createFileRoute("/_authenticated/workspace/loyalty")({
   head: () => ({ meta: [{ title: "Customer Loyalty — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: LoyaltyPage,
   errorComponent: ({ error, reset }) => (

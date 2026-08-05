@@ -16,7 +16,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/service-reminders")({
+export const Route = createFileRoute("/_authenticated/workspace/service-reminders")({
   head: () => ({ meta: [{ title: "Service Reminders — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: RemindersPage,
   errorComponent: ({ error, reset }) => (

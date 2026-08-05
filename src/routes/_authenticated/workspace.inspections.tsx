@@ -60,7 +60,7 @@ async function fetchTemplates() {
   return data as { id: string; name: string; is_system: boolean; is_default: boolean }[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/inspections")({
+export const Route = createFileRoute("/_authenticated/workspace/inspections")({
   head: () => ({
     meta: [
       { title: "Inspections — Shop Manager" },

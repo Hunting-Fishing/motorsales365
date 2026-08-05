@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { smSupabase } from "@/lib/shop-manager/db";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/_authenticated/shop/expenses")({
+export const Route = createFileRoute("/_authenticated/workspace/expenses")({
   head: () => ({
     meta: [
       { title: "Expenses — Shop Manager" },

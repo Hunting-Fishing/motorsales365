@@ -38,7 +38,7 @@ async function fetchQuotes(): Promise<Q[]> {
   return (data ?? []) as Q[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/quotes")({
+export const Route = createFileRoute("/_authenticated/workspace/quotes")({
   head: () => ({
     meta: [
       { title: "Quotes — Shop Manager" },

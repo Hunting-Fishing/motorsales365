@@ -18,7 +18,7 @@ import {
 import { toast } from "sonner";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/work-orders/new")({
+export const Route = createFileRoute("/_authenticated/workspace/work-orders/new")({
   head: () => ({
     meta: [
       { title: "New Work Order — Shop Manager" },

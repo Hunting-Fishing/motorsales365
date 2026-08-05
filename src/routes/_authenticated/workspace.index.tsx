@@ -36,7 +36,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop")({
+export const Route = createFileRoute("/_authenticated/workspace/")({
   head: () => ({
     meta: [
       { title: "Shop Manager — 365 Motor Sales" },

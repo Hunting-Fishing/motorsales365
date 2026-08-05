@@ -48,7 +48,7 @@ async function fetchAppts(): Promise<Appt[]> {
   return (data ?? []) as Appt[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/appointments")({
+export const Route = createFileRoute("/_authenticated/workspace/appointments")({
   head: () => ({
     meta: [
       { title: "Appointments — Shop Manager" },

@@ -63,7 +63,7 @@ async function fetchItems(id: string) {
   return (data ?? []) as Item[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/quotes/$id")({
+export const Route = createFileRoute("/_authenticated/workspace/quotes/$id")({
   head: () => ({
     meta: [
       { title: "Quote — Shop Manager" },

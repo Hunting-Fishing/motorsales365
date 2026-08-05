@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/reports")({
+export const Route = createFileRoute("/_authenticated/workspace/reports")({
   head: () => ({
     meta: [
       { title: "Reports — Shop Manager" },

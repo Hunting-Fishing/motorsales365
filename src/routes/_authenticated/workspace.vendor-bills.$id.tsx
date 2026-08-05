@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/vendor-bills/$id")({
+export const Route = createFileRoute("/_authenticated/workspace/vendor-bills/$id")({
   head: () => ({
     meta: [
       { title: "Vendor Bill — Shop Manager" },

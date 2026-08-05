@@ -67,7 +67,7 @@ async function fetchPOItems(poId: string) {
   return (data ?? []) as POItem[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/purchase-orders/$id")({
+export const Route = createFileRoute("/_authenticated/workspace/purchase-orders/$id")({
   head: () => ({
     meta: [
       { title: "PO Detail — Shop Manager" },

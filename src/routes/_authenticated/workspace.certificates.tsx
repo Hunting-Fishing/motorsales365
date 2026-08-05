@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/certificates")({
+export const Route = createFileRoute("/_authenticated/workspace/certificates")({
   head: () => ({ meta: [{ title: "Staff Certificates — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: CertificatesPage,
   errorComponent: ({ error, reset }) => (

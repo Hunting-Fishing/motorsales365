@@ -79,7 +79,7 @@ async function fetchWorkOrders(vehicleId: string): Promise<WorkOrder[]> {
   return (data ?? []) as WorkOrder[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/vehicles/$id")({
+export const Route = createFileRoute("/_authenticated/workspace/vehicles/$id")({
   head: () => ({
     meta: [
       { title: "Vehicle — Shop Manager" },

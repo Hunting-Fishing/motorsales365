@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/automation/logs")({
+export const Route = createFileRoute("/_authenticated/workspace/automation/logs")({
   head: () => ({ meta: [{ title: "Automation Logs — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: AutomationLogsPage,
   errorComponent: ({ error, reset }) => (

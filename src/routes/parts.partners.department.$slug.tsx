@@ -23,7 +23,7 @@ const depSearch = z.object({
   brand: fallback(z.string(), "").default(""),
 });
 
-export const Route = createFileRoute("/shop/department/$slug")({
+export const Route = createFileRoute("/parts/partners/department/$slug")({
   component: DepartmentPage,
   validateSearch: zodValidator(depSearch),
   head: ({ params }) => ({

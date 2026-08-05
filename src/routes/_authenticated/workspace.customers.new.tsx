@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/customers/new")({
+export const Route = createFileRoute("/_authenticated/workspace/customers/new")({
   head: () => ({
     meta: [
       { title: "New Customer — Shop Manager" },

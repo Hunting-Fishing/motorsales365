@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/reports/technician/$id")({
+export const Route = createFileRoute("/_authenticated/workspace/reports/technician/$id")({
   head: () => ({
     meta: [
       { title: "Technician P&L — Shop Manager" },

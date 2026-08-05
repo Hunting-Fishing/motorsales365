@@ -22,7 +22,7 @@ function slugToName(slug: string) {
   return slug.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export const Route = createFileRoute("/shop/brand/$slug")({
+export const Route = createFileRoute("/parts/partners/brand/$slug")({
   component: BrandPage,
   validateSearch: zodValidator(brandSearch),
   head: ({ params }) => {

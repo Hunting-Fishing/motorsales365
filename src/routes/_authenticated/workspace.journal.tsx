@@ -16,7 +16,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/journal")({
+export const Route = createFileRoute("/_authenticated/workspace/journal")({
   head: () => ({ meta: [{ title: "General Ledger — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: JournalPage,
   errorComponent: ({ error, reset }) => (

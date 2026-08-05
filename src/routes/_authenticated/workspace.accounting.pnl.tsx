@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { smSupabase } from "@/lib/shop-manager/db";
 
-export const Route = createFileRoute("/_authenticated/shop/accounting/pnl")({
+export const Route = createFileRoute("/_authenticated/workspace/accounting/pnl")({
   head: () => ({ meta: [{ title: "Profit & Loss — Shop Manager" }, { name: "robots", content: "noindex" }] }),
   component: PnLPage,
   errorComponent: ({ error, reset }) => (

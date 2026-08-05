@@ -24,7 +24,7 @@ type Schedule = {
 };
 type BreakRow = { id: string; schedule_id: string; start_time: string; end_time: string };
 
-export const Route = createFileRoute("/_authenticated/shop/technicians/$id")({
+export const Route = createFileRoute("/_authenticated/workspace/technicians/$id")({
   head: () => ({
     meta: [
       { title: "Technician Schedule — Shop Manager" },

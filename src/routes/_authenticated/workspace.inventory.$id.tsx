@@ -88,7 +88,7 @@ async function fetchTxns(id: string): Promise<InventoryTxn[]> {
   return (data ?? []) as InventoryTxn[];
 }
 
-export const Route = createFileRoute("/_authenticated/shop/inventory/$id")({
+export const Route = createFileRoute("/_authenticated/workspace/inventory/$id")({
   head: () => ({
     meta: [
       { title: "Inventory item — Shop Manager" },
