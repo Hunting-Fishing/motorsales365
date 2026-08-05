@@ -530,6 +530,303 @@ Keep the operational Shop Manager affordable while making expensive data modular
 
 Provider costs must be matched to the shops that use the licensed module. The proprietary coverage registry, local vehicle mappings, field-validated procedures and anonymized benchmarks remain 365 assets.
 
+## 3.6 Marine and watercraft coverage
+
+### Decision
+
+Marine must be a first-class service domain in the 365 Repair Knowledge Network. It cannot be treated as a car with a different body type.
+
+There is no single legitimate worldwide “Chilton for boats” that supplies every outboard, inboard, sterndrive, pod drive, personal watercraft, generator, hull system, parts diagram, repair manual and labour operation through one commercial API. The correct architecture is:
+
+> **ARI illustrated parts data where licensed → serial-specific OEM catalogues and service portals → Jaltest/TEXA multi-brand diagnostics → OEM diagnostic tools for protected functions → NCM/Spader plus 365 regional labour benchmarks → Signal K for permitted read-only vessel telemetry**
+
+Every result must identify the exact vessel, installed component, serial range, market and data source. A visually similar engine, the same advertised horsepower, or the same base engine family is not an exact match.
+
+### 3.6.1 Marine asset taxonomy
+
+365 should support all of the following without forcing them into passenger-vehicle fields:
+
+| Domain | Included assets and systems |
+|---|---|
+| Small commercial and traditional craft | Philippine bancas, pump boats, fishing boats, passenger boats, utility boats and locally fabricated hulls |
+| Outboards | Two-stroke, four-stroke, diesel and electric outboards; tiller and remote control; single and multi-engine installations |
+| Inboards | Gasoline and diesel engines with shaft drive, V-drive, saildrive, surface drive or waterjet |
+| Sterndrives and pods | MerCruiser-style sterndrives, Volvo Penta Aquamatic/IPS and other integrated propulsion systems |
+| Personal watercraft and jet boats | Sea-Doo, Yamaha WaveRunner, Kawasaki Jet Ski and other PWC/jet propulsion |
+| Commercial propulsion | High-speed and medium-speed marine diesels, marine gears, controllable-pitch systems, waterjets and auxiliary engines |
+| Vessel systems | Steering, throttle/shift, fuel, cooling, exhaust, bilge, pumps, plumbing, sanitation, fire suppression, HVAC/refrigeration, AC/DC electrical, batteries and charging |
+| Marine electronics | NMEA 0183/NMEA 2000 networks, gauges, multifunction displays, radar, sonar, AIS, VHF, autopilot, sensors and digital switching |
+| Auxiliary equipment | Marine generators, inverters, chargers, windlasses, cranes, refrigeration and deck machinery |
+| Hull and structure | Fiberglass, aluminum, steel and wood hulls; transoms, stringers, through-hulls, coatings, corrosion and damage repair |
+| Support assets | Boat trailers, cradles, lifts and shore-power equipment |
+
+Commercial fishing and passenger vessels should be supported operationally, but statutory survey, class, flag-state and life-safety requirements must remain a separate compliance layer from ordinary repair information.
+
+### 3.6.2 Provider and integration matrix
+
+| Priority | Provider/source | Parts diagrams | Repair/service information | Labour times | Diagnostics/telemetry | Intended 365 role and limit |
+|---:|---|---:|---:|---:|---:|---|
+| 1 | [ARI PartSmart, PartStream and DataSmart](https://arinet.com/marine/ecatalogs/) | Yes—licensed illustrated OEM replacement-parts lookup; ARI advertises more than 10 million SKUs | Primarily catalogue/parts content | No universal repair-time database | No | Best identified commercial route for embedding illustrated marine parts lookup. PartStream supplies a web lookup experience; DataSmart is the DaaS/feed option. Require a Philippines/Asia brand-and-model coverage file and explicit marketplace/SaaS rights. |
+| 2 | OEM recreational-marine catalogues and portals | Strongest serial-specific source; examples include the official [Mercury/MerCruiser parts catalogue](https://www.mercurymarine.com/an/en/parts-and-service/parts-catalog) and [Honda Marine parts catalogue](https://marine.honda.com/parts) | Factory manuals, bulletins, rigging and installation data are normally purchased, dealer-only or portal-controlled; see [Mercury manuals](https://www.mercurymarine.com/an/en/parts-and-service/service-and-support/owners-manual) and [Honda shop manuals](https://marine.honda.com/support/manuals/shop-manuals) | OEM warranty operation guides usually require dealer authorization | Factory tools such as Mercury CDS G3, Yamaha YDIS, Suzuki SDS, Honda Dr. H and BRP BUDS/BUDS2 | Use approved embedded viewers, deep links or negotiated OEM feeds. Public lookup access does not grant permission to copy diagrams or manuals into 365. |
+| 3 | [Cummins QuickServe Online](https://www.cummins.com/en-na/eu/parts/quickserve-online) | Engine-serial-specific parts catalogues | Operation, maintenance and service manuals, service bulletins, wiring and dataplate information | OEM operations may exist under authorized service programs | Cummins service/diagnostic ecosystem | Important for marine diesels and Onan marine generators. Start with an engine-serial deep link; negotiate commercial integration and caching rights before embedding content. |
+| 4 | [Volvo Penta Support/Connect](https://www.volvopenta.com/en-us/support/) and Yanmar service systems | OEM parts and serial/product information | Manuals, handbooks, service protocols, recalls/campaigns and dealer technical information; Yanmar service staff use its controlled D Site/SMARTASSIST environment | Dealer/warranty-controlled | Volvo VODIA and Yanmar authorized service tools | Strategic inboard, sterndrive, pod and diesel coverage. These are OEM relationships, not scrape targets. |
+| 5 | [Jaltest Marine](https://www.jaltest.com/en/diagnostics/jaltest-marine-vessels/) | Limited compared with an EPC | Guided technical information depends on licensed coverage | Not a universal OEM labour guide | Multi-brand inboard, outboard, stationary-engine and PWC diagnosis | First multi-brand diagnostic candidate. Require the exact Philippine brand/model/function coverage export, report-export format and SDK/API or launch-link terms. |
+| 6 | [TEXA Marine](https://www.texausa.com/solutions/marine/) | Limited compared with an EPC | Technical sheets, values and wiring support depending on subscription/coverage | Not a universal OEM labour guide | Multi-brand marine diagnosis using the TXB family and IDC software | Evaluate alongside Jaltest. Treat it as a shop-tool/report source unless TEXA grants programmatic integration rights. |
+| 7 | [NCM/Spader Marine Flat Rate](https://sf.ncmassociates.com/product/flat-rate-manual/) | No | Job descriptions rather than factory procedures | Yes—NCM states that its Marine product contains more than 16,300 jobs and offers downloadable formats | No | Best identified general marine labour baseline. It is compiled mainly from US/Canadian dealers, so it is not an exact Philippine OEM warranty time. Confirm SaaS import, display, derivative-benchmark and multi-tenant rights. |
+| 8 | [Signal K Server](https://github.com/SignalK/signalk-server) and [CANboat](https://github.com/canboat/canboat) | No | No repair manuals | No | Open-source vessel data ingestion and normalization | Useful zero-cost foundation for owner-authorized, read-only NMEA 0183/NMEA 2000 telemetry and logbook data. It must not be marketed as a factory diagnostic replacement. NMEA 2000 and proprietary PGNs require licensing/care; do not enable control or programming from reverse-engineered data. |
+| Regional/OEM | Yamaha, Suzuki, Honda, Tohatsu, Mercury/Mariner, Parsun/Hidea and other outboard distributors; Yanmar, Volvo Penta, Cummins, Caterpillar, MAN, MTU, FPT, Perkins, John Deere, Hyundai SeasAll, Mitsubishi and other diesel OEMs | Varies by OEM and territory | Varies by OEM and authorized-service status | Usually dealer/warranty controlled | OEM-specific tools | Build OEM/distributor partnerships in the Philippines and Southeast Asia. Use one adapter contract and record every right separately; do not assume a dealer login authorizes customer-facing redistribution. |
+| Large commercial vessel | OEM portals plus vessel owner, shipyard, class/flag and equipment-maker records | Component-specific | Controlled technical publications, service letters and vessel-specific documentation | Contract/service-program specific | OEM and onboard automation systems | Later enterprise tier. Large-vessel data can be safety-critical and vessel-specific; access must be owner-authorized and role-restricted. |
+
+ARI is the strongest identified parts-diagram integration lead, while NCM/Spader is the strongest identified independent labour-time lead. Neither replaces OEM repair manuals or dealer diagnostic access.
+
+### 3.6.3 Parts diagrams and ordering rules
+
+The parts workflow must resolve the installed component before it shows a diagram:
+
+1. Select the vessel and installation position: port, center, starboard, auxiliary or generator.
+2. Resolve engine/drive make, model, model code, serial number and production range.
+3. Resolve separate gear, sterndrive, pod, waterjet, control and generator identities where applicable.
+4. Query an entitled catalogue.
+5. Display the catalogue title, diagram revision, serial applicability and source.
+6. Allow the technician to select callout numbers and add the licensed part numbers to the work order/cart.
+7. Resolve supersessions, quantity, side/position, kit contents, availability and supplier.
+8. Store the selected catalogue reference and part number on the work order; store the actual diagram image only when the contract permits it.
+
+Hard rules:
+
+- Same horsepower is not proof of fitment.
+- Engine block identity is not proof that marine cooling, exhaust, mounts, controls, gear or calibration are the same.
+- Port and starboard components may differ.
+- Counter-rotation, shaft length, gear ratio, propeller hub and serial breaks must be explicit.
+- A replacement engine or drive changes applicability from the installation date forward.
+- A public OEM fiche may be deep-linked, but it may not be mirrored without written reuse rights.
+- Aftermarket cross-reference must remain separate from OEM supersession and must carry its own fitment confidence.
+
+The parts integration interface should support:
+
+- vessel/component identification;
+- catalogue and figure listing;
+- illustration retrieval when licensed;
+- callout-to-part resolution;
+- serial-range validation;
+- supersession and kit contents;
+- price and availability;
+- cart/order handoff;
+- territory, currency and distributor;
+- diagram licence/expiry and access audit.
+
+### 3.6.4 Repair-manual strategy
+
+Marine repair information should be classified into five source types:
+
+| Source type | Examples | 365 treatment |
+|---|---|---|
+| Licensed embedded OEM/commercial | Contracted API, DaaS, SDK or embedded viewer | Display only within the purchased territory, user role and retention rules; pin the provider reference/revision to the work order |
+| Authorized portal/deep link | Mercury, Yamaha, Suzuki, Honda, Tohatsu, Volvo Penta, Yanmar, Cummins, Caterpillar and other dealer/owner portals | Store identity and the deep link or portal launch context; do not cache the protected manual |
+| Purchased manual for internal shop use | Printed/digital service manual purchased under normal terms | Use by the licensed shop/user only; do not turn it into shared 365 content unless the licence expressly permits |
+| 365 original technician content | Original procedures, tests, photos and diagrams created for 365 | Publish through the existing provenance, plagiarism, review, safety and revision workflow |
+| Owner/manufacturer-public documents | Owner manuals, installation guides and public service notices | Link by default; store or index only after recording the exact reuse terms |
+
+Required manual categories include:
+
+- workshop/service manual;
+- installation and rigging manual;
+- electrical/wiring manual;
+- fuel and emissions information;
+- diagnostic code and guided-test manual;
+- service bulletins and campaigns;
+- maintenance schedule;
+- specifications/torques/clearances;
+- special tools and software level;
+- drive, gear, propeller and control manuals;
+- hull/system/equipment manuals;
+- commissioning, sea-trial and post-repair checks.
+
+365 must not bulk-download or mirror dealer portals. When no licensed factory procedure exists, the UI should say **Factory information unavailable through 365** and offer an authorized source link or an explicitly labelled 365 procedure.
+
+### 3.6.5 Marine labour-time model
+
+Marine jobs need more than one number. Store the base time, source and job-condition adjustments separately:
+
+| Time classification | Meaning |
+|---|---|
+| Licensed OEM warranty time | Manufacturer reimbursement time for an exact operation/serial range; never silently treated as the retail customer time |
+| Licensed commercial flat-rate time | NCM/Spader or another contracted data product |
+| 365 regional benchmark | An anonymized Philippine/market benchmark derived from qualified shops and sufficient sample size |
+| Shop estimate | The service writer/technician estimate for this vessel and condition |
+| Actual technician time | Clocked productive time from the work order |
+| Billable time | Time charged after shop policy, authorization and adjustments |
+
+Marine-specific add-on operations or condition factors must include:
+
+- saltwater corrosion, seized fasteners and electrolysis;
+- engine-room access or outboard removal;
+- single versus twin/triple/quad installations;
+- rigging, cowling, deck, cabinetry or tank removal;
+- haul-out, blocking, launch and marina fees;
+- travel, dockside/mobile service and remote-island work;
+- diagnostic time and intermittent-fault monitoring;
+- sea trial, load test and water test;
+- propeller/shaft alignment;
+- contamination capture, fuel disposal and environmental cleanup;
+- software update, calibration and commissioning;
+- hull length/area for bottom, fiberglass and detailing work.
+
+The customer quote should show base operation, approved additions and exclusions. Corrosion or access adjustments should require photos/notes when added after authorization.
+
+### 3.6.6 Vessel and component identity
+
+Marine identity is a graph, not one VIN.
+
+The canonical vessel should support:
+
+- HIN/CIN where present;
+- vessel name;
+- national/local registration number and issuing authority;
+- official number or IMO number where applicable;
+- builder, model, build year and build country;
+- hull material, length overall, beam, draft and rated capacity;
+- use class: private, fishing, passenger, cargo, charter, government or other;
+- home port, operating area and current country;
+- identity confidence and verification evidence.
+
+Each installed component should have its own record and installation history:
+
+- position and role;
+- manufacturer, model, serial and production code;
+- rated power and fuel/energy type;
+- engine hours at reading and source of hours;
+- transmission/gear/drive, ratio and serial;
+- shaft, propeller, rotation and dimensions;
+- controls, steering and network/gateway;
+- ECU/software/calibration where permitted;
+- cooling and exhaust configuration;
+- installed/removed dates and supporting work order.
+
+For locally fabricated Philippine craft that lack standardized hull identifiers, 365 should accept manual registration evidence, builder/owner information, hull photos, dimensions and component plates. It must never fabricate a HIN, model year or serial number to satisfy a provider lookup.
+
+### 3.6.7 Diagnostics, scans and telemetry
+
+Marine diagnostics needs three separate modes:
+
+1. **OEM-authorized diagnosis** for full codes, active tests, calibrations, programming and warranty evidence.
+2. **Multi-brand professional diagnosis** through Jaltest/TEXA for supported makes, models and functions.
+3. **Owner-authorized vessel telemetry** through Signal K/NMEA gateways for read-only trends such as RPM, temperatures, pressures, fuel rate, battery voltage, alarms and engine hours.
+
+A marine scan report must record:
+
+- vessel and exact installed component;
+- position/engine instance;
+- tool/provider, interface, cable and adapter;
+- software and coverage version;
+- protocol/network;
+- engine hours and operating state;
+- active/stored/history codes;
+- freeze-frame/live values with units;
+- tests performed and results;
+- files/screenshots and provider report reference;
+- authorization and technician;
+- whether data was read-only, bidirectional or programming-related.
+
+Do not expose steering, throttle, start/stop, digital switching, autopilot, calibration or ECU programming through a general web UI. Any future control function requires an approved hardware/provider path, physical-presence confirmation, role restriction, safety design and audit.
+
+Signal K is valuable for a zero-cost prototype because it exposes normalized REST/streaming data and can run on a Raspberry Pi or supported marine gateway. CANboat can help ingest/decode network traffic, but its own project explains that the official NMEA 2000 database is copyrighted and restricted. Use the open-source stack for permitted observation and data normalization—not as authority to reproduce proprietary PGNs or certify a safety-critical product.
+
+### 3.6.8 Philippines and Asia acceptance fleet
+
+Provider marketing claims are not enough. The marine coverage test must use actual model and serial data from Philippine shops, boat owners and distributors.
+
+Minimum test groups:
+
+- Yamaha Enduro/two-stroke and four-stroke outboards commonly used for fishing, passenger and utility work;
+- Suzuki DF, Honda BF, Tohatsu/Mercury and other locally sold Japanese/US outboards;
+- locally available Chinese outboards such as Parsun/Hidea where demand justifies them;
+- repowered or locally fabricated bancas/pump boats with Yanmar, Kubota, Mitsubishi, Isuzu or other industrial/automotive-derived diesel installations;
+- Yanmar recreational/light-commercial marine diesels;
+- Volvo Penta diesel, Aquamatic and IPS installations;
+- Cummins and Caterpillar commercial/recreational diesels and marine generators;
+- Sea-Doo, Yamaha WaveRunner and Kawasaki personal watercraft;
+- multi-engine passenger/tour boats;
+- commercial fishing vessels with separate engine, gear, generator and deck-equipment records;
+- marine electronics from Garmin, Raymarine, Simrad/Lowrance, Furuno and other common regional brands;
+- trailers, steering, controls, fuel systems and safety equipment.
+
+For every specimen, test:
+
+- exact identity by serial/model/market;
+- parts catalogue and diagram;
+- parts availability and supersession;
+- repair manual/procedure;
+- wiring and diagnostics;
+- labour operation/time;
+- maintenance schedule;
+- applicable bulletins/campaigns;
+- territory and customer/shop display rights.
+
+Results must be stored at capability level. A provider that returns a parts fiche but no repair manual is **parts-supported**, not “fully supported.”
+
+### 3.6.9 Shop Manager marine changes
+
+Add a Marine & Watercraft workspace profile rather than duplicating the entire Shop Manager.
+
+Required additions:
+
+- vessel customer asset and registration/HIN/manual identity;
+- multiple installed engines/components with immutable installation history;
+- engine-hour readings and source;
+- marine-specific inspection templates;
+- haul-out, launch, storage, dockage, travel and per-foot charges;
+- estimates supporting time/material, flat rate, per-foot and capped work;
+- parts fiche launch and diagram-to-cart handoff;
+- engine/drive/gear/propeller and electronics service history;
+- corrosion, water-ingress and contamination photo evidence;
+- sea-trial authorization, checklist, conditions and results;
+- winterization/de-winterization where relevant;
+- mobile/dockside/off-island service;
+- warranty claim and OEM operation-code capture;
+- technician certification/specialty fields;
+- recurring maintenance by date, engine hours or both;
+- customer portal with vessel status, approvals, photos, invoices and service records.
+
+Recommended routes:
+
+| Route | Purpose |
+|---|---|
+| /workspace/marine | Vessel list, due service, active jobs, recalls/campaigns and coverage gaps |
+| /workspace/marine/new | Create vessel and initial component configuration |
+| /workspace/marine/$id | Vessel, installations, hours, documents, service history and telemetry summary |
+| /workspace/marine/$id/components | Engine, drive, gear, generator, electronics and system installation history |
+| /workspace/marine/$id/parts | Entitled parts diagrams, catalogue references, cart and availability |
+| /workspace/marine/$id/diagnostics | Scan reports, alarms, trends and supported tool launch |
+| /workspace/marine/$id/documents | Owner-supplied documents plus licensed source links; strict access rights |
+| /workspace/marine/coverage | Unsupported model/serial/capability queue for vendor and OEM outreach |
+
+Existing work orders, inspections, parts, inventory, technician time, quotes, invoices, payments, reminders and automation should be reused.
+
+### 3.6.10 Marine commercial opportunity
+
+Marine can become a separate paid vertical:
+
+- **Marine Owner:** vessel history, reminders, document vault, engine hours, approved telemetry and marketplace/service discovery.
+- **Marine Shop Pro:** multi-component work orders, marine inspections, parts fiches, labour benchmarks, sea trials and mobile service.
+- **Marina/Fleet Pro:** multiple vessels, slips/storage, recurring maintenance, fleet downtime, inventory and approvals.
+- **Commercial Marine Enterprise:** owner-authorized vessel documentation, component lifecycle, remote operations, compliance links and multi-location reporting.
+- **Parts Network:** OEM/aftermarket catalogue-to-order connections with participating Philippine distributors.
+
+Monetization must never depend on hiding safety information or steering a technician toward an affiliate part that does not have verified fitment.
+
+### 3.6.11 Marine safety and data-rights rules
+
+- No manual, fiche, wiring diagram or diagnostic database is copied merely because it can be viewed online.
+- No provider data enters AI search, summarization or model training unless the contract explicitly allows it.
+- Serial numbers, vessel location, routes, ownership documents and onboard-network data are sensitive and shop/owner private by default.
+- Customer telemetry is opt-in, purpose-limited and revocable.
+- Bilge, fuel, steering, controls, fire suppression, shore power, high-current DC, lithium batteries, exhaust, through-hulls and passenger-safety procedures receive high/restricted safety review.
+- Sea-trial and on-water tests require authorization, operator responsibility and recorded conditions.
+- Survey, class, flag-state and statutory compliance records must identify the issuing authority and cannot be replaced by a 365 checklist.
+- An unsupported lookup must be shown as unsupported; never substitute a similar outboard, automotive base engine or different serial range.
+
+
 ## 4. The opportunity: 365 Repair Knowledge Network
 
 ### 4.1 Product promise
@@ -616,15 +913,19 @@ Do not place commercial-provider API secrets or reusable access tokens in these 
 
 | Table | Purpose | Essential fields |
 |---|---|---|
-| `service_assets` | Canonical identity across cars, motorcycles, trucks, buses, trailers and future equipment | `id`, `asset_domain`, `asset_type`, `make`, `model`, `series`, `model_code`, `year`, `original_market`, `current_country`, `identity_confidence` |
-| `asset_identifiers` | Multiple identifiers without assuming a 17-character VIN | `id`, `asset_id`, `identifier_type`, `value`, `issuer_or_make`, `country`, `verified_at`; types include VIN, chassis, frame, engine serial, registration and fleet number |
-| `asset_components` | Installed truck/motorcycle/trailer systems | `id`, `asset_id`, `parent_component_id`, `component_type`, `manufacturer`, `model`, `serial_number`, `rating`, `software_or_calibration`, `installed_from`, `installed_to` |
+| `service_assets` | Canonical identity across cars, motorcycles, trucks, buses, trailers, equipment and vessels | `id`, `asset_domain`, `asset_type`, `make`, `model`, `series`, `model_code`, `year`, `original_market`, `current_country`, `identity_confidence` |
+| `asset_identifiers` | Multiple identifiers without assuming a 17-character VIN | `id`, `asset_id`, `identifier_type`, `value`, `issuer_or_make`, `country`, `verified_at`; types include VIN, chassis, frame, HIN/CIN, vessel registration, official/IMO number, engine/component serial and fleet number |
+| `asset_components` | Installed truck, motorcycle, trailer, vessel-propulsion and onboard systems | `id`, `asset_id`, `parent_component_id`, `component_type`, `manufacturer`, `model`, `serial_number`, `rating`, `software_or_calibration`, `installed_from`, `installed_to` |
 | `asset_configuration_revisions` | Immutable snapshots used by work orders/provider lookups | `id`, `asset_id`, `revision_number`, `configuration_json`, `verified_by`, `verified_at` |
 | `provider_component_mappings` | Map provider records to the whole asset or a component | `id`, `provider_id`, `asset_id`, `component_id`, `provider_type_id`, `market`, `match_level`, `confidence`, `verified_at` |
 | `coverage_claims` | Capability-level provider coverage registry | `id`, `provider_id`, `contract_version`, `country`, `asset_domain`, `asset_type`, `make`, `model_pattern`, `year_from`, `year_to`, `component_pattern`, `capability`, `status`, `expires_at` |
 | `coverage_test_runs` | Evidence from sandbox and production validation | `id`, `coverage_claim_id`, `asset_id`, `tested_at`, `environment`, `match_level`, `result`, `provider_reference`, `notes` |
 | `coverage_gaps` | Demand-weighted unsupported or incorrect matches | `id`, `asset_id`, `requested_capability`, `country`, `occurrence_count`, `first_seen_at`, `last_seen_at`, `status`, `provider_ticket`, `resolution` |
 | `diagnostic_connector_profiles` | Known connector/protocol/tool requirements | `id`, `asset_or_platform_id`, `connector_type`, `location`, `protocols`, `required_vci`, `required_cable`, `supported_functions`, `safety_notes` |
+| `marine_vessel_profiles` | Hull, registration and operating identity | `asset_id`, `hin_cin`, `registration_number`, `issuing_authority`, `official_number`, `imo_number`, `hull_material`, `length_overall`, `beam`, `draft`, `use_class`, `home_port` |
+| `marine_component_installations` | Position and configuration of propulsion/auxiliary systems over time | `asset_id`, `component_id`, `position`, `role`, `drive_type`, `gear_ratio`, `rotation`, `propeller_spec`, `installed_from`, `installed_to`, `evidence` |
+| `marine_hour_readings` | Auditable engine/generator hours from gauges, scans or telemetry | `asset_id`, `component_id`, `hours`, `recorded_at`, `source_type`, `source_reference`, `work_order_id`, `confidence` |
+| `marine_telemetry_consents` | Owner authorization and scope for vessel data ingestion | `asset_id`, `owner_id`, `gateway_id`, `allowed_paths`, `read_write_mode`, `purpose`, `granted_at`, `revoked_at` |
 
 The existing Shop Manager vehicle table can remain the transactional reference during migration. New generalized identities should link to it so current work orders, invoices and service history are not broken.
 
@@ -873,22 +1174,27 @@ The zero-cost MVP should prove the closed loop from vehicle → knowledge → wo
 
 ### Phase 4 — multi-domain diagnostic companion and measurement intelligence
 
-- Replace the passenger-car-only OBD assumption with supported profiles for car/LCV, motorcycle/powersports, truck/bus, trailer and later off-highway/marine.
+- Replace the passenger-car-only OBD assumption with supported profiles for car/LCV, motorcycle/powersports, truck/bus, trailer, off-highway and marine.
 - Choose supported VCI/adapter families, protocols and exact vehicle cables.
 - Build a signed Windows/Android companion or approved provider bridge for scanner communication.
-- Import generic OBD-II data where applicable plus provider-approved motorcycle and heavy-truck reports.
+- Import generic OBD-II data where applicable plus provider-approved motorcycle, heavy-truck and marine reports; keep NMEA/Signal K telemetry separate from factory diagnostic reports.
 - Support truck component/module identity, J1939 and legacy/proprietary protocol profiles without claiming universal coverage.
 - Record VCI, cable, driver/software version, protocol, tool provider and vehicle/component identity with every scan.
 - Add explicit user consent, encryption, device pairing and raw-file retention rules.
-- Pilot TEXA for motorcycles/multi-domain coverage and Jaltest/TEXA/Bosch for commercial vehicles; evaluate JPRO for North American trucks.
+- Pilot TEXA for motorcycles/multi-domain coverage, Jaltest/TEXA/Bosch for commercial vehicles, and Jaltest/TEXA plus approved OEM tools for marine; evaluate JPRO for North American trucks.
 - Keep bidirectional tests, protected gateways and programming outside scope until safety, device, OEM-security and licensing requirements are satisfied.
 
-**Exit condition:** supported devices can reliably create normalized, source-labelled scan reports for at least one Philippine motorcycle fleet and one mixed commercial-truck fleet, attached to the correct asset/component and work order.
+**Exit condition:** supported devices can reliably create normalized, source-labelled scan reports for at least one Philippine motorcycle fleet, one mixed commercial-truck fleet and one mixed outboard/inboard marine pilot, attached to the correct asset/component and work order.
 
 ### Phase 5 — commercial data and monetization
 
 - Request coverage, sandbox, pricing and multi-tenant licensing terms from TecAlliance Southeast Asia, Autodata and Infomedia first.
 - Request separate motorcycle and truck datasets; do not assume the passenger-car licence includes them.
+- Request ARI PartStream/DataSmart marine coverage, sandbox, pricing and multi-tenant catalogue/diagram rights.
+- Request OEM/distributor integration discussions for Philippine outboards first, followed by Yanmar, Volvo Penta, Cummins and other inboard/commercial-marine providers.
+- Evaluate NCM/Spader Marine Flat Rate licensing for Shop Manager import and customer-facing SaaS use.
+- Evaluate Jaltest and TEXA marine coverage/report export against the Philippine acceptance fleet; preserve OEM tools for protected factory functions.
+- Negotiate only approved deep-link, embedded-viewer, data-feed or document-vault rights for marine manuals and bulletins; do not mirror dealer portals.
 - Evaluate Autodata Motorcycle, HaynesPro Motorcycle/Truck and TecRMI Truck/TecDoc commercial-vehicle/motorbike capabilities against the Philippine acceptance fleets.
 - Evaluate Jaltest, TEXA and Bosch as diagnostic ecosystems; record whether each supports launch links, report export, SDK/API access or only standalone use.
 - Evaluate MOTOR FleetCross, Mitchell TruckSeries, Diesel Repair APIs and JPRO as a separate North American commercial-vehicle pack.
@@ -945,6 +1251,16 @@ The zero-cost MVP should prove the closed loop from vehicle → knowledge → wo
 - [ ] Generalized service-asset, identifier, component and configuration-revision schema.
 - [ ] Motorcycle, scooter, underbone, tricycle, ATV/UTV and electric two/three-wheeler identity forms.
 - [ ] Truck, bus and trailer component-configuration forms.
+- [ ] Marine vessel, registration/HIN/manual-identity and multi-engine component forms.
+- [ ] Marine installation history for engines, gears, drives, propellers, generators, controls and electronics.
+- [ ] Marine hour readings, date/hour maintenance triggers, sea-trial records and telemetry consent.
+- [ ] ARI PartStream/DataSmart marine catalogue and diagram licensing evaluation.
+- [ ] OEM outboard/inboard manual, parts, bulletin, flat-rate and diagnostic portal partnership review.
+- [ ] NCM/Spader Marine Flat Rate SaaS licensing evaluation.
+- [ ] Jaltest/TEXA marine diagnostic demonstration, coverage export and report/API review.
+- [ ] Signal K read-only telemetry proof of concept with consent, security and NMEA licensing review.
+- [ ] Philippines marine acceptance fleet and capability-level scorecard.
+- [ ] Marine marketplace/shop profile and Marine Owner, Shop Pro and Fleet Pro entitlements.
 - [ ] Capability-level coverage registry, test runner, gap queue and admin dashboard.
 - [ ] Autodata/HaynesPro/TecAlliance motorcycle coverage evaluation.
 - [ ] TecRMI Truck/HaynesPro Truck commercial-data evaluation.
@@ -1007,6 +1323,9 @@ A source is not production-ready until all answers are recorded:
 9. **No silent cross-market fallback.** A family-level or different-market motorcycle/truck result is never presented as an exact match.
 10. **Truck configuration is component-based.** Chassis, engine, transmission, brakes, aftertreatment, body and trailer mappings retain separate provenance.
 11. **Coverage gaps are product data.** Unsupported lookups are recorded, demand-ranked and used for provider/OEM outreach.
+12. **Marine identity is component-based.** A vessel, each engine, drive, gear, generator and major onboard system retain separate identity and installation history.
+13. **Same horsepower is not fitment.** Marine parts/procedures require exact model, serial range, installation position and configuration.
+14. **Telemetry is not diagnosis.** Signal K/NMEA data may support trends and evidence but does not replace factory diagnostic information or authorize vessel control.
 
 ## 13. Recommended first build slice
 
