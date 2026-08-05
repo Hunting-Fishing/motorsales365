@@ -19,6 +19,7 @@ import { Route as StartSellingRouteImport } from './routes/start-selling'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ShopManagerRouteImport } from './routes/shop-manager'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -433,6 +434,11 @@ const ShopManagerRoute = ShopManagerRouteImport.update({
   path: '/shop-manager',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SellRoute = SellRouteImport.update({
   id: '/sell',
   path: '/sell',
@@ -628,9 +634,9 @@ const WantedPartsIndexRoute = WantedPartsIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopIndexRoute = ShopIndexRouteImport.update({
-  id: '/shop/',
-  path: '/shop/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShopRoute,
 } as any)
 const ShopManagerIndexRoute = ShopManagerIndexRouteImport.update({
   id: '/',
@@ -2415,6 +2421,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sell': typeof SellRoute
+  '/shop': typeof ShopRouteWithChildren
   '/shop-manager': typeof ShopManagerRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -3151,6 +3158,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sell': typeof SellRoute
+  '/shop': typeof ShopRouteWithChildren
   '/shop-manager': typeof ShopManagerRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -3527,6 +3535,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/robots.txt'
     | '/sell'
+    | '/shop'
     | '/shop-manager'
     | '/signup'
     | '/sitemap.xml'
@@ -4262,6 +4271,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/robots.txt'
     | '/sell'
+    | '/shop'
     | '/shop-manager'
     | '/signup'
     | '/sitemap.xml'
@@ -4638,6 +4648,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SellRoute: typeof SellRoute
+  ShopRoute: typeof ShopRouteWithChildren
   ShopManagerRoute: typeof ShopManagerRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -4695,7 +4706,6 @@ export interface RootRouteChildren {
   GamesIndexRoute: typeof GamesIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
-  ShopIndexRoute: typeof ShopIndexRoute
   WantedPartsIndexRoute: typeof WantedPartsIndexRoute
   WantedIndexRoute: typeof WantedIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -4812,6 +4822,13 @@ declare module '@tanstack/react-router' {
       path: '/shop-manager'
       fullPath: '/shop-manager'
       preLoaderRoute: typeof ShopManagerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sell': {
@@ -5089,10 +5106,10 @@ declare module '@tanstack/react-router' {
     }
     '/shop/': {
       id: '/shop/'
-      path: '/shop'
+      path: '/'
       fullPath: '/shop/'
       preLoaderRoute: typeof ShopIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ShopRoute
     }
     '/shop-manager/': {
       id: '/shop-manager/'
@@ -8267,6 +8284,16 @@ const PaymentsRouteWithChildren = PaymentsRoute._addFileChildren(
   PaymentsRouteChildren,
 )
 
+interface ShopRouteChildren {
+  ShopIndexRoute: typeof ShopIndexRoute
+}
+
+const ShopRouteChildren: ShopRouteChildren = {
+  ShopIndexRoute: ShopIndexRoute,
+}
+
+const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
+
 interface ShopManagerRouteChildren {
   ShopManagerCheckoutRoute: typeof ShopManagerCheckoutRoute
   ShopManagerPricingRoute: typeof ShopManagerPricingRoute
@@ -8383,6 +8410,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SellRoute: SellRoute,
+  ShopRoute: ShopRouteWithChildren,
   ShopManagerRoute: ShopManagerRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -8441,7 +8469,6 @@ const rootRouteChildren: RootRouteChildren = {
   GamesIndexRoute: GamesIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
-  ShopIndexRoute: ShopIndexRoute,
   WantedPartsIndexRoute: WantedPartsIndexRoute,
   WantedIndexRoute: WantedIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
