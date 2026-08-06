@@ -61,7 +61,8 @@ Code and database schemas are evidence of current behavior; they do not prove th
 | [`SHOP_MANAGER_MIGRATION_STATUS.md`](./SHOP_MANAGER_MIGRATION_STATUS.md) | Historical migration record dated 2026-07-13 | Reference only; no longer current program status | Replace later with a current architecture and migration register |
 | `src/data/features-catalog.ts` | Product/marketing feature inventory | Descriptive; not launch authority | Reconcile labels with tested production status |
 | `src/routes/terms.tsx` and related policies | Current public contractual statements | Binding only as deployed and legally applicable; not an architecture plan | Split or add product-specific terms before new services launch |
-| [Parts Program draft PR #2](https://github.com/Hunting-Fishing/motorsales365/pull/2) | Parts index, roadmap, decisions, economics, quality, country and export packs | Draft/unmerged; not platform authority | Reconcile with current `main`, this index and Vehicle History before merge |
+| [`365_PARTS_PARTNER_NETWORK_PLAN.md`](./365_PARTS_PARTNER_NETWORK_PLAN.md) | Parts catalog, partner enrollment/tiers, offers, reservations, orders, returns and the Shop Manager consumption contract | Specialist plan on `main` (Parts control baseline) | Reconcile draft PR #2 into it, then record `G0` |
+| [Parts Program draft PR #2](https://github.com/Hunting-Fishing/motorsales365/pull/2) | Parts index, roadmap, decisions, economics, quality, country and export packs | Draft/unmerged; not platform authority | Reconcile into `365_PARTS_PARTNER_NETWORK_PLAN.md` against current `main`, this index and Vehicle History before merge |
 
 After Parts PR #2 is reconciled and merged, its Parts Program Index controls Parts-only execution beneath this platform index. Its `G0–G10` gates remain Parts gates; this document's `PG0–PG10` are platform gates.
 
