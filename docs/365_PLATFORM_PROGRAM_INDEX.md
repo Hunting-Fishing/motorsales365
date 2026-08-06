@@ -61,7 +61,8 @@ Code and database schemas are evidence of current behavior; they do not prove th
 | [`SHOP_MANAGER_MIGRATION_STATUS.md`](./SHOP_MANAGER_MIGRATION_STATUS.md) | Historical migration record dated 2026-07-13 | Reference only; no longer current program status | Replace later with a current architecture and migration register |
 | `src/data/features-catalog.ts` | Product/marketing feature inventory | Descriptive; not launch authority | Reconcile labels with tested production status |
 | `src/routes/terms.tsx` and related policies | Current public contractual statements | Binding only as deployed and legally applicable; not an architecture plan | Split or add product-specific terms before new services launch |
-| [Parts Program draft PR #2](https://github.com/Hunting-Fishing/motorsales365/pull/2) | Parts index, roadmap, decisions, economics, quality, country and export packs | Draft/unmerged; not platform authority | Reconcile with current `main`, this index and Vehicle History before merge |
+| [`365_PARTS_PARTNER_NETWORK_PLAN.md`](./365_PARTS_PARTNER_NETWORK_PLAN.md) | Parts catalog, partner enrollment/tiers, offers, reservations, orders, returns and the Shop Manager consumption contract | Specialist plan on `main` (Parts control baseline) | Reconcile draft PR #2 into it, then record `G0` |
+| [Parts Program draft PR #2](https://github.com/Hunting-Fishing/motorsales365/pull/2) | Parts index, roadmap, decisions, economics, quality, country and export packs | Draft/unmerged; not platform authority | Reconcile into `365_PARTS_PARTNER_NETWORK_PLAN.md` against current `main`, this index and Vehicle History before merge |
 
 After Parts PR #2 is reconciled and merged, its Parts Program Index controls Parts-only execution beneath this platform index. Its `G0–G10` gates remain Parts gates; this document's `PG0–PG10` are platform gates.
 
@@ -94,7 +95,7 @@ Never convert `repository-evidenced` or a feature-catalogue `live` label into `p
 |---|---|---|---|---|
 | Marketplace and Business Directory | Vehicle/equipment listings, seller/business discovery, messaging and listing trust | Repository-evidenced; production claims need verification | `in-build` | Identity, trust, policy and payments |
 | Shop Manager Core | Customers, staff, work orders, inspections, quotes, parts, time, invoices, payments and reminders | Strong native `/workspace` surfaces documented; multi-company correction incomplete | `in-build` | Tenancy, RLS, billing and continuity |
-| Parts Partner Network | Catalog, partner offers, stock, RFQ, ordering, fulfilment, returns, warranty and installed-part traceability | Detailed plans in draft PR #2; some existing inquiry/inventory surfaces | `proposed` | Shop Manager, catalog, tenancy, finance and quality |
+| Parts Partner Network | Catalog, partner offers, stock, RFQ, ordering, fulfilment, returns, warranty and installed-part traceability | Control baseline on `main` (`365_PARTS_PARTNER_NETWORK_PLAN.md`); network stock, inquiry and inventory surfaces at internal-test | `proposed` | Shop Manager, catalog, tenancy, finance and quality |
 | Repair Knowledge Network | Licensed/free/original repair information, labour, recall, procedure and provider routing | Complete plan; shared network not implemented | `proposed` | Asset identity, domain entitlements, licences and Shop Manager |
 | 365 Scan Companion | Device registration, read-only scans, VIN comparison, DTC/readiness/freeze-frame/live observations and RO attachment | Architecture researched; no production companion verified | `research` | Shop Manager, device trust, domain rules and evidence service |
 | Vehicle History Network | Verified lifecycle events, installed parts, reports, owner sharing, correction/dispute and partner status checks | Plan and outreach package complete; product and external feeds not verified | `proposed` | Shared asset/event/evidence model, Shop Manager, Parts and Scan |
@@ -261,7 +262,7 @@ Gate approval is version-, market-, module-, product- and volume-specific. Passi
 | ID | Area | Current state | Blocking issue | Depends on | Owner |
 |---|---|---|---|---|---|
 | `PS-001` | Platform authority | This initial index prepared | Sponsor approval and named program owner open | — | Open |
-| `PS-002` | Parts documents | Draft PR #2 is open and currently separate from `main` | Reconcile shared identity, evidence and current History work before merge | PS-001 | Program owner |
+| `PS-002` | Parts documents | Parts control baseline published on `main`; draft PR #2 still separate | Reconcile PR #2 detail into the Parts plan and record Parts `G0` owner approval | PS-001 | Program owner |
 | `PS-003` | Shop Manager | Strong single-shop native foundation reported | Current architecture inventory, duplicate-table plan and multi-company RLS tests incomplete | PG1/PG2 | Technical lead |
 | `PS-004` | Identity/tenancy | Several user/business/shop concepts exist | Organization, legal entity, location, listing and enrollment boundaries not yet enforced consistently | PG1 | Product + technical |
 | `PS-005` | Subscriptions | User/business-scoped flows exist | Organization/site grants and separate module/provider entitlements incomplete | PS-004 | Product + finance |
