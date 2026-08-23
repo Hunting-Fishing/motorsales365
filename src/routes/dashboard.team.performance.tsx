@@ -34,7 +34,7 @@ function downloadCsv(filename: string, rows: (string | number | null)[][]) {
 }
 
 function PerformancePage() {
-  const { orgId } = Route.useSearch();
+  const orgId = Route.useSearch().orgId ?? "";
   const [days, setDays] = useState(30);
   const fetchPerf = useServerFn(getOrgPerformance);
   const { data, isLoading } = useQuery({
