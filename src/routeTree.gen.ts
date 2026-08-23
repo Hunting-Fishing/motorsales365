@@ -29,6 +29,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as PartsRouteImport } from './routes/parts'
+import { Route as PartnersRouteImport } from './routes/partners'
 import { Route as PartnerTrainingRouteImport } from './routes/partner-training'
 import { Route as PartnerProgramRouteImport } from './routes/partner-program'
 import { Route as MyQrRouteImport } from './routes/my-qr'
@@ -484,6 +485,11 @@ const PartsRoute = PartsRouteImport.update({
   path: '/parts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnersRoute = PartnersRouteImport.update({
+  id: '/partners',
+  path: '/partners',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PartnerTrainingRoute = PartnerTrainingRouteImport.update({
   id: '/partner-training',
   path: '/partner-training',
@@ -809,9 +815,9 @@ const PartsCategoriesRoute = PartsCategoriesRouteImport.update({
   getParentRoute: () => PartsRoute,
 } as any)
 const PartnersPartsRoute = PartnersPartsRouteImport.update({
-  id: '/partners/parts',
-  path: '/partners/parts',
-  getParentRoute: () => rootRouteImport,
+  id: '/parts',
+  path: '/parts',
+  getParentRoute: () => PartnersRoute,
 } as any)
 const PartnerProgramTermsRoute = PartnerProgramTermsRouteImport.update({
   id: '/terms',
@@ -2412,6 +2418,7 @@ export interface FileRoutesByFullPath {
   '/my-qr': typeof MyQrRoute
   '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
+  '/partners': typeof PartnersRouteWithChildren
   '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -2781,6 +2788,7 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/my-qr': typeof MyQrRoute
   '/partner-training': typeof PartnerTrainingRoute
+  '/partners': typeof PartnersRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -3149,6 +3157,7 @@ export interface FileRoutesById {
   '/my-qr': typeof MyQrRoute
   '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
+  '/partners': typeof PartnersRouteWithChildren
   '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -3526,6 +3535,7 @@ export interface FileRouteTypes {
     | '/my-qr'
     | '/partner-program'
     | '/partner-training'
+    | '/partners'
     | '/parts'
     | '/payments'
     | '/pricing'
@@ -3895,6 +3905,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/my-qr'
     | '/partner-training'
+    | '/partners'
     | '/payments'
     | '/pricing'
     | '/privacy'
@@ -4262,6 +4273,7 @@ export interface FileRouteTypes {
     | '/my-qr'
     | '/partner-program'
     | '/partner-training'
+    | '/partners'
     | '/parts'
     | '/payments'
     | '/pricing'
@@ -4639,6 +4651,7 @@ export interface RootRouteChildren {
   MyQrRoute: typeof MyQrRoute
   PartnerProgramRoute: typeof PartnerProgramRouteWithChildren
   PartnerTrainingRoute: typeof PartnerTrainingRoute
+  PartnersRoute: typeof PartnersRouteWithChildren
   PartsRoute: typeof PartsRouteWithChildren
   PaymentsRoute: typeof PaymentsRouteWithChildren
   PricingRoute: typeof PricingRoute
@@ -4684,7 +4697,6 @@ export interface RootRouteChildren {
   LearnMechanicsRoute: typeof LearnMechanicsRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   ListingCheckoutRoute: typeof ListingCheckoutRoute
-  PartnersPartsRoute: typeof PartnersPartsRouteWithChildren
   PassportPremiumCheckoutRoute: typeof PassportPremiumCheckoutRoute
   PassportSlugRoute: typeof PassportSlugRoute
   PayManualRoute: typeof PayManualRoute
@@ -4892,6 +4904,13 @@ declare module '@tanstack/react-router' {
       path: '/parts'
       fullPath: '/parts'
       preLoaderRoute: typeof PartsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partners': {
+      id: '/partners'
+      path: '/partners'
+      fullPath: '/partners'
+      preLoaderRoute: typeof PartnersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner-training': {
@@ -5351,10 +5370,10 @@ declare module '@tanstack/react-router' {
     }
     '/partners/parts': {
       id: '/partners/parts'
-      path: '/partners/parts'
+      path: '/parts'
       fullPath: '/partners/parts'
       preLoaderRoute: typeof PartnersPartsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartnersRoute
     }
     '/partner-program/terms': {
       id: '/partner-program/terms'
@@ -8238,6 +8257,30 @@ const PartnerProgramRouteWithChildren = PartnerProgramRoute._addFileChildren(
   PartnerProgramRouteChildren,
 )
 
+interface PartnersPartsRouteChildren {
+  PartnersPartsOnboardingRoute: typeof PartnersPartsOnboardingRoute
+}
+
+const PartnersPartsRouteChildren: PartnersPartsRouteChildren = {
+  PartnersPartsOnboardingRoute: PartnersPartsOnboardingRoute,
+}
+
+const PartnersPartsRouteWithChildren = PartnersPartsRoute._addFileChildren(
+  PartnersPartsRouteChildren,
+)
+
+interface PartnersRouteChildren {
+  PartnersPartsRoute: typeof PartnersPartsRouteWithChildren
+}
+
+const PartnersRouteChildren: PartnersRouteChildren = {
+  PartnersPartsRoute: PartnersPartsRouteWithChildren,
+}
+
+const PartnersRouteWithChildren = PartnersRoute._addFileChildren(
+  PartnersRouteChildren,
+)
+
 interface PartsRouteChildren {
   PartsCategoriesRoute: typeof PartsCategoriesRoute
   PartsNetworkRoute: typeof PartsNetworkRoute
@@ -8348,18 +8391,6 @@ const ListingIdRouteWithChildren = ListingIdRoute._addFileChildren(
   ListingIdRouteChildren,
 )
 
-interface PartnersPartsRouteChildren {
-  PartnersPartsOnboardingRoute: typeof PartnersPartsOnboardingRoute
-}
-
-const PartnersPartsRouteChildren: PartnersPartsRouteChildren = {
-  PartnersPartsOnboardingRoute: PartnersPartsOnboardingRoute,
-}
-
-const PartnersPartsRouteWithChildren = PartnersPartsRoute._addFileChildren(
-  PartnersPartsRouteChildren,
-)
-
 interface RCodeRouteChildren {
   RCodePosterRoute: typeof RCodePosterRoute
   RCodeQrRoute: typeof RCodeQrRoute
@@ -8401,6 +8432,7 @@ const rootRouteChildren: RootRouteChildren = {
   MyQrRoute: MyQrRoute,
   PartnerProgramRoute: PartnerProgramRouteWithChildren,
   PartnerTrainingRoute: PartnerTrainingRoute,
+  PartnersRoute: PartnersRouteWithChildren,
   PartsRoute: PartsRouteWithChildren,
   PaymentsRoute: PaymentsRouteWithChildren,
   PricingRoute: PricingRoute,
@@ -8447,7 +8479,6 @@ const rootRouteChildren: RootRouteChildren = {
   LearnMechanicsRoute: LearnMechanicsRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   ListingCheckoutRoute: ListingCheckoutRoute,
-  PartnersPartsRoute: PartnersPartsRouteWithChildren,
   PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
   PassportSlugRoute: PassportSlugRoute,
   PayManualRoute: PayManualRoute,
