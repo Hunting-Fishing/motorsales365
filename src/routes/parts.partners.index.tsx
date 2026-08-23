@@ -62,7 +62,7 @@ export const Route = createFileRoute("/parts/partners/")({
 
 function ShopIndex() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/workspace/" });
+  const navigate = useNavigate({ from: "/parts/partners/" });
   const [garage, setGarageState] = useGarage();
 
   // Sync URL <-> garage
