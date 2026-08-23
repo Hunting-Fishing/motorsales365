@@ -166,7 +166,7 @@ function VerifiedPage() {
               </Card>
             );
             return t.to ? (
-              <Link key={t.title} to={t.to} className="block">
+              <Link key={t.title} to={t.to as "/report"} className="block">
                 {inner}
               </Link>
             ) : (
