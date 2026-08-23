@@ -97,6 +97,7 @@ import { Route as PartsSearchRouteImport } from './routes/parts.search'
 import { Route as PartsNetworkRouteImport } from './routes/parts.network'
 import { Route as PartsCategoriesRouteImport } from './routes/parts.categories'
 import { Route as PartnersPartsRouteImport } from './routes/partners.parts'
+import { Route as PartnersNetworkRouteImport } from './routes/partners.network'
 import { Route as PartnerProgramTermsRouteImport } from './routes/partner-program.terms'
 import { Route as PartnerProgramInfoRouteImport } from './routes/partner-program.info'
 import { Route as PartnerProgramApplyRouteImport } from './routes/partner-program.apply'
@@ -823,6 +824,11 @@ const PartsCategoriesRoute = PartsCategoriesRouteImport.update({
 const PartnersPartsRoute = PartnersPartsRouteImport.update({
   id: '/parts',
   path: '/parts',
+  getParentRoute: () => PartnersRoute,
+} as any)
+const PartnersNetworkRoute = PartnersNetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
   getParentRoute: () => PartnersRoute,
 } as any)
 const PartnerProgramTermsRoute = PartnerProgramTermsRouteImport.update({
@@ -2556,6 +2562,7 @@ export interface FileRoutesByFullPath {
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
+  '/partners/network': typeof PartnersNetworkRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/network': typeof PartsNetworkRoute
@@ -2918,6 +2925,7 @@ export interface FileRoutesByTo {
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
+  '/partners/network': typeof PartnersNetworkRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/network': typeof PartsNetworkRoute
@@ -3296,6 +3304,7 @@ export interface FileRoutesById {
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
+  '/partners/network': typeof PartnersNetworkRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/network': typeof PartsNetworkRoute
@@ -3675,6 +3684,7 @@ export interface FileRouteTypes {
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
+    | '/partners/network'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/network'
@@ -4037,6 +4047,7 @@ export interface FileRouteTypes {
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
+    | '/partners/network'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/network'
@@ -4414,6 +4425,7 @@ export interface FileRouteTypes {
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
+    | '/partners/network'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/network'
@@ -5390,6 +5402,13 @@ declare module '@tanstack/react-router' {
       path: '/parts'
       fullPath: '/partners/parts'
       preLoaderRoute: typeof PartnersPartsRouteImport
+      parentRoute: typeof PartnersRoute
+    }
+    '/partners/network': {
+      id: '/partners/network'
+      path: '/network'
+      fullPath: '/partners/network'
+      preLoaderRoute: typeof PartnersNetworkRouteImport
       parentRoute: typeof PartnersRoute
     }
     '/partner-program/terms': {
@@ -8287,11 +8306,13 @@ const PartnersPartsRouteWithChildren = PartnersPartsRoute._addFileChildren(
 )
 
 interface PartnersRouteChildren {
+  PartnersNetworkRoute: typeof PartnersNetworkRoute
   PartnersPartsRoute: typeof PartnersPartsRouteWithChildren
   PartnersIndexRoute: typeof PartnersIndexRoute
 }
 
 const PartnersRouteChildren: PartnersRouteChildren = {
+  PartnersNetworkRoute: PartnersNetworkRoute,
   PartnersPartsRoute: PartnersPartsRouteWithChildren,
   PartnersIndexRoute: PartnersIndexRoute,
 }
