@@ -64,6 +64,7 @@ import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as ShopManagerIndexRouteImport } from './routes/shop-manager.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as PartsIndexRouteImport } from './routes/parts.index'
+import { Route as PartnersIndexRouteImport } from './routes/partners.index'
 import { Route as PartnerProgramIndexRouteImport } from './routes/partner-program.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
@@ -658,6 +659,11 @@ const PartsIndexRoute = PartsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PartsRoute,
+} as any)
+const PartnersIndexRoute = PartnersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnersRoute,
 } as any)
 const PartnerProgramIndexRoute = PartnerProgramIndexRouteImport.update({
   id: '/',
@@ -2582,6 +2588,7 @@ export interface FileRoutesByFullPath {
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/partner-program/': typeof PartnerProgramIndexRoute
+  '/partners/': typeof PartnersIndexRoute
   '/parts/': typeof PartsIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop-manager/': typeof ShopManagerIndexRoute
@@ -2788,7 +2795,6 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/my-qr': typeof MyQrRoute
   '/partner-training': typeof PartnerTrainingRoute
-  '/partners': typeof PartnersRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -2944,6 +2950,7 @@ export interface FileRoutesByTo {
   '/games': typeof GamesIndexRoute
   '/learn': typeof LearnIndexRoute
   '/partner-program': typeof PartnerProgramIndexRoute
+  '/partners': typeof PartnersIndexRoute
   '/parts': typeof PartsIndexRoute
   '/rides': typeof RidesIndexRoute
   '/shop-manager': typeof ShopManagerIndexRoute
@@ -3321,6 +3328,7 @@ export interface FileRoutesById {
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/partner-program/': typeof PartnerProgramIndexRoute
+  '/partners/': typeof PartnersIndexRoute
   '/parts/': typeof PartsIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop-manager/': typeof ShopManagerIndexRoute
@@ -3699,6 +3707,7 @@ export interface FileRouteTypes {
     | '/games/'
     | '/learn/'
     | '/partner-program/'
+    | '/partners/'
     | '/parts/'
     | '/rides/'
     | '/shop-manager/'
@@ -3905,7 +3914,6 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/my-qr'
     | '/partner-training'
-    | '/partners'
     | '/payments'
     | '/pricing'
     | '/privacy'
@@ -4061,6 +4069,7 @@ export interface FileRouteTypes {
     | '/games'
     | '/learn'
     | '/partner-program'
+    | '/partners'
     | '/parts'
     | '/rides'
     | '/shop-manager'
@@ -4437,6 +4446,7 @@ export interface FileRouteTypes {
     | '/games/'
     | '/learn/'
     | '/partner-program/'
+    | '/partners/'
     | '/parts/'
     | '/rides/'
     | '/shop-manager/'
@@ -5150,6 +5160,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/parts/'
       preLoaderRoute: typeof PartsIndexRouteImport
       parentRoute: typeof PartsRoute
+    }
+    '/partners/': {
+      id: '/partners/'
+      path: '/'
+      fullPath: '/partners/'
+      preLoaderRoute: typeof PartnersIndexRouteImport
+      parentRoute: typeof PartnersRoute
     }
     '/partner-program/': {
       id: '/partner-program/'
@@ -8271,10 +8288,12 @@ const PartnersPartsRouteWithChildren = PartnersPartsRoute._addFileChildren(
 
 interface PartnersRouteChildren {
   PartnersPartsRoute: typeof PartnersPartsRouteWithChildren
+  PartnersIndexRoute: typeof PartnersIndexRoute
 }
 
 const PartnersRouteChildren: PartnersRouteChildren = {
   PartnersPartsRoute: PartnersPartsRouteWithChildren,
+  PartnersIndexRoute: PartnersIndexRoute,
 }
 
 const PartnersRouteWithChildren = PartnersRoute._addFileChildren(
