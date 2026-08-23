@@ -52,7 +52,7 @@ export const Route = createFileRoute("/parts/partners/c/$category")({
 function ShopCategory() {
   const { category } = Route.useParams();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/workspace/$category" });
+  const navigate = useNavigate({ from: "/parts/partners/c/$category" });
   const [garage, setGarageState] = useGarage();
   const activeVehicle =
     search.make && search.model

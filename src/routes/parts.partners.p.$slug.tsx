@@ -84,7 +84,7 @@ function ProductPage() {
       <SiteLayout>
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-semibold">Product not found</h1>
-          <Link to="/workspace" className="mt-4 inline-block text-primary underline">
+          <Link to="/parts/partners" className="mt-4 inline-block text-primary underline">
             Back to shop
           </Link>
         </div>
@@ -109,14 +109,14 @@ function ProductPage() {
     <SiteLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-          <Link to="/workspace" className="hover:text-foreground">
+          <Link to="/parts/partners" className="hover:text-foreground">
             Shop
           </Link>
           {p.category && (
             <>
               <span>/</span>
               <Link
-                to="/workspace/$category"
+                to="/parts/partners/c/$category"
                 params={{ category: p.category.slug }}
                 className="hover:text-foreground"
               >

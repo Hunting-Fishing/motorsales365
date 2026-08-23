@@ -29,6 +29,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as PartsRouteImport } from './routes/parts'
+import { Route as PartnersRouteImport } from './routes/partners'
 import { Route as PartnerTrainingRouteImport } from './routes/partner-training'
 import { Route as PartnerProgramRouteImport } from './routes/partner-program'
 import { Route as MyQrRouteImport } from './routes/my-qr'
@@ -63,6 +64,7 @@ import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as ShopManagerIndexRouteImport } from './routes/shop-manager.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as PartsIndexRouteImport } from './routes/parts.index'
+import { Route as PartnersIndexRouteImport } from './routes/partners.index'
 import { Route as PartnerProgramIndexRouteImport } from './routes/partner-program.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
@@ -95,6 +97,7 @@ import { Route as PartsSearchRouteImport } from './routes/parts.search'
 import { Route as PartsNetworkRouteImport } from './routes/parts.network'
 import { Route as PartsCategoriesRouteImport } from './routes/parts.categories'
 import { Route as PartnersPartsRouteImport } from './routes/partners.parts'
+import { Route as PartnersNetworkRouteImport } from './routes/partners.network'
 import { Route as PartnerProgramTermsRouteImport } from './routes/partner-program.terms'
 import { Route as PartnerProgramInfoRouteImport } from './routes/partner-program.info'
 import { Route as PartnerProgramApplyRouteImport } from './routes/partner-program.apply'
@@ -484,6 +487,11 @@ const PartsRoute = PartsRouteImport.update({
   path: '/parts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnersRoute = PartnersRouteImport.update({
+  id: '/partners',
+  path: '/partners',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PartnerTrainingRoute = PartnerTrainingRouteImport.update({
   id: '/partner-training',
   path: '/partner-training',
@@ -653,6 +661,11 @@ const PartsIndexRoute = PartsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PartsRoute,
 } as any)
+const PartnersIndexRoute = PartnersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnersRoute,
+} as any)
 const PartnerProgramIndexRoute = PartnerProgramIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -809,9 +822,14 @@ const PartsCategoriesRoute = PartsCategoriesRouteImport.update({
   getParentRoute: () => PartsRoute,
 } as any)
 const PartnersPartsRoute = PartnersPartsRouteImport.update({
-  id: '/partners/parts',
-  path: '/partners/parts',
-  getParentRoute: () => rootRouteImport,
+  id: '/parts',
+  path: '/parts',
+  getParentRoute: () => PartnersRoute,
+} as any)
+const PartnersNetworkRoute = PartnersNetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
+  getParentRoute: () => PartnersRoute,
 } as any)
 const PartnerProgramTermsRoute = PartnerProgramTermsRouteImport.update({
   id: '/terms',
@@ -2412,6 +2430,7 @@ export interface FileRoutesByFullPath {
   '/my-qr': typeof MyQrRoute
   '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
+  '/partners': typeof PartnersRouteWithChildren
   '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -2543,6 +2562,7 @@ export interface FileRoutesByFullPath {
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
+  '/partners/network': typeof PartnersNetworkRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/network': typeof PartsNetworkRoute
@@ -2575,6 +2595,7 @@ export interface FileRoutesByFullPath {
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/partner-program/': typeof PartnerProgramIndexRoute
+  '/partners/': typeof PartnersIndexRoute
   '/parts/': typeof PartsIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop-manager/': typeof ShopManagerIndexRoute
@@ -2904,6 +2925,7 @@ export interface FileRoutesByTo {
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
+  '/partners/network': typeof PartnersNetworkRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/network': typeof PartsNetworkRoute
@@ -2936,6 +2958,7 @@ export interface FileRoutesByTo {
   '/games': typeof GamesIndexRoute
   '/learn': typeof LearnIndexRoute
   '/partner-program': typeof PartnerProgramIndexRoute
+  '/partners': typeof PartnersIndexRoute
   '/parts': typeof PartsIndexRoute
   '/rides': typeof RidesIndexRoute
   '/shop-manager': typeof ShopManagerIndexRoute
@@ -3149,6 +3172,7 @@ export interface FileRoutesById {
   '/my-qr': typeof MyQrRoute
   '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
+  '/partners': typeof PartnersRouteWithChildren
   '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -3280,6 +3304,7 @@ export interface FileRoutesById {
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
+  '/partners/network': typeof PartnersNetworkRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/network': typeof PartsNetworkRoute
@@ -3312,6 +3337,7 @@ export interface FileRoutesById {
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/partner-program/': typeof PartnerProgramIndexRoute
+  '/partners/': typeof PartnersIndexRoute
   '/parts/': typeof PartsIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop-manager/': typeof ShopManagerIndexRoute
@@ -3526,6 +3552,7 @@ export interface FileRouteTypes {
     | '/my-qr'
     | '/partner-program'
     | '/partner-training'
+    | '/partners'
     | '/parts'
     | '/payments'
     | '/pricing'
@@ -3657,6 +3684,7 @@ export interface FileRouteTypes {
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
+    | '/partners/network'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/network'
@@ -3689,6 +3717,7 @@ export interface FileRouteTypes {
     | '/games/'
     | '/learn/'
     | '/partner-program/'
+    | '/partners/'
     | '/parts/'
     | '/rides/'
     | '/shop-manager/'
@@ -4018,6 +4047,7 @@ export interface FileRouteTypes {
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
+    | '/partners/network'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/network'
@@ -4050,6 +4080,7 @@ export interface FileRouteTypes {
     | '/games'
     | '/learn'
     | '/partner-program'
+    | '/partners'
     | '/parts'
     | '/rides'
     | '/shop-manager'
@@ -4262,6 +4293,7 @@ export interface FileRouteTypes {
     | '/my-qr'
     | '/partner-program'
     | '/partner-training'
+    | '/partners'
     | '/parts'
     | '/payments'
     | '/pricing'
@@ -4393,6 +4425,7 @@ export interface FileRouteTypes {
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
+    | '/partners/network'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/network'
@@ -4425,6 +4458,7 @@ export interface FileRouteTypes {
     | '/games/'
     | '/learn/'
     | '/partner-program/'
+    | '/partners/'
     | '/parts/'
     | '/rides/'
     | '/shop-manager/'
@@ -4639,6 +4673,7 @@ export interface RootRouteChildren {
   MyQrRoute: typeof MyQrRoute
   PartnerProgramRoute: typeof PartnerProgramRouteWithChildren
   PartnerTrainingRoute: typeof PartnerTrainingRoute
+  PartnersRoute: typeof PartnersRouteWithChildren
   PartsRoute: typeof PartsRouteWithChildren
   PaymentsRoute: typeof PaymentsRouteWithChildren
   PricingRoute: typeof PricingRoute
@@ -4684,7 +4719,6 @@ export interface RootRouteChildren {
   LearnMechanicsRoute: typeof LearnMechanicsRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   ListingCheckoutRoute: typeof ListingCheckoutRoute
-  PartnersPartsRoute: typeof PartnersPartsRouteWithChildren
   PassportPremiumCheckoutRoute: typeof PassportPremiumCheckoutRoute
   PassportSlugRoute: typeof PassportSlugRoute
   PayManualRoute: typeof PayManualRoute
@@ -4892,6 +4926,13 @@ declare module '@tanstack/react-router' {
       path: '/parts'
       fullPath: '/parts'
       preLoaderRoute: typeof PartsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partners': {
+      id: '/partners'
+      path: '/partners'
+      fullPath: '/partners'
+      preLoaderRoute: typeof PartnersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner-training': {
@@ -5132,6 +5173,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartsIndexRouteImport
       parentRoute: typeof PartsRoute
     }
+    '/partners/': {
+      id: '/partners/'
+      path: '/'
+      fullPath: '/partners/'
+      preLoaderRoute: typeof PartnersIndexRouteImport
+      parentRoute: typeof PartnersRoute
+    }
     '/partner-program/': {
       id: '/partner-program/'
       path: '/'
@@ -5351,10 +5399,17 @@ declare module '@tanstack/react-router' {
     }
     '/partners/parts': {
       id: '/partners/parts'
-      path: '/partners/parts'
+      path: '/parts'
       fullPath: '/partners/parts'
       preLoaderRoute: typeof PartnersPartsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartnersRoute
+    }
+    '/partners/network': {
+      id: '/partners/network'
+      path: '/network'
+      fullPath: '/partners/network'
+      preLoaderRoute: typeof PartnersNetworkRouteImport
+      parentRoute: typeof PartnersRoute
     }
     '/partner-program/terms': {
       id: '/partner-program/terms'
@@ -8238,6 +8293,34 @@ const PartnerProgramRouteWithChildren = PartnerProgramRoute._addFileChildren(
   PartnerProgramRouteChildren,
 )
 
+interface PartnersPartsRouteChildren {
+  PartnersPartsOnboardingRoute: typeof PartnersPartsOnboardingRoute
+}
+
+const PartnersPartsRouteChildren: PartnersPartsRouteChildren = {
+  PartnersPartsOnboardingRoute: PartnersPartsOnboardingRoute,
+}
+
+const PartnersPartsRouteWithChildren = PartnersPartsRoute._addFileChildren(
+  PartnersPartsRouteChildren,
+)
+
+interface PartnersRouteChildren {
+  PartnersNetworkRoute: typeof PartnersNetworkRoute
+  PartnersPartsRoute: typeof PartnersPartsRouteWithChildren
+  PartnersIndexRoute: typeof PartnersIndexRoute
+}
+
+const PartnersRouteChildren: PartnersRouteChildren = {
+  PartnersNetworkRoute: PartnersNetworkRoute,
+  PartnersPartsRoute: PartnersPartsRouteWithChildren,
+  PartnersIndexRoute: PartnersIndexRoute,
+}
+
+const PartnersRouteWithChildren = PartnersRoute._addFileChildren(
+  PartnersRouteChildren,
+)
+
 interface PartsRouteChildren {
   PartsCategoriesRoute: typeof PartsCategoriesRoute
   PartsNetworkRoute: typeof PartsNetworkRoute
@@ -8348,18 +8431,6 @@ const ListingIdRouteWithChildren = ListingIdRoute._addFileChildren(
   ListingIdRouteChildren,
 )
 
-interface PartnersPartsRouteChildren {
-  PartnersPartsOnboardingRoute: typeof PartnersPartsOnboardingRoute
-}
-
-const PartnersPartsRouteChildren: PartnersPartsRouteChildren = {
-  PartnersPartsOnboardingRoute: PartnersPartsOnboardingRoute,
-}
-
-const PartnersPartsRouteWithChildren = PartnersPartsRoute._addFileChildren(
-  PartnersPartsRouteChildren,
-)
-
 interface RCodeRouteChildren {
   RCodePosterRoute: typeof RCodePosterRoute
   RCodeQrRoute: typeof RCodeQrRoute
@@ -8401,6 +8472,7 @@ const rootRouteChildren: RootRouteChildren = {
   MyQrRoute: MyQrRoute,
   PartnerProgramRoute: PartnerProgramRouteWithChildren,
   PartnerTrainingRoute: PartnerTrainingRoute,
+  PartnersRoute: PartnersRouteWithChildren,
   PartsRoute: PartsRouteWithChildren,
   PaymentsRoute: PaymentsRouteWithChildren,
   PricingRoute: PricingRoute,
@@ -8447,7 +8519,6 @@ const rootRouteChildren: RootRouteChildren = {
   LearnMechanicsRoute: LearnMechanicsRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   ListingCheckoutRoute: ListingCheckoutRoute,
-  PartnersPartsRoute: PartnersPartsRouteWithChildren,
   PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
   PassportSlugRoute: PassportSlugRoute,
   PayManualRoute: PayManualRoute,
