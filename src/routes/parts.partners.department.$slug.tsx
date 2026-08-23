@@ -40,7 +40,7 @@ export const Route = createFileRoute("/parts/partners/department/$slug")({
 function DepartmentPage() {
   const { slug } = Route.useParams();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/workspace/department/$slug" });
+  const navigate = useNavigate({ from: "/parts/partners/department/$slug" });
   const [garage, setGarageState] = useGarage();
   const activeVehicle =
     search.make && search.model
@@ -109,7 +109,7 @@ function DepartmentPage() {
               else setGarageState(null);
               if (next.categorySlug) {
                 navigate({
-                  to: "/workspace/$category",
+                  to: "/parts/partners/c/$category",
                   params: { category: next.categorySlug },
                   search: {
                     brand: next.brand,
@@ -171,7 +171,7 @@ function DepartmentPage() {
               {categories.map((c: any) => (
                 <Link
                   key={c.id}
-                  to="/workspace/$category"
+                  to="/parts/partners/c/$category"
                   params={{ category: c.slug }}
                   className="group rounded-xl border bg-card p-4 transition hover:border-primary hover:shadow-md"
                 >
@@ -204,7 +204,7 @@ function DepartmentPage() {
               {crossCats.map((c: any) => (
                 <Link
                   key={c.id}
-                  to="/workspace/$category"
+                  to="/parts/partners/c/$category"
                   params={{ category: c.slug }}
                   className="rounded-full border bg-background px-3 py-1.5 text-xs font-medium hover:border-primary hover:text-primary"
                 >
