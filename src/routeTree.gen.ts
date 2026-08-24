@@ -134,6 +134,7 @@ import { Route as DashboardQrAdsRouteImport } from './routes/dashboard.qr-ads'
 import { Route as DashboardPromoterResourcesRouteImport } from './routes/dashboard.promoter-resources'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardPartnerProgramRouteImport } from './routes/dashboard.partner-program'
+import { Route as DashboardPartnerNetworkRouteImport } from './routes/dashboard.partner-network'
 import { Route as DashboardPartnerRouteImport } from './routes/dashboard.partner'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
@@ -1010,6 +1011,11 @@ const DashboardProfileRoute = DashboardProfileRouteImport.update({
 const DashboardPartnerProgramRoute = DashboardPartnerProgramRouteImport.update({
   id: '/partner-program',
   path: '/partner-program',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPartnerNetworkRoute = DashboardPartnerNetworkRouteImport.update({
+  id: '/partner-network',
+  path: '/partner-network',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardPartnerRoute = DashboardPartnerRouteImport.update({
@@ -2526,6 +2532,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/partner': typeof DashboardPartnerRouteWithChildren
+  '/dashboard/partner-network': typeof DashboardPartnerNetworkRoute
   '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
@@ -2891,6 +2898,7 @@ export interface FileRoutesByTo {
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/partner-network': typeof DashboardPartnerNetworkRoute
   '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
@@ -3268,6 +3276,7 @@ export interface FileRoutesById {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/partner': typeof DashboardPartnerRouteWithChildren
+  '/dashboard/partner-network': typeof DashboardPartnerNetworkRoute
   '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
@@ -3648,6 +3657,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/partner'
+    | '/dashboard/partner-network'
     | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
@@ -4013,6 +4023,7 @@ export interface FileRouteTypes {
     | '/dashboard/learning'
     | '/dashboard/likes'
     | '/dashboard/messages'
+    | '/dashboard/partner-network'
     | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
@@ -4389,6 +4400,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/partner'
+    | '/dashboard/partner-network'
     | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
@@ -5661,6 +5673,13 @@ declare module '@tanstack/react-router' {
       path: '/partner-program'
       fullPath: '/dashboard/partner-program'
       preLoaderRoute: typeof DashboardPartnerProgramRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/partner-network': {
+      id: '/dashboard/partner-network'
+      path: '/partner-network'
+      fullPath: '/dashboard/partner-network'
+      preLoaderRoute: typeof DashboardPartnerNetworkRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/partner': {
@@ -8140,6 +8159,7 @@ interface DashboardRouteChildren {
   DashboardLikesRoute: typeof DashboardLikesRoute
   DashboardMessagesRoute: typeof DashboardMessagesRoute
   DashboardPartnerRoute: typeof DashboardPartnerRouteWithChildren
+  DashboardPartnerNetworkRoute: typeof DashboardPartnerNetworkRoute
   DashboardPartnerProgramRoute: typeof DashboardPartnerProgramRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardPromoterResourcesRoute: typeof DashboardPromoterResourcesRoute
@@ -8177,6 +8197,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLikesRoute: DashboardLikesRoute,
   DashboardMessagesRoute: DashboardMessagesRoute,
   DashboardPartnerRoute: DashboardPartnerRouteWithChildren,
+  DashboardPartnerNetworkRoute: DashboardPartnerNetworkRoute,
   DashboardPartnerProgramRoute: DashboardPartnerProgramRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardPromoterResourcesRoute: DashboardPromoterResourcesRoute,
