@@ -85,6 +85,8 @@ export function SiteFooter() {
         { to: "/support", label: "Help & Support" },
         { to: "/report", label: "Report a scam" },
         { to: "/advertise", label: "Advertise / buy ad space" },
+        { to: "/partners", label: "365 Partner Network" },
+        { to: "/partners/network", label: "Partner directory" },
         { to: "/partner-program", label: "Promoter Program — apply" },
         { to: "/partner-program/info", label: "About the Promoter Program" },
         ...(user ? [{ to: "/dashboard/partner-program", label: "My promoter dashboard" }] : []),
