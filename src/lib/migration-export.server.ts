@@ -19,9 +19,17 @@ function timingSafeEqualHex(a: string, b: string): boolean {
   return diff === 0;
 }
 
-/** Verify the `x-365-migration-token` header. Raw token is never stored or printed. */
+/**
+ * Verify the one-time migration token.
+ * Header form is preferred. A temporary query-param fallback exists only because
+ * the migration transport available to the operator cannot set custom headers.
+ * Raw token is never stored or printed and this helper is removed after cutover.
+ */
 export async function verifyMigrationToken(request: Request): Promise<boolean> {
-  const raw = request.headers.get("x-365-migration-token");
+  const requestUrl = new URL(request.url);
+  const raw =
+    request.headers.get("x-365-migration-token") ??
+    requestUrl.searchParams.get("migration_token");
   if (!raw) return false;
   const digest = hex(
     await crypto.subtle.digest("SHA-256", new TextEncoder().encode(raw.trim())),
