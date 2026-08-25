@@ -1,5 +1,15 @@
 # 365 Ecosystem Integration Registry
 
+## Infrastructure parent
+
+**Supabase organization:** `366 Industries AI Platform`  
+**Organization ID:** `lqoqcbpfwwwpyjfiveun`  
+**Policy:** Main commercial 366 Industries products may share this Supabase organization for centralized ownership, billing, access administration, and cost management, but each independently saleable business must use its own Supabase project/database unless an explicit architecture review approves otherwise.
+
+Sharing the Supabase organization does **not** mean sharing application databases. Each serious business retains independent database, Auth, Storage, Edge Functions, secrets, API keys, migrations, and deployment configuration so it can be sold, transferred, paused, or operated independently.
+
+SWGOH Command Center remains outside the 366 Industries business ecosystem and must not be merged into these databases.
+
 ## Rule
 
 365 Motor Sales is a standalone service. All connections to Barangay Buddy, Drone Network, Shop Manager, payment providers, mapping providers, parts partners, and future products must be registered here or in a linked service-specific integration document.
@@ -11,7 +21,7 @@ No integration may depend on direct access to another independently saleable pro
 **Owner:** 365 Motor Sales  
 **Role:** System of record for 365 Motor Sales automotive marketplace and automotive business data.  
 **Production API target:** `https://api.365motorsales.com/v1` (planned; do not assume live until deployed).  
-**Current backend migration target:** Standalone managed Supabase project owned by the operator.
+**Current backend migration target:** Dedicated managed Supabase project inside `366 Industries AI Platform`.
 
 ### Provides
 
@@ -69,6 +79,12 @@ Other products consume Drone Network capabilities through a versioned API. Direc
 **Role:** Own work orders, technicians, customers, shop inventory, inspections, estimates, invoices, and repair-operation records created inside that product.
 
 365 Motor Sales can provide automotive directory/listing/referral information through API integration. Shop Manager can expose controlled service availability or public business information back through its own API.
+
+## Cost and lifecycle policy
+
+Not every experiment needs a dedicated always-on production database. Dedicated projects are prioritized for active, serious, independently saleable products. Early concepts may remain GitHub-only, local, archived, or paused until active development justifies compute cost.
+
+Cost optimization must not create direct database coupling between independently saleable businesses. If the cost of separate production projects becomes material, prefer pausing inactive projects, archival, API caching, or infrastructure plan changes rather than merging ownership boundaries.
 
 ## Integration implementation pattern
 
