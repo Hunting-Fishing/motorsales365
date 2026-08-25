@@ -245,6 +245,7 @@ import { Route as ClubsApplySuccessRouteImport } from './routes/clubs.apply.succ
 import { Route as BusinessesSlugBookRouteImport } from './routes/businesses.$slug.book'
 import { Route as ApiPublicReverseGeocodeRouteImport } from './routes/api/public/reverse-geocode'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
+import { Route as ApiPublicMigrationExportRouteImport } from './routes/api/public/migration-export'
 import { Route as ApiPublicIpLocationRouteImport } from './routes/api/public/ip-location'
 import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocode'
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
@@ -1585,6 +1586,12 @@ const ApiPublicPaymentEventsRoute = ApiPublicPaymentEventsRouteImport.update({
   path: '/api/public/payment-events',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMigrationExportRoute =
+  ApiPublicMigrationExportRouteImport.update({
+    id: '/api/public/migration-export',
+    path: '/api/public/migration-export',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicIpLocationRoute = ApiPublicIpLocationRouteImport.update({
   id: '/api/public/ip-location',
   path: '/api/public/ip-location',
@@ -2677,6 +2684,7 @@ export interface FileRoutesByFullPath {
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/ip-location': typeof ApiPublicIpLocationRoute
+  '/api/public/migration-export': typeof ApiPublicMigrationExportRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
@@ -3041,6 +3049,7 @@ export interface FileRoutesByTo {
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/ip-location': typeof ApiPublicIpLocationRoute
+  '/api/public/migration-export': typeof ApiPublicMigrationExportRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
@@ -3421,6 +3430,7 @@ export interface FileRoutesById {
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/ip-location': typeof ApiPublicIpLocationRoute
+  '/api/public/migration-export': typeof ApiPublicMigrationExportRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
@@ -3802,6 +3812,7 @@ export interface FileRouteTypes {
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/ip-location'
+    | '/api/public/migration-export'
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
@@ -4166,6 +4177,7 @@ export interface FileRouteTypes {
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/ip-location'
+    | '/api/public/migration-export'
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
@@ -4545,6 +4557,7 @@ export interface FileRouteTypes {
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/ip-location'
+    | '/api/public/migration-export'
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
@@ -4761,6 +4774,7 @@ export interface RootRouteChildren {
   ApiPublicGeoSearchRoute: typeof ApiPublicGeoSearchRoute
   ApiPublicGeocodeRoute: typeof ApiPublicGeocodeRoute
   ApiPublicIpLocationRoute: typeof ApiPublicIpLocationRoute
+  ApiPublicMigrationExportRoute: typeof ApiPublicMigrationExportRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   ApiPublicReverseGeocodeRoute: typeof ApiPublicReverseGeocodeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -6450,6 +6464,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/payment-events'
       fullPath: '/api/public/payment-events'
       preLoaderRoute: typeof ApiPublicPaymentEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/migration-export': {
+      id: '/api/public/migration-export'
+      path: '/api/public/migration-export'
+      fullPath: '/api/public/migration-export'
+      preLoaderRoute: typeof ApiPublicMigrationExportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/ip-location': {
@@ -8570,6 +8591,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicGeoSearchRoute: ApiPublicGeoSearchRoute,
   ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,
   ApiPublicIpLocationRoute: ApiPublicIpLocationRoute,
+  ApiPublicMigrationExportRoute: ApiPublicMigrationExportRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   ApiPublicReverseGeocodeRoute: ApiPublicReverseGeocodeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
