@@ -1,0 +1,128 @@
+name: Build Standalone Supabase Migration Chunks
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+
+permissions:
+  contents: write
+
+jobs:
+  build-migration-chunks:
+    if: ${{ !contains(github.event.head_commit.message, '[migration-chunks]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: migration/standalone-supabase-365
+          fetch-depth: 1
+
+      - name: Build ordered chunks and audit
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json, re, shutil
+
+          source = Path('supabase/migrations')
+          out = Path('supabase/standalone_migration_chunks')
+          if out.exists():
+              shutil.rmtree(out)
+          out.mkdir(parents=True)
+
+          files = sorted(source.glob('*.sql'), key=lambda p: p.name)
+          if not files:
+              raise SystemExit('No SQL migrations found')
+
+          # Keep chunks small enough to review/apply through the management API.
+          max_bytes = 220_000
+          chunks = []
+          current = []
+          current_bytes = 0
+
+          for path in files:
+              size = path.stat().st_size
+              if current and current_bytes + size > max_bytes:
+                  chunks.append(current)
+                  current = []
+                  current_bytes = 0
+              current.append(path)
+              current_bytes += size
+          if current:
+              chunks.append(current)
+
+          manifest = {
+              'source_directory': str(source),
+              'file_count': len(files),
+              'first_migration': files[0].name,
+              'last_migration': files[-1].name,
+              'chunks': []
+          }
+
+          danger = re.compile(
+              r'(?i)(DROP\s+(TABLE|SCHEMA|DATABASE)|TRUNCATE\b|DELETE\s+FROM|ALTER\s+DATABASE|'
+              r'jfjrnjyroxvlydajvndl|https?://[^\s\'\"]*\.supabase\.co|auth\.users|storage\.objects|'
+              r'CREATE\s+EXTENSION|SECURITY\s+DEFINER|\bpg_net\b|\bcron\b|\bvault\b)'
+          )
+          audit_hits = []
+
+          for idx, chunk_files in enumerate(chunks, start=1):
+              chunk_name = f'chunk_{idx:03d}.sql'
+              chunk_path = out / chunk_name
+              parts = []
+              byte_count = 0
+              for path in chunk_files:
+                  text = path.read_text(encoding='utf-8')
+                  byte_count += len(text.encode('utf-8'))
+                  parts.append(f'\n-- ============================================================================\n-- SOURCE MIGRATION: {path.name}\n-- ============================================================================\n{text.rstrip()}\n')
+                  for lineno, line in enumerate(text.splitlines(), start=1):
+                      if danger.search(line):
+                          audit_hits.append({
+                              'file': path.name,
+                              'line': lineno,
+                              'text': line.strip()[:500]
+                          })
+              chunk_path.write_text('\n'.join(parts), encoding='utf-8')
+              manifest['chunks'].append({
+                  'chunk': chunk_name,
+                  'files': [p.name for p in chunk_files],
+                  'source_bytes': byte_count,
+                  'first': chunk_files[0].name,
+                  'last': chunk_files[-1].name
+              })
+
+          (out / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
+          (out / 'audit.json').write_text(json.dumps({
+              'migration_file_count': len(files),
+              'chunk_count': len(chunks),
+              'hazard_match_count': len(audit_hits),
+              'hazard_matches': audit_hits
+          }, indent=2), encoding='utf-8')
+
+          summary = [
+              '# Standalone Supabase migration build',
+              f'- Migration files: {len(files)}',
+              f'- First: {files[0].name}',
+              f'- Last: {files[-1].name}',
+              f'- Chunks: {len(chunks)}',
+              f'- Hazard-pattern matches requiring review: {len(audit_hits)}',
+              '',
+              'Generated from the repository migration history only. No database connection was made.'
+          ]
+          (out / 'README.md').write_text('\n'.join(summary) + '\n', encoding='utf-8')
+          print('\n'.join(summary))
+          PY
+
+      - name: Commit generated migration package
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add supabase/standalone_migration_chunks
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git commit -m "chore: package standalone Supabase migrations [migration-chunks]"
+          git push
