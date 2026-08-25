@@ -1,0 +1,104 @@
+name: Export Lovable Source for Standalone Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Inventory only or full source export"
+        required: true
+        type: choice
+        default: inventory
+        options:
+          - inventory
+          - full-export
+      include_storage:
+        description: "Include Storage object bytes in full export"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  SOURCE_SUPABASE_URL: https://jfjrnjyroxvlydajvndl.supabase.co
+  SOURCE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY }}
+
+jobs:
+  export-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: migration/standalone-supabase-365
+          fetch-depth: 1
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Verify required secret is configured
+        shell: bash
+        run: |
+          if [ -z "$SOURCE_SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "Required GitHub Actions secret LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY is not configured."
+            exit 2
+          fi
+          echo "Source credential is configured. Value will not be printed."
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run read-only source inventory
+        env:
+          OUT_FILE: migration-output/source-inventory.json
+        run: node scripts/migration/inventory-lovable-source.mjs
+
+      - name: Run full read-only source export
+        if: ${{ inputs.mode == 'full-export' }}
+        env:
+          OUT_DIR: migration-output/source-export
+          EXPORT_STORAGE: ${{ inputs.include_storage }}
+        run: node scripts/migration/export-lovable-source.mjs
+
+      - name: Create checksums
+        shell: bash
+        run: |
+          find migration-output -type f -print0 | sort -z | xargs -0 sha256sum > migration-output/SHA256SUMS.txt
+
+      - name: Upload inventory artifact
+        if: ${{ inputs.mode == 'inventory' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: 365-lovable-source-inventory
+          path: |
+            migration-output/source-inventory.json
+            migration-output/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload full export artifact
+        if: ${{ inputs.mode == 'full-export' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: 365-lovable-source-export
+          path: migration-output/
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Migration safety summary
+        shell: bash
+        run: |
+          echo "### 365 Motor Sales source export" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source project: jfjrnjyroxvlydajvndl" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Mode: ${{ inputs.mode }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Storage bytes requested: ${{ inputs.include_storage }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source operations: read-only" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Service-role value: never printed or uploaded intentionally" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Production cutover: not performed" >> "$GITHUB_STEP_SUMMARY"
