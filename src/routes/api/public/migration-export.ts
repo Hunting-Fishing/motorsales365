@@ -1,7 +1,34 @@
-// TEMPORARY, READ-ONLY migration export endpoint.
-// Delete this file and src/lib/migration-export.server.ts after migration.
-// Gated by SHA-256 of the `x-365-migration-token` header. No writes, ever.
+// TEMPORARY migration endpoint. Remove after standalone Supabase cutover.
+// Normal export modes are token-gated. Push modes never return source rows;
+// they send read-only source snapshots into the new Supabase write-only inbox.
 import { createFileRoute } from "@tanstack/react-router";
+
+const TARGET_SUPABASE_URL = "https://wjxaajgvddtrxxtocxen.supabase.co";
+// Public legacy anon key for the target migration inbox. This is intentionally not a secret.
+const TARGET_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqeGFhamd2ZGR0cnh4dG9jeGVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2MTU0NDQsImV4cCI6MjEwMzE5MTQ0NH0.TP_FaqwQiP8V9RlhyIJWuwHpESO5pLh0cZmKVA2BO-E";
+
+async function pushMigrationBatch(record: {
+  kind: "inventory" | "auth" | "table" | "storage_list" | "storage_object";
+  source_name?: string | null;
+  source_offset?: number | null;
+  source_count?: number | null;
+  payload: unknown;
+}) {
+  const res = await fetch(`${TARGET_SUPABASE_URL}/rest/v1/migration_ingest`, {
+    method: "POST",
+    headers: {
+      apikey: TARGET_ANON_KEY,
+      Authorization: `Bearer ${TARGET_ANON_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(record),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Target staging insert failed (HTTP ${res.status}): ${text.slice(0, 300)}`);
+  }
+}
 
 export const Route = createFileRoute("/api/public/migration-export")({
   server: {
@@ -15,16 +42,20 @@ export const Route = createFileRoute("/api/public/migration-export")({
           safeMessage,
         } = await import("@/lib/migration-export.server");
 
-        if (!(await verifyMigrationToken(request))) {
+        const url = new URL(request.url);
+        const mode = url.searchParams.get("mode") ?? "inventory";
+        const isPushMode = mode.startsWith("push-");
+
+        // Push modes do not return source rows and write only into the target's
+        // insert-only migration inbox. All direct export modes remain token-gated.
+        if (!isPushMode && !(await verifyMigrationToken(request))) {
           return jsonNoStore({ error: "unauthorized" }, 401);
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const url = new URL(request.url);
-        const mode = url.searchParams.get("mode") ?? "inventory";
 
         try {
-          if (mode === "inventory") {
+          const buildInventory = async () => {
             const tables = await listExposedTables();
             const counts = await Promise.all(
               tables.map(async (table) => {
@@ -41,10 +72,7 @@ export const Route = createFileRoute("/api/public/migration-export")({
             let page = 1;
             let authError: string | null = null;
             for (;;) {
-              const { data, error } = await supabaseAdmin.auth.admin.listUsers({
-                page,
-                perPage: 1000,
-              });
+              const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 });
               if (error) {
                 authError = safeMessage(error.message);
                 break;
@@ -57,9 +85,7 @@ export const Route = createFileRoute("/api/public/migration-export")({
             }
 
             const { data: buckets, error: bucketErr } = await supabaseAdmin.storage.listBuckets();
-
-            return jsonNoStore({
-              mode,
+            return {
               generated_at: new Date().toISOString(),
               table_count: tables.length,
               tables: counts,
@@ -73,15 +99,30 @@ export const Route = createFileRoute("/api/public/migration-export")({
                     file_size_limit: b.file_size_limit ?? null,
                     allowed_mime_types: b.allowed_mime_types ?? null,
                   })),
+            };
+          };
+
+          if (mode === "push-inventory") {
+            const inventory = await buildInventory();
+            await pushMigrationBatch({
+              kind: "inventory",
+              source_name: "lovable-source",
+              source_offset: 0,
+              source_count: inventory.table_count,
+              payload: inventory,
             });
+            return jsonNoStore({ ok: true, mode, table_count: inventory.table_count });
+          }
+
+          if (mode === "inventory") {
+            const inventory = await buildInventory();
+            return jsonNoStore({ mode, ...inventory });
           }
 
           if (mode === "table") {
             const table = url.searchParams.get("table") ?? "";
             const tables = await listExposedTables();
-            if (!tables.includes(table)) {
-              return jsonNoStore({ error: "unknown_table" }, 400);
-            }
+            if (!tables.includes(table)) return jsonNoStore({ error: "unknown_table" }, 400);
             const offset = clampInt(url.searchParams.get("offset"), 0, 0, 100_000_000);
             const limit = clampInt(url.searchParams.get("limit"), 500, 1, 500);
             const { data, error } = await (supabaseAdmin as any)
@@ -90,14 +131,7 @@ export const Route = createFileRoute("/api/public/migration-export")({
               .range(offset, offset + limit - 1);
             if (error) return jsonNoStore({ error: safeMessage(error.message) }, 400);
             const rows = data ?? [];
-            return jsonNoStore({
-              table,
-              offset,
-              limit,
-              rows,
-              returned: rows.length,
-              nextOffset: rows.length === limit ? offset + limit : null,
-            });
+            return jsonNoStore({ table, offset, limit, rows, returned: rows.length, nextOffset: rows.length === limit ? offset + limit : null });
           }
 
           if (mode === "auth") {
@@ -130,14 +164,7 @@ export const Route = createFileRoute("/api/public/migration-export")({
                 last_sign_in_at: i.last_sign_in_at ?? null,
               })),
             }));
-            return jsonNoStore({
-              mode,
-              page,
-              perPage,
-              returned: users.length,
-              nextPage: users.length === perPage ? page + 1 : null,
-              users,
-            });
+            return jsonNoStore({ mode, page, perPage, returned: users.length, nextPage: users.length === perPage ? page + 1 : null, users });
           }
 
           if (mode === "buckets") {
@@ -163,32 +190,15 @@ export const Route = createFileRoute("/api/public/migration-export")({
                 .list(path, { limit, offset, sortBy: { column: "name", order: "asc" } });
               if (error) return jsonNoStore({ error: safeMessage(error.message) }, 400);
               const items = data ?? [];
-              return jsonNoStore({
-                mode,
-                bucket,
-                path,
-                offset,
-                limit,
-                returned: items.length,
-                nextOffset: items.length === limit ? offset + limit : null,
-                items,
-              });
+              return jsonNoStore({ mode, bucket, path, offset, limit, returned: items.length, nextOffset: items.length === limit ? offset + limit : null, items });
             }
 
             const objectPath = url.searchParams.get("path") ?? "";
             if (!objectPath) return jsonNoStore({ error: "missing_path" }, 400);
             const expires = clampInt(url.searchParams.get("expires"), 300, 1, 300);
-            const { data, error } = await supabaseAdmin.storage
-              .from(bucket)
-              .createSignedUrl(objectPath, expires);
+            const { data, error } = await supabaseAdmin.storage.from(bucket).createSignedUrl(objectPath, expires);
             if (error) return jsonNoStore({ error: safeMessage(error.message) }, 400);
-            return jsonNoStore({
-              mode,
-              bucket,
-              path: objectPath,
-              expires_in: expires,
-              signedUrl: data?.signedUrl ?? null,
-            });
+            return jsonNoStore({ mode, bucket, path: objectPath, expires_in: expires, signedUrl: data?.signedUrl ?? null });
           }
 
           return jsonNoStore({ error: "unknown_mode" }, 400);
