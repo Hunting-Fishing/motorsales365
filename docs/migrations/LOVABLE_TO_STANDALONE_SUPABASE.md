@@ -4,13 +4,17 @@
 
 Move 365 Motor Sales from the Lovable Cloud Supabase project to a standalone Supabase project controlled by the operator, without changing production traffic until validation is complete.
 
-Current Lovable Cloud project reference at migration start:
+Source Lovable Cloud project reference:
 
 ```text
 jfjrnjyroxvlydajvndl
 ```
 
-The target standalone project reference must be inserted only after the target project is created.
+Target standalone Supabase project reference:
+
+```text
+wjxaajgvddtrxxtocxen
+```
 
 ## Safety rules
 
@@ -19,6 +23,31 @@ The target standalone project reference must be inserted only after the target p
 - Never commit service-role keys, database passwords, OAuth secrets, payment secrets, webhook secrets, or private API credentials.
 - Treat production writes during the migration window as a cutover concern; define a final synchronization/freeze strategy before switching endpoints.
 - Preserve a rollback path until post-cutover validation is complete.
+- Keep target cron jobs disabled during copy/validation so migrated jobs do not execute against incomplete data or external services.
+
+## Verified checkpoint — 2026-08-25
+
+Schema replay is complete on the standalone target.
+
+- 388 / 388 repository migrations successfully applied.
+- 0 unresolved migration failures.
+- 260 public base tables.
+- 269 public functions.
+- 703 public RLS policies.
+- 12 storage buckets recreated by schema migrations.
+- 0 active cron jobs during migration.
+- All public base tables have RLS enabled.
+- 0 unvalidated public foreign-key constraints.
+- Target production-user data has not been copied yet.
+- Target Auth currently contains 0 users.
+- Target Storage currently contains 0 objects.
+- Lovable production remains the active source of truth and has not been cut over.
+
+Historical migration failures were repaired and then successfully replayed. Repairs were limited to source-schema prerequisites that existed in Lovable but were missing from the checked-in migration history, including organization infrastructure, organization references, shop category hierarchy, and required business-type reference rows.
+
+### Security-advisor checkpoint
+
+Supabase's advisor reports inherited security findings from the source schema, including SECURITY DEFINER views/RPC grants and RLS-enabled `shop_manager` tables with no explicit policies. These are not treated as migration failures because schema parity is the immediate objective. Do not blindly harden these before application compatibility testing; review them in a dedicated post-copy hardening pass and convert/revoke only after confirming required application behavior.
 
 ## Migration phases
 
@@ -54,11 +83,22 @@ After application:
 - Verify triggers and database functions.
 - Verify grants for `anon`, `authenticated`, and service roles.
 
+**Status: complete.**
+
 ### Phase 4 — Copy data
 
 Copy application data with primary keys and timestamps preserved where required.
 
 Validate per-table row counts and high-value aggregates. Record exceptions rather than silently dropping rows.
+
+Preferred source-access order:
+
+1. Direct database export/dump if Lovable exposes a database connection credential.
+2. Source `SUPABASE_SERVICE_ROLE_KEY` through a controlled, temporary server-side exporter if direct DB access is unavailable.
+3. Supabase Admin API/PostgREST + Storage API export where schema/API exposure permits it.
+4. Manual CSV only as a last resort for isolated tables, not as the default migration method.
+
+Do not commit the source service-role key. The existing server application expects Lovable Cloud to inject `SUPABASE_SERVICE_ROLE_KEY` at runtime.
 
 ### Phase 5 — Auth
 
@@ -111,7 +151,19 @@ Minimum acceptance checks:
 - Billing/payment flows in test mode where applicable.
 - RLS negative tests proving one user/business cannot read or modify another user's private records.
 
-### Phase 10 — Cutover
+### Phase 10 — Security hardening
+
+After data copy and compatibility validation, review inherited Supabase advisor findings. Prioritize:
+
+1. SECURITY DEFINER views exposed through the public schema.
+2. SECURITY DEFINER functions executable by `anon` when not intentionally public.
+3. SECURITY DEFINER functions executable by all authenticated users when intended only for admin/service contexts.
+4. `shop_manager` RLS-enabled tables without policies: confirm whether they are intentionally service-role-only or require tenant policies.
+5. Extension placement warnings such as `pg_trgm` in `public`.
+
+Each change must be application-tested and committed as a new standalone migration rather than silently mutating historical migrations.
+
+### Phase 11 — Cutover
 
 Define a final synchronization window for records written after the initial data copy.
 
@@ -124,7 +176,7 @@ Then:
 5. Monitor Auth, API, database, storage, and payment errors.
 6. Keep Lovable Cloud intact as rollback until the agreed observation period passes.
 
-### Phase 11 — Lovable retirement
+### Phase 12 — Lovable retirement
 
 Only after successful validation:
 
@@ -145,13 +197,17 @@ Only after successful validation:
 - [x] Create isolated migration branch.
 - [x] Define data-ownership boundaries.
 - [x] Define ecosystem integration registry.
-- [ ] Create standalone 365 Motor Sales Supabase project.
-- [ ] Apply schema migrations.
+- [x] Create standalone 365 Motor Sales Supabase project.
+- [x] Apply all 388 schema migrations.
+- [x] Validate migration replay / unresolved-failure count.
+- [x] Validate public-table RLS enablement and FK validation state.
+- [ ] Obtain controlled source data-export credential/path.
 - [ ] Inventory/copy production data.
 - [ ] Migrate/reconfigure Auth.
-- [ ] Migrate Storage.
+- [ ] Migrate Storage objects.
 - [ ] Recreate backend functions/secrets.
 - [ ] Update project configuration.
 - [ ] Validate end-to-end flows.
+- [ ] Review inherited security-advisor findings.
 - [ ] Cut over production.
 - [ ] Retire Lovable dependency.
