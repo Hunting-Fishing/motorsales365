@@ -1,6 +1,11 @@
 name: Export Lovable Source for Standalone Migration
 
 on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - .github/workflows/export-lovable-source.yml
   workflow_dispatch:
     inputs:
       mode:
@@ -23,6 +28,8 @@ permissions:
 env:
   SOURCE_SUPABASE_URL: https://jfjrnjyroxvlydajvndl.supabase.co
   SOURCE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY }}
+  EXPORT_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'inventory' }}
+  EXPORT_STORAGE_BYTES: ${{ github.event_name == 'workflow_dispatch' && inputs.include_storage || false }}
 
 jobs:
   export-source:
@@ -61,10 +68,10 @@ jobs:
         run: node scripts/migration/inventory-lovable-source.mjs
 
       - name: Run full read-only source export
-        if: ${{ inputs.mode == 'full-export' }}
+        if: ${{ env.EXPORT_MODE == 'full-export' }}
         env:
           OUT_DIR: migration-output/source-export
-          EXPORT_STORAGE: ${{ inputs.include_storage }}
+          EXPORT_STORAGE: ${{ env.EXPORT_STORAGE_BYTES }}
         run: node scripts/migration/export-lovable-source.mjs
 
       - name: Create checksums
@@ -73,7 +80,7 @@ jobs:
           find migration-output -type f -print0 | sort -z | xargs -0 sha256sum > migration-output/SHA256SUMS.txt
 
       - name: Upload inventory artifact
-        if: ${{ inputs.mode == 'inventory' }}
+        if: ${{ env.EXPORT_MODE == 'inventory' }}
         uses: actions/upload-artifact@v4
         with:
           name: 365-lovable-source-inventory
@@ -84,7 +91,7 @@ jobs:
           retention-days: 7
 
       - name: Upload full export artifact
-        if: ${{ inputs.mode == 'full-export' }}
+        if: ${{ env.EXPORT_MODE == 'full-export' }}
         uses: actions/upload-artifact@v4
         with:
           name: 365-lovable-source-export
@@ -97,8 +104,8 @@ jobs:
         run: |
           echo "### 365 Motor Sales source export" >> "$GITHUB_STEP_SUMMARY"
           echo "- Source project: jfjrnjyroxvlydajvndl" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Mode: ${{ inputs.mode }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Storage bytes requested: ${{ inputs.include_storage }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Mode: $EXPORT_MODE" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Storage bytes requested: $EXPORT_STORAGE_BYTES" >> "$GITHUB_STEP_SUMMARY"
           echo "- Source operations: read-only" >> "$GITHUB_STEP_SUMMARY"
           echo "- Service-role value: never printed or uploaded intentionally" >> "$GITHUB_STEP_SUMMARY"
           echo "- Production cutover: not performed" >> "$GITHUB_STEP_SUMMARY"
