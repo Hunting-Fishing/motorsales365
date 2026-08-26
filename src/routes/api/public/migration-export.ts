@@ -16,14 +16,13 @@ async function pushMigrationBatch(record: {
   source_count?: number | null;
   payload: unknown;
 }) {
-  const qs = new URLSearchParams({ on_conflict: "kind,source_name,source_offset" });
-  const res = await fetch(`${TARGET_SUPABASE_URL}/rest/v1/migration_ingest?${qs}`, {
+  const res = await fetch(`${TARGET_SUPABASE_URL}/rest/v1/migration_ingest`, {
     method: "POST",
     headers: {
       apikey: TARGET_ANON_KEY,
       Authorization: `Bearer ${TARGET_ANON_KEY}`,
       "Content-Type": "application/json",
-      Prefer: "resolution=ignore-duplicates,return=minimal",
+      Prefer: "return=minimal",
     },
     body: JSON.stringify(record),
   });
