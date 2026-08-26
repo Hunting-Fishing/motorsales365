@@ -13,9 +13,7 @@ const BUILD_ID = `${new Date().toISOString().slice(0, 19).replace(/[-:T]/g, "")}
 export default defineConfig({
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),
-    tanstackStart({
-      server: { entry: "./src/server.ts" },
-    }),
+    tanstackStart(),
     react(),
     tailwindcss(),
     tsconfigPaths(),
