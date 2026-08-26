@@ -1,13 +1,13 @@
 // Worker entry wrapper. Catches catastrophic SSR errors and — critically —
 // detects stale/missing server-action IDs so the client gets a friendly JSON
-// error instead of a crashed dev server. Each occurrence is logged to
-// `ops_alerts` so admins can review them in the Errors / Alerts tab.
+// error instead of a crashed Worker. Each occurrence is logged to `ops_alerts`
+// so admins can review it in the Errors / Alerts tab.
 import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
 type ServerEntry = {
-  fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
+  fetch: (request: Request) => Promise<Response> | Response;
 };
 
 let serverEntryPromise: Promise<ServerEntry> | undefined;
@@ -74,10 +74,7 @@ async function logToOpsAlerts(payload: {
   }
 }
 
-async function handleMissingAction(
-  request: Request,
-  error: unknown,
-): Promise<Response> {
+async function handleMissingAction(request: Request, error: unknown): Promise<Response> {
   const fnId = extractServerFnId(request);
   const url = request.url;
   console.error("[ssr-wrapper] missing server action handler", {
@@ -100,8 +97,7 @@ async function handleMissingAction(
   return new Response(
     JSON.stringify({
       error: "stale_client",
-      message:
-        "This page is out of date. Please refresh to load the latest version.",
+      message: "This page is out of date. Please refresh to load the latest version.",
       fnId,
     }),
     {
@@ -114,10 +110,7 @@ async function handleMissingAction(
   );
 }
 
-async function normalizeCatastrophicSsrResponse(
-  request: Request,
-  response: Response,
-): Promise<Response> {
+async function normalizeCatastrophicSsrResponse(request: Request, response: Response): Promise<Response> {
   if (response.status < 500) return response;
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) return response;
@@ -132,7 +125,7 @@ async function normalizeCatastrophicSsrResponse(
     return handleMissingAction(request, captured);
   }
 
-  console.error(captured ?? new Error(`h3 swallowed SSR error: ${body}`));
+  console.error(captured ?? new Error(`TanStack Start swallowed SSR error: ${body}`));
   await logToOpsAlerts({
     event: "ssr_swallowed_error",
     severity: "error",
@@ -153,10 +146,13 @@ async function normalizeCatastrophicSsrResponse(
 }
 
 export default {
-  async fetch(request: Request, env: unknown, ctx: unknown) {
+  // Cloudflare supplies env/context to this Worker wrapper. Application code that
+  // still reads process.env receives configured Worker variables/secrets through
+  // Cloudflare's Node compatibility layer. TanStack Start itself receives the request.
+  async fetch(request: Request, _env: unknown, _ctx: unknown) {
     try {
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
+      const response = await handler.fetch(request);
       return await normalizeCatastrophicSsrResponse(request, response);
     } catch (error) {
       if (isMissingActionError(error) && isServerFnRequest(request)) {
