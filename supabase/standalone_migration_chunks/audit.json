@@ -1,0 +1,3877 @@
+{
+  "migration_file_count": 388,
+  "chunk_count": 7,
+  "hazard_match_count": 774,
+  "hazard_matches": [
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 17,
+      "text": "id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 39,
+      "text": "user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 49,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 81,
+      "text": "user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 128,
+      "text": "user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 140,
+      "text": "sender_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 141,
+      "text": "recipient_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 155,
+      "text": "reporter_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 205,
+      "text": "user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 217,
+      "text": "user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 258,
+      "text": "RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 267,
+      "text": "AFTER INSERT ON auth.users"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 366,
+      "text": "-- Storage policies (use storage.objects)"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 367,
+      "text": "CREATE POLICY \"Public read listing photos\" ON storage.objects FOR SELECT USING (bucket_id = 'listing-photos');"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 368,
+      "text": "CREATE POLICY \"Public read listing videos\" ON storage.objects FOR SELECT USING (bucket_id = 'listing-videos');"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 369,
+      "text": "CREATE POLICY \"Public read avatars\" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 370,
+      "text": "CREATE POLICY \"Public read logos\" ON storage.objects FOR SELECT USING (bucket_id = 'business-logos');"
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 372,
+      "text": "CREATE POLICY \"Auth upload listing photos\" ON storage.objects FOR INSERT WITH CHECK ("
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 375,
+      "text": "CREATE POLICY \"Auth update own listing photos\" ON storage.objects FOR UPDATE USING ("
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 378,
+      "text": "CREATE POLICY \"Auth delete own listing photos\" ON storage.objects FOR DELETE USING ("
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 382,
+      "text": "CREATE POLICY \"Auth upload listing videos\" ON storage.objects FOR INSERT WITH CHECK ("
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 385,
+      "text": "CREATE POLICY \"Auth update own listing videos\" ON storage.objects FOR UPDATE USING ("
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 388,
+      "text": "CREATE POLICY \"Auth delete own listing videos\" ON storage.objects FOR DELETE USING ("
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 392,
+      "text": "CREATE POLICY \"Auth upload own avatar\" ON storage.objects FOR INSERT WITH CHECK ("
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 395,
+      "text": "CREATE POLICY \"Auth update own avatar\" ON storage.objects FOR UPDATE USING ("
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 399,
+      "text": "CREATE POLICY \"Auth upload own logo\" ON storage.objects FOR INSERT WITH CHECK ("
+    },
+    {
+      "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "line": 402,
+      "text": "CREATE POLICY \"Auth update own logo\" ON storage.objects FOR UPDATE USING ("
+    },
+    {
+      "file": "20260501224438_ca85ed23-9689-4604-8f3c-b709823c9510.sql",
+      "line": 7,
+      "text": "-- Lock down EXECUTE on SECURITY DEFINER functions"
+    },
+    {
+      "file": "20260501224438_ca85ed23-9689-4604-8f3c-b709823c9510.sql",
+      "line": 15,
+      "text": "-- on storage.objects to either anon-via-public-URL fetches (which don't go through this policy)"
+    },
+    {
+      "file": "20260501224438_ca85ed23-9689-4604-8f3c-b709823c9510.sql",
+      "line": 17,
+      "text": "DROP POLICY IF EXISTS \"Public read listing photos\" ON storage.objects;"
+    },
+    {
+      "file": "20260501224438_ca85ed23-9689-4604-8f3c-b709823c9510.sql",
+      "line": 18,
+      "text": "DROP POLICY IF EXISTS \"Public read listing videos\" ON storage.objects;"
+    },
+    {
+      "file": "20260501224438_ca85ed23-9689-4604-8f3c-b709823c9510.sql",
+      "line": 19,
+      "text": "DROP POLICY IF EXISTS \"Public read avatars\" ON storage.objects;"
+    },
+    {
+      "file": "20260501224438_ca85ed23-9689-4604-8f3c-b709823c9510.sql",
+      "line": 20,
+      "text": "DROP POLICY IF EXISTS \"Public read logos\" ON storage.objects;"
+    },
+    {
+      "file": "20260501224438_ca85ed23-9689-4604-8f3c-b709823c9510.sql",
+      "line": 24,
+      "text": "CREATE POLICY \"Owners list listing photos\" ON storage.objects FOR SELECT USING ("
+    },
+    {
+      "file": "20260501224438_ca85ed23-9689-4604-8f3c-b709823c9510.sql",
+      "line": 27,
+      "text": "CREATE POLICY \"Owners list listing videos\" ON storage.objects FOR SELECT USING ("
+    },
+    {
+      "file": "20260501224438_ca85ed23-9689-4604-8f3c-b709823c9510.sql",
+      "line": 30,
+      "text": "CREATE POLICY \"Owners list avatars\" ON storage.objects FOR SELECT USING ("
+    },
+    {
+      "file": "20260501224438_ca85ed23-9689-4604-8f3c-b709823c9510.sql",
+      "line": 33,
+      "text": "CREATE POLICY \"Owners list business logos\" ON storage.objects FOR SELECT USING ("
+    },
+    {
+      "file": "20260502024123_33ed76c1-367a-4457-9e86-d2934f2bcdf6.sql",
+      "line": 62,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260502024123_33ed76c1-367a-4457-9e86-d2934f2bcdf6.sql",
+      "line": 95,
+      "text": "ON storage.objects FOR INSERT"
+    },
+    {
+      "file": "20260502024123_33ed76c1-367a-4457-9e86-d2934f2bcdf6.sql",
+      "line": 102,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260502024123_33ed76c1-367a-4457-9e86-d2934f2bcdf6.sql",
+      "line": 109,
+      "text": "ON storage.objects FOR DELETE"
+    },
+    {
+      "file": "20260502024123_33ed76c1-367a-4457-9e86-d2934f2bcdf6.sql",
+      "line": 116,
+      "text": "ON storage.objects FOR ALL"
+    },
+    {
+      "file": "20260502031101_a769b2a0-ddbb-4232-ba1f-7aa472edcc16.sql",
+      "line": 11,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260503001732_93b27f60-91cb-488a-9181-9514e987ea97.sql",
+      "line": 44,
+      "text": "STABLE SECURITY DEFINER"
+    },
+    {
+      "file": "20260503003237_3682dcfb-dd9d-4fde-9173-a4e8b22c9182.sql",
+      "line": 6,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260503004302_d77ec04f-172f-4cf6-abf7-612fb83d6d93.sql",
+      "line": 66,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260503011334_7446ee59-2782-4eed-b1fc-e99720bf3bec.sql",
+      "line": 13,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260503011334_7446ee59-2782-4eed-b1fc-e99720bf3bec.sql",
+      "line": 76,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260510005334_4ee23b71-094a-4057-bd91-67be0767c459.sql",
+      "line": 10,
+      "text": "user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 6,
+      "text": "CREATE EXTENSION IF NOT EXISTS pg_net SCHEMA extensions;"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 9,
+      "text": "CREATE EXTENSION pg_cron;"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 12,
+      "text": "CREATE EXTENSION IF NOT EXISTS supabase_vault;"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 13,
+      "text": "CREATE EXTENSION IF NOT EXISTS pgmq;"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 133,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 145,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 157,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 170,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 193,
+      "text": "-- Restrict queue RPC wrappers to service_role only (SECURITY DEFINER runs as owner,"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 279,
+      "text": "-- 1. VAULT SECRET"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 281,
+      "text": "--    vault as 'email_queue_service_role_key'."
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 282,
+      "text": "--    Uses vault.create_secret / vault.update_secret (upsert)."
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 283,
+      "text": "--    To revert: DELETE FROM vault.secrets WHERE name = 'email_queue_service_role_key';"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 285,
+      "text": "-- 2. CRON JOB (pg_cron)"
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 291,
+      "text": "--    via net.http_post using the vault-stored service_role key."
+    },
+    {
+      "file": "20260510014232_email_infra.sql",
+      "line": 292,
+      "text": "--    To revert: SELECT cron.unschedule('process-email-queue');"
+    },
+    {
+      "file": "20260510033922_5e16a679-3788-4cdd-bc80-225ffefc0c38.sql",
+      "line": 20,
+      "text": "LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public"
+    },
+    {
+      "file": "20260510033922_5e16a679-3788-4cdd-bc80-225ffefc0c38.sql",
+      "line": 36,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public"
+    },
+    {
+      "file": "20260511111920_33ce198e-af1c-4b5a-8d89-065a9c398a7d.sql",
+      "line": 43,
+      "text": "-- Increment function (security definer so anon can call)"
+    },
+    {
+      "file": "20260511111920_33ce198e-af1c-4b5a-8d89-065a9c398a7d.sql",
+      "line": 47,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260511140558_454c66c4-559a-4ae6-8a0b-2474942813d1.sql",
+      "line": 49,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260511140558_454c66c4-559a-4ae6-8a0b-2474942813d1.sql",
+      "line": 73,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512022424_db17ca36-985d-4405-8d4a-6f8fe8e8b124.sql",
+      "line": 7,
+      "text": "-- 2) Revoke public EXECUTE on trigger-only / service-only SECURITY DEFINER functions."
+    },
+    {
+      "file": "20260512022424_db17ca36-985d-4405-8d4a-6f8fe8e8b124.sql",
+      "line": 8,
+      "text": "--    These are invoked by triggers, cron, or service_role only \u2014 never by app users."
+    },
+    {
+      "file": "20260512023916_08c3429a-e992-4bc3-ae1c-118ace98df45.sql",
+      "line": 10,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260512023916_08c3429a-e992-4bc3-ae1c-118ace98df45.sql",
+      "line": 18,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260512023916_08c3429a-e992-4bc3-ae1c-118ace98df45.sql",
+      "line": 26,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260512023916_08c3429a-e992-4bc3-ae1c-118ace98df45.sql",
+      "line": 34,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260512023916_08c3429a-e992-4bc3-ae1c-118ace98df45.sql",
+      "line": 42,
+      "text": "RETURNS text LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260512023916_08c3429a-e992-4bc3-ae1c-118ace98df45.sql",
+      "line": 55,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260512025805_b3d154de-ab7f-47ca-a554-005070df0844.sql",
+      "line": 45,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512025805_b3d154de-ab7f-47ca-a554-005070df0844.sql",
+      "line": 79,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512025805_b3d154de-ab7f-47ca-a554-005070df0844.sql",
+      "line": 121,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512030721_58a27109-fdba-49db-b9cb-234df9070e9c.sql",
+      "line": 22,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512034115_20d8dec1-5c0e-44b9-b23b-bf899ef89f48.sql",
+      "line": 10,
+      "text": "staff_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260512034115_20d8dec1-5c0e-44b9-b23b-bf899ef89f48.sql",
+      "line": 86,
+      "text": "user_id uuid NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260512034115_20d8dec1-5c0e-44b9-b23b-bf899ef89f48.sql",
+      "line": 155,
+      "text": "-- record_qr_scan RPC (public, SECURITY DEFINER)"
+    },
+    {
+      "file": "20260512034115_20d8dec1-5c0e-44b9-b23b-bf899ef89f48.sql",
+      "line": 165,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512034115_20d8dec1-5c0e-44b9-b23b-bf899ef89f48.sql",
+      "line": 213,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512034115_20d8dec1-5c0e-44b9-b23b-bf899ef89f48.sql",
+      "line": 221,
+      "text": "SELECT raw_user_meta_data INTO meta FROM auth.users WHERE id = NEW.id;"
+    },
+    {
+      "file": "20260512034115_20d8dec1-5c0e-44b9-b23b-bf899ef89f48.sql",
+      "line": 243,
+      "text": "CREATE POLICY \"QR codes public read\" ON storage.objects"
+    },
+    {
+      "file": "20260512034115_20d8dec1-5c0e-44b9-b23b-bf899ef89f48.sql",
+      "line": 245,
+      "text": "CREATE POLICY \"Admins upload QR codes\" ON storage.objects"
+    },
+    {
+      "file": "20260512034115_20d8dec1-5c0e-44b9-b23b-bf899ef89f48.sql",
+      "line": 247,
+      "text": "CREATE POLICY \"Admins update QR codes\" ON storage.objects"
+    },
+    {
+      "file": "20260512034115_20d8dec1-5c0e-44b9-b23b-bf899ef89f48.sql",
+      "line": 249,
+      "text": "CREATE POLICY \"Admins delete QR codes\" ON storage.objects"
+    },
+    {
+      "file": "20260512035032_ca4ac263-acec-4578-ac25-6fef9210a8fe.sql",
+      "line": 2,
+      "text": "DELETE FROM public.qr_scans a"
+    },
+    {
+      "file": "20260512035032_ca4ac263-acec-4578-ac25-6fef9210a8fe.sql",
+      "line": 26,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512041821_2d0a7a68-1cf7-4345-a03c-5ba714443c7c.sql",
+      "line": 3,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260512041821_2d0a7a68-1cf7-4345-a03c-5ba714443c7c.sql",
+      "line": 7,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260512041821_2d0a7a68-1cf7-4345-a03c-5ba714443c7c.sql",
+      "line": 12,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260512044820_214707b8-961e-4280-ac70-df449d5fc43f.sql",
+      "line": 65,
+      "text": "LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260512044820_214707b8-961e-4280-ac70-df449d5fc43f.sql",
+      "line": 105,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260512044820_214707b8-961e-4280-ac70-df449d5fc43f.sql",
+      "line": 148,
+      "text": "LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260512050915_de9fd8bd-5aec-4ebc-95ed-e4d4fe125d16.sql",
+      "line": 43,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512050915_de9fd8bd-5aec-4ebc-95ed-e4d4fe125d16.sql",
+      "line": 50,
+      "text": "-- Only service role can call this (RLS bypass intentional for cron-driven refresh)"
+    },
+    {
+      "file": "20260512054457_90aac1ba-c3f0-48ff-a9b4-06739ddd2108.sql",
+      "line": 160,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260512071955_7309943a-34a5-4e6d-a9ee-315cb2cdb12b.sql",
+      "line": 6,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512071955_7309943a-34a5-4e6d-a9ee-315cb2cdb12b.sql",
+      "line": 33,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512071955_7309943a-34a5-4e6d-a9ee-315cb2cdb12b.sql",
+      "line": 54,
+      "text": "SELECT au.email INTO uemail FROM auth.users au WHERE au.id = r.user_id;"
+    },
+    {
+      "file": "20260512071955_7309943a-34a5-4e6d-a9ee-315cb2cdb12b.sql",
+      "line": 73,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512071955_7309943a-34a5-4e6d-a9ee-315cb2cdb12b.sql",
+      "line": 84,
+      "text": "SELECT email INTO uemail FROM auth.users WHERE id = NEW.user_id;"
+    },
+    {
+      "file": "20260512071955_7309943a-34a5-4e6d-a9ee-315cb2cdb12b.sql",
+      "line": 114,
+      "text": "SELECT email INTO uemail FROM auth.users WHERE id = r.user_id;"
+    },
+    {
+      "file": "20260512100854_68ca1079-f761-4859-9bb7-e42aaac54f01.sql",
+      "line": 28,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260512100854_68ca1079-f761-4859-9bb7-e42aaac54f01.sql",
+      "line": 54,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 10,
+      "text": "DROP POLICY IF EXISTS \"listing-photos public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 11,
+      "text": "DROP POLICY IF EXISTS \"listing-photos owner insert\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 12,
+      "text": "DROP POLICY IF EXISTS \"listing-photos owner update\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 13,
+      "text": "DROP POLICY IF EXISTS \"listing-photos owner delete\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 16,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 20,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 27,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 32,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 38,
+      "text": "DROP POLICY IF EXISTS \"listing-videos public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 39,
+      "text": "DROP POLICY IF EXISTS \"listing-videos owner insert\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 40,
+      "text": "DROP POLICY IF EXISTS \"listing-videos owner update\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 41,
+      "text": "DROP POLICY IF EXISTS \"listing-videos owner delete\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 44,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 48,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 55,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 60,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 66,
+      "text": "DROP POLICY IF EXISTS \"avatars public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 67,
+      "text": "DROP POLICY IF EXISTS \"avatars owner insert\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 68,
+      "text": "DROP POLICY IF EXISTS \"avatars owner update\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 69,
+      "text": "DROP POLICY IF EXISTS \"avatars owner delete\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 72,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 76,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 83,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 88,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 94,
+      "text": "DROP POLICY IF EXISTS \"business-logos public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 95,
+      "text": "DROP POLICY IF EXISTS \"business-logos owner insert\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 96,
+      "text": "DROP POLICY IF EXISTS \"business-logos owner update\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 97,
+      "text": "DROP POLICY IF EXISTS \"business-logos owner delete\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 100,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 104,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 111,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 116,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 123,
+      "text": "DROP POLICY IF EXISTS \"qr-codes public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 124,
+      "text": "DROP POLICY IF EXISTS \"qr-codes admin or owner insert\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 125,
+      "text": "DROP POLICY IF EXISTS \"qr-codes admin or owner update\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 126,
+      "text": "DROP POLICY IF EXISTS \"qr-codes admin or owner delete\" ON storage.objects;"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 129,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 133,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 143,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260518040611_63cdca37-d85e-43c5-b2c3-71c43d5fb476.sql",
+      "line": 160,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260518044545_abd1298a-af7d-446a-af5e-80dd161af929.sql",
+      "line": 7,
+      "text": "-- storage.objects only governs LIST and signed-URL flows."
+    },
+    {
+      "file": "20260518044545_abd1298a-af7d-446a-af5e-80dd161af929.sql",
+      "line": 8,
+      "text": "DROP POLICY IF EXISTS \"avatars public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260518044545_abd1298a-af7d-446a-af5e-80dd161af929.sql",
+      "line": 9,
+      "text": "DROP POLICY IF EXISTS \"business-logos public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260518044545_abd1298a-af7d-446a-af5e-80dd161af929.sql",
+      "line": 10,
+      "text": "DROP POLICY IF EXISTS \"listing-photos public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260518044545_abd1298a-af7d-446a-af5e-80dd161af929.sql",
+      "line": 11,
+      "text": "DROP POLICY IF EXISTS \"listing-videos public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260518044545_abd1298a-af7d-446a-af5e-80dd161af929.sql",
+      "line": 12,
+      "text": "DROP POLICY IF EXISTS \"qr-codes public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260518044545_abd1298a-af7d-446a-af5e-80dd161af929.sql",
+      "line": 15,
+      "text": "-- 2. SECURITY DEFINER: revoke from anon/public"
+    },
+    {
+      "file": "20260518044545_abd1298a-af7d-446a-af5e-80dd161af929.sql",
+      "line": 34,
+      "text": "-- Service-role-only (cron-driven currency refresh)."
+    },
+    {
+      "file": "20260518070132_6d00d33a-e6c7-497f-b015-486b9d604cc1.sql",
+      "line": 2,
+      "text": "DROP POLICY IF EXISTS \"QR codes public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260518070132_6d00d33a-e6c7-497f-b015-486b9d604cc1.sql",
+      "line": 17,
+      "text": "-- Server / cron-only"
+    },
+    {
+      "file": "20260518070132_6d00d33a-e6c7-497f-b015-486b9d604cc1.sql",
+      "line": 20,
+      "text": "-- Internal helpers (called by other SECURITY DEFINER fns)"
+    },
+    {
+      "file": "20260518070316_7f6c1e1d-f205-4f57-b602-f3a7266ec0c0.sql",
+      "line": 1,
+      "text": "CREATE EXTENSION IF NOT EXISTS pg_cron;"
+    },
+    {
+      "file": "20260518070316_7f6c1e1d-f205-4f57-b602-f3a7266ec0c0.sql",
+      "line": 2,
+      "text": "CREATE EXTENSION IF NOT EXISTS pg_net;"
+    },
+    {
+      "file": "20260518070316_7f6c1e1d-f205-4f57-b602-f3a7266ec0c0.sql",
+      "line": 6,
+      "text": "PERFORM cron.unschedule('expire-stale-pending-sales');"
+    },
+    {
+      "file": "20260518070316_7f6c1e1d-f205-4f57-b602-f3a7266ec0c0.sql",
+      "line": 9,
+      "text": "PERFORM cron.unschedule('refresh-fx-rates');"
+    },
+    {
+      "file": "20260518070316_7f6c1e1d-f205-4f57-b602-f3a7266ec0c0.sql",
+      "line": 13,
+      "text": "SELECT cron.schedule("
+    },
+    {
+      "file": "20260518070316_7f6c1e1d-f205-4f57-b602-f3a7266ec0c0.sql",
+      "line": 20,
+      "text": "SELECT cron.schedule("
+    },
+    {
+      "file": "20260518090328_5b38b226-8d4a-44e4-839e-1b58dbdf1ab6.sql",
+      "line": 9,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260518111709_2eec0c15-3766-4b5b-bc71-05ef0b45ec15.sql",
+      "line": 8,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260518122003_adc25d79-b45b-40e8-8e5f-fbe488772375.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260518130914_a13fc071-f3d6-4cd8-8b6a-1678b388f5e0.sql",
+      "line": 16,
+      "text": "DELETE FROM public.business_tags t"
+    },
+    {
+      "file": "20260519040516_c7384b0f-639e-4698-b5a3-6fe84e5827dd.sql",
+      "line": 9,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260521083454_95a0eb1c-2bfe-4887-b9ec-66aa7b587cb0.sql",
+      "line": 21,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260521093754_d4c431fc-bd43-4d2c-8a3e-2a77ee9369b6.sql",
+      "line": 101,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260521093754_d4c431fc-bd43-4d2c-8a3e-2a77ee9369b6.sql",
+      "line": 117,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260521093754_d4c431fc-bd43-4d2c-8a3e-2a77ee9369b6.sql",
+      "line": 190,
+      "text": "CREATE POLICY \"Ride media public read\" ON storage.objects"
+    },
+    {
+      "file": "20260521093754_d4c431fc-bd43-4d2c-8a3e-2a77ee9369b6.sql",
+      "line": 192,
+      "text": "CREATE POLICY \"Users upload own ride media\" ON storage.objects"
+    },
+    {
+      "file": "20260521093754_d4c431fc-bd43-4d2c-8a3e-2a77ee9369b6.sql",
+      "line": 194,
+      "text": "CREATE POLICY \"Users update own ride media\" ON storage.objects"
+    },
+    {
+      "file": "20260521093754_d4c431fc-bd43-4d2c-8a3e-2a77ee9369b6.sql",
+      "line": 196,
+      "text": "CREATE POLICY \"Users delete own ride media\" ON storage.objects"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 16,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 66,
+      "text": "created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 99,
+      "text": "user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 112,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 139,
+      "text": "assigned_to uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 141,
+      "text": "submitter_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 169,
+      "text": "DROP POLICY IF EXISTS \"Ad media public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 170,
+      "text": "CREATE POLICY \"Ad media public read\" ON storage.objects FOR SELECT USING (bucket_id = 'ad-media');"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 171,
+      "text": "DROP POLICY IF EXISTS \"Ad managers can upload ad media\" ON storage.objects;"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 172,
+      "text": "CREATE POLICY \"Ad managers can upload ad media\" ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 174,
+      "text": "DROP POLICY IF EXISTS \"Ad managers can update ad media\" ON storage.objects;"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 175,
+      "text": "CREATE POLICY \"Ad managers can update ad media\" ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 177,
+      "text": "DROP POLICY IF EXISTS \"Ad managers can delete ad media\" ON storage.objects;"
+    },
+    {
+      "file": "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
+      "line": 178,
+      "text": "CREATE POLICY \"Ad managers can delete ad media\" ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260522111105_2c76877e-25cd-41b5-aed4-03377ce2bb42.sql",
+      "line": 8,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260522111105_2c76877e-25cd-41b5-aed4-03377ce2bb42.sql",
+      "line": 114,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260525021220_1704181b-8d1c-446c-9098-3b6bf1b4497b.sql",
+      "line": 11,
+      "text": "-- 3. Create a SECURITY DEFINER public view exposing only non-sensitive fields."
+    },
+    {
+      "file": "20260525110546_bcdd53df-2d19-4f55-bc0e-4b364fa2db0a.sql",
+      "line": 17,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $function$"
+    },
+    {
+      "file": "20260525110546_bcdd53df-2d19-4f55-bc0e-4b364fa2db0a.sql",
+      "line": 74,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260525110546_bcdd53df-2d19-4f55-bc0e-4b364fa2db0a.sql",
+      "line": 99,
+      "text": "user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260525110546_bcdd53df-2d19-4f55-bc0e-4b364fa2db0a.sql",
+      "line": 108,
+      "text": "assigned_to uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260525131427_be1ff2ed-4252-4891-8033-514954cadfc8.sql",
+      "line": 96,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260525131427_be1ff2ed-4252-4891-8033-514954cadfc8.sql",
+      "line": 128,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260525131427_be1ff2ed-4252-4891-8033-514954cadfc8.sql",
+      "line": 195,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260525131427_be1ff2ed-4252-4891-8033-514954cadfc8.sql",
+      "line": 232,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260525154337_8148e969-e07c-4e8c-b8bc-2f4a19c2e1d3.sql",
+      "line": 3,
+      "text": "RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260525154337_8148e969-e07c-4e8c-b8bc-2f4a19c2e1d3.sql",
+      "line": 24,
+      "text": "RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260525154337_8148e969-e07c-4e8c-b8bc-2f4a19c2e1d3.sql",
+      "line": 31,
+      "text": "SELECT email INTO uemail FROM auth.users WHERE id = uid;"
+    },
+    {
+      "file": "20260525154337_8148e969-e07c-4e8c-b8bc-2f4a19c2e1d3.sql",
+      "line": 48,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260525154337_8148e969-e07c-4e8c-b8bc-2f4a19c2e1d3.sql",
+      "line": 57,
+      "text": "JOIN auth.users u ON u.id = m.user_id"
+    },
+    {
+      "file": "20260525155935_31efaded-ef49-43e7-945b-f213f41edda7.sql",
+      "line": 35,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260525162719_50c7215e-4c67-42cb-8aec-b68ec5ca7ef6.sql",
+      "line": 36,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260526073719_11c435e8-6844-44c8-941a-e0d57931962c.sql",
+      "line": 2,
+      "text": "-- 1) Security Definer View \u2192 security_invoker"
+    },
+    {
+      "file": "20260526073719_11c435e8-6844-44c8-941a-e0d57931962c.sql",
+      "line": 5,
+      "text": "-- 2) Revoke EXECUTE from trigger-only / internal-only SECURITY DEFINER functions"
+    },
+    {
+      "file": "20260526073719_11c435e8-6844-44c8-941a-e0d57931962c.sql",
+      "line": 91,
+      "text": "EXECUTE format('DROP POLICY IF EXISTS %I ON storage.objects', pol.policyname);"
+    },
+    {
+      "file": "20260526073719_11c435e8-6844-44c8-941a-e0d57931962c.sql",
+      "line": 99,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260526123921_c0881eba-e524-4c6d-a54b-2a3052863d99.sql",
+      "line": 61,
+      "text": "-- 3) listing_views: lock down direct inserts (writes only via SECURITY DEFINER fn)"
+    },
+    {
+      "file": "20260526123959_95b81751-3a57-42d8-9821-6efa63d98c4f.sql",
+      "line": 2,
+      "text": "DROP POLICY IF EXISTS \"Ad media public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260526123959_95b81751-3a57-42d8-9821-6efa63d98c4f.sql",
+      "line": 3,
+      "text": "DROP POLICY IF EXISTS \"Ride media public read\" ON storage.objects;"
+    },
+    {
+      "file": "20260526123959_95b81751-3a57-42d8-9821-6efa63d98c4f.sql",
+      "line": 6,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260526123959_95b81751-3a57-42d8-9821-6efa63d98c4f.sql",
+      "line": 10,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260527101926_98d7c403-0beb-4d30-b432-0fce0c2c409a.sql",
+      "line": 2,
+      "text": "IF EXISTS (SELECT 1 FROM cron.job WHERE jobname='refresh-lazada-prices') THEN"
+    },
+    {
+      "file": "20260527101926_98d7c403-0beb-4d30-b432-0fce0c2c409a.sql",
+      "line": 3,
+      "text": "PERFORM cron.unschedule('refresh-lazada-prices');"
+    },
+    {
+      "file": "20260527101926_98d7c403-0beb-4d30-b432-0fce0c2c409a.sql",
+      "line": 7,
+      "text": "SELECT cron.schedule("
+    },
+    {
+      "file": "20260527101926_98d7c403-0beb-4d30-b432-0fce0c2c409a.sql",
+      "line": 10,
+      "text": "$cron$SELECT net.http_post("
+    },
+    {
+      "file": "20260527101926_98d7c403-0beb-4d30-b432-0fce0c2c409a.sql",
+      "line": 14,
+      "text": ") AS request_id;$cron$"
+    },
+    {
+      "file": "20260528054733_ad81c4de-65fb-49d4-8b17-b0273d9d9216.sql",
+      "line": 21,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260528054733_ad81c4de-65fb-49d4-8b17-b0273d9d9216.sql",
+      "line": 220,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260528054733_ad81c4de-65fb-49d4-8b17-b0273d9d9216.sql",
+      "line": 226,
+      "text": "ON storage.objects FOR INSERT"
+    },
+    {
+      "file": "20260528054733_ad81c4de-65fb-49d4-8b17-b0273d9d9216.sql",
+      "line": 234,
+      "text": "ON storage.objects FOR UPDATE"
+    },
+    {
+      "file": "20260528054733_ad81c4de-65fb-49d4-8b17-b0273d9d9216.sql",
+      "line": 242,
+      "text": "ON storage.objects FOR DELETE"
+    },
+    {
+      "file": "20260529103420_2638953d-9d10-4fb6-a50b-b469e593a1ec.sql",
+      "line": 6,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260529103420_2638953d-9d10-4fb6-a50b-b469e593a1ec.sql",
+      "line": 36,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260529110857_5046e165-5e9b-4dd8-b643-3deffd0a340e.sql",
+      "line": 3,
+      "text": "-- Cascades via existing FKs (profiles.id -> auth.users.id on delete cascade, etc.)"
+    },
+    {
+      "file": "20260529110857_5046e165-5e9b-4dd8-b643-3deffd0a340e.sql",
+      "line": 7,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260529110857_5046e165-5e9b-4dd8-b643-3deffd0a340e.sql",
+      "line": 16,
+      "text": "FROM auth.users"
+    },
+    {
+      "file": "20260529110857_5046e165-5e9b-4dd8-b643-3deffd0a340e.sql",
+      "line": 24,
+      "text": "DELETE FROM auth.users WHERE id = r.id;"
+    },
+    {
+      "file": "20260529110857_5046e165-5e9b-4dd8-b643-3deffd0a340e.sql",
+      "line": 37,
+      "text": "PERFORM cron.unschedule('cleanup-unverified-users');"
+    },
+    {
+      "file": "20260529110857_5046e165-5e9b-4dd8-b643-3deffd0a340e.sql",
+      "line": 42,
+      "text": "SELECT cron.schedule("
+    },
+    {
+      "file": "20260529110941_ec4ca8a5-b78c-4254-b9f4-315a9b19ef9b.sql",
+      "line": 4,
+      "text": "DELETE FROM auth.users WHERE id = 'e3b80d24-34d7-4a36-85cb-a89826e2c8da' AND email_confirmed_at IS NULL;"
+    },
+    {
+      "file": "20260529114303_62e11c44-56f1-4552-828e-cc9e2d3c3fe5.sql",
+      "line": 77,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260530131847_36e4ac3c-8ab5-4310-ae44-f419fb7b3997.sql",
+      "line": 193,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260530131847_36e4ac3c-8ab5-4310-ae44-f419fb7b3997.sql",
+      "line": 197,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260530131847_36e4ac3c-8ab5-4310-ae44-f419fb7b3997.sql",
+      "line": 201,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260530131847_36e4ac3c-8ab5-4310-ae44-f419fb7b3997.sql",
+      "line": 206,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260601042141_25c0cbaf-9664-41b6-ac02-f08aa7f340ed.sql",
+      "line": 277,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260601042141_25c0cbaf-9664-41b6-ac02-f08aa7f340ed.sql",
+      "line": 291,
+      "text": "CREATE POLICY \"Course media is publicly readable\" ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260601042141_25c0cbaf-9664-41b6-ac02-f08aa7f340ed.sql",
+      "line": 293,
+      "text": "CREATE POLICY \"Moderators upload course media\" ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260601042141_25c0cbaf-9664-41b6-ac02-f08aa7f340ed.sql",
+      "line": 295,
+      "text": "CREATE POLICY \"Moderators update course media\" ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260601042141_25c0cbaf-9664-41b6-ac02-f08aa7f340ed.sql",
+      "line": 297,
+      "text": "CREATE POLICY \"Moderators delete course media\" ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260601134129_39db4dbf-b53a-4491-8006-95ec1e6087a6.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260601134129_39db4dbf-b53a-4491-8006-95ec1e6087a6.sql",
+      "line": 23,
+      "text": "SELECT email INTO owner_email FROM auth.users WHERE id = NEW.owner_id;"
+    },
+    {
+      "file": "20260601152700_e4784cd3-37e1-425b-af96-515e4d088cfb.sql",
+      "line": 7,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260601152700_e4784cd3-37e1-425b-af96-515e4d088cfb.sql",
+      "line": 11,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260601152700_e4784cd3-37e1-425b-af96-515e4d088cfb.sql",
+      "line": 18,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260601152700_e4784cd3-37e1-425b-af96-515e4d088cfb.sql",
+      "line": 25,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql",
+      "line": 7,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql",
+      "line": 15,
+      "text": "SELECT email INTO owner_email FROM auth.users WHERE id = NEW.owner_id;"
+    },
+    {
+      "file": "20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql",
+      "line": 42,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql",
+      "line": 56,
+      "text": "SELECT email INTO owner_email FROM auth.users WHERE id = NEW.owner_id;"
+    },
+    {
+      "file": "20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql",
+      "line": 82,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql",
+      "line": 92,
+      "text": "SELECT email INTO uemail FROM auth.users WHERE id = NEW.user_id;"
+    },
+    {
+      "file": "20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql",
+      "line": 118,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql",
+      "line": 135,
+      "text": "SELECT email INTO uemail FROM auth.users WHERE id = NEW.user_id;"
+    },
+    {
+      "file": "20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql",
+      "line": 161,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260602050028_48904d57-846f-45e4-9641-3bd1272160bf.sql",
+      "line": 22,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260602081428_560fbe2c-f709-4b2f-860c-7883ddc68194.sql",
+      "line": 5,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260603063551_f1347a42-fcfe-415f-a41f-13f0f567b2be.sql",
+      "line": 11,
+      "text": "-- Internal cron-job tokens. Service-role only."
+    },
+    {
+      "file": "20260603063551_f1347a42-fcfe-415f-a41f-13f0f567b2be.sql",
+      "line": 32,
+      "text": "-- Ensure site_settings has app_url so cron jobs can read it."
+    },
+    {
+      "file": "20260603063551_f1347a42-fcfe-415f-a41f-13f0f567b2be.sql",
+      "line": 41,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260603063551_f1347a42-fcfe-415f-a41f-13f0f567b2be.sql",
+      "line": 59,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 4,
+      "text": "PERFORM cron.unschedule(jobid)"
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 5,
+      "text": "FROM cron.job"
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 11,
+      "text": "SELECT cron.schedule("
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 14,
+      "text": "$cron$"
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 19,
+      "text": "'x-cron-token', (SELECT token FROM public.internal_cron_tokens WHERE job_name = 'ops_alerts_digest')"
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 23,
+      "text": "$cron$"
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 27,
+      "text": "SELECT cron.schedule("
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 30,
+      "text": "$cron$"
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 35,
+      "text": "'x-cron-token', (SELECT token FROM public.internal_cron_tokens WHERE job_name = 'refresh_lazada')"
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 39,
+      "text": "$cron$"
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 43,
+      "text": "SELECT cron.schedule("
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 46,
+      "text": "$cron$"
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 51,
+      "text": "'x-cron-token', (SELECT token FROM public.internal_cron_tokens WHERE job_name = 'fx_refresh')"
+    },
+    {
+      "file": "20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql",
+      "line": 55,
+      "text": "$cron$"
+    },
+    {
+      "file": "20260604122237_2389a56f-bfe5-45e0-8114-a798b2889648.sql",
+      "line": 2,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260605033802_58c5391b-eb0e-40fd-babd-8203a211081e.sql",
+      "line": 15,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260605033802_58c5391b-eb0e-40fd-babd-8203a211081e.sql",
+      "line": 40,
+      "text": "target_user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260605033802_58c5391b-eb0e-40fd-babd-8203a211081e.sql",
+      "line": 48,
+      "text": "issued_by uuid NOT NULL REFERENCES auth.users(id),"
+    },
+    {
+      "file": "20260605033802_58c5391b-eb0e-40fd-babd-8203a211081e.sql",
+      "line": 87,
+      "text": "FROM auth.users"
+    },
+    {
+      "file": "20260605044520_a8fe8551-55be-4c4f-87b2-3c223bbf1dd2.sql",
+      "line": 1,
+      "text": "DROP POLICY IF EXISTS \"Public read avatars\" ON storage.objects;"
+    },
+    {
+      "file": "20260605044520_a8fe8551-55be-4c4f-87b2-3c223bbf1dd2.sql",
+      "line": 2,
+      "text": "CREATE POLICY \"Public read avatars\" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');"
+    },
+    {
+      "file": "20260605050625_ab3ca880-2df9-4ae9-865f-cd1ca5c84255.sql",
+      "line": 4,
+      "text": "user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260605050625_ab3ca880-2df9-4ae9-865f-cd1ca5c84255.sql",
+      "line": 27,
+      "text": "rep_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260605050625_ab3ca880-2df9-4ae9-865f-cd1ca5c84255.sql",
+      "line": 49,
+      "text": "rep_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260605050625_ab3ca880-2df9-4ae9-865f-cd1ca5c84255.sql",
+      "line": 55,
+      "text": "assigned_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260605050625_ab3ca880-2df9-4ae9-865f-cd1ca5c84255.sql",
+      "line": 76,
+      "text": "rep_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260605050625_ab3ca880-2df9-4ae9-865f-cd1ca5c84255.sql",
+      "line": 103,
+      "text": "LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260605050625_ab3ca880-2df9-4ae9-865f-cd1ca5c84255.sql",
+      "line": 115,
+      "text": "LEFT JOIN auth.users au ON au.id = a.rep_user_id"
+    },
+    {
+      "file": "20260605050625_ab3ca880-2df9-4ae9-865f-cd1ca5c84255.sql",
+      "line": 133,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260605050625_ab3ca880-2df9-4ae9-865f-cd1ca5c84255.sql",
+      "line": 155,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260605051559_26b81f60-d973-4718-9e61-9d209dd5c39d.sql",
+      "line": 4,
+      "text": "actor_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260605102058_3f93ff4c-c7ee-417e-90a8-e2acc69ce921.sql",
+      "line": 6,
+      "text": "buyer_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260605102058_3f93ff4c-c7ee-417e-90a8-e2acc69ce921.sql",
+      "line": 62,
+      "text": "created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260605102153_39018714-7821-475b-a287-ea88edc82215.sql",
+      "line": 30,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260605103051_33840174-a52e-4fa2-b3c2-434d46ecbdfa.sql",
+      "line": 36,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260606041358_7821951b-4327-458a-ac97-d13073d706e7.sql",
+      "line": 24,
+      "text": "DROP POLICY IF EXISTS \"Authenticated upload to business gallery\" ON storage.objects;"
+    },
+    {
+      "file": "20260606041358_7821951b-4327-458a-ac97-d13073d706e7.sql",
+      "line": 26,
+      "text": "ON storage.objects"
+    },
+    {
+      "file": "20260606123543_fb94412b-0d85-4071-bee5-42acbaf4cf90.sql",
+      "line": 106,
+      "text": "-- 4) Helper: approve a claim (server-side, SECURITY DEFINER, used by server fns)"
+    },
+    {
+      "file": "20260606123543_fb94412b-0d85-4071-bee5-42acbaf4cf90.sql",
+      "line": 110,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260606130250_6d6b8df8-037d-43a6-88d4-a9541634eb7e.sql",
+      "line": 43,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260606130250_6d6b8df8-037d-43a6-88d4-a9541634eb7e.sql",
+      "line": 50,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260606130250_6d6b8df8-037d-43a6-88d4-a9541634eb7e.sql",
+      "line": 57,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260606130908_794768e3-771f-42ed-b904-e5f51aa1f509.sql",
+      "line": 32,
+      "text": "-- Inserts happen via SECURITY DEFINER triggers; deny direct user inserts"
+    },
+    {
+      "file": "20260606130908_794768e3-771f-42ed-b904-e5f51aa1f509.sql",
+      "line": 41,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'"
+    },
+    {
+      "file": "20260606130908_794768e3-771f-42ed-b904-e5f51aa1f509.sql",
+      "line": 81,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'"
+    },
+    {
+      "file": "20260606134147_a7df571a-fced-4d56-a407-5721eb5580ed.sql",
+      "line": 14,
+      "text": "created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260606134147_a7df571a-fced-4d56-a407-5721eb5580ed.sql",
+      "line": 63,
+      "text": "reviewed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260606143803_4431c898-03ff-47a4-a84b-ffa2efba7721.sql",
+      "line": 2,
+      "text": "DELETE FROM public.businesses a"
+    },
+    {
+      "file": "20260607053342_aace8b5d-2b64-45f3-be02-9fc21d6794d5.sql",
+      "line": 6,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260607053342_aace8b5d-2b64-45f3-be02-9fc21d6794d5.sql",
+      "line": 35,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260607053704_3150cd92-bbb6-44c9-8cbe-be001d44d257.sql",
+      "line": 6,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260607053704_3150cd92-bbb6-44c9-8cbe-be001d44d257.sql",
+      "line": 37,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260607054023_e316b1f5-445d-4577-b115-5d5ed320508b.sql",
+      "line": 32,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260607054023_e316b1f5-445d-4577-b115-5d5ed320508b.sql",
+      "line": 96,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260607054023_e316b1f5-445d-4577-b115-5d5ed320508b.sql",
+      "line": 121,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260607054410_89bd86ee-7fca-4ea2-8d6c-0e6a906d4030.sql",
+      "line": 5,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260607055051_b92fd447-fac7-450f-ba0a-d924f986fab3.sql",
+      "line": 23,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260608001625_03d95da2-89a5-4b5a-a475-8712ab4c8e83.sql",
+      "line": 9,
+      "text": "-- 2) storage.objects: fix broken business-gallery upload policy that referenced"
+    },
+    {
+      "file": "20260608001625_03d95da2-89a5-4b5a-a475-8712ab4c8e83.sql",
+      "line": 11,
+      "text": "DROP POLICY IF EXISTS \"Authenticated upload to business gallery\" ON storage.objects;"
+    },
+    {
+      "file": "20260608001625_03d95da2-89a5-4b5a-a475-8712ab4c8e83.sql",
+      "line": 13,
+      "text": "ON storage.objects"
+    },
+    {
+      "file": "20260608001625_03d95da2-89a5-4b5a-a475-8712ab4c8e83.sql",
+      "line": 21,
+      "text": "WHERE b.id::text = (storage.foldername(storage.objects.name))[1]"
+    },
+    {
+      "file": "20260608061836_2d3a4896-bee4-424d-ae82-6c19557df804.sql",
+      "line": 30,
+      "text": "ON storage.objects FOR INSERT TO anon, authenticated"
+    },
+    {
+      "file": "20260608061836_2d3a4896-bee4-424d-ae82-6c19557df804.sql",
+      "line": 34,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260608065742_3fe92331-464d-4bf6-bbd2-63b243db14a0.sql",
+      "line": 3,
+      "text": "-- Cleanup: DELETE FROM shop_products WHERE '365-seed' = ANY(tags);"
+    },
+    {
+      "file": "20260608092901_ee4416c6-d63a-49e5-a6f8-5bbcc595767e.sql",
+      "line": 8,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260608092901_ee4416c6-d63a-49e5-a6f8-5bbcc595767e.sql",
+      "line": 58,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260608095644_fb9d08f4-071d-4fd8-b79c-6af03bd600f1.sql",
+      "line": 10,
+      "text": "reviewer_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260608095644_fb9d08f4-071d-4fd8-b79c-6af03bd600f1.sql",
+      "line": 56,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260608095644_fb9d08f4-071d-4fd8-b79c-6af03bd600f1.sql",
+      "line": 80,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260609103310_426c088d-266f-41b9-8be0-b6e103c4d1af.sql",
+      "line": 38,
+      "text": "DROP POLICY IF EXISTS \"Anyone can upload report evidence\" ON storage.objects;"
+    },
+    {
+      "file": "20260609103310_426c088d-266f-41b9-8be0-b6e103c4d1af.sql",
+      "line": 40,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260609110225_077cc862-a837-4d02-bdf2-729169c31be7.sql",
+      "line": 38,
+      "text": "buyer_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260609111324_6c48b235-a3a4-4485-b6d5-9b1503108849.sql",
+      "line": 117,
+      "text": "LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260609111324_6c48b235-a3a4-4485-b6d5-9b1503108849.sql",
+      "line": 138,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260609111324_6c48b235-a3a4-4485-b6d5-9b1503108849.sql",
+      "line": 145,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260609111324_6c48b235-a3a4-4485-b6d5-9b1503108849.sql",
+      "line": 154,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260609113058_24366c82-0d4b-4d5d-a8a1-e51f56472c95.sql",
+      "line": 39,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260609135634_7449cd6c-adce-4836-a039-4571160c11e4.sql",
+      "line": 55,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260609135725_293408c6-2ad8-4b94-9c58-54da4f131c87.sql",
+      "line": 1,
+      "text": "DROP POLICY IF EXISTS \"Users upload own payment proofs\" ON storage.objects;"
+    },
+    {
+      "file": "20260609135725_293408c6-2ad8-4b94-9c58-54da4f131c87.sql",
+      "line": 2,
+      "text": "DROP POLICY IF EXISTS \"Users read own payment proofs\" ON storage.objects;"
+    },
+    {
+      "file": "20260609135725_293408c6-2ad8-4b94-9c58-54da4f131c87.sql",
+      "line": 5,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260609135725_293408c6-2ad8-4b94-9c58-54da4f131c87.sql",
+      "line": 9,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260609140507_e60a3304-5bfa-4d23-83ad-d98fdc22eaa6.sql",
+      "line": 67,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260609150605_d17e78ae-088c-4f78-b2a9-2c93ddb97b83.sql",
+      "line": 19,
+      "text": "LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public"
+    },
+    {
+      "file": "20260609150605_d17e78ae-088c-4f78-b2a9-2c93ddb97b83.sql",
+      "line": 26,
+      "text": "LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public"
+    },
+    {
+      "file": "20260609150605_d17e78ae-088c-4f78-b2a9-2c93ddb97b83.sql",
+      "line": 52,
+      "text": "LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public"
+    },
+    {
+      "file": "20260609150605_d17e78ae-088c-4f78-b2a9-2c93ddb97b83.sql",
+      "line": 56,
+      "text": "JOIN auth.users u ON u.id = p.id"
+    },
+    {
+      "file": "20260609150605_d17e78ae-088c-4f78-b2a9-2c93ddb97b83.sql",
+      "line": 66,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public"
+    },
+    {
+      "file": "20260609150605_d17e78ae-088c-4f78-b2a9-2c93ddb97b83.sql",
+      "line": 97,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public"
+    },
+    {
+      "file": "20260609150719_b8b702f6-20b1-4370-be4d-32ae44284712.sql",
+      "line": 4,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public"
+    },
+    {
+      "file": "20260609150719_b8b702f6-20b1-4370-be4d-32ae44284712.sql",
+      "line": 15,
+      "text": "SELECT raw_user_meta_data INTO v_meta FROM auth.users WHERE id = NEW.id;"
+    },
+    {
+      "file": "20260609153726_dbc4c2ec-5457-414b-9fe5-2cc79073a28f.sql",
+      "line": 69,
+      "text": "RETURNS text LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260609153726_dbc4c2ec-5457-414b-9fe5-2cc79073a28f.sql",
+      "line": 77,
+      "text": "RETURNS uuid[] LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260609153726_dbc4c2ec-5457-414b-9fe5-2cc79073a28f.sql",
+      "line": 120,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260609153726_dbc4c2ec-5457-414b-9fe5-2cc79073a28f.sql",
+      "line": 131,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260609153726_dbc4c2ec-5457-414b-9fe5-2cc79073a28f.sql",
+      "line": 152,
+      "text": "RETURNS integer LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260609155038_7a3dc09f-8065-415a-9d37-1e30ab858087.sql",
+      "line": 29,
+      "text": "RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260609155038_7a3dc09f-8065-415a-9d37-1e30ab858087.sql",
+      "line": 48,
+      "text": "RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260609155038_7a3dc09f-8065-415a-9d37-1e30ab858087.sql",
+      "line": 72,
+      "text": "RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260609155038_7a3dc09f-8065-415a-9d37-1e30ab858087.sql",
+      "line": 97,
+      "text": "RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260609155038_7a3dc09f-8065-415a-9d37-1e30ab858087.sql",
+      "line": 119,
+      "text": "RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260610033604_355e741d-6864-485f-aa03-ffb99aa086cf.sql",
+      "line": 3,
+      "text": "blocker_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260610033604_355e741d-6864-485f-aa03-ffb99aa086cf.sql",
+      "line": 4,
+      "text": "blocked_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260610043918_06033592-e2d2-4d8d-91e1-3b4c53f30bef.sql",
+      "line": 7,
+      "text": "created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260610074339_363b9ce5-f62d-4293-a3ac-6892c69318d2.sql",
+      "line": 4,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260610074339_363b9ce5-f62d-4293-a3ac-6892c69318d2.sql",
+      "line": 11,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260610074339_363b9ce5-f62d-4293-a3ac-6892c69318d2.sql",
+      "line": 18,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260610074339_363b9ce5-f62d-4293-a3ac-6892c69318d2.sql",
+      "line": 27,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260611044319_aa6847c4-a282-4892-a40f-6cdf10b8546e.sql",
+      "line": 6,
+      "text": "CREATE POLICY \"Admins read cron tokens\""
+    },
+    {
+      "file": "20260611160209_a5575f50-1cb9-450f-baa9-f18e961b7c98.sql",
+      "line": 59,
+      "text": "requester_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260612083840_d97f4a0f-e475-415c-b725-117c1d8854fc.sql",
+      "line": 5,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260612105044_94140c07-aee7-4c48-a6d3-beba9a7e0f98.sql",
+      "line": 5,
+      "text": "ADD COLUMN IF NOT EXISTS made_public_by uuid REFERENCES auth.users(id) ON DELETE SET NULL;"
+    },
+    {
+      "file": "20260612105044_94140c07-aee7-4c48-a6d3-beba9a7e0f98.sql",
+      "line": 13,
+      "text": "STABLE SECURITY DEFINER"
+    },
+    {
+      "file": "20260612105044_94140c07-aee7-4c48-a6d3-beba9a7e0f98.sql",
+      "line": 53,
+      "text": "STABLE SECURITY DEFINER"
+    },
+    {
+      "file": "20260612105044_94140c07-aee7-4c48-a6d3-beba9a7e0f98.sql",
+      "line": 74,
+      "text": "STABLE SECURITY DEFINER"
+    },
+    {
+      "file": "20260613035610_c210e9ab-f101-44b8-9bc3-ad6dd05e0ff9.sql",
+      "line": 7,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260613035610_c210e9ab-f101-44b8-9bc3-ad6dd05e0ff9.sql",
+      "line": 52,
+      "text": "created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260613035610_c210e9ab-f101-44b8-9bc3-ad6dd05e0ff9.sql",
+      "line": 102,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260613035610_c210e9ab-f101-44b8-9bc3-ad6dd05e0ff9.sql",
+      "line": 129,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260613035610_c210e9ab-f101-44b8-9bc3-ad6dd05e0ff9.sql",
+      "line": 156,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260613041354_d7a99bca-9ea5-4580-8838-8e5059e5816e.sql",
+      "line": 14,
+      "text": "user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260613041354_d7a99bca-9ea5-4580-8838-8e5059e5816e.sql",
+      "line": 103,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260613041354_d7a99bca-9ea5-4580-8838-8e5059e5816e.sql",
+      "line": 203,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260613041354_d7a99bca-9ea5-4580-8838-8e5059e5816e.sql",
+      "line": 228,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260613041354_d7a99bca-9ea5-4580-8838-8e5059e5816e.sql",
+      "line": 250,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260613171425_1213eb65-8a37-49f4-8c6a-322d6c9cb5b8.sql",
+      "line": 14,
+      "text": "user_id uuid NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260614085350_85fe0599-95d4-4737-b909-bebe0a2fd766.sql",
+      "line": 4,
+      "text": "ADD COLUMN IF NOT EXISTS resolved_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260614090848_beea068c-2b7b-4f59-b645-1382f7e6693c.sql",
+      "line": 7,
+      "text": "user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260615022440_4d6fb9e4-c294-4d42-a9f0-401223fa4169.sql",
+      "line": 14,
+      "text": "requester_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260615022440_4d6fb9e4-c294-4d42-a9f0-401223fa4169.sql",
+      "line": 15,
+      "text": "owner_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260615022440_4d6fb9e4-c294-4d42-a9f0-401223fa4169.sql",
+      "line": 16,
+      "text": "client_profile_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260615022440_4d6fb9e4-c294-4d42-a9f0-401223fa4169.sql",
+      "line": 21,
+      "text": "decided_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260615022440_4d6fb9e4-c294-4d42-a9f0-401223fa4169.sql",
+      "line": 44,
+      "text": "actor_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260615022440_4d6fb9e4-c294-4d42-a9f0-401223fa4169.sql",
+      "line": 70,
+      "text": "RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260615022440_4d6fb9e4-c294-4d42-a9f0-401223fa4169.sql",
+      "line": 75,
+      "text": "SELECT 1 FROM auth.users"
+    },
+    {
+      "file": "20260615022440_4d6fb9e4-c294-4d42-a9f0-401223fa4169.sql",
+      "line": 82,
+      "text": "RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260615040047_45f630ff-bc04-4acc-abb9-c48a7ebd148d.sql",
+      "line": 8,
+      "text": "actor_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260615040047_45f630ff-bc04-4acc-abb9-c48a7ebd148d.sql",
+      "line": 51,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260615040047_45f630ff-bc04-4acc-abb9-c48a7ebd148d.sql",
+      "line": 56,
+      "text": "resolved_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260615040047_45f630ff-bc04-4acc-abb9-c48a7ebd148d.sql",
+      "line": 110,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260615040047_45f630ff-bc04-4acc-abb9-c48a7ebd148d.sql",
+      "line": 116,
+      "text": "actor_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260615040047_45f630ff-bc04-4acc-abb9-c48a7ebd148d.sql",
+      "line": 136,
+      "text": "RETURNS int LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260615040047_45f630ff-bc04-4acc-abb9-c48a7ebd148d.sql",
+      "line": 174,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260615040047_45f630ff-bc04-4acc-abb9-c48a7ebd148d.sql",
+      "line": 181,
+      "text": "granted_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260615040047_45f630ff-bc04-4acc-abb9-c48a7ebd148d.sql",
+      "line": 216,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260615040047_45f630ff-bc04-4acc-abb9-c48a7ebd148d.sql",
+      "line": 274,
+      "text": "DELETE FROM public.listings WHERE id = _listing.id;"
+    },
+    {
+      "file": "20260615041003_2a252442-7543-45ae-b1b5-dc6302e72f01.sql",
+      "line": 7,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260615041003_2a252442-7543-45ae-b1b5-dc6302e72f01.sql",
+      "line": 13,
+      "text": "actor_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260615041003_2a252442-7543-45ae-b1b5-dc6302e72f01.sql",
+      "line": 29,
+      "text": "RETURNS int LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260615041003_2a252442-7543-45ae-b1b5-dc6302e72f01.sql",
+      "line": 43,
+      "text": "RETURNS text LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260615041003_2a252442-7543-45ae-b1b5-dc6302e72f01.sql",
+      "line": 51,
+      "text": "FROM auth.users WHERE id = _user_id;"
+    },
+    {
+      "file": "20260615041003_2a252442-7543-45ae-b1b5-dc6302e72f01.sql",
+      "line": 71,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260615041003_2a252442-7543-45ae-b1b5-dc6302e72f01.sql",
+      "line": 153,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260615043357_0189690f-14ba-493e-a401-98a94c6c3be8.sql",
+      "line": 5,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260615051550_216e1718-9be9-4635-81c1-16f7d40a4c68.sql",
+      "line": 22,
+      "text": "RETURNS uuid[] LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260616033348_a261b9e7-281d-4e16-bf61-1f3043a80d12.sql",
+      "line": 42,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260616033348_a261b9e7-281d-4e16-bf61-1f3043a80d12.sql",
+      "line": 47,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260616033348_a261b9e7-281d-4e16-bf61-1f3043a80d12.sql",
+      "line": 58,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260616051838_15d109db-c2ae-477f-a7d4-6f1b8ad10740.sql",
+      "line": 44,
+      "text": "submitter_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260616051838_15d109db-c2ae-477f-a7d4-6f1b8ad10740.sql",
+      "line": 49,
+      "text": "decided_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260616051838_15d109db-c2ae-477f-a7d4-6f1b8ad10740.sql",
+      "line": 83,
+      "text": "RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260616065656_7793cf87-1c3b-4fec-8151-38cd3ab67b18.sql",
+      "line": 14,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260616065656_7793cf87-1c3b-4fec-8151-38cd3ab67b18.sql",
+      "line": 29,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260617092418_a50d4b21-3863-4d9a-b7ce-20866f5b7ca1.sql",
+      "line": 3,
+      "text": "ADD COLUMN IF NOT EXISTS assigned_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;"
+    },
+    {
+      "file": "20260618143033_d72ee2aa-d994-47fd-941d-2407c084e60e.sql",
+      "line": 28,
+      "text": "-- No INSERT/UPDATE/DELETE policies: writes happen via SECURITY DEFINER trigger; table is effectively append-only from app code."
+    },
+    {
+      "file": "20260618143033_d72ee2aa-d994-47fd-941d-2407c084e60e.sql",
+      "line": 33,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260618143923_eb7a3021-7236-4dc9-8cbb-cf030cc4c9af.sql",
+      "line": 16,
+      "text": "created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260618143923_eb7a3021-7236-4dc9-8cbb-cf030cc4c9af.sql",
+      "line": 48,
+      "text": "hidden_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260618144012_6a199a95-2beb-4279-950d-af8fb30472a7.sql",
+      "line": 3,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260618144012_6a199a95-2beb-4279-950d-af8fb30472a7.sql",
+      "line": 8,
+      "text": "ON storage.objects FOR INSERT"
+    },
+    {
+      "file": "20260618144012_6a199a95-2beb-4279-950d-af8fb30472a7.sql",
+      "line": 13,
+      "text": "ON storage.objects FOR UPDATE"
+    },
+    {
+      "file": "20260618144012_6a199a95-2beb-4279-950d-af8fb30472a7.sql",
+      "line": 18,
+      "text": "ON storage.objects FOR DELETE"
+    },
+    {
+      "file": "20260618193735_da239fa8-bd86-4306-bbcf-ce8f3ca641e8.sql",
+      "line": 6,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260619131835_99305083-0d8e-4bb8-b95a-3918e1a14f19.sql",
+      "line": 10,
+      "text": "updated_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260619174416_890280d2-2b87-48e6-ac17-839a5b02fe50.sql",
+      "line": 44,
+      "text": "LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260619183732_375472c8-9c6b-4392-85c3-021a02d51140.sql",
+      "line": 5,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260619191109_b6c5a81a-a8ea-4168-b767-e1e21a1b67c9.sql",
+      "line": 7,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260619191109_b6c5a81a-a8ea-4168-b767-e1e21a1b67c9.sql",
+      "line": 91,
+      "text": "-- 9. organization_invites: helper that checks current user's email from auth.users"
+    },
+    {
+      "file": "20260619191109_b6c5a81a-a8ea-4168-b767-e1e21a1b67c9.sql",
+      "line": 98,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260619191109_b6c5a81a-a8ea-4168-b767-e1e21a1b67c9.sql",
+      "line": 102,
+      "text": "SELECT 1 FROM auth.users u"
+    },
+    {
+      "file": "20260619191109_b6c5a81a-a8ea-4168-b767-e1e21a1b67c9.sql",
+      "line": 123,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260620173020_b2bd6551-8f88-4050-bf57-10a0e7be4da2.sql",
+      "line": 56,
+      "text": "created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260620173020_b2bd6551-8f88-4050-bf57-10a0e7be4da2.sql",
+      "line": 82,
+      "text": "advertiser_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260620173020_b2bd6551-8f88-4050-bf57-10a0e7be4da2.sql",
+      "line": 96,
+      "text": "reviewed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260620173020_b2bd6551-8f88-4050-bf57-10a0e7be4da2.sql",
+      "line": 138,
+      "text": "uploaded_by uuid NOT NULL REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260620173020_b2bd6551-8f88-4050-bf57-10a0e7be4da2.sql",
+      "line": 154,
+      "text": "reviewed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260620173020_b2bd6551-8f88-4050-bf57-10a0e7be4da2.sql",
+      "line": 281,
+      "text": "actor_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260620173020_b2bd6551-8f88-4050-bf57-10a0e7be4da2.sql",
+      "line": 314,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260620173020_b2bd6551-8f88-4050-bf57-10a0e7be4da2.sql",
+      "line": 323,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260620173020_b2bd6551-8f88-4050-bf57-10a0e7be4da2.sql",
+      "line": 332,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260620173020_b2bd6551-8f88-4050-bf57-10a0e7be4da2.sql",
+      "line": 341,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260620174155_8a20bc24-209e-4a9f-bdb5-c15947568c88.sql",
+      "line": 5,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260620174155_8a20bc24-209e-4a9f-bdb5-c15947568c88.sql",
+      "line": 12,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260620174155_8a20bc24-209e-4a9f-bdb5-c15947568c88.sql",
+      "line": 19,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260620174155_8a20bc24-209e-4a9f-bdb5-c15947568c88.sql",
+      "line": 26,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260620175446_5053a902-248b-4600-bef6-8a9c84c28cd8.sql",
+      "line": 7,
+      "text": "actor_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260620175446_5053a902-248b-4600-bef6-8a9c84c28cd8.sql",
+      "line": 55,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260620175446_5053a902-248b-4600-bef6-8a9c84c28cd8.sql",
+      "line": 83,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260621050736_a2046304-e3c7-4094-8d9c-f4974e0c65b9.sql",
+      "line": 5,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260622025943_8776ca6a-ff43-4a58-b1cd-d40e0cfe9b25.sql",
+      "line": 14,
+      "text": "synced_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260622025943_8776ca6a-ff43-4a58-b1cd-d40e0cfe9b25.sql",
+      "line": 41,
+      "text": "user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260624042039_d0201104-a2e4-4674-b4ba-f6fffe8e8ab5.sql",
+      "line": 60,
+      "text": "created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260627025907_55545abc-08e6-4995-b0d1-6f98737bb935.sql",
+      "line": 48,
+      "text": "user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260627064717_e3493d02-195d-4e15-bbca-e55115084ae2.sql",
+      "line": 27,
+      "text": "reviewed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260627114834_89899757-a064-4f38-8146-4d4c41a5c70b.sql",
+      "line": 4,
+      "text": "ON storage.objects FOR INSERT"
+    },
+    {
+      "file": "20260627114834_89899757-a064-4f38-8146-4d4c41a5c70b.sql",
+      "line": 9,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260627114834_89899757-a064-4f38-8146-4d4c41a5c70b.sql",
+      "line": 14,
+      "text": "ON storage.objects FOR DELETE"
+    },
+    {
+      "file": "20260627155108_133816c5-a182-43a6-9159-d8d6d6da0491.sql",
+      "line": 75,
+      "text": "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+    },
+    {
+      "file": "20260701072731_9871982b-7cfc-4c7c-b27a-a88cfce0a6f5.sql",
+      "line": 5,
+      "text": "user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260701072731_9871982b-7cfc-4c7c-b27a-a88cfce0a6f5.sql",
+      "line": 17,
+      "text": "reviewer_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260701072731_9871982b-7cfc-4c7c-b27a-a88cfce0a6f5.sql",
+      "line": 41,
+      "text": "user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260701073345_120230cf-82bf-44f2-9a3f-845373a6c87c.sql",
+      "line": 11,
+      "text": "created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260701073345_120230cf-82bf-44f2-9a3f-845373a6c87c.sql",
+      "line": 12,
+      "text": "paid_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260701073345_120230cf-82bf-44f2-9a3f-845373a6c87c.sql",
+      "line": 35,
+      "text": "ADD COLUMN approved_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260701073345_120230cf-82bf-44f2-9a3f-845373a6c87c.sql",
+      "line": 40,
+      "text": "ADD COLUMN clawed_back_by uuid REFERENCES auth.users(id) ON DELETE SET NULL;"
+    },
+    {
+      "file": "20260701073345_120230cf-82bf-44f2-9a3f-845373a6c87c.sql",
+      "line": 49,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260702133312_b82ffba0-6e87-4f60-a422-87b37cfb994f.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260702135859_cd21d4f3-c323-473c-8b80-8960437e500a.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260703001045_a60e1893-fdf9-4317-b0d1-11606fea2118.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 14,
+      "text": "owner_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 30,
+      "text": "reviewed_by uuid REFERENCES auth.users(id),"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 51,
+      "text": "uploaded_by uuid NOT NULL REFERENCES auth.users(id),"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 64,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 83,
+      "text": "created_by uuid NOT NULL REFERENCES auth.users(id),"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 108,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 124,
+      "text": "added_by uuid NOT NULL REFERENCES auth.users(id),"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 139,
+      "text": "author_id uuid NOT NULL REFERENCES auth.users(id),"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 155,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 172,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 312,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260703133351_ae2ded6d-03e2-4c5a-bda9-8ab011454540.sql",
+      "line": 338,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260703133635_5cc0adde-634a-4f1e-9fde-f821eca32075.sql",
+      "line": 4,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260703133635_5cc0adde-634a-4f1e-9fde-f821eca32075.sql",
+      "line": 18,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260703133635_5cc0adde-634a-4f1e-9fde-f821eca32075.sql",
+      "line": 29,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260703133635_5cc0adde-634a-4f1e-9fde-f821eca32075.sql",
+      "line": 44,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260703133635_5cc0adde-634a-4f1e-9fde-f821eca32075.sql",
+      "line": 56,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260703133635_5cc0adde-634a-4f1e-9fde-f821eca32075.sql",
+      "line": 68,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260703135517_be64835f-9a09-4cbc-84d7-739d9c05be1a.sql",
+      "line": 7,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260703135517_be64835f-9a09-4cbc-84d7-739d9c05be1a.sql",
+      "line": 24,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260704080604_32cb4318-076d-4e4f-9469-17276834652d.sql",
+      "line": 5,
+      "text": "STABLE SECURITY DEFINER"
+    },
+    {
+      "file": "20260706042027_d7ff3b5e-60ff-4d87-ad68-c6934d53d076.sql",
+      "line": 8,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706042027_d7ff3b5e-60ff-4d87-ad68-c6934d53d076.sql",
+      "line": 19,
+      "text": "SELECT email INTO v_email FROM auth.users WHERE id = _staff_user_id;"
+    },
+    {
+      "file": "20260706042027_d7ff3b5e-60ff-4d87-ad68-c6934d53d076.sql",
+      "line": 85,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706042027_d7ff3b5e-60ff-4d87-ad68-c6934d53d076.sql",
+      "line": 102,
+      "text": "-- Trigger on auth.users email confirmation for staff domain"
+    },
+    {
+      "file": "20260706042027_d7ff3b5e-60ff-4d87-ad68-c6934d53d076.sql",
+      "line": 106,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706042027_d7ff3b5e-60ff-4d87-ad68-c6934d53d076.sql",
+      "line": 118,
+      "text": "DROP TRIGGER IF EXISTS on_auth_user_confirmed_accredit_staff ON auth.users;"
+    },
+    {
+      "file": "20260706042027_d7ff3b5e-60ff-4d87-ad68-c6934d53d076.sql",
+      "line": 120,
+      "text": "AFTER INSERT OR UPDATE OF email_confirmed_at ON auth.users"
+    },
+    {
+      "file": "20260706042027_d7ff3b5e-60ff-4d87-ad68-c6934d53d076.sql",
+      "line": 130,
+      "text": "JOIN auth.users u ON u.id = sr.staff_user_id"
+    },
+    {
+      "file": "20260706042342_a2a3a3d6-6594-4d25-9a6b-2e02e5dff27f.sql",
+      "line": 8,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706042342_a2a3a3d6-6594-4d25-9a6b-2e02e5dff27f.sql",
+      "line": 17,
+      "text": "SELECT raw_user_meta_data INTO meta FROM auth.users WHERE id = NEW.id;"
+    },
+    {
+      "file": "20260706042342_a2a3a3d6-6594-4d25-9a6b-2e02e5dff27f.sql",
+      "line": 43,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706042631_6543409d-ceed-4d72-bc09-7b9b2564b2d0.sql",
+      "line": 10,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706044717_364ddd91-48e7-4224-b5cf-a6b500a9bd42.sql",
+      "line": 3,
+      "text": "ADD COLUMN IF NOT EXISTS intent_evaluated_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;"
+    },
+    {
+      "file": "20260706045048_1725132d-d311-46a4-8ce9-cffcca83cb5d.sql",
+      "line": 6,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706045048_1725132d-d311-46a4-8ce9-cffcca83cb5d.sql",
+      "line": 37,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706045048_1725132d-d311-46a4-8ce9-cffcca83cb5d.sql",
+      "line": 63,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706045048_1725132d-d311-46a4-8ce9-cffcca83cb5d.sql",
+      "line": 83,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706045048_1725132d-d311-46a4-8ce9-cffcca83cb5d.sql",
+      "line": 112,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706045431_7f2e9b7f-0a44-499c-8482-f19f453b658d.sql",
+      "line": 5,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706045715_97c676ff-485d-46a0-a0e6-cc08a8da583d.sql",
+      "line": 14,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706045715_97c676ff-485d-46a0-a0e6-cc08a8da583d.sql",
+      "line": 68,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706045715_97c676ff-485d-46a0-a0e6-cc08a8da583d.sql",
+      "line": 95,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706045715_97c676ff-485d-46a0-a0e6-cc08a8da583d.sql",
+      "line": 137,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706054357_10431f45-ac66-46e5-a269-94edb188c7ea.sql",
+      "line": 7,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706054357_10431f45-ac66-46e5-a269-94edb188c7ea.sql",
+      "line": 49,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260706060958_d3327508-28b4-441c-8c04-04a1ae4ec6a3.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260707032926_14a53ed0-2a8d-464d-ace9-fd0b9348ad26.sql",
+      "line": 16,
+      "text": "uploaded_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260707032926_14a53ed0-2a8d-464d-ace9-fd0b9348ad26.sql",
+      "line": 31,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260707032926_14a53ed0-2a8d-464d-ace9-fd0b9348ad26.sql",
+      "line": 35,
+      "text": "SELECT 1 FROM auth.users u"
+    },
+    {
+      "file": "20260707032926_14a53ed0-2a8d-464d-ace9-fd0b9348ad26.sql",
+      "line": 75,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260707032926_14a53ed0-2a8d-464d-ace9-fd0b9348ad26.sql",
+      "line": 79,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260707032926_14a53ed0-2a8d-464d-ace9-fd0b9348ad26.sql",
+      "line": 83,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260707032926_14a53ed0-2a8d-464d-ace9-fd0b9348ad26.sql",
+      "line": 88,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260707035635_7d2b1a07-5394-44db-a776-960b45aa686a.sql",
+      "line": 10,
+      "text": "changed_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260707035635_7d2b1a07-5394-44db-a776-960b45aa686a.sql",
+      "line": 32,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260707040025_b9000316-7857-4be7-b4ff-9b1401174bf6.sql",
+      "line": 6,
+      "text": "viewer_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260707070949_d718892b-ccd8-45c4-a81b-058bb9b75211.sql",
+      "line": 21,
+      "text": "RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$"
+    },
+    {
+      "file": "20260707070949_d718892b-ccd8-45c4-a81b-058bb9b75211.sql",
+      "line": 31,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$"
+    },
+    {
+      "file": "20260707070949_d718892b-ccd8-45c4-a81b-058bb9b75211.sql",
+      "line": 41,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $function$"
+    },
+    {
+      "file": "20260707070949_d718892b-ccd8-45c4-a81b-058bb9b75211.sql",
+      "line": 153,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$"
+    },
+    {
+      "file": "20260707070949_d718892b-ccd8-45c4-a81b-058bb9b75211.sql",
+      "line": 168,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$"
+    },
+    {
+      "file": "20260707070949_d718892b-ccd8-45c4-a81b-058bb9b75211.sql",
+      "line": 196,
+      "text": "FROM auth.users u"
+    },
+    {
+      "file": "20260707080025_262f0b57-b8aa-4af5-bab2-cfddbda4264d.sql",
+      "line": 4,
+      "text": "ADD COLUMN IF NOT EXISTS manager_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;"
+    },
+    {
+      "file": "20260707080025_262f0b57-b8aa-4af5-bab2-cfddbda4264d.sql",
+      "line": 13,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260707080025_262f0b57-b8aa-4af5-bab2-cfddbda4264d.sql",
+      "line": 32,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260707080025_262f0b57-b8aa-4af5-bab2-cfddbda4264d.sql",
+      "line": 47,
+      "text": "FROM auth.users WHERE id = NEW.id;"
+    },
+    {
+      "file": "20260707080753_afc8dc03-a367-4712-aa1d-0cb0c4310c7b.sql",
+      "line": 4,
+      "text": "sender_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260707080753_afc8dc03-a367-4712-aa1d-0cb0c4310c7b.sql",
+      "line": 5,
+      "text": "recipient_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260707090829_a2dc61f9-cef9-40f8-a590-f3b5b25216da.sql",
+      "line": 25,
+      "text": "DROP POLICY IF EXISTS \"Staff can upload own DM attachments\" ON storage.objects;"
+    },
+    {
+      "file": "20260707090829_a2dc61f9-cef9-40f8-a590-f3b5b25216da.sql",
+      "line": 27,
+      "text": "ON storage.objects"
+    },
+    {
+      "file": "20260707090829_a2dc61f9-cef9-40f8-a590-f3b5b25216da.sql",
+      "line": 36,
+      "text": "DROP POLICY IF EXISTS \"Staff can read own DM attachments\" ON storage.objects;"
+    },
+    {
+      "file": "20260707090829_a2dc61f9-cef9-40f8-a590-f3b5b25216da.sql",
+      "line": 38,
+      "text": "ON storage.objects"
+    },
+    {
+      "file": "20260707090829_a2dc61f9-cef9-40f8-a590-f3b5b25216da.sql",
+      "line": 47,
+      "text": "DROP POLICY IF EXISTS \"Staff can delete own DM attachments\" ON storage.objects;"
+    },
+    {
+      "file": "20260707090829_a2dc61f9-cef9-40f8-a590-f3b5b25216da.sql",
+      "line": 49,
+      "text": "ON storage.objects"
+    },
+    {
+      "file": "20260708123217_5b3e358c-e539-49de-8754-19d253503b91.sql",
+      "line": 2,
+      "text": "-- Register cron token for the signup-failure-alerts hook and schedule it."
+    },
+    {
+      "file": "20260708123217_5b3e358c-e539-49de-8754-19d253503b91.sql",
+      "line": 10,
+      "text": "IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'signup-failure-alerts') THEN"
+    },
+    {
+      "file": "20260708123217_5b3e358c-e539-49de-8754-19d253503b91.sql",
+      "line": 11,
+      "text": "PERFORM cron.unschedule('signup-failure-alerts');"
+    },
+    {
+      "file": "20260708123217_5b3e358c-e539-49de-8754-19d253503b91.sql",
+      "line": 15,
+      "text": "SELECT cron.schedule("
+    },
+    {
+      "file": "20260708123217_5b3e358c-e539-49de-8754-19d253503b91.sql",
+      "line": 18,
+      "text": "$cron$"
+    },
+    {
+      "file": "20260708123217_5b3e358c-e539-49de-8754-19d253503b91.sql",
+      "line": 23,
+      "text": "'x-cron-token', (SELECT token FROM public.internal_cron_tokens WHERE job_name = 'signup_failure_alerts')"
+    },
+    {
+      "file": "20260708123217_5b3e358c-e539-49de-8754-19d253503b91.sql",
+      "line": 27,
+      "text": "$cron$"
+    },
+    {
+      "file": "20260708125611_e1cfedea-54a0-4a13-b001-bd85362cc654.sql",
+      "line": 9,
+      "text": "ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;"
+    },
+    {
+      "file": "20260708125611_e1cfedea-54a0-4a13-b001-bd85362cc654.sql",
+      "line": 15,
+      "text": "ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;"
+    },
+    {
+      "file": "20260708125611_e1cfedea-54a0-4a13-b001-bd85362cc654.sql",
+      "line": 21,
+      "text": "ADD COLUMN IF NOT EXISTS linked_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260708125611_e1cfedea-54a0-4a13-b001-bd85362cc654.sql",
+      "line": 39,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260708153505_f6b6ac7a-c38a-43cb-be5e-2e6be4cacbd3.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260708160022_e03fc10a-b6d0-47be-b6d3-5fa49f1190a6.sql",
+      "line": 7,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260708160022_e03fc10a-b6d0-47be-b6d3-5fa49f1190a6.sql",
+      "line": 19,
+      "text": "DROP POLICY IF EXISTS \"Staff can upload own DM attachments\" ON storage.objects;"
+    },
+    {
+      "file": "20260708160022_e03fc10a-b6d0-47be-b6d3-5fa49f1190a6.sql",
+      "line": 21,
+      "text": "ON storage.objects"
+    },
+    {
+      "file": "20260708160022_e03fc10a-b6d0-47be-b6d3-5fa49f1190a6.sql",
+      "line": 30,
+      "text": "DROP POLICY IF EXISTS \"Staff can read own DM attachments\" ON storage.objects;"
+    },
+    {
+      "file": "20260708160022_e03fc10a-b6d0-47be-b6d3-5fa49f1190a6.sql",
+      "line": 32,
+      "text": "ON storage.objects"
+    },
+    {
+      "file": "20260709023324_24974e61-13ff-43ae-bf62-3a0e6ecc181a.sql",
+      "line": 45,
+      "text": "user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260709023324_24974e61-13ff-43ae-bf62-3a0e6ecc181a.sql",
+      "line": 64,
+      "text": "reviewer_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260709023324_24974e61-13ff-43ae-bf62-3a0e6ecc181a.sql",
+      "line": 123,
+      "text": "user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260709023324_24974e61-13ff-43ae-bf62-3a0e6ecc181a.sql",
+      "line": 167,
+      "text": "sender_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260709025751_5a50c373-3640-4199-a6fc-e1fe4ebd7a9d.sql",
+      "line": 91,
+      "text": "requester_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260709031605_e6ef502c-ccd3-4729-82ef-0126d7982b97.sql",
+      "line": 18,
+      "text": "ADD COLUMN IF NOT EXISTS responded_by uuid REFERENCES auth.users(id) ON DELETE SET NULL;"
+    },
+    {
+      "file": "20260709031605_e6ef502c-ccd3-4729-82ef-0126d7982b97.sql",
+      "line": 24,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260709032612_de807014-2081-45d2-aeb9-d87eaaf84cfa.sql",
+      "line": 5,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260709032612_de807014-2081-45d2-aeb9-d87eaaf84cfa.sql",
+      "line": 49,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260709033210_c4809a08-9c0c-4d61-ba3a-e8ac506f4506.sql",
+      "line": 7,
+      "text": "ADD COLUMN IF NOT EXISTS network_exposure_reviewed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260709033210_c4809a08-9c0c-4d61-ba3a-e8ac506f4506.sql",
+      "line": 65,
+      "text": "actor_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260709033210_c4809a08-9c0c-4d61-ba3a-e8ac506f4506.sql",
+      "line": 102,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260709033210_c4809a08-9c0c-4d61-ba3a-e8ac506f4506.sql",
+      "line": 165,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260709033911_3dc415e7-4ec3-47e8-bafa-e2dc520d5f34.sql",
+      "line": 62,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260709033911_3dc415e7-4ec3-47e8-bafa-e2dc520d5f34.sql",
+      "line": 144,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260709050925_918c4bd8-4b0a-4918-8562-62b2489289d0.sql",
+      "line": 47,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260709060552_123adf7e-1ad8-41e9-b69a-a952324aa074.sql",
+      "line": 5,
+      "text": "actor_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260710001100_9dd483f0-8801-42c9-b17e-cce04dd856b5.sql",
+      "line": 6,
+      "text": "-- 2. Franchise: replace spoofable JWT-email match with a verified auth.users email join."
+    },
+    {
+      "file": "20260710001100_9dd483f0-8801-42c9-b17e-cce04dd856b5.sql",
+      "line": 11,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260710001100_9dd483f0-8801-42c9-b17e-cce04dd856b5.sql",
+      "line": 16,
+      "text": "FROM auth.users u"
+    },
+    {
+      "file": "20260710034108_5d384337-c4aa-4b0f-9db3-10393bda2e5e.sql",
+      "line": 7,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260710034108_5d384337-c4aa-4b0f-9db3-10393bda2e5e.sql",
+      "line": 31,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260710034108_5d384337-c4aa-4b0f-9db3-10393bda2e5e.sql",
+      "line": 64,
+      "text": "RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260710034222_13379b58-1899-400b-b56d-c680b5c320fd.sql",
+      "line": 2,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260710034222_13379b58-1899-400b-b56d-c680b5c320fd.sql",
+      "line": 6,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260710034222_13379b58-1899-400b-b56d-c680b5c320fd.sql",
+      "line": 10,
+      "text": "ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260710034222_13379b58-1899-400b-b56d-c680b5c320fd.sql",
+      "line": 14,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260710034222_13379b58-1899-400b-b56d-c680b5c320fd.sql",
+      "line": 18,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260710045307_201d3de0-c3d7-4e00-ac7a-289796cc509a.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260710045307_201d3de0-c3d7-4e00-ac7a-289796cc509a.sql",
+      "line": 17,
+      "text": "user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260710051539_39c40ffd-84f4-4989-af0d-330b19a37527.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260711010354_064bbdf4-d81e-4437-98d9-b75c0c57afcb.sql",
+      "line": 16,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260711010354_064bbdf4-d81e-4437-98d9-b75c0c57afcb.sql",
+      "line": 82,
+      "text": "DELETE FROM public.listings WHERE id = _listing.id;"
+    },
+    {
+      "file": "20260711011141_9f8294d9-bbfa-4fdb-a058-d364cdfed91f.sql",
+      "line": 11,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260711011141_9f8294d9-bbfa-4fdb-a058-d364cdfed91f.sql",
+      "line": 38,
+      "text": "ON storage.objects"
+    },
+    {
+      "file": "20260711011141_9f8294d9-bbfa-4fdb-a058-d364cdfed91f.sql",
+      "line": 46,
+      "text": "WHERE d.attachment_path = storage.objects.name"
+    },
+    {
+      "file": "20260711065141_5acf3fda-e424-43a9-ad55-be9982fe0117.sql",
+      "line": 49,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260711065326_ef5ce8a6-5dd5-40f6-be75-52253b43e0d7.sql",
+      "line": 3,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260711065326_ef5ce8a6-5dd5-40f6-be75-52253b43e0d7.sql",
+      "line": 7,
+      "text": "ON storage.objects FOR INSERT"
+    },
+    {
+      "file": "20260711065326_ef5ce8a6-5dd5-40f6-be75-52253b43e0d7.sql",
+      "line": 12,
+      "text": "ON storage.objects FOR UPDATE"
+    },
+    {
+      "file": "20260711065326_ef5ce8a6-5dd5-40f6-be75-52253b43e0d7.sql",
+      "line": 17,
+      "text": "ON storage.objects FOR DELETE"
+    },
+    {
+      "file": "20260711070812_b5fc269f-649d-4705-b255-89d823663b24.sql",
+      "line": 5,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260711072533_71165e8b-c1de-4475-94a1-9c91ae3c46e5.sql",
+      "line": 19,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260711072533_71165e8b-c1de-4475-94a1-9c91ae3c46e5.sql",
+      "line": 48,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260711072533_71165e8b-c1de-4475-94a1-9c91ae3c46e5.sql",
+      "line": 93,
+      "text": "ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260711072533_71165e8b-c1de-4475-94a1-9c91ae3c46e5.sql",
+      "line": 100,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260711072533_71165e8b-c1de-4475-94a1-9c91ae3c46e5.sql",
+      "line": 107,
+      "text": "ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260711072533_71165e8b-c1de-4475-94a1-9c91ae3c46e5.sql",
+      "line": 112,
+      "text": "WHERE m.attachment_path = storage.objects.name"
+    },
+    {
+      "file": "20260711072533_71165e8b-c1de-4475-94a1-9c91ae3c46e5.sql",
+      "line": 118,
+      "text": "ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 6,
+      "text": "created_by uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 16,
+      "text": "user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 17,
+      "text": "invited_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 30,
+      "text": "sender_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 46,
+      "text": "-- 2. Helper (SECURITY DEFINER to avoid recursive RLS)"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 49,
+      "text": "LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 59,
+      "text": "LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 119,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 160,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 204,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 244,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 263,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql",
+      "line": 275,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260711073454_cea6ce68-1eda-4711-8431-5d3468395289.sql",
+      "line": 3,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260711073454_cea6ce68-1eda-4711-8431-5d3468395289.sql",
+      "line": 41,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260711073454_cea6ce68-1eda-4711-8431-5d3468395289.sql",
+      "line": 82,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260711074001_e72c5982-744f-4023-9045-99a02778d52b.sql",
+      "line": 3,
+      "text": "LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260712010743_2fbad4dc-269c-4aed-b5b5-c8a714d5828f.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260712053445_e5ece42f-5c6d-4e45-a47e-05759dd82540.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260712053952_4bb09603-be11-47ed-aaaf-4114494cbd93.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260712054230_0cadcc14-52ad-4ffb-9294-fa2c1d058c2f.sql",
+      "line": 4,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260712062336_120321ae-5824-4df8-9d53-0e8b448e5160.sql",
+      "line": 17,
+      "text": "user_id      uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260712062336_120321ae-5824-4df8-9d53-0e8b448e5160.sql",
+      "line": 50,
+      "text": "user_id    uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,"
+    },
+    {
+      "file": "20260712062336_120321ae-5824-4df8-9d53-0e8b448e5160.sql",
+      "line": 85,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 70,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.appointments ADD CONSTRAINT appointments_advisor_id_fkey FOREIGN KEY (advisor_id) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 71,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.customer_addresses ADD CONSTRAINT customer_addresses_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 72,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.customer_form_comments ADD CONSTRAINT customer_form_comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 73,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.customer_payment_methods ADD CONSTRAINT customer_payment_methods_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 74,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.customer_profiles ADD CONSTRAINT customer_profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 75,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.customer_provided_forms ADD CONSTRAINT customer_provided_forms_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 76,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.customers ADD CONSTRAINT customers_auth_user_id_fkey FOREIGN KEY (auth_user_id) REFERENCES auth.users(id) ON DELETE SET NULL'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 77,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.customers ADD CONSTRAINT customers_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 78,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.discount_code_usage ADD CONSTRAINT discount_code_usage_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 79,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.discount_codes ADD CONSTRAINT discount_codes_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 80,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.employee_availability ADD CONSTRAINT employee_availability_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES auth.users(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 81,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.inventory_adjustments ADD CONSTRAINT inventory_adjustments_adjusted_by_fkey FOREIGN KEY (adjusted_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 82,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.inventory_alerts ADD CONSTRAINT inventory_alerts_acknowledged_by_fkey FOREIGN KEY (acknowledged_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 83,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.profiles ADD CONSTRAINT profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 84,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.purchase_orders ADD CONSTRAINT purchase_orders_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 85,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.quotes ADD CONSTRAINT quotes_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 86,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.schedule_notifications ADD CONSTRAINT schedule_notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 87,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.shift_chats ADD CONSTRAINT shift_chats_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 88,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.shift_swap_requests ADD CONSTRAINT shift_swap_requests_requesting_employee_id_fkey FOREIGN KEY (requesting_employee_id) REFERENCES auth.users(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 89,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.shift_swap_requests ADD CONSTRAINT shift_swap_requests_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 90,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.shift_swap_requests ADD CONSTRAINT shift_swap_requests_target_employee_id_fkey FOREIGN KEY (target_employee_id) REFERENCES auth.users(id) ON DELETE SET NULL'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 91,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.shift_templates ADD CONSTRAINT shift_templates_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 92,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.shopping_carts ADD CONSTRAINT shopping_carts_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 93,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.user_roles ADD CONSTRAINT user_roles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 94,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.vehicle_inspections ADD CONSTRAINT vehicle_inspections_technician_id_fkey FOREIGN KEY (technician_id) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 95,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.work_order_document_versions ADD CONSTRAINT work_order_document_versions_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 96,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.work_order_documents ADD CONSTRAINT work_order_documents_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 97,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.work_order_documents ADD CONSTRAINT work_order_documents_uploaded_by_fkey FOREIGN KEY (uploaded_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 98,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.work_order_job_line_history ADD CONSTRAINT work_order_job_line_history_changed_by_fkey FOREIGN KEY (changed_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 99,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.work_order_part_history ADD CONSTRAINT work_order_part_history_changed_by_fkey FOREIGN KEY (changed_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 100,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.work_orders ADD CONSTRAINT work_orders_advisor_id_fkey FOREIGN KEY (advisor_id) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "line": 101,
+      "text": "DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.work_orders ADD CONSTRAINT work_orders_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;"
+    },
+    {
+      "file": "20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql",
+      "line": 16,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql",
+      "line": 52,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql",
+      "line": 64,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql",
+      "line": 71,
+      "text": "DELETE FROM public.chat_thread_members"
+    },
+    {
+      "file": "20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql",
+      "line": 109,
+      "text": ") RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql",
+      "line": 117,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql",
+      "line": 171,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql",
+      "line": 190,
+      "text": "RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$"
+    },
+    {
+      "file": "20260713081429_d9cdd366-04dd-4e51-939f-541106ff205e.sql",
+      "line": 4,
+      "text": "RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081429_d9cdd366-04dd-4e51-939f-541106ff205e.sql",
+      "line": 9,
+      "text": "RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081429_d9cdd366-04dd-4e51-939f-541106ff205e.sql",
+      "line": 31,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081429_d9cdd366-04dd-4e51-939f-541106ff205e.sql",
+      "line": 43,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081559_69ad9a73-edab-4719-b16e-38541b8ba91a.sql",
+      "line": 4,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081559_69ad9a73-edab-4719-b16e-38541b8ba91a.sql",
+      "line": 13,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081559_69ad9a73-edab-4719-b16e-38541b8ba91a.sql",
+      "line": 18,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081559_69ad9a73-edab-4719-b16e-38541b8ba91a.sql",
+      "line": 28,
+      "text": "RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081559_69ad9a73-edab-4719-b16e-38541b8ba91a.sql",
+      "line": 34,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081649_7763bb16-35c5-4c76-a8f9-36c3f58090ce.sql",
+      "line": 3,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081649_7763bb16-35c5-4c76-a8f9-36c3f58090ce.sql",
+      "line": 8,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081649_7763bb16-35c5-4c76-a8f9-36c3f58090ce.sql",
+      "line": 13,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081649_7763bb16-35c5-4c76-a8f9-36c3f58090ce.sql",
+      "line": 18,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081649_7763bb16-35c5-4c76-a8f9-36c3f58090ce.sql",
+      "line": 27,
+      "text": "RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081838_b99aba93-f19b-4aec-b7a1-3bdb86faadc6.sql",
+      "line": 138,
+      "text": "RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, shop_manager AS $$"
+    },
+    {
+      "file": "20260713081838_b99aba93-f19b-4aec-b7a1-3bdb86faadc6.sql",
+      "line": 160,
+      "text": "FROM auth.users WHERE id = _user_id;"
+    },
+    {
+      "file": "20260714034131_1bed039d-569f-4b91-8f56-bf19451a7786.sql",
+      "line": 4,
+      "text": "DROP POLICY IF EXISTS \"shop-receipts read authenticated\" ON storage.objects;"
+    },
+    {
+      "file": "20260714034131_1bed039d-569f-4b91-8f56-bf19451a7786.sql",
+      "line": 5,
+      "text": "DROP POLICY IF EXISTS \"shop-receipts write authenticated\" ON storage.objects;"
+    },
+    {
+      "file": "20260714034131_1bed039d-569f-4b91-8f56-bf19451a7786.sql",
+      "line": 6,
+      "text": "DROP POLICY IF EXISTS \"shop-receipts update authenticated\" ON storage.objects;"
+    },
+    {
+      "file": "20260714034131_1bed039d-569f-4b91-8f56-bf19451a7786.sql",
+      "line": 7,
+      "text": "DROP POLICY IF EXISTS \"shop-receipts delete authenticated\" ON storage.objects;"
+    },
+    {
+      "file": "20260714034131_1bed039d-569f-4b91-8f56-bf19451a7786.sql",
+      "line": 9,
+      "text": "CREATE POLICY \"shop-receipts read authenticated\" ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260714034131_1bed039d-569f-4b91-8f56-bf19451a7786.sql",
+      "line": 11,
+      "text": "CREATE POLICY \"shop-receipts write authenticated\" ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260714034131_1bed039d-569f-4b91-8f56-bf19451a7786.sql",
+      "line": 13,
+      "text": "CREATE POLICY \"shop-receipts update authenticated\" ON storage.objects FOR UPDATE TO authenticated"
+    },
+    {
+      "file": "20260714034131_1bed039d-569f-4b91-8f56-bf19451a7786.sql",
+      "line": 15,
+      "text": "CREATE POLICY \"shop-receipts delete authenticated\" ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260714155326_c1b1b538-961e-401b-a3e7-0eba5e655d65.sql",
+      "line": 47,
+      "text": "ON storage.objects FOR SELECT"
+    },
+    {
+      "file": "20260714155326_c1b1b538-961e-401b-a3e7-0eba5e655d65.sql",
+      "line": 51,
+      "text": "ON storage.objects FOR INSERT"
+    },
+    {
+      "file": "20260714155326_c1b1b538-961e-401b-a3e7-0eba5e655d65.sql",
+      "line": 56,
+      "text": "ON storage.objects FOR UPDATE"
+    },
+    {
+      "file": "20260714155326_c1b1b538-961e-401b-a3e7-0eba5e655d65.sql",
+      "line": 61,
+      "text": "ON storage.objects FOR DELETE"
+    },
+    {
+      "file": "20260714170250_e9540d54-e006-48bd-918c-8e5033f08dab.sql",
+      "line": 14,
+      "text": "-- Register the cron-driven automation runner token. Value is a random 32-byte"
+    },
+    {
+      "file": "20260714170250_e9540d54-e006-48bd-918c-8e5033f08dab.sql",
+      "line": 15,
+      "text": "-- hex string; pg_cron sends it in the `x-cron-token` header."
+    },
+    {
+      "file": "20260714172542_fe842540-f4a5-410d-a22b-db7d2530ac2c.sql",
+      "line": 13,
+      "text": "triggered_by text NOT NULL DEFAULT 'cron'"
+    },
+    {
+      "file": "20260714182226_86c87564-8376-4497-be04-81f0d6ff5210.sql",
+      "line": 186,
+      "text": "DROP POLICY IF EXISTS \"shop_inspections_read\" ON storage.objects;"
+    },
+    {
+      "file": "20260714182226_86c87564-8376-4497-be04-81f0d6ff5210.sql",
+      "line": 187,
+      "text": "CREATE POLICY \"shop_inspections_read\" ON storage.objects FOR SELECT TO authenticated"
+    },
+    {
+      "file": "20260714182226_86c87564-8376-4497-be04-81f0d6ff5210.sql",
+      "line": 190,
+      "text": "DROP POLICY IF EXISTS \"shop_inspections_write\" ON storage.objects;"
+    },
+    {
+      "file": "20260714182226_86c87564-8376-4497-be04-81f0d6ff5210.sql",
+      "line": 191,
+      "text": "CREATE POLICY \"shop_inspections_write\" ON storage.objects FOR INSERT TO authenticated"
+    },
+    {
+      "file": "20260714182226_86c87564-8376-4497-be04-81f0d6ff5210.sql",
+      "line": 194,
+      "text": "DROP POLICY IF EXISTS \"shop_inspections_delete\" ON storage.objects;"
+    },
+    {
+      "file": "20260714182226_86c87564-8376-4497-be04-81f0d6ff5210.sql",
+      "line": 195,
+      "text": "CREATE POLICY \"shop_inspections_delete\" ON storage.objects FOR DELETE TO authenticated"
+    },
+    {
+      "file": "20260715012303_a5daad1f-ca4a-4606-b07d-3f38ec8c7ee9.sql",
+      "line": 18,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715012303_a5daad1f-ca4a-4606-b07d-3f38ec8c7ee9.sql",
+      "line": 38,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715012303_a5daad1f-ca4a-4606-b07d-3f38ec8c7ee9.sql",
+      "line": 58,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715012303_a5daad1f-ca4a-4606-b07d-3f38ec8c7ee9.sql",
+      "line": 78,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715012303_a5daad1f-ca4a-4606-b07d-3f38ec8c7ee9.sql",
+      "line": 107,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715012303_a5daad1f-ca4a-4606-b07d-3f38ec8c7ee9.sql",
+      "line": 125,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715012303_a5daad1f-ca4a-4606-b07d-3f38ec8c7ee9.sql",
+      "line": 168,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715015208_d62496ef-e67e-4f61-a395-604bfd5749dc.sql",
+      "line": 16,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715015208_d62496ef-e67e-4f61-a395-604bfd5749dc.sql",
+      "line": 34,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715015208_d62496ef-e67e-4f61-a395-604bfd5749dc.sql",
+      "line": 63,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715015208_d62496ef-e67e-4f61-a395-604bfd5749dc.sql",
+      "line": 120,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715015208_d62496ef-e67e-4f61-a395-604bfd5749dc.sql",
+      "line": 135,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715015208_d62496ef-e67e-4f61-a395-604bfd5749dc.sql",
+      "line": 187,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715015208_d62496ef-e67e-4f61-a395-604bfd5749dc.sql",
+      "line": 255,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715015208_d62496ef-e67e-4f61-a395-604bfd5749dc.sql",
+      "line": 295,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715020120_bc5cc45c-4d3d-4e90-a555-cf44d6e11086.sql",
+      "line": 21,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715020120_bc5cc45c-4d3d-4e90-a555-cf44d6e11086.sql",
+      "line": 98,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715020120_bc5cc45c-4d3d-4e90-a555-cf44d6e11086.sql",
+      "line": 118,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715020120_bc5cc45c-4d3d-4e90-a555-cf44d6e11086.sql",
+      "line": 154,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260715020533_cd0eef21-5341-4af3-abc2-71fc7c080432.sql",
+      "line": 25,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 3,
+      "text": "DROP POLICY IF EXISTS shop_inspections_read ON storage.objects;"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 4,
+      "text": "DROP POLICY IF EXISTS shop_inspections_write ON storage.objects;"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 5,
+      "text": "DROP POLICY IF EXISTS shop_inspections_delete ON storage.objects;"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 7,
+      "text": "CREATE POLICY shop_inspections_read ON storage.objects"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 18,
+      "text": "CREATE POLICY shop_inspections_write ON storage.objects"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 29,
+      "text": "CREATE POLICY shop_inspections_delete ON storage.objects"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 41,
+      "text": "DROP POLICY IF EXISTS \"shop-receipts read authenticated\" ON storage.objects;"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 42,
+      "text": "DROP POLICY IF EXISTS \"shop-receipts write authenticated\" ON storage.objects;"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 43,
+      "text": "DROP POLICY IF EXISTS \"shop-receipts update authenticated\" ON storage.objects;"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 44,
+      "text": "DROP POLICY IF EXISTS \"shop-receipts delete authenticated\" ON storage.objects;"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 46,
+      "text": "CREATE POLICY \"shop-receipts read authenticated\" ON storage.objects"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 53,
+      "text": "CREATE POLICY \"shop-receipts write authenticated\" ON storage.objects"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 60,
+      "text": "CREATE POLICY \"shop-receipts update authenticated\" ON storage.objects"
+    },
+    {
+      "file": "20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql",
+      "line": 71,
+      "text": "CREATE POLICY \"shop-receipts delete authenticated\" ON storage.objects"
+    },
+    {
+      "file": "20260716145553_ac1cd5fe-07aa-4ad1-b6ad-caf47c0e2886.sql",
+      "line": 8,
+      "text": "created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,"
+    },
+    {
+      "file": "20260728125715_52a60fda-14fe-4758-bf19-22284e3e7468.sql",
+      "line": 43,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260728125715_52a60fda-14fe-4758-bf19-22284e3e7468.sql",
+      "line": 70,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260728125715_52a60fda-14fe-4758-bf19-22284e3e7468.sql",
+      "line": 90,
+      "text": "SECURITY DEFINER"
+    },
+    {
+      "file": "20260805084402_cd07847a-26f0-4c31-a2fe-ab0088684f77.sql",
+      "line": 147,
+      "text": "'ALTER POLICY %I ON storage.objects USING (%s AND name IS NOT NULL AND octet_length(coalesce(name, '''')) > 0)',"
+    },
+    {
+      "file": "20260805084402_cd07847a-26f0-4c31-a2fe-ab0088684f77.sql",
+      "line": 158,
+      "text": "ALTER PUBLICATION supabase_realtime DROP TABLE public.business_inquiries;"
+    },
+    {
+      "file": "20260805084402_cd07847a-26f0-4c31-a2fe-ab0088684f77.sql",
+      "line": 161,
+      "text": "ALTER PUBLICATION supabase_realtime DROP TABLE public.ops_alerts;"
+    }
+  ]
+}
