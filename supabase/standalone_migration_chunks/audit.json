@@ -1,7 +1,7 @@
 {
-  "migration_file_count": 391,
+  "migration_file_count": 392,
   "chunk_count": 7,
-  "hazard_match_count": 780,
+  "hazard_match_count": 783,
   "hazard_matches": [
     {
       "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
@@ -3896,6 +3896,21 @@
     {
       "file": "20260829180321_harden_public_projection_views.sql",
       "line": 82,
+      "text": "security definer"
+    },
+    {
+      "file": "20260829180438_move_projection_helpers_private.sql",
+      "line": 18,
+      "text": "security definer"
+    },
+    {
+      "file": "20260829180438_move_projection_helpers_private.sql",
+      "line": 48,
+      "text": "security definer"
+    },
+    {
+      "file": "20260829180438_move_projection_helpers_private.sql",
+      "line": 76,
       "text": "security definer"
     },
     {
