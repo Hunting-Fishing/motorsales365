@@ -14,6 +14,8 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      TARGET_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
     steps:
       - name: Verify public standalone routes
         shell: bash
@@ -43,3 +45,18 @@ jobs:
           [[ "$code" == '422' ]] || { echo "Expected controlled signup validation status 422; got ${code}." >&2; exit 1; }
           grep -q '"ok":false' /tmp/signup-response.json || { echo 'Expected validation response body was not returned.' >&2; exit 1; }
           echo 'Controlled signup validation request reached standalone server route.'
+
+      - name: Remove controlled smoke audit event
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${TARGET_SUPABASE_SERVICE_ROLE_KEY:-}" || { echo 'Missing target service-role secret.' >&2; exit 1; }
+          endpoint='https://wjxaajgvddtrxxtocxen.supabase.co/rest/v1/signup_failure_events?user_agent=eq.standalone-service-role-smoke-20260829-1818'
+          code="$(curl --silent --show-error --output /tmp/delete-response.txt --write-out '%{http_code}' \
+            --request DELETE \
+            --header "apikey: ${TARGET_SUPABASE_SERVICE_ROLE_KEY}" \
+            --header "Authorization: Bearer ${TARGET_SUPABASE_SERVICE_ROLE_KEY}" \
+            --header 'Prefer: return=minimal' \
+            "$endpoint")"
+          [[ "$code" == '204' || "$code" == '200' ]] || { echo "Smoke audit cleanup failed with HTTP ${code}." >&2; exit 1; }
+          echo 'Controlled smoke audit event removed.'
