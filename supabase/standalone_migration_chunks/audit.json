@@ -1,7 +1,7 @@
 {
-  "migration_file_count": 394,
+  "migration_file_count": 395,
   "chunk_count": 7,
-  "hazard_match_count": 783,
+  "hazard_match_count": 785,
   "hazard_matches": [
     {
       "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
@@ -3917,6 +3917,16 @@
       "file": "20260830015000_restrict_internal_security_definer_helpers.sql",
       "line": 1,
       "text": "-- Standalone hardening: these SECURITY DEFINER helpers are internal mutation"
+    },
+    {
+      "file": "20260830153000_repair_r32_demo_legacy_lovable_media.sql",
+      "line": 40,
+      "text": "and lm.url like 'https://wjxaajgvddtrxxtocxen.supabase.co/storage/v1/object/public/listing-photos/%'"
+    },
+    {
+      "file": "20260830153000_repair_r32_demo_legacy_lovable_media.sql",
+      "line": 48,
+      "text": "delete from public.listing_media lm"
     }
   ]
 }
