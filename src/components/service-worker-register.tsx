@@ -17,17 +17,9 @@ export function ServiceWorkerRegister() {
     const buildStorageKey = "365ms:last-build-id";
     const reloadStorageKey = `365ms:reloaded-for-build:${buildId}`;
     const hostname = window.location.hostname;
-    const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
-    const isPreviewHost =
-      hostname.startsWith("id-preview--") ||
-      hostname.startsWith("preview--") ||
-      hostname === "lovableproject.com" ||
-      hostname.endsWith(".lovableproject.com") ||
-      hostname === "lovableproject-dev.com" ||
-      hostname.endsWith(".lovableproject-dev.com") ||
-      hostname === "beta.lovable.dev" ||
-      hostname.endsWith(".beta.lovable.dev");
-    const shouldAutoReloadForNewBuild = !isLocalhost && !isPreviewHost;
+    const isLocalhost =
+      hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".localhost");
+    const shouldAutoReloadForNewBuild = !isLocalhost;
     const hasServiceWorker = "serviceWorker" in navigator;
 
     document.documentElement.dataset.appBuild = buildId;
@@ -107,7 +99,11 @@ export function ServiceWorkerRegister() {
       try {
         const previousBuildId = getStorage(window.localStorage, buildStorageKey);
         setStorage(window.localStorage, buildStorageKey, buildId);
-        if (previousBuildId && previousBuildId !== buildId && !getStorage(window.sessionStorage, reloadStorageKey)) {
+        if (
+          previousBuildId &&
+          previousBuildId !== buildId &&
+          !getStorage(window.sessionStorage, reloadStorageKey)
+        ) {
           setStorage(window.sessionStorage, reloadStorageKey, "1");
           window.location.reload();
         }
