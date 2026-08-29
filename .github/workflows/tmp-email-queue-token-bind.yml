@@ -1,0 +1,85 @@
+name: Temporary Email Queue Token Bind
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/tmp-email-queue-token-bind.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  bind-and-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_URL: https://wjxaajgvddtrxxtocxen.supabase.co
+      STAGING_URL: https://motorsales365-standalone-staging.jordilwbailey.workers.dev
+    steps:
+      - name: Create dedicated token and store it in target Supabase
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}"
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}"
+          test -n "${SUPABASE_SERVICE_ROLE_KEY:-}"
+
+          umask 077
+          openssl rand -hex 32 > /tmp/email-queue-token
+          token="$(cat /tmp/email-queue-token)"
+          payload="$(jq -cn --arg t "$token" '{job_name:"email_queue",token:$t,rotated_at:(now|todateiso8601)}')"
+
+          status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+            --request POST "${SUPABASE_URL}/rest/v1/internal_cron_tokens?on_conflict=job_name" \
+            --header "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+            --header "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+            --header 'Content-Type: application/json' \
+            --header 'Prefer: resolution=merge-duplicates,return=minimal' \
+            --data "$payload")"
+          [[ "$status" == '201' || "$status" == '204' ]] || { echo "target_token_store_http=${status}"; exit 1; }
+          echo 'target_email_queue_token_stored=true'
+
+      - name: Bind the same token to isolated staging Worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat /tmp/email-queue-token | npx --yes wrangler@4 secret put EMAIL_QUEUE_CRON_TOKEN --name motorsales365-standalone-staging >/dev/null
+          npx --yes wrangler@4 secret list --name motorsales365-standalone-staging > /tmp/secret-list.txt
+          grep -Fq 'EMAIL_QUEUE_CRON_TOKEN' /tmp/secret-list.txt
+          echo 'worker_email_queue_token_binding=true'
+
+      - name: Verify target registry metadata without exposing token
+        shell: bash
+        run: |
+          set -euo pipefail
+          status="$(curl --silent --show-error --output /tmp/token-metadata.json --write-out '%{http_code}' \
+            --get "${SUPABASE_URL}/rest/v1/internal_cron_tokens" \
+            --data-urlencode 'job_name=eq.email_queue' \
+            --data-urlencode 'select=job_name,rotated_at' \
+            --header "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+            --header "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}")"
+          [[ "$status" == '200' ]]
+          jq -e 'length == 1 and .[0].job_name == "email_queue"' /tmp/token-metadata.json >/dev/null
+          echo 'target_email_queue_registry_verified=true'
+
+      - name: Probe empty staging email queue
+        shell: bash
+        run: |
+          set -euo pipefail
+          token="$(cat /tmp/email-queue-token)"
+          status="$(curl --silent --show-error --output /tmp/queue-response.json --write-out '%{http_code}' \
+            --request POST "${STAGING_URL}/api/internal/email/queue/process" \
+            --header "x-cron-token: ${token}" \
+            --header 'Content-Type: application/json' \
+            --data '{}')"
+          echo "queue_probe_http=${status}"
+          [[ "$status" == '200' ]]
+          processed="$(jq -r '.processed // -1' /tmp/queue-response.json)"
+          echo "queue_processed=${processed}"
+          [[ "$processed" == '0' ]]
+          rm -f /tmp/email-queue-token /tmp/token-metadata.json /tmp/queue-response.json
