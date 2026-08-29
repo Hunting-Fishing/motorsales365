@@ -1,0 +1,50 @@
+name: Standalone Runtime CI
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  standalone-runtime:
+    if: ${{ github.event_name != 'pull_request' || github.head_ref == 'migration/standalone-supabase-365' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Guard standalone runtime from Lovable source endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RInE \
+            --exclude='*.map' \
+            --exclude-dir=node_modules \
+            'jfjrnjyroxvlydajvndl|\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' \
+            src wrangler.jsonc vite.config.ts; then
+            echo 'Standalone runtime still contains a Lovable source/runtime endpoint.' >&2
+            exit 1
+          fi
+
+      - name: Build standalone application
+        run: npm run build
+
+      - name: Run unit tests
+        run: npm test
