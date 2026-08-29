@@ -1,7 +1,7 @@
 # Standalone Supabase migration build
-- Migration files: 388
+- Migration files: 389
 - First: 20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql
-- Last: 20260805085754_f4e0fcae-45f3-42a2-b801-44216b32a6bc.sql
+- Last: 20260830014500_harden_trigger_function_execute_privileges.sql
 - Chunks: 7
 - Hazard-pattern matches requiring review: 774
 
