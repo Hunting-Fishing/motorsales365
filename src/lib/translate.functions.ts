@@ -2,14 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
+import { callStandaloneAi } from "@/lib/ai-provider.server";
 
 const codes = SUPPORTED_LANGUAGES.map((l) => l.code) as [string, ...string[]];
 
-/**
- * On-demand translation of user-generated content (listing descriptions,
- * messages) via the Lovable AI Gateway. No API key needed — the gateway
- * injects credentials on Cloudflare Workers.
- */
+/** On-demand translation using the configured standalone AI provider. */
 export const translateText = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { text: string; target: string }) =>
@@ -21,21 +18,12 @@ export const translateText = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) {
-      return { text: data.text, translated: false, error: "AI gateway unavailable" };
-    }
     const langName =
       SUPPORTED_LANGUAGES.find((l) => l.code === data.target)?.label ?? data.target;
 
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+    try {
+      const out = await callStandaloneAi({
+        model: process.env.AI_MODEL_TRANSLATE,
         messages: [
           {
             role: "system",
@@ -47,20 +35,14 @@ export const translateText = createServerFn({ method: "POST" })
             content: `Target language: ${langName}\n\nText:\n${data.text}`,
           },
         ],
-      }),
-    });
+      });
 
-    if (!resp.ok) {
-      return {
-        text: data.text,
-        translated: false,
-        error: `Translation failed (${resp.status})`,
-      };
+      if (!out) {
+        return { text: data.text, translated: false, error: "AI provider unavailable" };
+      }
+      return { text: out, translated: true };
+    } catch (error) {
+      console.error("Translation provider failed", error);
+      return { text: data.text, translated: false, error: "Translation failed" };
     }
-    const json = (await resp.json()) as {
-      choices?: { message?: { content?: string } }[];
-    };
-    const out = json.choices?.[0]?.message?.content?.trim();
-    if (!out) return { text: data.text, translated: false, error: "Empty response" };
-    return { text: out, translated: true };
   });
