@@ -31,6 +31,7 @@ function bundleModuleProfilePlugin(): Plugin {
 
       const moduleTotals = new Map<string, number>();
       const packageTotals = new Map<string, number>();
+      const renderedModuleIds = new Set<string>();
       const chunks: Array<{ file: string; renderedBytes: number; moduleCount: number }> = [];
 
       for (const output of Object.values(bundle)) {
@@ -41,6 +42,7 @@ function bundleModuleProfilePlugin(): Plugin {
         for (const [id, details] of entries) {
           const renderedBytes = Number(details.renderedLength || 0);
           chunkRenderedBytes += renderedBytes;
+          renderedModuleIds.add(id);
           moduleTotals.set(id, (moduleTotals.get(id) ?? 0) + renderedBytes);
 
           const packageName = packageNameForModule(id);
@@ -59,12 +61,28 @@ function bundleModuleProfilePlugin(): Plugin {
           .map(([name, renderedBytes]) => ({ name, renderedBytes }))
           .sort((a, b) => b.renderedBytes - a.renderedBytes);
 
+      const importGraph = [...renderedModuleIds]
+        .map((id) => {
+          const info = this.getModuleInfo(id);
+          return {
+            id,
+            packageName: packageNameForModule(id),
+            renderedBytes: moduleTotals.get(id) ?? 0,
+            importers: info?.importers ?? [],
+            dynamicImporters: info?.dynamicImporters ?? [],
+            importedIds: info?.importedIds ?? [],
+            dynamicallyImportedIds: info?.dynamicallyImportedIds ?? [],
+          };
+        })
+        .sort((a, b) => b.renderedBytes - a.renderedBytes);
+
       const report = {
         outputDir: outputOptions.dir ?? null,
         generatedAt: new Date().toISOString(),
         packageTotals: sortTotals(packageTotals).slice(0, 100),
         moduleTotals: sortTotals(moduleTotals).slice(0, 500),
         chunks: chunks.sort((a, b) => b.renderedBytes - a.renderedBytes).slice(0, 200),
+        importGraph,
       };
 
       mkdirSync("bundle-profile", { recursive: true });
