@@ -1,0 +1,92 @@
+name: Deploy Standalone Staging
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'wrangler.jsonc'
+      - '.github/workflows/deploy-standalone-staging.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motorsales365-standalone-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Verify Cloudflare deployment credentials are available
+        id: cloudflare
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${CLOUDFLARE_API_TOKEN:-}" || -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'Cloudflare deployment credentials are not configured in GitHub Actions; staging deployment skipped.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo 'ready=true' >> "$GITHUB_OUTPUT"
+          echo 'Cloudflare deployment credentials are present. No credential values are printed.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install locked dependencies
+        if: steps.cloudflare.outputs.ready == 'true'
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+
+      - name: Run standalone runtime guard
+        if: steps.cloudflare.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          matches="$({
+            grep -RInE \
+              --exclude='*.map' \
+              --exclude='qr-rescue-detector.tsx' \
+              --exclude-dir=node_modules \
+              'jfjrnjyroxvlydajvndl|\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' \
+              src wrangler.jsonc vite.config.ts || true
+          } | grep -vE '^[^:]+:[0-9]+:[[:space:]]*(//|/\*|\*|\*/)' || true)"
+          if [[ -n "$matches" ]]; then
+            printf '%s\n' "$matches"
+            echo 'Standalone staging deployment blocked: Lovable source/runtime endpoint found.' >&2
+            exit 1
+          fi
+
+      - name: Run unit tests
+        if: steps.cloudflare.outputs.ready == 'true'
+        run: npm test
+
+      - name: Build standalone application
+        if: steps.cloudflare.outputs.ready == 'true'
+        run: npm run build
+
+      - name: Deploy isolated standalone staging Worker
+        if: steps.cloudflare.outputs.ready == 'true'
+        run: npx wrangler deploy --env staging
+
+      - name: Record staging deployment result
+        if: steps.cloudflare.outputs.ready == 'true' && success()
+        run: |
+          echo 'Standalone staging Worker deployed successfully.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Production Worker and production DNS were not modified by this workflow.' >> "$GITHUB_STEP_SUMMARY"
