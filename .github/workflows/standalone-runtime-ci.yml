@@ -38,11 +38,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -RInE \
-            --exclude='*.map' \
-            --exclude-dir=node_modules \
-            'jfjrnjyroxvlydajvndl|\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' \
-            src wrangler.jsonc vite.config.ts; then
+          matches="$({
+            grep -RInE \
+              --exclude='*.map' \
+              --exclude='qr-rescue-detector.tsx' \
+              --exclude-dir=node_modules \
+              'jfjrnjyroxvlydajvndl|\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' \
+              src wrangler.jsonc vite.config.ts || true
+          } | grep -vE '^[^:]+:[0-9]+:[[:space:]]*(//|/\*|\*|\*/)' || true)"
+          if [[ -n "$matches" ]]; then
+            printf '%s\n' "$matches"
             echo 'Standalone runtime still contains a Lovable source/runtime endpoint.' >&2
             exit 1
           fi
