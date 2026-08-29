@@ -15,7 +15,6 @@ vi.mock("@/lib/email/send", () => ({
   sendTransactionalEmail: vi.fn().mockResolvedValue({ ok: true }),
 }));
 
-// ---- Sonner toast spy ----------------------------------------------------
 const toastError = vi.fn<(msg: string, opts: any) => string>(() => "toast-id-1");
 const toastDismiss = vi.fn<(id: any) => void>();
 vi.mock("sonner", () => ({
@@ -29,15 +28,16 @@ vi.mock("sonner", () => ({
   },
 }));
 
-// ---- Supabase mocks ------------------------------------------------------
 type AuthListener = (event: string, session: any) => void;
 const listeners: AuthListener[] = [];
 const signOutLocal = vi.fn().mockResolvedValue({ error: null });
+const initialSession = {
+  user: { id: "u1", email: "u@x.com", user_metadata: {} },
+};
 
 const rolesTable = () => ({
   select: () => ({
-    eq: () =>
-      Promise.resolve({ data: [{ role: "user" }], error: null }),
+    eq: () => Promise.resolve({ data: [{ role: "user" }], error: null }),
   }),
 });
 const profilesTable = () => ({
@@ -56,22 +56,17 @@ const profilesTable = () => ({
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
-      getUser: vi.fn().mockResolvedValue({
-        data: { user: { id: "u1", email: "u@x.com", user_metadata: {} } },
-        error: null,
-      }),
-      getSession: vi.fn().mockResolvedValue({
-        data: {
-          session: { user: { id: "u1", email: "u@x.com", user_metadata: {} } },
-        },
-        error: null,
-      }),
       signOut: vi.fn((opts?: { scope?: string }) => {
         if (opts?.scope === "local") return signOutLocal();
         return Promise.resolve({ error: null });
       }),
+      refreshSession: vi.fn().mockResolvedValue({
+        data: { session: null },
+        error: { message: "session revoked", status: 401 },
+      }),
       onAuthStateChange: (cb: AuthListener) => {
         listeners.push(cb);
+        queueMicrotask(() => cb("INITIAL_SESSION", initialSession));
         return {
           data: {
             subscription: {
@@ -124,21 +119,17 @@ describe("auth — unexpected SIGNED_OUT surfaces toast + Try again flow", () =>
 
     const { result } = renderHook(() => useAuth(), { wrapper });
 
-    // Wait for initial signed-in bootstrap.
     await waitFor(() => expect(result.current.user?.id).toBe("u1"), { timeout: 3000 });
     expect(result.current.authError).toBeNull();
 
-    // Simulate Supabase emitting SIGNED_OUT that we did NOT initiate.
     await act(async () => {
       for (const cb of listeners) cb("SIGNED_OUT", null);
     });
 
-    // 1) authError transitions to refresh_failed, session cleared.
     await waitFor(() => expect(result.current.authError).toBe("refresh_failed"));
     expect(result.current.user).toBeNull();
     expect(result.current.effectiveRoles).toEqual([]);
 
-    // 2) Sonner red toast raised with a "Try again" action.
     await waitFor(() => expect(toastError).toHaveBeenCalledTimes(1));
     const [msg, opts] = toastError.mock.calls[0] as [string, any];
     expect(msg).toMatch(/session expired/i);
@@ -146,7 +137,6 @@ describe("auth — unexpected SIGNED_OUT surfaces toast + Try again flow", () =>
     expect(opts.action?.label).toBe("Try again");
     expect(typeof opts.action?.onClick).toBe("function");
 
-    // 3) Invoke the "Try again" action → retryAuth runs.
     await act(async () => {
       await opts.action.onClick();
       await Promise.resolve();
@@ -156,7 +146,6 @@ describe("auth — unexpected SIGNED_OUT surfaces toast + Try again flow", () =>
     expect(result.current.user).toBeNull();
     expect(result.current.authError).toBeNull();
 
-    // 4) Navigation went to /auth?next=<encoded current path+search>.
     expect(assignSpy).toHaveBeenCalledTimes(1);
     const target = assignSpy.mock.calls[0][0] as string;
     expect(target).toBe(
