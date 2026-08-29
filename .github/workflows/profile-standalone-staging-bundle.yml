@@ -58,6 +58,38 @@ jobs:
             exit 1
           fi
 
+      - name: Apply profiling-only selective SSR experiment
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const edits = [
+            {
+              path: 'src/routes/dashboard.tsx',
+              before: 'export const Route = createFileRoute("/dashboard")({\n  component: DashboardLayout,',
+              after: 'export const Route = createFileRoute("/dashboard")({\n  ssr: false,\n  component: DashboardLayout,',
+            },
+            {
+              path: 'src/routes/admin.tsx',
+              before: 'export const Route = createFileRoute("/admin")({\n  component: AdminLayout,',
+              after: 'export const Route = createFileRoute("/admin")({\n  ssr: false,\n  component: AdminLayout,',
+            },
+          ];
+
+          for (const edit of edits) {
+            const original = fs.readFileSync(edit.path, 'utf8');
+            if (!original.includes(edit.before)) {
+              console.error(`Profiling experiment blocked: expected route declaration not found in ${edit.path}.`);
+              process.exit(1);
+            }
+            fs.writeFileSync(edit.path, original.replace(edit.before, edit.after));
+          }
+
+          console.log('Applied CI-workspace-only ssr:false to /dashboard and /admin for measurement.');
+          NODE
+
       - name: Build exact standalone staging application
         run: npm run build
 
@@ -124,7 +156,9 @@ jobs:
 
           const fmt = n => `${(n / 1024).toFixed(1)} KiB`;
           const lines = [
-            '# Standalone staging Worker bundle profile',
+            '# Standalone staging Worker bundle profile — selective SSR experiment',
+            '',
+            'Experiment: `/dashboard` and `/admin` are temporarily `ssr: false` inside the CI workspace only.',
             '',
             `Files measured: ${rows.length}`,
             `Total raw: ${fmt(total.raw)}`,
@@ -173,4 +207,4 @@ jobs:
       - name: Confirm no deployment occurred
         run: |
           echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '**Safety:** this workflow performed a local Wrangler dry-run only. No Worker or DNS was deployed or modified.' >> "$GITHUB_STEP_SUMMARY"
+          echo '**Safety:** this workflow performed a local Wrangler dry-run only. The selective-SSR change existed only in the CI workspace. No Worker, DNS, or application source file was deployed or modified by the experiment.' >> "$GITHUB_STEP_SUMMARY"
