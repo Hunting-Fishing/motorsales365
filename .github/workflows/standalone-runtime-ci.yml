@@ -28,7 +28,10 @@ jobs:
           cache: npm
 
       - name: Install locked dependencies
-        run: npm ci
+        # The existing lockfile contains a known peer-metadata mismatch between
+        # @tanstack/zod-adapter and Zod 4. Keep the lockfile authoritative while
+        # bypassing npm's peer resolver; do not rewrite the dependency graph in CI.
+        run: npm ci --legacy-peer-deps
 
       - name: Guard standalone runtime from Lovable source endpoints
         shell: bash
