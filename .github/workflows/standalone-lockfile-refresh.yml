@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   refresh-lockfile:
@@ -38,6 +38,20 @@ jobs:
             echo 'Generated lockfile unexpectedly contains removed Lovable packages.' >&2
             exit 1
           fi
+
+      - name: Commit regenerated lockfile to migration branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo 'package-lock.json is already current.'
+            exit 0
+          fi
+          git commit -m 'chore(standalone): refresh npm lockfile'
+          git push origin HEAD:migration/standalone-supabase-365
 
       - name: Upload generated lockfile
         uses: actions/upload-artifact@v4
