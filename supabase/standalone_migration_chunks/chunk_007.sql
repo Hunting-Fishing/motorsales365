@@ -544,6 +544,23 @@ grant execute on function public.derive_signup_intent(uuid) to authenticated, se
 
 
 -- ============================================================================
+-- SOURCE MIGRATION: 20260829202547_revoke_direct_execute_maintenance_rpcs.sql
+-- ============================================================================
+-- Restrict direct RPC access to maintenance helpers that are executed
+-- internally by postgres-owned trigger/helper functions or trusted server code.
+-- Preserve service_role and postgres execution while removing public client access.
+
+REVOKE ALL ON FUNCTION public.match_listing_to_parts_wanted(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.match_listing_to_parts_wanted(uuid) TO service_role;
+
+REVOKE ALL ON FUNCTION public.recompute_seller_rating(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.recompute_seller_rating(uuid) TO service_role;
+
+REVOKE ALL ON FUNCTION public.pp_recompute_payout_total(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.pp_recompute_payout_total(uuid) TO service_role;
+
+
+-- ============================================================================
 -- SOURCE MIGRATION: 20260830014500_harden_trigger_function_execute_privileges.sql
 -- ============================================================================
 -- Standalone hardening: trigger functions are not valid public RPC endpoints.

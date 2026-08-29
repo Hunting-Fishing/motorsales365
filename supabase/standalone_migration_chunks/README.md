@@ -1,5 +1,5 @@
 # Standalone Supabase migration build
-- Migration files: 393
+- Migration files: 394
 - First: 20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql
 - Last: 20260830015000_restrict_internal_security_definer_helpers.sql
 - Chunks: 7
