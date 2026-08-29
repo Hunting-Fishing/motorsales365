@@ -1,7 +1,7 @@
 {
-  "migration_file_count": 389,
+  "migration_file_count": 390,
   "chunk_count": 7,
-  "hazard_match_count": 774,
+  "hazard_match_count": 775,
   "hazard_matches": [
     {
       "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
@@ -3872,6 +3872,11 @@
       "file": "20260805084402_cd07847a-26f0-4c31-a2fe-ab0088684f77.sql",
       "line": 161,
       "text": "ALTER PUBLICATION supabase_realtime DROP TABLE public.ops_alerts;"
+    },
+    {
+      "file": "20260830015000_restrict_internal_security_definer_helpers.sql",
+      "line": 1,
+      "text": "-- Standalone hardening: these SECURITY DEFINER helpers are internal mutation"
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
   "source_directory": "supabase/migrations",
-  "file_count": 389,
+  "file_count": 390,
   "first_migration": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
-  "last_migration": "20260830014500_harden_trigger_function_execute_privileges.sql",
+  "last_migration": "20260830015000_restrict_internal_security_definer_helpers.sql",
   "chunks": [
     {
       "chunk": "chunk_001.sql",
@@ -443,11 +443,12 @@
       "files": [
         "20260805084402_cd07847a-26f0-4c31-a2fe-ab0088684f77.sql",
         "20260805085754_f4e0fcae-45f3-42a2-b801-44216b32a6bc.sql",
-        "20260830014500_harden_trigger_function_execute_privileges.sql"
+        "20260830014500_harden_trigger_function_execute_privileges.sql",
+        "20260830015000_restrict_internal_security_definer_helpers.sql"
       ],
-      "source_bytes": 12101,
+      "source_bytes": 13419,
       "first": "20260805084402_cd07847a-26f0-4c31-a2fe-ab0088684f77.sql",
-      "last": "20260830014500_harden_trigger_function_execute_privileges.sql"
+      "last": "20260830015000_restrict_internal_security_definer_helpers.sql"
     }
   ]
 }
