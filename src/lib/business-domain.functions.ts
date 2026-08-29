@@ -47,6 +47,10 @@ function mintToken() {
   return "365ms-" + Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+function customDomainCnameTarget(): string {
+  return (process.env.CUSTOM_DOMAIN_CNAME_TARGET ?? "").trim().replace(/\.$/, "");
+}
+
 export const getBusinessCustomDomain = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { businessId: string }) =>
@@ -59,12 +63,20 @@ export const getBusinessCustomDomain = createServerFn({ method: "GET" })
       .select("id, slug, custom_domain, custom_domain_status, custom_domain_verify_token, custom_domain_verified_at")
       .eq("id", data.businessId)
       .maybeSingle();
+
+    const cnameTarget = customDomainCnameTarget();
     return {
       business: biz,
       verifyHost: biz?.custom_domain ? `${VERIFY_HOST_PREFIX}.${biz.custom_domain}` : null,
+      hostingConfigured: Boolean(cnameTarget),
+      hostingMessage: cnameTarget
+        ? null
+        : "Custom-domain hosting is not configured for this deployment yet.",
+      // Keep the legacy property names for UI compatibility while changing the
+      // actual DNS instruction from a hard-coded hosting IP to our deployment target.
       instructions: {
-        aRecord: { name: "@", type: "A", value: "185.158.133.1" },
-        wwwRecord: { name: "www", type: "A", value: "185.158.133.1" },
+        aRecord: { name: "@", type: "CNAME", value: cnameTarget },
+        wwwRecord: { name: "www", type: "CNAME", value: cnameTarget },
       },
     };
   });
@@ -177,13 +189,11 @@ export const resolveBusinessByHost = createServerFn({ method: "GET" })
     host = host.replace(/:\d+$/, "").replace(/^www\./, "");
     if (!host) return { business: null };
 
-    // Never match our own domains.
+    // Never treat our canonical site or local development as a customer domain.
     if (
-      host.endsWith(".lovable.app") ||
       host === "365motorsales.com" ||
-      host === "www.365motorsales.com" ||
-      host === "motorsales365.lovable.app" ||
       host === "localhost" ||
+      host === "127.0.0.1" ||
       host.endsWith(".localhost")
     ) {
       return { business: null };
