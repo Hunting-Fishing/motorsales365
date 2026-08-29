@@ -1,0 +1,72 @@
+name: Bridge Target Service Role To Staging
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/bridge-target-service-role-to-staging.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TARGET_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      TARGET_SUPABASE_URL: https://wjxaajgvddtrxxtocxen.supabase.co
+      WORKER_NAME: motorsales365-standalone-staging
+    steps:
+      - name: Verify required secret handles exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo 'Cloudflare token is unavailable.' >&2; exit 1; }
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'Cloudflare account id is unavailable.' >&2; exit 1; }
+          test -n "${TARGET_SUPABASE_SERVICE_ROLE_KEY:-}" || {
+            echo 'TARGET_SUPABASE_SERVICE_ROLE_KEY is not available in GitHub Actions.' >&2
+            exit 1
+          }
+
+      - name: Prove credential belongs to standalone target
+        shell: bash
+        run: |
+          set -euo pipefail
+          status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+            --header "apikey: ${TARGET_SUPABASE_SERVICE_ROLE_KEY}" \
+            --header "Authorization: Bearer ${TARGET_SUPABASE_SERVICE_ROLE_KEY}" \
+            "${TARGET_SUPABASE_URL}/auth/v1/admin/users?page=1&per_page=1")"
+          if [[ "$status" != "200" ]]; then
+            echo "Refusing bridge: target Auth Admin verification returned HTTP ${status}." >&2
+            exit 1
+          fi
+          echo 'Verified target service-role credential against standalone Supabase Auth Admin API.'
+
+      - name: Install target service role as staging Worker secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s' "${TARGET_SUPABASE_SERVICE_ROLE_KEY}" | \
+            npx --yes wrangler@4 secret put SUPABASE_SERVICE_ROLE_KEY --name "${WORKER_NAME}"
+
+      - name: Verify secret name is bound
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4 secret list --name "${WORKER_NAME}" > /tmp/secrets.json
+          node <<'NODE'
+          const fs = require('fs');
+          const raw = fs.readFileSync('/tmp/secrets.json','utf8').trim();
+          const parsed = JSON.parse(raw);
+          const names = Array.isArray(parsed) ? parsed.map(x => x?.name).filter(Boolean) : [];
+          if (!names.includes('SUPABASE_SERVICE_ROLE_KEY')) {
+            console.error('SUPABASE_SERVICE_ROLE_KEY was not found after binding.');
+            process.exit(1);
+          }
+          console.log('Verified SUPABASE_SERVICE_ROLE_KEY is bound to staging Worker.');
+          NODE
