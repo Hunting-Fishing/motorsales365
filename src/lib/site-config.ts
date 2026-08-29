@@ -21,6 +21,8 @@ export const CANONICAL_HOSTS = [
  * This is deliberately separate from CANONICAL_HOSTS: staging must be able to
  * complete OAuth against the standalone project without making its Worker URL
  * canonical for SEO, share links, QR codes, or outbound email content.
+ * Auth flows such as OAuth, signup confirmation, and password recovery must use
+ * authReturnOrigin() rather than the canonical siteOrigin().
  */
 export const AUTH_RETURN_HOSTS = [
   ...CANONICAL_HOSTS,
