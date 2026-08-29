@@ -1,0 +1,45 @@
+name: Standalone Service Role Smoke
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/standalone-service-role-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify public standalone routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://motorsales365-standalone-staging.jordilwbailey.workers.dev'
+          for path in '/' '/businesses' '/map' '/listing/a60923a9-e834-4432-9061-563358bc3d9a'; do
+            code="$(curl --silent --show-error --location --output /tmp/page.html --write-out '%{http_code}' "${base}${path}")"
+            [[ "$code" == '200' ]] || { echo "Unexpected ${path} status: ${code}" >&2; exit 1; }
+            if grep -aiEq 'jfjrnjyroxvlydajvndl|lovable\.app|lovableproject\.com' /tmp/page.html; then
+              echo "Source/Lovable runtime reference detected on ${path}." >&2
+              exit 1
+            fi
+          done
+
+      - name: Exercise server-side signup audit with controlled invalid request
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://motorsales365-standalone-staging.jordilwbailey.workers.dev'
+          code="$(curl --silent --show-error --output /tmp/signup-response.json --write-out '%{http_code}' \
+            --request POST \
+            --header 'content-type: application/json' \
+            --header 'user-agent: standalone-service-role-smoke-20260829-1818' \
+            --data '{"intent":"buyer"}' \
+            "${base}/api/public/auth/signup")"
+          [[ "$code" == '422' ]] || { echo "Expected controlled signup validation status 422; got ${code}." >&2; exit 1; }
+          grep -q '"ok":false' /tmp/signup-response.json || { echo 'Expected validation response body was not returned.' >&2; exit 1; }
+          echo 'Controlled signup validation request reached standalone server route.'
