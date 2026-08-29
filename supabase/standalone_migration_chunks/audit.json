@@ -1,7 +1,7 @@
 {
-  "migration_file_count": 390,
+  "migration_file_count": 391,
   "chunk_count": 7,
-  "hazard_match_count": 775,
+  "hazard_match_count": 780,
   "hazard_matches": [
     {
       "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
@@ -3872,6 +3872,31 @@
       "file": "20260805084402_cd07847a-26f0-4c31-a2fe-ab0088684f77.sql",
       "line": 161,
       "text": "ALTER PUBLICATION supabase_realtime DROP TABLE public.ops_alerts;"
+    },
+    {
+      "file": "20260829180321_harden_public_projection_views.sql",
+      "line": 1,
+      "text": "-- Replace SECURITY DEFINER views with SECURITY INVOKER views over narrowly scoped,"
+    },
+    {
+      "file": "20260829180321_harden_public_projection_views.sql",
+      "line": 2,
+      "text": "-- explicitly granted SECURITY DEFINER projection functions. This preserves the"
+    },
+    {
+      "file": "20260829180321_harden_public_projection_views.sql",
+      "line": 18,
+      "text": "security definer"
+    },
+    {
+      "file": "20260829180321_harden_public_projection_views.sql",
+      "line": 51,
+      "text": "security definer"
+    },
+    {
+      "file": "20260829180321_harden_public_projection_views.sql",
+      "line": 82,
+      "text": "security definer"
     },
     {
       "file": "20260830015000_restrict_internal_security_definer_helpers.sql",
