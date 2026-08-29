@@ -11,5 +11,15 @@
     "SUPABASE_URL": "https://wjxaajgvddtrxxtocxen.supabase.co",
     "SUPABASE_PROJECT_ID": "wjxaajgvddtrxxtocxen",
     "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_RTI8m0ZvjoZFH7_q-wnIQQ_SxrL0s-d"
+  },
+  "env": {
+    "staging": {
+      "name": "motorsales365-standalone-staging",
+      "vars": {
+        "SUPABASE_URL": "https://wjxaajgvddtrxxtocxen.supabase.co",
+        "SUPABASE_PROJECT_ID": "wjxaajgvddtrxxtocxen",
+        "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_RTI8m0ZvjoZFH7_q-wnIQQ_SxrL0s-d"
+      }
+    }
   }
 }
