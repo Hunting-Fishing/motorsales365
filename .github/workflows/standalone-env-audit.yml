@@ -1,0 +1,84 @@
+name: Standalone Environment Inventory
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Inventory environment-variable names
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          roots = [Path('src'), Path('scripts'), Path('e2e')]
+          extra = [Path('vite.config.ts'), Path('wrangler.jsonc')]
+          suffixes = {'.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.json', '.jsonc'}
+          patterns = [
+              re.compile(r'process\.env\.([A-Z][A-Z0-9_]*)'),
+              re.compile(r'''process\.env\[["']([A-Z][A-Z0-9_]*)["']\]'''),
+              re.compile(r'import\.meta\.env\.([A-Z][A-Z0-9_]*)'),
+              re.compile(r'''getEnv\(["']([A-Z][A-Z0-9_]*)["']\)'''),
+          ]
+
+          found = {}
+          files = []
+          for root in roots:
+              if root.exists():
+                  files.extend(p for p in root.rglob('*') if p.is_file() and p.suffix in suffixes)
+          files.extend(p for p in extra if p.exists())
+
+          for path in files:
+              try:
+                  text = path.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              for pattern in patterns:
+                  for name in pattern.findall(text):
+                      found.setdefault(name, set()).add(path.as_posix())
+
+          runtime = {}
+          tests = {}
+          for name, paths in found.items():
+              runtime_paths = sorted(p for p in paths if not re.search(r'(^|/)(__tests__|e2e)(/|$)|\.test\.|\.spec\.', p))
+              test_paths = sorted(set(paths) - set(runtime_paths))
+              if runtime_paths:
+                  runtime[name] = runtime_paths
+              if test_paths:
+                  tests[name] = test_paths
+
+          out = []
+          out.append('# Runtime environment names')
+          for name in sorted(runtime):
+              out.append(f'{name}\t' + ', '.join(runtime[name]))
+          out.append('')
+          out.append('# Test-only/additional environment names')
+          for name in sorted(tests):
+              if name not in runtime:
+                  out.append(f'{name}\t' + ', '.join(tests[name]))
+          Path('standalone-env-inventory.txt').write_text('\n'.join(out) + '\n', encoding='utf-8')
+          print('\n'.join(out))
+          PY
+
+      - name: Upload inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: standalone-env-inventory
+          path: standalone-env-inventory.txt
+          if-no-files-found: error
+          retention-days: 3
