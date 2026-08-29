@@ -2,7 +2,7 @@
 // Called by the cron hook and by the "run now" server function.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const GATEWAY = "https://connector-gateway.lovable.dev/google_maps";
+const PLACES_API_BASE = "https://places.googleapis.com/v1";
 
 // Mirrors TYPE_MAP in business-seed.functions.ts. Kept here so the sync can
 // run without importing client-safe modules from this server file.
@@ -32,13 +32,11 @@ function mapType(types: string[] | undefined): string | null {
   return null;
 }
 
-function gatewayHeaders() {
-  const lov = process.env.LOVABLE_API_KEY;
-  const gm = process.env.GOOGLE_MAPS_API_KEY;
-  if (!lov || !gm) throw new Error("Google Maps connector is not configured");
+function googlePlacesHeaders() {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey) throw new Error("GOOGLE_MAPS_API_KEY is not configured");
   return {
-    Authorization: `Bearer ${lov}`,
-    "X-Connection-Api-Key": gm,
+    "X-Goog-Api-Key": apiKey,
     "Content-Type": "application/json",
   };
 }
@@ -80,8 +78,6 @@ const FIELD_MASK = [
 ].join(",");
 
 async function runOnePlacesSearch(s: SearchRow): Promise<PlaceResult[]> {
-  // Bake the place type into the query as a keyword (Google's strict
-  // `includedType` rejects many of our internal slugs and returns zero hits).
   const typeKeyword = (s.place_type ?? "").replace(/_/g, " ");
   const textQuery = [s.query, typeKeyword, s.city, s.region, "Philippines"]
     .filter(Boolean)
@@ -92,9 +88,9 @@ async function runOnePlacesSearch(s: SearchRow): Promise<PlaceResult[]> {
     regionCode: "PH",
     languageCode: "en",
   };
-  const res = await fetch(`${GATEWAY}/places/v1/places:searchText`, {
+  const res = await fetch(`${PLACES_API_BASE}/places:searchText`, {
     method: "POST",
-    headers: { ...gatewayHeaders(), "X-Goog-FieldMask": FIELD_MASK },
+    headers: { ...googlePlacesHeaders(), "X-Goog-FieldMask": FIELD_MASK },
     body: JSON.stringify(body),
   });
   if (!res.ok) {
@@ -107,7 +103,13 @@ async function runOnePlacesSearch(s: SearchRow): Promise<PlaceResult[]> {
 
 function computeDiff(
   place: PlaceResult,
-  existing: { phone: string | null; website: string | null; rating_avg: number | null; rating_count: number | null; street_address: string | null },
+  existing: {
+    phone: string | null;
+    website: string | null;
+    rating_avg: number | null;
+    rating_count: number | null;
+    street_address: string | null;
+  },
 ): Record<string, { from: unknown; to: unknown }> | null {
   const phone = place.nationalPhoneNumber ?? place.internationalPhoneNumber ?? null;
   const website = place.websiteUri ?? null;
@@ -116,10 +118,14 @@ function computeDiff(
   const address = place.formattedAddress ?? null;
   const diff: Record<string, { from: unknown; to: unknown }> = {};
   if ((existing.phone ?? null) !== phone && phone) diff.phone = { from: existing.phone, to: phone };
-  if ((existing.website ?? null) !== website && website) diff.website = { from: existing.website, to: website };
-  if (rating != null && Number(existing.rating_avg ?? 0) !== Number(rating)) diff.rating_avg = { from: existing.rating_avg, to: rating };
-  if (ratingCount != null && Number(existing.rating_count ?? 0) !== Number(ratingCount)) diff.rating_count = { from: existing.rating_count, to: ratingCount };
-  if (address && existing.street_address !== address) diff.street_address = { from: existing.street_address, to: address };
+  if ((existing.website ?? null) !== website && website)
+    diff.website = { from: existing.website, to: website };
+  if (rating != null && Number(existing.rating_avg ?? 0) !== Number(rating))
+    diff.rating_avg = { from: existing.rating_avg, to: rating };
+  if (ratingCount != null && Number(existing.rating_count ?? 0) !== Number(ratingCount))
+    diff.rating_count = { from: existing.rating_count, to: ratingCount };
+  if (address && existing.street_address !== address)
+    diff.street_address = { from: existing.street_address, to: address };
   return Object.keys(diff).length ? diff : null;
 }
 
@@ -137,9 +143,8 @@ export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Pro
     .from("business_discovery_searches")
     .select("id, query, city, region, place_type")
     .eq("active", true);
-  const { data: searches, error } = opts.searchIds && opts.searchIds.length
-    ? await q.in("id", opts.searchIds)
-    : await q;
+  const { data: searches, error } =
+    opts.searchIds && opts.searchIds.length ? await q.in("id", opts.searchIds) : await q;
   if (error) throw new Error(`load searches: ${error.message}`);
 
   const summary: SyncSummary = {
@@ -159,13 +164,18 @@ export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Pro
       if (places.length === 0) {
         await (supabaseAdmin as any)
           .from("business_discovery_searches")
-          .update({ last_run_at: now, last_status: "ok", last_error: null, last_found_count: 0, last_new_count: 0 })
+          .update({
+            last_run_at: now,
+            last_status: "ok",
+            last_error: null,
+            last_found_count: 0,
+            last_new_count: 0,
+          })
           .eq("id", s.id);
         continue;
       }
       const placeIds = places.map((p) => p.id);
 
-      // Already-imported businesses for this batch (for update detection)
       const { data: existing } = await supabaseAdmin
         .from("businesses")
         .select("id, source_external_id, phone, website, rating_avg, rating_count, street_address")
@@ -173,7 +183,6 @@ export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Pro
         .in("source_external_id", placeIds);
       const existingMap = new Map((existing ?? []).map((e: any) => [e.source_external_id, e]));
 
-      // Already-queued rows so we update last_seen_at rather than insert dupes
       const { data: queued } = await (supabaseAdmin as any)
         .from("business_discovery_queue")
         .select("id, external_id, status")
@@ -210,7 +219,6 @@ export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Pro
         };
 
         if (existingQueue) {
-          // Refresh existing pending row (or keep dismissed/imported as-is on status).
           if ((existingQueue as any).status === "pending") {
             await (supabaseAdmin as any)
               .from("business_discovery_queue")
@@ -220,7 +228,6 @@ export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Pro
             if (diff) summary.updates_detected++;
           }
         } else if (existingBiz && !diff) {
-          // Already imported, nothing changed — skip queuing.
           continue;
         } else {
           const { error: insErr } = await (supabaseAdmin as any)
