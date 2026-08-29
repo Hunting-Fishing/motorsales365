@@ -561,70 +561,7 @@ GRANT EXECUTE ON FUNCTION public.pp_recompute_payout_total(uuid) TO service_role
 
 
 -- ============================================================================
--- SOURCE MIGRATION: 20260830014500_harden_trigger_function_execute_privileges.sql
--- ============================================================================
--- Standalone hardening: trigger functions are not valid public RPC endpoints.
--- Existing database triggers continue to execute normally; service_role access
--- is preserved explicitly for backend administration/introspection.
-
-do $$
-declare
-  fn record;
-begin
-  for fn in
-    select p.oid::regprocedure as signature
-    from pg_proc p
-    join pg_namespace n on n.oid = p.pronamespace
-    where n.nspname = 'public'
-      and p.prorettype = 'pg_catalog.trigger'::regtype
-  loop
-    execute format(
-      'revoke execute on function %s from public, anon, authenticated',
-      fn.signature
-    );
-    execute format(
-      'grant execute on function %s to service_role',
-      fn.signature
-    );
-  end loop;
-end
-$$;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260830015000_restrict_internal_security_definer_helpers.sql
--- ============================================================================
--- Standalone hardening: these SECURITY DEFINER helpers are internal mutation
--- primitives used by trusted triggers/server routes. They are not public RPCs.
-
-revoke execute on function public.accredit_staff_partner(uuid)
-  from public, anon, authenticated;
-grant execute on function public.accredit_staff_partner(uuid) to service_role;
-
-revoke execute on function public.backfill_parts_wanted(uuid)
-  from public, anon, authenticated;
-grant execute on function public.backfill_parts_wanted(uuid) to service_role;
-
-revoke execute on function public.dispatch_expand_stale()
-  from public, anon, authenticated;
-grant execute on function public.dispatch_expand_stale() to service_role;
-
-revoke execute on function public.dispatch_match_providers(uuid, integer)
-  from public, anon, authenticated;
-grant execute on function public.dispatch_match_providers(uuid, integer) to service_role;
-
-revoke execute on function public.notify_user(uuid, text, text, text, text, text, uuid, jsonb)
-  from public, anon, authenticated;
-grant execute on function public.notify_user(uuid, text, text, text, text, text, uuid, jsonb)
-  to service_role;
-
-revoke execute on function public.pp_award_bounty(text, text, text)
-  from public, anon, authenticated;
-grant execute on function public.pp_award_bounty(text, text, text) to service_role;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260830153000_repair_r32_demo_legacy_lovable_media.sql
+-- SOURCE MIGRATION: 20260829213343_repair_r32_demo_legacy_lovable_media.sql
 -- ============================================================================
 -- Repair the R32 demo listing after the standalone migration.
 --
@@ -689,3 +626,66 @@ begin
   where id = v_replacement_id;
 end
 $$;
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260830014500_harden_trigger_function_execute_privileges.sql
+-- ============================================================================
+-- Standalone hardening: trigger functions are not valid public RPC endpoints.
+-- Existing database triggers continue to execute normally; service_role access
+-- is preserved explicitly for backend administration/introspection.
+
+do $$
+declare
+  fn record;
+begin
+  for fn in
+    select p.oid::regprocedure as signature
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public'
+      and p.prorettype = 'pg_catalog.trigger'::regtype
+  loop
+    execute format(
+      'revoke execute on function %s from public, anon, authenticated',
+      fn.signature
+    );
+    execute format(
+      'grant execute on function %s to service_role',
+      fn.signature
+    );
+  end loop;
+end
+$$;
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260830015000_restrict_internal_security_definer_helpers.sql
+-- ============================================================================
+-- Standalone hardening: these SECURITY DEFINER helpers are internal mutation
+-- primitives used by trusted triggers/server routes. They are not public RPCs.
+
+revoke execute on function public.accredit_staff_partner(uuid)
+  from public, anon, authenticated;
+grant execute on function public.accredit_staff_partner(uuid) to service_role;
+
+revoke execute on function public.backfill_parts_wanted(uuid)
+  from public, anon, authenticated;
+grant execute on function public.backfill_parts_wanted(uuid) to service_role;
+
+revoke execute on function public.dispatch_expand_stale()
+  from public, anon, authenticated;
+grant execute on function public.dispatch_expand_stale() to service_role;
+
+revoke execute on function public.dispatch_match_providers(uuid, integer)
+  from public, anon, authenticated;
+grant execute on function public.dispatch_match_providers(uuid, integer) to service_role;
+
+revoke execute on function public.notify_user(uuid, text, text, text, text, text, uuid, jsonb)
+  from public, anon, authenticated;
+grant execute on function public.notify_user(uuid, text, text, text, text, text, uuid, jsonb)
+  to service_role;
+
+revoke execute on function public.pp_award_bounty(text, text, text)
+  from public, anon, authenticated;
+grant execute on function public.pp_award_bounty(text, text, text) to service_role;
