@@ -3,9 +3,9 @@
  *
  * Sellers upload their Certificate of Registration (CR) and Official Receipt
  * (OR) to a private storage bucket. This server function fetches each doc,
- * runs it through Gemini (vision) for structured field extraction, then
- * cross-checks the extracted fields against the listing to build a mismatch
- * report and an overall verification status.
+ * runs it through the configured standalone vision provider for structured
+ * field extraction, then cross-checks the extracted fields against the
+ * listing to build a mismatch report and an overall verification status.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -122,9 +122,10 @@ async function extractDocFields(
   bytes: Uint8Array,
   mediaType: string,
   gateway: ReturnType<typeof createOpenAICompatible>,
+  modelName: string,
   docType: "cr" | "or",
 ): Promise<DocFields> {
-  const model = gateway("google/gemini-2.5-flash");
+  const model = gateway(modelName);
   const result = await generateText({
     model,
     system: SYSTEM_PROMPT,
@@ -156,9 +157,7 @@ export const verifyListingDocuments = createServerFn({ method: "POST" })
 
     const { data: listing, error: lErr } = await supabase
       .from("listings")
-      .select(
-        "id,user_id,title,attributes,vehicle_id,category_slug,region,province,city",
-      )
+      .select("id,user_id,title,attributes,vehicle_id,category_slug,region,province,city")
       .eq("id", data.listingId)
       .maybeSingle();
     if (lErr) throw new Error(lErr.message);
@@ -188,12 +187,16 @@ export const verifyListingDocuments = createServerFn({ method: "POST" })
     }>;
     if (docList.length === 0) throw new Error("Upload at least one document first");
 
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("Verification unavailable — AI gateway key missing");
+    const key = process.env.AI_API_KEY?.trim();
+    const baseURL = process.env.AI_API_BASE_URL?.trim().replace(/\/+$/, "");
+    const modelName = process.env.AI_MODEL_VISION?.trim() || process.env.AI_MODEL?.trim();
+    if (!key || !baseURL || !modelName) {
+      throw new Error("Verification unavailable — standalone AI provider is not configured");
+    }
     const gateway = createOpenAICompatible({
-      name: "lovable",
-      baseURL: "https://ai.gateway.lovable.dev/v1",
-      headers: { "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
+      name: "standalone",
+      baseURL,
+      headers: { Authorization: `Bearer ${key}` },
     });
 
     const extracted: { cr?: DocFields; or?: DocFields } = {};
@@ -205,17 +208,13 @@ export const verifyListingDocuments = createServerFn({ method: "POST" })
       const res = await fetch(signed.signedUrl);
       if (!res.ok) continue;
       const mediaType = d.mime_type || res.headers.get("content-type")?.split(";")[0] || "image/jpeg";
-      // Gemini does not accept PDF via `image`; if the file is a PDF, ask the
-      // model with a plain-text hint referencing the signed URL page images.
-      // For simplicity we send images/jpeg/png only. PDFs are skipped with a
-      // note the UI can surface.
       if (!/^image\//.test(mediaType)) {
         extracted[d.doc_type] = { received_from: "PDF_SKIPPED" } as DocFields;
         continue;
       }
       const bytes = new Uint8Array(await res.arrayBuffer());
       try {
-        extracted[d.doc_type] = await extractDocFields(bytes, mediaType, gateway, d.doc_type);
+        extracted[d.doc_type] = await extractDocFields(bytes, mediaType, gateway, modelName, d.doc_type);
       } catch (e) {
         extracted[d.doc_type] = {};
         void e;
@@ -224,12 +223,8 @@ export const verifyListingDocuments = createServerFn({ method: "POST" })
 
     const cr = extracted.cr ?? {};
     const or = extracted.or ?? {};
-
-    // Cross-check plate between CR and OR
     const checks: FieldCheck[] = [];
-    checks.push(
-      compareField("vin_chassis", "VIN / Chassis", listingFields.vin, cr.vin || cr.chassis_no),
-    );
+    checks.push(compareField("vin_chassis", "VIN / Chassis", listingFields.vin, cr.vin || cr.chassis_no));
     checks.push(compareField("make", "Make", listingFields.make, cr.make));
     checks.push(compareField("model", "Model", listingFields.model, cr.series_model));
     checks.push(
@@ -241,12 +236,9 @@ export const verifyListingDocuments = createServerFn({ method: "POST" })
     checks.push(compareField("body_type", "Body type", listingFields.body_type, cr.body_type));
     checks.push(compareField("fuel", "Fuel", listingFields.fuel, cr.fuel_type));
     if (or.plate_no || cr.plate_no) {
-      checks.push(
-        compareField("plate", "Plate", listingFields.plate, cr.plate_no || or.plate_no),
-      );
+      checks.push(compareField("plate", "Plate", listingFields.plate, cr.plate_no || or.plate_no));
     }
 
-    // OR/CR plate consistency
     if (cr.plate_no && or.plate_no) {
       const consistent = norm(cr.plate_no) === norm(or.plate_no);
       checks.push({
@@ -258,7 +250,6 @@ export const verifyListingDocuments = createServerFn({ method: "POST" })
       });
     }
 
-    // OR expiry
     const validUntil = parseDate(or.or_valid_until);
     let expired = false;
     if (validUntil) {
@@ -275,8 +266,7 @@ export const verifyListingDocuments = createServerFn({ method: "POST" })
     const mismatches = checks.filter((c) => c.match === "mismatch");
     let status: "lto_verified" | "mismatch" | "expired" | "pending" = "pending";
     if (expired) status = "expired";
-    else if (mismatches.length === 0 && checks.some((c) => c.match === "match"))
-      status = "lto_verified";
+    else if (mismatches.length === 0 && checks.some((c) => c.match === "match")) status = "lto_verified";
     else if (mismatches.length > 0) status = "mismatch";
 
     const payload = {
@@ -329,9 +319,7 @@ export const getListingVerification = createServerFn({ method: "GET" })
 
 export const deleteListingDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ documentId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ documentId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: doc } = await supabase
@@ -341,10 +329,7 @@ export const deleteListingDocument = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!doc || doc.user_id !== userId) throw new Error("Not found");
     await supabase.storage.from("listing-documents").remove([doc.storage_path]);
-    const { error } = await supabase
-      .from("listing_documents")
-      .delete()
-      .eq("id", data.documentId);
+    const { error } = await supabase.from("listing_documents").delete().eq("id", data.documentId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
