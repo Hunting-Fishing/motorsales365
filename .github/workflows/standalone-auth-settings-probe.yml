@@ -27,7 +27,7 @@ jobs:
             --header "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
             "${SUPABASE_URL}/auth/v1/settings")"
           [[ "$code" == '200' ]] || { echo "Auth settings probe failed with HTTP ${code}." >&2; exit 1; }
-          jq -c '{disable_signup:(.disable_signup // null), mailer_autoconfirm:(.mailer_autoconfirm // null), phone_autoconfirm:(.phone_autoconfirm // null), google_enabled:(.external.google // false), apple_enabled:(.external.apple // false), azure_enabled:(.external.azure // false)}' /tmp/settings.json
+          jq -c '{top_level_keys:(keys|sort), external_keys:((.external // {})|keys|sort), email_enabled:(.external.email // false), phone_enabled:(.external.phone // false), google_enabled:(.external.google // false), apple_enabled:(.external.apple // false), azure_enabled:(.external.azure // false)}' /tmp/settings.json
 
       - name: Probe Google authorization without exposing provider configuration
         shell: bash
