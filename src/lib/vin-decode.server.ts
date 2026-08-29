@@ -5,6 +5,7 @@
 
 import type { WmiRow } from "@/data/vin-vds-tables";
 import { lookupVds, lookupWmi, regionFromWmi, type Region } from "@/data/vin-vds-tables";
+import { callStandaloneAi } from "@/lib/ai-provider.server";
 
 export type DecodedFields = {
   year?: string;
@@ -172,11 +173,9 @@ export function structuralDecode(vin: string): DecodePartial | null {
     assign("engine", vds.engine);
     assign("category", vds.category);
     assign("trim", vds.trim);
-    // Clamp year to VDS-provided range when the position-10 code disagrees.
     if (vds.yearMin && vds.yearMax) {
       const y = Number(fields.year);
       if (!Number.isFinite(y) || y < vds.yearMin || y > vds.yearMax) {
-        // Prefer VDS midpoint if position-10 lands outside the platform lifespan.
         fields.year = String(vds.yearMin);
         sources.year = "vds";
       }
@@ -185,18 +184,13 @@ export function structuralDecode(vin: string): DecodePartial | null {
   return { fields, sources, region };
 }
 
-// --- AI Gateway fallback -------------------------------------------------
-
-const AI_MODEL = "google/gemini-3-flash-preview";
+// --- Standalone AI fallback ----------------------------------------------
 
 export async function aiDecode(opts: {
   vin: string;
   region: Region;
   known: DecodedFields;
 }): Promise<DecodePartial | null> {
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key) return null;
-
   const missingList = FIELD_KEYS.filter((k) => !opts.known[k]).join(", ");
   if (!missingList) return null;
 
@@ -209,22 +203,13 @@ Return strict JSON with exactly these keys (use null when you cannot confidently
 Never invent — a wrong guess is worse than null.`;
 
   try {
-    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Lovable-API-Key": key,
-      },
-      body: JSON.stringify({
-        model: AI_MODEL,
-        messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" },
-      }),
+    const raw = await callStandaloneAi({
+      model: process.env.AI_MODEL_VIN,
+      messages: [{ role: "user", content: prompt }],
+      responseFormat: { type: "json_object" },
     });
-    if (!r.ok) return null;
-    const json = (await r.json()) as { choices?: Array<{ message?: { content?: string } }> };
-    const raw = json.choices?.[0]?.message?.content;
     if (!raw) return null;
+
     let parsed: Record<string, unknown>;
     try {
       parsed = JSON.parse(raw);
