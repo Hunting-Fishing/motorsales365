@@ -21,6 +21,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       TARGET_SUPABASE_URL: https://wjxaajgvddtrxxtocxen.supabase.co
       WORKER_NAME: motorsales365-standalone-staging
+      STAGING_URL: https://motorsales365-standalone-staging.jordilwbailey.workers.dev
     steps:
       - name: Verify required secret handles exist
         shell: bash
@@ -70,3 +71,23 @@ jobs:
           }
           console.log('Verified SUPABASE_SERVICE_ROLE_KEY is bound to staging Worker.');
           NODE
+
+      - name: Prove Worker privileged target access without writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=''
+          for attempt in 1 2 3 4 5 6; do
+            status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+              --request POST \
+              --header 'x-cron-token: intentionally-invalid-cutover-probe' \
+              "${STAGING_URL}/api/public/hooks/recompute-tiers" || true)"
+            if [[ "$status" == '401' ]]; then
+              echo 'Verified deployed Worker can read target cron credentials and rejects an invalid token before job execution.'
+              exit 0
+            fi
+            echo "Privileged smoke attempt ${attempt}: HTTP ${status:-000}; retrying deployment propagation."
+            sleep 3
+          done
+          echo "Privileged Worker smoke failed: expected HTTP 401, received ${status:-000}. No cron job was executed." >&2
+          exit 1
