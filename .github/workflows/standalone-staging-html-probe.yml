@@ -1,0 +1,81 @@
+name: Standalone Staging HTML Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/standalone-staging-html-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      STAGING_URL: https://motorsales365-standalone-staging.jordilwbailey.workers.dev
+      SUPABASE_URL: https://wjxaajgvddtrxxtocxen.supabase.co
+      SUPABASE_PUBLISHABLE_KEY: sb_publishable_RTI8m0ZvjoZFH7_q-wnIQQ_SxrL0s-d
+      ACCEPTANCE_LISTING_ID: a60923a9-e834-4432-9061-563358bc3d9a
+
+    steps:
+      - name: Fetch listing SSR HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error --location --retry 4 --retry-delay 3 --retry-all-errors --connect-timeout 15 --max-time 60 --output /tmp/listing.html "${STAGING_URL}/listing/${ACCEPTANCE_LISTING_ID}"
+          test -s /tmp/listing.html
+
+      - name: Fetch listing media through public REST
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error --get \
+            --header "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
+            --header "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}" \
+            --data-urlencode 'select=url,type' \
+            --data-urlencode "listing_id=eq.${ACCEPTANCE_LISTING_ID}" \
+            --data-urlencode 'type=eq.photo' \
+            --data-urlencode 'order=sort_order.asc' \
+            --data-urlencode 'limit=1' \
+            --output /tmp/media.json \
+            "${SUPABASE_URL}/rest/v1/listing_media"
+          test -s /tmp/media.json
+
+      - name: Public REST returns media row
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'listing-photos' /tmp/media.json
+
+      - name: SSR contains target Supabase reference
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fqi 'wjxaajgvddtrxxtocxen' /tmp/listing.html
+
+      - name: SSR contains og image metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Eqi 'og:image|twitter:image' /tmp/listing.html
+
+      - name: SSR contains listing photo path
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fqi 'listing-photos' /tmp/listing.html
+
+      - name: Upload probe output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: standalone-staging-html-probe
+          path: |
+            /tmp/listing.html
+            /tmp/media.json
+          if-no-files-found: warn
+          retention-days: 1
