@@ -8,8 +8,6 @@ const getEnv = (key: string): string => {
 
 export type StripeEnv = "sandbox" | "live";
 
-const GATEWAY_STRIPE_BASE = "https://connector-gateway.lovable.dev/stripe";
-
 export function getConnectionApiKey(env: StripeEnv): string {
   return env === "sandbox" ? getEnv("STRIPE_SANDBOX_API_KEY") : getEnv("STRIPE_LIVE_API_KEY");
 }
@@ -20,55 +18,42 @@ export function getWebhookSecret(env: StripeEnv): string {
     : getEnv("PAYMENTS_LIVE_WEBHOOK_SECRET");
 }
 
+/**
+ * Standalone Stripe client. Requests go directly to Stripe; there is no
+ * Lovable connector/gateway fallback. Missing credentials fail closed.
+ */
 export function createStripeClient(env: StripeEnv): Stripe {
-  const connectionApiKey = getConnectionApiKey(env);
-  const lovableApiKey = getEnv("LOVABLE_API_KEY");
-
-  return new Stripe(connectionApiKey, {
+  return new Stripe(getConnectionApiKey(env), {
     apiVersion: "2026-03-25.dahlia",
-    httpClient: Stripe.createFetchHttpClient(((input: URL | RequestInfo, init?: RequestInit) => {
-      const original =
-        typeof input === "string" || input instanceof URL ? input.toString() : input.url;
-      const gatewayUrl = original.replace("https://api.stripe.com", GATEWAY_STRIPE_BASE);
-      return fetch(gatewayUrl, {
-        ...init,
-        headers: {
-          ...Object.fromEntries(new Headers(init?.headers).entries()),
-          "X-Connection-Api-Key": connectionApiKey,
-          "Lovable-API-Key": lovableApiKey,
-        },
-      });
-    }) as typeof fetch),
   });
 }
 
-const ALLOWED_RETURN_ORIGINS = new Set<string>([
-  "https://www.365motorsales.com",
-  "https://365motorsales.com",
-  "https://motorsales365.lovable.app",
-  "https://id-preview--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app",
-  "https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app",
-  "https://project--0738c881-614d-4885-8d75-1b7c90e0835e-dev.lovable.app",
-  "https://localhost:8080",
-  "http://localhost:8080",
-]);
+function allowedReturnOrigins(): Set<string> {
+  const origins = new Set<string>([
+    "https://www.365motorsales.com",
+    "https://365motorsales.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+  ]);
 
-// Allow any Lovable preview/sandbox subdomain (e.g. *.lovableproject.com,
-// *.lovable.app, *.sandbox.lovable.dev) so in-editor previews work without
-// hardcoding every per-session host.
-const ALLOWED_RETURN_HOST_SUFFIXES = [
-  ".lovableproject.com",
-  ".lovable.app",
-  ".sandbox.lovable.dev",
-];
+  // Permit an explicitly configured standalone preview/staging origin without
+  // opening a wildcard host suffix. Invalid values are ignored here and will
+  // still fail validation below.
+  for (const value of [process.env.SITE_URL, process.env.PUBLIC_SITE_ORIGIN]) {
+    if (!value) continue;
+    try {
+      origins.add(new URL(value).origin);
+    } catch {
+      // Ignore malformed configuration; do not broaden the allowlist.
+    }
+  }
+
+  return origins;
+}
 
 /**
- * Validate a client-supplied `returnUrl` against an allowlist of trusted
- * origins so an attacker can't redirect a user back to an external phishing
- * page after a legitimate Stripe Checkout / Billing Portal flow.
- *
- * Throws if invalid. Returns the original URL string when allowed.
- * Pass `required: false` to allow undefined (used by Portal).
+ * Validate a client-supplied `returnUrl` against an explicit origin allowlist
+ * so an attacker cannot redirect a user to an external site after Stripe.
  */
 export function validateReturnUrl(
   url: string | undefined,
@@ -78,19 +63,25 @@ export function validateReturnUrl(
     if (required) throw new Error("returnUrl is required");
     return undefined;
   }
+
   let parsed: URL;
   try {
     parsed = new URL(url);
   } catch {
     throw new Error("Invalid returnUrl");
   }
-  const isHttps = parsed.protocol === "https:";
-  const hostAllowed =
-    isHttps &&
-    ALLOWED_RETURN_HOST_SUFFIXES.some((suffix) => parsed.hostname.endsWith(suffix));
-  if (!ALLOWED_RETURN_ORIGINS.has(parsed.origin) && !hostAllowed) {
+
+  const localDevelopment =
+    parsed.protocol === "http:" &&
+    (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1");
+  if (parsed.protocol !== "https:" && !localDevelopment) {
+    throw new Error("returnUrl must use HTTPS");
+  }
+
+  if (!allowedReturnOrigins().has(parsed.origin)) {
     throw new Error("returnUrl origin is not allowed");
   }
+
   return url;
 }
 
