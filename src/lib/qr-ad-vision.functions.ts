@@ -1,14 +1,8 @@
 /**
  * AI-powered "Scan Here" panel detector for QR ad flyers.
  *
- * Sends the flyer to Gemini and asks for the bounding box of the white QR
- * placeholder. Used by the admin Smart auto-fit flow as a smarter alternative
- * to the pure-pixel `detectQrSlot` heuristic (which fails when the panel has
- * a colored border, isn't pure white, or competes with other white space).
- *
- * Returns normalized cx/cy/size (relative to template WIDTH, matching the
- * existing template schema) plus a confidence score. Callers should fall
- * back to the heuristic detector when `found` is false or confidence is low.
+ * Uses the configured standalone OpenAI-compatible vision provider. There is
+ * intentionally no Lovable fallback.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -24,7 +18,6 @@ const inputSchema = z.object({
 
 const visionResponseSchema = z.object({
   found: z.boolean(),
-  // Normalized 0..1 coordinates of the panel center + side.
   cx: z.number().min(0).max(1).optional(),
   cy: z.number().min(0).max(1).optional(),
   width: z.number().min(0).max(1).optional(),
@@ -37,7 +30,7 @@ export type VisionDetection = {
   found: boolean;
   cx: number;
   cy: number;
-  size: number; // square QR side, normalized to template WIDTH
+  size: number;
   confidence: number;
   reasoning: string;
 };
@@ -51,12 +44,12 @@ Return ONLY a JSON object — no prose, no markdown fences, no comments.
 JSON shape (all coordinates normalized 0..1 relative to the image, origin = top-left):
 {
   "found": boolean,
-  "cx": number,        // center X of the white panel
-  "cy": number,        // center Y of the white panel
-  "width": number,     // panel width
-  "height": number,    // panel height
-  "confidence": number,// 0..1, how certain you are this is the QR target panel
-  "reasoning": string  // <= 200 chars
+  "cx": number,
+  "cy": number,
+  "width": number,
+  "height": number,
+  "confidence": number,
+  "reasoning": string
 }
 
 Rules:
@@ -67,7 +60,6 @@ Rules:
 
 const USER_PROMPT = `Find the white QR placement panel ("Scan Here" / "Scan Me" area) in this flyer and return the JSON object described in the system prompt.`;
 
-/** Strip ```json fences / leading prose if the model included any. */
 function extractJson(text: string): string {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
   const raw = fenced ? fenced[1] : text;
@@ -79,9 +71,7 @@ function extractJson(text: string): string {
 
 async function fetchImageAsBytes(url: string): Promise<{ bytes: Uint8Array; mediaType: string }> {
   const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`Could not download flyer image (${res.status})`);
-  }
+  if (!res.ok) throw new Error(`Could not download flyer image (${res.status})`);
   const mediaType = res.headers.get("content-type")?.split(";")[0] || "image/png";
   const buf = await res.arrayBuffer();
   return { bytes: new Uint8Array(buf), mediaType };
@@ -91,22 +81,28 @@ export const detectScanHereWithVision = createServerFn({ method: "POST" })
   .middleware([requireAdminRoleAudited("qrAds.smartFit")])
   .inputValidator((input: unknown) => inputSchema.parse(input))
   .handler(async ({ data }): Promise<VisionDetection> => {
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) {
-      throw new Error("Smart fit is unavailable — LOVABLE_API_KEY is missing.");
+    const key = process.env.AI_API_KEY?.trim();
+    const baseURL = process.env.AI_API_BASE_URL?.trim().replace(/\/+$/, "");
+    const modelName = process.env.AI_MODEL_VISION?.trim() || process.env.AI_MODEL?.trim();
+    if (!key || !baseURL || !modelName) {
+      return {
+        found: false,
+        cx: 0,
+        cy: 0,
+        size: 0,
+        confidence: 0,
+        reasoning: "AI_PROVIDER_NOT_CONFIGURED",
+      };
     }
 
     const { bytes, mediaType } = await fetchImageAsBytes(data.imageUrl);
 
     const gateway = createOpenAICompatible({
-      name: "lovable",
-      baseURL: "https://ai.gateway.lovable.dev/v1",
-      headers: {
-        "Lovable-API-Key": key,
-        "X-Lovable-AIG-SDK": "vercel-ai-sdk",
-      },
+      name: "standalone",
+      baseURL,
+      headers: { Authorization: `Bearer ${key}` },
     });
-    const model = gateway("google/gemini-2.5-flash");
+    const model = gateway(modelName);
 
     let text: string;
     try {
@@ -127,24 +123,10 @@ export const detectScanHereWithVision = createServerFn({ method: "POST" })
     } catch (err: any) {
       const msg = String(err?.message ?? err);
       if (/402|payment.?required|credit/i.test(msg)) {
-        return {
-          found: false,
-          cx: 0,
-          cy: 0,
-          size: 0,
-          confidence: 0,
-          reasoning: "AI_CREDITS_EXHAUSTED",
-        };
+        return { found: false, cx: 0, cy: 0, size: 0, confidence: 0, reasoning: "AI_PROVIDER_BILLING" };
       }
       if (/429|rate.?limit/i.test(msg)) {
-        return {
-          found: false,
-          cx: 0,
-          cy: 0,
-          size: 0,
-          confidence: 0,
-          reasoning: "AI_RATE_LIMITED",
-        };
+        return { found: false, cx: 0, cy: 0, size: 0, confidence: 0, reasoning: "AI_RATE_LIMITED" };
       }
       throw new Error(`Smart fit failed: ${msg.slice(0, 200)}`);
     }
@@ -153,14 +135,7 @@ export const detectScanHereWithVision = createServerFn({ method: "POST" })
     try {
       parsed = visionResponseSchema.parse(JSON.parse(extractJson(text)));
     } catch {
-      return {
-        found: false,
-        cx: 0,
-        cy: 0,
-        size: 0,
-        confidence: 0,
-        reasoning: "AI response was not valid JSON",
-      };
+      return { found: false, cx: 0, cy: 0, size: 0, confidence: 0, reasoning: "AI response was not valid JSON" };
     }
 
     if (!parsed.found || parsed.cx == null || parsed.cy == null || parsed.width == null || parsed.height == null) {
@@ -174,15 +149,8 @@ export const detectScanHereWithVision = createServerFn({ method: "POST" })
       };
     }
 
-    // Convert AI box (normalized to image dims) to template-space square side.
-    // template.qr.size is expressed relative to WIDTH; the panel height in
-    // template coords is panel.height * (templateH / templateW), so the
-    // largest square that fits inside the panel has side =
-    //   min( panel.width, panel.height * (H/W) )   (all in width-normalized)
     const aspect = data.width / data.height;
     const sideWidthNorm = Math.min(parsed.width, parsed.height / aspect);
-
-    // Slight inset so the QR doesn't kiss the printed border of the panel.
     const INSET = 0.92;
     const size = Math.max(0.05, Math.min(0.8, sideWidthNorm * INSET));
 
