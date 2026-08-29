@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SiteLayout } from "@/components/site-layout";
-import { siteOrigin } from "@/lib/site-config";
+import { authReturnOrigin } from "@/lib/site-config";
 
 function safeInternalPath(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
@@ -126,9 +126,12 @@ function LoginPage() {
       // Preserve `redirect` (e.g. the MCP consent URL) through the Google
       // round-trip: route Google back to /login?redirect=..., where the
       // signed-in effect below forwards the user to the intended destination.
+      // Use the trusted Auth runtime origin here instead of the canonical SEO
+      // origin so isolated standalone staging can complete its own OAuth flow.
+      const authOrigin = authReturnOrigin();
       const returnTo = redirectTo
-        ? `${siteOrigin()}/login?redirect=${encodeURIComponent(redirectTo)}`
-        : siteOrigin();
+        ? `${authOrigin}/login?redirect=${encodeURIComponent(redirectTo)}`
+        : authOrigin;
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: returnTo,
       });
