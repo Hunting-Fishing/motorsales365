@@ -1,0 +1,70 @@
+name: Temporary Auth Origin Fix
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/tmp-auth-origin-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v4
+        with:
+          ref: migration/standalone-supabase-365
+
+      - name: Patch Auth return origins only
+        shell: python
+        run: |
+          from pathlib import Path
+
+          replacements = {
+              Path('src/routes/forgot-password.tsx'): [
+                  ('import { siteOrigin } from "@/lib/site-config";', 'import { authReturnOrigin } from "@/lib/site-config";'),
+                  ('redirectTo: `${siteOrigin()}/reset-password`,', 'redirectTo: `${authReturnOrigin()}/reset-password`,'),
+              ],
+              Path('src/routes/signup.tsx'): [
+                  ('import { siteOrigin } from "@/lib/site-config";', 'import { authReturnOrigin } from "@/lib/site-config";'),
+                  ('origin: siteOrigin(),', 'origin: authReturnOrigin(),'),
+                  ('? `${siteOrigin()}/login?redirect=${encodeURIComponent(search.redirect)}`', '? `${authReturnOrigin()}/login?redirect=${encodeURIComponent(search.redirect)}`'),
+                  (': siteOrigin();', ': authReturnOrigin();'),
+              ],
+          }
+
+          for path, pairs in replacements.items():
+              text = path.read_text(encoding='utf-8')
+              for old, new in pairs:
+                  count = text.count(old)
+                  if count != 1:
+                      raise SystemExit(f'{path}: expected exactly one occurrence of {old!r}, found {count}')
+                  text = text.replace(old, new, 1)
+              path.write_text(text, encoding='utf-8')
+
+          print('Auth return-origin replacements applied with exact occurrence checks.')
+
+      - name: Verify no canonical siteOrigin remains in Auth flows
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -n 'siteOrigin' src/routes/forgot-password.tsx
+          ! grep -n 'siteOrigin' src/routes/signup.tsx
+          grep -n 'authReturnOrigin' src/routes/forgot-password.tsx
+          grep -n 'authReturnOrigin' src/routes/signup.tsx
+
+      - name: Commit patch to migration branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name '366 Industries'
+          git config user.email '103216816+Hunting-Fishing@users.noreply.github.com'
+          git add src/routes/forgot-password.tsx src/routes/signup.tsx
+          git diff --cached --check
+          git commit -m 'auth: keep staging email and signup returns on staging'
+          git push origin HEAD:migration/standalone-supabase-365
