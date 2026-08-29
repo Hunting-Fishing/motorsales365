@@ -4,7 +4,6 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 
 // Stamp every build with a unique id so the service worker can bust its
 // offline cache on each deploy without us editing public/sw.js by hand.
@@ -17,7 +16,6 @@ export default defineConfig({
     react(),
     tailwindcss(),
     tsconfigPaths(),
-    mcpPlugin(),
   ],
   cacheDir: "node_modules/.cache/vite",
   define: {
