@@ -2,21 +2,18 @@
 // nearby search (admin-only import flow). Must NOT be imported from client code.
 // The router blocks *.server.ts from the client bundle.
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
+const PLACES_API_BASE = "https://places.googleapis.com/v1";
 
 // Nominatim usage policy: descriptive User-Agent, <=1 req/sec, attribution in UI.
 // https://operations.osmfoundation.org/policies/nominatim/
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org";
 const NOMINATIM_UA = "365MotorSales/1.0 (https://365motorsales.com; support@365motorsales.com)";
 
-function authHeaders(): Record<string, string> {
-  const lovable = process.env.LOVABLE_API_KEY;
+function googlePlacesHeaders(): Record<string, string> {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-  if (!lovable) throw new Error("LOVABLE_API_KEY is not configured");
-  if (!apiKey) throw new Error("Google Maps connector is not linked (GOOGLE_MAPS_API_KEY missing)");
+  if (!apiKey) throw new Error("GOOGLE_MAPS_API_KEY is not configured");
   return {
-    Authorization: `Bearer ${lovable}`,
-    "X-Connection-Api-Key": apiKey,
+    "X-Goog-Api-Key": apiKey,
   };
 }
 
@@ -63,7 +60,6 @@ export type NearbyPlace = {
 };
 
 // Map our business type slugs → Google Places (New) "includedTypes".
-// https://developers.google.com/maps/documentation/places/web-service/place-types
 const PLACE_TYPE_MAP: Record<string, string[]> = {
   fuel_station: ["gas_station"],
   dealership: ["car_dealer"],
@@ -107,10 +103,10 @@ export async function searchNearbyPlaces(opts: {
       },
     },
   };
-  const res = await fetch(`${GATEWAY_URL}/places/v1/places:searchNearby`, {
+  const res = await fetch(`${PLACES_API_BASE}/places:searchNearby`, {
     method: "POST",
     headers: {
-      ...authHeaders(),
+      ...googlePlacesHeaders(),
       "Content-Type": "application/json",
       "X-Goog-FieldMask":
         "places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.types,places.websiteUri,places.nationalPhoneNumber",
