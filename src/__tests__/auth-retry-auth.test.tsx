@@ -17,7 +17,6 @@ vi.mock("@/lib/email/send", () => ({
 type AuthListener = (event: string, session: any) => void;
 const listeners: AuthListener[] = [];
 
-// Roles query always rejects so loadRoles schedules a retry we can then cancel.
 let rolesCallCount = 0;
 const rolesTableBuilder = () => ({
   select: () => ({
@@ -38,28 +37,20 @@ const profilesTableBuilder = () => ({
 });
 
 const signOutLocal = vi.fn().mockResolvedValue({ error: null });
+const initialSession = {
+  user: { id: "user-123", email: "t@example.com", user_metadata: {} },
+};
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
-      getUser: vi.fn().mockResolvedValue({
-        data: { user: { id: "user-123", email: "t@example.com", user_metadata: {} } },
-        error: null,
-      }),
-      getSession: vi.fn().mockResolvedValue({
-        data: {
-          session: {
-            user: { id: "user-123", email: "t@example.com", user_metadata: {} },
-          },
-        },
-        error: null,
-      }),
       signOut: vi.fn((opts?: { scope?: string }) => {
         if (opts?.scope === "local") return signOutLocal();
         return Promise.resolve({ error: null });
       }),
       onAuthStateChange: (cb: AuthListener) => {
         listeners.push(cb);
+        queueMicrotask(() => cb("INITIAL_SESSION", initialSession));
         return {
           data: {
             subscription: {
@@ -98,7 +89,6 @@ describe("retryAuth", () => {
   });
 
   it("clears session, cancels pending role retries, and navigates to /auth", async () => {
-    // Stub window.location.assign so retryAuth doesn't blow up jsdom.
     const assignSpy = vi.fn();
     Object.defineProperty(window, "location", {
       writable: true,
@@ -112,8 +102,8 @@ describe("retryAuth", () => {
 
     const { result } = renderHook(() => useAuth(), { wrapper });
 
-    // Wait for bootstrap → user loaded → first roles attempt rejected →
-    // retry scheduled (setTimeout ~1s).
+    // Listener-first bootstrap emits INITIAL_SESSION, then the first role
+    // attempt fails and schedules a retry (~1s).
     await waitFor(() => expect(result.current.user?.id).toBe("user-123"), {
       timeout: 3000,
     });
@@ -127,20 +117,15 @@ describe("retryAuth", () => {
       await result.current.retryAuth();
     });
 
-    // 1) Local sign-out happened.
     expect(signOutLocal).toHaveBeenCalledTimes(1);
-    // 2) Session state cleared.
     expect(result.current.user).toBeNull();
     expect(result.current.effectiveRoles).toEqual([]);
     expect(result.current.authError).toBeNull();
     expect(result.current.loading).toBe(false);
-    // 3) Redirect to /auth with preserved next param.
     expect(assignSpy).toHaveBeenCalledWith(
       expect.stringContaining("/auth?next=%2Fdashboard"),
     );
 
-    // 4) Pending role retry timer was cancelled: no further roles calls
-    //    should fire even after the original ~1s backoff elapses.
     await new Promise((r) => setTimeout(r, 1500));
     expect(rolesCallCount).toBe(callsBeforeRetry);
   });
