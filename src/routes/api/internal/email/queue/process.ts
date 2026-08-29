@@ -73,7 +73,7 @@ export const Route = createFileRoute("/api/internal/email/queue/process")({
       POST: async ({ request }) => {
         const expectedCronToken = process.env.EMAIL_QUEUE_CRON_TOKEN?.trim();
         const suppliedCronToken = request.headers.get("x-cron-token")?.trim();
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseUrl = process.env.SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL;
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
         if (!expectedCronToken || !supabaseUrl || !supabaseServiceKey) {
