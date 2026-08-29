@@ -68,16 +68,20 @@ Return ONLY a JSON object — no prose, no markdown fences:
 }
 
 async function classifyOne(imageUrl: string): Promise<ClassifyResult> {
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key) throw new Error("Auto-categorize unavailable — LOVABLE_API_KEY missing.");
+  const key = process.env.AI_API_KEY?.trim();
+  const baseURL = process.env.AI_API_BASE_URL?.trim().replace(/\/+$/, "");
+  const modelName = process.env.AI_MODEL_VISION?.trim() || process.env.AI_MODEL?.trim();
+  if (!key || !baseURL || !modelName) {
+    throw new Error("Auto-categorize unavailable — standalone AI provider is not configured.");
+  }
 
   const { bytes, mediaType } = await fetchImageAsBytes(imageUrl);
   const gateway = createOpenAICompatible({
-    name: "lovable",
-    baseURL: "https://ai.gateway.lovable.dev/v1",
-    headers: { "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
+    name: "standalone",
+    baseURL,
+    headers: { Authorization: `Bearer ${key}` },
   });
-  const model = gateway("google/gemini-2.5-flash");
+  const model = gateway(modelName);
 
   let text: string;
   try {
@@ -97,7 +101,7 @@ async function classifyOne(imageUrl: string): Promise<ClassifyResult> {
     text = result.text;
   } catch (err: any) {
     const msg = String(err?.message ?? err);
-    if (/402|payment.?required|credit/i.test(msg)) throw new Error("AI credits exhausted.");
+    if (/402|payment.?required|credit/i.test(msg)) throw new Error("AI provider billing unavailable.");
     if (/429|rate.?limit/i.test(msg)) throw new Error("AI rate-limited. Try again shortly.");
     throw new Error(`Auto-categorize failed: ${msg.slice(0, 200)}`);
   }
