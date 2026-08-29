@@ -10,7 +10,11 @@
   "vars": {
     "SUPABASE_URL": "https://wjxaajgvddtrxxtocxen.supabase.co",
     "SUPABASE_PROJECT_ID": "wjxaajgvddtrxxtocxen",
-    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_RTI8m0ZvjoZFH7_q-wnIQQ_SxrL0s-d"
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_RTI8m0ZvjoZFH7_q-wnIQQ_SxrL0s-d",
+    "PUBLIC_SITE_ORIGIN": "https://www.365motorsales.com",
+    "SITE_URL": "https://www.365motorsales.com",
+    "TRANSACTIONAL_FROM_EMAIL": "no-reply@auth.365motorsales.com",
+    "EMAIL_PROVIDER": "resend"
   },
   "env": {
     "staging": {
@@ -18,7 +22,11 @@
       "vars": {
         "SUPABASE_URL": "https://wjxaajgvddtrxxtocxen.supabase.co",
         "SUPABASE_PROJECT_ID": "wjxaajgvddtrxxtocxen",
-        "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_RTI8m0ZvjoZFH7_q-wnIQQ_SxrL0s-d"
+        "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_RTI8m0ZvjoZFH7_q-wnIQQ_SxrL0s-d",
+        "PUBLIC_SITE_ORIGIN": "https://motorsales365-standalone-staging.jordilwbailey.workers.dev",
+        "SITE_URL": "https://motorsales365-standalone-staging.jordilwbailey.workers.dev",
+        "TRANSACTIONAL_FROM_EMAIL": "no-reply@auth.365motorsales.com",
+        "EMAIL_PROVIDER": "resend"
       }
     }
   }
