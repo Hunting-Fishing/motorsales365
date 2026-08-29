@@ -28,6 +28,9 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_ENV: staging
       STAGING_URL: https://motorsales365-standalone-staging.jordilwbailey.workers.dev
+      STANDALONE_SUPABASE_REF: wjxaajgvddtrxxtocxen
+      LOVABLE_SOURCE_REF: jfjrnjyroxvlydajvndl
+      ACCEPTANCE_LISTING_ID: a60923a9-e834-4432-9061-563358bc3d9a
 
     steps:
       - name: Check out migration branch
@@ -143,6 +146,79 @@ jobs:
           test -s /tmp/staging-home.html || { echo 'Staging smoke test returned an empty response body.' >&2; exit 1; }
           echo 'Standalone staging URL responded successfully.' >> "$GITHUB_STEP_SUMMARY"
           echo "Smoke tested: ${STAGING_URL}/" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Accept public standalone staging routes
+        if: steps.cloudflare.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_route() {
+            local route="$1"
+            local output="$2"
+            local effective
+            echo "Testing ${STAGING_URL}${route}"
+            effective="$(curl \
+              --fail-with-body \
+              --silent \
+              --show-error \
+              --location \
+              --retry 4 \
+              --retry-delay 3 \
+              --retry-all-errors \
+              --connect-timeout 15 \
+              --max-time 60 \
+              --output "$output" \
+              --write-out '%{url_effective}' \
+              "${STAGING_URL}${route}")"
+
+            test -s "$output" || { echo "${route} returned an empty body." >&2; exit 1; }
+            if [[ "$effective" == *"${LOVABLE_SOURCE_REF}"* || "$effective" == *"lovable"* ]]; then
+              echo "${route} redirected to a Lovable/source endpoint: ${effective}" >&2
+              exit 1
+            fi
+          }
+
+          fetch_route '/' /tmp/accept-home.html
+          fetch_route '/businesses' /tmp/accept-businesses.html
+          fetch_route '/map' /tmp/accept-map.html
+          fetch_route "/listing/${ACCEPTANCE_LISTING_ID}" /tmp/accept-listing.html
+
+          for body in /tmp/accept-home.html /tmp/accept-businesses.html /tmp/accept-map.html /tmp/accept-listing.html; do
+            if grep -Eqi "${LOVABLE_SOURCE_REF}|\\.lovableproject\\.com|lovable\\.dev/api|lovable\\.app/api" "$body"; then
+              echo "Standalone staging acceptance blocked: source/Lovable runtime reference found in ${body}." >&2
+              exit 1
+            fi
+          done
+
+          grep -Fqi '2007 civic' /tmp/accept-listing.html || {
+            echo 'Active standalone listing did not render its expected server-side title.' >&2
+            exit 1
+          }
+
+          grep -Fqi "https://${STANDALONE_SUPABASE_REF}.supabase.co/storage/v1/object/public/" /tmp/accept-listing.html || {
+            echo 'Active listing did not render a standalone Supabase Storage URL.' >&2
+            exit 1
+          }
+
+          media_url="$(grep -Eo "https://${STANDALONE_SUPABASE_REF}\\.supabase\\.co/storage/v1/object/public/[^\"<> ]+" /tmp/accept-listing.html | head -n 1 || true)"
+          test -n "$media_url" || { echo 'Could not extract standalone listing media URL.' >&2; exit 1; }
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --retry 3 \
+            --retry-delay 2 \
+            --connect-timeout 15 \
+            --max-time 60 \
+            --range 0-0 \
+            --output /dev/null \
+            "$media_url"
+
+          echo 'Public staging acceptance passed for homepage, businesses, map, active listing, and target Storage media.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No Lovable/source runtime reference was observed in tested staging responses.' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Record staging deployment result
         if: steps.cloudflare.outputs.ready == 'true' && success()
