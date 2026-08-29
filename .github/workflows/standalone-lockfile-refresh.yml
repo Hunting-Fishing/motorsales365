@@ -1,0 +1,48 @@
+name: Standalone Lockfile Refresh
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refresh-lockfile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Generate lockfile from current declarations
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f package-lock.json
+          npm install --package-lock-only --legacy-peer-deps --ignore-scripts --no-audit --no-fund
+
+      - name: Verify Lovable packages are absent from generated lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -nE '"@lovable\.dev/(cloud-auth-js|email-js|webhooks-js)"' package-lock.json; then
+            echo 'Generated lockfile unexpectedly contains removed Lovable packages.' >&2
+            exit 1
+          fi
+
+      - name: Upload generated lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: standalone-package-lock
+          path: package-lock.json
+          if-no-files-found: error
+          retention-days: 3
