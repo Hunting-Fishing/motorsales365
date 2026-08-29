@@ -10,10 +10,14 @@ vi.mock("@supabase/supabase-js", () => {
     eq: () => usersQuery,
     maybeSingle: async () => ({ data: null, error: null }),
   };
+  const profileUpdateQuery = {
+    eq: () => profileUpdateQuery,
+    select: async () => ({ data: [{ id: "test-user" }], error: null }),
+  };
   const client = {
     from: () => ({
       insert: async () => ({ error: null }),
-      update: () => ({ eq: async () => ({ error: null }) }),
+      update: () => profileUpdateQuery,
     }),
     schema: () => ({ from: () => usersQuery }),
     auth: {
