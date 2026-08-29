@@ -60,3 +60,9 @@ jobs:
 
       - name: Build standalone application
         run: npm run build
+
+      # Validate that the isolated staging Worker can be packaged with the
+      # checked-in public configuration. --dry-run does not deploy or alter
+      # production and does not require private provider secret values.
+      - name: Validate standalone staging Worker package
+        run: npx wrangler deploy --dry-run --env staging
