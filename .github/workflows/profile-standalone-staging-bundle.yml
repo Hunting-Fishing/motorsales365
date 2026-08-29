@@ -1,0 +1,176 @@
+name: Profile Standalone Staging Bundle
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'wrangler.jsonc'
+      - '.github/workflows/profile-standalone-staging-bundle.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motorsales365-standalone-staging-profile
+  cancel-in-progress: true
+
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ENV: staging
+
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+
+      - name: Run standalone runtime guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          matches="$({
+            grep -RInE \
+              --exclude='*.map' \
+              --exclude='qr-rescue-detector.tsx' \
+              --exclude-dir=node_modules \
+              'jfjrnjyroxvlydajvndl|\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' \
+              src wrangler.jsonc vite.config.ts || true
+          } | grep -vE '^[^:]+:[0-9]+:[[:space:]]*(//|/\*|\*|\*/)' || true)"
+          if [[ -n "$matches" ]]; then
+            printf '%s\n' "$matches"
+            echo 'Bundle profiling blocked: Lovable source/runtime endpoint found.' >&2
+            exit 1
+          fi
+
+      - name: Build exact standalone staging application
+        run: npm run build
+
+      - name: Verify generated build is isolated staging
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const path = 'dist/server/wrangler.json';
+          const expectedName = 'motorsales365-standalone-staging';
+          const expectedProject = 'wjxaajgvddtrxxtocxen';
+          const config = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+          if (config.name !== expectedName) {
+            console.error(`Blocked: generated Worker name is ${JSON.stringify(config.name)}, expected ${JSON.stringify(expectedName)}.`);
+            process.exit(1);
+          }
+          if (config.vars?.SUPABASE_PROJECT_ID !== expectedProject) {
+            console.error('Blocked: generated staging Worker does not target the standalone Supabase project.');
+            process.exit(1);
+          }
+          console.log('Verified isolated staging Worker name and standalone Supabase target.');
+          NODE
+
+      - name: Measure generated Worker files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p bundle-profile
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import zlib from 'node:zlib';
+
+          const root = 'dist/server';
+          const rows = [];
+
+          function walk(dir) {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) walk(full);
+              else if (entry.isFile()) {
+                const data = fs.readFileSync(full);
+                rows.push({
+                  file: full.replaceAll('\\', '/'),
+                  raw: data.length,
+                  gzip: zlib.gzipSync(data, { level: 9 }).length,
+                  brotli: zlib.brotliCompressSync(data).length,
+                });
+              }
+            }
+          }
+
+          walk(root);
+          rows.sort((a, b) => b.gzip - a.gzip);
+
+          const total = rows.reduce((acc, row) => ({
+            raw: acc.raw + row.raw,
+            gzip: acc.gzip + row.gzip,
+            brotli: acc.brotli + row.brotli,
+          }), { raw: 0, gzip: 0, brotli: 0 });
+
+          const fmt = n => `${(n / 1024).toFixed(1)} KiB`;
+          const lines = [
+            '# Standalone staging Worker bundle profile',
+            '',
+            `Files measured: ${rows.length}`,
+            `Total raw: ${fmt(total.raw)}`,
+            `Total gzip (sum of files): ${fmt(total.gzip)}`,
+            `Total Brotli (sum of files): ${fmt(total.brotli)}`,
+            '',
+            '## Largest files by gzip size',
+            '',
+            '| # | File | Raw | Gzip | Brotli |',
+            '|---:|---|---:|---:|---:|',
+            ...rows.slice(0, 80).map((row, i) => `| ${i + 1} | \`${row.file}\` | ${fmt(row.raw)} | ${fmt(row.gzip)} | ${fmt(row.brotli)} |`),
+            '',
+          ];
+
+          fs.writeFileSync('bundle-profile/generated-files.md', lines.join('\n'));
+          fs.writeFileSync('bundle-profile/generated-files.json', JSON.stringify({ total, files: rows }, null, 2));
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n'));
+          NODE
+
+      - name: Capture Wrangler dry-run package measurement
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Dry-run only: this writes a local package and never contacts the deploy API.
+          npx wrangler deploy --dry-run --outdir bundle-profile/wrangler-package 2>&1 | tee bundle-profile/wrangler-dry-run.txt
+          {
+            echo ''
+            echo '## Wrangler package measurement'
+            echo ''
+            echo '```text'
+            grep -E 'Total Upload|gzip|Worker Startup Time|Your Worker has access|--dry-run|dry run' bundle-profile/wrangler-dry-run.txt || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload text profile only
+        uses: actions/upload-artifact@v4
+        with:
+          name: standalone-staging-bundle-profile
+          path: |
+            bundle-profile/generated-files.md
+            bundle-profile/generated-files.json
+            bundle-profile/wrangler-dry-run.txt
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Confirm no deployment occurred
+        run: |
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '**Safety:** this workflow performed a local Wrangler dry-run only. No Worker or DNS was deployed or modified.' >> "$GITHUB_STEP_SUMMARY"
