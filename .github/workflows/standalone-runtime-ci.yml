@@ -52,8 +52,11 @@ jobs:
             exit 1
           fi
 
-      - name: Build standalone application
-        run: npm run build
-
+      # Run tests against the clean checked-out source tree before TanStack/Vite
+      # build generation. This prevents generated build artifacts from being
+      # mistaken for repository-owned tests while preserving the full test suite.
       - name: Run unit tests
         run: npm test
+
+      - name: Build standalone application
+        run: npm run build
