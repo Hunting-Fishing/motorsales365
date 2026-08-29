@@ -1,0 +1,82 @@
+name: Recover Verified Target Service Role Alias
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/recover-target-service-role-alias.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CANDIDATE_GENERIC: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      CANDIDATE_STANDALONE: ${{ secrets.STANDALONE_SUPABASE_SERVICE_ROLE_KEY }}
+      CANDIDATE_TARGET_SHORT: ${{ secrets.TARGET_SERVICE_ROLE_KEY }}
+      CANDIDATE_NEW: ${{ secrets.NEW_SUPABASE_SERVICE_ROLE_KEY }}
+      TARGET_SUPABASE_URL: https://wjxaajgvddtrxxtocxen.supabase.co
+      WORKER_NAME: motorsales365-standalone-staging
+    steps:
+      - name: Find a candidate that proves target ownership
+        id: verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}"
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}"
+          : > /tmp/verified-key
+          selected=''
+          for label in GENERIC STANDALONE TARGET_SHORT NEW; do
+            var="CANDIDATE_${label}"
+            key="${!var:-}"
+            if [[ -z "$key" ]]; then
+              echo "${label}: unavailable"
+              continue
+            fi
+            status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+              --header "apikey: ${key}" \
+              --header "Authorization: Bearer ${key}" \
+              "${TARGET_SUPABASE_URL}/auth/v1/admin/users?page=1&per_page=1")"
+            if [[ "$status" == '200' ]]; then
+              printf '%s' "$key" > /tmp/verified-key
+              chmod 600 /tmp/verified-key
+              selected="$label"
+              break
+            fi
+            echo "${label}: present but rejected by standalone target (HTTP ${status})"
+          done
+          if [[ -z "$selected" ]]; then
+            echo 'No existing GitHub service-role alias verified against the standalone target.' >&2
+            exit 1
+          fi
+          echo "Verified GitHub secret alias ${selected} belongs to the standalone target."
+          echo "selected=${selected}" >> "$GITHUB_OUTPUT"
+
+      - name: Bind verified target key to staging Worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s /tmp/verified-key
+          npx --yes wrangler@4 secret put SUPABASE_SERVICE_ROLE_KEY --name "${WORKER_NAME}" < /tmp/verified-key
+          rm -f /tmp/verified-key
+
+      - name: Confirm binding name only
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4 secret list --name "${WORKER_NAME}" > /tmp/secrets.json
+          node <<'NODE'
+          const fs = require('fs');
+          const parsed = JSON.parse(fs.readFileSync('/tmp/secrets.json','utf8'));
+          const names = Array.isArray(parsed) ? parsed.map(x => x?.name).filter(Boolean) : [];
+          if (!names.includes('SUPABASE_SERVICE_ROLE_KEY')) process.exit(1);
+          console.log('Verified staging Worker has SUPABASE_SERVICE_ROLE_KEY binding.');
+          NODE
