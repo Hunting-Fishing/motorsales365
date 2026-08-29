@@ -185,7 +185,7 @@ jobs:
           fetch_route "/listing/${ACCEPTANCE_LISTING_ID}" /tmp/accept-listing.html
 
           for body in /tmp/accept-home.html /tmp/accept-businesses.html /tmp/accept-map.html /tmp/accept-listing.html; do
-            if grep -Eqi "${LOVABLE_SOURCE_REF}|\\.lovableproject\\.com|lovable\\.dev/api|lovable\\.app/api" "$body"; then
+            if grep -Eqi "${LOVABLE_SOURCE_REF}|\.lovableproject\.com|lovable\.dev/api|lovable\.app/api" "$body"; then
               echo "Standalone staging acceptance blocked: source/Lovable runtime reference found in ${body}." >&2
               exit 1
             fi
@@ -201,7 +201,7 @@ jobs:
             exit 1
           }
 
-          media_url="$(grep -Eo "https://${STANDALONE_SUPABASE_REF}\\.supabase\\.co/storage/v1/object/public/[^\"<> ]+" /tmp/accept-listing.html | head -n 1 || true)"
+          media_url="$(grep -aEo "https://${STANDALONE_SUPABASE_REF}\.supabase\.co/storage/v1/object/public/[^\"<> ]+" /tmp/accept-listing.html | head -n 1 || true)"
           test -n "$media_url" || { echo 'Could not extract standalone listing media URL.' >&2; exit 1; }
 
           curl \
