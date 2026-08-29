@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const GATEWAY = "https://connector-gateway.lovable.dev/google_maps";
+const PLACES_API_BASE = "https://places.googleapis.com/v1";
 
 // Google place type -> our business_types.slug
 const TYPE_MAP: Record<string, string> = {
@@ -41,13 +41,11 @@ async function assertStaff(ctx: { supabase: any; userId: string }) {
   if (error || !data) throw new Error("Forbidden: staff only");
 }
 
-function gatewayHeaders() {
-  const lov = process.env.LOVABLE_API_KEY;
-  const gm = process.env.GOOGLE_MAPS_API_KEY;
-  if (!lov || !gm) throw new Error("Google Maps connector is not configured");
+function googlePlacesHeaders() {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey) throw new Error("GOOGLE_MAPS_API_KEY is not configured");
   return {
-    Authorization: `Bearer ${lov}`,
-    "X-Connection-Api-Key": gm,
+    "X-Goog-Api-Key": apiKey,
     "Content-Type": "application/json",
   };
 }
@@ -82,10 +80,6 @@ export const searchGooglePlaces = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertStaff(context);
 
-    // Bake the place type into the text query as a keyword instead of using
-    // Google's strict `includedType` filter — many of our internal type slugs
-    // (motorcycle_repair, auto_body_shop, tire_shop, etc.) aren't valid
-    // "primary types" for the New Places API and silently return zero results.
     const typeKeyword = data.placeType.replace(/_/g, " ");
     const textQuery = [data.query, typeKeyword, data.city, data.region, "Philippines"]
       .filter(Boolean)
@@ -114,9 +108,9 @@ export const searchGooglePlaces = createServerFn({ method: "POST" })
       "nextPageToken",
     ].join(",");
 
-    const res = await fetch(`${GATEWAY}/places/v1/places:searchText`, {
+    const res = await fetch(`${PLACES_API_BASE}/places:searchText`, {
       method: "POST",
-      headers: { ...gatewayHeaders(), "X-Goog-FieldMask": fieldMask },
+      headers: { ...googlePlacesHeaders(), "X-Goog-FieldMask": fieldMask },
       body: JSON.stringify(body),
     });
     if (!res.ok) {
