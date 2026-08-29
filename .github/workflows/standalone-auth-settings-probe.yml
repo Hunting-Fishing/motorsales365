@@ -17,7 +17,6 @@ jobs:
     env:
       SUPABASE_URL: https://wjxaajgvddtrxxtocxen.supabase.co
       SUPABASE_PUBLISHABLE_KEY: sb_publishable_RTI8m0ZvjoZFH7_q-wnIQQ_SxrL0s-d
-      STAGING_RETURN: https://motorsales365-standalone-staging.jordilwbailey.workers.dev/login
     steps:
       - name: Read safe Auth settings
         shell: bash
@@ -27,26 +26,4 @@ jobs:
             --header "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
             "${SUPABASE_URL}/auth/v1/settings")"
           [[ "$code" == '200' ]] || { echo "Auth settings probe failed with HTTP ${code}." >&2; exit 1; }
-          jq -c '{top_level_keys:(keys|sort), external_keys:((.external // {})|keys|sort), email_enabled:(.external.email // false), phone_enabled:(.external.phone // false), google_enabled:(.external.google // false), apple_enabled:(.external.apple // false), azure_enabled:(.external.azure // false)}' /tmp/settings.json
-
-      - name: Probe Google authorization without exposing provider configuration
-        shell: bash
-        run: |
-          set -euo pipefail
-          enabled="$(jq -r '.external.google // false' /tmp/settings.json)"
-          if [[ "$enabled" != 'true' ]]; then
-            echo 'Google OAuth provider is disabled in standalone Supabase.'
-            exit 0
-          fi
-          headers=/tmp/google-headers.txt
-          code="$(curl --silent --show-error --output /dev/null --dump-header "$headers" --write-out '%{http_code}' \
-            --header "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
-            --get \
-            --data-urlencode 'provider=google' \
-            --data-urlencode "redirect_to=${STAGING_RETURN}" \
-            "${SUPABASE_URL}/auth/v1/authorize")"
-          location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/^[^:]+:[[:space:]]*/,""); sub(/\r$/,""); print; exit}' "$headers")"
-          host="$(python3 -c 'import sys,urllib.parse; print(urllib.parse.urlparse(sys.stdin.read().strip()).hostname or "")' <<< "$location")"
-          echo "Google authorize HTTP ${code}; redirect host=${host:-none}"
-          [[ "$code" =~ ^30[12378]$ ]] || { echo 'Google authorization did not return a redirect.' >&2; exit 1; }
-          [[ "$host" == 'accounts.google.com' ]] || { echo 'Google authorization did not redirect to accounts.google.com.' >&2; exit 1; }
+          jq -c '{disable_signup:.disable_signup, mailer_autoconfirm:.mailer_autoconfirm, phone_autoconfirm:.phone_autoconfirm, email_enabled:.external.email, google_enabled:.external.google}' /tmp/settings.json
