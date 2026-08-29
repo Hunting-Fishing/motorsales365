@@ -11,7 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { SiteLayout } from "@/components/site-layout";
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
-import { siteOrigin } from "@/lib/site-config";
+import { authReturnOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/forgot-password")({
   component: ForgotPasswordPage,
@@ -65,7 +65,7 @@ function ForgotPasswordPage() {
     setEmailStatus("sending");
     setEmailError(null);
     const { error } = await supabase.auth.resetPasswordForEmail(targetEmail, {
-      redirectTo: `${siteOrigin()}/reset-password`,
+      redirectTo: `${authReturnOrigin()}/reset-password`,
     });
     if (error) {
       const msg = error.message || "Could not send the reset link.";

@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { getCreditedCode, getCreditedSource, getVisitorId, recordTouch } from "@/lib/referral";
 import { SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid.types";
 import type { LocationValue } from "@/components/location-picker";
-import { siteOrigin } from "@/lib/site-config";
+import { authReturnOrigin } from "@/lib/site-config";
 import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
 import { readPending, writePending, clearPending } from "@/lib/signup-pending";
 
@@ -687,7 +687,7 @@ function SignupPage() {
           visitor_id: search.vid || getVisitorId(),
           invite: search.invite,
           redirect: search.redirect ?? "",
-          origin: siteOrigin(),
+          origin: authReturnOrigin(),
           agreed: true,
         }),
       });
@@ -803,8 +803,8 @@ function SignupPage() {
     if (!intent) return;
     stashPendingProfile();
     const returnTo = search.redirect
-      ? `${siteOrigin()}/login?redirect=${encodeURIComponent(search.redirect)}`
-      : siteOrigin();
+      ? `${authReturnOrigin()}/login?redirect=${encodeURIComponent(search.redirect)}`
+      : authReturnOrigin();
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: returnTo,
     });
