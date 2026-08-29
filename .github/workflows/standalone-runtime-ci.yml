@@ -27,12 +27,12 @@ jobs:
           node-version: '22'
           cache: npm
 
-      - name: Install declared dependencies
-        # package.json has moved ahead of every committed lockfile. For the
-        # standalone cutover gate, first prove the current declarations build.
-        # Lockfile normalization is tracked separately and must not mask runtime
-        # failures during the Lovable exit.
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Install locked dependencies
+        # The migration branch carries a regenerated npm lockfile with removed
+        # Lovable packages absent. --legacy-peer-deps remains required because
+        # @tanstack/zod-adapter currently declares a Zod 3 peer while this app
+        # intentionally runs Zod 4.
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
 
       - name: Guard standalone runtime from Lovable source endpoints
         shell: bash
