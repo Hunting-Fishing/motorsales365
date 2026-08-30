@@ -1,7 +1,7 @@
 {
-  "migration_file_count": 395,
+  "migration_file_count": 396,
   "chunk_count": 7,
-  "hazard_match_count": 785,
+  "hazard_match_count": 786,
   "hazard_matches": [
     {
       "file": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
@@ -3927,6 +3927,11 @@
       "file": "20260830015000_restrict_internal_security_definer_helpers.sql",
       "line": 1,
       "text": "-- Standalone hardening: these SECURITY DEFINER helpers are internal mutation"
+    },
+    {
+      "file": "20260830165926_harden_internal_security_definer_rpc_grants.sql",
+      "line": 1,
+      "text": "-- Standalone target hardening: internal SECURITY DEFINER helpers are invoked by"
     }
   ]
 }
