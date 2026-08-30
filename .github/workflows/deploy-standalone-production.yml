@@ -1,0 +1,237 @@
+name: Deploy Standalone Production
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/deploy-standalone-production.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motorsales365-standalone-production
+  cancel-in-progress: false
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PRODUCTION_URL: https://www.365motorsales.com
+      STANDALONE_SUPABASE_REF: wjxaajgvddtrxxtocxen
+      LOVABLE_SOURCE_REF: jfjrnjyroxvlydajvndl
+      ACCEPTANCE_LISTING_ID: a60923a9-e834-4432-9061-563358bc3d9a
+
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Verify Cloudflare deployment credentials are available
+        id: cloudflare
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${CLOUDFLARE_API_TOKEN:-}" || -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'Production deployment blocked: Cloudflare deployment credentials are not configured.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo 'ready=true' >> "$GITHUB_OUTPUT"
+          echo 'Cloudflare deployment credentials are present. No credential values are printed.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install locked dependencies
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+
+      - name: Run standalone runtime guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          matches="$({
+            grep -RInE \
+              --exclude='*.map' \
+              --exclude='qr-rescue-detector.tsx' \
+              --exclude-dir=node_modules \
+              'jfjrnjyroxvlydajvndl|\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' \
+              src wrangler.jsonc vite.config.ts || true
+          } | grep -vE '^[^:]+:[0-9]+:[[:space:]]*(//|/\*|\*|\*/)' || true)"
+          if [[ -n "$matches" ]]; then
+            printf '%s\n' "$matches"
+            echo 'Production deployment blocked: Lovable source/runtime endpoint found.' >&2
+            exit 1
+          fi
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Build standalone production application
+        run: npm run build
+
+      - name: Verify generated deployment is standalone production
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const path = 'dist/server/wrangler.json';
+          const expectedName = 'motorsales365';
+          const expectedProject = 'wjxaajgvddtrxxtocxen';
+          const config = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+          if (config.name !== expectedName) {
+            console.error(`Blocked: generated Worker name is ${JSON.stringify(config.name)}, expected ${JSON.stringify(expectedName)}.`);
+            process.exit(1);
+          }
+
+          if (config.vars?.SUPABASE_PROJECT_ID !== expectedProject) {
+            console.error('Blocked: generated production Worker does not target the standalone Supabase project.');
+            process.exit(1);
+          }
+
+          console.log('Verified production Worker name and standalone Supabase target.');
+          NODE
+
+      - name: Verify built runtime has no source fallback or bundled secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Rq --exclude='*.map' "${LOVABLE_SOURCE_REF}" dist/server; then
+            echo 'Production deployment blocked: source Supabase ref found in built runtime.' >&2
+            exit 1
+          fi
+          if grep -REqi --exclude='*.map' '\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' dist/server; then
+            echo 'Production deployment blocked: Lovable endpoint found in built runtime.' >&2
+            exit 1
+          fi
+          if grep -REq --exclude='*.map' 'sk-(proj-)?[A-Za-z0-9_-]{20,}' dist/server; then
+            echo 'Production deployment blocked: possible OpenAI secret embedded in built runtime.' >&2
+            exit 1
+          fi
+          grep -Rq --exclude='*.map' "${STANDALONE_SUPABASE_REF}" dist/server || {
+            echo 'Production deployment blocked: standalone Supabase ref not found in built runtime.' >&2
+            exit 1
+          }
+
+      - name: Strip server source maps before production deploy
+        shell: bash
+        run: find dist/server -type f -name '*.map' -delete
+
+      - name: Deploy standalone production Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo 'CLOUDFLARE_API_TOKEN is unavailable in the deploy step.' >&2; exit 1; }
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'CLOUDFLARE_ACCOUNT_ID is unavailable in the deploy step.' >&2; exit 1; }
+          npx wrangler deploy
+
+      - name: Smoke test production Worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Smoke testing ${PRODUCTION_URL}/"
+          curl \
+            --fail-with-body \
+            --silent \
+            --show-error \
+            --location \
+            --retry 8 \
+            --retry-delay 5 \
+            --retry-all-errors \
+            --connect-timeout 15 \
+            --max-time 60 \
+            --output /tmp/production-home.html \
+            "${PRODUCTION_URL}/"
+          test -s /tmp/production-home.html || { echo 'Production smoke test returned an empty response body.' >&2; exit 1; }
+
+      - name: Accept public standalone production routes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_route() {
+            local route="$1"
+            local output="$2"
+            local effective
+            echo "Testing ${PRODUCTION_URL}${route}"
+            effective="$(curl \
+              --fail-with-body \
+              --silent \
+              --show-error \
+              --location \
+              --retry 6 \
+              --retry-delay 5 \
+              --retry-all-errors \
+              --connect-timeout 15 \
+              --max-time 60 \
+              --output "$output" \
+              --write-out '%{url_effective}' \
+              "${PRODUCTION_URL}${route}")"
+
+            test -s "$output" || { echo "${route} returned an empty body." >&2; exit 1; }
+            if [[ "$effective" == *"${LOVABLE_SOURCE_REF}"* || "$effective" == *"lovable"* ]]; then
+              echo "${route} redirected to a Lovable/source endpoint: ${effective}" >&2
+              exit 1
+            fi
+          }
+
+          fetch_route '/' /tmp/accept-home.html
+          fetch_route '/businesses' /tmp/accept-businesses.html
+          fetch_route '/map' /tmp/accept-map.html
+          fetch_route "/listing/${ACCEPTANCE_LISTING_ID}" /tmp/accept-listing.html
+
+          for body in /tmp/accept-home.html /tmp/accept-businesses.html /tmp/accept-map.html /tmp/accept-listing.html; do
+            if grep -Eqi "${LOVABLE_SOURCE_REF}|\.lovableproject\.com|lovable\.dev/api|lovable\.app/api" "$body"; then
+              echo "Production acceptance blocked: source/Lovable runtime reference found in ${body}." >&2
+              exit 1
+            fi
+          done
+
+          grep -Fqi '2007 civic' /tmp/accept-listing.html || {
+            echo 'Active standalone listing did not render its expected server-side title.' >&2
+            exit 1
+          }
+
+          grep -Fqi "https://${STANDALONE_SUPABASE_REF}.supabase.co/storage/v1/object/public/" /tmp/accept-listing.html || {
+            echo 'Active listing did not render a standalone Supabase Storage URL.' >&2
+            exit 1
+          }
+
+          media_url="$(grep -aEo "https://${STANDALONE_SUPABASE_REF}\.supabase\.co/storage/v1/object/public/[^\"<> ]+" /tmp/accept-listing.html | head -n 1 || true)"
+          test -n "$media_url" || { echo 'Could not extract standalone listing media URL.' >&2; exit 1; }
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --retry 3 \
+            --retry-delay 2 \
+            --connect-timeout 15 \
+            --max-time 60 \
+            --range 0-0 \
+            --output /dev/null \
+            "$media_url"
+
+          echo 'Production cutover acceptance passed for homepage, businesses, map, active listing, and target Storage media.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No Lovable/source runtime reference was observed in tested production responses.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Record production deployment result
+        if: success()
+        run: |
+          echo 'Standalone production Worker deployed successfully.' >> "$GITHUB_STEP_SUMMARY"
+          echo "Production: ${PRODUCTION_URL}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Supabase project: ${STANDALONE_SUPABASE_REF}" >> "$GITHUB_STEP_SUMMARY"
