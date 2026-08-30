@@ -7,6 +7,7 @@ on:
       - migration/standalone-supabase-365
     paths:
       - '.github/workflows/deploy-standalone-production.yml'
+      - 'wrangler.jsonc'
 
 permissions:
   contents: read
