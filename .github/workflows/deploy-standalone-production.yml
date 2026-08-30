@@ -55,6 +55,34 @@ jobs:
           node-version: '22'
           cache: npm
 
+      - name: Bind Vite client to standalone Supabase
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const config = JSON.parse(fs.readFileSync('wrangler.jsonc', 'utf8'));
+          const vars = config.vars ?? {};
+          const expectedProject = process.env.STANDALONE_SUPABASE_REF;
+          const expectedUrl = `https://${expectedProject}.supabase.co`;
+
+          if (vars.SUPABASE_PROJECT_ID !== expectedProject || vars.SUPABASE_URL !== expectedUrl) {
+            console.error('Production build blocked: wrangler public Supabase config does not match the standalone project.');
+            process.exit(1);
+          }
+          if (!vars.SUPABASE_PUBLISHABLE_KEY) {
+            console.error('Production build blocked: standalone Supabase publishable key is missing from wrangler config.');
+            process.exit(1);
+          }
+
+          fs.appendFileSync(
+            process.env.GITHUB_ENV,
+            `VITE_SUPABASE_URL=${vars.SUPABASE_URL}\nVITE_SUPABASE_PUBLISHABLE_KEY=${vars.SUPABASE_PUBLISHABLE_KEY}\n`,
+          );
+          console.log('Bound Vite client to standalone Supabase public configuration without printing values.');
+          NODE
+
       - name: Verify Cloudflare deployment credentials are available
         shell: bash
         run: |
@@ -136,7 +164,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -Rq --exclude='*.map' "${LOVABLE_SOURCE_REF}" dist/server; then
+          if grep -Rq --exclude='*.map' "${LOVABLE_SOURCE_REF}" dist; then
             echo 'Production deployment blocked: source Supabase ref found in built runtime.' >&2
             exit 1
           fi
@@ -145,7 +173,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -REqi --exclude='*.map' '\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' dist/server; then
+          if grep -REqi --exclude='*.map' '\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' dist; then
             echo 'Production deployment blocked: Lovable endpoint found in built runtime.' >&2
             exit 1
           fi
@@ -171,14 +199,25 @@ jobs:
           done
           echo 'Exact configured-secret leak scan passed; no secret values were printed.' >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Require standalone Supabase ref in built runtime
+      - name: Require standalone Supabase ref in server runtime
         shell: bash
         run: |
           set -euo pipefail
           grep -Rq --exclude='*.map' "${STANDALONE_SUPABASE_REF}" dist/server || {
-            echo 'Production deployment blocked: standalone Supabase ref not found in built runtime.' >&2
+            echo 'Production deployment blocked: standalone Supabase ref not found in server runtime.' >&2
             exit 1
           }
+
+      - name: Require standalone Supabase ref in browser runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          browser_match="$(grep -RIl --exclude='*.map' "${STANDALONE_SUPABASE_REF}" dist | grep -v '^dist/server/' | head -n 1 || true)"
+          test -n "$browser_match" || {
+            echo 'Production deployment blocked: standalone Supabase ref not found in browser runtime.' >&2
+            exit 1
+          }
+          echo 'Verified browser and server runtimes both target standalone Supabase.' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Prepare atomic production secret payload
         shell: bash
