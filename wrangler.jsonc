@@ -8,6 +8,10 @@
     {
       "pattern": "365motorsales.com",
       "custom_domain": true
+    },
+    {
+      "pattern": "www.365motorsales.com",
+      "custom_domain": true
     }
   ],
   "observability": {
