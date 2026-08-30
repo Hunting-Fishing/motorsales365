@@ -102,7 +102,7 @@ jobs:
           console.log('Verified production Worker name and standalone Supabase target.');
           NODE
 
-      - name: Verify built runtime has no source fallback or bundled secrets
+      - name: Reject source Supabase ref in built runtime
         shell: bash
         run: |
           set -euo pipefail
@@ -110,14 +110,29 @@ jobs:
             echo 'Production deployment blocked: source Supabase ref found in built runtime.' >&2
             exit 1
           fi
+
+      - name: Reject Lovable endpoint in built runtime
+        shell: bash
+        run: |
+          set -euo pipefail
           if grep -REqi --exclude='*.map' '\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' dist/server; then
             echo 'Production deployment blocked: Lovable endpoint found in built runtime.' >&2
             exit 1
           fi
+
+      - name: Reject possible embedded OpenAI secret
+        shell: bash
+        run: |
+          set -euo pipefail
           if grep -REq --exclude='*.map' 'sk-(proj-)?[A-Za-z0-9_-]{20,}' dist/server; then
             echo 'Production deployment blocked: possible OpenAI secret embedded in built runtime.' >&2
             exit 1
           fi
+
+      - name: Require standalone Supabase ref in built runtime
+        shell: bash
+        run: |
+          set -euo pipefail
           grep -Rq --exclude='*.map' "${STANDALONE_SUPABASE_REF}" dist/server || {
             echo 'Production deployment blocked: standalone Supabase ref not found in built runtime.' >&2
             exit 1
