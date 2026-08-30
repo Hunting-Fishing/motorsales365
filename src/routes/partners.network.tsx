@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { listNetworkPartners } from "@/lib/partner-network.functions";
 
-const TITLE = "365 Partner Network Directory — Parts Stores & Shops";
+const TITLE = "365 Associate Network Directory — Parts Stores & Repair Shops";
 const DESCRIPTION =
-  "Browse verified 365 MotorSales network partners: parts stores, wholesalers, surplus dealers, and repair shops with published storefronts.";
+  "Browse verified 365 MotorSales Associates: parts stores, wholesalers, surplus dealers, and repair shops with published storefronts.";
 const URL = "https://www.365motorsales.com/partners/network";
 
 export const Route = createFileRoute("/partners/network")({
@@ -43,12 +43,12 @@ function NetworkDirectory() {
     <SiteLayout>
       <div className="container mx-auto max-w-5xl px-4 py-10">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-          <Network className="h-3.5 w-3.5" /> Network directory
+          <Network className="h-3.5 w-3.5" /> Associate directory
         </span>
-        <h1 className="mt-3 font-display text-3xl font-bold">365 network partners</h1>
+        <h1 className="mt-3 font-display text-3xl font-bold">365 Associate businesses</h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Verified parts stores, wholesalers, and shops with a published 365 storefront. Every partner
-          here passed document review before going live.
+          Verified parts stores, wholesalers, and repair shops with a published 365 storefront.
+          Every Associate here passed document review before going live.
         </p>
 
         <form
@@ -76,10 +76,11 @@ function NetworkDirectory() {
             <div className="rounded-xl border border-dashed border-border p-8 text-center">
               <p className="font-medium">No published partners match yet.</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                We're onboarding stores now — apply to be one of the first in your city.
+                We're onboarding stores and repair shops now—apply to be one of the first in your
+                city.
               </p>
               <Button asChild className="mt-4">
-                <Link to="/partners/parts/onboarding">Apply to join</Link>
+                <Link to="/partners">Choose an Associate track</Link>
               </Button>
             </div>
           ) : (
@@ -142,15 +143,15 @@ function NetworkDirectory() {
         <div className="mt-10 rounded-xl border border-border bg-muted/30 p-6">
           <h2 className="font-display text-xl font-bold">Want your store listed here?</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Submit your business documents once. On approval we publish your storefront and switch on
-            network + affiliate tools.
+            Submit your business documents once. On approval we publish your storefront and switch
+            on network + affiliate tools.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button asChild>
-              <Link to="/partners/parts/onboarding">Apply to join the network</Link>
+              <Link to="/partners">Join the Associate Network</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/partners">Partner overview</Link>
+              <Link to="/partners">Associate overview</Link>
             </Button>
           </div>
         </div>

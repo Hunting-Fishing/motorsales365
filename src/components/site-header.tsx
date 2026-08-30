@@ -30,6 +30,7 @@ import {
   ChevronDown,
   LayoutDashboard,
   Handshake,
+  Network,
   Sparkles,
 } from "lucide-react";
 import { useAuth, type SellerType, type AppRole } from "@/hooks/use-auth";
@@ -110,9 +111,9 @@ const MOBILE_SECTIONS: MobileSection[] = [
     tone: "border-orange-300 bg-orange-100 dark:border-orange-500/40 dark:bg-orange-500/15",
     summaryTone: "bg-orange-100 dark:bg-orange-500/25 text-orange-800 dark:text-orange-200",
     links: [
-      { to: "/partners", label: "365 Partner Network — vendors & shops" },
-      { to: "/partners/network", label: "Partner network directory" },
-      { to: "/partner-program", label: "Become a promoter — apply" },
+      { to: "/partners", label: "365 Associate Network — shops & suppliers" },
+      { to: "/partners/network", label: "Associate business directory" },
+      { to: "/partner-program", label: "Promoter affiliate program — apply" },
       { to: "/partner-program/info", label: "About the Promoter Program" },
       { to: "/partner-training", label: "Partner training" },
       { to: "/franchise", label: "Franchise & partners" },
@@ -353,11 +354,11 @@ export function SiteHeader() {
               Export
             </Link>
             <Link
-              to="/partner-program"
+              to="/partners"
               className="hidden shrink-0 whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground min-[1600px]:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
-              Earn with us
+              Join 365
             </Link>
           </nav>
         </div>
@@ -723,9 +724,21 @@ export function SiteHeader() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/partners">
+                    <Network className="mr-2 h-4 w-4" />
+                    Associate Network
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/partner-network">
+                    <Building2 className="mr-2 h-4 w-4" />
+                    My Associate application
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/partner-program">
                     <Handshake className="mr-2 h-4 w-4" />
-                    Promoter Program
+                    Promoter affiliate program
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
