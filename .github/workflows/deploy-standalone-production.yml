@@ -124,8 +124,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -REq --exclude='*.map' 'sk-(proj-)?[A-Za-z0-9_-]{20,}' dist/server; then
-            echo 'Production deployment blocked: possible OpenAI secret embedded in built runtime.' >&2
+          mapfile -t candidate_files < <(grep -RIlE --exclude='*.map' 'sk-(proj-)?[A-Za-z0-9_-]{20,}' dist/server || true)
+          if (( ${#candidate_files[@]} > 0 )); then
+            echo 'Production deployment blocked: secret-like OpenAI key pattern found.' >&2
+            echo 'Only affected bundle filenames are shown; candidate values are never printed.' >&2
+            printf '  %s\n' "${candidate_files[@]}" >&2
             exit 1
           fi
 
