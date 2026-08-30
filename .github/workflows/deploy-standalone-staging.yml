@@ -42,6 +42,34 @@ jobs:
           node-version: '22'
           cache: npm
 
+      - name: Bind Vite client to standalone Supabase staging
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const config = JSON.parse(fs.readFileSync('wrangler.jsonc', 'utf8'));
+          const vars = config.env?.staging?.vars ?? {};
+          const expectedProject = process.env.STANDALONE_SUPABASE_REF;
+          const expectedUrl = `https://${expectedProject}.supabase.co`;
+
+          if (vars.SUPABASE_PROJECT_ID !== expectedProject || vars.SUPABASE_URL !== expectedUrl) {
+            console.error('Staging build blocked: wrangler public Supabase config does not match the standalone project.');
+            process.exit(1);
+          }
+          if (!vars.SUPABASE_PUBLISHABLE_KEY) {
+            console.error('Staging build blocked: standalone Supabase publishable key is missing from wrangler staging config.');
+            process.exit(1);
+          }
+
+          fs.appendFileSync(
+            process.env.GITHUB_ENV,
+            `VITE_SUPABASE_URL=${vars.SUPABASE_URL}\nVITE_SUPABASE_PUBLISHABLE_KEY=${vars.SUPABASE_PUBLISHABLE_KEY}\n`,
+          );
+          console.log('Bound staging Vite client to standalone Supabase public configuration without printing values.');
+          NODE
+
       - name: Verify Cloudflare deployment credentials are available
         id: cloudflare
         shell: bash
@@ -111,6 +139,36 @@ jobs:
 
           console.log('Verified isolated staging Worker name and standalone Supabase target.');
           NODE
+
+      - name: Reject source or Lovable refs in built staging runtime
+        if: steps.cloudflare.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Rq --exclude='*.map' "${LOVABLE_SOURCE_REF}" dist; then
+            echo 'Staging deployment blocked: source Supabase ref found in built runtime.' >&2
+            exit 1
+          fi
+          if grep -REqi --exclude='*.map' '\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' dist; then
+            echo 'Staging deployment blocked: Lovable endpoint found in built runtime.' >&2
+            exit 1
+          fi
+
+      - name: Require standalone Supabase in staging browser and server runtimes
+        if: steps.cloudflare.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Rq --exclude='*.map' "${STANDALONE_SUPABASE_REF}" dist/server || {
+            echo 'Staging deployment blocked: standalone Supabase ref not found in server runtime.' >&2
+            exit 1
+          }
+          browser_match="$(grep -RIl --exclude='*.map' "${STANDALONE_SUPABASE_REF}" dist | grep -v '^dist/server/' | head -n 1 || true)"
+          test -n "$browser_match" || {
+            echo 'Staging deployment blocked: standalone Supabase ref not found in browser runtime.' >&2
+            exit 1
+          }
+          echo 'Verified staging browser and server runtimes both target standalone Supabase.' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Deploy isolated standalone staging Worker
         if: steps.cloudflare.outputs.ready == 'true'
