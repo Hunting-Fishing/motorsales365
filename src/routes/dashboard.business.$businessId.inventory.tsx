@@ -209,7 +209,12 @@ function InventoryPage() {
                 <div className="text-xs text-muted-foreground">
                   {it.sku && <span>SKU {it.sku} · </span>}
                   {it.category && <span>{it.category} · </span>}
-                  {it.location && <span>@ {it.location}</span>}
+                  {(it.business_inventory_locations?.name || it.location) && (
+                    <span>
+                      @ {it.business_inventory_locations?.name ?? it.location}
+                      {it.location && it.business_inventory_locations?.name ? ` / ${it.location}` : ""}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-3">

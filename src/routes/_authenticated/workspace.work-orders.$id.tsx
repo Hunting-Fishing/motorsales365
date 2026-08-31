@@ -1,7 +1,17 @@
 import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, Loader2, Wrench, Package, ListChecks, Plus, Trash2, Receipt, ClipboardCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  Wrench,
+  Package,
+  ListChecks,
+  Plus,
+  Trash2,
+  Receipt,
+  ClipboardCheck,
+} from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -110,7 +120,9 @@ type WorkOrderPart = {
 async function fetchJobLines(id: string): Promise<JobLine[]> {
   const { data, error } = await (smSupabase as any)
     .from("work_order_job_lines")
-    .select("id,name,category,description,estimated_hours,labor_rate,total_amount,status,display_order")
+    .select(
+      "id,name,category,description,estimated_hours,labor_rate,total_amount,status,display_order",
+    )
     .eq("work_order_id", id)
     .order("display_order", { ascending: true });
   if (error) throw error;
@@ -142,9 +154,7 @@ export const Route = createFileRoute("/_authenticated/workspace/work-orders/$id"
       <SiteLayout>
         <div className="mx-auto max-w-4xl px-4 py-10">
           <h1 className="text-2xl font-bold">Work Order</h1>
-          <p className="mt-2 text-destructive">
-            {String((error as any)?.message ?? error)}
-          </p>
+          <p className="mt-2 text-destructive">{String((error as any)?.message ?? error)}</p>
           <Button
             className="mt-4"
             onClick={() => {
@@ -208,7 +218,7 @@ function WorkOrderDetailPage() {
     queryFn: () => fetchWorkOrderParts(id),
   });
   const partsTotal = parts.reduce(
-    (s, p) => s + (Number(p.customer_price ?? 0) * Number(p.quantity ?? 0)),
+    (s, p) => s + Number(p.customer_price ?? 0) * Number(p.quantity ?? 0),
     0,
   );
   const laborTotal = jobLines.reduce((s, j) => s + Number(j.total_amount ?? 0), 0);
@@ -262,9 +272,7 @@ function WorkOrderDetailPage() {
         })),
       ];
       if (items.length > 0) {
-        const { error: itErr } = await (smSupabase as any)
-          .from("invoice_items")
-          .insert(items);
+        const { error: itErr } = await (smSupabase as any).from("invoice_items").insert(items);
         if (itErr) throw itErr;
       }
       return invoiceId;
@@ -276,7 +284,6 @@ function WorkOrderDetailPage() {
     },
     onError: (e: any) => toast.error(e?.message ?? "Failed to generate invoice"),
   });
-
 
   const updateStatus = useMutation({
     mutationFn: async (status: string) => {
@@ -356,16 +363,12 @@ function WorkOrderDetailPage() {
                   </h1>
                   <p className="text-muted-foreground">
                     {data.service_type ?? "Service"} ·{" "}
-                    {data.created_at
-                      ? new Date(data.created_at).toLocaleString()
-                      : "—"}
+                    {data.created_at ? new Date(data.created_at).toLocaleString() : "—"}
                   </p>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant={statusVariant(data.status)}>
-                  {data.status ?? "unknown"}
-                </Badge>
+                <Badge variant={statusVariant(data.status)}>{data.status ?? "unknown"}</Badge>
                 <Select
                   value={data.status ?? undefined}
                   onValueChange={(v) => updateStatus.mutate(v)}
@@ -381,13 +384,13 @@ function WorkOrderDetailPage() {
                     ))}
                   </SelectContent>
                 </Select>
-                {data.priority ? (
-                  <Badge variant="outline">Priority: {data.priority}</Badge>
-                ) : null}
+                {data.priority ? <Badge variant="outline">Priority: {data.priority}</Badge> : null}
                 <Button
                   size="sm"
                   variant="default"
-                  disabled={generateInvoice.isPending || (jobLines.length === 0 && parts.length === 0)}
+                  disabled={
+                    generateInvoice.isPending || (jobLines.length === 0 && parts.length === 0)
+                  }
                   onClick={() => generateInvoice.mutate()}
                 >
                   {generateInvoice.isPending ? (
@@ -426,9 +429,7 @@ function WorkOrderDetailPage() {
                       </div>
                     </>
                   ) : (
-                    <span className="text-muted-foreground">
-                      No customer attached.
-                    </span>
+                    <span className="text-muted-foreground">No customer attached.</span>
                   )}
                 </CardContent>
               </Card>
@@ -453,20 +454,32 @@ function WorkOrderDetailPage() {
                       <div className="text-muted-foreground">
                         Plate: {data.vehicles.license_plate ?? "—"}
                       </div>
-                      <div className="text-muted-foreground">
-                        VIN: {data.vehicles.vin ?? "—"}
-                      </div>
+                      <div className="text-muted-foreground">VIN: {data.vehicles.vin ?? "—"}</div>
                       <div className="text-muted-foreground">
                         Mileage in:{" "}
-                        {data.initial_mileage != null
-                          ? data.initial_mileage.toLocaleString()
-                          : "—"}
+                        {data.initial_mileage != null ? data.initial_mileage.toLocaleString() : "—"}
                       </div>
+                      <Button asChild size="sm" variant="outline" className="mt-3">
+                        <Link
+                          to="/parts/network"
+                          search={{
+                            q: "",
+                            category: "",
+                            brand: "",
+                            make: data.vehicles.make ?? "",
+                            model: data.vehicles.model ?? "",
+                            year: data.vehicles.year ?? 0,
+                            province: "",
+                            vin: data.vehicles.vin ?? "",
+                            workOrderId: data.id,
+                          }}
+                        >
+                          <Package className="mr-1.5 h-3.5 w-3.5" /> Find parts for this work order
+                        </Link>
+                      </Button>
                     </>
                   ) : (
-                    <span className="text-muted-foreground">
-                      No vehicle attached.
-                    </span>
+                    <span className="text-muted-foreground">No vehicle attached.</span>
                   )}
                 </CardContent>
               </Card>
@@ -477,14 +490,8 @@ function WorkOrderDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                   <Field label="Description" value={data.description} />
-                  <Field
-                    label="Customer complaint"
-                    value={data.customer_complaint}
-                  />
-                  <Field
-                    label="Diagnostic notes"
-                    value={data.diagnostic_notes}
-                  />
+                  <Field label="Customer complaint" value={data.customer_complaint} />
+                  <Field label="Diagnostic notes" value={data.diagnostic_notes} />
                   <Field label="Additional info" value={data.additional_info} />
                 </CardContent>
               </Card>
@@ -496,27 +503,15 @@ function WorkOrderDetailPage() {
                 <CardContent className="space-y-2 text-sm">
                   <Field
                     label="Start"
-                    value={
-                      data.start_time
-                        ? new Date(data.start_time).toLocaleString()
-                        : null
-                    }
+                    value={data.start_time ? new Date(data.start_time).toLocaleString() : null}
                   />
                   <Field
                     label="End"
-                    value={
-                      data.end_time
-                        ? new Date(data.end_time).toLocaleString()
-                        : null
-                    }
+                    value={data.end_time ? new Date(data.end_time).toLocaleString() : null}
                   />
                   <Field
                     label="Estimated hours"
-                    value={
-                      data.estimated_hours != null
-                        ? String(data.estimated_hours)
-                        : null
-                    }
+                    value={data.estimated_hours != null ? String(data.estimated_hours) : null}
                   />
                 </CardContent>
               </Card>
@@ -549,8 +544,6 @@ function WorkOrderDetailPage() {
                 <WorkOrderInspectionsCard workOrderId={id} />
               </div>
 
-
-
               <Card className="md:col-span-2">
                 <CardHeader className="flex-row items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
@@ -560,9 +553,7 @@ function WorkOrderDetailPage() {
                 </CardHeader>
                 <CardContent className="p-0">
                   {jobLines.length === 0 ? (
-                    <div className="px-6 pb-6 text-sm text-muted-foreground">
-                      No job lines yet.
-                    </div>
+                    <div className="px-6 pb-6 text-sm text-muted-foreground">No job lines yet.</div>
                   ) : (
                     <Table>
                       <TableHeader>
@@ -586,7 +577,9 @@ function WorkOrderDetailPage() {
                               {j.labor_rate != null ? Number(j.labor_rate).toLocaleString() : "—"}
                             </TableCell>
                             <TableCell className="text-right">
-                              {j.total_amount != null ? Number(j.total_amount).toLocaleString() : "—"}
+                              {j.total_amount != null
+                                ? Number(j.total_amount).toLocaleString()
+                                : "—"}
                             </TableCell>
                             <TableCell>
                               <Badge variant="outline">{j.status ?? "—"}</Badge>
@@ -643,11 +636,15 @@ function WorkOrderDetailPage() {
                           return (
                             <TableRow key={p.id}>
                               <TableCell className="font-medium">{p.part_name ?? "—"}</TableCell>
-                              <TableCell className="font-mono text-xs">{p.part_number ?? "—"}</TableCell>
+                              <TableCell className="font-mono text-xs">
+                                {p.part_number ?? "—"}
+                              </TableCell>
                               <TableCell>{p.supplier_name ?? "—"}</TableCell>
                               <TableCell className="text-right">{qty}</TableCell>
                               <TableCell className="text-right">{price.toLocaleString()}</TableCell>
-                              <TableCell className="text-right">{(qty * price).toLocaleString()}</TableCell>
+                              <TableCell className="text-right">
+                                {(qty * price).toLocaleString()}
+                              </TableCell>
                               <TableCell>
                                 <Badge variant="outline">{p.status ?? "—"}</Badge>
                               </TableCell>
@@ -683,27 +680,15 @@ function WorkOrderDetailPage() {
 function Field({ label, value }: { label: string; value: string | null }) {
   return (
     <div>
-      <div className="text-xs uppercase tracking-wide text-muted-foreground">
-        {label}
-      </div>
+      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className="whitespace-pre-wrap">
-        {value && value.length > 0 ? (
-          value
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        )}
+        {value && value.length > 0 ? value : <span className="text-muted-foreground">—</span>}
       </div>
     </div>
   );
 }
 
-function AddJobLineDialog({
-  workOrderId,
-  nextOrder,
-}: {
-  workOrderId: string;
-  nextOrder: number;
-}) {
+function AddJobLineDialog({ workOrderId, nextOrder }: { workOrderId: string; nextOrder: number }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -712,8 +697,7 @@ function AddJobLineDialog({
   const [hours, setHours] = useState("");
   const [rate, setRate] = useState("");
 
-  const total =
-    (Number(hours) || 0) * (Number(rate) || 0);
+  const total = (Number(hours) || 0) * (Number(rate) || 0);
 
   const create = useMutation({
     mutationFn: async () => {
@@ -728,9 +712,7 @@ function AddJobLineDialog({
         display_order: nextOrder,
         status: "pending",
       };
-      const { error } = await (smSupabase as any)
-        .from("work_order_job_lines")
-        .insert(payload);
+      const { error } = await (smSupabase as any).from("work_order_job_lines").insert(payload);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -760,7 +742,11 @@ function AddJobLineDialog({
         <div className="space-y-3">
           <div>
             <Label>Job name *</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Oil change" />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Oil change"
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -769,13 +755,23 @@ function AddJobLineDialog({
             </div>
             <div>
               <Label>Est. hours</Label>
-              <Input type="number" step="0.25" value={hours} onChange={(e) => setHours(e.target.value)} />
+              <Input
+                type="number"
+                step="0.25"
+                value={hours}
+                onChange={(e) => setHours(e.target.value)}
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Labor rate ₱/hr</Label>
-              <Input type="number" step="0.01" value={rate} onChange={(e) => setRate(e.target.value)} />
+              <Input
+                type="number"
+                step="0.01"
+                value={rate}
+                onChange={(e) => setRate(e.target.value)}
+              />
             </div>
             <div>
               <Label>Total ₱</Label>
@@ -791,10 +787,7 @@ function AddJobLineDialog({
           <Button variant="ghost" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button
-            disabled={!name.trim() || create.isPending}
-            onClick={() => create.mutate()}
-          >
+          <Button disabled={!name.trim() || create.isPending} onClick={() => create.mutate()}>
             {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
           </Button>
         </DialogFooter>
@@ -825,9 +818,7 @@ function AddPartDialog({ workOrderId }: { workOrderId: string }) {
         part_type: partType,
         status: "pending",
       };
-      const { error } = await (smSupabase as any)
-        .from("work_order_parts")
-        .insert(payload);
+      const { error } = await (smSupabase as any).from("work_order_parts").insert(payload);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -877,7 +868,12 @@ function AddPartDialog({ workOrderId }: { workOrderId: string }) {
             </div>
             <div>
               <Label>Price ₱ *</Label>
-              <Input type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} />
+              <Input
+                type="number"
+                step="0.01"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
             </div>
             <div>
               <Label>Type</Label>

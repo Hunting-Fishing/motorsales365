@@ -24,7 +24,7 @@ describe("365 Associate Network public structure", () => {
     expect(page).toContain('to="/parts/network"');
     expect(page).toContain('to="/shop-manager"');
     expect(page).toContain("VIN/chassis catalog and ordering");
-    expect(page).toContain("Building next");
+    expect(page).toContain("Internal pilot");
   });
 
   it("uses the Associate Network name on the parts-supplier entry point", () => {

@@ -63,8 +63,8 @@ const WORKFLOW = [
   },
   {
     icon: Radio,
-    title: "Request or reserve",
-    body: "Send the supplying store a structured inquiry or place a short stock hold while price, quantity, pickup, or delivery is confirmed.",
+    title: "Request a quote or order",
+    body: "Keep the structured inquiry flow for unpriced stock, or submit a priced order that the supplier can accept, reserve, pick, and fulfil.",
   },
   {
     icon: ClipboardList,
@@ -74,7 +74,7 @@ const WORKFLOW = [
   {
     icon: PackageCheck,
     title: "Receive, sell, and track",
-    body: "Update stock as parts are received and issued. Orders, transfers, returns, warranties, and installed-part records will build on this same inventory foundation.",
+    body: "Receive into the selected location, record installed parts against a work order, and keep returns and warranty cases tied to the original order.",
   },
 ];
 
@@ -98,10 +98,10 @@ const CAPABILITIES = [
     body: "Verified suppliers can be onboarded for hosted storefronts, catalog feeds, buyer inquiries, and network exposure review.",
   },
   {
-    status: "Building next",
+    status: "Internal pilot",
     tone: "bg-violet-500/10 text-violet-700 dark:text-violet-300",
     title: "VIN/chassis catalog and ordering",
-    body: "Canonical part numbers, supersessions, stronger fitment evidence, shop-to-store ordering, transfers, returns, and warranty workflows.",
+    body: "Canonical and alternate part numbers, verified fitment evidence, VIN/chassis-assisted lookup, location-aware ordering and transfers, returns, and warranty workflows are now integrated for testing.",
   },
 ];
 
@@ -235,7 +235,7 @@ function AssociateNetworkPage() {
                 "Opt-in stock visibility by location",
                 "Catalog, SKU, brand, price, and quantity support",
                 "Requests from shops that already need the part",
-                "Future reservations, transfers, fulfilment, and returns",
+                "Orders, reservations, transfers, fulfilment, and returns",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2">
                   <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> {item}
@@ -263,7 +263,7 @@ function AssociateNetworkPage() {
                 "Customers, vehicles, quotes, work orders, and invoices",
                 "Inventory, vendors, purchase orders, and stock alerts",
                 "Nearby network-stock search and supplier inquiries",
-                "Future direct part lookup from the work-order screen",
+                "Direct VIN/chassis part lookup from the work-order screen",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2">
                   <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> {item}
@@ -292,8 +292,8 @@ function AssociateNetworkPage() {
             </p>
             <h2 className="mt-2 font-display text-3xl font-bold">From vehicle to installed part</h2>
             <p className="mt-3 text-muted-foreground">
-              Our own parts-network workflow is being built directly on 365 inventory and Shop
-              Manager. Each stage can grow without forcing shops into a separate ordering app.
+              Our own parts-network workflow is built directly on 365 inventory and Shop Manager.
+              Each stage can grow without forcing shops into a separate ordering app.
             </p>
           </div>
           <ol className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
