@@ -106,3 +106,5 @@ jobs:
           done
 
           echo 'Both remaining oversized draft videos were copied and verified byte-for-byte.' >> "$GITHUB_STEP_SUMMARY"
+
+# migration final video copy trigger
