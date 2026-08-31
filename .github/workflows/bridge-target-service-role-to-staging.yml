@@ -1,5 +1,6 @@
 name: Bridge Target Service Role To Staging
 
+# Staging-only credential bridge; never targets the production Worker.
 on:
   push:
     branches:
