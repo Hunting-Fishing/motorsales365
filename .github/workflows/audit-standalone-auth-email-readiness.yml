@@ -1,0 +1,105 @@
+name: Audit Standalone Auth Email Readiness
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/audit-standalone-auth-email-readiness.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-auth-email:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TARGET_SUPABASE_URL: https://wjxaajgvddtrxxtocxen.supabase.co
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      REQUIRED_SENDER_DOMAIN: auth.365motorsales.com
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v4
+
+      - name: Audit public Supabase Auth settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const config = JSON.parse(fs.readFileSync('wrangler.jsonc', 'utf8'));
+          const vars = config.env?.staging?.vars ?? {};
+          if (!vars.SUPABASE_PUBLISHABLE_KEY) {
+            console.error('Missing standalone publishable key in staging config.');
+            process.exit(1);
+          }
+          fs.appendFileSync(process.env.GITHUB_ENV, `TARGET_SUPABASE_PUBLISHABLE_KEY=${vars.SUPABASE_PUBLISHABLE_KEY}\n`);
+          NODE
+
+          code="$(curl --silent --show-error \
+            --output /tmp/auth-settings.json \
+            --write-out '%{http_code}' \
+            --header "apikey: ${TARGET_SUPABASE_PUBLISHABLE_KEY}" \
+            "${TARGET_SUPABASE_URL}/auth/v1/settings")"
+          if [[ "$code" != '200' ]]; then
+            echo "Supabase Auth settings endpoint returned HTTP ${code}." >&2
+            cat /tmp/auth-settings.json >&2 || true
+            exit 1
+          fi
+
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const data = JSON.parse(fs.readFileSync('/tmp/auth-settings.json', 'utf8'));
+          const external = data.external && typeof data.external === 'object' ? data.external : {};
+          const enabled = Object.entries(external).filter(([, value]) => value === true).map(([key]) => key).sort();
+          console.log(`Auth signups disabled: ${Boolean(data.disable_signup)}`);
+          console.log(`Auth mailer autoconfirm: ${Boolean(data.mailer_autoconfirm)}`);
+          console.log(`Enabled external Auth providers: ${enabled.length ? enabled.join(', ') : 'none reported'}`);
+          if (external.google !== true) {
+            console.error('Google Auth is not reported enabled on the standalone target.');
+            process.exit(1);
+          }
+          NODE
+
+      - name: Verify Resend sender domain without sending mail
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${RESEND_API_KEY:-}" || { echo 'RESEND_API_KEY is not configured.' >&2; exit 1; }
+          code="$(curl --silent --show-error \
+            --output /tmp/resend-domains.json \
+            --write-out '%{http_code}' \
+            --header "Authorization: Bearer ${RESEND_API_KEY}" \
+            'https://api.resend.com/domains?limit=100')"
+          if [[ "$code" != '200' ]]; then
+            echo "Resend domains API returned HTTP ${code}." >&2
+            cat /tmp/resend-domains.json >&2 || true
+            exit 1
+          fi
+
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const payload = JSON.parse(fs.readFileSync('/tmp/resend-domains.json', 'utf8'));
+          const domains = Array.isArray(payload.data) ? payload.data : [];
+          const wanted = domains.find((d) => d?.name === process.env.REQUIRED_SENDER_DOMAIN);
+          if (!wanted) {
+            console.error(`Required Resend sender domain ${process.env.REQUIRED_SENDER_DOMAIN} was not found.`);
+            process.exit(1);
+          }
+          console.log(`Resend sender domain status: ${wanted.status ?? 'unknown'}`);
+          console.log(`Resend sending capability: ${wanted.capabilities?.sending ?? 'unknown'}`);
+          if (wanted.status !== 'verified') {
+            console.error('Required Resend sender domain is not verified.');
+            process.exit(1);
+          }
+          if (wanted.capabilities?.sending && wanted.capabilities.sending !== 'enabled') {
+            console.error('Required Resend sender domain does not have sending enabled.');
+            process.exit(1);
+          }
+          NODE
+
+      - name: Record non-destructive readiness result
+        run: |
+          echo 'Standalone Auth public settings and Resend sender-domain readiness passed without sending email.' >> "$GITHUB_STEP_SUMMARY"
