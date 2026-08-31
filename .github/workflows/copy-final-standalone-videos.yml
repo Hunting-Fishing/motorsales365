@@ -14,23 +14,29 @@ permissions:
 jobs:
   copy-videos:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       SOURCE_SUPABASE_URL: https://jfjrnjyroxvlydajvndl.supabase.co
+      SOURCE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY }}
       TARGET_SUPABASE_URL: https://wjxaajgvddtrxxtocxen.supabase.co
       TARGET_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
       BUCKET: listing-videos
     steps:
-      - name: Verify target credential handle exists
+      - name: Verify migration credential handles exist
         shell: bash
         run: |
           set -euo pipefail
+          test -n "${SOURCE_SUPABASE_SERVICE_ROLE_KEY:-}" || {
+            echo 'Missing LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY.' >&2
+            exit 1
+          }
           test -n "${TARGET_SUPABASE_SERVICE_ROLE_KEY:-}" || {
             echo 'Missing TARGET_SUPABASE_SERVICE_ROLE_KEY.' >&2
             exit 1
           }
+          echo 'Source read and target write credentials are configured; values are not printed.'
 
-      - name: Copy and verify two remaining draft videos
+      - name: Copy and verify two remaining private draft videos
         shell: bash
         run: |
           set -euo pipefail
@@ -43,16 +49,18 @@ jobs:
           index=0
           for object_path in "${objects[@]}"; do
             index=$((index + 1))
-            source_url="${SOURCE_SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${object_path}"
+            source_url="${SOURCE_SUPABASE_URL}/storage/v1/object/authenticated/${BUCKET}/${object_path}"
             target_upload_url="${TARGET_SUPABASE_URL}/storage/v1/object/${BUCKET}/${object_path}"
-            target_public_url="${TARGET_SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${object_path}"
+            target_download_url="${TARGET_SUPABASE_URL}/storage/v1/object/authenticated/${BUCKET}/${object_path}"
             source_file="/tmp/source-${index}.mp4"
             target_file="/tmp/target-${index}.mp4"
 
-            echo "Downloading source object ${index}/2."
+            echo "Downloading private source object ${index}/2 through authenticated Storage API."
             curl --fail --silent --show-error --location \
               --retry 4 --retry-delay 3 --retry-all-errors \
-              --connect-timeout 20 --max-time 600 \
+              --connect-timeout 20 --max-time 900 \
+              --header "apikey: ${SOURCE_SUPABASE_SERVICE_ROLE_KEY}" \
+              --header "Authorization: Bearer ${SOURCE_SUPABASE_SERVICE_ROLE_KEY}" \
               --output "$source_file" \
               "$source_url"
 
@@ -82,12 +90,14 @@ jobs:
               exit 1
             fi
 
-            echo "Downloading standalone object ${index}/2 for hash verification."
+            echo "Downloading standalone object ${index}/2 through authenticated Storage API for hash verification."
             curl --fail --silent --show-error --location \
               --retry 4 --retry-delay 3 --retry-all-errors \
-              --connect-timeout 20 --max-time 600 \
+              --connect-timeout 20 --max-time 900 \
+              --header "apikey: ${TARGET_SUPABASE_SERVICE_ROLE_KEY}" \
+              --header "Authorization: Bearer ${TARGET_SUPABASE_SERVICE_ROLE_KEY}" \
               --output "$target_file" \
-              "$target_public_url"
+              "$target_download_url"
 
             target_size="$(stat -c '%s' "$target_file")"
             target_sha="$(sha256sum "$target_file" | awk '{print $1}')"
@@ -105,6 +115,5 @@ jobs:
             rm -f "$source_file" "$target_file"
           done
 
-          echo 'Both remaining oversized draft videos were copied and verified byte-for-byte.' >> "$GITHUB_STEP_SUMMARY"
-
-# migration final video copy trigger
+          echo 'Both remaining private oversized draft videos were copied and verified byte-for-byte.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Source Storage operations were read-only.' >> "$GITHUB_STEP_SUMMARY"
