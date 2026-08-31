@@ -134,4 +134,6 @@ WHERE status = 'approved';
 CREATE POLICY "associate applications: approved public read"
   ON public.business_associate_applications FOR SELECT TO anon
   USING (status = 'approved');
+GRANT SELECT (business_id, track, status, approved_at)
+  ON public.business_associate_applications TO anon;
 GRANT SELECT ON public.associate_businesses_public TO anon, authenticated;

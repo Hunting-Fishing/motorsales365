@@ -11,6 +11,17 @@ describe("Associate enrollment structure", () => {
     expect(migration).toContain("business_associate_applications");
     expect(migration).toContain("associate_businesses_public");
     expect(migration).toContain("WHERE status = 'approved'");
+    expect(migration).toContain("GRANT SELECT (business_id, track, status, approved_at)");
+  });
+
+  it("ships an atomic cleanup-verified live acceptance migration", () => {
+    const acceptance = read(
+      "supabase/migrations/20260831113200_associate_enrollment_acceptance_test.sql",
+    );
+    expect(acceptance).toContain("cross_tenant_application_denied");
+    expect(acceptance).toContain("approved_public_projection");
+    expect(acceptance).toContain("suspension_removes_public_projection");
+    expect(acceptance).toContain("Associate acceptance cleanup failed");
   });
 
   it("restricts application and review operations", () => {
