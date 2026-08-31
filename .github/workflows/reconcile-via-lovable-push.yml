@@ -47,7 +47,6 @@ jobs:
           const target = process.env.TARGET_URL;
           const key = process.env.TARGET_KEY;
           const authHeaders = { apikey: key, Authorization: `Bearer ${key}` };
-
           const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
           const fetchRetry = async (url, options = {}, attempts = 4) => {
             let last;
@@ -61,8 +60,6 @@ jobs:
             }
             throw last || new Error('request failed');
           };
-
-          // Read only the newest catalog record written by the preceding push-catalog call.
           const catalogQuery = `${target}/rest/v1/migration_ingest?select=payload,inserted_at&kind=eq.inventory&source_name=eq.catalog&order=inserted_at.desc&limit=1`;
           const cr = await fetchRetry(catalogQuery, { headers: authHeaders });
           if (!cr.ok) throw new Error(`Could not read pushed catalog: HTTP ${cr.status}`);
@@ -70,82 +67,32 @@ jobs:
           const tables = catalogRows?.[0]?.payload?.tables;
           if (!Array.isArray(tables) || !tables.length) throw new Error('Pushed catalog did not contain a table list.');
           console.log(`Reconciling ${tables.length} source tables.`);
-
           async function targetCount(table) {
-            const r = await fetchRetry(`${target}/rest/v1/${encodeURIComponent(table)}?select=*`, {
-              method: 'HEAD',
-              headers: { ...authHeaders, Prefer: 'count=exact', 'Accept-Profile': 'public' },
-            });
+            const r = await fetchRetry(`${target}/rest/v1/${encodeURIComponent(table)}?select=*`, { method: 'HEAD', headers: { ...authHeaders, Prefer: 'count=exact', 'Accept-Profile': 'public' } });
             if (!r.ok) return { ok: false, status: r.status };
             const raw = (r.headers.get('content-range') || '').split('/')[1];
             return { ok: raw && raw !== '*', count: raw && raw !== '*' ? Number(raw) : null, status: r.status };
           }
-
           async function sourceCount(table) {
-            const u = new URL(source);
-            u.searchParams.set('mode', 'push-count');
-            u.searchParams.set('table', table);
-            const r = await fetchRetry(u, {}, 5);
-            const text = await r.text();
-            if (!r.ok) return { ok: false, status: r.status, error: text.slice(0, 120) };
-            let body;
-            try { body = JSON.parse(text); } catch { return { ok: false, status: r.status, error: 'non-json' }; }
+            const u = new URL(source); u.searchParams.set('mode', 'push-count'); u.searchParams.set('table', table);
+            const r = await fetchRetry(u, {}, 5); const text = await r.text();
+            if (!r.ok) return { ok: false, status: r.status, error: text.slice(0,120) };
+            let body; try { body = JSON.parse(text); } catch { return { ok:false,status:r.status,error:'non-json' }; }
             return { ok: body.ok === true && Number.isInteger(body.count), count: body.count ?? null, status: r.status, error: body.error ?? null };
           }
-
-          const rows = new Array(tables.length);
-          let cursor = 0;
-          const workers = Array.from({ length: 8 }, async () => {
-            while (true) {
-              const i = cursor++;
-              if (i >= tables.length) return;
-              const table = tables[i];
-              const [s, t] = await Promise.all([sourceCount(table), targetCount(table)]);
-              if (!s.ok || !t.ok) {
-                rows[i] = { table, state: 'error', source: s.count ?? null, target: t.count ?? null, source_status: s.status, target_status: t.status, error: s.error ?? null };
-                continue;
-              }
-              const delta = t.count - s.count;
-              rows[i] = { table, source: s.count, target: t.count, delta, state: delta === 0 ? 'equal' : delta < 0 ? 'target-behind' : 'target-ahead' };
-            }
-          });
-          await Promise.all(workers);
-
-          const equal = rows.filter((r) => r.state === 'equal');
-          const behind = rows.filter((r) => r.state === 'target-behind');
-          const ahead = rows.filter((r) => r.state === 'target-ahead');
-          const errors = rows.filter((r) => r.state === 'error');
-          const sourceTotal = rows.reduce((n, r) => n + (Number.isInteger(r.source) ? r.source : 0), 0);
-          const targetTotal = rows.reduce((n, r) => n + (Number.isInteger(r.target) ? r.target : 0), 0);
-          const report = { generated_at: new Date().toISOString(), compared: rows.length, equal: equal.length, target_behind: behind.length, target_ahead: ahead.length, errors: errors.length, source_total_rows: sourceTotal, target_total_rows: targetTotal, target_behind_tables: behind, target_ahead_tables: ahead, count_errors: errors };
-          fs.writeFileSync('/tmp/reconcile-push-counts.json', JSON.stringify(report, null, 2));
-
+          const rows = new Array(tables.length); let cursor = 0;
+          await Promise.all(Array.from({ length: 8 }, async () => { while (true) { const i = cursor++; if (i >= tables.length) return; const table=tables[i]; const [s,t]=await Promise.all([sourceCount(table),targetCount(table)]); if(!s.ok||!t.ok){rows[i]={table,state:'error',source:s.count??null,target:t.count??null,source_status:s.status,target_status:t.status,error:s.error??null};continue;} const delta=t.count-s.count; rows[i]={table,source:s.count,target:t.count,delta,state:delta===0?'equal':delta<0?'target-behind':'target-ahead'}; } }));
+          const equal=rows.filter(r=>r.state==='equal'), behind=rows.filter(r=>r.state==='target-behind'), ahead=rows.filter(r=>r.state==='target-ahead'), errors=rows.filter(r=>r.state==='error');
+          const sourceTotal=rows.reduce((n,r)=>n+(Number.isInteger(r.source)?r.source:0),0), targetTotal=rows.reduce((n,r)=>n+(Number.isInteger(r.target)?r.target:0),0);
+          const report={generated_at:new Date().toISOString(),compared:rows.length,equal:equal.length,target_behind:behind.length,target_ahead:ahead.length,errors:errors.length,source_total_rows:sourceTotal,target_total_rows:targetTotal,target_behind_tables:behind,target_ahead_tables:ahead,count_errors:errors};
+          fs.writeFileSync('/tmp/reconcile-push-counts.json',JSON.stringify(report,null,2));
           console.log(`Equal=${equal.length}; target-behind=${behind.length}; target-ahead=${ahead.length}; errors=${errors.length}.`);
           console.log(`Aggregate source=${sourceTotal}; target=${targetTotal}.`);
-          for (const r of behind) console.log(`BEHIND ${r.table}: source=${r.source} target=${r.target} missing=${-r.delta}`);
-          for (const r of ahead) console.log(`AHEAD ${r.table}: source=${r.source} target=${r.target} extra=${r.delta}`);
-          for (const r of errors) console.log(`ERROR ${r.table}: sourceHTTP=${r.source_status} targetHTTP=${r.target_status} ${r.error ?? ''}`);
-
-          const summary = [
-            '### Lovable → standalone exact count reconciliation',
-            `- Tables compared: ${rows.length}`,
-            `- Equal: ${equal.length}`,
-            `- Target behind: ${behind.length}`,
-            `- Target ahead: ${ahead.length}`,
-            `- Errors: ${errors.length}`,
-            `- Source aggregate rows: ${sourceTotal}`,
-            `- Target aggregate rows: ${targetTotal}`,
-            '',
-            '#### Target behind',
-            ...(behind.length ? behind.map((r) => `- \`${r.table}\`: missing ${-r.delta} (${r.source} → ${r.target})`) : ['- None']),
-            '',
-            '#### Target ahead',
-            ...(ahead.length ? ahead.map((r) => `- \`${r.table}\`: extra ${r.delta} (${r.source} → ${r.target})`) : ['- None']),
-            '',
-            'Source operations were read-only. Lovable push-count writes count-only migration evidence to the target migration inbox.',
-          ].join('\n');
-          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${summary}\n`);
-          if (errors.length) process.exitCode = 2;
+          for(const r of behind) console.log(`BEHIND ${r.table}: source=${r.source} target=${r.target} missing=${-r.delta}`);
+          for(const r of ahead) console.log(`AHEAD ${r.table}: source=${r.source} target=${r.target} extra=${r.delta}`);
+          for(const r of errors) console.log(`ERROR ${r.table}: sourceHTTP=${r.source_status} targetHTTP=${r.target_status} ${r.error??''}`);
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,`### Lovable → standalone exact count reconciliation\n- Tables compared: ${rows.length}\n- Equal: ${equal.length}\n- Target behind: ${behind.length}\n- Target ahead: ${ahead.length}\n- Errors: ${errors.length}\n- Source aggregate rows: ${sourceTotal}\n- Target aggregate rows: ${targetTotal}\n`);
+          if(errors.length) process.exitCode=2;
           NODE
 
       - name: Upload reconciliation evidence
@@ -156,3 +103,5 @@ jobs:
           path: /tmp/reconcile-push-counts.json
           retention-days: 7
           if-no-files-found: warn
+
+# rerun after write-only inbox privilege fix
