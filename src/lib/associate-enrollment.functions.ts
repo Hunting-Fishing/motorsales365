@@ -113,3 +113,23 @@ export const adminReviewAssociateApplication = createServerFn({ method: "POST" }
     if (error) throw error;
     return result;
   });
+
+export const adminOffboardAssociate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        applicationId: z.string().uuid(),
+        reason: z.string().trim().min(5).max(1000),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { data: result, error } = await context.supabase.rpc(
+      "offboard_business_associate" as any,
+      { _application_id: data.applicationId, _reason: data.reason },
+    );
+    if (error) throw error;
+    return result;
+  });

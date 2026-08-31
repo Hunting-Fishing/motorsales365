@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   adminListAssociateApplications,
+  adminOffboardAssociate,
   adminReviewAssociateApplication,
 } from "@/lib/associate-enrollment.functions";
 
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/admin/associate-applications")({
 function AssociateApplicationsAdmin() {
   const list = useServerFn(adminListAssociateApplications);
   const review = useServerFn(adminReviewAssociateApplication);
+  const offboard = useServerFn(adminOffboardAssociate);
   const qc = useQueryClient();
   const query = useQuery({ queryKey: ["admin", "associate-applications"], queryFn: () => list() });
   const mutation = useMutation({
@@ -30,6 +32,14 @@ function AssociateApplicationsAdmin() {
       qc.invalidateQueries({ queryKey: ["admin", "associate-applications"] });
     },
     onError: (error: any) => toast.error(error?.message ?? "Review failed"),
+  });
+  const offboardMutation = useMutation({
+    mutationFn: (input: { applicationId: string; reason: string }) => offboard({ data: input }),
+    onSuccess: () => {
+      toast.success("Associate offboarded — stock and API access disabled; records retained");
+      qc.invalidateQueries({ queryKey: ["admin", "associate-applications"] });
+    },
+    onError: (error: any) => toast.error(error?.message ?? "Offboarding failed"),
   });
   const rows = (query.data ?? []) as any[];
   return (
@@ -86,7 +96,7 @@ function AssociateApplicationsAdmin() {
                     <Button
                       size="sm"
                       variant="outline"
-                      disabled={mutation.isPending}
+                      disabled={mutation.isPending || offboardMutation.isPending}
                       onClick={() => mutation.mutate({ applicationId: a.id, status: "reviewing" })}
                     >
                       Reviewing
@@ -94,7 +104,7 @@ function AssociateApplicationsAdmin() {
                     <Button
                       size="sm"
                       className="bg-amber-500 text-amber-950 hover:bg-amber-400"
-                      disabled={mutation.isPending}
+                      disabled={mutation.isPending || offboardMutation.isPending}
                       onClick={() => mutation.mutate({ applicationId: a.id, status: "approved" })}
                     >
                       <BadgeCheck className="mr-1 h-4 w-4" />
@@ -104,19 +114,23 @@ function AssociateApplicationsAdmin() {
                       <Button
                         size="sm"
                         variant="destructive"
-                        disabled={mutation.isPending}
-                        onClick={() =>
-                          mutation.mutate({ applicationId: a.id, status: "suspended" })
-                        }
+                        disabled={mutation.isPending || offboardMutation.isPending}
+                        onClick={() => {
+                          const reason = window.prompt(
+                            "Offboarding reason (required). This immediately hides stock, revokes API connections, and blocks new transactions. Historical records remain.",
+                          );
+                          if (reason?.trim())
+                            offboardMutation.mutate({ applicationId: a.id, reason });
+                        }}
                       >
                         <ShieldX className="mr-1 h-4 w-4" />
-                        Suspend
+                        Offboard
                       </Button>
                     ) : (
                       <Button
                         size="sm"
                         variant="destructive"
-                        disabled={mutation.isPending}
+                        disabled={mutation.isPending || offboardMutation.isPending}
                         onClick={() => mutation.mutate({ applicationId: a.id, status: "rejected" })}
                       >
                         Reject
