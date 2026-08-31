@@ -26,6 +26,7 @@ import {
   CalendarDays,
   ClipboardCheck,
   ArrowRightLeft,
+  ScanLine,
 } from "lucide-react";
 
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
@@ -114,6 +115,7 @@ async function fetchDashboard() {
 }
 
 const QUICK_LINKS = [
+  { title: "Employee Operations", icon: ScanLine, to: "/workspace/operations" as const },
   { title: "Work Orders", icon: ClipboardList, to: "/workspace/work-orders" as const },
   { title: "Inspections", icon: ClipboardCheck, to: "/workspace/inspections" as const },
   { title: "Customers", icon: Users2, to: "/workspace/customers" as const },
@@ -147,6 +149,15 @@ const QUICK_LINKS = [
 
 function ShopHome() {
   useShopRealtime();
+  const access = useQuery({
+    queryKey: ["shop-manager", "employee-operations", "context"],
+    queryFn: async () => {
+      const { data, error } = await (smSupabase as any).rpc("employee_operating_context");
+      if (error) throw error;
+      return data as { allowed_modules?: string[] };
+    },
+    retry: false,
+  });
   const { data, isLoading } = useQuery({
     queryKey: ["shop-manager", "dashboard"],
     queryFn: fetchDashboard,
@@ -264,7 +275,33 @@ function ShopHome() {
           Modules
         </h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {QUICK_LINKS.map((m) => (
+          {QUICK_LINKS.filter((m) => {
+            const allowed = access.data?.allowed_modules;
+            if (!allowed?.length) return true;
+            const moduleByTitle: Record<string, string> = {
+              "Employee Operations": "operations",
+              Customers: "customers",
+              Vehicles: "vehicles",
+              "Work Orders": "work_orders",
+              Inspections: "inspections",
+              Inventory: "inventory",
+              "365 Parts Network": "parts_network",
+              "Purchase Orders": "purchase_orders",
+              Invoices: "invoices",
+              Quotes: "quotes",
+              Calendar: "appointments",
+              Vendors: "vendors",
+              "Vendor Bills": "vendor_bills",
+              Technicians: "technicians",
+              Reports: "reports",
+              Accounting: "accounting",
+              Discounts: "discounts",
+              Scheduling: "scheduling",
+              Settings: "settings",
+            };
+            const required = moduleByTitle[m.title];
+            return !required || allowed.includes(required);
+          }).map((m) => (
             <Link key={m.title} to={m.to as any} className="block">
               <Card className="transition hover:border-primary/50 hover:shadow-sm">
                 <CardHeader className="flex flex-row items-center gap-3 space-y-0">
