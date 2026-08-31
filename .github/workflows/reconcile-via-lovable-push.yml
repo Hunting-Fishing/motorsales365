@@ -1,0 +1,158 @@
+name: Reconcile Via Lovable Push Counts
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/reconcile-via-lovable-push.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SOURCE_EXPORT_URL: https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app/api/public/migration-export
+      TARGET_URL: https://wjxaajgvddtrxxtocxen.supabase.co
+      TARGET_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - name: Verify target credential exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${TARGET_KEY:-}" || { echo 'Missing TARGET_SUPABASE_SERVICE_ROLE_KEY.' >&2; exit 1; }
+
+      - name: Ask Lovable source to publish current catalog metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          code="$(curl --silent --show-error --output /tmp/catalog-response.json --write-out '%{http_code}' \
+            --retry 4 --retry-delay 2 --retry-all-errors \
+            "${SOURCE_EXPORT_URL}?mode=push-catalog")"
+          test "$code" = '200' || { echo "Lovable push-catalog failed HTTP ${code}." >&2; cat /tmp/catalog-response.json >&2 || true; exit 1; }
+          node -e "const x=require('/tmp/catalog-response.json'); if(!x.ok||!Number.isInteger(x.table_count)) process.exit(1); console.log('Lovable source catalog published count-only metadata for '+x.table_count+' tables.')"
+
+      - name: Reconcile exact source and target table counts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const source = process.env.SOURCE_EXPORT_URL;
+          const target = process.env.TARGET_URL;
+          const key = process.env.TARGET_KEY;
+          const authHeaders = { apikey: key, Authorization: `Bearer ${key}` };
+
+          const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+          const fetchRetry = async (url, options = {}, attempts = 4) => {
+            let last;
+            for (let i = 0; i < attempts; i++) {
+              try {
+                const r = await fetch(url, options);
+                if (r.ok || (r.status < 500 && r.status !== 429)) return r;
+                last = new Error(`HTTP ${r.status}`);
+              } catch (e) { last = e; }
+              await sleep(500 * (i + 1));
+            }
+            throw last || new Error('request failed');
+          };
+
+          // Read only the newest catalog record written by the preceding push-catalog call.
+          const catalogQuery = `${target}/rest/v1/migration_ingest?select=payload,created_at&kind=eq.inventory&source_name=eq.catalog&order=created_at.desc&limit=1`;
+          const cr = await fetchRetry(catalogQuery, { headers: authHeaders });
+          if (!cr.ok) throw new Error(`Could not read pushed catalog: HTTP ${cr.status}`);
+          const catalogRows = await cr.json();
+          const tables = catalogRows?.[0]?.payload?.tables;
+          if (!Array.isArray(tables) || !tables.length) throw new Error('Pushed catalog did not contain a table list.');
+          console.log(`Reconciling ${tables.length} source tables.`);
+
+          async function targetCount(table) {
+            const r = await fetchRetry(`${target}/rest/v1/${encodeURIComponent(table)}?select=*`, {
+              method: 'HEAD',
+              headers: { ...authHeaders, Prefer: 'count=exact', 'Accept-Profile': 'public' },
+            });
+            if (!r.ok) return { ok: false, status: r.status };
+            const raw = (r.headers.get('content-range') || '').split('/')[1];
+            return { ok: raw && raw !== '*', count: raw && raw !== '*' ? Number(raw) : null, status: r.status };
+          }
+
+          async function sourceCount(table) {
+            const u = new URL(source);
+            u.searchParams.set('mode', 'push-count');
+            u.searchParams.set('table', table);
+            const r = await fetchRetry(u, {}, 5);
+            const text = await r.text();
+            if (!r.ok) return { ok: false, status: r.status, error: text.slice(0, 120) };
+            let body;
+            try { body = JSON.parse(text); } catch { return { ok: false, status: r.status, error: 'non-json' }; }
+            return { ok: body.ok === true && Number.isInteger(body.count), count: body.count ?? null, status: r.status, error: body.error ?? null };
+          }
+
+          const rows = new Array(tables.length);
+          let cursor = 0;
+          const workers = Array.from({ length: 8 }, async () => {
+            while (true) {
+              const i = cursor++;
+              if (i >= tables.length) return;
+              const table = tables[i];
+              const [s, t] = await Promise.all([sourceCount(table), targetCount(table)]);
+              if (!s.ok || !t.ok) {
+                rows[i] = { table, state: 'error', source: s.count ?? null, target: t.count ?? null, source_status: s.status, target_status: t.status, error: s.error ?? null };
+                continue;
+              }
+              const delta = t.count - s.count;
+              rows[i] = { table, source: s.count, target: t.count, delta, state: delta === 0 ? 'equal' : delta < 0 ? 'target-behind' : 'target-ahead' };
+            }
+          });
+          await Promise.all(workers);
+
+          const equal = rows.filter((r) => r.state === 'equal');
+          const behind = rows.filter((r) => r.state === 'target-behind');
+          const ahead = rows.filter((r) => r.state === 'target-ahead');
+          const errors = rows.filter((r) => r.state === 'error');
+          const sourceTotal = rows.reduce((n, r) => n + (Number.isInteger(r.source) ? r.source : 0), 0);
+          const targetTotal = rows.reduce((n, r) => n + (Number.isInteger(r.target) ? r.target : 0), 0);
+          const report = { generated_at: new Date().toISOString(), compared: rows.length, equal: equal.length, target_behind: behind.length, target_ahead: ahead.length, errors: errors.length, source_total_rows: sourceTotal, target_total_rows: targetTotal, target_behind_tables: behind, target_ahead_tables: ahead, count_errors: errors };
+          fs.writeFileSync('/tmp/reconcile-push-counts.json', JSON.stringify(report, null, 2));
+
+          console.log(`Equal=${equal.length}; target-behind=${behind.length}; target-ahead=${ahead.length}; errors=${errors.length}.`);
+          console.log(`Aggregate source=${sourceTotal}; target=${targetTotal}.`);
+          for (const r of behind) console.log(`BEHIND ${r.table}: source=${r.source} target=${r.target} missing=${-r.delta}`);
+          for (const r of ahead) console.log(`AHEAD ${r.table}: source=${r.source} target=${r.target} extra=${r.delta}`);
+          for (const r of errors) console.log(`ERROR ${r.table}: sourceHTTP=${r.source_status} targetHTTP=${r.target_status} ${r.error ?? ''}`);
+
+          const summary = [
+            '### Lovable → standalone exact count reconciliation',
+            `- Tables compared: ${rows.length}`,
+            `- Equal: ${equal.length}`,
+            `- Target behind: ${behind.length}`,
+            `- Target ahead: ${ahead.length}`,
+            `- Errors: ${errors.length}`,
+            `- Source aggregate rows: ${sourceTotal}`,
+            `- Target aggregate rows: ${targetTotal}`,
+            '',
+            '#### Target behind',
+            ...(behind.length ? behind.map((r) => `- \`${r.table}\`: missing ${-r.delta} (${r.source} → ${r.target})`) : ['- None']),
+            '',
+            '#### Target ahead',
+            ...(ahead.length ? ahead.map((r) => `- \`${r.table}\`: extra ${r.delta} (${r.source} → ${r.target})`) : ['- None']),
+            '',
+            'Source operations were read-only. Lovable push-count writes count-only migration evidence to the target migration inbox.',
+          ].join('\n');
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${summary}\n`);
+          if (errors.length) process.exitCode = 2;
+          NODE
+
+      - name: Upload reconciliation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lovable-push-count-reconciliation
+          path: /tmp/reconcile-push-counts.json
+          retention-days: 7
+          if-no-files-found: warn
