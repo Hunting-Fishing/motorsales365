@@ -1,5 +1,4 @@
 {
-
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "motorsales365",
   "compatibility_date": "2026-08-26",
@@ -30,6 +29,8 @@
   "env": {
     "staging": {
       "name": "motorsales365-standalone-staging",
+      "workers_dev": true,
+      "routes": [],
       "vars": {
         "SUPABASE_URL": "https://wjxaajgvddtrxxtocxen.supabase.co",
         "SUPABASE_PROJECT_ID": "wjxaajgvddtrxxtocxen",
