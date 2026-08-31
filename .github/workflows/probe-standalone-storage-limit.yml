@@ -1,0 +1,85 @@
+name: Probe Standalone Storage Limit
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/probe-standalone-storage-limit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe-storage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TARGET_SUPABASE_URL: https://wjxaajgvddtrxxtocxen.supabase.co
+      TARGET_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
+      BUCKET: listing-videos
+      OBJECT_PATH: migration-probes/storage-limit-92MiB.bin
+    steps:
+      - name: Verify target credential handle exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${TARGET_SUPABASE_SERVICE_ROLE_KEY:-}" || {
+            echo 'Missing TARGET_SUPABASE_SERVICE_ROLE_KEY.' >&2
+            exit 1
+          }
+
+      - name: Create disposable 92 MiB probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          dd if=/dev/zero of=/tmp/storage-limit-probe.bin bs=1M count=92 status=none
+          size="$(stat -c '%s' /tmp/storage-limit-probe.bin)"
+          test "$size" -eq 96468992
+          echo "Prepared disposable upload probe: ${size} bytes."
+
+      - name: Upload probe to standalone Storage
+        shell: bash
+        run: |
+          set -euo pipefail
+          endpoint="${TARGET_SUPABASE_URL}/storage/v1/object/${BUCKET}/${OBJECT_PATH}"
+          code="$(curl --silent --show-error \
+            --output /tmp/storage-probe-response.txt \
+            --write-out '%{http_code}' \
+            --request POST \
+            --header "apikey: ${TARGET_SUPABASE_SERVICE_ROLE_KEY}" \
+            --header "Authorization: Bearer ${TARGET_SUPABASE_SERVICE_ROLE_KEY}" \
+            --header 'Content-Type: application/octet-stream' \
+            --header 'x-upsert: true' \
+            --data-binary @/tmp/storage-limit-probe.bin \
+            "$endpoint" || true)"
+
+          if [[ "$code" != '200' && "$code" != '201' ]]; then
+            echo "Standalone Storage rejected the 92 MiB probe with HTTP ${code}." >&2
+            cat /tmp/storage-probe-response.txt >&2 || true
+            exit 1
+          fi
+
+          echo 'Standalone Storage accepted a 92 MiB object; current upload ceiling is sufficient for the two remaining videos.'
+
+      - name: Remove disposable probe
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          endpoint="${TARGET_SUPABASE_URL}/storage/v1/object/${BUCKET}/${OBJECT_PATH}"
+          code="$(curl --silent --show-error \
+            --output /tmp/storage-delete-response.txt \
+            --write-out '%{http_code}' \
+            --request DELETE \
+            --header "apikey: ${TARGET_SUPABASE_SERVICE_ROLE_KEY}" \
+            --header "Authorization: Bearer ${TARGET_SUPABASE_SERVICE_ROLE_KEY}" \
+            "$endpoint" || true)"
+          if [[ "$code" == '200' || "$code" == '204' || "$code" == '404' ]]; then
+            echo 'Disposable Storage probe cleanup completed.'
+          else
+            echo "Warning: probe cleanup returned HTTP ${code}." >&2
+            cat /tmp/storage-delete-response.txt >&2 || true
+            exit 1
+          fi
