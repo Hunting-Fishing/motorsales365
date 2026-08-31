@@ -110,3 +110,5 @@ jobs:
       - name: Record non-destructive readiness result
         run: |
           echo 'Standalone Auth public settings and Resend sender-domain readiness passed without sending email.' >> "$GITHUB_STEP_SUMMARY"
+
+# migration readiness probe trigger
