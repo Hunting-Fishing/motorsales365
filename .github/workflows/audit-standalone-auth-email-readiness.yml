@@ -23,7 +23,7 @@ jobs:
       - name: Check out migration branch
         uses: actions/checkout@v4
 
-      - name: Audit public Supabase Auth settings
+      - name: Load standalone publishable key from staging config
         shell: bash
         run: |
           set -euo pipefail
@@ -36,8 +36,14 @@ jobs:
             process.exit(1);
           }
           fs.appendFileSync(process.env.GITHUB_ENV, `TARGET_SUPABASE_PUBLISHABLE_KEY=${vars.SUPABASE_PUBLISHABLE_KEY}\n`);
+          console.log('Loaded standalone publishable key from committed public staging configuration.');
           NODE
 
+      - name: Audit public Supabase Auth settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${TARGET_SUPABASE_PUBLISHABLE_KEY:-}" || { echo 'Standalone publishable key was not loaded.' >&2; exit 1; }
           code="$(curl --silent --show-error \
             --output /tmp/auth-settings.json \
             --write-out '%{http_code}' \
@@ -89,12 +95,13 @@ jobs:
             process.exit(1);
           }
           console.log(`Resend sender domain status: ${wanted.status ?? 'unknown'}`);
-          console.log(`Resend sending capability: ${wanted.capabilities?.sending ?? 'unknown'}`);
+          const sending = wanted.capabilities && typeof wanted.capabilities === 'object' ? wanted.capabilities.sending : undefined;
+          if (sending !== undefined) console.log(`Resend sending capability: ${sending}`);
           if (wanted.status !== 'verified') {
             console.error('Required Resend sender domain is not verified.');
             process.exit(1);
           }
-          if (wanted.capabilities?.sending && wanted.capabilities.sending !== 'enabled') {
+          if (sending !== undefined && sending !== 'enabled') {
             console.error('Required Resend sender domain does not have sending enabled.');
             process.exit(1);
           }
