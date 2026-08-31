@@ -1,0 +1,166 @@
+name: Sync Lovable Email Log Delta
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - .github/workflows/sync-lovable-email-send-log-delta.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motorsales365-lovable-email-log-delta
+  cancel-in-progress: false
+
+env:
+  SOURCE_SUPABASE_URL: https://jfjrnjyroxvlydajvndl.supabase.co
+  TARGET_SUPABASE_URL: https://wjxaajgvddtrxxtocxen.supabase.co
+  SOURCE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY }}
+  TARGET_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
+  EMAIL_LOG_CUTOFF: '2026-08-26T15:30:10.401777+00:00'
+
+jobs:
+  sync-email-send-log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Verify migration credentials and project guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${SOURCE_SUPABASE_SERVICE_ROLE_KEY:-}" || { echo 'Missing LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY.' >&2; exit 1; }
+          test -n "${TARGET_SUPABASE_SERVICE_ROLE_KEY:-}" || { echo 'Missing TARGET_SUPABASE_SERVICE_ROLE_KEY.' >&2; exit 1; }
+          [[ "$SOURCE_SUPABASE_URL" == 'https://jfjrnjyroxvlydajvndl.supabase.co' ]] || { echo 'Unexpected source project.' >&2; exit 1; }
+          [[ "$TARGET_SUPABASE_URL" == 'https://wjxaajgvddtrxxtocxen.supabase.co' ]] || { echo 'Unexpected target project.' >&2; exit 1; }
+          echo 'Source and target migration guards passed. Secret values are not printed.'
+
+      - name: Sync missing Lovable email_send_log rows into standalone
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          const sourceUrl = process.env.SOURCE_SUPABASE_URL;
+          const targetUrl = process.env.TARGET_SUPABASE_URL;
+          const sourceKey = process.env.SOURCE_SUPABASE_SERVICE_ROLE_KEY;
+          const targetKey = process.env.TARGET_SUPABASE_SERVICE_ROLE_KEY;
+          const cutoff = process.env.EMAIL_LOG_CUTOFF;
+          const pageSize = 200;
+          const verifyChunkSize = 100;
+          const columns = [
+            'id',
+            'message_id',
+            'template_name',
+            'recipient_email',
+            'status',
+            'error_message',
+            'metadata',
+            'created_at',
+          ];
+
+          const headersFor = (key) => ({
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+            'Accept-Profile': 'public',
+            'Content-Profile': 'public',
+          });
+
+          async function readSourcePage(offset) {
+            const params = new URLSearchParams();
+            params.set('select', columns.join(','));
+            params.set('created_at', `gt.${cutoff}`);
+            params.set('order', 'created_at.asc,id.asc');
+            params.set('limit', String(pageSize));
+            params.set('offset', String(offset));
+            const res = await fetch(`${sourceUrl}/rest/v1/email_send_log?${params}`, {
+              headers: { ...headersFor(sourceKey), Prefer: 'count=exact' },
+            });
+            if (!res.ok) throw new Error(`Source read failed: HTTP ${res.status}`);
+            const rows = await res.json();
+            if (!Array.isArray(rows)) throw new Error('Source returned a non-array payload.');
+            return rows;
+          }
+
+          async function insertTarget(rows) {
+            if (!rows.length) return 0;
+            const res = await fetch(`${targetUrl}/rest/v1/email_send_log?on_conflict=id`, {
+              method: 'POST',
+              headers: {
+                ...headersFor(targetKey),
+                'Content-Type': 'application/json',
+                Prefer: 'resolution=ignore-duplicates,return=representation',
+              },
+              body: JSON.stringify(rows),
+            });
+            if (!res.ok) throw new Error(`Target insert failed: HTTP ${res.status}`);
+            const inserted = await res.json();
+            if (!Array.isArray(inserted)) throw new Error('Target insert returned a non-array payload.');
+            return inserted.length;
+          }
+
+          async function verifyTargetIds(ids) {
+            for (let i = 0; i < ids.length; i += verifyChunkSize) {
+              const chunk = ids.slice(i, i + verifyChunkSize);
+              const params = new URLSearchParams();
+              params.set('select', 'id');
+              params.set('id', `in.(${chunk.join(',')})`);
+              params.set('limit', String(chunk.length));
+              const res = await fetch(`${targetUrl}/rest/v1/email_send_log?${params}`, {
+                headers: headersFor(targetKey),
+              });
+              if (!res.ok) throw new Error(`Target verification read failed: HTTP ${res.status}`);
+              const rows = await res.json();
+              const found = new Set((rows || []).map((row) => row.id));
+              const missing = chunk.filter((id) => !found.has(id));
+              if (missing.length) {
+                throw new Error(`Target verification failed: ${missing.length} source IDs are absent.`);
+              }
+            }
+          }
+
+          let offset = 0;
+          let sourceRowsSeen = 0;
+          let insertedRows = 0;
+          let pages = 0;
+
+          for (;;) {
+            const rows = await readSourcePage(offset);
+            if (!rows.length) break;
+
+            const ids = rows.map((row) => row.id);
+            if (ids.some((id) => typeof id !== 'string' || !id)) {
+              throw new Error('Source page contained an invalid primary key.');
+            }
+
+            const inserted = await insertTarget(rows);
+            await verifyTargetIds(ids);
+
+            sourceRowsSeen += rows.length;
+            insertedRows += inserted;
+            pages += 1;
+            offset += rows.length;
+
+            console.log(`Verified page ${pages}: ${rows.length} source rows; ${inserted} newly inserted.`);
+            if (rows.length < pageSize) break;
+          }
+
+          console.log(`Sync complete: ${sourceRowsSeen} source rows examined; ${insertedRows} inserted; ${sourceRowsSeen - insertedRows} already present; all source IDs verified on target.`);
+
+          const summary = process.env.GITHUB_STEP_SUMMARY;
+          if (summary) {
+            const fs = await import('node:fs');
+            fs.appendFileSync(summary,
+              `### Lovable email_send_log delta sync\n` +
+              `- Source operations: read-only\n` +
+              `- Target operation: insert missing rows only; duplicate IDs ignored\n` +
+              `- Cutoff: ${cutoff}\n` +
+              `- Source rows examined: ${sourceRowsSeen}\n` +
+              `- Newly inserted: ${insertedRows}\n` +
+              `- Already present: ${sourceRowsSeen - insertedRows}\n` +
+              `- Verification: every examined source ID exists on target\n` +
+              `- Credentials and row payloads: not printed\n`
+            );
+          }
+          NODE
