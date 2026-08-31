@@ -116,6 +116,7 @@ async function fetchDashboard() {
 
 const QUICK_LINKS = [
   { title: "Employee Operations", icon: ScanLine, to: "/workspace/operations" as const },
+  { title: "Counter Sale", icon: Receipt, to: "/workspace/counter-sale" as const },
   { title: "Work Orders", icon: ClipboardList, to: "/workspace/work-orders" as const },
   { title: "Inspections", icon: ClipboardCheck, to: "/workspace/inspections" as const },
   { title: "Customers", icon: Users2, to: "/workspace/customers" as const },

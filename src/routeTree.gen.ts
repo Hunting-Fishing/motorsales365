@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 90900)
+Total output lines: 8779
+
 /* eslint-disable */
 
 // @ts-nocheck
@@ -232,6 +235,7 @@ import { Route as AuthenticatedWorkspaceAccountingRouteImport } from './routes/_
 import { Route as AuthenticatedWorkspaceAppointmentsRouteImport } from './routes/_authenticated/workspace.appointments'
 import { Route as AuthenticatedWorkspaceAutomationRouteImport } from './routes/_authenticated/workspace.automation'
 import { Route as AuthenticatedWorkspaceCertificatesRouteImport } from './routes/_authenticated/workspace.certificates'
+import { Route as AuthenticatedWorkspaceCounterSaleRouteImport } from './routes/_authenticated/workspace.counter-sale'
 import { Route as AuthenticatedWorkspaceCustomersRouteImport } from './routes/_authenticated/workspace.customers'
 import { Route as AuthenticatedWorkspaceDiscountsRouteImport } from './routes/_authenticated/workspace.discounts'
 import { Route as AuthenticatedWorkspaceExpensesRouteImport } from './routes/_authenticated/workspace.expenses'
@@ -1191,1210 +1195,1387 @@ const GoProductIdRoute = GoProductIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelpPayWithGcashRoute = HelpPayWithGcashRouteImport.update({
-  id: '/help/pay-with-gcash',
-  path: '/help/pay-with-gcash',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HelpPostingEtiquetteRoute = HelpPostingEtiquetteRouteImport.update({
-  id: '/help/posting-etiquette',
-  path: '/help/posting-etiquette',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HelpTrustScoreRoute = HelpTrustScoreRouteImport.update({
-  id: '/help/trust-score',
-  path: '/help/trust-score',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvitesTokenRoute = InvitesTokenRouteImport.update({
-  id: '/invites/$token',
-  path: '/invites/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LearnIndexRoute = LearnIndexRouteImport.update({
-  id: '/learn/',
-  path: '/learn/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LearnSlugRoute = LearnSlugRouteImport.update({
-  id: '/learn/$slug',
-  path: '/learn/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LearnFlashcardsRoute = LearnFlashcardsRouteImport.update({
-  id: '/learn/flashcards',
-  path: '/learn/flashcards',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LearnMechanicsRoute = LearnMechanicsRouteImport.update({
-  id: '/learn/mechanics',
-  path: '/learn/mechanics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ListingIdRoute = ListingIdRouteImport.update({
-  id: '/listing/$id',
-  path: '/listing/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ListingCheckoutRoute = ListingCheckoutRouteImport.update({
-  id: '/listing/checkout',
-  path: '/listing/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PartnerProgramIndexRoute = PartnerProgramIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PartnerProgramRoute,
-} as any)
-const PartnerProgramApplyRoute = PartnerProgramApplyRouteImport.update({
-  id: '/apply',
-  path: '/apply',
-  getParentRoute: () => PartnerProgramRoute,
-} as any)
-const PartnerProgramInfoRoute = PartnerProgramInfoRouteImport.update({
-  id: '/info',
-  path: '/info',
-  getParentRoute: () => PartnerProgramRoute,
-} as any)
-const PartnerProgramTermsRoute = PartnerProgramTermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => PartnerProgramRoute,
-} as any)
-const PartnersIndexRoute = PartnersIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PartnersRoute,
-} as any)
-const PartnersNetworkRoute = PartnersNetworkRouteImport.update({
-  id: '/network',
-  path: '/network',
-  getParentRoute: () => PartnersRoute,
-} as any)
-const PartnersPartsRoute = PartnersPartsRouteImport.update({
-  id: '/parts',
-  path: '/parts',
-  getParentRoute: () => PartnersRoute,
-} as any)
-const PartsIndexRoute = PartsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PartsRoute,
-} as any)
-const PartsCategoriesRoute = PartsCategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => PartsRoute,
-} as any)
-const PartsNetworkRoute = PartsNetworkRouteImport.update({
-  id: '/network',
-  path: '/network',
-  getParentRoute: () => PartsRoute,
-} as any)
-const PartsSearchRoute = PartsSearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => PartsRoute,
-} as any)
-const PassportPremiumCheckoutRoute = PassportPremiumCheckoutRouteImport.update({
-  id: '/passport-premium/checkout',
-  path: '/passport-premium/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PassportSlugRoute = PassportSlugRouteImport.update({
-  id: '/passport/$slug',
-  path: '/passport/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayManualRoute = PayManualRouteImport.update({
-  id: '/pay/manual',
-  path: '/pay/manual',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RCodeRoute = RCodeRouteImport.update({
-  id: '/r/$code',
-  path: '/r/$code',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResourcesQrLandingRoute = ResourcesQrLandingRouteImport.update({
-  id: '/resources/qr-landing',
-  path: '/resources/qr-landing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RidesIndexRoute = RidesIndexRouteImport.update({
-  id: '/rides/',
-  path: '/rides/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RidesSlugRoute = RidesSlugRouteImport.update({
-  id: '/rides/$slug',
-  path: '/rides/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SSlugRoute = SSlugRouteImport.update({
-  id: '/s/$slug',
-  path: '/s/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SellerIdRoute = SellerIdRouteImport.update({
-  id: '/seller/$id',
-  path: '/seller/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ServicesInspectionRoute = ServicesInspectionRouteImport.update({
-  id: '/services/inspection',
-  path: '/services/inspection',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopManagerIndexRoute = ShopManagerIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ShopManagerRoute,
-} as any)
-const ShopManagerCheckoutRoute = ShopManagerCheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
-  getParentRoute: () => ShopManagerRoute,
-} as any)
-const ShopManagerPricingRoute = ShopManagerPricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
-  getParentRoute: () => ShopManagerRoute,
-} as any)
-const ShopIndexRoute = ShopIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ShopRoute,
-} as any)
-const SupportAccountRoute = SupportAccountRouteImport.update({
-  id: '/support_/account',
-  path: '/support/account',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SupportBusinessRoute = SupportBusinessRouteImport.update({
-  id: '/support_/business',
-  path: '/support/business',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SupportBuyingRoute = SupportBuyingRouteImport.update({
-  id: '/support_/buying',
-  path: '/support/buying',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SupportSellingRoute = SupportSellingRouteImport.update({
-  id: '/support_/selling',
-  path: '/support/selling',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WantedPartsIndexRoute = WantedPartsIndexRouteImport.update({
-  id: '/wanted-parts/',
-  path: '/wanted-parts/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WantedPartsNewRoute = WantedPartsNewRouteImport.update({
-  id: '/wanted-parts/new',
-  path: '/wanted-parts/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WantedIndexRoute = WantedIndexRouteImport.update({
-  id: '/wanted/',
-  path: '/wanted/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WantedIdRoute = WantedIdRouteImport.update({
-  id: '/wanted/$id',
-  path: '/wanted/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WantedNewRoute = WantedNewRouteImport.update({
-  id: '/wanted/new',
-  path: '/wanted/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
-  id: '/.lovable/oauth/consent',
-  path: '/.lovable/oauth/consent',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Char91DotmcpChar93InvokeToolToolRoute =
-  Char91DotmcpChar93InvokeToolToolRouteImport.update({
-    id: '/.mcp/invoke-tool/$tool',
-    path: '/.mcp/invoke-tool/$tool',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedAccountDisputesRoute =
-  AuthenticatedAccountDisputesRouteImport.update({
-    id: '/account/disputes',
-    path: '/account/disputes',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAccountRewardsRoute =
-  AuthenticatedAccountRewardsRouteImport.update({
-    id: '/account/rewards',
-    path: '/account/rewards',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAccountTrustScoreRoute =
-  AuthenticatedAccountTrustScoreRouteImport.update({
-    id: '/account/trust-score',
-    path: '/account/trust-score',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAdminClubDiscountPromotionsRoute =
-  AuthenticatedAdminClubDiscountPromotionsRouteImport.update({
-    id: '/admin/club-discount-promotions',
-    path: '/admin/club-discount-promotions',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAdminFeatureScreenshotsRoute =
-  AuthenticatedAdminFeatureScreenshotsRouteImport.update({
-    id: '/admin/feature-screenshots',
-    path: '/admin/feature-screenshots',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardClaimBusinessRoute =
-  AuthenticatedDashboardClaimBusinessRouteImport.update({
-    id: '/dashboard/claim-business',
-    path: '/dashboard/claim-business',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardClubsRoute =
-  AuthenticatedDashboardClubsRouteImport.update({
-    id: '/dashboard/clubs',
-    path: '/dashboard/clubs',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardPartsWantedRoute =
-  AuthenticatedDashboardPartsWantedRouteImport.update({
-    id: '/dashboard/parts-wanted',
-    path: '/dashboard/parts-wanted',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardStaffRequestsRoute =
-  AuthenticatedDashboardStaffRequestsRouteImport.update({
-    id: '/dashboard/staff-requests',
-    path: '/dashboard/staff-requests',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDisputeReportIdRoute =
-  AuthenticatedDisputeReportIdRouteImport.update({
-    id: '/dispute/$reportId',
-    path: '/dispute/$reportId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedFranchiseDashboardRoute =
-  AuthenticatedFranchiseDashboardRouteImport.update({
-    id: '/franchise/dashboard',
-    path: '/franchise/dashboard',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedFranchiseStatusRoute =
-  AuthenticatedFranchiseStatusRouteImport.update({
-    id: '/franchise/status',
-    path: '/franchise/status',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedPartsMyRequestsRoute =
-  AuthenticatedPartsMyRequestsRouteImport.update({
-    id: '/parts/my-requests',
-    path: '/parts/my-requests',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedStaffAcademyRoute =
-  AuthenticatedStaffAcademyRouteImport.update({
-    id: '/staff/academy',
-    path: '/staff/academy',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedWorkspaceIndexRoute =
-  AuthenticatedWorkspaceIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceAccountingRoute =
-  AuthenticatedWorkspaceAccountingRouteImport.update({
-    id: '/accounting',
-    path: '/accounting',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceAppointmentsRoute =
-  AuthenticatedWorkspaceAppointmentsRouteImport.update({
-    id: '/appointments',
-    path: '/appointments',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceAutomationRoute =
-  AuthenticatedWorkspaceAutomationRouteImport.update({
-    id: '/automation',
-    path: '/automation',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceCertificatesRoute =
-  AuthenticatedWorkspaceCertificatesRouteImport.update({
-    id: '/certificates',
-    path: '/certificates',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceCustomersRoute =
-  AuthenticatedWorkspaceCustomersRouteImport.update({
-    id: '/customers',
-    path: '/customers',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceDiscountsRoute =
-  AuthenticatedWorkspaceDiscountsRouteImport.update({
-    id: '/discounts',
-    path: '/discounts',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceExpensesRoute =
-  AuthenticatedWorkspaceExpensesRouteImport.update({
-    id: '/expenses',
-    path: '/expenses',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceInspectionsRoute =
-  AuthenticatedWorkspaceInspectionsRouteImport.update({
-    id: '/inspections',
-    path: '/inspections',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceInventoryRoute =
-  AuthenticatedWorkspaceInventoryRouteImport.update({
-    id: '/inventory',
-    path: '/inventory',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceInvoicesRoute =
-  AuthenticatedWorkspaceInvoicesRouteImport.update({
-    id: '/invoices',
-    path: '/invoices',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceJournalRoute =
-  AuthenticatedWorkspaceJournalRouteImport.update({
-    id: '/journal',
-    path: '/journal',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceLeaveRoute =
-  AuthenticatedWorkspaceLeaveRouteImport.update({
-    id: '/leave',
-    path: '/leave',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceLeaveRequestsRoute =
-  AuthenticatedWorkspaceLeaveRequestsRouteImport.update({
-    id: '/leave-requests',
-    path: '/leave-requests',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceLoyaltyRoute =
-  AuthenticatedWorkspaceLoyaltyRouteImport.update({
-    id: '/loyalty',
-    path: '/loyalty',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceOperationsRoute =
-  AuthenticatedWorkspaceOperationsRouteImport.update({
-    id: '/operations',
-    path: '/operations',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspacePurchaseOrdersRoute =
-  AuthenticatedWorkspacePurchaseOrdersRouteImport.update({
-    id: '/purchase-orders',
-    path: '/purchase-orders',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceQuotesRoute =
-  AuthenticatedWorkspaceQuotesRouteImport.update({
-    id: '/quotes',
-    path: '/quotes',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceReportsRoute =
-  AuthenticatedWorkspaceReportsRouteImport.update({
-    id: '/reports',
-    path: '/reports',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceSchedulingRoute =
-  AuthenticatedWorkspaceSchedulingRouteImport.update({
-    id: '/scheduling',
-    path: '/scheduling',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceSegmentsRoute =
-  AuthenticatedWorkspaceSegmentsRouteImport.update({
-    id: '/segments',
-    path: '/segments',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceServiceRemindersRoute =
-  AuthenticatedWorkspaceServiceRemindersRouteImport.update({
-    id: '/service-reminders',
-    path: '/service-reminders',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceSettingsRoute =
-  AuthenticatedWorkspaceSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceStockAlertsRoute =
-  AuthenticatedWorkspaceStockAlertsRouteImport.update({
-    id: '/stock-alerts',
-    path: '/stock-alerts',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceTechniciansRoute =
-  AuthenticatedWorkspaceTechniciansRouteImport.update({
-    id: '/technicians',
-    path: '/technicians',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceVehiclesRoute =
-  AuthenticatedWorkspaceVehiclesRouteImport.update({
-    id: '/vehicles',
-    path: '/vehicles',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceVendorBillsRoute =
-  AuthenticatedWorkspaceVendorBillsRouteImport.update({
-    id: '/vendor-bills',
-    path: '/vendor-bills',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceVendorsRoute =
-  AuthenticatedWorkspaceVendorsRouteImport.update({
-    id: '/vendors',
-    path: '/vendors',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceWorkOrdersRoute =
-  AuthenticatedWorkspaceWorkOrdersRouteImport.update({
-    id: '/work-orders',
-    path: '/work-orders',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AdminAccountsBackfillRoute = AdminAccountsBackfillRouteImport.update({
-  id: '/backfill',
-  path: '/backfill',
-  getParentRoute: () => AdminAccountsRoute,
-} as any)
-const AdminAdvertisementsIndexRoute =
-  AdminAdvertisementsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
-const AdminAdvertisementsAnalyticsRoute =
-  AdminAdvertisementsAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
-const AdminAdvertisementsApprovalsRoute =
-  AdminAdvertisementsApprovalsRouteImport.update({
-    id: '/approvals',
-    path: '/approvals',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
-const AdminAdvertisementsCampaignsRoute =
-  AdminAdvertisementsCampaignsRouteImport.update({
-    id: '/campaigns',
-    path: '/campaigns',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
-const AdminAdvertisementsHistoryRoute =
-  AdminAdvertisementsHistoryRouteImport.update({
-    id: '/history',
-    path: '/history',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
-const AdminAdvertisementsInquiriesRoute =
-  AdminAdvertisementsInquiriesRouteImport.update({
-    id: '/inquiries',
-    path: '/inquiries',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
-const AdminAdvertisementsPlaceholdersRoute =
-  AdminAdvertisementsPlaceholdersRouteImport.update({
-    id: '/placeholders',
-    path: '/placeholders',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
-const AdminAdvertisementsPreviewRoute =
-  AdminAdvertisementsPreviewRouteImport.update({
-    id: '/preview',
-    path: '/preview',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
-const AdminAdvertisementsPromotionsRoute =
-  AdminAdvertisementsPromotionsRouteImport.update({
-    id: '/promotions',
-    path: '/promotions',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
-const AdminAdvertisementsQrAdsRoute =
-  AdminAdvertisementsQrAdsRouteImport.update({
-    id: '/qr-ads',
-    path: '/qr-ads',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
-const AdminAdvertisementsSlotsRoute =
-  AdminAdvertisementsSlotsRouteImport.update({
-    id: '/slots',
-    path: '/slots',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
-const AdminPartnerProgramLedgerRoute =
-  AdminPartnerProgramLedgerRouteImport.update({
-    id: '/ledger',
-    path: '/ledger',
-    getParentRoute: () => AdminPartnerProgramRoute,
-  } as any)
-const AdminPartnerProgramOverviewRoute =
-  AdminPartnerProgramOverviewRouteImport.update({
-    id: '/overview',
-    path: '/overview',
-    getParentRoute: () => AdminPartnerProgramRoute,
-  } as any)
-const AdminPartsAnalyticsRoute = AdminPartsAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AdminPartsRoute,
-} as any)
-const AdminPartsCommissionsRoute = AdminPartsCommissionsRouteImport.update({
-  id: '/commissions',
-  path: '/commissions',
-  getParentRoute: () => AdminPartsRoute,
-} as any)
-const AdminPartsFeedsRoute = AdminPartsFeedsRouteImport.update({
-  id: '/feeds',
-  path: '/feeds',
-  getParentRoute: () => AdminPartsRoute,
-} as any)
-const AdminPartsOutreachRoute = AdminPartsOutreachRouteImport.update({
-  id: '/outreach',
-  path: '/outreach',
-  getParentRoute: () => AdminPartsRoute,
-} as any)
-const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
-  id: '/redemptions_/$staffId',
-  path: '/redemptions/$staffId',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminStaffAcademyIndexRoute = AdminStaffAcademyIndexRouteImport.update({
-  id: '/staff-academy/',
-  path: '/staff-academy/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminStaffAcademyIdRoute = AdminStaffAcademyIdRouteImport.update({
-  id: '/staff-academy/$id',
-  path: '/staff-academy/$id',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminStaffAcademyAssetsRoute = AdminStaffAcademyAssetsRouteImport.update({
-  id: '/staff-academy/assets',
-  path: '/staff-academy/assets',
-  getParentRoute: () => AdminRoute,
-} as any)
-const ApiAdminBackfillProfilesRoute =
-  ApiAdminBackfillProfilesRouteImport.update({
-    id: '/api/admin/backfill-profiles',
-    path: '/api/admin/backfill-profiles',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAdminCreateUserRoute = ApiAdminCreateUserRouteImport.update({
-  id: '/api/admin/create-user',
-  path: '/api/admin/create-user',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicGeoSearchRoute = ApiPublicGeoSearchRouteImport.update({
-  id: '/api/public/geo-search',
-  path: '/api/public/geo-search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicGeocodeRoute = ApiPublicGeocodeRouteImport.update({
-  id: '/api/public/geocode',
-  path: '/api/public/geocode',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicIpLocationRoute = ApiPublicIpLocationRouteImport.update({
-  id: '/api/public/ip-location',
-  path: '/api/public/ip-location',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicMigrationExportRoute =
-  ApiPublicMigrationExportRouteImport.update({
-    id: '/api/public/migration-export',
-    path: '/api/public/migration-export',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicMigrationTargetPreflightRoute =
-  ApiPublicMigrationTargetPreflightRouteImport.update({
-    id: '/api/public/migration-target-preflight',
-    path: '/api/public/migration-target-preflight',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicPaymentEventsRoute = ApiPublicPaymentEventsRouteImport.update({
-  id: '/api/public/payment-events',
-  path: '/api/public/payment-events',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicReverseGeocodeRoute = ApiPublicReverseGeocodeRouteImport.update({
-  id: '/api/public/reverse-geocode',
-  path: '/api/public/reverse-geocode',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BusinessesSlugBookRoute = BusinessesSlugBookRouteImport.update({
-  id: '/book',
-  path: '/book',
-  getParentRoute: () => BusinessesSlugRoute,
-} as any)
-const ClubsApplySuccessRoute = ClubsApplySuccessRouteImport.update({
-  id: '/success',
-  path: '/success',
-  getParentRoute: () => ClubsApplyRoute,
-} as any)
-const DashboardBusinessBusinessIdRoute =
-  DashboardBusinessBusinessIdRouteImport.update({
-    id: '/business/$businessId',
-    path: '/business/$businessId',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardDispatchHistoryRoute =
-  DashboardDispatchHistoryRouteImport.update({
-    id: '/history',
-    path: '/history',
-    getParentRoute: () => DashboardDispatchRoute,
-  } as any)
-const DashboardPartnerIndexRoute = DashboardPartnerIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardPartnerRoute,
-} as any)
-const DashboardPartnerActivityRoute =
-  DashboardPartnerActivityRouteImport.update({
-    id: '/activity',
-    path: '/activity',
-    getParentRoute: () => DashboardPartnerRoute,
-  } as any)
-const DashboardPartnerAdvertisementsRoute =
-  DashboardPartnerAdvertisementsRouteImport.update({
-    id: '/advertisements',
-    path: '/advertisements',
-    getParentRoute: () => DashboardPartnerRoute,
-  } as any)
-const DashboardPartnerInboxRoute = DashboardPartnerInboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => DashboardPartnerRoute,
-} as any)
-const DashboardPartnerOverviewRoute =
-  DashboardPartnerOverviewRouteImport.update({
-    id: '/overview',
-    path: '/overview',
-    getParentRoute: () => DashboardPartnerRoute,
-  } as any)
-const DashboardPartnerPerformanceRoute =
-  DashboardPartnerPerformanceRouteImport.update({
-    id: '/performance',
-    path: '/performance',
-    getParentRoute: () => DashboardPartnerRoute,
-  } as any)
-const DashboardPartnerQrAdsRoute = DashboardPartnerQrAdsRouteImport.update({
-  id: '/qr-ads',
-  path: '/qr-ads',
-  getParentRoute: () => DashboardPartnerRoute,
-} as any)
-const DashboardPartnerQrAnalyticsRoute =
-  DashboardPartnerQrAnalyticsRouteImport.update({
-    id: '/qr-analytics',
-    path: '/qr-analytics',
-    getParentRoute: () => DashboardPartnerRoute,
-  } as any)
-const DashboardPartnerReferralsRoute =
-  DashboardPartnerReferralsRouteImport.update({
-    id: '/referrals',
-    path: '/referrals',
-    getParentRoute: () => DashboardPartnerRoute,
-  } as any)
-const DashboardRidesNewRoute = DashboardRidesNewRouteImport.update({
-  id: '/rides_/new',
-  path: '/rides/new',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardStaffInboxRoute = DashboardStaffInboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => DashboardStaffRoute,
-} as any)
-const DashboardTeamIndexRoute = DashboardTeamIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardTeamRoute,
-} as any)
-const DashboardTeamLeadsRoute = DashboardTeamLeadsRouteImport.update({
-  id: '/leads',
-  path: '/leads',
-  getParentRoute: () => DashboardTeamRoute,
-} as any)
-const DashboardTeamMembersRoute = DashboardTeamMembersRouteImport.update({
-  id: '/members',
-  path: '/members',
-  getParentRoute: () => DashboardTeamRoute,
-} as any)
-const DashboardTeamPerformanceRoute =
-  DashboardTeamPerformanceRouteImport.update({
-    id: '/performance',
-    path: '/performance',
-    getParentRoute: () => DashboardTeamRoute,
-  } as any)
-const DocumentCheckCountryQuickGuideRoute =
-  DocumentCheckCountryQuickGuideRouteImport.update({
-    id: '/quick-guide',
-    path: '/quick-guide',
-    getParentRoute: () => DocumentCheckCountryRoute,
-  } as any)
-const ListingIdIndexRoute = ListingIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ListingIdRoute,
-} as any)
-const ListingIdEditRoute = ListingIdEditRouteImport.update({
-  id: '/edit',
-  path: '/edit',
-  getParentRoute: () => ListingIdRoute,
-} as any)
-const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
-  id: '/lovable/email/suppression',
-  path: '/lovable/email/suppression',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PartnersAssociateApplyRoute = PartnersAssociateApplyRouteImport.update({
-  id: '/associate/apply',
-  path: '/associate/apply',
-  getParentRoute: () => PartnersRoute,
-} as any)
-const PartnersPartsOnboardingRoute = PartnersPartsOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => PartnersPartsRoute,
-} as any)
-const PartsCSlugRoute = PartsCSlugRouteImport.update({
-  id: '/c/$slug',
-  path: '/c/$slug',
-  getParentRoute: () => PartsRoute,
-} as any)
-const PartsPartnersIndexRoute = PartsPartnersIndexRouteImport.update({
-  id: '/partners/',
-  path: '/partners/',
-  getParentRoute: () => PartsRoute,
-} as any)
-const PartsPartnersCategoriesRoute = PartsPartnersCategoriesRouteImport.update({
-  id: '/partners/categories',
-  path: '/partners/categories',
-  getParentRoute: () => PartsRoute,
-} as any)
-const PaymentsIdReceiptRoute = PaymentsIdReceiptRouteImport.update({
-  id: '/$id/receipt',
-  path: '/$id/receipt',
-  getParentRoute: () => PaymentsRoute,
-} as any)
-const RCodePosterRoute = RCodePosterRouteImport.update({
-  id: '/poster',
-  path: '/poster',
-  getParentRoute: () => RCodeRoute,
-} as any)
-const RCodeQrRoute = RCodeQrRouteImport.update({
-  id: '/qr',
-  path: '/qr',
-  getParentRoute: () => RCodeRoute,
-} as any)
-const AuthenticatedDashboardClubsIdRoute =
-  AuthenticatedDashboardClubsIdRouteImport.update({
-    id: '/dashboard/clubs_/$id',
-    path: '/dashboard/clubs/$id',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedStaffAcademySlugRoute =
-  AuthenticatedStaffAcademySlugRouteImport.update({
-    id: '/$slug',
-    path: '/$slug',
-    getParentRoute: () => AuthenticatedStaffAcademyRoute,
-  } as any)
-const AuthenticatedWorkspaceAccountingPnlRoute =
-  AuthenticatedWorkspaceAccountingPnlRouteImport.update({
-    id: '/pnl',
-    path: '/pnl',
-    getParentRoute: () => AuthenticatedWorkspaceAccountingRoute,
-  } as any)
-const AuthenticatedWorkspaceAutomationLogsRoute =
-  AuthenticatedWorkspaceAutomationLogsRouteImport.update({
-    id: '/logs',
-    path: '/logs',
-    getParentRoute: () => AuthenticatedWorkspaceAutomationRoute,
-  } as any)
-const AuthenticatedWorkspaceCustomersIdRoute =
-  AuthenticatedWorkspaceCustomersIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedWorkspaceCustomersRoute,
-  } as any)
-const AuthenticatedWorkspaceCustomersNewRoute =
-  AuthenticatedWorkspaceCustomersNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthenticatedWorkspaceCustomersRoute,
-  } as any)
-const AuthenticatedWorkspaceInspectionsIdRoute =
-  AuthenticatedWorkspaceInspectionsIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedWorkspaceInspectionsRoute,
-  } as any)
-const AuthenticatedWorkspaceInventoryIdRoute =
-  AuthenticatedWorkspaceInventoryIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
-  } as any)
-const AuthenticatedWorkspaceInvoicesIdRoute =
-  AuthenticatedWorkspaceInvoicesIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedWorkspaceInvoicesRoute,
-  } as any)
-const AuthenticatedWorkspaceJournalAccountIdRoute =
-  AuthenticatedWorkspaceJournalAccountIdRouteImport.update({
-    id: '/$accountId',
-    path: '/$accountId',
-    getParentRoute: () => AuthenticatedWorkspaceJournalRoute,
-  } as any)
-const AuthenticatedWorkspacePurchaseOrdersIdRoute =
-  AuthenticatedWorkspacePurchaseOrdersIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedWorkspacePurchaseOrdersRoute,
-  } as any)
-const AuthenticatedWorkspaceQuotesIdRoute =
-  AuthenticatedWorkspaceQuotesIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedWorkspaceQuotesRoute,
-  } as any)
-const AuthenticatedWorkspaceQuotesNewRoute =
-  AuthenticatedWorkspaceQuotesNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthenticatedWorkspaceQuotesRoute,
-  } as any)
-const AuthenticatedWorkspaceReportsLtvRoute =
-  AuthenticatedWorkspaceReportsLtvRouteImport.update({
-    id: '/ltv',
-    path: '/ltv',
-    getParentRoute: () => AuthenticatedWorkspaceReportsRoute,
-  } as any)
-const AuthenticatedWorkspaceReportsPartsMarginRoute =
-  AuthenticatedWorkspaceReportsPartsMarginRouteImport.update({
-    id: '/parts-margin',
-    path: '/parts-margin',
-    getParentRoute: () => AuthenticatedWorkspaceReportsRoute,
-  } as any)
-const AuthenticatedWorkspaceTechniciansIdRoute =
-  AuthenticatedWorkspaceTechniciansIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedWorkspaceTechniciansRoute,
-  } as any)
-const AuthenticatedWorkspaceVehiclesIdRoute =
-  AuthenticatedWorkspaceVehiclesIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedWorkspaceVehiclesRoute,
-  } as any)
-const AuthenticatedWorkspaceVendorBillsIdRoute =
-  AuthenticatedWorkspaceVendorBillsIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedWorkspaceVendorBillsRoute,
-  } as any)
-const AuthenticatedWorkspaceWorkOrdersIdRoute =
-  AuthenticatedWorkspaceWorkOrdersIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedWorkspaceWorkOrdersRoute,
-  } as any)
-const AuthenticatedWorkspaceWorkOrdersNewRoute =
-  AuthenticatedWorkspaceWorkOrdersNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthenticatedWorkspaceWorkOrdersRoute,
-  } as any)
-const AdminAdvertisementsAnalyticsCodeRoute =
-  AdminAdvertisementsAnalyticsCodeRouteImport.update({
-    id: '/$code',
-    path: '/$code',
-    getParentRoute: () => AdminAdvertisementsAnalyticsRoute,
-  } as any)
-const ApiPublicAuthSignupRoute = ApiPublicAuthSignupRouteImport.update({
-  id: '/api/public/auth/signup',
-  path: '/api/public/auth/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicAuthSignupFailureLogRoute =
-  ApiPublicAuthSignupFailureLogRouteImport.update({
-    id: '/api/public/auth/signup-failure-log',
-    path: '/api/public/auth/signup-failure-log',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicFlashcardsContentRoute =
-  ApiPublicFlashcardsContentRouteImport.update({
-    id: '/api/public/flashcards/content',
-    path: '/api/public/flashcards/content',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicFxRefreshRoute = ApiPublicFxRefreshRouteImport.update({
-  id: '/api/public/fx/refresh',
-  path: '/api/public/fx/refresh',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicGoSlugRoute = ApiPublicGoSlugRouteImport.update({
-  id: '/api/public/go/$slug',
-  path: '/api/public/go/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicHealthRoutesRoute = ApiPublicHealthRoutesRouteImport.update({
-  id: '/api/public/health/routes',
-  path: '/api/public/health/routes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicHooksAnnualBonusesRoute =
-  ApiPublicHooksAnnualBonusesRouteImport.update({
-    id: '/api/public/hooks/annual-bonuses',
-    path: '/api/public/hooks/annual-bonuses',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksDiscoverSyncRoute =
-  ApiPublicHooksDiscoverSyncRouteImport.update({
-    id: '/api/public/hooks/discover-sync',
-    path: '/api/public/hooks/discover-sync',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksDispatchExpandRoute =
-  ApiPublicHooksDispatchExpandRouteImport.update({
-    id: '/api/public/hooks/dispatch-expand',
-    path: '/api/public/hooks/dispatch-expand',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksFlashcardsAutosyncRoute =
-  ApiPublicHooksFlashcardsAutosyncRouteImport.update({
-    id: '/api/public/hooks/flashcards-autosync',
-    path: '/api/public/hooks/flashcards-autosync',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksOpsAlertsDigestRoute =
-  ApiPublicHooksOpsAlertsDigestRouteImport.update({
-    id: '/api/public/hooks/ops-alerts-digest',
-    path: '/api/public/hooks/ops-alerts-digest',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksPartsWantedDigestRoute =
-  ApiPublicHooksPartsWantedDigestRouteImport.update({
-    id: '/api/public/hooks/parts-wanted-digest',
-    path: '/api/public/hooks/parts-wanted-digest',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksQuarterlyBonusesRoute =
-  ApiPublicHooksQuarterlyBonusesRouteImport.update({
-    id: '/api/public/hooks/quarterly-bonuses',
-    path: '/api/public/hooks/quarterly-bonuses',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksRecomputeTiersRoute =
-  ApiPublicHooksRecomputeTiersRouteImport.update({
-    id: '/api/public/hooks/recompute-tiers',
-    path: '/api/public/hooks/recompute-tiers',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksRefreshLazadaRoute =
-  ApiPublicHooksRefreshLazadaRouteImport.update({
-    id: '/api/public/hooks/refresh-lazada',
-    path: '/api/public/hooks/refresh-lazada',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksShopAutomationRunRoute =
-  ApiPublicHooksShopAutomationRunRouteImport.update({
-    id: '/api/public/hooks/shop-automation-run',
-    path: '/api/public/hooks/shop-automation-run',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksSignupFailureAlertsRoute =
-  ApiPublicHooksSignupFailureAlertsRouteImport.update({
-    id: '/api/public/hooks/signup-failure-alerts',
-    path: '/api/public/hooks/signup-failure-alerts',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksSyncPartsFeedsRoute =
-  ApiPublicHooksSyncPartsFeedsRouteImport.update({
-    id: '/api/public/hooks/sync-parts-feeds',
-    path: '/api/public/hooks/sync-parts-feeds',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicPaymentsWebhookRoute =
-  ApiPublicPaymentsWebhookRouteImport.update({
-    id: '/api/public/payments/webhook',
-    path: '/api/public/payments/webhook',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicPostbackNetworkRoute =
-  ApiPublicPostbackNetworkRouteImport.update({
-    id: '/api/public/postback/$network',
-    path: '/api/public/postback/$network',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicQrRescueCodeRoute = ApiPublicQrRescueCodeRouteImport.update({
-  id: '/api/public/qr-rescue/$code',
-  path: '/api/public/qr-rescue/$code',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicQrRescueLogRoute = ApiPublicQrRescueLogRouteImport.update({
-  id: '/api/public/qr-rescue/log',
-  path: '/api/public/qr-rescue/log',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSellerStaffCreateRoute = ApiSellerStaffCreateRouteImport.update({
-  id: '/api/seller/staff/create',
-  path: '/api/seller/staff/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSellerStaffDeactivateRoute =
-  ApiSellerStaffDeactivateRouteImport.update({
-    id: '/api/seller/staff/deactivate',
-    path: '/api/seller/staff/deactivate',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiSellerStaffResetPasswordRoute =
-  ApiSellerStaffResetPasswordRouteImport.update({
-    id: '/api/seller/staff/reset-password',
-    path: '/api/seller/staff/reset-password',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardBusinessBusinessIdIndexRoute =
-  DashboardBusinessBusinessIdIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardBusinessBusinessIdRoute,
-  } as any)
-const DashboardBusinessBusinessIdBillingRoute =
-  DashboardBusinessBusinessIdBillingRouteImport.update({
-    id: '/billing',
-    path: '/billing',
-    getParentRoute: () => DashboardBusinessBusinessIdRoute,
-  } as any)
-const DashboardBusinessBusinessIdDispatchRoute =
-  DashboardBusinessBusinessIdDispatchRouteImport.update({
-    id: '/dispatch',
-    path: '/dispatch',
-    getParentRoute: () => DashboardBusinessBusinessIdRoute,
-  } as any)
-const DashboardBusinessBusinessIdFleetRoute =
-  DashboardBusinessBusinessIdFleetRouteImport.update({
-    id: '/fleet',
-    path: '/fleet',
-    getParentRoute: () => DashboardBusinessBusinessIdRoute,
-  } as any)
-const DashboardBusinessBusinessIdInventoryRoute =
-  DashboardBusinessBusinessIdInventoryRouteImport.update({
-    id: '/inventory',
-    path: '/inventory',
-    getParentRoute: () => DashboardBusinessBusinessIdRoute,
-  } as any)
-const DashboardBusinessBusinessIdInvoicesRoute =
-  DashboardBusinessBusinessIdInvoicesRouteImport.update({
-    id: '/invoices',
-    path: '/invoices',
-    getParentRoute: () => DashboardBusinessBusinessIdRoute,
-  } as any)
-const DashboardBusinessBusinessIdPartsOperationsRoute =
-  DashboardBusinessBusinessIdPartsOperationsRouteImport.update({
-    id: '/parts-operations',
-    path: '/parts-operations',
-    getParentRoute: () => DashboardBusinessBusinessIdRoute,
-  } as any)
-const DashboardBusinessBusinessIdSettingsRoute =
-  DashboardBusinessBusinessIdSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => DashboardBusinessBusinessIdRoute,
-  } as any)
-const DashboardBusinessBusinessIdStaffRoute =
-  DashboardBusinessBusinessIdStaffRouteImport.update({
-    id: '/staff',
-    path: '/staff',
-    getParentRoute: () => DashboardBusinessBusinessIdRoute,
-  } as any)
-const DashboardBusinessesIdAnalyticsRoute =
-  DashboardBusinessesIdAnalyticsRouteImport.update({
-    id: '/businesses_/$id/analytics',
-    path: '/businesses/$id/analytics',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardBusinessesIdDomainRoute =
-  DashboardBusinessesIdDomainRouteImport.update({
-    id: '/businesses_/$id/domain',
-    path: '/businesses/$id/domain',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardBusinessesIdEditRoute =
-  DashboardBusinessesIdEditRouteImport.update({
-    id: '/businesses_/$id/edit',
-    path: '/businesses/$id/edit',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardRidesIdEditRoute = DashboardRidesIdEditRouteImport.update({
-  id: '/rides_/$id/edit',
-  path: '/rides/$id/edit',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardTeamLeadsIdRoute = DashboardTeamLeadsIdRouteImport.update({
-  id: '/leads_/$id',
-  path: '/leads/$id',
-  getParentRoute: () => DashboardTeamRoute,
-} as any)
-const LearnSlugWatchLessonIdRoute = LearnSlugWatchLessonIdRouteImport.update({
-  id: '/learn_/$slug/watch/$lessonId',
-  path: '/learn/$slug/watch/$lessonId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
-  id: '/lovable/email/auth/preview',
-  path: '/lovable/email/auth/preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
-  id: '/lovable/email/auth/webhook',
-  path: '/lovable/email/auth/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailTransactionalPreviewRoute =
-  LovableEmailTransactionalPreviewRouteImport.update({
-    id: '/lovable/email/transactional/preview',
-    path: '/lovable/email/transactional/preview',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailTransactionalSendRoute =
-  LovableEmailTransactionalSendRouteImport.update({
-    id: '/lovable/email/transactional/send',
-    path: '/lovable/email/transactional/send',
-    getParentRoute: () => rootRouteImport,
+  id: '/help/pay…60900 tokens truncated…th: '/billing'
+      fullPath: '/dashboard/business/$businessId/billing'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdBillingRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/dispatch': {
+      id: '/dashboard/business/$businessId/dispatch'
+      path: '/dispatch'
+      fullPath: '/dashboard/business/$businessId/dispatch'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdDispatchRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/fleet': {
+      id: '/dashboard/business/$businessId/fleet'
+      path: '/fleet'
+      fullPath: '/dashboard/business/$businessId/fleet'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdFleetRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/inventory': {
+      id: '/dashboard/business/$businessId/inventory'
+      path: '/inventory'
+      fullPath: '/dashboard/business/$businessId/inventory'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdInventoryRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/invoices': {
+      id: '/dashboard/business/$businessId/invoices'
+      path: '/invoices'
+      fullPath: '/dashboard/business/$businessId/invoices'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdInvoicesRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/parts-operations': {
+      id: '/dashboard/business/$businessId/parts-operations'
+      path: '/parts-operations'
+      fullPath: '/dashboard/business/$businessId/parts-operations'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdPartsOperationsRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/settings': {
+      id: '/dashboard/business/$businessId/settings'
+      path: '/settings'
+      fullPath: '/dashboard/business/$businessId/settings'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdSettingsRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/staff': {
+      id: '/dashboard/business/$businessId/staff'
+      path: '/staff'
+      fullPath: '/dashboard/business/$businessId/staff'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdStaffRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/businesses_/$id/analytics': {
+      id: '/dashboard/businesses_/$id/analytics'
+      path: '/businesses/$id/analytics'
+      fullPath: '/dashboard/businesses/$id/analytics'
+      preLoaderRoute: typeof DashboardBusinessesIdAnalyticsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/businesses_/$id/domain': {
+      id: '/dashboard/businesses_/$id/domain'
+      path: '/businesses/$id/domain'
+      fullPath: '/dashboard/businesses/$id/domain'
+      preLoaderRoute: typeof DashboardBusinessesIdDomainRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/businesses_/$id/edit': {
+      id: '/dashboard/businesses_/$id/edit'
+      path: '/businesses/$id/edit'
+      fullPath: '/dashboard/businesses/$id/edit'
+      preLoaderRoute: typeof DashboardBusinessesIdEditRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/rides_/$id/edit': {
+      id: '/dashboard/rides_/$id/edit'
+      path: '/rides/$id/edit'
+      fullPath: '/dashboard/rides/$id/edit'
+      preLoaderRoute: typeof DashboardRidesIdEditRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/team/leads_/$id': {
+      id: '/dashboard/team/leads_/$id'
+      path: '/leads/$id'
+      fullPath: '/dashboard/team/leads/$id'
+      preLoaderRoute: typeof DashboardTeamLeadsIdRouteImport
+      parentRoute: typeof DashboardTeamRoute
+    }
+    '/learn_/$slug/watch/$lessonId': {
+      id: '/learn_/$slug/watch/$lessonId'
+      path: '/learn/$slug/watch/$lessonId'
+      fullPath: '/learn/$slug/watch/$lessonId'
+      preLoaderRoute: typeof LearnSlugWatchLessonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parts/p/$network/$sku': {
+      id: '/parts/p/$network/$sku'
+      path: '/p/$network/$sku'
+      fullPath: '/parts/p/$network/$sku'
+      preLoaderRoute: typeof PartsPNetworkSkuRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/parts/partners/brand/$slug': {
+      id: '/parts/partners/brand/$slug'
+      path: '/partners/brand/$slug'
+      fullPath: '/parts/partners/brand/$slug'
+      preLoaderRoute: typeof PartsPartnersBrandSlugRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/parts/partners/c/$category': {
+      id: '/parts/partners/c/$category'
+      path: '/partners/c/$category'
+      fullPath: '/parts/partners/c/$category'
+      preLoaderRoute: typeof PartsPartnersCCategoryRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/parts/partners/department/$slug': {
+      id: '/parts/partners/department/$slug'
+      path: '/partners/department/$slug'
+      fullPath: '/parts/partners/department/$slug'
+      preLoaderRoute: typeof PartsPartnersDepartmentSlugRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/parts/partners/p/$slug': {
+      id: '/parts/partners/p/$slug'
+      path: '/partners/p/$slug'
+      fullPath: '/parts/partners/p/$slug'
+      preLoaderRoute: typeof PartsPartnersPSlugRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/parts/partners/store/$slug': {
+      id: '/parts/partners/store/$slug'
+      path: '/partners/store/$slug'
+      fullPath: '/parts/partners/store/$slug'
+      preLoaderRoute: typeof PartsPartnersStoreSlugRouteImport
+      parentRoute: typeof PartsRoute
+    }
+    '/_authenticated/workspace/reports/technician/$id': {
+      id: '/_authenticated/workspace/reports/technician/$id'
+      path: '/technician/$id'
+      fullPath: '/workspace/reports/technician/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceReportsTechnicianIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceReportsRoute
+    }
+    '/api/public/training-partners/$id/click': {
+      id: '/api/public/training-partners/$id/click'
+      path: '/api/public/training-partners/$id/click'
+      fullPath: '/api/public/training-partners/$id/click'
+      preLoaderRoute: typeof ApiPublicTrainingPartnersIdClickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/business/$businessId/invoices/$id': {
+      id: '/dashboard/business/$businessId/invoices/$id'
+      path: '/$id'
+      fullPath: '/dashboard/business/$businessId/invoices/$id'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdInvoicesIdRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdInvoicesRoute
+    }
+  }
+}
+
+interface AuthenticatedWorkspaceAccountingRouteChildren {
+  AuthenticatedWorkspaceAccountingPnlRoute: typeof AuthenticatedWorkspaceAccountingPnlRoute
+}
+
+const AuthenticatedWorkspaceAccountingRouteChildren: AuthenticatedWorkspaceAccountingRouteChildren =
+  {
+    AuthenticatedWorkspaceAccountingPnlRoute:
+      AuthenticatedWorkspaceAccountingPnlRoute,
+  }
+
+const AuthenticatedWorkspaceAccountingRouteWithChildren =
+  AuthenticatedWorkspaceAccountingRoute._addFileChildren(
+    AuthenticatedWorkspaceAccountingRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceAutomationRouteChildren {
+  AuthenticatedWorkspaceAutomationLogsRoute: typeof AuthenticatedWorkspaceAutomationLogsRoute
+}
+
+const AuthenticatedWorkspaceAutomationRouteChildren: AuthenticatedWorkspaceAutomationRouteChildren =
+  {
+    AuthenticatedWorkspaceAutomationLogsRoute:
+      AuthenticatedWorkspaceAutomationLogsRoute,
+  }
+
+const AuthenticatedWorkspaceAutomationRouteWithChildren =
+  AuthenticatedWorkspaceAutomationRoute._addFileChildren(
+    AuthenticatedWorkspaceAutomationRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceCustomersRouteChildren {
+  AuthenticatedWorkspaceCustomersIdRoute: typeof AuthenticatedWorkspaceCustomersIdRoute
+  AuthenticatedWorkspaceCustomersNewRoute: typeof AuthenticatedWorkspaceCustomersNewRoute
+}
+
+const AuthenticatedWorkspaceCustomersRouteChildren: AuthenticatedWorkspaceCustomersRouteChildren =
+  {
+    AuthenticatedWorkspaceCustomersIdRoute:
+      AuthenticatedWorkspaceCustomersIdRoute,
+    AuthenticatedWorkspaceCustomersNewRoute:
+      AuthenticatedWorkspaceCustomersNewRoute,
+  }
+
+const AuthenticatedWorkspaceCustomersRouteWithChildren =
+  AuthenticatedWorkspaceCustomersRoute._addFileChildren(
+    AuthenticatedWorkspaceCustomersRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceInspectionsRouteChildren {
+  AuthenticatedWorkspaceInspectionsIdRoute: typeof AuthenticatedWorkspaceInspectionsIdRoute
+}
+
+const AuthenticatedWorkspaceInspectionsRouteChildren: AuthenticatedWorkspaceInspectionsRouteChildren =
+  {
+    AuthenticatedWorkspaceInspectionsIdRoute:
+      AuthenticatedWorkspaceInspectionsIdRoute,
+  }
+
+const AuthenticatedWorkspaceInspectionsRouteWithChildren =
+  AuthenticatedWorkspaceInspectionsRoute._addFileChildren(
+    AuthenticatedWorkspaceInspectionsRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceInventoryRouteChildren {
+  AuthenticatedWorkspaceInventoryIdRoute: typeof AuthenticatedWorkspaceInventoryIdRoute
+}
+
+const AuthenticatedWorkspaceInventoryRouteChildren: AuthenticatedWorkspaceInventoryRouteChildren =
+  {
+    AuthenticatedWorkspaceInventoryIdRoute:
+      AuthenticatedWorkspaceInventoryIdRoute,
+  }
+
+const AuthenticatedWorkspaceInventoryRouteWithChildren =
+  AuthenticatedWorkspaceInventoryRoute._addFileChildren(
+    AuthenticatedWorkspaceInventoryRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceInvoicesRouteChildren {
+  AuthenticatedWorkspaceInvoicesIdRoute: typeof AuthenticatedWorkspaceInvoicesIdRoute
+}
+
+const AuthenticatedWorkspaceInvoicesRouteChildren: AuthenticatedWorkspaceInvoicesRouteChildren =
+  {
+    AuthenticatedWorkspaceInvoicesIdRoute:
+      AuthenticatedWorkspaceInvoicesIdRoute,
+  }
+
+const AuthenticatedWorkspaceInvoicesRouteWithChildren =
+  AuthenticatedWorkspaceInvoicesRoute._addFileChildren(
+    AuthenticatedWorkspaceInvoicesRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceJournalRouteChildren {
+  AuthenticatedWorkspaceJournalAccountIdRoute: typeof AuthenticatedWorkspaceJournalAccountIdRoute
+}
+
+const AuthenticatedWorkspaceJournalRouteChildren: AuthenticatedWorkspaceJournalRouteChildren =
+  {
+    AuthenticatedWorkspaceJournalAccountIdRoute:
+      AuthenticatedWorkspaceJournalAccountIdRoute,
+  }
+
+const AuthenticatedWorkspaceJournalRouteWithChildren =
+  AuthenticatedWorkspaceJournalRoute._addFileChildren(
+    AuthenticatedWorkspaceJournalRouteChildren,
+  )
+
+interface AuthenticatedWorkspacePurchaseOrdersRouteChildren {
+  AuthenticatedWorkspacePurchaseOrdersIdRoute: typeof AuthenticatedWorkspacePurchaseOrdersIdRoute
+}
+
+const AuthenticatedWorkspacePurchaseOrdersRouteChildren: AuthenticatedWorkspacePurchaseOrdersRouteChildren =
+  {
+    AuthenticatedWorkspacePurchaseOrdersIdRoute:
+      AuthenticatedWorkspacePurchaseOrdersIdRoute,
+  }
+
+const AuthenticatedWorkspacePurchaseOrdersRouteWithChildren =
+  AuthenticatedWorkspacePurchaseOrdersRoute._addFileChildren(
+    AuthenticatedWorkspacePurchaseOrdersRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceQuotesRouteChildren {
+  AuthenticatedWorkspaceQuotesIdRoute: typeof AuthenticatedWorkspaceQuotesIdRoute
+  AuthenticatedWorkspaceQuotesNewRoute: typeof AuthenticatedWorkspaceQuotesNewRoute
+}
+
+const AuthenticatedWorkspaceQuotesRouteChildren: AuthenticatedWorkspaceQuotesRouteChildren =
+  {
+    AuthenticatedWorkspaceQuotesIdRoute: AuthenticatedWorkspaceQuotesIdRoute,
+    AuthenticatedWorkspaceQuotesNewRoute: AuthenticatedWorkspaceQuotesNewRoute,
+  }
+
+const AuthenticatedWorkspaceQuotesRouteWithChildren =
+  AuthenticatedWorkspaceQuotesRoute._addFileChildren(
+    AuthenticatedWorkspaceQuotesRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceReportsRouteChildren {
+  AuthenticatedWorkspaceReportsLtvRoute: typeof AuthenticatedWorkspaceReportsLtvRoute
+  AuthenticatedWorkspaceReportsPartsMarginRoute: typeof AuthenticatedWorkspaceReportsPartsMarginRoute
+  AuthenticatedWorkspaceReportsTechnicianIdRoute: typeof AuthenticatedWorkspaceReportsTechnicianIdRoute
+}
+
+const AuthenticatedWorkspaceReportsRouteChildren: AuthenticatedWorkspaceReportsRouteChildren =
+  {
+    AuthenticatedWorkspaceReportsLtvRoute:
+      AuthenticatedWorkspaceReportsLtvRoute,
+    AuthenticatedWorkspaceReportsPartsMarginRoute:
+      AuthenticatedWorkspaceReportsPartsMarginRoute,
+    AuthenticatedWorkspaceReportsTechnicianIdRoute:
+      AuthenticatedWorkspaceReportsTechnicianIdRoute,
+  }
+
+const AuthenticatedWorkspaceReportsRouteWithChildren =
+  AuthenticatedWorkspaceReportsRoute._addFileChildren(
+    AuthenticatedWorkspaceReportsRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceTechniciansRouteChildren {
+  AuthenticatedWorkspaceTechniciansIdRoute: typeof AuthenticatedWorkspaceTechniciansIdRoute
+}
+
+const AuthenticatedWorkspaceTechniciansRouteChildren: AuthenticatedWorkspaceTechniciansRouteChildren =
+  {
+    AuthenticatedWorkspaceTechniciansIdRoute:
+      AuthenticatedWorkspaceTechniciansIdRoute,
+  }
+
+const AuthenticatedWorkspaceTechniciansRouteWithChildren =
+  AuthenticatedWorkspaceTechniciansRoute._addFileChildren(
+    AuthenticatedWorkspaceTechniciansRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceVehiclesRouteChildren {
+  AuthenticatedWorkspaceVehiclesIdRoute: typeof AuthenticatedWorkspaceVehiclesIdRoute
+}
+
+const AuthenticatedWorkspaceVehiclesRouteChildren: AuthenticatedWorkspaceVehiclesRouteChildren =
+  {
+    AuthenticatedWorkspaceVehiclesIdRoute:
+      AuthenticatedWorkspaceVehiclesIdRoute,
+  }
+
+const AuthenticatedWorkspaceVehiclesRouteWithChildren =
+  AuthenticatedWorkspaceVehiclesRoute._addFileChildren(
+    AuthenticatedWorkspaceVehiclesRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceVendorBillsRouteChildren {
+  AuthenticatedWorkspaceVendorBillsIdRoute: typeof AuthenticatedWorkspaceVendorBillsIdRoute
+}
+
+const AuthenticatedWorkspaceVendorBillsRouteChildren: AuthenticatedWorkspaceVendorBillsRouteChildren =
+  {
+    AuthenticatedWorkspaceVendorBillsIdRoute:
+      AuthenticatedWorkspaceVendorBillsIdRoute,
+  }
+
+const AuthenticatedWorkspaceVendorBillsRouteWithChildren =
+  AuthenticatedWorkspaceVendorBillsRoute._addFileChildren(
+    AuthenticatedWorkspaceVendorBillsRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceWorkOrdersRouteChildren {
+  AuthenticatedWorkspaceWorkOrdersIdRoute: typeof AuthenticatedWorkspaceWorkOrdersIdRoute
+  AuthenticatedWorkspaceWorkOrdersNewRoute: typeof AuthenticatedWorkspaceWorkOrdersNewRoute
+}
+
+const AuthenticatedWorkspaceWorkOrdersRouteChildren: AuthenticatedWorkspaceWorkOrdersRouteChildren =
+  {
+    AuthenticatedWorkspaceWorkOrdersIdRoute:
+      AuthenticatedWorkspaceWorkOrdersIdRoute,
+    AuthenticatedWorkspaceWorkOrdersNewRoute:
+      AuthenticatedWorkspaceWorkOrdersNewRoute,
+  }
+
+const AuthenticatedWorkspaceWorkOrdersRouteWithChildren =
+  AuthenticatedWorkspaceWorkOrdersRoute._addFileChildren(
+    AuthenticatedWorkspaceWorkOrdersRouteChildren,
+  )
+
+interface AuthenticatedWorkspaceRouteChildren {
+  AuthenticatedWorkspaceAccountingRoute: typeof AuthenticatedWorkspaceAccountingRouteWithChildren
+  AuthenticatedWorkspaceAppointmentsRoute: typeof AuthenticatedWorkspaceAppointmentsRoute
+  AuthenticatedWorkspaceAutomationRoute: typeof AuthenticatedWorkspaceAutomationRouteWithChildren
+  AuthenticatedWorkspaceCertificatesRoute: typeof AuthenticatedWorkspaceCertificatesRoute
+  AuthenticatedWorkspaceCounterSaleRoute: typeof AuthenticatedWorkspaceCounterSaleRoute
+  AuthenticatedWorkspaceCustomersRoute: typeof AuthenticatedWorkspaceCustomersRouteWithChildren
+  AuthenticatedWorkspaceDiscountsRoute: typeof AuthenticatedWorkspaceDiscountsRoute
+  AuthenticatedWorkspaceExpensesRoute: typeof AuthenticatedWorkspaceExpensesRoute
+  AuthenticatedWorkspaceInspectionsRoute: typeof AuthenticatedWorkspaceInspectionsRouteWithChildren
+  AuthenticatedWorkspaceInventoryRoute: typeof AuthenticatedWorkspaceInventoryRouteWithChildren
+  AuthenticatedWorkspaceInvoicesRoute: typeof AuthenticatedWorkspaceInvoicesRouteWithChildren
+  AuthenticatedWorkspaceJournalRoute: typeof AuthenticatedWorkspaceJournalRouteWithChildren
+  AuthenticatedWorkspaceLeaveRoute: typeof AuthenticatedWorkspaceLeaveRoute
+  AuthenticatedWorkspaceLeaveRequestsRoute: typeof AuthenticatedWorkspaceLeaveRequestsRoute
+  AuthenticatedWorkspaceLoyaltyRoute: typeof AuthenticatedWorkspaceLoyaltyRoute
+  AuthenticatedWorkspaceOperationsRoute: typeof AuthenticatedWorkspaceOperationsRoute
+  AuthenticatedWorkspacePurchaseOrdersRoute: typeof AuthenticatedWorkspacePurchaseOrdersRouteWithChildren
+  AuthenticatedWorkspaceQuotesRoute: typeof AuthenticatedWorkspaceQuotesRouteWithChildren
+  AuthenticatedWorkspaceReportsRoute: typeof AuthenticatedWorkspaceReportsRouteWithChildren
+  AuthenticatedWorkspaceSchedulingRoute: typeof AuthenticatedWorkspaceSchedulingRoute
+  AuthenticatedWorkspaceSegmentsRoute: typeof AuthenticatedWorkspaceSegmentsRoute
+  AuthenticatedWorkspaceServiceRemindersRoute: typeof AuthenticatedWorkspaceServiceRemindersRoute
+  AuthenticatedWorkspaceSettingsRoute: typeof AuthenticatedWorkspaceSettingsRoute
+  AuthenticatedWorkspaceStockAlertsRoute: typeof AuthenticatedWorkspaceStockAlertsRoute
+  AuthenticatedWorkspaceTechniciansRoute: typeof AuthenticatedWorkspaceTechniciansRouteWithChildren
+  AuthenticatedWorkspaceVehiclesRoute: typeof AuthenticatedWorkspaceVehiclesRouteWithChildren
+  AuthenticatedWorkspaceVendorBillsRoute: typeof AuthenticatedWorkspaceVendorBillsRouteWithChildren
+  AuthenticatedWorkspaceVendorsRoute: typeof AuthenticatedWorkspaceVendorsRoute
+  AuthenticatedWorkspaceWorkOrdersRoute: typeof AuthenticatedWorkspaceWorkOrdersRouteWithChildren
+  AuthenticatedWorkspaceIndexRoute: typeof AuthenticatedWorkspaceIndexRoute
+}
+
+const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
+  {
+    AuthenticatedWorkspaceAccountingRoute:
+      AuthenticatedWorkspaceAccountingRouteWithChildren,
+    AuthenticatedWorkspaceAppointmentsRoute:
+      AuthenticatedWorkspaceAppointmentsRoute,
+    AuthenticatedWorkspaceAutomationRoute:
+      AuthenticatedWorkspaceAutomationRouteWithChildren,
+    AuthenticatedWorkspaceCertificatesRoute:
+      AuthenticatedWorkspaceCertificatesRoute,
+    AuthenticatedWorkspaceCounterSaleRoute:
+      AuthenticatedWorkspaceCounterSaleRoute,
+    AuthenticatedWorkspaceCustomersRoute:
+      AuthenticatedWorkspaceCustomersRouteWithChildren,
+    AuthenticatedWorkspaceDiscountsRoute: AuthenticatedWorkspaceDiscountsRoute,
+    AuthenticatedWorkspaceExpensesRoute: AuthenticatedWorkspaceExpensesRoute,
+    AuthenticatedWorkspaceInspectionsRoute:
+      AuthenticatedWorkspaceInspectionsRouteWithChildren,
+    AuthenticatedWorkspaceInventoryRoute:
+      AuthenticatedWorkspaceInventoryRouteWithChildren,
+    AuthenticatedWorkspaceInvoicesRoute:
+      AuthenticatedWorkspaceInvoicesRouteWithChildren,
+    AuthenticatedWorkspaceJournalRoute:
+      AuthenticatedWorkspaceJournalRouteWithChildren,
+    AuthenticatedWorkspaceLeaveRoute: AuthenticatedWorkspaceLeaveRoute,
+    AuthenticatedWorkspaceLeaveRequestsRoute:
+      AuthenticatedWorkspaceLeaveRequestsRoute,
+    AuthenticatedWorkspaceLoyaltyRoute: AuthenticatedWorkspaceLoyaltyRoute,
+    AuthenticatedWorkspaceOperationsRoute:
+      AuthenticatedWorkspaceOperationsRoute,
+    AuthenticatedWorkspacePurchaseOrdersRoute:
+      AuthenticatedWorkspacePurchaseOrdersRouteWithChildren,
+    AuthenticatedWorkspaceQuotesRoute:
+      AuthenticatedWorkspaceQuotesRouteWithChildren,
+    AuthenticatedWorkspaceReportsRoute:
+      AuthenticatedWorkspaceReportsRouteWithChildren,
+    AuthenticatedWorkspaceSchedulingRoute:
+      AuthenticatedWorkspaceSchedulingRoute,
+    AuthenticatedWorkspaceSegmentsRoute: AuthenticatedWorkspaceSegmentsRoute,
+    AuthenticatedWorkspaceServiceRemindersRoute:
+      AuthenticatedWorkspaceServiceRemindersRoute,
+    AuthenticatedWorkspaceSettingsRoute: AuthenticatedWorkspaceSettingsRoute,
+    AuthenticatedWorkspaceStockAlertsRoute:
+      AuthenticatedWorkspaceStockAlertsRoute,
+    AuthenticatedWorkspaceTechniciansRoute:
+      AuthenticatedWorkspaceTechniciansRouteWithChildren,
+    AuthenticatedWorkspaceVehiclesRoute:
+      AuthenticatedWorkspaceVehiclesRouteWithChildren,
+    AuthenticatedWorkspaceVendorBillsRoute:
+      AuthenticatedWorkspaceVendorBillsRouteWithChildren,
+    AuthenticatedWorkspaceVendorsRoute: AuthenticatedWorkspaceVendorsRoute,
+    AuthenticatedWorkspaceWorkOrdersRoute:
+      AuthenticatedWorkspaceWorkOrdersRouteWithChildren,
+    AuthenticatedWorkspaceIndexRoute: AuthenticatedWorkspaceIndexRoute,
+  }
+
+const AuthenticatedWorkspaceRouteWithChildren =
+  AuthenticatedWorkspaceRoute._addFileChildren(
+    AuthenticatedWorkspaceRouteChildren,
+  )
+
+interface AuthenticatedStaffAcademyRouteChildren {
+  AuthenticatedStaffAcademySlugRoute: typeof AuthenticatedStaffAcademySlugRoute
+}
+
+const AuthenticatedStaffAcademyRouteChildren: AuthenticatedStaffAcademyRouteChildren =
+  {
+    AuthenticatedStaffAcademySlugRoute: AuthenticatedStaffAcademySlugRoute,
+  }
+
+const AuthenticatedStaffAcademyRouteWithChildren =
+  AuthenticatedStaffAcademyRoute._addFileChildren(
+    AuthenticatedStaffAcademyRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCompleteProfileRoute: typeof AuthenticatedCompleteProfileRoute
+  AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRouteWithChildren
+  AuthenticatedAccountDisputesRoute: typeof AuthenticatedAccountDisputesRoute
+  AuthenticatedAccountRewardsRoute: typeof AuthenticatedAccountRewardsRoute
+  AuthenticatedAccountTrustScoreRoute: typeof AuthenticatedAccountTrustScoreRoute
+  AuthenticatedAdminClubDiscountPromotionsRoute: typeof AuthenticatedAdminClubDiscountPromotionsRoute
+  AuthenticatedAdminFeatureScreenshotsRoute: typeof AuthenticatedAdminFeatureScreenshotsRoute
+  AuthenticatedDashboardClaimBusinessRoute: typeof AuthenticatedDashboardClaimBusinessRoute
+  AuthenticatedDashboardClubsRoute: typeof AuthenticatedDashboardClubsRoute
+  AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
+  AuthenticatedDashboardStaffRequestsRoute: typeof AuthenticatedDashboardStaffRequestsRoute
+  AuthenticatedDisputeReportIdRoute: typeof AuthenticatedDisputeReportIdRoute
+  AuthenticatedFranchiseDashboardRoute: typeof AuthenticatedFranchiseDashboardRoute
+  AuthenticatedFranchiseStatusRoute: typeof AuthenticatedFranchiseStatusRoute
+  AuthenticatedPartsMyRequestsRoute: typeof AuthenticatedPartsMyRequestsRoute
+  AuthenticatedStaffAcademyRoute: typeof AuthenticatedStaffAcademyRouteWithChildren
+  AuthenticatedDashboardClubsIdRoute: typeof AuthenticatedDashboardClubsIdRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCompleteProfileRoute: AuthenticatedCompleteProfileRoute,
+  AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRouteWithChildren,
+  AuthenticatedAccountDisputesRoute: AuthenticatedAccountDisputesRoute,
+  AuthenticatedAccountRewardsRoute: AuthenticatedAccountRewardsRoute,
+  AuthenticatedAccountTrustScoreRoute: AuthenticatedAccountTrustScoreRoute,
+  AuthenticatedAdminClubDiscountPromotionsRoute:
+    AuthenticatedAdminClubDiscountPromotionsRoute,
+  AuthenticatedAdminFeatureScreenshotsRoute:
+    AuthenticatedAdminFeatureScreenshotsRoute,
+  AuthenticatedDashboardClaimBusinessRoute:
+    AuthenticatedDashboardClaimBusinessRoute,
+  AuthenticatedDashboardClubsRoute: AuthenticatedDashboardClubsRoute,
+  AuthenticatedDashboardPartsWantedRoute:
+    AuthenticatedDashboardPartsWantedRoute,
+  AuthenticatedDashboardStaffRequestsRoute:
+    AuthenticatedDashboardStaffRequestsRoute,
+  AuthenticatedDisputeReportIdRoute: AuthenticatedDisputeReportIdRoute,
+  AuthenticatedFranchiseDashboardRoute: AuthenticatedFranchiseDashboardRoute,
+  AuthenticatedFranchiseStatusRoute: AuthenticatedFranchiseStatusRoute,
+  AuthenticatedPartsMyRequestsRoute: AuthenticatedPartsMyRequestsRoute,
+  AuthenticatedStaffAcademyRoute: AuthenticatedStaffAcademyRouteWithChildren,
+  AuthenticatedDashboardClubsIdRoute: AuthenticatedDashboardClubsIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface AdminAccountsRouteChildren {
+  AdminAccountsBackfillRoute: typeof AdminAccountsBackfillRoute
+}
+
+const AdminAccountsRouteChildren: AdminAccountsRouteChildren = {
+  AdminAccountsBackfillRoute: AdminAccountsBackfillRoute,
+}
+
+const AdminAccountsRouteWithChildren = AdminAccountsRoute._addFileChildren(
+  AdminAccountsRouteChildren,
+)
+
+interface AdminAdvertisementsAnalyticsRouteChildren {
+  AdminAdvertisementsAnalyticsCodeRoute: typeof AdminAdvertisementsAnalyticsCodeRoute
+}
+
+const AdminAdvertisementsAnalyticsRouteChildren: AdminAdvertisementsAnalyticsRouteChildren =
+  {
+    AdminAdvertisementsAnalyticsCodeRoute:
+      AdminAdvertisementsAnalyticsCodeRoute,
+  }
+
+const AdminAdvertisementsAnalyticsRouteWithChildren =
+  AdminAdvertisementsAnalyticsRoute._addFileChildren(
+    AdminAdvertisementsAnalyticsRouteChildren,
+  )
+
+interface AdminAdvertisementsRouteChildren {
+  AdminAdvertisementsAnalyticsRoute: typeof AdminAdvertisementsAnalyticsRouteWithChildren
+  AdminAdvertisementsApprovalsRoute: typeof AdminAdvertisementsApprovalsRoute
+  AdminAdvertisementsCampaignsRoute: typeof AdminAdvertisementsCampaignsRoute
+  AdminAdvertisementsHistoryRoute: typeof AdminAdvertisementsHistoryRoute
+  AdminAdvertisementsInquiriesRoute: typeof AdminAdvertisementsInquiriesRoute
+  AdminAdvertisementsPlaceholdersRoute: typeof AdminAdvertisementsPlaceholdersRoute
+  AdminAdvertisementsPreviewRoute: typeof AdminAdvertisementsPreviewRoute
+  AdminAdvertisementsPromotionsRoute: typeof AdminAdvertisementsPromotionsRoute
+  AdminAdvertisementsQrAdsRoute: typeof AdminAdvertisementsQrAdsRoute
+  AdminAdvertisementsSlotsRoute: typeof AdminAdvertisementsSlotsRoute
+  AdminAdvertisementsIndexRoute: typeof AdminAdvertisementsIndexRoute
+}
+
+const AdminAdvertisementsRouteChildren: AdminAdvertisementsRouteChildren = {
+  AdminAdvertisementsAnalyticsRoute:
+    AdminAdvertisementsAnalyticsRouteWithChildren,
+  AdminAdvertisementsApprovalsRoute: AdminAdvertisementsApprovalsRoute,
+  AdminAdvertisementsCampaignsRoute: AdminAdvertisementsCampaignsRoute,
+  AdminAdvertisementsHistoryRoute: AdminAdvertisementsHistoryRoute,
+  AdminAdvertisementsInquiriesRoute: AdminAdvertisementsInquiriesRoute,
+  AdminAdvertisementsPlaceholdersRoute: AdminAdvertisementsPlaceholdersRoute,
+  AdminAdvertisementsPreviewRoute: AdminAdvertisementsPreviewRoute,
+  AdminAdvertisementsPromotionsRoute: AdminAdvertisementsPromotionsRoute,
+  AdminAdvertisementsQrAdsRoute: AdminAdvertisementsQrAdsRoute,
+  AdminAdvertisementsSlotsRoute: AdminAdvertisementsSlotsRoute,
+  AdminAdvertisementsIndexRoute: AdminAdvertisementsIndexRoute,
+}
+
+const AdminAdvertisementsRouteWithChildren =
+  AdminAdvertisementsRoute._addFileChildren(AdminAdvertisementsRouteChildren)
+
+interface AdminPartnerProgramRouteChildren {
+  AdminPartnerProgramLedgerRoute: typeof AdminPartnerProgramLedgerRoute
+  AdminPartnerProgramOverviewRoute: typeof AdminPartnerProgramOverviewRoute
+}
+
+const AdminPartnerProgramRouteChildren: AdminPartnerProgramRouteChildren = {
+  AdminPartnerProgramLedgerRoute: AdminPartnerProgramLedgerRoute,
+  AdminPartnerProgramOverviewRoute: AdminPartnerProgramOverviewRoute,
+}
+
+const AdminPartnerProgramRouteWithChildren =
+  AdminPartnerProgramRoute._addFileChildren(AdminPartnerProgramRouteChildren)
+
+interface AdminPartsRouteChildren {
+  AdminPartsAnalyticsRoute: typeof AdminPartsAnalyticsRoute
+  AdminPartsCommissionsRoute: typeof AdminPartsCommissionsRoute
+  AdminPartsFeedsRoute: typeof AdminPartsFeedsRoute
+  AdminPartsOutreachRoute: typeof AdminPartsOutreachRoute
+}
+
+const AdminPartsRouteChildren: AdminPartsRouteChildren = {
+  AdminPartsAnalyticsRoute: AdminPartsAnalyticsRoute,
+  AdminPartsCommissionsRoute: AdminPartsCommissionsRoute,
+  AdminPartsFeedsRoute: AdminPartsFeedsRoute,
+  AdminPartsOutreachRoute: AdminPartsOutreachRoute,
+}
+
+const AdminPartsRouteWithChildren = AdminPartsRoute._addFileChildren(
+  AdminPartsRouteChildren,
+)
+
+interface AdminRouteChildren {
+  AdminAccountsRoute: typeof AdminAccountsRouteWithChildren
+  AdminAdvertisementsRoute: typeof AdminAdvertisementsRouteWithChildren
+  AdminAlertsRoute: typeof AdminAlertsRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminAssociateApplicationsRoute: typeof AdminAssociateApplicationsRoute
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminBusinessesRoute: typeof AdminBusinessesRoute
+  AdminClaimsRoute: typeof AdminClaimsRoute
+  AdminClubDiscountRoute: typeof AdminClubDiscountRoute
+  AdminClubsRoute: typeof AdminClubsRoute
+  AdminCronTokensRoute: typeof AdminCronTokensRoute
+  AdminCurrenciesRoute: typeof AdminCurrenciesRoute
+  AdminDiagnosticsRoute: typeof AdminDiagnosticsRoute
+  AdminDiscountAuditsRoute: typeof AdminDiscountAuditsRoute
+  AdminDiscoverBusinessesRoute: typeof AdminDiscoverBusinessesRoute
+  AdminDispatchRoute: typeof AdminDispatchRoute
+  AdminDocumentCheckRoute: typeof AdminDocumentCheckRoute
+  AdminEducationRoute: typeof AdminEducationRoute
+  AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
+  AdminFlashcardsRoute: typeof AdminFlashcardsRoute
+  AdminFranchiseRoute: typeof AdminFranchiseRoute
+  AdminFranchiseTiersRoute: typeof AdminFranchiseTiersRoute
+  AdminInquiriesRoute: typeof AdminInquiriesRoute
+  AdminLeadOffersRoute: typeof AdminLeadOffersRoute
+  AdminListingsRoute: typeof AdminListingsRoute
+  AdminLocationCorrectionsRoute: typeof AdminLocationCorrectionsRoute
+  AdminNetworkExposureRoute: typeof AdminNetworkExposureRoute
+  AdminPartnerProgramRoute: typeof AdminPartnerProgramRouteWithChildren
+  AdminPartsRoute: typeof AdminPartsRouteWithChildren
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminPerformanceRoute: typeof AdminPerformanceRoute
+  AdminPermissionsRoute: typeof AdminPermissionsRoute
+  AdminPricingRoute: typeof AdminPricingRoute
+  AdminQrLeadsRoute: typeof AdminQrLeadsRoute
+  AdminRedemptionsRoute: typeof AdminRedemptionsRoute
+  AdminReferralsRoute: typeof AdminReferralsRoute
+  AdminReportsRoute: typeof AdminReportsRoute
+  AdminRewardsRoute: typeof AdminRewardsRoute
+  AdminSalesRoute: typeof AdminSalesRoute
+  AdminSalesRepsRoute: typeof AdminSalesRepsRoute
+  AdminSandboxRoute: typeof AdminSandboxRoute
+  AdminServiceSuggestionAuditRoute: typeof AdminServiceSuggestionAuditRoute
+  AdminServiceSuggestionsRoute: typeof AdminServiceSuggestionsRoute
+  AdminShopRoute: typeof AdminShopRoute
+  AdminSignupFailuresRoute: typeof AdminSignupFailuresRoute
+  AdminStaff365Route: typeof AdminStaff365Route
+  AdminTypeSuggestionsRoute: typeof AdminTypeSuggestionsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminVerificationsRoute: typeof AdminVerificationsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminRedemptionsStaffIdRoute: typeof AdminRedemptionsStaffIdRoute
+  AdminStaffAcademyIdRoute: typeof AdminStaffAcademyIdRoute
+  AdminStaffAcademyAssetsRoute: typeof AdminStaffAcademyAssetsRoute
+  AdminStaffAcademyIndexRoute: typeof AdminStaffAcademyIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAccountsRoute: AdminAccountsRouteWithChildren,
+  AdminAdvertisementsRoute: AdminAdvertisementsRouteWithChildren,
+  AdminAlertsRoute: AdminAlertsRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminAssociateApplicationsRoute: AdminAssociateApplicationsRoute,
+  AdminAuditRoute: AdminAuditRoute,
+  AdminBusinessesRoute: AdminBusinessesRoute,
+  AdminClaimsRoute: AdminClaimsRoute,
+  AdminClubDiscountRoute: AdminClubDiscountRoute,
+  AdminClubsRoute: AdminClubsRoute,
+  AdminCronTokensRoute: AdminCronTokensRoute,
+  AdminCurrenciesRoute: AdminCurrenciesRoute,
+  AdminDiagnosticsRoute: AdminDiagnosticsRoute,
+  AdminDiscountAuditsRoute: AdminDiscountAuditsRoute,
+  AdminDiscoverBusinessesRoute: AdminDiscoverBusinessesRoute,
+  AdminDispatchRoute: AdminDispatchRoute,
+  AdminDocumentCheckRoute: AdminDocumentCheckRoute,
+  AdminEducationRoute: AdminEducationRoute,
+  AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
+  AdminFlashcardsRoute: AdminFlashcardsRoute,
+  AdminFranchiseRoute: AdminFranchiseRoute,
+  AdminFranchiseTiersRoute: AdminFranchiseTiersRoute,
+  AdminInquiriesRoute: AdminInquiriesRoute,
+  AdminLeadOffersRoute: AdminLeadOffersRoute,
+  AdminListingsRoute: AdminListingsRoute,
+  AdminLocationCorrectionsRoute: AdminLocationCorrectionsRoute,
+  AdminNetworkExposureRoute: AdminNetworkExposureRoute,
+  AdminPartnerProgramRoute: AdminPartnerProgramRouteWithChildren,
+  AdminPartsRoute: AdminPartsRouteWithChildren,
+  AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminPerformanceRoute: AdminPerformanceRoute,
+  AdminPermissionsRoute: AdminPermissionsRoute,
+  AdminPricingRoute: AdminPricingRoute,
+  AdminQrLeadsRoute: AdminQrLeadsRoute,
+  AdminRedemptionsRoute: AdminRedemptionsRoute,
+  AdminReferralsRoute: AdminReferralsRoute,
+  AdminReportsRoute: AdminReportsRoute,
+  AdminRewardsRoute: AdminRewardsRoute,
+  AdminSalesRoute: AdminSalesRoute,
+  AdminSalesRepsRoute: AdminSalesRepsRoute,
+  AdminSandboxRoute: AdminSandboxRoute,
+  AdminServiceSuggestionAuditRoute: AdminServiceSuggestionAuditRoute,
+  AdminServiceSuggestionsRoute: AdminServiceSuggestionsRoute,
+  AdminShopRoute: AdminShopRoute,
+  AdminSignupFailuresRoute: AdminSignupFailuresRoute,
+  AdminStaff365Route: AdminStaff365Route,
+  AdminTypeSuggestionsRoute: AdminTypeSuggestionsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminVerificationsRoute: AdminVerificationsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminRedemptionsStaffIdRoute: AdminRedemptionsStaffIdRoute,
+  AdminStaffAcademyIdRoute: AdminStaffAcademyIdRoute,
+  AdminStaffAcademyAssetsRoute: AdminStaffAcademyAssetsRoute,
+  AdminStaffAcademyIndexRoute: AdminStaffAcademyIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface DashboardDispatchRouteChildren {
+  DashboardDispatchHistoryRoute: typeof DashboardDispatchHistoryRoute
+}
+
+const DashboardDispatchRouteChildren: DashboardDispatchRouteChildren = {
+  DashboardDispatchHistoryRoute: DashboardDispatchHistoryRoute,
+}
+
+const DashboardDispatchRouteWithChildren =
+  DashboardDispatchRoute._addFileChildren(DashboardDispatchRouteChildren)
+
+interface DashboardPartnerRouteChildren {
+  DashboardPartnerActivityRoute: typeof DashboardPartnerActivityRoute
+  DashboardPartnerAdvertisementsRoute: typeof DashboardPartnerAdvertisementsRoute
+  DashboardPartnerInboxRoute: typeof DashboardPartnerInboxRoute
+  DashboardPartnerOverviewRoute: typeof DashboardPartnerOverviewRoute
+  DashboardPartnerPerformanceRoute: typeof DashboardPartnerPerformanceRoute
+  DashboardPartnerQrAdsRoute: typeof DashboardPartnerQrAdsRoute
+  DashboardPartnerQrAnalyticsRoute: typeof DashboardPartnerQrAnalyticsRoute
+  DashboardPartnerReferralsRoute: typeof DashboardPartnerReferralsRoute
+  DashboardPartnerIndexRoute: typeof DashboardPartnerIndexRoute
+}
+
+const DashboardPartnerRouteChildren: DashboardPartnerRouteChildren = {
+  DashboardPartnerActivityRoute: DashboardPartnerActivityRoute,
+  DashboardPartnerAdvertisementsRoute: DashboardPartnerAdvertisementsRoute,
+  DashboardPartnerInboxRoute: DashboardPartnerInboxRoute,
+  DashboardPartnerOverviewRoute: DashboardPartnerOverviewRoute,
+  DashboardPartnerPerformanceRoute: DashboardPartnerPerformanceRoute,
+  DashboardPartnerQrAdsRoute: DashboardPartnerQrAdsRoute,
+  DashboardPartnerQrAnalyticsRoute: DashboardPartnerQrAnalyticsRoute,
+  DashboardPartnerReferralsRoute: DashboardPartnerReferralsRoute,
+  DashboardPartnerIndexRoute: DashboardPartnerIndexRoute,
+}
+
+const DashboardPartnerRouteWithChildren =
+  DashboardPartnerRoute._addFileChildren(DashboardPartnerRouteChildren)
+
+interface DashboardStaffRouteChildren {
+  DashboardStaffInboxRoute: typeof DashboardStaffInboxRoute
+}
+
+const DashboardStaffRouteChildren: DashboardStaffRouteChildren = {
+  DashboardStaffInboxRoute: DashboardStaffInboxRoute,
+}
+
+const DashboardStaffRouteWithChildren = DashboardStaffRoute._addFileChildren(
+  DashboardStaffRouteChildren,
+)
+
+interface DashboardTeamRouteChildren {
+  DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
+  DashboardTeamMembersRoute: typeof DashboardTeamMembersRoute
+  DashboardTeamPerformanceRoute: typeof DashboardTeamPerformanceRoute
+  DashboardTeamIndexRoute: typeof DashboardTeamIndexRoute
+  DashboardTeamLeadsIdRoute: typeof DashboardTeamLeadsIdRoute
+}
+
+const DashboardTeamRouteChildren: DashboardTeamRouteChildren = {
+  DashboardTeamLeadsRoute: DashboardTeamLeadsRoute,
+  DashboardTeamMembersRoute: DashboardTeamMembersRoute,
+  DashboardTeamPerformanceRoute: DashboardTeamPerformanceRoute,
+  DashboardTeamIndexRoute: DashboardTeamIndexRoute,
+  DashboardTeamLeadsIdRoute: DashboardTeamLeadsIdRoute,
+}
+
+const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
+  DashboardTeamRouteChildren,
+)
+
+interface DashboardBusinessBusinessIdInvoicesRouteChildren {
+  DashboardBusinessBusinessIdInvoicesIdRoute: typeof DashboardBusinessBusinessIdInvoicesIdRoute
+}
+
+const DashboardBusinessBusinessIdInvoicesRouteChildren: DashboardBusinessBusinessIdInvoicesRouteChildren =
+  {
+    DashboardBusinessBusinessIdInvoicesIdRoute:
+      DashboardBusinessBusinessIdInvoicesIdRoute,
+  }
+
+const DashboardBusinessBusinessIdInvoicesRouteWithChildren =
+  DashboardBusinessBusinessIdInvoicesRoute._addFileChildren(
+    DashboardBusinessBusinessIdInvoicesRouteChildren,
+  )
+
+interface DashboardBusinessBusinessIdRouteChildren {
+  DashboardBusinessBusinessIdBillingRoute: typeof DashboardBusinessBusinessIdBillingRoute
+  DashboardBusinessBusinessIdDispatchRoute: typeof DashboardBusinessBusinessIdDispatchRoute
+  DashboardBusinessBusinessIdFleetRoute: typeof DashboardBusinessBusinessIdFleetRoute
+  DashboardBusinessBusinessIdInventoryRoute: typeof DashboardBusinessBusinessIdInventoryRoute
+  DashboardBusinessBusinessIdInvoicesRoute: typeof DashboardBusinessBusinessIdInvoicesRouteWithChildren
+  DashboardBusinessBusinessIdPartsOperationsRoute: typeof DashboardBusinessBusinessIdPartsOperationsRoute
+  DashboardBusinessBusinessIdSettingsRoute: typeof DashboardBusinessBusinessIdSettingsRoute
+  DashboardBusinessBusinessIdStaffRoute: typeof DashboardBusinessBusinessIdStaffRoute
+  DashboardBusinessBusinessIdIndexRoute: typeof DashboardBusinessBusinessIdIndexRoute
+}
+
+const DashboardBusinessBusinessIdRouteChildren: DashboardBusinessBusinessIdRouteChildren =
+  {
+    DashboardBusinessBusinessIdBillingRoute:
+      DashboardBusinessBusinessIdBillingRoute,
+    DashboardBusinessBusinessIdDispatchRoute:
+      DashboardBusinessBusinessIdDispatchRoute,
+    DashboardBusinessBusinessIdFleetRoute:
+      DashboardBusinessBusinessIdFleetRoute,
+    DashboardBusinessBusinessIdInventoryRoute:
+      DashboardBusinessBusinessIdInventoryRoute,
+    DashboardBusinessBusinessIdInvoicesRoute:
+      DashboardBusinessBusinessIdInvoicesRouteWithChildren,
+    DashboardBusinessBusinessIdPartsOperationsRoute:
+      DashboardBusinessBusinessIdPartsOperationsRoute,
+    DashboardBusinessBusinessIdSettingsRoute:
+      DashboardBusinessBusinessIdSettingsRoute,
+    DashboardBusinessBusinessIdStaffRoute:
+      DashboardBusinessBusinessIdStaffRoute,
+    DashboardBusinessBusinessIdIndexRoute:
+      DashboardBusinessBusinessIdIndexRoute,
+  }
+
+const DashboardBusinessBusinessIdRouteWithChildren =
+  DashboardBusinessBusinessIdRoute._addFileChildren(
+    DashboardBusinessBusinessIdRouteChildren,
+  )
+
+interface DashboardRouteChildren {
+  DashboardAdsRoute: typeof DashboardAdsRoute
+  DashboardBillingRoute: typeof DashboardBillingRoute
+  DashboardBlockedRoute: typeof DashboardBlockedRoute
+  DashboardBoostsRoute: typeof DashboardBoostsRoute
+  DashboardBusinessesRoute: typeof DashboardBusinessesRoute
+  DashboardDispatchRoute: typeof DashboardDispatchRouteWithChildren
+  DashboardFavoritesRoute: typeof DashboardFavoritesRoute
+  DashboardLearningRoute: typeof DashboardLearningRoute
+  DashboardLikesRoute: typeof DashboardLikesRoute
+  DashboardMessagesRoute: typeof DashboardMessagesRoute
+  DashboardPartnerRoute: typeof DashboardPartnerRouteWithChildren
+  DashboardPartnerNetworkRoute: typeof DashboardPartnerNetworkRoute
+  DashboardPartnerProgramRoute: typeof DashboardPartnerProgramRoute
+  DashboardProfileRoute: typeof DashboardProfileRoute
+  DashboardPromoterResourcesRoute: typeof DashboardPromoterResourcesRoute
+  DashboardQrAdsRoute: typeof DashboardQrAdsRoute
+  DashboardQrScanTestRoute: typeof DashboardQrScanTestRoute
+  DashboardReferralRoute: typeof DashboardReferralRoute
+  DashboardRidesRoute: typeof DashboardRidesRoute
+  DashboardSearchesRoute: typeof DashboardSearchesRoute
+  DashboardShopFavoritesRoute: typeof DashboardShopFavoritesRoute
+  DashboardSponsorshipsRoute: typeof DashboardSponsorshipsRoute
+  DashboardStaffRoute: typeof DashboardStaffRouteWithChildren
+  DashboardTeamRoute: typeof DashboardTeamRouteWithChildren
+  DashboardTowRoute: typeof DashboardTowRoute
+  DashboardVehiclesRoute: typeof DashboardVehiclesRoute
+  DashboardVerificationRoute: typeof DashboardVerificationRoute
+  DashboardWantedRoute: typeof DashboardWantedRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardBusinessBusinessIdRoute: typeof DashboardBusinessBusinessIdRouteWithChildren
+  DashboardRidesNewRoute: typeof DashboardRidesNewRoute
+  DashboardBusinessesIdAnalyticsRoute: typeof DashboardBusinessesIdAnalyticsRoute
+  DashboardBusinessesIdDomainRoute: typeof DashboardBusinessesIdDomainRoute
+  DashboardBusinessesIdEditRoute: typeof DashboardBusinessesIdEditRoute
+  DashboardRidesIdEditRoute: typeof DashboardRidesIdEditRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAdsRoute: DashboardAdsRoute,
+  DashboardBillingRoute: DashboardBillingRoute,
+  DashboardBlockedRoute: DashboardBlockedRoute,
+  DashboardBoostsRoute: DashboardBoostsRoute,
+  DashboardBusinessesRoute: DashboardBusinessesRoute,
+  DashboardDispatchRoute: DashboardDispatchRouteWithChildren,
+  DashboardFavoritesRoute: DashboardFavoritesRoute,
+  DashboardLearningRoute: DashboardLearningRoute,
+  DashboardLikesRoute: DashboardLikesRoute,
+  DashboardMessagesRoute: DashboardMessagesRoute,
+  DashboardPartnerRoute: DashboardPartnerRouteWithChildren,
+  DashboardPartnerNetworkRoute: DashboardPartnerNetworkRoute,
+  DashboardPartnerProgramRoute: DashboardPartnerProgramRoute,
+  DashboardProfileRoute: DashboardProfileRoute,
+  DashboardPromoterResourcesRoute: DashboardPromoterResourcesRoute,
+  DashboardQrAdsRoute: DashboardQrAdsRoute,
+  DashboardQrScanTestRoute: DashboardQrScanTestRoute,
+  DashboardReferralRoute: DashboardReferralRoute,
+  DashboardRidesRoute: DashboardRidesRoute,
+  DashboardSearchesRoute: DashboardSearchesRoute,
+  DashboardShopFavoritesRoute: DashboardShopFavoritesRoute,
+  DashboardSponsorshipsRoute: DashboardSponsorshipsRoute,
+  DashboardStaffRoute: DashboardStaffRouteWithChildren,
+  DashboardTeamRoute: DashboardTeamRouteWithChildren,
+  DashboardTowRoute: DashboardTowRoute,
+  DashboardVehiclesRoute: DashboardVehiclesRoute,
+  DashboardVerificationRoute: DashboardVerificationRoute,
+  DashboardWantedRoute: DashboardWantedRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardBusinessBusinessIdRoute:
+    DashboardBusinessBusinessIdRouteWithChildren,
+  DashboardRidesNewRoute: DashboardRidesNewRoute,
+  DashboardBusinessesIdAnalyticsRoute: DashboardBusinessesIdAnalyticsRoute,
+  DashboardBusinessesIdDomainRoute: DashboardBusinessesIdDomainRoute,
+  DashboardBusinessesIdEditRoute: DashboardBusinessesIdEditRoute,
+  DashboardRidesIdEditRoute: DashboardRidesIdEditRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
+interface DispatchRouteChildren {
+  DispatchCheckoutRoute: typeof DispatchCheckoutRoute
+  DispatchJoinRoute: typeof DispatchJoinRoute
+  DispatchIndexRoute: typeof DispatchIndexRoute
+}
+
+const DispatchRouteChildren: DispatchRouteChildren = {
+  DispatchCheckoutRoute: DispatchCheckoutRoute,
+  DispatchJoinRoute: DispatchJoinRoute,
+  DispatchIndexRoute: DispatchIndexRoute,
+}
+
+const DispatchRouteWithChildren = DispatchRoute._addFileChildren(
+  DispatchRouteChildren,
+)
+
+interface DocumentCheckCountryRouteChildren {
+  DocumentCheckCountryQuickGuideRoute: typeof DocumentCheckCountryQuickGuideRoute
+}
+
+const DocumentCheckCountryRouteChildren: DocumentCheckCountryRouteChildren = {
+  DocumentCheckCountryQuickGuideRoute: DocumentCheckCountryQuickGuideRoute,
+}
+
+const DocumentCheckCountryRouteWithChildren =
+  DocumentCheckCountryRoute._addFileChildren(DocumentCheckCountryRouteChildren)
+
+interface DocumentCheckRouteChildren {
+  DocumentCheckCountryRoute: typeof DocumentCheckCountryRouteWithChildren
+  DocumentCheckIndexRoute: typeof DocumentCheckIndexRoute
+}
+
+const DocumentCheckRouteChildren: DocumentCheckRouteChildren = {
+  DocumentCheckCountryRoute: DocumentCheckCountryRouteWithChildren,
+  DocumentCheckIndexRoute: DocumentCheckIndexRoute,
+}
+
+const DocumentCheckRouteWithChildren = DocumentCheckRoute._addFileChildren(
+  DocumentCheckRouteChildren,
+)
+
+interface ExportRouteChildren {
+  ExportTrustRoute: typeof ExportTrustRoute
+}
+
+const ExportRouteChildren: ExportRouteChildren = {
+  ExportTrustRoute: ExportTrustRoute,
+}
+
+const ExportRouteWithChildren =
+  ExportRoute._addFileChildren(ExportRouteChildren)
+
+interface FranchiseRouteChildren {
+  FranchiseApplyRoute: typeof FranchiseApplyRoute
+  FranchisePartnersRoute: typeof FranchisePartnersRoute
+  FranchiseIndexRoute: typeof FranchiseIndexRoute
+}
+
+const FranchiseRouteChildren: FranchiseRouteChildren = {
+  FranchiseApplyRoute: FranchiseApplyRoute,
+  FranchisePartnersRoute: FranchisePartnersRoute,
+  FranchiseIndexRoute: FranchiseIndexRoute,
+}
+
+const FranchiseRouteWithChildren = FranchiseRoute._addFileChildren(
+  FranchiseRouteChildren,
+)
+
+interface PartnerProgramRouteChildren {
+  PartnerProgramApplyRoute: typeof PartnerProgramApplyRoute
+  PartnerProgramInfoRoute: typeof PartnerProgramInfoRoute
+  PartnerProgramTermsRoute: typeof PartnerProgramTermsRoute
+  PartnerProgramIndexRoute: typeof PartnerProgramIndexRoute
+}
+
+const PartnerProgramRouteChildren: PartnerProgramRouteChildren = {
+  PartnerProgramApplyRoute: PartnerProgramApplyRoute,
+  PartnerProgramInfoRoute: PartnerProgramInfoRoute,
+  PartnerProgramTermsRoute: PartnerProgramTermsRoute,
+  PartnerProgramIndexRoute: PartnerProgramIndexRoute,
+}
+
+const PartnerProgramRouteWithChildren = PartnerProgramRoute._addFileChildren(
+  PartnerProgramRouteChildren,
+)
+
+interface PartnersPartsRouteChildren {
+  PartnersPartsOnboardingRoute: typeof PartnersPartsOnboardingRoute
+}
+
+const PartnersPartsRouteChildren: PartnersPartsRouteChildren = {
+  PartnersPartsOnboardingRoute: PartnersPartsOnboardingRoute,
+}
+
+const PartnersPartsRouteWithChildren = PartnersPartsRoute._addFileChildren(
+  PartnersPartsRouteChildren,
+)
+
+interface PartnersRouteChildren {
+  PartnersNetworkRoute: typeof PartnersNetworkRoute
+  PartnersPartsRoute: typeof PartnersPartsRouteWithChildren
+  PartnersIndexRoute: typeof PartnersIndexRoute
+  PartnersAssociateApplyRoute: typeof PartnersAssociateApplyRoute
+}
+
+const PartnersRouteChildren: PartnersRouteChildren = {
+  PartnersNetworkRoute: PartnersNetworkRoute,
+  PartnersPartsRoute: PartnersPartsRouteWithChildren,
+  PartnersIndexRoute: PartnersIndexRoute,
+  PartnersAssociateApplyRoute: PartnersAssociateApplyRoute,
+}
+
+const PartnersRouteWithChildren = PartnersRoute._addFileChildren(
+  PartnersRouteChildren,
+)
+
+interface PartsRouteChildren {
+  PartsCategoriesRoute: typeof PartsCategoriesRoute
+  PartsNetworkRoute: typeof PartsNetworkRoute
+  PartsSearchRoute: typeof PartsSearchRoute
+  PartsIndexRoute: typeof PartsIndexRoute
+  PartsCSlugRoute: typeof PartsCSlugRoute
+  PartsPartnersCategoriesRoute: typeof PartsPartnersCategoriesRoute
+  PartsPartnersIndexRoute: typeof PartsPartnersIndexRoute
+  PartsPNetworkSkuRoute: typeof PartsPNetworkSkuRoute
+  PartsPartnersBrandSlugRoute: typeof PartsPartnersBrandSlugRoute
+  PartsPartnersCCategoryRoute: typeof PartsPartnersCCategoryRoute
+  PartsPartnersDepartmentSlugRoute: typeof PartsPartnersDepartmentSlugRoute
+  PartsPartnersPSlugRoute: typeof PartsPartnersPSlugRoute
+  PartsPartnersStoreSlugRoute: typeof PartsPartnersStoreSlugRoute
+}
+
+const PartsRouteChildren: PartsRouteChildren = {
+  PartsCategoriesRoute: PartsCategoriesRoute,
+  PartsNetworkRoute: PartsNetworkRoute,
+  PartsSearchRoute: PartsSearchRoute,
+  PartsIndexRoute: PartsIndexRoute,
+  PartsCSlugRoute: PartsCSlugRoute,
+  PartsPartnersCategoriesRoute: PartsPartnersCategoriesRoute,
+  PartsPartnersIndexRoute: PartsPartnersIndexRoute,
+  PartsPNetworkSkuRoute: PartsPNetworkSkuRoute,
+  PartsPartnersBrandSlugRoute: PartsPartnersBrandSlugRoute,
+  PartsPartnersCCategoryRoute: PartsPartnersCCategoryRoute,
+  PartsPartnersDepartmentSlugRoute: PartsPartnersDepartmentSlugRoute,
+  PartsPartnersPSlugRoute: PartsPartnersPSlugRoute,
+  PartsPartnersStoreSlugRoute: PartsPartnersStoreSlugRoute,
+}
+
+const PartsRouteWithChildren = PartsRoute._addFileChildren(PartsRouteChildren)
+
+interface PaymentsRouteChildren {
+  PaymentsIdReceiptRoute: typeof PaymentsIdReceiptRoute
+}
+
+const PaymentsRouteChildren: PaymentsRouteChildren = {
+  PaymentsIdReceiptRoute: PaymentsIdReceiptRoute,
+}
+
+const PaymentsRouteWithChildren = PaymentsRoute._addFileChildren(
+  PaymentsRouteChildren,
+)
+
+interface ShopRouteChildren {
+  ShopIndexRoute: typeof ShopIndexRoute
+}
+
+const ShopRouteChildren: ShopRouteChildren = {
+  ShopIndexRoute: ShopIndexRoute,
+}
+
+const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
+
+interface ShopManagerRouteChildren {
+  ShopManagerCheckoutRoute: typeof ShopManagerCheckoutRoute
+  ShopManagerPricingRoute: typeof ShopManagerPricingRoute
+  ShopManagerIndexRoute: typeof ShopManagerIndexRoute
+}
+
+const ShopManagerRouteChildren: ShopManagerRouteChildren = {
+  ShopManagerCheckoutRoute: ShopManagerCheckoutRoute,
+  ShopManagerPricingRoute: ShopManagerPricingRoute,
+  ShopManagerIndexRoute: ShopManagerIndexRoute,
+}
+
+const ShopManagerRouteWithChildren = ShopManagerRoute._addFileChildren(
+  ShopManagerRouteChildren,
+)
+
+interface BusinessesSlugRouteChildren {
+  BusinessesSlugBookRoute: typeof BusinessesSlugBookRoute
+}
+
+const BusinessesSlugRouteChildren: BusinessesSlugRouteChildren = {
+  BusinessesSlugBookRoute: BusinessesSlugBookRoute,
+}
+
+const BusinessesSlugRouteWithChildren = BusinessesSlugRoute._addFileChildren(
+  BusinessesSlugRouteChildren,
+)
+
+interface ClubsApplyRouteChildren {
+  ClubsApplySuccessRoute: typeof ClubsApplySuccessRoute
+}
+
+const ClubsApplyRouteChildren: ClubsApplyRouteChildren = {
+  ClubsApplySuccessRoute: ClubsApplySuccessRoute,
+}
+
+const ClubsApplyRouteWithChildren = ClubsApplyRoute._addFileChildren(
+  ClubsApplyRouteChildren,
+)
+
+interface ListingIdRouteChildren {
+  ListingIdEditRoute: typeof ListingIdEditRoute
+  ListingIdIndexRoute: typeof ListingIdIndexRoute
+}
+
+const ListingIdRouteChildren: ListingIdRouteChildren = {
+  ListingIdEditRoute: ListingIdEditRoute,
+  ListingIdIndexRoute: ListingIdIndexRoute,
+}
+
+const ListingIdRouteWithChildren = ListingIdRoute._addFileChildren(
+  ListingIdRouteChildren,
+)
+
+interface RCodeRouteChildren {
+  RCodePosterRoute: typeof RCodePosterRoute
+  RCodeQrRoute: typeof RCodeQrRoute
+}
+
+const RCodeRouteChildren: RCodeRouteChildren = {
+  RCodePosterRoute: RCodePosterRoute,
+  RCodeQrRoute: RCodeQrRoute,
+}
+
+const RCodeRouteWithChildren = RCodeRoute._addFileChildren(RCodeRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  SlugRoute: SlugRoute,
+  AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AdvertiseRoute: AdvertiseRoute,
+  AffiliateDisclosureRoute: AffiliateDisclosureRoute,
+  AuthRoute: AuthRoute,
+  BundlesRoute: BundlesRoute,
+  CompanyRoute: CompanyRoute,
+  ContactRoute: ContactRoute,
+  DashboardRoute: DashboardRouteWithChildren,
+  DispatchRoute: DispatchRouteWithChildren,
+  DocumentCheckRoute: DocumentCheckRouteWithChildren,
+  ExportRoute: ExportRouteWithChildren,
+  FeaturesRoute: FeaturesRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  FranchiseRoute: FranchiseRouteWithChildren,
+  GameRoute: GameRoute,
+  GuidelinesRoute: GuidelinesRoute,
+  LeadsMarketplaceRoute: LeadsMarketplaceRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
+  LoginRoute: LoginRoute,
+  MapRoute: MapRoute,
+  McpRoute: McpRoute,
+  MyQrRoute: MyQrRoute,
+  PartnerProgramRoute: PartnerProgramRouteWithChildren,
+  PartnerTrainingRoute: PartnerTrainingRoute,
+  PartnersRoute: PartnersRouteWithChildren,
+  PartsRoute: PartsRouteWithChildren,
+  PaymentsRoute: PaymentsRouteWithChildren,
+  PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
+  ReportRoute: ReportRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SellRoute: SellRoute,
+  ShopRoute: ShopRouteWithChildren,
+  ShopManagerRoute: ShopManagerRouteWithChildren,
+  SignupRoute: SignupRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StartSellingRoute: StartSellingRoute,
+  SupportRoute: SupportRoute,
+  TermsRoute: TermsRoute,
+  TowRoute: TowRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
+  VerifiedRoute: VerifiedRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
+  BSlugRoute: BSlugRoute,
+  BoostCheckoutRoute: BoostCheckoutRoute,
+  BrowseCategoryRoute: BrowseCategoryRoute,
+  BusinessCheckoutRoute: BusinessCheckoutRoute,
+  BusinessesSlugRoute: BusinessesSlugRouteWithChildren,
+  BusinessesSubmitRoute: BusinessesSubmitRoute,
+  CCodeRoute: CCodeRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
+  ClubsSlugRoute: ClubsSlugRoute,
+  ClubsApplyRoute: ClubsApplyRouteWithChildren,
+  ClubsStartRoute: ClubsStartRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  GoProductIdRoute: GoProductIdRoute,
+  HelpPayWithGcashRoute: HelpPayWithGcashRoute,
+  HelpPostingEtiquetteRoute: HelpPostingEtiquetteRoute,
+  HelpTrustScoreRoute: HelpTrustScoreRoute,
+  InvitesTokenRoute: InvitesTokenRoute,
+  LearnSlugRoute: LearnSlugRoute,
+  LearnFlashcardsRoute: LearnFlashcardsRoute,
+  LearnMechanicsRoute: LearnMechanicsRoute,
+  ListingIdRoute: ListingIdRouteWithChildren,
+  ListingCheckoutRoute: ListingCheckoutRoute,
+  PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
+  PassportSlugRoute: PassportSlugRoute,
+  PayManualRoute: PayManualRoute,
+  RCodeRoute: RCodeRouteWithChildren,
+  ResourcesQrLandingRoute: ResourcesQrLandingRoute,
+  RidesSlugRoute: RidesSlugRoute,
+  SSlugRoute: SSlugRoute,
+  SellerIdRoute: SellerIdRoute,
+  ServicesInspectionRoute: ServicesInspectionRoute,
+  SupportAccountRoute: SupportAccountRoute,
+  SupportBusinessRoute: SupportBusinessRoute,
+  SupportBuyingRoute: SupportBuyingRoute,
+  SupportSellingRoute: SupportSellingRoute,
+  WantedPartsNewRoute: WantedPartsNewRoute,
+  WantedIdRoute: WantedIdRoute,
+  WantedNewRoute: WantedNewRoute,
+  BusinessesIndexRoute: BusinessesIndexRoute,
+  ClubsIndexRoute: ClubsIndexRoute,
+  GamesIndexRoute: GamesIndexRoute,
+  LearnIndexRoute: LearnIndexRoute,
+  RidesIndexRoute: RidesIndexRoute,
+  WantedPartsIndexRoute: WantedPartsIndexRoute,
+  WantedIndexRoute: WantedIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiAdminBackfillProfilesRoute: ApiAdminBackfillProfilesRoute,
+  ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
+  ApiPublicGeoSearchRoute: ApiPublicGeoSearchRoute,
+  ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,
+  ApiPublicIpLocationRoute: ApiPublicIpLocationRoute,
+  ApiPublicMigrationExportRoute: ApiPublicMigrationExportRoute,
+  ApiPublicMigrationTargetPreflightRoute:
+    ApiPublicMigrationTargetPreflightRoute,
+  ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
+  ApiPublicReverseGeocodeRoute: ApiPublicReverseGeocodeRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicAuthSignupRoute: ApiPublicAuthSignupRoute,
+  ApiPublicAuthSignupFailureLogRoute: ApiPublicAuthSignupFailureLogRoute,
+  ApiPublicFlashcardsContentRoute: ApiPublicFlashcardsContentRoute,
+  ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
+  ApiPublicGoSlugRoute: ApiPublicGoSlugRoute,
+  ApiPublicHealthRoutesRoute: ApiPublicHealthRoutesRoute,
+  ApiPublicHooksAnnualBonusesRoute: ApiPublicHooksAnnualBonusesRoute,
+  ApiPublicHooksDiscoverSyncRoute: ApiPublicHooksDiscoverSyncRoute,
+  ApiPublicHooksDispatchExpandRoute: ApiPublicHooksDispatchExpandRoute,
+  ApiPublicHooksFlashcardsAutosyncRoute: ApiPublicHooksFlashcardsAutosyncRoute,
+  ApiPublicHooksOpsAlertsDigestRoute: ApiPublicHooksOpsAlertsDigestRoute,
+  ApiPublicHooksPartsWantedDigestRoute: ApiPublicHooksPartsWantedDigestRoute,
+  ApiPublicHooksQuarterlyBonusesRoute: ApiPublicHooksQuarterlyBonusesRoute,
+  ApiPublicHooksRecomputeTiersRoute: ApiPublicHooksRecomputeTiersRoute,
+  ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
+  ApiPublicHooksShopAutomationRunRoute: ApiPublicHooksShopAutomationRunRoute,
+  ApiPublicHooksSignupFailureAlertsRoute:
+    ApiPublicHooksSignupFailureAlertsRoute,
+  ApiPublicHooksSyncPartsFeedsRoute: ApiPublicHooksSyncPartsFeedsRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicPostbackNetworkRoute: ApiPublicPostbackNetworkRoute,
+  ApiPublicQrRescueCodeRoute: ApiPublicQrRescueCodeRoute,
+  ApiPublicQrRescueLogRoute: ApiPublicQrRescueLogRoute,
+  ApiSellerStaffCreateRoute: ApiSellerStaffCreateRoute,
+  ApiSellerStaffDeactivateRoute: ApiSellerStaffDeactivateRoute,
+  ApiSellerStaffResetPasswordRoute: ApiSellerStaffResetPasswordRoute,
+  LearnSlugWatchLessonIdRoute: LearnSlugWatchLessonIdRoute,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
+  ApiPublicTrainingPartnersIdClickRoute: ApiPublicTrainingPartnersIdClickRoute,
+}
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
