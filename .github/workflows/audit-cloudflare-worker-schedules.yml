@@ -1,0 +1,86 @@
+name: Audit Cloudflare Worker Schedules
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/audit-cloudflare-worker-schedules.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Verify Cloudflare read access
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo 'Missing Cloudflare API token.' >&2; exit 1; }
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'Missing Cloudflare account id.' >&2; exit 1; }
+
+      - name: Read 365 Motor Sales Worker cron triggers
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const account = process.env.CLOUDFLARE_ACCOUNT_ID;
+          const token = process.env.CLOUDFLARE_API_TOKEN;
+          const base = `https://api.cloudflare.com/client/v4/accounts/${account}/workers/scripts`;
+          const headers = { Authorization: `Bearer ${token}` };
+
+          const list = await fetch(base, { headers });
+          if (!list.ok) throw new Error(`Cloudflare Workers list failed: HTTP ${list.status}`);
+          const body = await list.json();
+          if (!body.success) throw new Error('Cloudflare Workers list returned success=false.');
+          const scripts = (body.result || []).map((x) => x.id).filter(Boolean);
+          const candidates = scripts.filter((id) => /motor|365/i.test(id)).sort();
+          if (!candidates.length) {
+            console.log('No Worker script names matching motor/365 were found.');
+          }
+
+          const report = [];
+          for (const script of candidates) {
+            const r = await fetch(`${base}/${encodeURIComponent(script)}/schedules`, { headers });
+            if (!r.ok) {
+              report.push({ script, http_status: r.status, schedules: null });
+              continue;
+            }
+            const data = await r.json();
+            const schedules = data?.result?.schedules ?? data?.result ?? [];
+            report.push({
+              script,
+              schedules: Array.isArray(schedules) ? schedules.map((s) => ({ cron: s.cron })) : [],
+            });
+          }
+
+          fs.writeFileSync('/tmp/cloudflare-schedules.json', JSON.stringify({ scripts: report }, null, 2));
+          for (const row of report) {
+            const crons = Array.isArray(row.schedules) ? row.schedules.map((s) => s.cron) : [];
+            console.log(`${row.script}: ${crons.length ? crons.join(', ') : 'no cron triggers'}`);
+          }
+
+          const lines = ['### Cloudflare 365 Worker schedule audit'];
+          for (const row of report) {
+            const crons = Array.isArray(row.schedules) ? row.schedules.map((s) => s.cron) : [];
+            lines.push(`- \`${row.script}\`: ${crons.length ? crons.join(', ') : 'no cron triggers'}`);
+          }
+          lines.push('', 'Cloudflare operation: read-only. No Worker, route, secret, schedule, or DNS state was modified.');
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
+          NODE
+
+      - name: Upload schedule evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-worker-schedules
+          path: /tmp/cloudflare-schedules.json
+          retention-days: 7
+          if-no-files-found: error
