@@ -1061,7 +1061,7 @@ BEGIN
   END IF;
   IF _quantity IS NULL OR _quantity <= 0 THEN RAISE EXCEPTION 'Installed quantity must be positive'; END IF;
 
-  SELECT l, o INTO v_line, v_order
+  SELECT l.* INTO v_line
   FROM public.parts_order_lines l
   JOIN public.parts_orders o ON o.id = l.order_id
   WHERE l.id = _order_line_id
