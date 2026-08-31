@@ -63,7 +63,7 @@ jobs:
           };
 
           // Read only the newest catalog record written by the preceding push-catalog call.
-          const catalogQuery = `${target}/rest/v1/migration_ingest?select=payload,created_at&kind=eq.inventory&source_name=eq.catalog&order=created_at.desc&limit=1`;
+          const catalogQuery = `${target}/rest/v1/migration_ingest?select=payload,inserted_at&kind=eq.inventory&source_name=eq.catalog&order=inserted_at.desc&limit=1`;
           const cr = await fetchRetry(catalogQuery, { headers: authHeaders });
           if (!cr.ok) throw new Error(`Could not read pushed catalog: HTTP ${cr.status}`);
           const catalogRows = await cr.json();
