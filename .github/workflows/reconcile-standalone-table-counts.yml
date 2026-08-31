@@ -1,0 +1,159 @@
+name: Reconcile Standalone Table Counts
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/reconcile-standalone-table-counts.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SOURCE_URL: https://jfjrnjyroxvlydajvndl.supabase.co
+      TARGET_URL: https://wjxaajgvddtrxxtocxen.supabase.co
+      SOURCE_KEY: ${{ secrets.LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY }}
+      TARGET_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - name: Verify guarded credentials exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${SOURCE_KEY:-}" || { echo 'Missing source migration credential.' >&2; exit 1; }
+          test -n "${TARGET_KEY:-}" || { echo 'Missing target migration credential.' >&2; exit 1; }
+          [[ "$SOURCE_URL" == 'https://jfjrnjyroxvlydajvndl.supabase.co' ]]
+          [[ "$TARGET_URL" == 'https://wjxaajgvddtrxxtocxen.supabase.co' ]]
+
+      - name: Compare every public REST table exactly
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const sourceUrl = process.env.SOURCE_URL;
+          const targetUrl = process.env.TARGET_URL;
+          const sourceKey = process.env.SOURCE_KEY;
+          const targetKey = process.env.TARGET_KEY;
+
+          const headers = (key, extra = {}) => ({
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+            'Accept-Profile': 'public',
+            ...extra,
+          });
+
+          async function openApi(url, key) {
+            const r = await fetch(`${url}/rest/v1/`, {
+              headers: headers(key, { Accept: 'application/openapi+json' }),
+            });
+            if (!r.ok) throw new Error(`OpenAPI discovery failed for guarded project: HTTP ${r.status}`);
+            return r.json();
+          }
+
+          function tables(doc) {
+            return [...new Set(Object.keys(doc.paths || {})
+              .map((p) => p.match(/^\/([^/]+)$/)?.[1])
+              .filter((x) => x && x !== 'rpc')
+              .map(decodeURIComponent))].sort();
+          }
+
+          async function exactCount(url, key, table) {
+            const r = await fetch(`${url}/rest/v1/${encodeURIComponent(table)}?select=*`, {
+              method: 'HEAD',
+              headers: headers(key, { Prefer: 'count=exact' }),
+            });
+            if (!r.ok) return { ok: false, status: r.status };
+            const range = r.headers.get('content-range') || '';
+            const raw = range.split('/')[1];
+            return { ok: true, count: raw && raw !== '*' ? Number(raw) : null };
+          }
+
+          const [sourceDoc, targetDoc] = await Promise.all([openApi(sourceUrl, sourceKey), openApi(targetUrl, targetKey)]);
+          const sourceTables = tables(sourceDoc);
+          const targetSet = new Set(tables(targetDoc));
+          const rows = [];
+
+          for (const table of sourceTables) {
+            if (!targetSet.has(table)) {
+              rows.push({ table, source: null, target: null, delta: null, state: 'missing-target-table' });
+              continue;
+            }
+            const [s, t] = await Promise.all([
+              exactCount(sourceUrl, sourceKey, table),
+              exactCount(targetUrl, targetKey, table),
+            ]);
+            if (!s.ok || !t.ok || s.count == null || t.count == null) {
+              rows.push({ table, source: s.count ?? null, target: t.count ?? null, delta: null, state: `count-error:${s.status ?? 'ok'}/${t.status ?? 'ok'}` });
+              continue;
+            }
+            const delta = t.count - s.count;
+            rows.push({ table, source: s.count, target: t.count, delta, state: delta === 0 ? 'equal' : delta < 0 ? 'target-behind' : 'target-ahead' });
+          }
+
+          const behind = rows.filter((r) => r.state === 'target-behind');
+          const ahead = rows.filter((r) => r.state === 'target-ahead');
+          const errors = rows.filter((r) => r.state.startsWith('count-error') || r.state === 'missing-target-table');
+          const equal = rows.filter((r) => r.state === 'equal');
+          const sourceTotal = rows.reduce((n, r) => n + (Number.isInteger(r.source) ? r.source : 0), 0);
+          const targetTotal = rows.reduce((n, r) => n + (Number.isInteger(r.target) ? r.target : 0), 0);
+
+          const report = {
+            generated_at: new Date().toISOString(),
+            source_table_count: sourceTables.length,
+            compared: rows.length,
+            equal: equal.length,
+            target_behind: behind.length,
+            target_ahead: ahead.length,
+            errors: errors.length,
+            source_total_rows: sourceTotal,
+            target_total_rows: targetTotal,
+            target_behind_tables: behind,
+            target_ahead_tables: ahead,
+            count_errors: errors,
+          };
+          fs.writeFileSync('/tmp/reconciliation.json', JSON.stringify(report, null, 2));
+
+          console.log(`Compared ${rows.length} public REST tables.`);
+          console.log(`Equal: ${equal.length}; target behind: ${behind.length}; target ahead: ${ahead.length}; errors: ${errors.length}.`);
+          console.log(`Source aggregate rows: ${sourceTotal}; target aggregate rows: ${targetTotal}.`);
+          for (const r of behind) console.log(`BEHIND ${r.table}: source=${r.source} target=${r.target} missing=${-r.delta}`);
+          for (const r of ahead) console.log(`AHEAD ${r.table}: source=${r.source} target=${r.target} extra=${r.delta}`);
+          for (const r of errors) console.log(`CHECK ${r.table}: ${r.state}`);
+
+          const summary = [
+            '### Exact source → standalone table-count reconciliation',
+            `- Public REST tables compared: ${rows.length}`,
+            `- Exact count parity: ${equal.length}`,
+            `- Target behind source: ${behind.length}`,
+            `- Target ahead of source: ${ahead.length}`,
+            `- Count/discovery errors: ${errors.length}`,
+            `- Source aggregate rows: ${sourceTotal}`,
+            `- Target aggregate rows: ${targetTotal}`,
+            '',
+            '#### Target-behind tables',
+            ...(behind.length ? behind.map((r) => `- \`${r.table}\`: source ${r.source}, target ${r.target}, missing ${-r.delta}`) : ['- None']),
+            '',
+            '#### Target-ahead tables',
+            ...(ahead.length ? ahead.map((r) => `- \`${r.table}\`: source ${r.source}, target ${r.target}, extra ${r.delta}`) : ['- None']),
+            '',
+            'Source and target operations were read-only. No row payloads or credentials were printed.',
+          ].join('\n');
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${summary}\n`);
+
+          if (errors.length) process.exit(2);
+          NODE
+
+      - name: Upload count-only reconciliation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: standalone-table-count-reconciliation
+          path: /tmp/reconciliation.json
+          retention-days: 7
+          if-no-files-found: error
