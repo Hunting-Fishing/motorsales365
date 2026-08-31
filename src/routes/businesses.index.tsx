@@ -25,7 +25,7 @@ import { getVerifiedOwnerIds } from "@/lib/business-directory.functions";
 import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
 export const Route = createFileRoute("/businesses/")({
-    head: () => ({
+  head: () => ({
     meta: [
       { title: "Businesses Directory — 365 MotorSales Philippines" },
       {
@@ -70,6 +70,7 @@ type BusinessRow = {
   subscription_tier: "free" | "listed" | "featured" | "premium" | null;
   owner_id: string | null;
   claim_state: "unclaimed" | "claim_pending" | "owned" | null;
+  is_associate?: boolean;
 };
 
 function BusinessesIndex() {
@@ -132,12 +133,11 @@ function BusinessesIndex() {
           query = query.eq("region", "All Philippines");
         } else {
           // Include nationwide businesses under every specific-region filter.
-          query = query.or(
-            `region.eq.${loc.region},region.eq.All Philippines`,
-          );
+          query = query.or(`region.eq.${loc.region},region.eq.All Philippines`);
         }
       }
-      if (loc.province && loc.region !== "All Philippines") query = query.eq("province", loc.province);
+      if (loc.province && loc.region !== "All Philippines")
+        query = query.eq("province", loc.province);
       if (loc.city && loc.region !== "All Philippines") query = query.eq("city", loc.city);
 
       if (loc.barangay) query = query.ilike("barangay", `%${loc.barangay}%`);
@@ -150,6 +150,19 @@ function BusinessesIndex() {
 
       const { data } = await query;
       const rows: BusinessRow[] = data ?? [];
+
+      const associateIds = new Set<string>();
+      if (rows.length > 0) {
+        const { data: associates } = await (supabase as any)
+          .from("associate_businesses_public")
+          .select("business_id")
+          .in(
+            "business_id",
+            rows.map((row) => row.id),
+          );
+        for (const associate of associates ?? []) associateIds.add(associate.business_id);
+      }
+      for (const row of rows) row.is_associate = associateIds.has(row.id);
 
       // load tag links for filtering and rendering
       const ids = rows.map((r) => r.id);
@@ -254,6 +267,7 @@ function BusinessesIndex() {
     city: b.city,
     featured: b.featured,
     price_label: b.price_label,
+    is_associate: b.is_associate,
   }));
 
   return (
@@ -282,7 +296,6 @@ function BusinessesIndex() {
               </Link>
             </Button>
           </div>
-
         </div>
 
         {/* Filters */}
@@ -439,6 +452,11 @@ function BusinessesIndex() {
                               >
                                 <BadgeCheck className="h-3 w-3" /> Verified
                               </span>
+                            )}
+                            {b.is_associate && (
+                              <Badge className="shrink-0 border border-amber-500 bg-amber-400/15 text-amber-800 hover:bg-amber-400/20 dark:text-amber-300">
+                                365 Associate
+                              </Badge>
                             )}
                             {b.subscription_tier === "premium" && (
                               <Badge className="shrink-0 bg-amber-500 text-amber-950">

@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, useParams, Link } from "@tanstack/react-router";
+import { BadgeCheck } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
@@ -10,7 +11,7 @@ import { WorkspaceNotificationBell } from "@/components/business-workspace/notif
 import { WorkspacePlanWarnings } from "@/components/business-workspace/plan-warnings";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/dashboard/business/$businessId")({
   component: WorkspaceLayout,
@@ -86,6 +87,7 @@ function WorkspaceLayout() {
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
           <div className="text-sm text-muted-foreground truncate">
             <span className="font-medium text-foreground">{business.name}</span> workspace
+            <AssociateWorkspaceBadge businessId={business.id} />
           </div>
           <div className="flex items-center gap-2">
             {usage && (
@@ -115,9 +117,27 @@ function WorkspaceLayout() {
             <Outlet />
           </main>
         </div>
-
       </div>
     </WorkspaceNotificationsProvider>
   );
 }
 
+function AssociateWorkspaceBadge({ businessId }: { businessId: string }) {
+  const query = useQuery({
+    queryKey: ["business-associate-status", businessId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("business_associate_applications" as any)
+        .select("status")
+        .eq("business_id", businessId)
+        .maybeSingle();
+      return data as any;
+    },
+  });
+  if (query.data?.status !== "approved") return null;
+  return (
+    <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/50 bg-amber-400/15 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+      <BadgeCheck className="h-3 w-3" /> 365 Associate
+    </span>
+  );
+}

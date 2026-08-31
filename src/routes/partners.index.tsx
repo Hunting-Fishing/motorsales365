@@ -144,13 +144,16 @@ function AssociateNetworkPage() {
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
                 <Button asChild size="lg">
-                  <Link to="/partners/parts/onboarding">
-                    Join as a parts business <ArrowRight className="ml-1 h-4 w-4" />
+                  <Link to="/partners/associate/apply">
+                    Join with your business <ArrowRight className="ml-1 h-4 w-4" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline">
-                  <Link to="/franchise/apply" search={{ tier: "partner" }}>
-                    Join as a repair shop
+                  <Link
+                    to="/signup"
+                    search={{ type: "business", redirect: "/partners/associate/apply" }}
+                  >
+                    New user signup
                   </Link>
                 </Button>
               </div>

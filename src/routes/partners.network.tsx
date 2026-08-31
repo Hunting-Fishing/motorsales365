@@ -148,7 +148,7 @@ function NetworkDirectory() {
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button asChild>
-              <Link to="/partners">Join the Associate Network</Link>
+              <Link to="/partners/associate/apply">Join the Associate Network</Link>
             </Button>
             <Button asChild variant="outline">
               <Link to="/partners">Associate overview</Link>
