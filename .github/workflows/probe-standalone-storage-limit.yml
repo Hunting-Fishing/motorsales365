@@ -83,3 +83,5 @@ jobs:
             cat /tmp/storage-delete-response.txt >&2 || true
             exit 1
           fi
+
+# migration readiness probe trigger
