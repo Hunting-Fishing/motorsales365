@@ -43,6 +43,19 @@ function WorkspaceLayout() {
     enabled: !!q.data?.business?.id,
     queryFn: () => loadUsage({ data: { businessId } }),
   });
+  const associateQ = useQuery({
+    queryKey: ["business-associate-status", businessId],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("business_associate_applications" as any)
+        .select("status")
+        .eq("business_id", businessId)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as any)?.status as string | undefined;
+    },
+  });
 
   if (loading || (user && q.isLoading)) {
     return (
@@ -102,7 +115,7 @@ function WorkspaceLayout() {
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
           <div className="text-sm text-muted-foreground truncate">
             <span className="font-medium text-foreground">{business.name}</span> workspace
-            <AssociateWorkspaceBadge businessId={business.id} />
+            <AssociateWorkspaceBadge status={associateQ.data} />
             {isDemo && (
               <span className="ml-2 inline-flex rounded-full border border-violet-500/40 bg-violet-500/10 px-2 py-0.5 text-[11px] font-semibold text-violet-700 dark:text-violet-300">
                 Playground
@@ -136,6 +149,7 @@ function WorkspaceLayout() {
             businessName={business.name}
             businessKind={business.type_slug}
             role={role as any}
+            associateApproved={associateQ.data === "approved"}
           />
           <main className="flex-1 min-w-0">
             <WorkspacePlanWarnings businessId={business.id} usage={usage} />
@@ -147,22 +161,27 @@ function WorkspaceLayout() {
   );
 }
 
-function AssociateWorkspaceBadge({ businessId }: { businessId: string }) {
-  const query = useQuery({
-    queryKey: ["business-associate-status", businessId],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("business_associate_applications" as any)
-        .select("status")
-        .eq("business_id", businessId)
-        .maybeSingle();
-      return data as any;
-    },
-  });
-  if (query.data?.status !== "approved") return null;
+function AssociateWorkspaceBadge({ status }: { status?: string }) {
+  if (status === "approved") {
+    return (
+      <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/50 bg-amber-400/15 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+        <BadgeCheck className="h-3 w-3" /> 365 Associate
+      </span>
+    );
+  }
+  if (status === "submitted" || status === "reviewing") {
+    return (
+      <span className="ml-2 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+        Associate application pending
+      </span>
+    );
+  }
   return (
-    <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/50 bg-amber-400/15 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
-      <BadgeCheck className="h-3 w-3" /> 365 Associate
-    </span>
+    <Link
+      to="/partners/associate/apply"
+      className="ml-2 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium text-muted-foreground hover:border-amber-500/50 hover:text-amber-700"
+    >
+      Not a 365 Associate · Apply
+    </Link>
   );
 }

@@ -377,11 +377,24 @@ async function assertBusinessMember(supabase: any, userId: string, businessId: s
   if (error || !data) throw new Error("Business workspace access required");
 }
 
+async function assertApprovedAssociate(supabase: any, businessId: string) {
+  const { data, error } = await supabase
+    .from("business_associate_applications")
+    .select("status")
+    .eq("business_id", businessId)
+    .maybeSingle();
+  if (error) throw error;
+  if (data?.status !== "approved") {
+    throw new Error("Approved 365 Associate enrollment is required for Parts Network operations");
+  }
+}
+
 export const listPartsOperations = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ businessId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertBusinessMember(context.supabase, context.userId, data.businessId);
+    await assertApprovedAssociate(context.supabase, data.businessId);
     const supabase = context.supabase as any;
     const { data: orders, error } = await supabase
       .from("parts_orders")

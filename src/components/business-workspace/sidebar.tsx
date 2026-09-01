@@ -8,11 +8,19 @@ type Props = {
   businessName: string;
   businessKind: string | null | undefined;
   role: "owner" | "manager" | "dispatcher" | "driver" | "mechanic" | "clerk";
+  associateApproved?: boolean;
 };
 
-export function WorkspaceSidebar({ businessId, businessName, businessKind, role }: Props) {
+export function WorkspaceSidebar({
+  businessId,
+  businessName,
+  businessKind,
+  role,
+  associateApproved = false,
+}: Props) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const modules = modulesForKind(businessKind).filter((m) => {
+    if (m.id === "parts_operations" && !associateApproved) return false;
     if (!m.roles) return true;
     if (role === "owner") return true;
     return m.roles.includes(role);

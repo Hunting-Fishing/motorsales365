@@ -25,11 +25,15 @@ export const listBusinessStaff = createServerFn({ method: "POST" })
   .inputValidator((d: { businessId: string }) => d)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: isMember } = await supabase.rpc("is_business_member", {
-      _user: userId,
-      _business: data.businessId,
-    });
-    if (!isMember) throw new Error("Forbidden");
+    await assertManager(supabase, userId, data.businessId);
+
+    const { data: business, error: businessError } = await supabase
+      .from("businesses")
+      .select("owner_id")
+      .eq("id", data.businessId)
+      .maybeSingle();
+    if (businessError) throw businessError;
+    if (!business) throw new Error("Business not found");
 
     const { data: rows, error } = await supabase
       .from("business_staff")
@@ -38,7 +42,8 @@ export const listBusinessStaff = createServerFn({ method: "POST" })
       .order("created_at", { ascending: true });
     if (error) throw error;
 
-    const ids = (rows ?? []).map((r) => r.user_id);
+    const staffRows = (rows ?? []).filter((r) => r.user_id !== business.owner_id);
+    const ids = [business.owner_id, ...staffRows.map((r) => r.user_id)];
     let profiles: Record<string, { name: string; email?: string }> = {};
     if (ids.length) {
       const { data: profs } = await supabase
@@ -46,13 +51,26 @@ export const listBusinessStaff = createServerFn({ method: "POST" })
         .select("id,full_name,business_name")
         .in("id", ids);
       (profs ?? []).forEach((p: any) => {
-        profiles[p.id] = { name: p.business_name || p.full_name || "Member" };
+        profiles[p.id] = { name: p.full_name || p.business_name || "Member" };
       });
     }
-    return (rows ?? []).map((r) => ({
-      ...r,
-      display_name: profiles[r.user_id]?.name ?? "Member",
-    }));
+    return [
+      {
+        id: `owner-${data.businessId}`,
+        user_id: business.owner_id,
+        role: "owner" as const,
+        title: "Business owner",
+        duties: [],
+        active: true,
+        on_shift: false,
+        created_at: null,
+        display_name: profiles[business.owner_id]?.name ?? "Business owner",
+      },
+      ...staffRows.map((r) => ({
+        ...r,
+        display_name: profiles[r.user_id]?.name ?? "Employee",
+      })),
+    ];
   });
 
 export const addBusinessStaffByEmail = createServerFn({ method: "POST" })
@@ -99,6 +117,14 @@ export const addBusinessStaffByEmail = createServerFn({ method: "POST" })
         "No account with that email yet. Ask them to sign up first, then invite again.",
       );
     }
+    const { data: business } = await supabase
+      .from("businesses")
+      .select("owner_id")
+      .eq("id", data.businessId)
+      .maybeSingle();
+    if (business?.owner_id === target.id) {
+      throw new Error("The business owner already has full access and cannot be added as staff.");
+    }
 
     const { error } = await supabase.from("business_staff").upsert(
       {
@@ -138,6 +164,7 @@ export const updateBusinessStaff = createServerFn({ method: "POST" })
       .from("business_staff")
       .select("user_id")
       .eq("id", data.staffId)
+      .eq("business_id", data.businessId)
       .maybeSingle();
     if (!row) throw new Error("Not found");
 
@@ -160,7 +187,11 @@ export const updateBusinessStaff = createServerFn({ method: "POST" })
     if (data.active !== undefined) patch.active = data.active;
     if (data.on_shift !== undefined) patch.on_shift = data.on_shift;
 
-    const { error } = await supabase.from("business_staff").update(patch).eq("id", data.staffId);
+    const { error } = await supabase
+      .from("business_staff")
+      .update(patch)
+      .eq("id", data.staffId)
+      .eq("business_id", data.businessId);
     if (error) throw error;
     return { ok: true };
   });
@@ -171,7 +202,11 @@ export const removeBusinessStaff = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertManager(supabase, userId, data.businessId);
-    const { error } = await supabase.from("business_staff").delete().eq("id", data.staffId);
+    const { error } = await supabase
+      .from("business_staff")
+      .delete()
+      .eq("id", data.staffId)
+      .eq("business_id", data.businessId);
     if (error) throw error;
     return { ok: true };
   });
