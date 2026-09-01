@@ -167,14 +167,14 @@ jobs:
           console.log(`Prepared ${Object.keys(out).length} configured production secrets for atomic deployment. Values were not printed.`);
           NODE
 
-      - name: Deploy standalone code and target secrets atomically
+      - name: Deploy standalone built Worker and target secrets atomically
         id: deploy
         shell: bash
         run: |
           set -euo pipefail
-          npx wrangler deploy --secrets-file /tmp/production-secrets.json
+          npx wrangler deploy --config dist/server/wrangler.json --secrets-file /tmp/production-secrets.json --message 'Standalone Supabase migration production cutover'
           rm -f /tmp/production-secrets.json
-          echo 'Standalone production Worker version deployed with target secrets in the same operation.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Standalone built production Worker deployed with target secrets in the same operation.' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Smoke test production cutover
         id: smoke
