@@ -1,0 +1,242 @@
+name: Deploy Standalone Production Cutover
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/deploy-standalone-production-cutover.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motorsales365-production-cutover
+  cancel-in-progress: false
+
+jobs:
+  cutover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
+      SIGNUP_AUDIT_SALT: ${{ secrets.SIGNUP_AUDIT_SALT }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      RESEND_WEBHOOK_SECRET: ${{ secrets.RESEND_WEBHOOK_SECRET }}
+      EMAIL_QUEUE_CRON_TOKEN: ${{ secrets.EMAIL_QUEUE_CRON_TOKEN }}
+      STRIPE_LIVE_API_KEY: ${{ secrets.STRIPE_LIVE_API_KEY }}
+      STRIPE_SANDBOX_API_KEY: ${{ secrets.STRIPE_SANDBOX_API_KEY }}
+      PAYMENTS_LIVE_WEBHOOK_SECRET: ${{ secrets.PAYMENTS_LIVE_WEBHOOK_SECRET }}
+      PAYMENTS_SANDBOX_WEBHOOK_SECRET: ${{ secrets.PAYMENTS_SANDBOX_WEBHOOK_SECRET }}
+      GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+      AI_API_BASE_URL: ${{ secrets.AI_API_BASE_URL }}
+      AI_API_KEY: ${{ secrets.AI_API_KEY }}
+      AI_MODEL: ${{ secrets.AI_MODEL }}
+      FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+      GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+      INVOLVE_ASIA_AFFILIATE_ID: ${{ secrets.INVOLVE_ASIA_AFFILIATE_ID }}
+      INVOLVE_ASIA_API_KEY_NAME: ${{ secrets.INVOLVE_ASIA_API_KEY_NAME }}
+      INVOLVE_ASIA_API_SECRET: ${{ secrets.INVOLVE_ASIA_API_SECRET }}
+      STANDALONE_SUPABASE_REF: wjxaajgvddtrxxtocxen
+      LOVABLE_SOURCE_REF: jfjrnjyroxvlydajvndl
+      PRODUCTION_WORKER: motorsales365
+      PRODUCTION_URL: https://www.365motorsales.com
+      APEX_URL: https://365motorsales.com
+      ACCEPTANCE_LISTING_ID: a60923a9-e834-4432-9061-563358bc3d9a
+
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v4
+        with:
+          ref: migration/standalone-supabase-365
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Verify cutover credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo 'Missing CLOUDFLARE_API_TOKEN.' >&2; exit 1; }
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'Missing CLOUDFLARE_ACCOUNT_ID.' >&2; exit 1; }
+          test -n "${SUPABASE_SERVICE_ROLE_KEY:-}" || { echo 'Missing TARGET_SUPABASE_SERVICE_ROLE_KEY.' >&2; exit 1; }
+
+      - name: Verify target service-role credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          code="$(curl --silent --show-error --output /tmp/target-check.json --write-out '%{http_code}' \
+            --header "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+            --header "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+            "https://${STANDALONE_SUPABASE_REF}.supabase.co/rest/v1/profiles?select=id&limit=1")"
+          test "$code" = '200' || { echo "Standalone service-role validation failed (HTTP ${code})." >&2; exit 1; }
+          echo 'Standalone service-role credential validated without printing its value.'
+
+      - name: Bind production browser client to standalone Supabase
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const config = JSON.parse(fs.readFileSync('wrangler.jsonc','utf8'));
+          const vars = config.vars ?? {};
+          const expected = process.env.STANDALONE_SUPABASE_REF;
+          if (config.name !== 'motorsales365') throw new Error('Production Worker name changed unexpectedly.');
+          if (vars.SUPABASE_PROJECT_ID !== expected || vars.SUPABASE_URL !== `https://${expected}.supabase.co`) throw new Error('Production Supabase public config does not target standalone project.');
+          if (vars.PUBLIC_SITE_ORIGIN !== 'https://www.365motorsales.com' || vars.SITE_URL !== 'https://www.365motorsales.com') throw new Error('Production site origin is not configured correctly.');
+          const routes = (config.routes ?? []).map((r) => `${r.pattern}:${r.custom_domain === true}`).sort();
+          const expectedRoutes = ['365motorsales.com:true','www.365motorsales.com:true'];
+          if (JSON.stringify(routes) !== JSON.stringify(expectedRoutes)) throw new Error(`Production routes changed unexpectedly: ${JSON.stringify(routes)}`);
+          if (!vars.SUPABASE_PUBLISHABLE_KEY) throw new Error('Production publishable key is missing.');
+          fs.appendFileSync(process.env.GITHUB_ENV, `VITE_SUPABASE_URL=${vars.SUPABASE_URL}\nVITE_SUPABASE_PUBLISHABLE_KEY=${vars.SUPABASE_PUBLISHABLE_KEY}\n`);
+          console.log('Production public bindings and hostnames verified.');
+          NODE
+
+      - name: Install locked dependencies
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+
+      - name: Reject Lovable runtime dependencies before build
+        shell: bash
+        run: |
+          set -euo pipefail
+          matches="$({
+            grep -RInE --exclude='*.map' --exclude='qr-rescue-detector.tsx' --exclude-dir=node_modules \
+              'jfjrnjyroxvlydajvndl|\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' \
+              src wrangler.jsonc vite.config.ts || true
+          } | grep -vE '^[^:]+:[0-9]+:[[:space:]]*(//|/\*|\*|\*/)' || true)"
+          if [[ -n "$matches" ]]; then
+            printf '%s\n' "$matches"
+            echo 'Production cutover blocked: Lovable/source runtime endpoint found.' >&2
+            exit 1
+          fi
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Build standalone production application
+        run: npm run build
+
+      - name: Verify generated production deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const config = JSON.parse(fs.readFileSync('dist/server/wrangler.json','utf8'));
+          if (config.name !== 'motorsales365') throw new Error(`Generated Worker name is ${JSON.stringify(config.name)}, expected motorsales365.`);
+          if (config.vars?.SUPABASE_PROJECT_ID !== 'wjxaajgvddtrxxtocxen') throw new Error('Generated Worker does not target standalone Supabase.');
+          console.log('Generated production Worker identity and standalone Supabase target verified.');
+          NODE
+          if grep -Rq --exclude='*.map' "${LOVABLE_SOURCE_REF}" dist; then
+            echo 'Production cutover blocked: Lovable source project ref found in built runtime.' >&2
+            exit 1
+          fi
+          if grep -REqi --exclude='*.map' '\.lovableproject\.com|lovable\.dev/api|lovable\.app/api' dist; then
+            echo 'Production cutover blocked: Lovable endpoint found in built runtime.' >&2
+            exit 1
+          fi
+          grep -Rq --exclude='*.map' "${STANDALONE_SUPABASE_REF}" dist/server || { echo 'Standalone Supabase ref missing from server runtime.' >&2; exit 1; }
+          browser_match="$(grep -RIl --exclude='*.map' "${STANDALONE_SUPABASE_REF}" dist | grep -v '^dist/server/' | head -n 1 || true)"
+          test -n "$browser_match" || { echo 'Standalone Supabase ref missing from browser runtime.' >&2; exit 1; }
+
+      - name: Build atomic production secret bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const names = [
+            'SUPABASE_SERVICE_ROLE_KEY','SIGNUP_AUDIT_SALT',
+            'RESEND_API_KEY','RESEND_WEBHOOK_SECRET','EMAIL_QUEUE_CRON_TOKEN',
+            'STRIPE_LIVE_API_KEY','STRIPE_SANDBOX_API_KEY',
+            'PAYMENTS_LIVE_WEBHOOK_SECRET','PAYMENTS_SANDBOX_WEBHOOK_SECRET',
+            'GOOGLE_MAPS_API_KEY','AI_API_BASE_URL','AI_API_KEY','AI_MODEL',
+            'FIRECRAWL_API_KEY','GIPHY_API_KEY',
+            'INVOLVE_ASIA_AFFILIATE_ID','INVOLVE_ASIA_API_KEY_NAME','INVOLVE_ASIA_API_SECRET'
+          ];
+          const out = {};
+          for (const name of names) if (process.env[name]) out[name] = process.env[name];
+          if (!out.SUPABASE_SERVICE_ROLE_KEY) throw new Error('Core standalone service-role secret missing from atomic bundle.');
+          fs.writeFileSync('/tmp/production-secrets.json', JSON.stringify(out), { mode: 0o600 });
+          console.log(`Prepared ${Object.keys(out).length} configured production secrets for atomic deployment. Values were not printed.`);
+          NODE
+
+      - name: Deploy standalone code and target secrets atomically
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler deploy --secrets-file /tmp/production-secrets.json
+          rm -f /tmp/production-secrets.json
+          echo 'Standalone production Worker version deployed with target secrets in the same operation.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Smoke test production cutover
+        id: smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_route() {
+            local base="$1"; local route="$2"; local output="$3"
+            effective="$(curl --fail-with-body --silent --show-error --location \
+              --retry 6 --retry-delay 4 --retry-all-errors --connect-timeout 15 --max-time 60 \
+              --output "$output" --write-out '%{url_effective}' "${base}${route}")"
+            test -s "$output" || { echo "${base}${route} returned an empty body." >&2; exit 1; }
+            if [[ "$effective" == *"${LOVABLE_SOURCE_REF}"* || "$effective" == *"lovable"* ]]; then
+              echo "Production route redirected to Lovable/source: ${effective}" >&2; exit 1
+            fi
+          }
+          fetch_route "$APEX_URL" '/' /tmp/prod-apex.html
+          fetch_route "$PRODUCTION_URL" '/' /tmp/prod-home.html
+          fetch_route "$PRODUCTION_URL" '/businesses' /tmp/prod-businesses.html
+          fetch_route "$PRODUCTION_URL" '/map' /tmp/prod-map.html
+          fetch_route "$PRODUCTION_URL" "/listing/${ACCEPTANCE_LISTING_ID}" /tmp/prod-listing.html
+          for body in /tmp/prod-apex.html /tmp/prod-home.html /tmp/prod-businesses.html /tmp/prod-map.html /tmp/prod-listing.html; do
+            if grep -Eqi "${LOVABLE_SOURCE_REF}|\.lovableproject\.com|lovable\.dev/api|lovable\.app/api" "$body"; then
+              echo "Production acceptance blocked: Lovable/source runtime reference found in ${body}." >&2; exit 1
+            fi
+          done
+          grep -Fqi '2007 civic' /tmp/prod-listing.html || { echo 'Expected standalone listing title did not render.' >&2; exit 1; }
+          grep -Fqi "https://${STANDALONE_SUPABASE_REF}.supabase.co/storage/v1/object/public/" /tmp/prod-listing.html || { echo 'Listing did not render target Supabase Storage media.' >&2; exit 1; }
+          media_url="$(grep -aEo "https://${STANDALONE_SUPABASE_REF}\.supabase\.co/storage/v1/object/public/[^\"<> ]+" /tmp/prod-listing.html | head -n 1 || true)"
+          test -n "$media_url" || { echo 'Could not extract target Storage media URL.' >&2; exit 1; }
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --range 0-0 --output /dev/null "$media_url"
+          echo 'Production homepage, businesses, map, listing, and target Storage acceptance passed.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No Lovable/source runtime reference was observed in tested production responses.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify privileged production binding without executing cron
+        id: privileged
+        shell: bash
+        run: |
+          set -euo pipefail
+          code="$(curl --silent --show-error --output /tmp/cron-probe.json --write-out '%{http_code}' \
+            --request POST --header 'content-type: application/json' --header 'x-cron-token: intentionally-invalid-cutover-probe' \
+            --data '{}' "${PRODUCTION_URL}/api/public/hooks/recompute-tiers")"
+          test "$code" = '401' || { echo "Protected production hook returned HTTP ${code}, expected 401 to invalid token." >&2; exit 1; }
+          echo 'Production Worker can reach its protected standalone runtime path; invalid cron token was rejected and no job executed.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Automatic rollback on post-deploy failure
+        if: failure() && steps.deploy.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f /tmp/production-secrets.json || true
+          echo 'Post-deploy acceptance failed; rolling Worker back to the immediately previous deployed version.' >&2
+          npx wrangler rollback --name "$PRODUCTION_WORKER" --message 'Automatic rollback after standalone production cutover acceptance failure'
+          echo 'Automatic Cloudflare Worker rollback executed.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Record successful production cutover
+        if: success()
+        shell: bash
+        run: |
+          echo '### Standalone production cutover succeeded' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Production Worker: motorsales365' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Production domains: 365motorsales.com and www.365motorsales.com' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Runtime Supabase: wjxaajgvddtrxxtocxen' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Lovable/source runtime references: none found in tested production output' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Target pg_cron activation: intentionally not performed by this workflow' >> "$GITHUB_STEP_SUMMARY"
