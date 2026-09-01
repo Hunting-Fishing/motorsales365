@@ -1,0 +1,70 @@
+name: Verify Standalone Auth Subset
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/verify-standalone-auth-subset.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SOURCE_URL: https://jfjrnjyroxvlydajvndl.supabase.co
+      SOURCE_KEY: ${{ secrets.LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY }}
+      TARGET_URL: https://wjxaajgvddtrxxtocxen.supabase.co
+      TARGET_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - name: Verify credentials exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${SOURCE_KEY:-}" || { echo 'Missing LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY.' >&2; exit 1; }
+          test -n "${TARGET_KEY:-}" || { echo 'Missing TARGET_SUPABASE_SERVICE_ROLE_KEY.' >&2; exit 1; }
+
+      - name: Compare source Auth IDs against standalone Auth
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          const sourceUrl = process.env.SOURCE_URL;
+          const sourceKey = process.env.SOURCE_KEY;
+          const targetUrl = process.env.TARGET_URL;
+          const targetKey = process.env.TARGET_KEY;
+
+          async function listAll(base, key) {
+            const ids = new Set();
+            for (let page = 1; page <= 100; page++) {
+              const u = `${base}/auth/v1/admin/users?page=${page}&per_page=1000`;
+              const r = await fetch(u, { headers: { apikey: key, Authorization: `Bearer ${key}` } });
+              if (!r.ok) throw new Error(`Auth Admin request failed for ${base.includes('jfjr') ? 'source' : 'target'} (HTTP ${r.status}).`);
+              const body = await r.json();
+              const users = Array.isArray(body?.users) ? body.users : [];
+              for (const user of users) if (typeof user?.id === 'string') ids.add(user.id);
+              if (users.length < 1000) break;
+            }
+            return ids;
+          }
+
+          const [source, target] = await Promise.all([
+            listAll(sourceUrl, sourceKey),
+            listAll(targetUrl, targetKey),
+          ]);
+          const missing = [...source].filter((id) => !target.has(id));
+          console.log(`Source Auth users=${source.size}; target Auth users=${target.size}; source-missing-on-target=${missing.length}.`);
+          const summary = [
+            '### Final Auth subset gate',
+            `- Source Auth users: ${source.size}`,
+            `- Target Auth users: ${target.size}`,
+            `- Source users missing on target: ${missing.length}`,
+            '- No user IDs, emails, tokens, or secret values were printed.',
+          ].join('\n');
+          await import('node:fs').then(({appendFileSync}) => appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${summary}\n`));
+          if (missing.length) process.exit(2);
+          NODE
