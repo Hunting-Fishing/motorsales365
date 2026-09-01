@@ -1,0 +1,104 @@
+name: Diagnose Production Worker Upload
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - '.github/workflows/diagnose-production-worker-upload.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
+      SIGNUP_AUDIT_SALT: ${{ secrets.SIGNUP_AUDIT_SALT }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      RESEND_WEBHOOK_SECRET: ${{ secrets.RESEND_WEBHOOK_SECRET }}
+      EMAIL_QUEUE_CRON_TOKEN: ${{ secrets.EMAIL_QUEUE_CRON_TOKEN }}
+      STRIPE_LIVE_API_KEY: ${{ secrets.STRIPE_LIVE_API_KEY }}
+      STRIPE_SANDBOX_API_KEY: ${{ secrets.STRIPE_SANDBOX_API_KEY }}
+      PAYMENTS_LIVE_WEBHOOK_SECRET: ${{ secrets.PAYMENTS_LIVE_WEBHOOK_SECRET }}
+      PAYMENTS_SANDBOX_WEBHOOK_SECRET: ${{ secrets.PAYMENTS_SANDBOX_WEBHOOK_SECRET }}
+      GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+      AI_API_BASE_URL: ${{ secrets.AI_API_BASE_URL }}
+      AI_API_KEY: ${{ secrets.AI_API_KEY }}
+      AI_MODEL: ${{ secrets.AI_MODEL }}
+      FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+      GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+      INVOLVE_ASIA_AFFILIATE_ID: ${{ secrets.INVOLVE_ASIA_AFFILIATE_ID }}
+      INVOLVE_ASIA_API_KEY_NAME: ${{ secrets.INVOLVE_ASIA_API_KEY_NAME }}
+      INVOLVE_ASIA_API_SECRET: ${{ secrets.INVOLVE_ASIA_API_SECRET }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: migration/standalone-supabase-365
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+
+      - name: Record active deployment before upload
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler deployments list --name motorsales365 --json > /tmp/deploy-before.json
+          node -e "const x=require('/tmp/deploy-before.json'); const d=Array.isArray(x)?x[0]:x; console.log('Current production deployment recorded. Deployment count returned='+ (Array.isArray(x)?x.length:1)); if(d?.id) console.log('Current deployment id='+d.id);"
+
+      - name: Build production secret bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const names = [
+            'SUPABASE_SERVICE_ROLE_KEY','SIGNUP_AUDIT_SALT',
+            'RESEND_API_KEY','RESEND_WEBHOOK_SECRET','EMAIL_QUEUE_CRON_TOKEN',
+            'STRIPE_LIVE_API_KEY','STRIPE_SANDBOX_API_KEY',
+            'PAYMENTS_LIVE_WEBHOOK_SECRET','PAYMENTS_SANDBOX_WEBHOOK_SECRET',
+            'GOOGLE_MAPS_API_KEY','AI_API_BASE_URL','AI_API_KEY','AI_MODEL',
+            'FIRECRAWL_API_KEY','GIPHY_API_KEY',
+            'INVOLVE_ASIA_AFFILIATE_ID','INVOLVE_ASIA_API_KEY_NAME','INVOLVE_ASIA_API_SECRET'
+          ];
+          const out = {};
+          for (const name of names) if (process.env[name]) out[name] = process.env[name];
+          if (!out.SUPABASE_SERVICE_ROLE_KEY) throw new Error('Missing target service-role secret.');
+          fs.writeFileSync('/tmp/production-secrets.json', JSON.stringify(out), { mode: 0o600 });
+          console.log(`Prepared ${Object.keys(out).length} secret bindings; values not printed.`);
+          NODE
+
+      - name: Upload a non-deployed Worker version
+        id: upload
+        shell: bash
+        run: |
+          set -uo pipefail
+          set +e
+          npx wrangler versions upload --name motorsales365 --secrets-file /tmp/production-secrets.json --message 'Standalone migration upload diagnostic; not deployed' > /tmp/upload.log 2>&1
+          rc=$?
+          set -e
+          rm -f /tmp/production-secrets.json
+          echo "Wrangler upload exit code=${rc}"
+          echo '--- Wrangler upload diagnostic tail ---'
+          tail -n 120 /tmp/upload.log | sed -E 's/(SUPABASE_SERVICE_ROLE_KEY|RESEND_API_KEY|STRIPE_[A-Z_]+|PAYMENTS_[A-Z_]+|AI_API_KEY|FIRECRAWL_API_KEY|GIPHY_API_KEY)=([^[:space:]]+)/\1=[REDACTED]/g'
+          echo '--- end diagnostic tail ---'
+          exit "$rc"
+
+      - name: Record active deployment after upload
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler deployments list --name motorsales365 --json > /tmp/deploy-after.json
+          node -e "const fs=require('fs'); const a=JSON.parse(fs.readFileSync('/tmp/deploy-before.json','utf8')); const b=JSON.parse(fs.readFileSync('/tmp/deploy-after.json','utf8')); const aid=Array.isArray(a)?a[0]?.id:a?.id; const bid=Array.isArray(b)?b[0]?.id:b?.id; console.log('Production deployment before='+String(aid)); console.log('Production deployment after='+String(bid)); console.log('Production deployment unchanged='+(aid===bid));"
