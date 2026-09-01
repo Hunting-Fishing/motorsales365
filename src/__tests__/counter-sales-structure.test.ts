@@ -21,6 +21,8 @@ describe("atomic counter sales", () => {
     expect(sql).toContain("Insufficient stock");
     expect(sql).toContain("Manager approval required");
     expect(sql).toContain("UPDATE shop_manager.inventory_items SET quantity=quantity-q");
+    expect(sql).toContain("i.cost_per_unit");
+    expect(sql).not.toContain("i.cost);");
   });
   it("uses protected financial RPCs", () => {
     for (const f of ["open_register", "complete_counter_sale", "close_register"]) {
@@ -32,5 +34,6 @@ describe("atomic counter sales", () => {
     const page = read("src/routes/_authenticated/workspace.counter-sale.tsx");
     expect(page).toContain("Counter Sale");
     expect(page).toContain("Complete cash sale");
+    expect(page).toContain("cost_per_unit");
   });
 });

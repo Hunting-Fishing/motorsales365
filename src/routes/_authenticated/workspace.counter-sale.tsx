@@ -26,7 +26,7 @@ function CounterSale() {
         (smSupabase as any).from("cash_registers").select("*").eq("active", true),
         (smSupabase as any)
           .from("inventory_items")
-          .select("id,name,sku,part_number,quantity,unit_price,cost")
+          .select("id,name,sku,part_number,quantity,unit_price,cost_per_unit")
           .gt("quantity", 0)
           .limit(500),
         (smSupabase as any).from("register_sessions").select("*").eq("status", "open").limit(1),
