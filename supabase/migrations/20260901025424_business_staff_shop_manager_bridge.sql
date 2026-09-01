@@ -64,7 +64,9 @@ BEGIN
     RETURN;
   END IF;
 
-  v_shop_role := CASE lower(_business_role)
+  -- Ownership is authoritative. A redundant/stale staff row must never reduce
+  -- the business owner's Shop Manager permissions (for example owner+driver).
+  v_shop_role := CASE WHEN v_business.owner_id = _user_id THEN 'owner' ELSE CASE lower(_business_role)
     WHEN 'owner' THEN 'owner'
     WHEN 'manager' THEN 'manager'
     WHEN 'dispatcher' THEN 'dispatch'
@@ -72,7 +74,7 @@ BEGIN
     WHEN 'mechanic' THEN 'technician'
     WHEN 'clerk' THEN 'office_admin'
     ELSE 'other_staff'
-  END;
+  END END;
 
   INSERT INTO shop_manager.profiles(
     id,user_id,email,first_name,last_name,shop_id,job_title,department,has_auth_account
