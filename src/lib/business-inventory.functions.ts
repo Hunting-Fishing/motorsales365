@@ -23,7 +23,7 @@ export const listBusinessInventory = createServerFn({ method: "POST" })
 
     const { data: rows, error } = await supabase
       .from("business_inventory_items")
-      .select("*")
+      .select("*, business_inventory_locations:location_id(name,code)")
       .eq("business_id", data.businessId)
       .order("name", { ascending: true });
     if (error) throw error;
@@ -46,6 +46,7 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       cost?: number | null;
       price?: number | null;
       location?: string | null;
+      location_id?: string | null;
       active?: boolean;
       network_visible?: boolean;
       catalog_part_id?: string | null;
@@ -60,9 +61,8 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
     await assertManager(supabase, userId, data.businessId);
 
     if (!data.id) {
-      const { enforceLimit, planLimitErrorPayload, PlanLimitError } = await import(
-        "@/lib/business-plan-enforcement.server"
-      );
+      const { enforceLimit, planLimitErrorPayload, PlanLimitError } =
+        await import("@/lib/business-plan-enforcement.server");
       try {
         await enforceLimit(supabase as any, data.businessId, "inventory_skus", userId);
       } catch (e) {
@@ -73,12 +73,36 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
 
     // Whitelist of extra columns the client may set through the multi-step form.
     const EXTRA_COLS = new Set([
-      "barcode","manufacturer_part_number","main_category","status","manufacturer",
-      "supplier","description","markup_percentage","date_purchased","last_price_update",
-      "qty_on_hold","qty_on_order","min_stock_level","max_stock_level","weight_lbs",
-      "dimensions","color","material","model_year","oem_part_number","warranty_period",
-      "universal_part","tax_rate","environmental_fee","core_charge","hazmat_fee",
-      "tax_exempt","date_last_ordered","date_last_used","web_links",
+      "barcode",
+      "manufacturer_part_number",
+      "main_category",
+      "status",
+      "manufacturer",
+      "supplier",
+      "description",
+      "markup_percentage",
+      "date_purchased",
+      "last_price_update",
+      "qty_on_hold",
+      "qty_on_order",
+      "min_stock_level",
+      "max_stock_level",
+      "weight_lbs",
+      "dimensions",
+      "color",
+      "material",
+      "model_year",
+      "oem_part_number",
+      "warranty_period",
+      "universal_part",
+      "tax_rate",
+      "environmental_fee",
+      "core_charge",
+      "hazmat_fee",
+      "tax_exempt",
+      "date_last_ordered",
+      "date_last_used",
+      "web_links",
     ]);
     const extra: Record<string, any> = {};
     if (data.extra && typeof data.extra === "object") {
@@ -100,12 +124,13 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       cost: data.cost ?? null,
       price: data.price ?? null,
       location: data.location ?? null,
+      location_id: data.location_id ?? null,
       active: data.active ?? true,
       network_visible: data.network_visible ?? true,
       catalog_part_id: data.catalog_part_id ?? null,
       ...extra,
     };
-    const { data: row, error } = await supabase
+    const { data: row, error } = await (supabase as any)
       .from("business_inventory_items")
       .upsert(payload)
       .select("*")
@@ -114,12 +139,9 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
     return row;
   });
 
-
 export const adjustBusinessInventory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (d: { itemId: string; businessId: string; delta: number; reason?: string }) => d,
-  )
+  .inputValidator((d: { itemId: string; businessId: string; delta: number; reason?: string }) => d)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: isMember } = await supabase.rpc("is_business_member", {

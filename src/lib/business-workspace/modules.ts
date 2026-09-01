@@ -14,14 +14,18 @@ import {
   Settings,
   Receipt,
   Wrench,
+  ArrowRightLeft,
+  Activity,
 } from "lucide-react";
 
 export type WorkspaceModuleId =
   | "overview"
+  | "operations"
   | "dispatch"
   | "fleet"
   | "staff"
   | "inventory"
+  | "parts_operations"
   | "invoices"
   | "listings"
   | "bookings"
@@ -29,7 +33,6 @@ export type WorkspaceModuleId =
   | "billing"
   | "settings"
   | "rates";
-
 
 export type WorkspaceModule = {
   id: WorkspaceModuleId;
@@ -46,6 +49,12 @@ export const MODULES: Record<WorkspaceModuleId, WorkspaceModule> = {
     label: "Overview",
     icon: LayoutDashboard,
     path: (id) => `/dashboard/business/${id}`,
+  },
+  operations: {
+    id: "operations",
+    label: "Employee operations",
+    icon: Activity,
+    path: (id) => `/dashboard/business/${id}/operations`,
   },
   dispatch: {
     id: "dispatch",
@@ -71,6 +80,12 @@ export const MODULES: Record<WorkspaceModuleId, WorkspaceModule> = {
     label: "Inventory",
     icon: Package,
     path: (id) => `/dashboard/business/${id}/inventory`,
+  },
+  parts_operations: {
+    id: "parts_operations",
+    label: "Parts network",
+    icon: ArrowRightLeft,
+    path: (id) => `/dashboard/business/${id}/parts-operations`,
   },
   invoices: {
     id: "invoices",
@@ -128,7 +143,17 @@ export function modulesForKind(kind: string | null | undefined): WorkspaceModule
   let ids: WorkspaceModuleId[];
   switch (k) {
     case "towing":
-      ids = ["overview", "dispatch", "fleet", "staff", "inventory", "invoices", ...COMMON_END];
+      ids = [
+        "overview",
+        "operations",
+        "dispatch",
+        "fleet",
+        "staff",
+        "inventory",
+        "parts_operations",
+        "invoices",
+        ...COMMON_END,
+      ];
       break;
     case "repair_shop":
     case "body_paint":
@@ -137,20 +162,20 @@ export function modulesForKind(kind: string | null | undefined): WorkspaceModule
     case "carwash":
     case "audio_tint":
     case "inspection":
-      ids = ["overview", "staff", "inventory", "invoices", ...COMMON_END];
+      ids = ["overview", "operations", "staff", "inventory", "parts_operations", "invoices", ...COMMON_END];
       break;
     case "parts_accessories":
     case "accessories":
-      ids = ["overview", "inventory", "invoices", "staff", ...COMMON_END];
+      ids = ["overview", "operations", "inventory", "parts_operations", "invoices", "staff", ...COMMON_END];
       break;
     case "dealership":
     case "used_dealership":
     case "motorcycle_shop":
     case "rental":
-      ids = ["overview", "fleet", "staff", "invoices", ...COMMON_END];
+      ids = ["overview", "operations", "fleet", "staff", "parts_operations", "invoices", ...COMMON_END];
       break;
     default:
-      ids = ["overview", "inventory", "invoices", "staff", ...COMMON_END];
+      ids = ["overview", "operations", "inventory", "parts_operations", "invoices", "staff", ...COMMON_END];
   }
 
   return ids.map((id) => MODULES[id]);

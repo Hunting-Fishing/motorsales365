@@ -59,7 +59,7 @@ export const getWorkspaceBusiness = createServerFn({ method: "POST" })
     const { data: biz, error } = await supabase
       .from("businesses")
       .select(
-        "id,name,slug,type_slug,status,logo_url,cover_url,city,region,province,owner_id,subscription_tier",
+        "id,name,slug,type_slug,status,logo_url,cover_url,city,region,province,owner_id,subscription_tier,import_metadata",
       )
       .eq("id", data.businessId)
       .maybeSingle();
@@ -80,6 +80,18 @@ export const getWorkspaceBusiness = createServerFn({ method: "POST" })
     }
     if (!role) return null;
     return { business: biz, role };
+  });
+
+/** Restore only the tagged baseline rows in a resettable demo workspace. */
+export const resetTowDemoWorkspace = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { businessId: string }) => d)
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("reset_tow_demo_workspace" as any, {
+      _business_id: data.businessId,
+    });
+    if (error) throw error;
+    return { ok: true };
   });
 
 /**

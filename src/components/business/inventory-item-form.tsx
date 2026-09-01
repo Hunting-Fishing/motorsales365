@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
@@ -31,6 +32,10 @@ import {
 } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { upsertBusinessInventoryItem } from "@/lib/business-inventory.functions";
+import {
+  getCanonicalCatalogMatches,
+  listBusinessPartsLocations,
+} from "@/lib/parts-network-operations.functions";
 import { cn } from "@/lib/utils";
 import { mainCategoriesFor, subcategoriesFor } from "@/data/inventory-taxonomy";
 import { businessKindLabel } from "@/data/business-kinds";
@@ -46,6 +51,7 @@ type FormState = {
   sku: string;
   barcode: string;
   manufacturer_part_number: string;
+  catalog_part_id: string;
   main_category: string;
   category: string;
   status: string;
@@ -64,6 +70,7 @@ type FormState = {
   reorder_at: string;
   unit: string;
   location: string;
+  location_id: string;
   qty_on_hold: string;
   qty_on_order: string;
   min_stock_level: string;
@@ -93,25 +100,55 @@ type FormState = {
 };
 
 const EMPTY: FormState = {
-  name: "", sku: "", barcode: "", manufacturer_part_number: "",
-  main_category: "", category: "", status: "active",
-  manufacturer: "", supplier: "", brand: "", description: "",
-  cost: "", price: "", markup_percentage: "",
-  date_purchased: "", last_price_update: "",
-  qty_on_hand: "0", reorder_at: "", unit: "pc", location: "",
-  qty_on_hold: "0", qty_on_order: "0",
-  min_stock_level: "", max_stock_level: "",
-  weight_lbs: "", dimensions: "", color: "", material: "",
-  model_year: "", oem_part_number: "", warranty_period: "", universal_part: false,
-  tax_rate: "", environmental_fee: "", core_charge: "", hazmat_fee: "",
+  name: "",
+  sku: "",
+  barcode: "",
+  manufacturer_part_number: "",
+  catalog_part_id: "",
+  main_category: "",
+  category: "",
+  status: "active",
+  manufacturer: "",
+  supplier: "",
+  brand: "",
+  description: "",
+  cost: "",
+  price: "",
+  markup_percentage: "",
+  date_purchased: "",
+  last_price_update: "",
+  qty_on_hand: "0",
+  reorder_at: "",
+  unit: "pc",
+  location: "",
+  location_id: "",
+  qty_on_hold: "0",
+  qty_on_order: "0",
+  min_stock_level: "",
+  max_stock_level: "",
+  weight_lbs: "",
+  dimensions: "",
+  color: "",
+  material: "",
+  model_year: "",
+  oem_part_number: "",
+  warranty_period: "",
+  universal_part: false,
+  tax_rate: "",
+  environmental_fee: "",
+  core_charge: "",
+  hazmat_fee: "",
   tax_exempt: false,
-  date_last_ordered: "", date_last_used: "", notes: "",
+  date_last_ordered: "",
+  date_last_used: "",
+  notes: "",
   web_links: [],
   network_visible: true,
 };
 
 const UNITS = ["pc", "set", "pair", "L", "gal", "kg", "lb", "ft", "m", "box"];
 const LINK_TYPES = ["Manufacturer", "Manual (PDF)", "Video", "Datasheet", "Supplier", "Other"];
+const NO_NETWORK_LOCATION = "__none__";
 
 type SectionKey = "basic" | "pricing" | "inventory" | "details" | "tax" | "additional";
 const SECTIONS: { key: SectionKey; label: string; icon: any }[] = [
@@ -142,6 +179,27 @@ export function InventoryItemFormDialog({
   const [form, setForm] = useState<FormState>(() => rowToForm(editing));
   const [saving, setSaving] = useState(false);
   const upsertFn = useServerFn(upsertBusinessInventoryItem);
+  const listLocationsFn = useServerFn(listBusinessPartsLocations);
+  const catalogFn = useServerFn(getCanonicalCatalogMatches);
+  const locations = useQuery({
+    queryKey: ["business-parts-locations", businessId],
+    queryFn: () => listLocationsFn({ data: { businessId } }),
+    enabled: open,
+    staleTime: 60_000,
+  });
+  const catalogMatches = useQuery({
+    queryKey: ["inventory-canonical-match", form.manufacturer_part_number, form.name],
+    queryFn: () =>
+      catalogFn({
+        data: {
+          query: form.manufacturer_part_number.trim() || form.name.trim(),
+          limit: 12,
+        },
+      }),
+    enabled:
+      open && (form.manufacturer_part_number.trim().length >= 3 || form.name.trim().length >= 4),
+    staleTime: 60_000,
+  });
 
   // Reset form whenever the dialog opens or the row changes
   useMemo(() => {
@@ -200,12 +258,14 @@ export function InventoryItemFormDialog({
           sku: form.sku || null,
           category: form.category || form.main_category || null,
           brand: form.brand || null,
+          catalog_part_id: form.catalog_part_id || null,
           unit: form.unit || "pc",
           qty_on_hand: Number(form.qty_on_hand) || 0,
           reorder_at: num(form.reorder_at),
           cost: num(form.cost),
           price: num(form.price),
           location: form.location || null,
+          location_id: form.location_id || null,
           network_visible: form.network_visible,
           extra: {
             barcode: form.barcode || null,
@@ -333,16 +393,55 @@ export function InventoryItemFormDialog({
             <Section title="Basic Information">
               <Grid2>
                 <Field label="Item Name" required>
-                  <Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Enter item name" />
+                  <Input
+                    value={form.name}
+                    onChange={(e) => set("name", e.target.value)}
+                    placeholder="Enter item name"
+                  />
                 </Field>
                 <Field label="SKU / Part Number">
-                  <Input value={form.sku} onChange={(e) => set("sku", e.target.value)} placeholder="Enter SKU or part number" />
+                  <Input
+                    value={form.sku}
+                    onChange={(e) => set("sku", e.target.value)}
+                    placeholder="Enter SKU or part number"
+                  />
                 </Field>
                 <Field label="Barcode">
-                  <Input value={form.barcode} onChange={(e) => set("barcode", e.target.value)} placeholder="Enter barcode" />
+                  <Input
+                    value={form.barcode}
+                    onChange={(e) => set("barcode", e.target.value)}
+                    placeholder="Enter barcode"
+                  />
                 </Field>
                 <Field label="Manufacturer Part Number">
-                  <Input value={form.manufacturer_part_number} onChange={(e) => set("manufacturer_part_number", e.target.value)} placeholder="Enter manufacturer part number" />
+                  <Input
+                    value={form.manufacturer_part_number}
+                    onChange={(e) => set("manufacturer_part_number", e.target.value)}
+                    placeholder="Enter manufacturer part number"
+                  />
+                </Field>
+                <Field
+                  label="Canonical catalogue match"
+                  hint="Links this stock row to verified numbers and vehicle fitment without replacing your SKU"
+                >
+                  <Select
+                    value={form.catalog_part_id || NO_NETWORK_LOCATION}
+                    onValueChange={(value) =>
+                      set("catalog_part_id", value === NO_NETWORK_LOCATION ? "" : value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="No canonical link" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NO_NETWORK_LOCATION}>No canonical link</SelectItem>
+                      {(catalogMatches.data ?? []).map((match) => (
+                        <SelectItem key={match.id} value={match.id}>
+                          {match.manufacturer_part_number || match.title} — {match.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </Field>
                 <Field
                   label="Main Category"
@@ -362,15 +461,23 @@ export function InventoryItemFormDialog({
                       if (!subs.includes(form.category)) set("category", "");
                     }}
                   >
-                    <SelectTrigger><SelectValue placeholder="Select main category" /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select main category" />
+                    </SelectTrigger>
                     <SelectContent>
-                      {mainCategories.map((c: string) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
+                      {mainCategories.map((c: string) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </Field>
                 <Field label="Status">
                   <Select value={form.status} onValueChange={(v) => set("status", v)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="active">Active</SelectItem>
                       <SelectItem value="inactive">Inactive</SelectItem>
@@ -379,13 +486,25 @@ export function InventoryItemFormDialog({
                   </Select>
                 </Field>
                 <Field label="Manufacturer">
-                  <Input value={form.manufacturer} onChange={(e) => set("manufacturer", e.target.value)} placeholder="Enter manufacturer name" />
+                  <Input
+                    value={form.manufacturer}
+                    onChange={(e) => set("manufacturer", e.target.value)}
+                    placeholder="Enter manufacturer name"
+                  />
                 </Field>
                 <Field label="Supplier">
-                  <Input value={form.supplier} onChange={(e) => set("supplier", e.target.value)} placeholder="Enter supplier name" />
+                  <Input
+                    value={form.supplier}
+                    onChange={(e) => set("supplier", e.target.value)}
+                    placeholder="Enter supplier name"
+                  />
                 </Field>
                 <Field label="Brand">
-                  <Input value={form.brand} onChange={(e) => set("brand", e.target.value)} placeholder="Bosch / Denso / OEM" />
+                  <Input
+                    value={form.brand}
+                    onChange={(e) => set("brand", e.target.value)}
+                    placeholder="Bosch / Denso / OEM"
+                  />
                 </Field>
                 <Field
                   label="Sub-category"
@@ -404,10 +523,18 @@ export function InventoryItemFormDialog({
                       disabled={!form.main_category}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={form.main_category ? "Select subcategory" : "Select main category first"} />
+                        <SelectValue
+                          placeholder={
+                            form.main_category ? "Select subcategory" : "Select main category first"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        {subCategories.map((s: string) => (<SelectItem key={s} value={s}>{s}</SelectItem>))}
+                        {subCategories.map((s: string) => (
+                          <SelectItem key={s} value={s}>
+                            {s}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   ) : (
@@ -421,38 +548,84 @@ export function InventoryItemFormDialog({
                 </Field>
               </Grid2>
               <Field label="Description">
-                <Textarea rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Enter item description" />
+                <Textarea
+                  rows={3}
+                  value={form.description}
+                  onChange={(e) => set("description", e.target.value)}
+                  placeholder="Enter item description"
+                />
               </Field>
             </Section>
           )}
 
           {section === "pricing" && (
-            <Section title="Pricing Information" tone="emerald" icon={<DollarSign className="h-5 w-5 text-emerald-600" />}>
+            <Section
+              title="Pricing Information"
+              tone="emerald"
+              icon={<DollarSign className="h-5 w-5 text-emerald-600" />}
+            >
               <Grid2>
-                <Field label="Total Cost (All Units)" hint="Total cost for all units in this inventory lot">
-                  <Input type="number" step="0.01" value={form.cost} onChange={(e) => set("cost", e.target.value)} placeholder="500.00" />
+                <Field
+                  label="Total Cost (All Units)"
+                  hint="Total cost for all units in this inventory lot"
+                >
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={form.cost}
+                    onChange={(e) => set("cost", e.target.value)}
+                    placeholder="500.00"
+                  />
                 </Field>
                 <Field label="Sell Price Per Unit" hint="Price per unit (e.g., per lb, per piece)">
-                  <Input type="number" step="0.01" value={form.price} onChange={(e) => set("price", e.target.value)} placeholder="45.00" />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={form.price}
+                    onChange={(e) => set("price", e.target.value)}
+                    placeholder="45.00"
+                  />
                 </Field>
               </Grid2>
               <Grid3>
                 <Field label="Markup Percentage" hint="Markup percentage over cost">
-                  <Input type="number" step="0.1" value={form.markup_percentage} onChange={(e) => set("markup_percentage", e.target.value)} placeholder="50.0" />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={form.markup_percentage}
+                    onChange={(e) => set("markup_percentage", e.target.value)}
+                    placeholder="50.0"
+                  />
                 </Field>
                 <Field label="Cost Per Unit" hint="Calculated: Total Cost ÷ Quantity">
-                  <Input readOnly value={costPerUnit ? costPerUnit.toFixed(2) : "0.00"} className="bg-muted" />
+                  <Input
+                    readOnly
+                    value={costPerUnit ? costPerUnit.toFixed(2) : "0.00"}
+                    className="bg-muted"
+                  />
                 </Field>
                 <Field label="Total Inventory Value" hint="Total value of this inventory lot">
-                  <Input readOnly value={totalInvValue ? totalInvValue.toFixed(2) : "0.00"} className="bg-muted" />
+                  <Input
+                    readOnly
+                    value={totalInvValue ? totalInvValue.toFixed(2) : "0.00"}
+                    className="bg-muted"
+                  />
                 </Field>
               </Grid3>
               <Grid2>
                 <Field label="Date Purchased">
-                  <Input type="date" value={form.date_purchased} onChange={(e) => set("date_purchased", e.target.value)} />
+                  <Input
+                    type="date"
+                    value={form.date_purchased}
+                    onChange={(e) => set("date_purchased", e.target.value)}
+                  />
                 </Field>
                 <Field label="Last Price Update">
-                  <Input type="date" value={form.last_price_update} onChange={(e) => set("last_price_update", e.target.value)} />
+                  <Input
+                    type="date"
+                    value={form.last_price_update}
+                    onChange={(e) => set("last_price_update", e.target.value)}
+                  />
                 </Field>
               </Grid2>
             </Section>
@@ -462,37 +635,100 @@ export function InventoryItemFormDialog({
             <Section title="Inventory Management">
               <Grid3>
                 <Field label="Current Quantity">
-                  <Input type="number" value={form.qty_on_hand} onChange={(e) => set("qty_on_hand", e.target.value)} />
+                  <Input
+                    type="number"
+                    value={form.qty_on_hand}
+                    onChange={(e) => set("qty_on_hand", e.target.value)}
+                  />
                 </Field>
                 <Field label="Reorder Point" hint="Minimum quantity before reordering">
-                  <Input type="number" value={form.reorder_at} onChange={(e) => set("reorder_at", e.target.value)} placeholder="0" />
+                  <Input
+                    type="number"
+                    value={form.reorder_at}
+                    onChange={(e) => set("reorder_at", e.target.value)}
+                    placeholder="0"
+                  />
                 </Field>
                 <Field label="Measurement Unit">
                   <Select value={form.unit} onValueChange={(v) => set("unit", v)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
-                      {UNITS.map((u) => (<SelectItem key={u} value={u}>{u}</SelectItem>))}
+                      {UNITS.map((u) => (
+                        <SelectItem key={u} value={u}>
+                          {u}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </Field>
               </Grid3>
               <Grid3>
-                <Field label="Location">
-                  <Input value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="Shelf A1, Bin 5" />
+                <Field
+                  label="Network location"
+                  hint="Store or warehouse used for nearby search and transfers"
+                >
+                  <Select
+                    value={form.location_id || NO_NETWORK_LOCATION}
+                    onValueChange={(value) =>
+                      set("location_id", value === NO_NETWORK_LOCATION ? "" : value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Business main location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NO_NETWORK_LOCATION}>Business main location</SelectItem>
+                      {(locations.data ?? [])
+                        .filter((location: any) => location.active)
+                        .map((location: any) => (
+                          <SelectItem key={location.id} value={location.id}>
+                            {location.name}
+                            {location.city ? ` — ${location.city}` : ""}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Shelf / bin">
+                  <Input
+                    value={form.location}
+                    onChange={(e) => set("location", e.target.value)}
+                    placeholder="Shelf A1, Bin 5"
+                  />
                 </Field>
                 <Field label="On Hold" hint="Quantity reserved/on hold">
-                  <Input type="number" value={form.qty_on_hold} onChange={(e) => set("qty_on_hold", e.target.value)} />
+                  <Input
+                    type="number"
+                    value={form.qty_on_hold}
+                    onChange={(e) => set("qty_on_hold", e.target.value)}
+                  />
                 </Field>
                 <Field label="On Order" hint="Quantity currently on order">
-                  <Input type="number" value={form.qty_on_order} onChange={(e) => set("qty_on_order", e.target.value)} />
+                  <Input
+                    type="number"
+                    value={form.qty_on_order}
+                    onChange={(e) => set("qty_on_order", e.target.value)}
+                  />
                 </Field>
               </Grid3>
               <Grid2>
                 <Field label="Minimum Stock Level">
-                  <Input type="number" value={form.min_stock_level} onChange={(e) => set("min_stock_level", e.target.value)} placeholder="0" />
+                  <Input
+                    type="number"
+                    value={form.min_stock_level}
+                    onChange={(e) => set("min_stock_level", e.target.value)}
+                    placeholder="0"
+                  />
                 </Field>
                 <Field label="Maximum Stock Level">
-                  <Input type="number" value={form.max_stock_level} onChange={(e) => set("max_stock_level", e.target.value)} placeholder="0" />
+                  <Input
+                    type="number"
+                    value={form.max_stock_level}
+                    onChange={(e) => set("max_stock_level", e.target.value)}
+                    placeholder="0"
+                  />
                 </Field>
               </Grid2>
               <div className="flex items-center justify-between rounded-md border p-3">
@@ -502,7 +738,10 @@ export function InventoryItemFormDialog({
                     Off = keep this item private to your shop.
                   </p>
                 </div>
-                <Switch checked={form.network_visible} onCheckedChange={(v) => set("network_visible", v)} />
+                <Switch
+                  checked={form.network_visible}
+                  onCheckedChange={(v) => set("network_visible", v)}
+                />
               </div>
             </Section>
           )}
@@ -511,33 +750,70 @@ export function InventoryItemFormDialog({
             <Section title="Product Details">
               <Grid3>
                 <Field label="Weight (lbs)" hint="Product weight in pounds">
-                  <Input type="number" step="0.1" value={form.weight_lbs} onChange={(e) => set("weight_lbs", e.target.value)} placeholder="30.0" />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={form.weight_lbs}
+                    onChange={(e) => set("weight_lbs", e.target.value)}
+                    placeholder="30.0"
+                  />
                 </Field>
                 <Field label="Dimensions" hint="Length x Width x Height">
-                  <Input value={form.dimensions} onChange={(e) => set("dimensions", e.target.value)} placeholder="12x8x6 inches" />
+                  <Input
+                    value={form.dimensions}
+                    onChange={(e) => set("dimensions", e.target.value)}
+                    placeholder="12x8x6 inches"
+                  />
                 </Field>
                 <Field label="Color" hint="Product color">
-                  <Input value={form.color} onChange={(e) => set("color", e.target.value)} placeholder="Black" />
+                  <Input
+                    value={form.color}
+                    onChange={(e) => set("color", e.target.value)}
+                    placeholder="Black"
+                  />
                 </Field>
               </Grid3>
               <Grid3>
                 <Field label="Material" hint="Primary material">
-                  <Input value={form.material} onChange={(e) => set("material", e.target.value)} placeholder="Steel, Aluminum, etc." />
+                  <Input
+                    value={form.material}
+                    onChange={(e) => set("material", e.target.value)}
+                    placeholder="Steel, Aluminum, etc."
+                  />
                 </Field>
                 <Field label="Model Year" hint="Applicable model year">
-                  <Input type="number" value={form.model_year} onChange={(e) => set("model_year", e.target.value)} placeholder="2023" />
+                  <Input
+                    type="number"
+                    value={form.model_year}
+                    onChange={(e) => set("model_year", e.target.value)}
+                    placeholder="2023"
+                  />
                 </Field>
                 <Field label="OEM Part Number" hint="Original equipment manufacturer part number">
-                  <Input value={form.oem_part_number} onChange={(e) => set("oem_part_number", e.target.value)} placeholder="OEM-12345" />
+                  <Input
+                    value={form.oem_part_number}
+                    onChange={(e) => set("oem_part_number", e.target.value)}
+                    placeholder="OEM-12345"
+                  />
                 </Field>
               </Grid3>
               <Grid2>
                 <Field label="Warranty Period" hint="Warranty coverage period">
-                  <Input value={form.warranty_period} onChange={(e) => set("warranty_period", e.target.value)} placeholder="12 months" />
+                  <Input
+                    value={form.warranty_period}
+                    onChange={(e) => set("warranty_period", e.target.value)}
+                    placeholder="12 months"
+                  />
                 </Field>
                 <div className="flex items-center gap-3 pt-6">
-                  <Switch checked={form.universal_part} onCheckedChange={(v) => set("universal_part", v)} id="universal" />
-                  <Label htmlFor="universal" className="cursor-pointer">Universal Part (fits multiple vehicles)</Label>
+                  <Switch
+                    checked={form.universal_part}
+                    onCheckedChange={(v) => set("universal_part", v)}
+                    id="universal"
+                  />
+                  <Label htmlFor="universal" className="cursor-pointer">
+                    Universal Part (fits multiple vehicles)
+                  </Label>
                 </div>
               </Grid2>
             </Section>
@@ -547,22 +823,52 @@ export function InventoryItemFormDialog({
             <Section title="Tax & Fees">
               <Grid3>
                 <Field label="Tax Rate (%)" hint="Sales tax rate percentage">
-                  <Input type="number" step="0.1" value={form.tax_rate} onChange={(e) => set("tax_rate", e.target.value)} placeholder="12" />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={form.tax_rate}
+                    onChange={(e) => set("tax_rate", e.target.value)}
+                    placeholder="12"
+                  />
                 </Field>
                 <Field label="Environmental Fee" hint="Environmental disposal fee">
-                  <Input type="number" step="0.01" value={form.environmental_fee} onChange={(e) => set("environmental_fee", e.target.value)} placeholder="5.00" />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={form.environmental_fee}
+                    onChange={(e) => set("environmental_fee", e.target.value)}
+                    placeholder="5.00"
+                  />
                 </Field>
                 <Field label="Core Charge" hint="Refundable core charge">
-                  <Input type="number" step="0.01" value={form.core_charge} onChange={(e) => set("core_charge", e.target.value)} placeholder="25.00" />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={form.core_charge}
+                    onChange={(e) => set("core_charge", e.target.value)}
+                    placeholder="25.00"
+                  />
                 </Field>
               </Grid3>
               <Grid2>
                 <Field label="Hazmat Fee" hint="Hazardous materials handling fee">
-                  <Input type="number" step="0.01" value={form.hazmat_fee} onChange={(e) => set("hazmat_fee", e.target.value)} placeholder="15.00" />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={form.hazmat_fee}
+                    onChange={(e) => set("hazmat_fee", e.target.value)}
+                    placeholder="15.00"
+                  />
                 </Field>
                 <div className="flex items-center gap-3 pt-6">
-                  <Switch checked={form.tax_exempt} onCheckedChange={(v) => set("tax_exempt", v)} id="taxexempt" />
-                  <Label htmlFor="taxexempt" className="cursor-pointer">Tax Exempt Item</Label>
+                  <Switch
+                    checked={form.tax_exempt}
+                    onCheckedChange={(v) => set("tax_exempt", v)}
+                    id="taxexempt"
+                  />
+                  <Label htmlFor="taxexempt" className="cursor-pointer">
+                    Tax Exempt Item
+                  </Label>
                 </div>
               </Grid2>
             </Section>
@@ -572,14 +878,27 @@ export function InventoryItemFormDialog({
             <Section title="Additional Information">
               <Grid2>
                 <Field label="Date Last Ordered">
-                  <Input type="date" value={form.date_last_ordered} onChange={(e) => set("date_last_ordered", e.target.value)} />
+                  <Input
+                    type="date"
+                    value={form.date_last_ordered}
+                    onChange={(e) => set("date_last_ordered", e.target.value)}
+                  />
                 </Field>
                 <Field label="Date Last Used">
-                  <Input type="date" value={form.date_last_used} onChange={(e) => set("date_last_used", e.target.value)} />
+                  <Input
+                    type="date"
+                    value={form.date_last_used}
+                    onChange={(e) => set("date_last_used", e.target.value)}
+                  />
                 </Field>
               </Grid2>
               <Field label="Notes" hint="Internal notes about this inventory item">
-                <Textarea rows={4} value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Enter any additional notes about this item" />
+                <Textarea
+                  rows={4}
+                  value={form.notes}
+                  onChange={(e) => set("notes", e.target.value)}
+                  placeholder="Enter any additional notes about this item"
+                />
               </Field>
 
               <div className="rounded-md border p-4 space-y-3">
@@ -588,29 +907,58 @@ export function InventoryItemFormDialog({
                   <div>
                     <p className="font-medium text-sm">Web Links & Resources</p>
                     <p className="text-xs text-muted-foreground">
-                      Add links to manufacturer websites, product manuals, videos, cloud documents, and other resources
+                      Add links to manufacturer websites, product manuals, videos, cloud documents,
+                      and other resources
                     </p>
                   </div>
                 </div>
                 {form.web_links.map((l, i) => (
                   <div key={i} className="grid grid-cols-1 md:grid-cols-[160px_1fr_2fr_auto] gap-2">
-                    <Select value={l.type} onValueChange={(v) => {
-                      const arr = [...form.web_links]; arr[i] = { ...arr[i], type: v }; set("web_links", arr);
-                    }}>
-                      <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
+                    <Select
+                      value={l.type}
+                      onValueChange={(v) => {
+                        const arr = [...form.web_links];
+                        arr[i] = { ...arr[i], type: v };
+                        set("web_links", arr);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Type" />
+                      </SelectTrigger>
                       <SelectContent>
-                        {LINK_TYPES.map((t) => (<SelectItem key={t} value={t}>{t}</SelectItem>))}
+                        {LINK_TYPES.map((t) => (
+                          <SelectItem key={t} value={t}>
+                            {t}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
-                    <Input placeholder="Label" value={l.label} onChange={(e) => {
-                      const arr = [...form.web_links]; arr[i] = { ...arr[i], label: e.target.value }; set("web_links", arr);
-                    }} />
-                    <Input placeholder="https://example.com" value={l.url} onChange={(e) => {
-                      const arr = [...form.web_links]; arr[i] = { ...arr[i], url: e.target.value }; set("web_links", arr);
-                    }} />
-                    <Button variant="ghost" size="icon" onClick={() => {
-                      const arr = form.web_links.filter((_, idx) => idx !== i); set("web_links", arr);
-                    }}>
+                    <Input
+                      placeholder="Label"
+                      value={l.label}
+                      onChange={(e) => {
+                        const arr = [...form.web_links];
+                        arr[i] = { ...arr[i], label: e.target.value };
+                        set("web_links", arr);
+                      }}
+                    />
+                    <Input
+                      placeholder="https://example.com"
+                      value={l.url}
+                      onChange={(e) => {
+                        const arr = [...form.web_links];
+                        arr[i] = { ...arr[i], url: e.target.value };
+                        set("web_links", arr);
+                      }}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        const arr = form.web_links.filter((_, idx) => idx !== i);
+                        set("web_links", arr);
+                      }}
+                    >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
@@ -618,7 +966,12 @@ export function InventoryItemFormDialog({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => set("web_links", [...form.web_links, { label: "", type: "Manufacturer", url: "" }])}
+                  onClick={() =>
+                    set("web_links", [
+                      ...form.web_links,
+                      { label: "", type: "Manufacturer", url: "" },
+                    ])
+                  }
                 >
                   <Plus className="h-4 w-4 mr-1" /> Add link
                 </Button>
@@ -633,12 +986,18 @@ export function InventoryItemFormDialog({
             <Button variant="outline" onClick={goPrev} disabled={section === SECTIONS[0].key}>
               <ChevronLeft className="h-4 w-4 mr-1" /> Previous
             </Button>
-            <Button variant="outline" onClick={goNext} disabled={section === SECTIONS[SECTIONS.length - 1].key}>
+            <Button
+              variant="outline"
+              onClick={goNext}
+              disabled={section === SECTIONS[SECTIONS.length - 1].key}
+            >
               Next <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
             <Button onClick={save} disabled={saving || !form.name.trim()}>
               <Save className="h-4 w-4 mr-1" />
               {saving ? "Saving…" : editing ? "Update Item" : "Add Item"}
@@ -658,6 +1017,7 @@ function rowToForm(row: any | null): FormState {
     sku: row.sku ?? "",
     barcode: row.barcode ?? "",
     manufacturer_part_number: row.manufacturer_part_number ?? "",
+    catalog_part_id: row.catalog_part_id ?? "",
     main_category: row.main_category ?? "",
     category: row.category ?? "",
     status: row.status ?? "active",
@@ -674,6 +1034,7 @@ function rowToForm(row: any | null): FormState {
     reorder_at: row.reorder_at != null ? String(row.reorder_at) : "",
     unit: row.unit ?? "pc",
     location: row.location ?? "",
+    location_id: row.location_id ?? "",
     qty_on_hold: row.qty_on_hold != null ? String(row.qty_on_hold) : "0",
     qty_on_order: row.qty_on_order != null ? String(row.qty_on_order) : "0",
     min_stock_level: row.min_stock_level != null ? String(row.min_stock_level) : "",
@@ -701,14 +1062,24 @@ function rowToForm(row: any | null): FormState {
 
 /* --- small layout helpers --- */
 function Section({
-  title, tone, icon, children,
-}: { title: string; tone?: "emerald"; icon?: React.ReactNode; children: React.ReactNode }) {
+  title,
+  tone,
+  icon,
+  children,
+}: {
+  title: string;
+  tone?: "emerald";
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-lg border bg-card overflow-hidden">
-      <div className={cn(
-        "px-5 py-3 border-b font-semibold flex items-center gap-2",
-        tone === "emerald" ? "bg-emerald-50 dark:bg-emerald-950/30" : "bg-muted/40",
-      )}>
+      <div
+        className={cn(
+          "px-5 py-3 border-b font-semibold flex items-center gap-2",
+          tone === "emerald" ? "bg-emerald-50 dark:bg-emerald-950/30" : "bg-muted/40",
+        )}
+      >
         {icon}
         {title}
       </div>
@@ -723,8 +1094,16 @@ function Grid3({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{children}</div>;
 }
 function Field({
-  label, required, hint, children,
-}: { label: string; required?: boolean; hint?: string; children: React.ReactNode }) {
+  label,
+  required,
+  hint,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1">
       <Label className="text-sm">

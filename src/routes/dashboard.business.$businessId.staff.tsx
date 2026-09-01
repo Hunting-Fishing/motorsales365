@@ -56,6 +56,15 @@ const DUTIES_BY_ROLE: Record<string, string[]> = {
   clerk: ["Billing", "Invoicing", "Records"],
 };
 
+const ROLE_HELP: Record<string, string> = {
+  owner: "Full control, billing, managers, employees, and all business records.",
+  manager: "Runs the business and staff; cannot replace or remove the owner.",
+  dispatcher: "Dispatch and assigned operational work; no staff or billing control.",
+  driver: "Own shifts, assigned jobs, vehicles, and required operational tools.",
+  mechanic: "Assigned service work, vehicles, and parts used on work orders.",
+  clerk: "Office, invoicing, records, and approved counter tasks.",
+};
+
 export const Route = createFileRoute("/dashboard/business/$businessId/staff")({
   component: StaffPage,
 });
@@ -133,6 +142,16 @@ function StaffPage() {
     }
   }
 
+  async function handleRoleChange(staffId: string, nextRole: string) {
+    try {
+      await updateFn({ data: { staffId, businessId, role: nextRole as any } });
+      toast.success("Employee role updated");
+      qc.invalidateQueries({ queryKey: ["business-staff", businessId] });
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to update role");
+    }
+  }
+
   const rows = staffQ.data ?? [];
 
   return (
@@ -151,6 +170,21 @@ function StaffPage() {
         </Button>
       </div>
 
+      <Card className="grid gap-3 p-4 text-sm md:grid-cols-3">
+        <div>
+          <p className="font-semibold">Owner</p>
+          <p className="text-xs text-muted-foreground">Permanent full control of this business.</p>
+        </div>
+        <div>
+          <p className="font-semibold">Manager</p>
+          <p className="text-xs text-muted-foreground">Manages employees and business operations.</p>
+        </div>
+        <div>
+          <p className="font-semibold">Operational staff</p>
+          <p className="text-xs text-muted-foreground">Only role-specific work; no employee administration.</p>
+        </div>
+      </Card>
+
       <Card className="divide-y">
         {staffQ.isLoading && (
           <div className="p-4 text-sm text-muted-foreground">Loading…</div>
@@ -158,6 +192,11 @@ function StaffPage() {
         {!staffQ.isLoading && rows.length === 0 && (
           <div className="p-6 text-center text-sm text-muted-foreground">
             No employees yet. Click <strong>Add employee</strong> to invite your first driver.
+          </div>
+        )}
+        {staffQ.isError && (
+          <div className="p-6 text-sm text-destructive">
+            Owner or manager access is required to view and manage this business team.
           </div>
         )}
         {rows.map((r: any) => (
@@ -169,14 +208,32 @@ function StaffPage() {
               <div className="font-medium truncate">{r.display_name}</div>
               <div className="text-xs text-muted-foreground">
                 {r.title ? `${r.title} · ` : ""}
-                <Badge variant="secondary" className="ml-1">
-                  {r.role}
-                </Badge>
+                {r.role === "owner" ? (
+                  <Badge className="ml-1">Owner</Badge>
+                ) : (
+                  <span className="ml-1 inline-flex w-40 align-middle">
+                    <Select value={r.role} onValueChange={(value) => handleRoleChange(r.id, value)}>
+                      <SelectTrigger className="h-7 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ROLES.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </span>
+                )}
                 {!r.active && (
                   <Badge variant="outline" className="ml-2">
                     inactive
                   </Badge>
                 )}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {ROLE_HELP[r.role] ?? ROLE_HELP.clerk}
               </div>
               {Array.isArray(r.duties) && r.duties.length > 0 && (
                 <div className="text-xs text-muted-foreground mt-1">
@@ -194,13 +251,15 @@ function StaffPage() {
                   On shift
                 </label>
               )}
-              <label className="flex items-center gap-2 text-xs">
-                <Switch
-                  checked={!!r.active}
-                  onCheckedChange={(v) => handleToggleActive(r.id, v)}
-                />
-                Active
-              </label>
+              {r.role !== "owner" && (
+                <label className="flex items-center gap-2 text-xs">
+                  <Switch
+                    checked={!!r.active}
+                    onCheckedChange={(v) => handleToggleActive(r.id, v)}
+                  />
+                  Active
+                </label>
+              )}
               {r.role !== "owner" && (
                 <Button
                   variant="ghost"

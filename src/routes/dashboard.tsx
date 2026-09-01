@@ -17,7 +17,6 @@ import {
   ShoppingBag,
   ChevronDown,
   Check,
-  Users,
   GraduationCap,
   Share2,
   Megaphone,
@@ -56,7 +55,6 @@ type NavItem = { to: string; label: string; Icon: any; exact?: boolean };
 type NavHub = { key: string; label: string; Icon: any; items: NavItem[] };
 
 function buildHubs(opts: {
-  hasOrg: boolean;
   hasReferral: boolean;
   isDispatchProvider: boolean;
 }): NavHub[] {
@@ -98,15 +96,9 @@ function buildHubs(opts: {
       Icon: Briefcase,
       items: [
         { to: "/dashboard/businesses", label: "Businesses", Icon: Store },
-        { to: "/shop-manager", label: "Shop Manager", Icon: Wrench },
+        { to: "/shop-manager", label: "Shop Manager plans", Icon: Wrench },
         { to: "/dashboard/ads", label: "Ad campaigns", Icon: Megaphone },
         { to: "/dashboard/sponsorships", label: "Sponsorships", Icon: Megaphone },
-        ...(opts.hasOrg
-          ? [
-              { to: "/dashboard/team", label: "Team", Icon: Users },
-              { to: "/dashboard/staff", label: "Staff & Access", Icon: Users },
-            ]
-          : []),
       ],
     },
   ];
@@ -174,7 +166,6 @@ function DashboardLayout() {
   const { user, loading, isStaff, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [hasReferral, setHasReferral] = useState(false);
-  const [hasOrg, setHasOrg] = useState(false);
   const { hasProfile: isDispatchProvider } = useDispatchProvider();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -191,18 +182,12 @@ function DashboardLayout() {
         .or(`staff_user_id.eq.${user.id},email.eq.${user.email?.toLowerCase()}`)
         .maybeSingle();
       setHasReferral(Boolean(data));
-      const { data: orgs } = await (supabase as any)
-        .from("organization_members")
-        .select("organization_id")
-        .eq("user_id", user.id)
-        .limit(1);
-      setHasOrg(Boolean(orgs && orgs.length > 0));
     })();
   }, [user]);
 
   const hubs = useMemo(
-    () => buildHubs({ hasOrg, hasReferral, isDispatchProvider }),
-    [hasOrg, hasReferral, isDispatchProvider],
+    () => buildHubs({ hasReferral, isDispatchProvider }),
+    [hasReferral, isDispatchProvider],
   );
 
   const activeHub = useMemo(

@@ -5,11 +5,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 
 function publicClient() {
-  return createClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
-    { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-  );
+  return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
 }
 
 export type NetworkStockRow = {
@@ -25,6 +23,16 @@ export type NetworkStockRow = {
   reserved_qty: number;
   price: number | null;
   catalog_part_id: string | null;
+  manufacturer_part_number: string | null;
+  oem_part_number: string | null;
+  catalog_manufacturer: string | null;
+  catalog_part_number: string | null;
+  item_condition: string;
+  lead_time_hours: number | null;
+  fulfillment_methods: string[];
+  warranty_months: number | null;
+  stock_location_id: string | null;
+  stock_location_name: string | null;
   updated_at: string;
   business_name: string;
   business_slug: string;
@@ -37,6 +45,19 @@ export type NetworkStockRow = {
   compatible_models: string[] | null;
   year_min: number | null;
   year_max: number | null;
+  fitment_profiles: Array<{
+    profile_id: string;
+    make: string;
+    model: string;
+    variant: string | null;
+    year_min: number | null;
+    year_max: number | null;
+    engine_code: string | null;
+    chassis_code: string | null;
+    position: string | null;
+    confidence: number;
+  }>;
+  distance_km?: number | null;
 };
 
 export type NetworkStockPage = {
@@ -56,6 +77,9 @@ export const searchNetworkStock = createServerFn({ method: "POST" })
       model?: string;
       year?: number;
       inStockOnly?: boolean;
+      originLat?: number;
+      originLng?: number;
+      radiusKm?: number;
       limit?: number;
       offset?: number;
     }) =>
@@ -69,6 +93,9 @@ export const searchNetworkStock = createServerFn({ method: "POST" })
           model: z.string().trim().max(80).optional(),
           year: z.number().int().min(1900).max(2100).optional(),
           inStockOnly: z.boolean().optional(),
+          originLat: z.number().min(-90).max(90).optional(),
+          originLng: z.number().min(-180).max(180).optional(),
+          radiusKm: z.number().positive().max(2000).optional(),
           limit: z.number().int().min(1).max(100).optional(),
           offset: z.number().int().min(0).max(10000).optional(),
         })
@@ -78,18 +105,20 @@ export const searchNetworkStock = createServerFn({ method: "POST" })
     const supabase = publicClient();
     const limit = data.limit ?? 20;
     const offset = data.offset ?? 0;
+    const hasOrigin = data.originLat != null && data.originLng != null;
     let q = supabase
       .from("network_stock")
       .select("*", { count: "exact" })
-      .order("updated_at", { ascending: false })
-      .range(offset, offset + limit - 1);
+      .order("updated_at", { ascending: false });
 
-    if (data.inStockOnly !== false) q = q.gt("qty_on_hand", 0);
+    if (data.inStockOnly !== false) q = q.gt("available_qty", 0);
 
     const term = data.query?.trim();
     if (term) {
-      const like = `%${term.replace(/[%_]/g, "\\$&")}%`;
-      q = q.or(`name.ilike.${like},sku.ilike.${like},category.ilike.${like},brand.ilike.${like}`);
+      const like = `%${term.replace(/[,()%_]/g, " ")}%`;
+      q = q.or(
+        `name.ilike.${like},sku.ilike.${like},category.ilike.${like},brand.ilike.${like},manufacturer_part_number.ilike.${like},oem_part_number.ilike.${like},catalog_part_number.ilike.${like},catalog_manufacturer.ilike.${like}`,
+      );
     }
     if (data.province) q = q.eq("province", data.province);
     if (data.category) q = q.ilike("category", data.category);
@@ -97,16 +126,67 @@ export const searchNetworkStock = createServerFn({ method: "POST" })
     if (data.make) q = q.contains("compatible_makes", [data.make]);
     if (data.model) q = q.contains("compatible_models", [data.model]);
     if (data.year) {
-      q = q.or(`year_min.is.null,year_min.lte.${data.year}`)
-           .or(`year_max.is.null,year_max.gte.${data.year}`);
+      q = q
+        .or(`year_min.is.null,year_min.lte.${data.year}`)
+        .or(`year_max.is.null,year_max.gte.${data.year}`);
     }
 
+    // Apply a coarse bounding box before the precise Haversine calculation so
+    // nearby search does not pick an arbitrary set from a national catalogue.
+    if (hasOrigin) {
+      const radius = data.radiusKm ?? 2000;
+      const latDelta = radius / 111.32;
+      const longitudeScale = Math.max(Math.cos((data.originLat! * Math.PI) / 180), 0.01);
+      const lngDelta = radius / (111.32 * longitudeScale);
+      q = q
+        .gte("lat", data.originLat! - latDelta)
+        .lte("lat", data.originLat! + latDelta)
+        .gte("lng", data.originLng! - lngDelta)
+        .lte("lng", data.originLng! + lngDelta);
+    }
+
+    // Distance requires a computed value. Pull a bounded candidate set after
+    // database filtering, then sort and page in memory. Without an origin we
+    // preserve the original database pagination path.
+    q = hasOrigin ? q.range(0, 499) : q.range(offset, offset + limit - 1);
     const { data: rows, error, count } = await q;
     if (error) throw error;
-    const list = (rows ?? []) as NetworkStockRow[];
-    const nextOffset = list.length === limit ? offset + limit : null;
-    return { rows: list, nextOffset, total: count ?? null };
+    let list = (rows ?? []) as NetworkStockRow[];
+    let total = count ?? null;
+    if (hasOrigin) {
+      list = list
+        .map((row) => ({
+          ...row,
+          distance_km:
+            row.lat == null || row.lng == null
+              ? null
+              : haversineKm(data.originLat!, data.originLng!, Number(row.lat), Number(row.lng)),
+        }))
+        .filter(
+          (row) =>
+            data.radiusKm == null || (row.distance_km != null && row.distance_km <= data.radiusKm),
+        )
+        .sort((a, b) => {
+          if (a.distance_km == null) return 1;
+          if (b.distance_km == null) return -1;
+          return a.distance_km - b.distance_km;
+        });
+      total = list.length;
+      list = list.slice(offset, offset + limit);
+    }
+    const nextOffset = offset + list.length < (total ?? 0) ? offset + limit : null;
+    return { rows: list, nextOffset, total };
   });
+
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const radians = (degrees: number) => (degrees * Math.PI) / 180;
+  const dLat = radians(lat2 - lat1);
+  const dLng = radians(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(radians(lat1)) * Math.cos(radians(lat2)) * Math.sin(dLng / 2) ** 2;
+  return Math.round(6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 10) / 10;
+}
 
 export type NetworkFacets = {
   categories: string[];
@@ -115,8 +195,8 @@ export type NetworkFacets = {
   provinces: string[];
 };
 
-export const getNetworkStockFacets = createServerFn({ method: "GET" })
-  .handler(async (): Promise<NetworkFacets> => {
+export const getNetworkStockFacets = createServerFn({ method: "GET" }).handler(
+  async (): Promise<NetworkFacets> => {
     const supabase = publicClient();
     const { data: rows, error } = await supabase
       .from("network_stock")
@@ -141,7 +221,8 @@ export const getNetworkStockFacets = createServerFn({ method: "GET" })
       makes: sort(makes),
       provinces: sort(provinces),
     };
-  });
+  },
+);
 
 export const getNetworkStockForSku = createServerFn({ method: "POST" })
   .inputValidator((d: { sku?: string; catalogPartId?: string; name?: string }) =>
@@ -161,7 +242,7 @@ export const getNetworkStockForSku = createServerFn({ method: "POST" })
     let q = supabase
       .from("network_stock")
       .select("*")
-      .gt("qty_on_hand", 0)
+      .gt("available_qty", 0)
       .order("qty_on_hand", { ascending: false })
       .limit(100);
 
@@ -209,8 +290,7 @@ export const submitNetworkPartInquiry = createServerFn({ method: "POST" })
     let requester_user_id: string | null = null;
     try {
       const { getRequestHeader } = await import("@tanstack/react-start/server");
-      const auth =
-        getRequestHeader("authorization") ?? getRequestHeader("Authorization");
+      const auth = getRequestHeader("authorization") ?? getRequestHeader("Authorization");
       const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
       if (token) {
         const { data: u } = await supabase.auth.getUser(token);
@@ -395,7 +475,7 @@ export const getBusinessNetworkExposure = createServerFn({ method: "POST" })
     if (error) throw error;
     return {
       expose: !!(row as any)?.expose_inventory_to_network,
-      status: (((row as any)?.network_exposure_status as NetworkExposureStatus) ?? "none"),
+      status: ((row as any)?.network_exposure_status as NetworkExposureStatus) ?? "none",
       requested_at: (row as any)?.network_exposure_requested_at ?? null,
       reviewed_at: (row as any)?.network_exposure_reviewed_at ?? null,
       review_note: (row as any)?.network_exposure_review_note ?? null,
@@ -576,4 +656,3 @@ export const releaseNetworkInquiry = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
-
