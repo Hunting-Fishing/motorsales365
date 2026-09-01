@@ -19,6 +19,11 @@ describe("business staff Shop Manager bridge", () => {
       expect(sql).toContain(`'${role}'`);
   });
 
+  it("keeps business owners authoritative over stale staff roles", () => {
+    expect(sql).toContain("v_business.owner_id = _user_id");
+    expect(sql).toContain("THEN 'owner'");
+  });
+
   it("cuts access and closes active work on deactivation", () => {
     expect(sql).toContain("Employee access deactivated");
     expect(sql).toContain("SET status='manager_closed'");
@@ -46,5 +51,16 @@ describe("business staff Shop Manager bridge", () => {
     expect(header).toContain("Employee operations");
     expect(modules).toContain("/dashboard/business/${id}/operations");
     expect(businessRoute).toContain("<EmployeeOperations embedded />");
+  });
+
+  it("provides a private, owner-resettable towing playground", () => {
+    const demoSql = read("supabase/migrations/20260901032848_test_tow_company_demo_workspace.sql");
+    const workspace = read("src/routes/dashboard.business.$businessId.tsx");
+    expect(demoSql).toContain("network_visible=false");
+    expect(demoSql).toContain("v_marker,true,false");
+    expect(demoSql).toContain("owner_id=(SELECT auth.uid())");
+    expect(demoSql).toContain("notes=v_marker");
+    expect(workspace).toContain("Reset demo");
+    expect(workspace).toContain("Playground");
   });
 });
