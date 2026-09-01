@@ -1,9 +1,10 @@
 import { createFileRoute, Outlet, useParams, Link } from "@tanstack/react-router";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, RotateCcw } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { getWorkspaceBusiness } from "@/lib/business-workspace.functions";
+import { resetTowDemoWorkspace } from "@/lib/business-workspace.functions";
 import { getBusinessPlanUsage } from "@/lib/business-plan-usage.functions";
 import { WorkspaceSidebar } from "@/components/business-workspace/sidebar";
 import { WorkspaceNotificationsProvider } from "@/components/business-workspace/notifications-provider";
@@ -12,6 +13,7 @@ import { WorkspacePlanWarnings } from "@/components/business-workspace/plan-warn
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard/business/$businessId")({
   component: WorkspaceLayout,
@@ -27,6 +29,7 @@ function WorkspaceLayout() {
   const { businessId } = useParams({ from: "/dashboard/business/$businessId" });
   const { user, loading } = useAuth();
   const load = useServerFn(getWorkspaceBusiness);
+  const resetDemo = useServerFn(resetTowDemoWorkspace);
 
   const q = useQuery({
     queryKey: ["workspace-business", businessId, user?.id],
@@ -74,6 +77,18 @@ function WorkspaceLayout() {
   }
 
   const { business, role } = q.data;
+  const isDemo = (business as any).import_metadata?.demo_template === "tow-company-v1";
+
+  async function handleDemoReset() {
+    if (!confirm("Restore the demo fleet and inventory baseline? Your own untagged records will remain.")) return;
+    try {
+      await resetDemo({ data: { businessId } });
+      toast.success("Demo fleet and inventory restored");
+      window.location.reload();
+    } catch (error: any) {
+      toast.error(error?.message || "Could not reset demo workspace");
+    }
+  }
 
   const usage = usageQ.data;
   const tone =
@@ -88,8 +103,18 @@ function WorkspaceLayout() {
           <div className="text-sm text-muted-foreground truncate">
             <span className="font-medium text-foreground">{business.name}</span> workspace
             <AssociateWorkspaceBadge businessId={business.id} />
+            {isDemo && (
+              <span className="ml-2 inline-flex rounded-full border border-violet-500/40 bg-violet-500/10 px-2 py-0.5 text-[11px] font-semibold text-violet-700 dark:text-violet-300">
+                Playground
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
+            {isDemo && role === "owner" && (
+              <Button size="sm" variant="outline" onClick={handleDemoReset}>
+                <RotateCcw className="mr-1 h-3.5 w-3.5" /> Reset demo
+              </Button>
+            )}
             {usage && (
               <Link
                 to="/dashboard/business/$businessId/billing"
