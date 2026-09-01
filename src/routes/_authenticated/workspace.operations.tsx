@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -102,7 +103,7 @@ function durationSince(iso: string) {
   return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
 }
 
-function EmployeeOperations() {
+export function EmployeeOperations({ embedded = false }: { embedded?: boolean } = {}) {
   const qc = useQueryClient();
   const [approvalType, setApprovalType] = useState("discount");
   const [reason, setReason] = useState("");
@@ -236,13 +237,13 @@ function EmployeeOperations() {
 
   if (context.isLoading)
     return (
-      <SiteLayout>
+      <OperationsShell embedded={embedded}>
         <div className="mx-auto max-w-6xl px-4 py-10">Loading employee workspace…</div>
-      </SiteLayout>
+      </OperationsShell>
     );
   if (context.error || !context.data)
     return (
-      <SiteLayout>
+      <OperationsShell embedded={embedded}>
         <div className="mx-auto max-w-4xl px-4 py-10">
           <h1 className="text-2xl font-bold">Employee Operations</h1>
           <p className="mt-2 text-destructive">
@@ -251,14 +252,14 @@ function EmployeeOperations() {
             )}
           </p>
         </div>
-      </SiteLayout>
+      </OperationsShell>
     );
 
   const ctx = context.data;
   const openApprovals = (approvals.data ?? []).filter((a: any) => a.status === "pending");
   return (
-    <SiteLayout>
-      <main className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+    <OperationsShell embedded={embedded}>
+      <div className="mx-auto max-w-7xl space-y-6 px-1 py-2 md:px-4 md:py-6">
         <header className="overflow-hidden rounded-2xl border bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950 p-6 text-white shadow-lg">
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div>
@@ -524,9 +525,13 @@ function EmployeeOperations() {
             </Button>
           </CardContent>
         </Card>
-      </main>
-    </SiteLayout>
+      </div>
+    </OperationsShell>
   );
+}
+
+function OperationsShell({ embedded, children }: { embedded: boolean; children: ReactNode }) {
+  return embedded ? <>{children}</> : <SiteLayout>{children}</SiteLayout>;
 }
 
 function ShiftControl({

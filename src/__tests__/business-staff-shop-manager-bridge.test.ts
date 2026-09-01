@@ -37,4 +37,14 @@ describe("business staff Shop Manager bridge", () => {
     expect(counterSql).toContain("Counter permission required");
     expect(counterSql).not.toContain("'truck_driver'");
   });
+
+  it("exposes Shop Manager and operations from authenticated navigation", () => {
+    const header = read("src/components/site-header.tsx");
+    const modules = read("src/lib/business-workspace/modules.ts");
+    const businessRoute = read("src/routes/dashboard.business.$businessId.operations.tsx");
+    expect(header).toContain("Open Shop Manager");
+    expect(header).toContain("Employee operations");
+    expect(modules).toContain("/dashboard/business/${id}/operations");
+    expect(businessRoute).toContain("<EmployeeOperations embedded />");
+  });
 });

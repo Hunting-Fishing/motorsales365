@@ -1,5 +1,5 @@
-Warning: truncated output (original token count: 90900)
-Total output lines: 8779
+Warning: truncated output (original token count: 91234)
+Total output lines: 8802
 
 /* eslint-disable */
 
@@ -374,6 +374,7 @@ import { Route as DashboardBusinessBusinessIdDispatchRouteImport } from './route
 import { Route as DashboardBusinessBusinessIdFleetRouteImport } from './routes/dashboard.business.$businessId.fleet'
 import { Route as DashboardBusinessBusinessIdInventoryRouteImport } from './routes/dashboard.business.$businessId.inventory'
 import { Route as DashboardBusinessBusinessIdInvoicesRouteImport } from './routes/dashboard.business.$businessId.invoices'
+import { Route as DashboardBusinessBusinessIdOperationsRouteImport } from './routes/dashboard.business.$businessId.operations'
 import { Route as DashboardBusinessBusinessIdPartsOperationsRouteImport } from './routes/dashboard.business.$businessId.parts-operations'
 import { Route as DashboardBusinessBusinessIdSettingsRouteImport } from './routes/dashboard.business.$businessId.settings'
 import { Route as DashboardBusinessBusinessIdStaffRouteImport } from './routes/dashboard.business.$businessId.staff'
@@ -1195,7 +1196,527 @@ const GoProductIdRoute = GoProductIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelpPayWithGcashRoute = HelpPayWithGcashRouteImport.update({
-  id: '/help/pay…60900 tokens truncated…th: '/billing'
+  id: '/help/pay-with-gcash',
+  path: '/help/pay-with-gcash',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpPostingEtiquetteRoute = HelpPostingEtiquetteRouteImport.update({
+  id: '/help/posting-etiquette',
+  path: '/help/posting-etiquette',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpTrustScoreRoute = HelpTrustScoreRouteImport.update({
+  id: '/help/trust-score',
+  path: '/help/trust-score',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvitesTokenRoute = InvitesTokenRouteImport.update({
+  id: '/invites/$token',
+  path: '/invites/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnIndexRoute = LearnIndexRouteImport.update({
+  id: '/learn/',
+  path: '/learn/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnSlugRoute = LearnSlugRouteImport.update({
+  id: '/learn/$slug',
+  path: '/learn/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnFlashcardsRoute = LearnFlashcardsRouteImport.update({
+  id: '/learn/flashcards',
+  path: '/learn/flashcards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnMechanicsRoute = LearnMechanicsRouteImport.update({
+  id: '/learn/mechanics',
+  path: '/learn/mechanics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListingIdRoute = ListingIdRouteImport.update({
+  id: '/listing/$id',
+  path: '/listing/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListingCheckoutRoute = ListingCheckoutRouteImport.update({
+  id: '/listing/checkout',
+  path: '/listing/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerProgramIndexRoute = PartnerProgramIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnerProgramRoute,
+} as any)
+const PartnerProgramApplyRoute = PartnerProgramApplyRouteImport.update({
+  id: '/apply',
+  path: '/apply',
+  getParentRoute: () => PartnerProgramRoute,
+} as any)
+const PartnerProgramInfoRoute = PartnerProgramInfoRouteImport.update({
+  id: '/info',
+  path: '/info',
+  getParentRoute: () => PartnerProgramRoute,
+} as any)
+const PartnerProgramTermsRoute = PartnerProgramTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => PartnerProgramRoute,
+} as any)
+const PartnersIndexRoute = PartnersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnersRoute,
+} as any)
+const PartnersNetworkRoute = PartnersNetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
+  getParentRoute: () => PartnersRoute,
+} as any)
+const PartnersPartsRoute = PartnersPartsRouteImport.update({
+  id: '/parts',
+  path: '/parts',
+  getParentRoute: () => PartnersRoute,
+} as any)
+const PartsIndexRoute = PartsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartsRoute,
+} as any)
+const PartsCategoriesRoute = PartsCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => PartsRoute,
+} as any)
+const PartsNetworkRoute = PartsNetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
+  getParentRoute: () => PartsRoute,
+} as any)
+const PartsSearchRoute = PartsSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => PartsRoute,
+} as any)
+const PassportPremiumCheckoutRoute = PassportPremiumCheckoutRouteImport.update({
+  id: '/passport-premium/checkout',
+  path: '/passport-premium/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PassportSlugRoute = PassportSlugRouteImport.update({
+  id: '/passport/$slug',
+  path: '/passport/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayManualRoute = PayManualRouteImport.update({
+  id: '/pay/manual',
+  path: '/pay/manual',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RCodeRoute = RCodeRouteImport.update({
+  id: '/r/$code',
+  path: '/r/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesQrLandingRoute = ResourcesQrLandingRouteImport.update({
+  id: '/resources/qr-landing',
+  path: '/resources/qr-landing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RidesIndexRoute = RidesIndexRouteImport.update({
+  id: '/rides/',
+  path: '/rides/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RidesSlugRoute = RidesSlugRouteImport.update({
+  id: '/rides/$slug',
+  path: '/rides/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SSlugRoute = SSlugRouteImport.update({
+  id: '/s/$slug',
+  path: '/s/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SellerIdRoute = SellerIdRouteImport.update({
+  id: '/seller/$id',
+  path: '/seller/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesInspectionRoute = ServicesInspectionRouteImport.update({
+  id: '/services/inspection',
+  path: '/services/inspection',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopManagerIndexRoute = ShopManagerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShopManagerRoute,
+} as any)
+const ShopManagerCheckoutRoute = ShopManagerCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => ShopManagerRoute,
+} as any)
+const ShopManagerPricingRoute = ShopManagerPricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => ShopManagerRoute,
+} as any)
+const ShopIndexRoute = ShopIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShopRoute,
+} as any)
+const SupportAccountRoute = SupportAccountRouteImport.update({
+  id: '/support_/account',
+  path: '/support/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportBusinessRoute = SupportBusinessRouteImport.update({
+  id: '/support_/business',
+  path: '/support/business',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportBuyingRoute = SupportBuyingRouteImport.update({
+  id: '/support_/buying',
+  path: '/support/buying',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportSellingRoute = SupportSellingRouteImport.update({
+  id: '/support_/selling',
+  path: '/support/selling',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WantedPartsIndexRoute = WantedPartsIndexRouteImport.update({
+  id: '/wanted-parts/',
+  path: '/wanted-parts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WantedPartsNewRoute = WantedPartsNewRouteImport.update({
+  id: '/wanted-parts/new',
+  path: '/wanted-parts/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WantedIndexRoute = WantedIndexRouteImport.update({
+  id: '/wanted/',
+  path: '/wanted/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WantedIdRoute = WantedIdRouteImport.update({
+  id: '/wanted/$id',
+  path: '/wanted/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WantedNewRoute = WantedNewRouteImport.update({
+  id: '/wanted/new',
+  path: '/wanted/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAccountDisputesRoute =
+  AuthenticatedAccountDisputesRouteImport.update({
+    id: '/account/disputes',
+    path: '/account/disputes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAccountRewardsRoute =
+  AuthenticatedAccountRewardsRouteImport.update({
+    id: '/account/rewards',
+    path: '/account/rewards',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAccountTrustScoreRoute =
+  AuthenticatedAccountTrustScoreRouteImport.update({
+    id: '/account/trust-score',
+    path: '/account/trust-score',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminClubDiscountPromotionsRoute =
+  AuthenticatedAdminClubDiscountPromotionsRouteImport.update({
+    id: '/admin/club-discount-promotions',
+    path: '/admin/club-discount-promotions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminFeatureScreenshotsRoute =
+  AuthenticatedAdminFeatureScreenshotsRouteImport.update({
+    id: '/admin/feature-screenshots',
+    path: '/admin/feature-screenshots',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardClaimBusinessRoute =
+  AuthenticatedDashboardClaimBusinessRouteImport.update({
+    id: '/dashboard/claim-business',
+    path: '/dashboard/claim-business',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardClubsRoute =
+  AuthenticatedDashboardClubsRouteImport.update({
+    id: '/dashboard/clubs',
+    path: '/dashboard/clubs',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardPartsWantedRoute =
+  AuthenticatedDashboardPartsWantedRouteImport.update({
+    id: '/dashboard/parts-wanted',
+    path: '/dashboard/parts-wanted',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardStaffRequestsRoute =
+  AuthenticatedDashboardStaffRequestsRouteImport.update({
+    id: '/dashboard/staff-requests',
+    path: '/dashboard/staff-requests',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDisputeReportIdRoute =
+  AuthenticatedDisputeReportIdRouteImport.update({
+    id: '/dispute/$reportId',
+    path: '/dispute/$reportId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFranchiseDashboardRoute =
+  AuthenticatedFranchiseDashboardRouteImport.update({
+    id: '/franchise/dashboard',
+    path: '/franchise/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFranchiseStatusRoute =
+  Aut…56234 tokens truncated…e/technicians/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceTechniciansIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceTechniciansRoute
+    }
+    '/_authenticated/workspace/vehicles/$id': {
+      id: '/_authenticated/workspace/vehicles/$id'
+      path: '/$id'
+      fullPath: '/workspace/vehicles/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceVehiclesIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceVehiclesRoute
+    }
+    '/_authenticated/workspace/vendor-bills/$id': {
+      id: '/_authenticated/workspace/vendor-bills/$id'
+      path: '/$id'
+      fullPath: '/workspace/vendor-bills/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceVendorBillsIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceVendorBillsRoute
+    }
+    '/_authenticated/workspace/work-orders/$id': {
+      id: '/_authenticated/workspace/work-orders/$id'
+      path: '/$id'
+      fullPath: '/workspace/work-orders/$id'
+      preLoaderRoute: typeof AuthenticatedWorkspaceWorkOrdersIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceWorkOrdersRoute
+    }
+    '/_authenticated/workspace/work-orders/new': {
+      id: '/_authenticated/workspace/work-orders/new'
+      path: '/new'
+      fullPath: '/workspace/work-orders/new'
+      preLoaderRoute: typeof AuthenticatedWorkspaceWorkOrdersNewRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceWorkOrdersRoute
+    }
+    '/admin/advertisements/analytics/$code': {
+      id: '/admin/advertisements/analytics/$code'
+      path: '/$code'
+      fullPath: '/admin/advertisements/analytics/$code'
+      preLoaderRoute: typeof AdminAdvertisementsAnalyticsCodeRouteImport
+      parentRoute: typeof AdminAdvertisementsAnalyticsRoute
+    }
+    '/api/public/auth/signup': {
+      id: '/api/public/auth/signup'
+      path: '/api/public/auth/signup'
+      fullPath: '/api/public/auth/signup'
+      preLoaderRoute: typeof ApiPublicAuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/auth/signup-failure-log': {
+      id: '/api/public/auth/signup-failure-log'
+      path: '/api/public/auth/signup-failure-log'
+      fullPath: '/api/public/auth/signup-failure-log'
+      preLoaderRoute: typeof ApiPublicAuthSignupFailureLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/flashcards/content': {
+      id: '/api/public/flashcards/content'
+      path: '/api/public/flashcards/content'
+      fullPath: '/api/public/flashcards/content'
+      preLoaderRoute: typeof ApiPublicFlashcardsContentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/fx/refresh': {
+      id: '/api/public/fx/refresh'
+      path: '/api/public/fx/refresh'
+      fullPath: '/api/public/fx/refresh'
+      preLoaderRoute: typeof ApiPublicFxRefreshRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/go/$slug': {
+      id: '/api/public/go/$slug'
+      path: '/api/public/go/$slug'
+      fullPath: '/api/public/go/$slug'
+      preLoaderRoute: typeof ApiPublicGoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/health/routes': {
+      id: '/api/public/health/routes'
+      path: '/api/public/health/routes'
+      fullPath: '/api/public/health/routes'
+      preLoaderRoute: typeof ApiPublicHealthRoutesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/annual-bonuses': {
+      id: '/api/public/hooks/annual-bonuses'
+      path: '/api/public/hooks/annual-bonuses'
+      fullPath: '/api/public/hooks/annual-bonuses'
+      preLoaderRoute: typeof ApiPublicHooksAnnualBonusesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/discover-sync': {
+      id: '/api/public/hooks/discover-sync'
+      path: '/api/public/hooks/discover-sync'
+      fullPath: '/api/public/hooks/discover-sync'
+      preLoaderRoute: typeof ApiPublicHooksDiscoverSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/dispatch-expand': {
+      id: '/api/public/hooks/dispatch-expand'
+      path: '/api/public/hooks/dispatch-expand'
+      fullPath: '/api/public/hooks/dispatch-expand'
+      preLoaderRoute: typeof ApiPublicHooksDispatchExpandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/flashcards-autosync': {
+      id: '/api/public/hooks/flashcards-autosync'
+      path: '/api/public/hooks/flashcards-autosync'
+      fullPath: '/api/public/hooks/flashcards-autosync'
+      preLoaderRoute: typeof ApiPublicHooksFlashcardsAutosyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/ops-alerts-digest': {
+      id: '/api/public/hooks/ops-alerts-digest'
+      path: '/api/public/hooks/ops-alerts-digest'
+      fullPath: '/api/public/hooks/ops-alerts-digest'
+      preLoaderRoute: typeof ApiPublicHooksOpsAlertsDigestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/parts-wanted-digest': {
+      id: '/api/public/hooks/parts-wanted-digest'
+      path: '/api/public/hooks/parts-wanted-digest'
+      fullPath: '/api/public/hooks/parts-wanted-digest'
+      preLoaderRoute: typeof ApiPublicHooksPartsWantedDigestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/quarterly-bonuses': {
+      id: '/api/public/hooks/quarterly-bonuses'
+      path: '/api/public/hooks/quarterly-bonuses'
+      fullPath: '/api/public/hooks/quarterly-bonuses'
+      preLoaderRoute: typeof ApiPublicHooksQuarterlyBonusesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/recompute-tiers': {
+      id: '/api/public/hooks/recompute-tiers'
+      path: '/api/public/hooks/recompute-tiers'
+      fullPath: '/api/public/hooks/recompute-tiers'
+      preLoaderRoute: typeof ApiPublicHooksRecomputeTiersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/refresh-lazada': {
+      id: '/api/public/hooks/refresh-lazada'
+      path: '/api/public/hooks/refresh-lazada'
+      fullPath: '/api/public/hooks/refresh-lazada'
+      preLoaderRoute: typeof ApiPublicHooksRefreshLazadaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/shop-automation-run': {
+      id: '/api/public/hooks/shop-automation-run'
+      path: '/api/public/hooks/shop-automation-run'
+      fullPath: '/api/public/hooks/shop-automation-run'
+      preLoaderRoute: typeof ApiPublicHooksShopAutomationRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/signup-failure-alerts': {
+      id: '/api/public/hooks/signup-failure-alerts'
+      path: '/api/public/hooks/signup-failure-alerts'
+      fullPath: '/api/public/hooks/signup-failure-alerts'
+      preLoaderRoute: typeof ApiPublicHooksSignupFailureAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/sync-parts-feeds': {
+      id: '/api/public/hooks/sync-parts-feeds'
+      path: '/api/public/hooks/sync-parts-feeds'
+      fullPath: '/api/public/hooks/sync-parts-feeds'
+      preLoaderRoute: typeof ApiPublicHooksSyncPartsFeedsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/postback/$network': {
+      id: '/api/public/postback/$network'
+      path: '/api/public/postback/$network'
+      fullPath: '/api/public/postback/$network'
+      preLoaderRoute: typeof ApiPublicPostbackNetworkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/qr-rescue/$code': {
+      id: '/api/public/qr-rescue/$code'
+      path: '/api/public/qr-rescue/$code'
+      fullPath: '/api/public/qr-rescue/$code'
+      preLoaderRoute: typeof ApiPublicQrRescueCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/qr-rescue/log': {
+      id: '/api/public/qr-rescue/log'
+      path: '/api/public/qr-rescue/log'
+      fullPath: '/api/public/qr-rescue/log'
+      preLoaderRoute: typeof ApiPublicQrRescueLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/seller/staff/create': {
+      id: '/api/seller/staff/create'
+      path: '/api/seller/staff/create'
+      fullPath: '/api/seller/staff/create'
+      preLoaderRoute: typeof ApiSellerStaffCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/seller/staff/deactivate': {
+      id: '/api/seller/staff/deactivate'
+      path: '/api/seller/staff/deactivate'
+      fullPath: '/api/seller/staff/deactivate'
+      preLoaderRoute: typeof ApiSellerStaffDeactivateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/seller/staff/reset-password': {
+      id: '/api/seller/staff/reset-password'
+      path: '/api/seller/staff/reset-password'
+      fullPath: '/api/seller/staff/reset-password'
+      preLoaderRoute: typeof ApiSellerStaffResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/business/$businessId/': {
+      id: '/dashboard/business/$businessId/'
+      path: '/'
+      fullPath: '/dashboard/business/$businessId/'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdIndexRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/billing': {
+      id: '/dashboard/business/$businessId/billing'
+      path: '/billing'
       fullPath: '/dashboard/business/$businessId/billing'
       preLoaderRoute: typeof DashboardBusinessBusinessIdBillingRouteImport
       parentRoute: typeof DashboardBusinessBusinessIdRoute
@@ -1226,6 +1747,13 @@ const HelpPayWithGcashRoute = HelpPayWithGcashRouteImport.update({
       path: '/invoices'
       fullPath: '/dashboard/business/$businessId/invoices'
       preLoaderRoute: typeof DashboardBusinessBusinessIdInvoicesRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/operations': {
+      id: '/dashboard/business/$businessId/operations'
+      path: '/operations'
+      fullPath: '/dashboard/business/$businessId/operations'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdOperationsRouteImport
       parentRoute: typeof DashboardBusinessBusinessIdRoute
     }
     '/dashboard/business/$businessId/parts-operations': {
@@ -2068,6 +2596,7 @@ interface DashboardBusinessBusinessIdRouteChildren {
   DashboardBusinessBusinessIdFleetRoute: typeof DashboardBusinessBusinessIdFleetRoute
   DashboardBusinessBusinessIdInventoryRoute: typeof DashboardBusinessBusinessIdInventoryRoute
   DashboardBusinessBusinessIdInvoicesRoute: typeof DashboardBusinessBusinessIdInvoicesRouteWithChildren
+  DashboardBusinessBusinessIdOperationsRoute: typeof DashboardBusinessBusinessIdOperationsRoute
   DashboardBusinessBusinessIdPartsOperationsRoute: typeof DashboardBusinessBusinessIdPartsOperationsRoute
   DashboardBusinessBusinessIdSettingsRoute: typeof DashboardBusinessBusinessIdSettingsRoute
   DashboardBusinessBusinessIdStaffRoute: typeof DashboardBusinessBusinessIdStaffRoute
@@ -2086,6 +2615,8 @@ const DashboardBusinessBusinessIdRouteChildren: DashboardBusinessBusinessIdRoute
       DashboardBusinessBusinessIdInventoryRoute,
     DashboardBusinessBusinessIdInvoicesRoute:
       DashboardBusinessBusinessIdInvoicesRouteWithChildren,
+    DashboardBusinessBusinessIdOperationsRoute:
+      DashboardBusinessBusinessIdOperationsRoute,
     DashboardBusinessBusinessIdPartsOperationsRoute:
       DashboardBusinessBusinessIdPartsOperationsRoute,
     DashboardBusinessBusinessIdSettingsRoute:

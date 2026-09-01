@@ -100,6 +100,8 @@ const MOBILE_SECTIONS: MobileSection[] = [
     tone: "border-blue-300 bg-blue-100 dark:border-blue-500/40 dark:bg-blue-500/15",
     summaryTone: "bg-blue-100 dark:bg-blue-500/25 text-blue-800 dark:text-blue-200",
     links: [
+      { to: "/workspace", label: "Open Shop Manager" },
+      { to: "/workspace/operations", label: "Employee operations" },
       { to: "/shop-manager", label: "Overview" },
       { to: "/shop-manager/pricing", label: "Plans & pricing" },
       { to: "/features", label: "All features" },
@@ -1182,4 +1184,3 @@ function useMyBusinesses(userId?: string): { list: MyBiz[]; setup: BusinessSetup
   }, [userId]);
   return { list, setup };
 }
-
