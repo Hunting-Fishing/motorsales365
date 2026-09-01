@@ -3,30 +3,26 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 import { brokeredPreviewStorage } from "./previewAuthStorage";
 
+// Production authentication must never fall back to the retired Lovable project.
+// These are public browser credentials (not the service-role secret). Keeping the
+// canonical standalone values here also protects production from stale Vite build
+// variables cached by a hosting provider.
+const STANDALONE_SUPABASE_URL = "https://wjxaajgvddtrxxtocxen.supabase.co";
+const STANDALONE_SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_RTI8m0ZvjoZFH7_q-wnIQQ_SxrL0s-d";
+
 function createSupabaseClient() {
-  // Use import.meta.env for client-side (Vite build-time replacement)
-  // Fall back to process.env for SSR (server-side rendering)
-  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const SUPABASE_PUBLISHABLE_KEY =
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
-
-  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    const missing = [
-      ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
-      ...(!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
-    ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
-  }
-
-  return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-    auth: {
-      storage: brokeredPreviewStorage(),
-      persistSession: true,
-      autoRefreshToken: true,
+  return createClient<Database>(
+    STANDALONE_SUPABASE_URL,
+    STANDALONE_SUPABASE_PUBLISHABLE_KEY,
+    {
+      auth: {
+        storage: brokeredPreviewStorage(),
+        persistSession: true,
+        autoRefreshToken: true,
+      },
     },
-  });
+  );
 }
 
 let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
