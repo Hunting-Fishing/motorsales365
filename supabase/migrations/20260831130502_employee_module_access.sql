@@ -44,6 +44,9 @@ BEGIN
   IF v_roles && ARRAY['other_staff','dispatch','yard','yard_manager','yard_manager_assistant']::text[] THEN
     v_modules := v_modules || ARRAY['customers','vehicles','work_orders','inventory','parts_network','scheduling'];
   END IF;
+  IF v_roles && ARRAY['truck_driver']::text[] THEN
+    v_modules := v_modules || ARRAY['vehicles','parts_network','scheduling'];
+  END IF;
   RETURN ARRAY(SELECT DISTINCT unnest(v_modules));
 END;
 $$;
