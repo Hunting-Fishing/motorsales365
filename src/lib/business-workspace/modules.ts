@@ -134,6 +134,7 @@ export const MODULES: Record<WorkspaceModuleId, WorkspaceModule> = {
     label: "Billing",
     icon: Receipt,
     path: (id) => `/dashboard/business/${id}/billing`,
+    roles: ["owner", "manager", "assistant_manager"],
   },
   settings: {
     id: "settings",
