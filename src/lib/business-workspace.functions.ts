@@ -66,7 +66,15 @@ export const getWorkspaceBusiness = createServerFn({ method: "POST" })
     if (error) throw error;
     if (!biz) return null;
 
-    let role: "owner" | "manager" | "dispatcher" | "driver" | "mechanic" | "clerk" | null = null;
+    let role:
+      | "owner"
+      | "manager"
+      | "assistant_manager"
+      | "dispatcher"
+      | "driver"
+      | "mechanic"
+      | "clerk"
+      | null = null;
     if (biz.owner_id === userId) {
       role = "owner";
     } else {
