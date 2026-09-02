@@ -164,7 +164,10 @@ export function NetworkPartOrderDialog({
           </p>
         ) : businesses.data?.length === 0 ? (
           <div className="space-y-3 rounded-lg border bg-muted/40 p-4 text-sm">
-            <p>A manager or owner role on a 365 business is required before placing orders.</p>
+            <p>
+              An owner, manager, or assistant manager role on a 365 business is required before
+              placing orders.
+            </p>
             <Button asChild variant="outline">
               <Link to="/partners/parts/onboarding">Set up an Associate business</Link>
             </Button>
