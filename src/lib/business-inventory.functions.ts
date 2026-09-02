@@ -24,7 +24,7 @@ export const listBusinessInventory = createServerFn({ method: "POST" })
     const { data: rows, error } = await supabase
       .from("business_inventory_items")
       .select(
-        "*, business_inventory_locations:location_id(name,code), business_part_cross_references(part_number,number_type,supplier_name,active)",
+        "*, business_inventory_locations:location_id(name,code), parts_catalog:catalog_part_id(id,title,manufacturer,manufacturer_part_number,catalog_status,active), business_part_cross_references(part_number,number_type,supplier_name,active)",
       )
       .eq("business_id", data.businessId)
       .order("name", { ascending: true });
@@ -61,6 +61,18 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertManager(supabase, userId, data.businessId);
+
+    if (data.catalog_part_id) {
+      const { data: canonicalPart, error: canonicalError } = await supabase
+        .from("parts_catalog")
+        .select("id")
+        .eq("id", data.catalog_part_id)
+        .eq("active", true)
+        .eq("catalog_status", "active")
+        .maybeSingle();
+      if (canonicalError) throw canonicalError;
+      if (!canonicalPart) throw new Error("Select an active canonical catalogue product");
+    }
 
     if (!data.id) {
       const { enforceLimit, planLimitErrorPayload, PlanLimitError } =
