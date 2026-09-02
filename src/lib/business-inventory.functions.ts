@@ -23,7 +23,9 @@ export const listBusinessInventory = createServerFn({ method: "POST" })
 
     const { data: rows, error } = await supabase
       .from("business_inventory_items")
-      .select("*, business_inventory_locations:location_id(name,code)")
+      .select(
+        "*, business_inventory_locations:location_id(name,code), business_part_cross_references(part_number,number_type,supplier_name,active)",
+      )
       .eq("business_id", data.businessId)
       .order("name", { ascending: true });
     if (error) throw error;
