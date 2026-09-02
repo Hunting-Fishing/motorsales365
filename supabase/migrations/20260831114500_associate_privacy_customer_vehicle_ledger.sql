@@ -105,6 +105,8 @@ DROP TRIGGER IF EXISTS parts_orders_require_active_associates ON public.parts_or
 CREATE TRIGGER parts_orders_require_active_associates
   BEFORE INSERT ON public.parts_orders FOR EACH ROW
   EXECUTE FUNCTION public.enforce_active_associate_on_new_order();
+REVOKE ALL ON FUNCTION public.enforce_active_associate_on_new_order() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.enforce_active_associate_on_new_order() TO service_role;
 
 CREATE OR REPLACE FUNCTION public.touch_associate_last_transaction()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
@@ -124,6 +126,8 @@ DROP TRIGGER IF EXISTS parts_order_events_touch_associate ON public.parts_order_
 CREATE TRIGGER parts_order_events_touch_associate
   AFTER INSERT ON public.parts_order_events FOR EACH ROW
   EXECUTE FUNCTION public.touch_associate_last_transaction();
+REVOKE ALL ON FUNCTION public.touch_associate_last_transaction() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.touch_associate_last_transaction() TO service_role;
 
 CREATE OR REPLACE FUNCTION public.offboard_business_associate(
   _application_id uuid,
@@ -192,6 +196,8 @@ DROP TRIGGER IF EXISTS business_associate_sync_access ON public.business_associa
 CREATE TRIGGER business_associate_sync_access
   BEFORE INSERT OR UPDATE OF status ON public.business_associate_applications
   FOR EACH ROW EXECUTE FUNCTION public.sync_associate_access_state();
+REVOKE ALL ON FUNCTION public.sync_associate_access_state() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.sync_associate_access_state() TO service_role;
 
 -- Customer identity stays private. Cross-location visibility is explicit and revocable.
 CREATE TABLE IF NOT EXISTS public.customer_accounts (
