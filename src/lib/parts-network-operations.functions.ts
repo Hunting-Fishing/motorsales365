@@ -224,7 +224,7 @@ export const listMyPartsBusinesses = createServerFn({ method: "POST" })
       .select("business_id,role")
       .eq("user_id", userId)
       .eq("active", true)
-      .in("role", ["owner", "manager"]);
+      .in("role", ["owner", "manager", "assistant_manager"]);
     if (staffError) throw staffError;
     const staffIds = (staffRows ?? []).map((row: any) => row.business_id);
 
