@@ -199,3 +199,39 @@ export const deleteBusinessInventoryItem = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+export const getCanonicalLinkCapability = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { businessId: string }) => d)
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: canManage, error: managerError } = await (supabase as any).rpc(
+      "has_business_role",
+      { _user: userId, _business: data.businessId, _role: "manager" },
+    );
+    if (managerError) throw managerError;
+    const { data: allowed, error } = await (supabase as any).rpc("has_active_business_permission", {
+      _user: userId,
+      _business: data.businessId,
+      _permission_key: "canonical_inventory_link",
+    });
+    if (error) throw error;
+    return { allowed: allowed === true, canManage: canManage === true };
+  });
+
+export const linkBusinessInventoryCanonicalPart = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { businessId: string; itemId: string; catalogPartId: string | null }) => d)
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: row, error } = await (supabase as any).rpc(
+      "link_business_inventory_catalog_part",
+      {
+        _business_id: data.businessId,
+        _inventory_item_id: data.itemId,
+        _catalog_part_id: data.catalogPartId,
+      },
+    );
+    if (error) throw error;
+    return row;
+  });
