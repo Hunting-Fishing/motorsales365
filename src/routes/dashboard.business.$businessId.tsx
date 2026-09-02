@@ -49,11 +49,15 @@ function WorkspaceLayout() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("business_associate_applications" as any)
-        .select("status")
+        .select("status,access_enabled,offboarded_at")
         .eq("business_id", businessId)
         .maybeSingle();
       if (error) throw error;
-      return (data as any)?.status as string | undefined;
+      return data as {
+        status: string;
+        access_enabled: boolean;
+        offboarded_at: string | null;
+      } | null;
     },
   });
 
@@ -93,7 +97,12 @@ function WorkspaceLayout() {
   const isDemo = (business as any).import_metadata?.demo_template === "tow-company-v1";
 
   async function handleDemoReset() {
-    if (!confirm("Restore the demo fleet and inventory baseline? Your own untagged records will remain.")) return;
+    if (
+      !confirm(
+        "Restore the demo fleet and inventory baseline? Your own untagged records will remain.",
+      )
+    )
+      return;
     try {
       await resetDemo({ data: { businessId } });
       toast.success("Demo fleet and inventory restored");
@@ -115,7 +124,14 @@ function WorkspaceLayout() {
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
           <div className="text-sm text-muted-foreground truncate">
             <span className="font-medium text-foreground">{business.name}</span> workspace
-            <AssociateWorkspaceBadge status={associateQ.data} />
+            <AssociateWorkspaceBadge
+              status={associateQ.data?.status}
+              active={
+                associateQ.data?.status === "approved" &&
+                associateQ.data?.access_enabled === true &&
+                !associateQ.data?.offboarded_at
+              }
+            />
             {isDemo && (
               <span className="ml-2 inline-flex rounded-full border border-violet-500/40 bg-violet-500/10 px-2 py-0.5 text-[11px] font-semibold text-violet-700 dark:text-violet-300">
                 Playground
@@ -149,7 +165,11 @@ function WorkspaceLayout() {
             businessName={business.name}
             businessKind={business.type_slug}
             role={role as any}
-            associateApproved={associateQ.data === "approved"}
+            associateApproved={
+              associateQ.data?.status === "approved" &&
+              associateQ.data?.access_enabled === true &&
+              !associateQ.data?.offboarded_at
+            }
           />
           <main className="flex-1 min-w-0">
             <WorkspacePlanWarnings businessId={business.id} usage={usage} />
@@ -161,18 +181,25 @@ function WorkspaceLayout() {
   );
 }
 
-function AssociateWorkspaceBadge({ status }: { status?: string }) {
-  if (status === "approved") {
+function AssociateWorkspaceBadge({ status, active }: { status?: string; active?: boolean }) {
+  if (active) {
     return (
       <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/50 bg-amber-400/15 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
         <BadgeCheck className="h-3 w-3" /> 365 Associate
       </span>
     );
   }
-  if (status === "submitted" || status === "reviewing") {
+  if (status === "pending" || status === "submitted" || status === "reviewing") {
     return (
       <span className="ml-2 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
         Associate application pending
+      </span>
+    );
+  }
+  if (status === "suspended" || status === "withdrawn" || status === "rejected") {
+    return (
+      <span className="ml-2 inline-flex rounded-full border border-destructive/40 bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">
+        Associate access inactive
       </span>
     );
   }
