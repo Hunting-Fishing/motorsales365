@@ -21,7 +21,10 @@ import {
   upsertBusinessInventoryItem,
   adjustBusinessInventory,
   deleteBusinessInventoryItem,
+  getCanonicalLinkCapability,
+  linkBusinessInventoryCanonicalPart,
 } from "@/lib/business-inventory.functions";
+import { getCanonicalCatalogMatches } from "@/lib/parts-network-operations.functions";
 import {
   listShopInquiries,
   updateNetworkInquiryStatus,
@@ -61,11 +64,19 @@ function InventoryPage() {
   const adjustFn = useServerFn(adjustBusinessInventory);
   const delFn = useServerFn(deleteBusinessInventoryItem);
   const inquiriesFn = useServerFn(listShopInquiries);
+  const capabilityFn = useServerFn(getCanonicalLinkCapability);
+  const linkCanonicalFn = useServerFn(linkBusinessInventoryCanonicalPart);
+  const catalogFn = useServerFn(getCanonicalCatalogMatches);
 
   const q = useQuery({
     queryKey: ["business-inventory", businessId],
     enabled: !!user?.id,
     queryFn: () => loadFn({ data: { businessId } }),
+  });
+  const capability = useQuery({
+    queryKey: ["business-canonical-link-capability", businessId, user?.id],
+    enabled: !!user?.id,
+    queryFn: () => capabilityFn({ data: { businessId } }),
   });
 
   const businessMeta = useQuery({
@@ -126,6 +137,17 @@ function InventoryPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
   const [inventorySearch, setInventorySearch] = useState("");
+  const [linkingItem, setLinkingItem] = useState<any | null>(null);
+  const [catalogSearch, setCatalogSearch] = useState("");
+  const [selectedCatalogPartId, setSelectedCatalogPartId] = useState<string | null>(null);
+  const [linking, setLinking] = useState(false);
+
+  const catalogMatches = useQuery({
+    queryKey: ["canonical-link-search", catalogSearch],
+    enabled: !!linkingItem && catalogSearch.trim().length >= 3,
+    queryFn: () => catalogFn({ data: { query: catalogSearch.trim(), limit: 20 } }),
+    staleTime: 60_000,
+  });
 
   function openNew() {
     setEditing(null);
@@ -135,6 +157,33 @@ function InventoryPage() {
   function openEdit(row: any) {
     setEditing(row);
     setOpen(true);
+  }
+
+  function openCanonicalLink(row: any) {
+    setLinkingItem(row);
+    setCatalogSearch(row.manufacturer_part_number || row.sku || row.name || "");
+    setSelectedCatalogPartId(row.catalog_part_id ?? null);
+  }
+
+  async function saveCanonicalLink() {
+    if (!linkingItem) return;
+    setLinking(true);
+    try {
+      await linkCanonicalFn({
+        data: {
+          businessId,
+          itemId: linkingItem.id,
+          catalogPartId: selectedCatalogPartId,
+        },
+      });
+      toast.success(selectedCatalogPartId ? "Canonical product linked" : "Canonical link removed");
+      setLinkingItem(null);
+      qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
+    } catch (e: any) {
+      toast.error(e?.message || "Could not update canonical link");
+    } finally {
+      setLinking(false);
+    }
   }
 
   async function adjust(itemId: string, delta: number) {
@@ -200,9 +249,11 @@ function InventoryPage() {
             Track straps, dollies, fuel, spare parts, and any other consumables.
           </p>
         </div>
-        <Button onClick={openNew}>
-          <Plus className="h-4 w-4 mr-1" /> Add item
-        </Button>
+        {capability.data?.canManage && (
+          <Button onClick={openNew}>
+            <Plus className="h-4 w-4 mr-1" /> Add item
+          </Button>
+        )}
       </div>
 
       <NetworkExposureCard businessId={businessId} />
@@ -316,12 +367,26 @@ function InventoryPage() {
                   </Button>
                   <span className="text-xs text-muted-foreground ml-1">{it.unit}</span>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => openEdit(it)}>
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleDelete(it.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                {capability.data?.allowed && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openCanonicalLink(it)}
+                    aria-label={`Link ${it.name} to canonical catalogue`}
+                  >
+                    <Link2 className="mr-1 h-3.5 w-3.5" /> Catalogue
+                  </Button>
+                )}
+                {capability.data?.canManage && (
+                  <>
+                    <Button variant="ghost" size="icon" onClick={() => openEdit(it)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(it.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           );
@@ -336,6 +401,73 @@ function InventoryPage() {
         editing={editing}
         onSaved={() => qc.invalidateQueries({ queryKey: ["business-inventory", businessId] })}
       />
+
+      <Dialog open={!!linkingItem} onOpenChange={(next) => !next && setLinkingItem(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Link approved canonical product</DialogTitle>
+            <DialogDescription>
+              Match {linkingItem?.name} to one active 365 catalogue record. This action changes only
+              the catalogue link and is recorded in inventory history.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Search by part number, brand, or product name</Label>
+              <Input
+                value={catalogSearch}
+                onChange={(event) => setCatalogSearch(event.target.value)}
+                placeholder="Enter at least 3 characters"
+              />
+            </div>
+            <div className="max-h-72 space-y-2 overflow-y-auto rounded-md border p-2">
+              {catalogMatches.isFetching && (
+                <p className="p-3 text-sm text-muted-foreground">Searching approved catalogue…</p>
+              )}
+              {!catalogMatches.isFetching && catalogSearch.trim().length < 3 && (
+                <p className="p-3 text-sm text-muted-foreground">Enter at least 3 characters.</p>
+              )}
+              {!catalogMatches.isFetching &&
+                catalogSearch.trim().length >= 3 &&
+                (catalogMatches.data ?? []).length === 0 && (
+                  <p className="p-3 text-sm text-muted-foreground">No approved products found.</p>
+                )}
+              {(catalogMatches.data ?? []).map((match) => (
+                <button
+                  type="button"
+                  key={match.id}
+                  onClick={() => setSelectedCatalogPartId(match.id)}
+                  className={`w-full rounded-md border p-3 text-left transition-colors ${
+                    selectedCatalogPartId === match.id
+                      ? "border-primary bg-primary/5"
+                      : "hover:bg-muted/60"
+                  }`}
+                >
+                  <div className="font-medium">{match.title}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {[match.manufacturer, match.manufacturer_part_number, match.match_reason]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-between">
+            <Button variant="ghost" onClick={() => setSelectedCatalogPartId(null)}>
+              Remove link
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setLinkingItem(null)}>
+                Cancel
+              </Button>
+              <Button onClick={saveCanonicalLink} disabled={linking}>
+                {linking ? "Saving…" : "Save catalogue link"}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
