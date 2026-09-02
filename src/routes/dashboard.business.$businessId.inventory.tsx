@@ -3,7 +3,18 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Package, Trash2, Pencil, Minus, Plus as PlusIcon, AlertTriangle, Radio, Search, Link2 } from "lucide-react";
+import {
+  Plus,
+  Package,
+  Trash2,
+  Pencil,
+  Minus,
+  Plus as PlusIcon,
+  AlertTriangle,
+  Radio,
+  Search,
+  Link2,
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   listBusinessInventory,
@@ -71,7 +82,6 @@ function InventoryPage() {
     },
   });
 
-
   const inquiries = useQuery({
     queryKey: ["business-network-inquiries", businessId],
     enabled: !!user?.id,
@@ -127,7 +137,6 @@ function InventoryPage() {
     setOpen(true);
   }
 
-
   async function adjust(itemId: string, delta: number) {
     try {
       await adjustFn({
@@ -151,7 +160,10 @@ function InventoryPage() {
   }
 
   const rows = q.data ?? [];
-  const normalizedSearch = inventorySearch.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  const normalizedSearch = inventorySearch
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
   const visibleRows = normalizedSearch
     ? rows.filter((item: any) => {
         const values = [
@@ -169,7 +181,10 @@ function InventoryPage() {
           ]),
         ];
         return values.some((value) =>
-          String(value ?? "").toLowerCase().replace(/[^a-z0-9]/g, "").includes(normalizedSearch),
+          String(value ?? "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "")
+            .includes(normalizedSearch),
         );
       })
     : rows;
@@ -203,7 +218,6 @@ function InventoryPage() {
         />
       </div>
 
-
       {inquiries.data && inquiries.data.length > 0 && (
         <Card className="divide-y">
           <div className="p-4">
@@ -218,7 +232,6 @@ function InventoryPage() {
         </Card>
       )}
 
-
       <Card className="divide-y">
         {q.isLoading && <div className="p-4 text-sm text-muted-foreground">Loading…</div>}
         {!q.isLoading && rows.length === 0 && (
@@ -232,8 +245,7 @@ function InventoryPage() {
           </div>
         )}
         {visibleRows.map((it: any) => {
-          const low =
-            it.reorder_at != null && Number(it.qty_on_hand) <= Number(it.reorder_at);
+          const low = it.reorder_at != null && Number(it.qty_on_hand) <= Number(it.reorder_at);
           return (
             <div key={it.id} className="p-4 flex items-center justify-between gap-3">
               <div className="min-w-0">
@@ -251,17 +263,26 @@ function InventoryPage() {
                   {(it.business_inventory_locations?.name || it.location) && (
                     <span>
                       @ {it.business_inventory_locations?.name ?? it.location}
-                      {it.location && it.business_inventory_locations?.name ? ` / ${it.location}` : ""}
+                      {it.location && it.business_inventory_locations?.name
+                        ? ` / ${it.location}`
+                        : ""}
                     </span>
                   )}
                 </div>
                 <div className="mt-1 flex flex-wrap gap-1.5">
                   {it.catalog_part_id && (
-                    <Badge variant="outline" className="text-[10px]">
-                      <Link2 className="mr-1 h-3 w-3" /> 365 catalogue linked
+                    <Badge variant="outline" className="max-w-full text-[10px]">
+                      <Link2 className="mr-1 h-3 w-3 shrink-0" />
+                      <span className="truncate">
+                        365:{" "}
+                        {it.parts_catalog?.manufacturer_part_number ||
+                          it.parts_catalog?.title ||
+                          "catalogue linked"}
+                      </span>
                     </Badge>
                   )}
-                  {(it.business_part_cross_references ?? []).filter((xref: any) => xref.active)
+                  {(it.business_part_cross_references ?? [])
+                    .filter((xref: any) => xref.active)
                     .slice(0, 3)
                     .map((xref: any) => (
                       <Badge
@@ -284,9 +305,7 @@ function InventoryPage() {
                   >
                     <Minus className="h-3 w-3" />
                   </Button>
-                  <div className="w-14 text-center font-semibold">
-                    {Number(it.qty_on_hand)}
-                  </div>
+                  <div className="w-14 text-center font-semibold">{Number(it.qty_on_hand)}</div>
                   <Button
                     variant="outline"
                     size="icon"
@@ -321,7 +340,10 @@ function InventoryPage() {
   );
 }
 
-const STATUS_VARIANT: Record<NetworkInquiryStatus, "default" | "secondary" | "destructive" | "outline"> = {
+const STATUS_VARIANT: Record<
+  NetworkInquiryStatus,
+  "default" | "secondary" | "destructive" | "outline"
+> = {
   pending: "default",
   accepted: "secondary",
   rejected: "destructive",
@@ -345,12 +367,8 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
   const [fulfill, setFulfill] = useState({
     price: row.fulfilled_price != null ? String(row.fulfilled_price) : "",
     quantity:
-      row.fulfilled_quantity != null
-        ? String(row.fulfilled_quantity)
-        : String(row.quantity ?? 1),
-    eta: row.fulfilled_eta
-      ? new Date(row.fulfilled_eta).toISOString().slice(0, 16)
-      : "",
+      row.fulfilled_quantity != null ? String(row.fulfilled_quantity) : String(row.quantity ?? 1),
+    eta: row.fulfilled_eta ? new Date(row.fulfilled_eta).toISOString().slice(0, 16) : "",
     message: row.fulfilled_message ?? "",
   });
 
@@ -436,7 +454,6 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
     }
   }
 
-
   async function submitFulfill() {
     if (!fulfillFor) return;
     const priceNum = fulfill.price.trim() === "" ? null : Number(fulfill.price);
@@ -493,12 +510,8 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
             {row.fulfilled_price != null && (
               <span>Price ₱{Number(row.fulfilled_price).toLocaleString()}</span>
             )}
-            {row.fulfilled_quantity != null && (
-              <span>Qty {Number(row.fulfilled_quantity)}</span>
-            )}
-            {row.fulfilled_eta && (
-              <span>ETA {new Date(row.fulfilled_eta).toLocaleString()}</span>
-            )}
+            {row.fulfilled_quantity != null && <span>Qty {Number(row.fulfilled_quantity)}</span>}
+            {row.fulfilled_eta && <span>ETA {new Date(row.fulfilled_eta).toLocaleString()}</span>}
           </div>
           {row.fulfilled_message && (
             <p className="mt-1 text-muted-foreground">{row.fulfilled_message}</p>
@@ -536,13 +549,7 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
             <Button
               key={s}
               size="sm"
-              variant={
-                s === "rejected"
-                  ? "destructive"
-                  : s === "accepted"
-                    ? "default"
-                    : "outline"
-              }
+              variant={s === "rejected" ? "destructive" : s === "accepted" ? "default" : "outline"}
               disabled={busy !== null}
               onClick={() => handleClick(s)}
               className="capitalize"
@@ -561,12 +568,10 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
       <Dialog open={!!fulfillFor} onOpenChange={(o) => !o && setFulfillFor(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              Mark as {fulfillFor === "closed" ? "Closed" : "Fulfilled"}
-            </DialogTitle>
+            <DialogTitle>Mark as {fulfillFor === "closed" ? "Closed" : "Fulfilled"}</DialogTitle>
             <DialogDescription>
-              Attach the final price, quantity, ETA, and a message. The customer sees
-              this on their request status.
+              Attach the final price, quantity, ETA, and a message. The customer sees this on their
+              request status.
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-3">
