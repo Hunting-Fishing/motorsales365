@@ -20,6 +20,7 @@ import {
 
 export type WorkspaceModuleId =
   | "overview"
+  | "shop_manager"
   | "operations"
   | "dispatch"
   | "fleet"
@@ -49,6 +50,13 @@ export const MODULES: Record<WorkspaceModuleId, WorkspaceModule> = {
     label: "Overview",
     icon: LayoutDashboard,
     path: (id) => `/dashboard/business/${id}`,
+  },
+  shop_manager: {
+    id: "shop_manager",
+    label: "Open Shop Manager",
+    icon: Wrench,
+    path: () => "/workspace",
+    roles: ["owner", "manager"],
   },
   operations: {
     id: "operations",
@@ -145,6 +153,7 @@ export function modulesForKind(kind: string | null | undefined): WorkspaceModule
     case "towing":
       ids = [
         "overview",
+        "shop_manager",
         "operations",
         "dispatch",
         "fleet",
@@ -162,20 +171,20 @@ export function modulesForKind(kind: string | null | undefined): WorkspaceModule
     case "carwash":
     case "audio_tint":
     case "inspection":
-      ids = ["overview", "operations", "staff", "inventory", "parts_operations", "invoices", ...COMMON_END];
+      ids = ["overview", "shop_manager", "operations", "staff", "inventory", "parts_operations", "invoices", ...COMMON_END];
       break;
     case "parts_accessories":
     case "accessories":
-      ids = ["overview", "operations", "inventory", "parts_operations", "invoices", "staff", ...COMMON_END];
+      ids = ["overview", "shop_manager", "operations", "inventory", "parts_operations", "invoices", "staff", ...COMMON_END];
       break;
     case "dealership":
     case "used_dealership":
     case "motorcycle_shop":
     case "rental":
-      ids = ["overview", "operations", "fleet", "staff", "parts_operations", "invoices", ...COMMON_END];
+      ids = ["overview", "shop_manager", "operations", "fleet", "staff", "parts_operations", "invoices", ...COMMON_END];
       break;
     default:
-      ids = ["overview", "operations", "inventory", "parts_operations", "invoices", "staff", ...COMMON_END];
+      ids = ["overview", "shop_manager", "operations", "inventory", "parts_operations", "invoices", "staff", ...COMMON_END];
   }
 
   return ids.map((id) => MODULES[id]);
