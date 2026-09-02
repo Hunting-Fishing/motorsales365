@@ -3,7 +3,7 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Package, Trash2, Pencil, Minus, Plus as PlusIcon, AlertTriangle, Radio } from "lucide-react";
+import { Plus, Package, Trash2, Pencil, Minus, Plus as PlusIcon, AlertTriangle, Radio, Search, Link2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   listBusinessInventory,
@@ -115,6 +115,7 @@ function InventoryPage() {
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
+  const [inventorySearch, setInventorySearch] = useState("");
 
   function openNew() {
     setEditing(null);
@@ -150,6 +151,28 @@ function InventoryPage() {
   }
 
   const rows = q.data ?? [];
+  const normalizedSearch = inventorySearch.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  const visibleRows = normalizedSearch
+    ? rows.filter((item: any) => {
+        const values = [
+          item.name,
+          item.sku,
+          item.category,
+          item.brand,
+          item.manufacturer_part_number,
+          item.oem_part_number,
+          item.barcode,
+          item.supplier,
+          ...(item.business_part_cross_references ?? []).flatMap((xref: any) => [
+            xref.part_number,
+            xref.supplier_name,
+          ]),
+        ];
+        return values.some((value) =>
+          String(value ?? "").toLowerCase().replace(/[^a-z0-9]/g, "").includes(normalizedSearch),
+        );
+      })
+    : rows;
 
   return (
     <div className="space-y-4">
@@ -168,6 +191,17 @@ function InventoryPage() {
       </div>
 
       <NetworkExposureCard businessId={businessId} />
+
+      <div className="relative max-w-xl">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={inventorySearch}
+          onChange={(event) => setInventorySearch(event.target.value)}
+          className="pl-9"
+          placeholder="Search item, SKU, OEM, barcode, supplier, or cross-reference"
+          aria-label="Search business inventory and private part cross-references"
+        />
+      </div>
 
 
       {inquiries.data && inquiries.data.length > 0 && (
@@ -192,7 +226,12 @@ function InventoryPage() {
             No inventory yet. Add items you want to track so you never run out.
           </div>
         )}
-        {rows.map((it: any) => {
+        {!q.isLoading && rows.length > 0 && visibleRows.length === 0 && (
+          <div className="p-6 text-center text-sm text-muted-foreground">
+            No inventory matches “{inventorySearch}”.
+          </div>
+        )}
+        {visibleRows.map((it: any) => {
           const low =
             it.reorder_at != null && Number(it.qty_on_hand) <= Number(it.reorder_at);
           return (
@@ -215,6 +254,24 @@ function InventoryPage() {
                       {it.location && it.business_inventory_locations?.name ? ` / ${it.location}` : ""}
                     </span>
                   )}
+                </div>
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  {it.catalog_part_id && (
+                    <Badge variant="outline" className="text-[10px]">
+                      <Link2 className="mr-1 h-3 w-3" /> 365 catalogue linked
+                    </Badge>
+                  )}
+                  {(it.business_part_cross_references ?? []).filter((xref: any) => xref.active)
+                    .slice(0, 3)
+                    .map((xref: any) => (
+                      <Badge
+                        key={`${xref.number_type}-${xref.part_number}`}
+                        variant="secondary"
+                        className="text-[10px]"
+                      >
+                        {String(xref.number_type).replaceAll("_", " ")}: {xref.part_number}
+                      </Badge>
+                    ))}
                 </div>
               </div>
               <div className="flex items-center gap-3">
