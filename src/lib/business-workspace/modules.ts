@@ -41,7 +41,9 @@ export type WorkspaceModule = {
   icon: LucideIcon;
   path: (businessId: string) => string;
   /** Roles allowed to see this module in the sidebar. Owner is always allowed. */
-  roles?: Array<"owner" | "manager" | "dispatcher" | "driver" | "mechanic" | "clerk">;
+  roles?: Array<
+    "owner" | "manager" | "assistant_manager" | "dispatcher" | "driver" | "mechanic" | "clerk"
+  >;
 };
 
 export const MODULES: Record<WorkspaceModuleId, WorkspaceModule> = {
@@ -56,7 +58,7 @@ export const MODULES: Record<WorkspaceModuleId, WorkspaceModule> = {
     label: "Open Shop Manager",
     icon: Wrench,
     path: () => "/workspace",
-    roles: ["owner", "manager"],
+    roles: ["owner", "manager", "assistant_manager"],
   },
   operations: {
     id: "operations",
@@ -81,7 +83,7 @@ export const MODULES: Record<WorkspaceModuleId, WorkspaceModule> = {
     label: "Employees",
     icon: Users,
     path: (id) => `/dashboard/business/${id}/staff`,
-    roles: ["owner", "manager"],
+    roles: ["owner", "manager", "assistant_manager"],
   },
   inventory: {
     id: "inventory",
@@ -100,7 +102,7 @@ export const MODULES: Record<WorkspaceModuleId, WorkspaceModule> = {
     label: "Invoices",
     icon: Receipt,
     path: (id) => `/dashboard/business/${id}/invoices`,
-    roles: ["owner", "manager"],
+    roles: ["owner", "manager", "assistant_manager"],
   },
 
   listings: {
@@ -138,7 +140,7 @@ export const MODULES: Record<WorkspaceModuleId, WorkspaceModule> = {
     label: "Settings",
     icon: Settings,
     path: (id) => `/dashboard/business/${id}/settings`,
-    roles: ["owner", "manager"],
+    roles: ["owner", "manager", "assistant_manager"],
   },
 };
 
@@ -171,20 +173,56 @@ export function modulesForKind(kind: string | null | undefined): WorkspaceModule
     case "carwash":
     case "audio_tint":
     case "inspection":
-      ids = ["overview", "shop_manager", "operations", "staff", "inventory", "parts_operations", "invoices", ...COMMON_END];
+      ids = [
+        "overview",
+        "shop_manager",
+        "operations",
+        "staff",
+        "inventory",
+        "parts_operations",
+        "invoices",
+        ...COMMON_END,
+      ];
       break;
     case "parts_accessories":
     case "accessories":
-      ids = ["overview", "shop_manager", "operations", "inventory", "parts_operations", "invoices", "staff", ...COMMON_END];
+      ids = [
+        "overview",
+        "shop_manager",
+        "operations",
+        "inventory",
+        "parts_operations",
+        "invoices",
+        "staff",
+        ...COMMON_END,
+      ];
       break;
     case "dealership":
     case "used_dealership":
     case "motorcycle_shop":
     case "rental":
-      ids = ["overview", "shop_manager", "operations", "fleet", "staff", "parts_operations", "invoices", ...COMMON_END];
+      ids = [
+        "overview",
+        "shop_manager",
+        "operations",
+        "fleet",
+        "staff",
+        "parts_operations",
+        "invoices",
+        ...COMMON_END,
+      ];
       break;
     default:
-      ids = ["overview", "shop_manager", "operations", "inventory", "parts_operations", "invoices", "staff", ...COMMON_END];
+      ids = [
+        "overview",
+        "shop_manager",
+        "operations",
+        "inventory",
+        "parts_operations",
+        "invoices",
+        "staff",
+        ...COMMON_END,
+      ];
   }
 
   return ids.map((id) => MODULES[id]);
