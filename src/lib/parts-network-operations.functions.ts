@@ -378,14 +378,12 @@ async function assertBusinessMember(supabase: any, userId: string, businessId: s
 }
 
 async function assertApprovedAssociate(supabase: any, businessId: string) {
-  const { data, error } = await supabase
-    .from("business_associate_applications")
-    .select("status")
-    .eq("business_id", businessId)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("is_active_associate", {
+    _business_id: businessId,
+  });
   if (error) throw error;
-  if (data?.status !== "approved") {
-    throw new Error("Approved 365 Associate enrollment is required for Parts Network operations");
+  if (!data) {
+    throw new Error("Active 365 Associate access is required for Parts Network operations");
   }
 }
 
