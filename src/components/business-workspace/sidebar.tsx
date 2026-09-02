@@ -7,7 +7,7 @@ type Props = {
   businessId: string;
   businessName: string;
   businessKind: string | null | undefined;
-  role: "owner" | "manager" | "dispatcher" | "driver" | "mechanic" | "clerk";
+  role: "owner" | "manager" | "assistant_manager" | "dispatcher" | "driver" | "mechanic" | "clerk";
   associateApproved?: boolean;
 };
 
@@ -37,25 +37,21 @@ export function WorkspaceSidebar({
         </Link>
         <div className="mt-2 font-semibold truncate">{businessName}</div>
         <div className="text-[11px] uppercase tracking-wide text-muted-foreground mt-0.5">
-          {role}
+          {role.replaceAll("_", " ")}
         </div>
       </div>
       <nav className="p-2 flex md:flex-col gap-1 overflow-x-auto md:overflow-visible">
         {modules.map((m: WorkspaceModule) => {
           const Icon = m.icon;
           const href = m.path(businessId);
-          const active =
-            pathname === href ||
-            (m.id !== "overview" && pathname.startsWith(href));
+          const active = pathname === href || (m.id !== "overview" && pathname.startsWith(href));
           return (
             <Link
               key={m.id}
               to={href}
               className={cn(
                 "flex items-center gap-2 px-3 py-2 rounded-md text-sm whitespace-nowrap transition-colors",
-                active
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted text-foreground/80",
+                active ? "bg-primary text-primary-foreground" : "hover:bg-muted text-foreground/80",
               )}
             >
               <Icon className="h-4 w-4" />
