@@ -3,13 +3,15 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Trash2, Users } from "lucide-react";
+import { Clock3, KeyRound, Plus, Trash2, Users } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   listBusinessStaff,
   addBusinessStaffByEmail,
   updateBusinessStaff,
   removeBusinessStaff,
+  grantTemporaryCanonicalLinkPermission,
+  revokeTemporaryCanonicalLinkPermission,
 } from "@/lib/business-staff.functions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,6 +37,7 @@ import {
 
 const ROLES = [
   { value: "manager", label: "Manager" },
+  { value: "assistant_manager", label: "Assistant manager" },
   { value: "dispatcher", label: "Dispatcher" },
   { value: "driver", label: "Driver" },
   { value: "mechanic", label: "Mechanic" },
@@ -59,6 +62,8 @@ const DUTIES_BY_ROLE: Record<string, string[]> = {
 const ROLE_HELP: Record<string, string> = {
   owner: "Full control, billing, managers, employees, and all business records.",
   manager: "Runs the business and staff; cannot replace or remove the owner.",
+  assistant_manager:
+    "Manager-level daily operations and Shop Manager access; cannot replace the owner.",
   dispatcher: "Dispatch and assigned operational work; no staff or billing control.",
   driver: "Own shifts, assigned jobs, vehicles, and required operational tools.",
   mechanic: "Assigned service work, vehicles, and parts used on work orders.",
@@ -77,6 +82,8 @@ function StaffPage() {
   const addFn = useServerFn(addBusinessStaffByEmail);
   const updateFn = useServerFn(updateBusinessStaff);
   const removeFn = useServerFn(removeBusinessStaff);
+  const grantPermissionFn = useServerFn(grantTemporaryCanonicalLinkPermission);
+  const revokePermissionFn = useServerFn(revokeTemporaryCanonicalLinkPermission);
 
   const staffQ = useQuery({
     queryKey: ["business-staff", businessId],
@@ -90,6 +97,10 @@ function StaffPage() {
   const [title, setTitle] = useState("");
   const [duties, setDuties] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [permissionEmployee, setPermissionEmployee] = useState<any | null>(null);
+  const [permissionHours, setPermissionHours] = useState("8");
+  const [permissionReason, setPermissionReason] = useState("");
+  const [permissionBusy, setPermissionBusy] = useState(false);
 
   const dutyOptions = DUTIES_BY_ROLE[role] ?? [];
 
@@ -109,7 +120,6 @@ function StaffPage() {
       toast.error(e?.message || "Failed to add employee");
     } finally {
       setSubmitting(false);
-
     }
   }
 
@@ -152,6 +162,39 @@ function StaffPage() {
     }
   }
 
+  async function handleGrantPermission() {
+    if (!permissionEmployee) return;
+    setPermissionBusy(true);
+    try {
+      await grantPermissionFn({
+        data: {
+          businessId,
+          targetUserId: permissionEmployee.user_id,
+          durationHours: Number(permissionHours),
+          reason: permissionReason.trim() || undefined,
+        },
+      });
+      toast.success("Temporary catalogue-link permission granted");
+      setPermissionEmployee(null);
+      setPermissionReason("");
+      qc.invalidateQueries({ queryKey: ["business-staff", businessId] });
+    } catch (e: any) {
+      toast.error(e?.message || "Could not grant permission");
+    } finally {
+      setPermissionBusy(false);
+    }
+  }
+
+  async function handleRevokePermission(permissionId: string) {
+    try {
+      await revokePermissionFn({ data: { businessId, permissionId } });
+      toast.success("Temporary permission revoked");
+      qc.invalidateQueries({ queryKey: ["business-staff", businessId] });
+    } catch (e: any) {
+      toast.error(e?.message || "Could not revoke permission");
+    }
+  }
+
   const rows = staffQ.data ?? [];
 
   return (
@@ -170,25 +213,31 @@ function StaffPage() {
         </Button>
       </div>
 
-      <Card className="grid gap-3 p-4 text-sm md:grid-cols-3">
+      <Card className="grid gap-3 p-4 text-sm md:grid-cols-4">
         <div>
           <p className="font-semibold">Owner</p>
           <p className="text-xs text-muted-foreground">Permanent full control of this business.</p>
         </div>
         <div>
           <p className="font-semibold">Manager</p>
-          <p className="text-xs text-muted-foreground">Manages employees and business operations.</p>
+          <p className="text-xs text-muted-foreground">
+            Manages employees and business operations.
+          </p>
+        </div>
+        <div>
+          <p className="font-semibold">Assistant manager</p>
+          <p className="text-xs text-muted-foreground">Daily management and Shop Manager access.</p>
         </div>
         <div>
           <p className="font-semibold">Operational staff</p>
-          <p className="text-xs text-muted-foreground">Only role-specific work; no employee administration.</p>
+          <p className="text-xs text-muted-foreground">
+            Only role-specific work; no employee administration.
+          </p>
         </div>
       </Card>
 
       <Card className="divide-y">
-        {staffQ.isLoading && (
-          <div className="p-4 text-sm text-muted-foreground">Loading…</div>
-        )}
+        {staffQ.isLoading && <div className="p-4 text-sm text-muted-foreground">Loading…</div>}
         {!staffQ.isLoading && rows.length === 0 && (
           <div className="p-6 text-center text-sm text-muted-foreground">
             No employees yet. Click <strong>Add employee</strong> to invite your first driver.
@@ -236,12 +285,34 @@ function StaffPage() {
                 {ROLE_HELP[r.role] ?? ROLE_HELP.clerk}
               </div>
               {Array.isArray(r.duties) && r.duties.length > 0 && (
-                <div className="text-xs text-muted-foreground mt-1">
-                  {r.duties.join(" · ")}
+                <div className="text-xs text-muted-foreground mt-1">{r.duties.join(" · ")}</div>
+              )}
+              {r.canonical_link_permission && (
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                  <Badge variant="secondary" className="gap-1">
+                    <Clock3 className="h-3 w-3" /> Catalogue linking until{" "}
+                    {new Date(r.canonical_link_permission.expires_at).toLocaleString()}
+                  </Badge>
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="h-auto px-0 text-xs"
+                    onClick={() => handleRevokePermission(r.canonical_link_permission.id)}
+                  >
+                    Revoke now
+                  </Button>
                 </div>
               )}
             </div>
             <div className="flex items-center gap-4">
+              {r.role !== "owner" &&
+                r.role !== "manager" &&
+                r.role !== "assistant_manager" &&
+                !r.canonical_link_permission && (
+                  <Button variant="outline" size="sm" onClick={() => setPermissionEmployee(r)}>
+                    <KeyRound className="mr-1 h-3.5 w-3.5" /> Temporary catalogue access
+                  </Button>
+                )}
               {r.role === "driver" && (
                 <label className="flex items-center gap-2 text-xs">
                   <Switch
@@ -296,7 +367,13 @@ function StaffPage() {
             </div>
             <div>
               <Label>Role</Label>
-              <Select value={role} onValueChange={(v: any) => { setRole(v); setDuties([]); }}>
+              <Select
+                value={role}
+                onValueChange={(v: any) => {
+                  setRole(v);
+                  setDuties([]);
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -333,9 +410,7 @@ function StaffPage() {
                           checked={checked}
                           onChange={(e) =>
                             setDuties(
-                              e.target.checked
-                                ? [...duties, d]
-                                : duties.filter((x) => x !== d),
+                              e.target.checked ? [...duties, d] : duties.filter((x) => x !== d),
                             )
                           }
                         />
@@ -353,6 +428,56 @@ function StaffPage() {
             </Button>
             <Button onClick={handleInvite} disabled={!email || submitting}>
               {submitting ? "Adding…" : "Add"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!permissionEmployee}
+        onOpenChange={(next) => !next && setPermissionEmployee(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Grant temporary catalogue-link access</DialogTitle>
+            <DialogDescription>
+              {permissionEmployee?.display_name} can link this business's inventory items to
+              approved 365 canonical products until the permission expires. This does not grant
+              pricing, deletion, billing, employee, or settings access.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Duration</Label>
+              <Select value={permissionHours} onValueChange={setPermissionHours}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="4">4 hours</SelectItem>
+                  <SelectItem value="8">8 hours / one shift</SelectItem>
+                  <SelectItem value="24">24 hours</SelectItem>
+                  <SelectItem value="168">7 days</SelectItem>
+                  <SelectItem value="720">30 days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Reason (optional)</Label>
+              <Input
+                value={permissionReason}
+                onChange={(event) => setPermissionReason(event.target.value)}
+                maxLength={300}
+                placeholder="Example: catalogue cleanup for today's receiving shift"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPermissionEmployee(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleGrantPermission} disabled={permissionBusy}>
+              {permissionBusy ? "Granting…" : "Grant temporary access"}
             </Button>
           </DialogFooter>
         </DialogContent>
