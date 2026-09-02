@@ -200,6 +200,9 @@ export function InventoryItemFormDialog({
       open && (form.manufacturer_part_number.trim().length >= 3 || form.name.trim().length >= 4),
     staleTime: 60_000,
   });
+  const selectedCatalogMatch = (catalogMatches.data ?? []).find(
+    (match) => match.id === form.catalog_part_id,
+  );
 
   // Reset form whenever the dialog opens or the row changes
   useMemo(() => {
@@ -437,11 +440,38 @@ export function InventoryItemFormDialog({
                       <SelectItem value={NO_NETWORK_LOCATION}>No canonical link</SelectItem>
                       {(catalogMatches.data ?? []).map((match) => (
                         <SelectItem key={match.id} value={match.id}>
-                          {match.manufacturer_part_number || match.title} — {match.title}
+                          {[match.manufacturer, match.manufacturer_part_number, match.title]
+                            .filter(Boolean)
+                            .join(" · ")}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {form.catalog_part_id ? (
+                    <div className="mt-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs">
+                      <p className="flex items-center gap-1 font-medium text-primary">
+                        <Check className="h-3.5 w-3.5" /> Canonical identity connected
+                      </p>
+                      <p className="mt-0.5 text-muted-foreground">
+                        {selectedCatalogMatch?.match_reason ||
+                          "Existing verified catalogue connection"}
+                      </p>
+                      {selectedCatalogMatch?.alternate_numbers.length ? (
+                        <p className="mt-1 truncate text-muted-foreground">
+                          Also known as:{" "}
+                          {selectedCatalogMatch.alternate_numbers
+                            .slice(0, 4)
+                            .map((number) => number.number)
+                            .join(", ")}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
+                      Private stock still works. Link a canonical product before sharing verified
+                      fitment across the 365 network.
+                    </p>
+                  )}
                 </Field>
                 <Field
                   label="Main Category"
