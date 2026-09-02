@@ -17,7 +17,7 @@ export const getAssociateEnrollmentContext = createServerFn({ method: "GET" })
         .select("business_id,role,active")
         .eq("user_id", userId)
         .eq("active", true)
-        .in("role", ["owner", "manager"]),
+        .in("role", ["owner", "manager", "assistant_manager"]),
     ]);
     if (owned.error) throw owned.error;
     if (staff.error) throw staff.error;
