@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const ROLES = [
   "owner",
   "manager",
+  "assistant_manager",
   "dispatcher",
   "driver",
   "mechanic",
@@ -43,6 +44,19 @@ export const listBusinessStaff = createServerFn({ method: "POST" })
     if (error) throw error;
 
     const staffRows = (rows ?? []).filter((r) => r.user_id !== business.owner_id);
+    const { data: grants, error: grantsError } = await (supabase as any)
+      .from("business_staff_temporary_permissions")
+      .select("id,user_id,permission_key,reason,granted_at,expires_at,revoked_at")
+      .eq("business_id", data.businessId)
+      .eq("permission_key", "canonical_inventory_link")
+      .is("revoked_at", null)
+      .gt("expires_at", new Date().toISOString())
+      .order("expires_at", { ascending: false });
+    if (grantsError) throw grantsError;
+    const grantByUser = new Map<string, any>();
+    for (const grant of grants ?? []) {
+      if (!grantByUser.has(grant.user_id)) grantByUser.set(grant.user_id, grant);
+    }
     const ids = [business.owner_id, ...staffRows.map((r) => r.user_id)];
     let profiles: Record<string, { name: string; email?: string }> = {};
     if (ids.length) {
@@ -69,6 +83,7 @@ export const listBusinessStaff = createServerFn({ method: "POST" })
       ...staffRows.map((r) => ({
         ...r,
         display_name: profiles[r.user_id]?.name ?? "Employee",
+        canonical_link_permission: grantByUser.get(r.user_id) ?? null,
       })),
     ];
   });
@@ -76,7 +91,13 @@ export const listBusinessStaff = createServerFn({ method: "POST" })
 export const addBusinessStaffByEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (d: { businessId: string; email: string; role: StaffRole; title?: string; duties?: string[] }) => {
+    (d: {
+      businessId: string;
+      email: string;
+      role: StaffRole;
+      title?: string;
+      duties?: string[];
+    }) => {
       if (!ROLES.includes(d.role)) throw new Error("Invalid role");
       if (!d.email?.includes("@")) throw new Error("Invalid email");
       return d;
@@ -88,9 +109,8 @@ export const addBusinessStaffByEmail = createServerFn({ method: "POST" })
 
     // Enforce plan staff cap (with auto-upgrade if enabled)
     try {
-      const { enforceLimit, planLimitErrorPayload, PlanLimitError } = await import(
-        "@/lib/business-plan-enforcement.server"
-      );
+      const { enforceLimit, planLimitErrorPayload, PlanLimitError } =
+        await import("@/lib/business-plan-enforcement.server");
       try {
         await enforceLimit(supabase as any, data.businessId, "staff", userId);
       } catch (e) {
@@ -141,7 +161,6 @@ export const addBusinessStaffByEmail = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
-
 
 export const updateBusinessStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -207,6 +226,71 @@ export const removeBusinessStaff = createServerFn({ method: "POST" })
       .delete()
       .eq("id", data.staffId)
       .eq("business_id", data.businessId);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const grantTemporaryCanonicalLinkPermission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (d: { businessId: string; targetUserId: string; durationHours: number; reason?: string }) => {
+      if (!Number.isInteger(d.durationHours) || d.durationHours < 1 || d.durationHours > 720) {
+        throw new Error("Permission duration must be between 1 hour and 30 days");
+      }
+      if ((d.reason ?? "").length > 300) throw new Error("Reason is too long");
+      return d;
+    },
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertManager(supabase, userId, data.businessId);
+
+    const { data: target } = await supabase
+      .from("business_staff")
+      .select("user_id,active")
+      .eq("business_id", data.businessId)
+      .eq("user_id", data.targetUserId)
+      .eq("active", true)
+      .maybeSingle();
+    if (!target) throw new Error("Select an active employee");
+
+    await (supabase as any)
+      .from("business_staff_temporary_permissions")
+      .update({ revoked_at: new Date().toISOString(), revoked_by: userId })
+      .eq("business_id", data.businessId)
+      .eq("user_id", data.targetUserId)
+      .eq("permission_key", "canonical_inventory_link")
+      .is("revoked_at", null);
+
+    const expiresAt = new Date(Date.now() + data.durationHours * 60 * 60 * 1000).toISOString();
+    const { data: grant, error } = await (supabase as any)
+      .from("business_staff_temporary_permissions")
+      .insert({
+        business_id: data.businessId,
+        user_id: data.targetUserId,
+        permission_key: "canonical_inventory_link",
+        granted_by: userId,
+        reason: data.reason?.trim() || null,
+        expires_at: expiresAt,
+      })
+      .select("id,expires_at")
+      .single();
+    if (error) throw error;
+    return grant;
+  });
+
+export const revokeTemporaryCanonicalLinkPermission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { businessId: string; permissionId: string }) => d)
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertManager(supabase, userId, data.businessId);
+    const { error } = await (supabase as any)
+      .from("business_staff_temporary_permissions")
+      .update({ revoked_at: new Date().toISOString(), revoked_by: userId })
+      .eq("id", data.permissionId)
+      .eq("business_id", data.businessId)
+      .is("revoked_at", null);
     if (error) throw error;
     return { ok: true };
   });
