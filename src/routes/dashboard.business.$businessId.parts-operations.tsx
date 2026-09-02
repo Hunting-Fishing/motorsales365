@@ -65,13 +65,13 @@ function PartsOperationsPage() {
   const queryClient = useQueryClient();
   const load = useServerFn(listPartsOperations);
   const transitionOrder = useServerFn(transitionPartsNetworkOrder);
-  const receiveOrder = useServerFn(receivePartsNetworkOrder);
   const transitionReturn = useServerFn(transitionPartsReturn);
   const transitionWarranty = useServerFn(transitionPartsWarrantyClaim);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [returnOrder, setReturnOrder] = useState<any | null>(null);
   const [warrantyOrder, setWarrantyOrder] = useState<any | null>(null);
   const [installOrder, setInstallOrder] = useState<any | null>(null);
+  const [receivingOrder, setReceivingOrder] = useState<any | null>(null);
   const [locationOpen, setLocationOpen] = useState(false);
 
   const operations = useQuery({
@@ -102,24 +102,6 @@ function PartsOperationsPage() {
       await refresh();
     } catch (error: any) {
       toast.error(error?.message ?? "Could not update the order");
-    } finally {
-      setBusyKey(null);
-    }
-  }
-
-  async function receive(order: any) {
-    const key = `${order.id}:receive`;
-    setBusyKey(key);
-    try {
-      const result: any = await receiveOrder({ data: { orderId: order.id } });
-      toast.success(
-        result.status === "received"
-          ? `${order.order_number} received into inventory`
-          : `${order.order_number} partially received`,
-      );
-      await refresh();
-    } catch (error: any) {
-      toast.error(error?.message ?? "Could not receive the order");
     } finally {
       setBusyKey(null);
     }
@@ -238,7 +220,7 @@ function PartsOperationsPage() {
                 businessId={businessId}
                 busyKey={busyKey}
                 onStatus={(status) => changeOrder(order, status)}
-                onReceive={() => receive(order)}
+                onReceive={() => setReceivingOrder(order)}
                 onReturn={() => setReturnOrder(order)}
                 onWarranty={() => setWarrantyOrder(order)}
                 onInstall={() => setInstallOrder(order)}
@@ -336,6 +318,12 @@ function PartsOperationsPage() {
       </Tabs>
 
       <ReturnDialog order={returnOrder} onClose={() => setReturnOrder(null)} onCreated={refresh} />
+      <ReceiveOrderDialog
+        key={receivingOrder?.id ?? "receive-closed"}
+        order={receivingOrder}
+        onClose={() => setReceivingOrder(null)}
+        onReceived={refresh}
+      />
       <WarrantyDialog
         order={warrantyOrder}
         businessId={businessId}
@@ -601,6 +589,185 @@ function warrantyActions(item: any, businessId: string) {
   if (supplier && ["replacement_sent", "credit_issued"].includes(item.status))
     return [{ id: item.id, status: "closed", label: "Close" }];
   return [];
+}
+
+function ReceiveOrderDialog({
+  order,
+  onClose,
+  onReceived,
+}: {
+  order: any | null;
+  onClose: () => void;
+  onReceived: () => Promise<void>;
+}) {
+  const receiveOrder = useServerFn(receivePartsNetworkOrder);
+  const lines = order?.parts_order_lines ?? [];
+  const [deliveryReference, setDeliveryReference] = useState("");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [receipts, setReceipts] = useState<
+    Record<
+      string,
+      {
+        quantity: number;
+        condition: "accepted" | "damaged" | "incorrect" | "short";
+        notes: string;
+      }
+    >
+  >(() =>
+    Object.fromEntries(
+      lines.map((line: any) => [
+        line.id,
+        {
+          quantity: Math.max(
+            0,
+            Number(line.requested_quantity ?? 0) - Number(line.received_quantity ?? 0),
+          ),
+          condition: "accepted" as const,
+          notes: "",
+        },
+      ]),
+    ),
+  );
+
+  function updateLine(lineId: string, patch: Partial<(typeof receipts)[string]>) {
+    setReceipts((current) => ({
+      ...current,
+      [lineId]: { ...current[lineId], ...patch },
+    }));
+  }
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!order) return;
+    const submittedLines = lines
+      .map((line: any) => ({
+        order_line_id: line.id,
+        quantity: Number(receipts[line.id]?.quantity ?? 0),
+        condition: receipts[line.id]?.condition ?? "accepted",
+        notes: receipts[line.id]?.notes.trim() || null,
+      }))
+      .filter((line: any) => line.quantity > 0);
+    if (!submittedLines.length) {
+      toast.error("Enter a received quantity for at least one line");
+      return;
+    }
+    setBusy(true);
+    try {
+      const result: any = await receiveOrder({
+        data: {
+          orderId: order.id,
+          lines: submittedLines as any,
+          note: note.trim() || null,
+          deliveryReference: deliveryReference.trim() || null,
+        },
+      });
+      toast.success(
+        result.status === "received"
+          ? `${order.order_number} received into inventory`
+          : `${order.order_number} partially received`,
+      );
+      await onReceived();
+      onClose();
+    } catch (error: any) {
+      toast.error(error?.message ?? "Could not receive the order");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Dialog open={!!order} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>Receive {order?.order_number}</DialogTitle>
+          <DialogDescription>
+            Confirm each accepted quantity and record delivery details before stock is added to the
+            receiving location. Damaged or incorrect goods should be received through the returns
+            workflow so they never enter sellable stock.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={submit} className="space-y-4">
+          <div className="space-y-3">
+            {lines.map((line: any) => {
+              const remaining = Math.max(
+                0,
+                Number(line.requested_quantity ?? 0) - Number(line.received_quantity ?? 0),
+              );
+              const receipt = receipts[line.id] ?? {
+                quantity: 0,
+                condition: "accepted",
+                notes: "",
+              };
+              return (
+                <div key={line.id} className="rounded-lg border p-3">
+                  <div className="mb-3 flex flex-wrap justify-between gap-2">
+                    <div>
+                      <p className="font-medium">{line.name_snapshot}</p>
+                      <p className="font-mono text-xs text-muted-foreground">
+                        {line.part_number_snapshot || line.sku_snapshot || "No part number"}
+                      </p>
+                    </div>
+                    <Badge variant="outline">{remaining} remaining</Badge>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-[120px_1fr]">
+                    <div>
+                      <Label>Received</Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        max={remaining}
+                        step="any"
+                        value={receipt.quantity}
+                        onChange={(event) =>
+                          updateLine(line.id, { quantity: Number(event.target.value) || 0 })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label>Receiving / discrepancy note</Label>
+                      <Input
+                        value={receipt.notes}
+                        onChange={(event) => updateLine(line.id, { notes: event.target.value })}
+                        maxLength={500}
+                        placeholder="Package condition, discrepancy, bin location…"
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label>Delivery or transfer reference</Label>
+              <Input
+                value={deliveryReference}
+                onChange={(event) => setDeliveryReference(event.target.value)}
+                maxLength={120}
+                placeholder="Waybill, DR, courier, or transfer slip"
+              />
+            </div>
+            <div>
+              <Label>Receiving note</Label>
+              <Input
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                maxLength={2000}
+                placeholder="Receiver, counter, or inspection note"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button disabled={busy}>{busy ? "Receiving…" : "Post receipt"}</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function ReturnDialog({
