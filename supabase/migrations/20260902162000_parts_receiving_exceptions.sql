@@ -69,6 +69,7 @@ DECLARE
   v_line public.parts_order_lines%ROWTYPE;
   v_exception public.parts_receiving_exceptions%ROWTYPE;
   v_remaining numeric;
+  v_open_exception_quantity numeric;
 BEGIN
   IF (select auth.uid()) IS NULL THEN RAISE EXCEPTION 'Authentication required'; END IF;
   IF _exception_type NOT IN ('damaged','incorrect','short') THEN
@@ -103,6 +104,11 @@ BEGIN
   IF NOT FOUND THEN RAISE EXCEPTION 'Order line not found'; END IF;
   v_remaining := COALESCE(NULLIF(v_line.accepted_quantity, 0), v_line.requested_quantity)
     - v_line.received_quantity;
+  SELECT COALESCE(sum(e.affected_quantity), 0) INTO v_open_exception_quantity
+  FROM public.parts_receiving_exceptions e
+  WHERE e.order_line_id = v_line.id
+    AND e.status NOT IN ('resolved','rejected','cancelled');
+  v_remaining := v_remaining - v_open_exception_quantity;
   IF _affected_quantity > v_remaining THEN
     RAISE EXCEPTION 'Affected quantity cannot exceed % remaining', v_remaining;
   END IF;
@@ -210,3 +216,34 @@ $$;
 REVOKE ALL ON FUNCTION public.transition_parts_receiving_exception(uuid,text,text,text) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.transition_parts_receiving_exception(uuid,text,text,text) FROM anon;
 GRANT EXECUTE ON FUNCTION public.transition_parts_receiving_exception(uuid,text,text,text) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.enforce_receiving_exception_quarantine()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_open_exception_quantity numeric;
+  v_fulfillment_quantity numeric;
+BEGIN
+  IF NEW.received_quantity <= OLD.received_quantity THEN RETURN NEW; END IF;
+  SELECT COALESCE(sum(e.affected_quantity), 0) INTO v_open_exception_quantity
+  FROM public.parts_receiving_exceptions e
+  WHERE e.order_line_id = NEW.id
+    AND e.status NOT IN ('resolved','rejected','cancelled');
+  v_fulfillment_quantity := COALESCE(NULLIF(NEW.accepted_quantity, 0), NEW.requested_quantity);
+  IF NEW.received_quantity > v_fulfillment_quantity - v_open_exception_quantity THEN
+    RAISE EXCEPTION 'Receipt exceeds accepted quantity available after receiving quarantine';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.enforce_receiving_exception_quarantine() FROM PUBLIC, anon, authenticated;
+
+DROP TRIGGER IF EXISTS enforce_receiving_exception_quarantine
+  ON public.parts_order_lines;
+CREATE TRIGGER enforce_receiving_exception_quarantine
+  BEFORE UPDATE OF received_quantity ON public.parts_order_lines
+  FOR EACH ROW EXECUTE FUNCTION public.enforce_receiving_exception_quarantine();
