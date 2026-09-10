@@ -1,0 +1,84 @@
+name: Recover Lovable-managed image assets
+
+on:
+  push:
+    branches:
+      - migration/standalone-supabase-365
+    paths:
+      - scripts/recover-lovable-assets.mjs
+      - .github/workflows/recover-lovable-assets.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: recover-lovable-assets-standalone
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    if: github.ref == 'refs/heads/migration/standalone-supabase-365'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout migration branch
+        uses: actions/checkout@v4
+        with:
+          ref: migration/standalone-supabase-365
+          fetch-depth: 1
+
+      - name: Guard against main
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "migration/standalone-supabase-365"
+          test "${GITHUB_REF_NAME}" != "main"
+
+      - name: Confirm expected Lovable manifest inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          count="$(find src -type f -name '*.asset.json' | wc -l | tr -d ' ')"
+          echo "Lovable asset manifests: ${count}"
+          test "${count}" -eq 50
+
+      - name: Recover and validate original image bytes
+        run: node scripts/recover-lovable-assets.mjs
+
+      - name: Verify every manifest now has a matching image
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=0
+          while IFS= read -r manifest; do
+            target="${manifest%.asset.json}"
+            if [ ! -s "${target}" ]; then
+              echo "Missing recovered asset: ${target}"
+              missing=$((missing + 1))
+            fi
+          done < <(find src -type f -name '*.asset.json' | sort)
+          test "${missing}" -eq 0
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build standalone application with recovered assets
+        run: npm run build
+
+      - name: Run standalone verification
+        run: node scripts/verify-standalone.mjs
+
+      - name: Commit recovered binaries to migration branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src
+          if git diff --cached --quiet; then
+            echo "No recovered assets needed committing."
+            exit 0
+          fi
+          git commit -m "Restore original Lovable-generated image assets"
+          git push origin HEAD:migration/standalone-supabase-365
