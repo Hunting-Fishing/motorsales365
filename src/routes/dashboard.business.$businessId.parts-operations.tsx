@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowRightLeft,
+  AlertTriangle,
   Boxes,
   MapPin,
   PackageCheck,
@@ -17,12 +18,14 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import {
+  createPartsReceivingException,
   createPartsReturn,
   createPartsWarrantyClaim,
   listPartsOperations,
   receivePartsNetworkOrder,
   recordInstalledComponent,
   transitionPartsNetworkOrder,
+  transitionPartsReceivingException,
   transitionPartsReturn,
   transitionPartsWarrantyClaim,
   upsertBusinessPartsLocation,
@@ -67,11 +70,13 @@ function PartsOperationsPage() {
   const transitionOrder = useServerFn(transitionPartsNetworkOrder);
   const transitionReturn = useServerFn(transitionPartsReturn);
   const transitionWarranty = useServerFn(transitionPartsWarrantyClaim);
+  const transitionException = useServerFn(transitionPartsReceivingException);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [returnOrder, setReturnOrder] = useState<any | null>(null);
   const [warrantyOrder, setWarrantyOrder] = useState<any | null>(null);
   const [installOrder, setInstallOrder] = useState<any | null>(null);
   const [receivingOrder, setReceivingOrder] = useState<any | null>(null);
+  const [exceptionOrder, setExceptionOrder] = useState<any | null>(null);
   const [locationOpen, setLocationOpen] = useState(false);
 
   const operations = useQuery({
@@ -79,7 +84,13 @@ function PartsOperationsPage() {
     queryFn: () => load({ data: { businessId } }),
   });
 
-  const data = operations.data ?? { orders: [], returns: [], warranties: [], locations: [] };
+  const data = operations.data ?? {
+    orders: [],
+    returns: [],
+    warranties: [],
+    receivingExceptions: [],
+    locations: [],
+  };
   const orders = data.orders as any[];
   const incoming = orders.filter((order) => order.supplier_business_id === businessId);
   const outgoing = orders.filter((order) => order.requester_business_id === businessId);
@@ -130,6 +141,20 @@ function PartsOperationsPage() {
       await refresh();
     } catch (error: any) {
       toast.error(error?.message ?? "Could not update the warranty claim");
+    } finally {
+      setBusyKey(null);
+    }
+  }
+
+  async function changeException(item: any, status: string) {
+    const key = `${item.id}:${status}`;
+    setBusyKey(key);
+    try {
+      await transitionException({ data: { id: item.id, status } });
+      toast.success(`${item.exception_number} moved to ${labelStatus(status)}`);
+      await refresh();
+    } catch (error: any) {
+      toast.error(error?.message ?? "Could not update the receiving exception");
     } finally {
       setBusyKey(null);
     }
@@ -192,6 +217,9 @@ function PartsOperationsPage() {
             ).length +
             data.warranties.filter(
               (item: any) => !["closed", "cancelled", "rejected"].includes(item.status),
+            ).length +
+            data.receivingExceptions.filter(
+              (item: any) => !["resolved", "cancelled", "rejected"].includes(item.status),
             ).length
           }
         />
@@ -201,6 +229,9 @@ function PartsOperationsPage() {
         <TabsList className="h-auto flex-wrap">
           <TabsTrigger value="orders">Orders & transfers</TabsTrigger>
           <TabsTrigger value="returns">Returns ({data.returns.length})</TabsTrigger>
+          <TabsTrigger value="exceptions">
+            Receiving exceptions ({data.receivingExceptions.length})
+          </TabsTrigger>
           <TabsTrigger value="warranty">Warranty ({data.warranties.length})</TabsTrigger>
           <TabsTrigger value="locations">Locations ({data.locations.length})</TabsTrigger>
         </TabsList>
@@ -221,9 +252,33 @@ function PartsOperationsPage() {
                 busyKey={busyKey}
                 onStatus={(status) => changeOrder(order, status)}
                 onReceive={() => setReceivingOrder(order)}
+                onException={() => setExceptionOrder(order)}
                 onReturn={() => setReturnOrder(order)}
                 onWarranty={() => setWarrantyOrder(order)}
                 onInstall={() => setInstallOrder(order)}
+              />
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="exceptions" className="space-y-3">
+          {data.receivingExceptions.length === 0 ? (
+            <EmptyState
+              icon={AlertTriangle}
+              title="No receiving exceptions"
+              body="Damaged, incorrect, or short deliveries will appear here without entering sellable stock."
+            />
+          ) : (
+            data.receivingExceptions.map((item: any) => (
+              <CaseCard
+                key={item.id}
+                number={item.exception_number}
+                status={item.status}
+                title={`${item.parts_order_lines?.name_snapshot || "Order item"} · ${labelStatus(item.exception_type)} · ${Number(item.affected_quantity)} affected`}
+                note={item.description || item.supplier_note}
+                actions={exceptionActions(item, businessId)}
+                busyKey={busyKey}
+                onAction={(status: string) => changeException(item, status)}
               />
             ))
           )}
@@ -324,6 +379,12 @@ function PartsOperationsPage() {
         onClose={() => setReceivingOrder(null)}
         onReceived={refresh}
       />
+      <ReceivingExceptionDialog
+        key={exceptionOrder?.id ?? "exception-closed"}
+        order={exceptionOrder}
+        onClose={() => setExceptionOrder(null)}
+        onCreated={refresh}
+      />
       <WarrantyDialog
         order={warrantyOrder}
         businessId={businessId}
@@ -368,6 +429,7 @@ function OrderCard({
   busyKey,
   onStatus,
   onReceive,
+  onException,
   onReturn,
   onWarranty,
   onInstall,
@@ -377,6 +439,7 @@ function OrderCard({
   busyKey: string | null;
   onStatus: (status: string) => void;
   onReceive: () => void;
+  onException: () => void;
   onReturn: () => void;
   onWarranty: () => void;
   onInstall: () => void;
@@ -453,10 +516,17 @@ function OrderCard({
             </Button>
           ))}
           {requesterSide && ["ready", "shipped", "partially_received"].includes(order.status) ? (
-            <Button size="sm" onClick={onReceive} disabled={busyKey === `${order.id}:receive`}>
-              <PackageCheck className="mr-1 h-3.5 w-3.5" />
-              {busyKey === `${order.id}:receive` ? "Receiving…" : "Receive all"}
-            </Button>
+            <>
+              <Button size="sm" onClick={onReceive} disabled={busyKey === `${order.id}:receive`}>
+                <PackageCheck className="mr-1 h-3.5 w-3.5" />
+                {busyKey === `${order.id}:receive` ? "Receiving…" : "Receive items"}
+              </Button>
+              {order.order_kind === "purchase" ? (
+                <Button size="sm" variant="outline" onClick={onException}>
+                  <AlertTriangle className="mr-1 h-3.5 w-3.5" /> Report discrepancy
+                </Button>
+              ) : null}
+            </>
           ) : null}
           {requesterSide && ["partially_received", "received"].includes(order.status) ? (
             <>
@@ -591,6 +661,31 @@ function warrantyActions(item: any, businessId: string) {
   return [];
 }
 
+function exceptionActions(item: any, businessId: string) {
+  const requester = item.requester_business_id === businessId;
+  const supplier = item.supplier_business_id === businessId;
+  if (requester && item.status === "reported")
+    return [{ id: item.id, status: "cancelled", label: "Cancel report" }];
+  if (supplier && item.status === "reported")
+    return [
+      { id: item.id, status: "supplier_review", label: "Start review" },
+      { id: item.id, status: "rejected", label: "Reject" },
+    ];
+  if (supplier && item.status === "supplier_review")
+    return [
+      { id: item.id, status: "replacement_authorized", label: "Authorize replacement" },
+      { id: item.id, status: "credit_authorized", label: "Authorize credit" },
+      { id: item.id, status: "return_authorized", label: "Authorize return" },
+      { id: item.id, status: "rejected", label: "Reject" },
+    ];
+  if (
+    (requester || supplier) &&
+    ["replacement_authorized", "credit_authorized", "return_authorized"].includes(item.status)
+  )
+    return [{ id: item.id, status: "resolved", label: "Mark resolved" }];
+  return [];
+}
+
 function ReceiveOrderDialog({
   order,
   onClose,
@@ -683,8 +778,8 @@ function ReceiveOrderDialog({
           <DialogTitle>Receive {order?.order_number}</DialogTitle>
           <DialogDescription>
             Confirm each accepted quantity and record delivery details before stock is added to the
-            receiving location. Damaged or incorrect goods should be received through the returns
-            workflow so they never enter sellable stock.
+            receiving location. Use Report discrepancy for damaged, incorrect, or short-delivered
+            goods; do not include those quantities here.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
@@ -763,6 +858,115 @@ function ReceiveOrderDialog({
               Cancel
             </Button>
             <Button disabled={busy}>{busy ? "Receiving…" : "Post receipt"}</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ReceivingExceptionDialog({
+  order,
+  onClose,
+  onCreated,
+}: {
+  order: any | null;
+  onClose: () => void;
+  onCreated: () => Promise<void>;
+}) {
+  const createException = useServerFn(createPartsReceivingException);
+  const lines = order?.parts_order_lines ?? [];
+  const [lineId, setLineId] = useState("");
+  const [exceptionType, setExceptionType] = useState("damaged");
+  const [quantity, setQuantity] = useState(1);
+  const [description, setDescription] = useState("");
+  const [busy, setBusy] = useState(false);
+  const selected = lines.find((line: any) => line.id === lineId);
+  const remaining = selected
+    ? Math.max(
+        0,
+        Number(selected.accepted_quantity || selected.requested_quantity) -
+          Number(selected.received_quantity),
+      )
+    : 0;
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!order || !lineId) return;
+    setBusy(true);
+    try {
+      const result: any = await createException({
+        data: {
+          orderId: order.id,
+          orderLineId: lineId,
+          exceptionType: exceptionType as any,
+          affectedQuantity: quantity,
+          description,
+        },
+      });
+      toast.success(`Receiving exception ${result.exception_number} opened`);
+      await onCreated();
+      onClose();
+    } catch (error: any) {
+      toast.error(error?.message ?? "Could not report the discrepancy");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Dialog open={!!order} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Report receiving discrepancy</DialogTitle>
+          <DialogDescription>
+            Create a shared case for {order?.order_number}. The affected quantity remains outside
+            sellable inventory until the supplier resolution is complete.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={submit} className="space-y-4">
+          <div>
+            <Label>Part</Label>
+            <Select value={lineId} onValueChange={setLineId}>
+              <SelectTrigger><SelectValue placeholder="Choose inspected part" /></SelectTrigger>
+              <SelectContent>
+                {lines.map((line: any) => (
+                  <SelectItem key={line.id} value={line.id}>
+                    {line.name_snapshot} ({Math.max(0, Number(line.accepted_quantity || line.requested_quantity) - Number(line.received_quantity))} open)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Issue</Label>
+              <Select value={exceptionType} onValueChange={setExceptionType}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {['damaged', 'incorrect', 'short'].map((value) => (
+                    <SelectItem key={value} value={value}>{labelStatus(value)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Affected quantity</Label>
+              <Input type="number" min={0.01} max={remaining || undefined} step="any" value={quantity}
+                onChange={(event) => setQuantity(Number(event.target.value) || 0)} />
+            </div>
+          </div>
+          <div>
+            <Label>Inspection details</Label>
+            <Textarea required minLength={5} maxLength={4000} value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              placeholder="Describe packaging, visible damage, expected part, or missing quantity…" />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <Button disabled={busy || !lineId || quantity <= 0 || quantity > remaining}>
+              {busy ? "Reporting…" : "Open exception"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -1094,248 +1298,3 @@ function InstallationDialog({
             <Select value={lineId} onValueChange={setLineId}>
               <SelectTrigger>
                 <SelectValue placeholder="Choose received part" />
-              </SelectTrigger>
-              <SelectContent>
-                {lines.map((line: any) => (
-                  <SelectItem key={line.id} value={line.id}>
-                    {line.name_snapshot} ({Number(line.received_quantity)} received)
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Quantity</Label>
-              <Input
-                type="number"
-                min={1}
-                value={quantity}
-                onChange={(event) => setQuantity(Number(event.target.value) || 1)}
-              />
-            </div>
-            <div>
-              <Label>Position</Label>
-              <Input
-                value={position}
-                onChange={(event) => setPosition(event.target.value)}
-                placeholder="Front left, engine bay"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Serial number</Label>
-              <Input
-                value={serialNumber}
-                onChange={(event) => setSerialNumber(event.target.value)}
-              />
-            </div>
-            <div>
-              <Label>Odometer (km)</Label>
-              <Input
-                type="number"
-                min={0}
-                value={odometer}
-                onChange={(event) => setOdometer(event.target.value)}
-              />
-            </div>
-          </div>
-          <div>
-            <Label>Installation notes</Label>
-            <Textarea value={notes} onChange={(event) => setNotes(event.target.value)} />
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button disabled={busy || !lineId}>
-              {busy ? "Recording…" : "Record installation"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function LocationDialog({
-  open,
-  businessId,
-  onClose,
-  onSaved,
-}: {
-  open: boolean;
-  businessId: string;
-  onClose: () => void;
-  onSaved: () => Promise<void>;
-}) {
-  const upsert = useServerFn(upsertBusinessPartsLocation);
-  const [form, setForm] = useState({
-    code: "",
-    name: "",
-    locationType: "store",
-    addressLine: "",
-    barangay: "",
-    city: "",
-    province: "",
-    region: "",
-    postalCode: "",
-    pickupNotes: "",
-  });
-  const [busy, setBusy] = useState(false);
-  async function submit(event: React.FormEvent) {
-    event.preventDefault();
-    setBusy(true);
-    try {
-      await upsert({
-        data: {
-          businessId,
-          ...form,
-          locationType: form.locationType as any,
-          networkVisible: true,
-          active: true,
-        },
-      });
-      toast.success("Stock location added");
-      await onSaved();
-      onClose();
-    } catch (error: any) {
-      toast.error(error?.message ?? "Could not save the location");
-    } finally {
-      setBusy(false);
-    }
-  }
-  return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add stock location</DialogTitle>
-          <DialogDescription>
-            Use a real store or warehouse so nearby search, pickup, and transfers resolve to the
-            right place.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={submit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Code</Label>
-              <Input
-                required
-                value={form.code}
-                onChange={(event) => setForm({ ...form, code: event.target.value.toUpperCase() })}
-                placeholder="MNL-01"
-              />
-            </div>
-            <div>
-              <Label>Type</Label>
-              <Select
-                value={form.locationType}
-                onValueChange={(value) => setForm({ ...form, locationType: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {["store", "warehouse", "repair_shop", "counter", "mobile", "other"].map(
-                    (value) => (
-                      <SelectItem key={value} value={value}>
-                        {labelStatus(value)}
-                      </SelectItem>
-                    ),
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div>
-            <Label>Location name</Label>
-            <Input
-              required
-              value={form.name}
-              onChange={(event) => setForm({ ...form, name: event.target.value })}
-              placeholder="Quezon City Parts Counter"
-            />
-          </div>
-          <div>
-            <Label>Address</Label>
-            <Input
-              value={form.addressLine}
-              onChange={(event) => setForm({ ...form, addressLine: event.target.value })}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Barangay</Label>
-              <Input
-                value={form.barangay}
-                onChange={(event) => setForm({ ...form, barangay: event.target.value })}
-              />
-            </div>
-            <div>
-              <Label>City</Label>
-              <Input
-                required
-                value={form.city}
-                onChange={(event) => setForm({ ...form, city: event.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Province</Label>
-              <Input
-                required
-                value={form.province}
-                onChange={(event) => setForm({ ...form, province: event.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Region</Label>
-              <Input
-                value={form.region}
-                onChange={(event) => setForm({ ...form, region: event.target.value })}
-              />
-            </div>
-          </div>
-          <div>
-            <Label>Pickup notes</Label>
-            <Textarea
-              value={form.pickupNotes}
-              onChange={(event) => setForm({ ...form, pickupNotes: event.target.value })}
-              placeholder="Counter hours, landmark, contact instructions"
-            />
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button disabled={busy}>{busy ? "Saving…" : "Add location"}</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function EmptyState({ icon: Icon, title, body }: { icon: any; title: string; body: string }) {
-  return (
-    <Card className="p-8 text-center">
-      <Icon className="mx-auto h-8 w-8 text-muted-foreground" />
-      <p className="mt-3 font-semibold">{title}</p>
-      <p className="mx-auto mt-1 max-w-xl text-sm text-muted-foreground">{body}</p>
-    </Card>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const destructive = ["declined", "rejected", "cancelled"].includes(status);
-  const complete = ["received", "refunded", "replaced", "credit_issued", "closed"].includes(status);
-  return (
-    <Badge variant={destructive ? "destructive" : complete ? "secondary" : "outline"}>
-      {labelStatus(status)}
-    </Badge>
-  );
-}
-
-function labelStatus(value: string) {
-  return value.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
