@@ -420,6 +420,14 @@ export const listPartsOperations = createServerFn({ method: "POST" })
       .limit(100);
     if (warrantyError) throw warrantyError;
 
+    const { data: receivingExceptions, error: receivingExceptionsError } = await supabase
+      .from("parts_receiving_exceptions")
+      .select("*,parts_order_lines(name_snapshot,part_number_snapshot),parts_orders(order_number)")
+      .or(`requester_business_id.eq.${data.businessId},supplier_business_id.eq.${data.businessId}`)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (receivingExceptionsError) throw receivingExceptionsError;
+
     const { data: locations, error: locationsError } = await supabase
       .from("business_inventory_locations")
       .select("id,name,code,city,province,location_type,network_visible,active")
@@ -431,8 +439,72 @@ export const listPartsOperations = createServerFn({ method: "POST" })
       orders: orders ?? [],
       returns: returns ?? [],
       warranties: warranties ?? [],
+      receivingExceptions: receivingExceptions ?? [],
       locations: locations ?? [],
     };
+  });
+
+export const createPartsReceivingException = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        orderId: z.string().uuid(),
+        orderLineId: z.string().uuid(),
+        exceptionType: z.enum(["damaged", "incorrect", "short"]),
+        affectedQuantity: z.number().positive(),
+        description: z.string().trim().min(5).max(4000),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: result, error } = await (context.supabase as any).rpc(
+      "create_parts_receiving_exception",
+      {
+        _order_id: data.orderId,
+        _order_line_id: data.orderLineId,
+        _exception_type: data.exceptionType,
+        _affected_quantity: data.affectedQuantity,
+        _description: data.description,
+        _evidence: [],
+      },
+    );
+    if (error) throw new Error(error.message);
+    return result;
+  });
+
+export const transitionPartsReceivingException = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum([
+          "supplier_review",
+          "replacement_authorized",
+          "credit_authorized",
+          "return_authorized",
+          "resolved",
+          "rejected",
+          "cancelled",
+        ]),
+        note: optionalText(2000),
+        resolution: optionalText(2000),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: result, error } = await (context.supabase as any).rpc(
+      "transition_parts_receiving_exception",
+      {
+        _exception_id: data.id,
+        _target_status: data.status,
+        _note: data.note ?? undefined,
+        _resolution: data.resolution ?? undefined,
+      },
+    );
+    if (error) throw new Error(error.message);
+    return result;
   });
 
 const ORDER_STATUSES = [
