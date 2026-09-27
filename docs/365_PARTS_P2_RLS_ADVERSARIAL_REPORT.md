@@ -86,21 +86,67 @@ The suite creates synthetic fixtures inside one transaction and always ends in `
 
 **Local replay caveat:** the repository's migration history does not recreate every production object (for example `organizations`, `business_services`, `business_bookings`, `staff_dms` were created outside it), so ~47 unrelated migrations fail to replay locally. All Parts network objects replay; the suite's positive controls would fail if one did not. This is why `G2` needs a staging run.
 
-## 6. Residual risks and follow-ups (not fixed here)
+## 6. Residual risks and follow-ups
 
-| Item | Why not here | Suggested owner |
-|---|---|---|
-| `businesses` is publicly readable with table-level `SELECT`, which also exposes `network_exposure_review_note`, `network_exposure_reviewed_by` and `custom_domain_verify_token`. | Column-level revocation would break every `select("*")` on public business pages; needs a public projection view first. | Platform security |
-| Any active staff role (mechanic, driver, clerk) of a business can read its own inventory cost and supplier. | Intra-organization, role-scoped cost visibility is a product decision. | Parts owner |
-| `accredit_staff_partner(uuid)` (promoter program) is `SECURITY DEFINER`, executable by `anon`, and performs no caller check in the migration history. | Outside the Parts program (plan §1.2 keeps promoters separate). | Platform security |
-| Anonymous inquiry volume is not rate-limited. | Needs an abuse/rate-limit decision. | Parts owner |
-| Supabase Realtime column filtering for anon subscribers must be confirmed on staging. | Requires a live Realtime instance. | Platform security |
-| `shop_manager` schema isolation is only spot-checked (customers, work orders). | A dedicated Shop Manager tenancy suite belongs to that program. | Shop Manager owner |
+The first five items below were fixed in the follow-up migration
+`20260927120000_parts_network_security_followups.sql`; see §8.
+
+| Item | Status |
+|---|---|
+| `businesses` was publicly readable with table-level `SELECT`, which exposed `network_exposure_review_note`, `network_exposure_reviewed_by` and `custom_domain_verify_token`. | **Fixed (S1)** |
+| Every active staff role (mechanic, driver, clerk) of a business could read its own inventory cost and supplier. | **Fixed (S2)** |
+| `accredit_staff_partner(uuid)` (promoter program) was `SECURITY DEFINER`, executable by `anon` and did no caller check. | **Fixed (S3)** |
+| Anonymous inquiry volume was not rate-limited. | **Fixed (S4)** |
+| Supabase Realtime column filtering for anon subscribers needed confirmation. | **Covered (S5)**: replayed locally through walrus; one staging smoke test is still recommended. |
+| `shop_manager` schema isolation is only spot-checked (customers, work orders). | Open. A dedicated Shop Manager tenancy suite belongs to that program (owner: Shop Manager). |
 
 ## 7. G2 sign-off checklist
 
 - [ ] Hardening migration reviewed and applied to a staging copy of production.
 - [ ] `./scripts/test-parts-rls-adversarial.sh` green against staging (attach output).
 - [ ] `/parts/network` search, inquiry submission (guest and signed-in) and "My requests" smoke-tested on staging.
-- [ ] Residual risks in §6 accepted or ticketed by the named owners.
+- [ ] Follow-up migration (§8) reviewed and applied to staging after the hardening migration; `--local --realtime` output attached.
+- [ ] Remaining residual risk in §6 accepted or ticketed by the named owner.
 - [ ] Program owner records `G2` in the Parts plan.
+
+## 8. Security follow-ups (migration `20260927120000`)
+
+`supabase/migrations/20260927120000_parts_network_security_followups.sql` builds on the hardening
+migration `20260927090000` and must be applied **after** it. It is additive: no table, column or
+row is dropped or rewritten. Suite section **5b** covers every fix. Before the migration 51 of the
+247 assertions fail; after it all 247 pass. The Realtime replay passes 10 of 10 checks after the
+migration and 7 of 10 before it.
+
+| # | Finding | Fix | Suite coverage |
+|---|---|---|---|
+| S1 | `anon`/`authenticated` could select `businesses.custom_domain_verify_token`, `network_exposure_review_note` and `network_exposure_reviewed_by`. `API select=*` exposed them on every public business row. The owner of an unrelated domain row could also set `custom_domain_status = 'verified'` directly. | Table-level `SELECT` is replaced by a column grant on every other column, so these three columns are no longer selectable. Members and moderators read review notes through `get_business_network_exposure_reviews(uuid[])`. The owner, managers and moderators read the token through `get_business_custom_domain_token(uuid)`. Trigger `trg_guard_business_custom_domain_verification` blocks API callers from marking a domain verified, and changing the domain resets verification. The server marks the domain verified with the service role after the DNS TXT check. | `S1 …` (anon, outsider, competitor, mechanic, owner, admin) |
+| S2 | Every active staff role could read `business_inventory_items.cost`, `supplier` and `markup_percentage`. That included filtering on them and receiving them in Realtime payloads. | `authenticated` loses `SELECT` on those columns. `get_business_inventory_costs(uuid, uuid[])` returns them only when `can_view_business_inventory_costs`, which is true for the owner, `manager` and `assistant_manager`, the same set that may write stock. Writes are unchanged. The app no longer upserts, because `ON CONFLICT … EXCLUDED.cost` needs `SELECT`. | `S2 …` (mechanic denied incl. `WHERE cost > …` side channel, assistant manager allowed, owner writes) |
+| S3 | `accredit_staff_partner` was executable by `anon` through `PUBLIC` and performed no caller check. | `EXECUTE` revoked from `PUBLIC`/`anon`. A direct API call must come from the staff user themself or from an admin. Trigger, cron, migration and service-role contexts keep working. | `S3 …` |
+| S4 | Inquiries were not rate limited. | Trigger `trg_npi_throttle` (BEFORE INSERT, `SECURITY DEFINER`, advisory-locked) sets these limits: 5 per contact e-mail per hour and 20 per day (case-insensitive); 10 per signed-in requester per hour; 30 guest inquiries per partner per hour. `created_at` is forced to `now()` so the window cannot be dodged by backdating. It raises `SQLSTATE PT429`, which PostgREST returns as **HTTP 429**. Service-role and internal inserts are exempt. | `S4 …` |
+| S5 | Realtime exposure of columns. | Realtime (`realtime.apply_rls`, supabase/walrus) drops every column the subscriber's role cannot `SELECT`, including `old_record` under `REPLICA IDENTITY FULL`. S1/S2 therefore also remove those columns from `postgres_changes` payloads. Before this migration, **staff subscribers received cost/supplier/markup** in inventory change events. Anon was already limited by `20260927090000`. | `S5 …` privilege and drift guards; `supabase/tests/parts_network_realtime_columns.sql` replays real WAL (wal2json) through walrus for anon, mechanic and owner subscribers. |
+
+### Behaviour changes (API clients)
+
+- `select("*")` / `select=*` on `businesses` now fails with *permission denied* for `anon` and
+  `authenticated`. List columns explicitly. For owner and editor screens, use
+  `BUSINESS_EDITOR_COLUMNS` in `src/lib/security/restricted-columns.ts`. The only such call in
+  the repo was the page editor, and it has been updated.
+- `select("*")` on `business_inventory_items` fails for `authenticated`. Use
+  `INVENTORY_MEMBER_COLUMNS` and merge costs from `get_business_inventory_costs`.
+  `listBusinessInventory` returns rows with `cost_restricted: true` and no cost keys for staff
+  without cost access. The item form then locks cost, supplier and markup and never sends them.
+- Column privileges do not extend to columns added later. Every future migration that adds a
+  column to `businesses` or `business_inventory_items` must call
+  `SELECT public.reapply_restricted_column_grants();`. The suite's S5 drift guards fail if it is
+  forgotten.
+- Custom domains can now only be managed by the owner and manager-level staff. Previously any
+  staff member passed the server check.
+
+### How to run
+
+```bash
+# rolled-back suite (sections 1–6 incl. 5b)
+./scripts/test-parts-rls-adversarial.sh --local
+# plus the Realtime replay (needs wal_level=logical and wal2json on the local server)
+./scripts/test-parts-rls-adversarial.sh --local --realtime
+```
