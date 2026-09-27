@@ -55,6 +55,7 @@ declare -A EXPECTED=(
   ["can_manage_ads"]="false|true"
   ["current_plan_tier"]="false|true"
   ["is_business_account"]="false|true"
+  ["is_network_publishable_business"]="true|true"
 )
 
 fail=0
