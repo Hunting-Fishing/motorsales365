@@ -15,6 +15,14 @@
 > This is not a production-launch claim: database migration, synthetic
 > end-to-end validation, commercial decisions, and the applicable gates below
 > still precede external pilot use.
+>
+> **P2 implementation note (2026-09-27):** The cross-organization adversarial
+> RLS suite (`supabase/tests/parts_network_adversarial_rls.sql`, runner
+> `scripts/test-parts-rls-adversarial.sh`) and the hardening migration
+> `20260927090000_parts_network_cross_org_rls_hardening.sql` are in the
+> repository. Findings, fixes and the `G2` sign-off checklist are in
+> [`365_PARTS_P2_RLS_ADVERSARIAL_REPORT.md`](./365_PARTS_P2_RLS_ADVERSARIAL_REPORT.md).
+> `G2` is not passed until the suite runs green against staging.
 
 ## 1. Purpose and scope
 
@@ -83,6 +91,7 @@ Labels follow the platform status vocabulary. Nothing below is
 | Partner enrollment as a distinct commercial product | Not implemented | `proposed` |
 | Order, fulfilment, transfer, receipt, return and warranty records | Tenant-scoped tables and atomic lifecycle RPCs implemented on the feature branch | `in-build` |
 | Installed-component registry | Work-order-linked registry and vehicle-history read surface implemented on the feature branch | `in-build` |
+| Cross-organization RLS adversarial suite (`G2`) | 174-assertion rolled-back suite, runner, coverage guard and hardening migration; green on local replay, staging run pending | `in-build` |
 
 ## 3. Architecture rules (non-negotiable)
 
@@ -329,5 +338,6 @@ Halt the affected capability immediately if any of the following occur:
 1. Name a Parts program owner and record `G0` approval.
 2. Reconcile draft PR #2 into this plan and close `PS-002`.
 3. Produce the canonical catalog and offer design for `G1`.
-4. Write the cross-organization adversarial RLS test suite for `G2`.
+4. Run the cross-organization adversarial RLS suite against staging and record `G2`
+   (suite written; see [`365_PARTS_P2_RLS_ADVERSARIAL_REPORT.md`](./365_PARTS_P2_RLS_ADVERSARIAL_REPORT.md)).
 5. Record decisions `PD-001` through `PD-007`.
