@@ -3,9 +3,17 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import { bearerToken, buildNetworkInquiryRow } from "@/lib/network-inquiry";
 
 function publicClient() {
   return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
+}
+
+function userClient(token: string) {
+  return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
 }
@@ -283,41 +291,36 @@ export const submitNetworkPartInquiry = createServerFn({ method: "POST" })
         .parse(d),
   )
   .handler(async ({ data }) => {
-    const supabase = publicClient();
-
-    // If the caller is signed in, tag the row with their user id so they can
-    // track it in "My requests".
-    let requester_user_id: string | null = null;
+    // Signed-in callers insert with their own session so RLS can bind
+    // requester_user_id to auth.uid() and they can track the request in
+    // "My requests". Guests insert anonymously with no requester attached.
+    let supabase = publicClient();
+    let requesterUserId: string | null = null;
     try {
       const { getRequestHeader } = await import("@tanstack/react-start/server");
-      const auth = getRequestHeader("authorization") ?? getRequestHeader("Authorization");
-      const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+      const token = bearerToken(
+        getRequestHeader("authorization") ?? getRequestHeader("Authorization"),
+      );
       if (token) {
         const { data: u } = await supabase.auth.getUser(token);
-        requester_user_id = u.user?.id ?? null;
+        if (u.user?.id) {
+          requesterUserId = u.user.id;
+          supabase = userClient(token);
+        }
       }
     } catch {
-      requester_user_id = null;
+      requesterUserId = null;
+      supabase = publicClient();
     }
 
-    const { data: row, error } = await supabase
+    // Generate the id here and do not ask for the row back: guests have no SELECT policy on
+    // inquiries, so returning the inserted row would be rejected by RLS.
+    const id = crypto.randomUUID();
+    const { error } = await supabase
       .from("network_part_inquiries")
-      .insert({
-        business_id: data.business_id,
-        item_id: data.item_id ?? null,
-        sku: data.sku ?? null,
-        part_name: data.part_name,
-        quantity: data.quantity ?? 1,
-        contact_name: data.contact_name,
-        contact_email: data.contact_email,
-        contact_phone: data.contact_phone ?? null,
-        message: data.message ?? null,
-        requester_user_id,
-      })
-      .select("id")
-      .single();
+      .insert(buildNetworkInquiryRow(data, { id, requesterUserId }));
     if (error) throw error;
-    return { ok: true, id: row.id };
+    return { ok: true, id };
   });
 
 export const NETWORK_INQUIRY_STATUSES = [
