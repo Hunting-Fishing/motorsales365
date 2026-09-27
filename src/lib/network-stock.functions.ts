@@ -3,7 +3,12 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
-import { bearerToken, buildNetworkInquiryRow } from "@/lib/network-inquiry";
+import {
+  bearerToken,
+  buildNetworkInquiryRow,
+  networkInquiryErrorMessage,
+} from "@/lib/network-inquiry";
+import { attachExposureReviewNotes } from "@/lib/security/restricted-columns";
 
 function publicClient() {
   return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
@@ -319,7 +324,8 @@ export const submitNetworkPartInquiry = createServerFn({ method: "POST" })
     const { error } = await supabase
       .from("network_part_inquiries")
       .insert(buildNetworkInquiryRow(data, { id, requesterUserId }));
-    if (error) throw error;
+    // The database throttles inquiries (SQLSTATE PT429); surface its message.
+    if (error) throw new Error(networkInquiryErrorMessage(error));
     return { ok: true, id };
   });
 
@@ -471,17 +477,24 @@ export const getBusinessNetworkExposure = createServerFn({ method: "POST" })
     const { data: row, error } = await supabase
       .from("businesses")
       .select(
-        "expose_inventory_to_network, network_exposure_status, network_exposure_requested_at, network_exposure_reviewed_at, network_exposure_review_note",
+        "expose_inventory_to_network, network_exposure_status, network_exposure_requested_at, network_exposure_reviewed_at",
       )
       .eq("id", data.businessId)
       .maybeSingle();
     if (error) throw error;
+    // Review notes are not selectable by API roles; members read them via RPC.
+    const { data: reviews, error: reviewError } = await (supabase as any).rpc(
+      "get_business_network_exposure_reviews",
+      { _business_ids: [data.businessId] },
+    );
+    if (reviewError) throw reviewError;
+    const review = attachExposureReviewNotes([{ id: data.businessId }], reviews)[0];
     return {
       expose: !!(row as any)?.expose_inventory_to_network,
       status: ((row as any)?.network_exposure_status as NetworkExposureStatus) ?? "none",
       requested_at: (row as any)?.network_exposure_requested_at ?? null,
       reviewed_at: (row as any)?.network_exposure_reviewed_at ?? null,
-      review_note: (row as any)?.network_exposure_review_note ?? null,
+      review_note: review.network_exposure_review_note,
     };
   });
 
@@ -553,7 +566,7 @@ export const adminListNetworkExposure = createServerFn({ method: "POST" })
     let q = context.supabase
       .from("businesses")
       .select(
-        "id, name, slug, city, province, expose_inventory_to_network, network_exposure_status, network_exposure_requested_at, network_exposure_reviewed_at, network_exposure_review_note",
+        "id, name, slug, city, province, expose_inventory_to_network, network_exposure_status, network_exposure_requested_at, network_exposure_reviewed_at",
       )
       .order("network_exposure_requested_at", { ascending: false, nullsFirst: false })
       .limit(300);
@@ -567,7 +580,16 @@ export const adminListNetworkExposure = createServerFn({ method: "POST" })
     }
     const { data: rows, error } = await q;
     if (error) throw error;
-    return ((rows as any[]) ?? []) as AdminNetworkExposureRow[];
+    const list = ((rows as any[]) ?? []) as Array<
+      Omit<AdminNetworkExposureRow, "network_exposure_review_note">
+    >;
+    if (list.length === 0) return [];
+    const { data: reviews, error: reviewError } = await (context.supabase as any).rpc(
+      "get_business_network_exposure_reviews",
+      { _business_ids: list.map((r) => r.id) },
+    );
+    if (reviewError) throw reviewError;
+    return attachExposureReviewNotes(list, reviews) as AdminNetworkExposureRow[];
   });
 
 export const adminReviewNetworkExposure = createServerFn({ method: "POST" })

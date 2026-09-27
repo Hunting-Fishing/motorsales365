@@ -97,3 +97,37 @@ export function bearerToken(header: string | null | undefined): string | null {
   const match = /^Bearer\s+(\S+)$/i.exec(header.trim());
   return match ? match[1] : null;
 }
+
+/**
+ * Server-side inquiry limits enforced by the `trg_npi_throttle` trigger
+ * (migration 20260927120000). Mirrored here for UI copy and tests; the
+ * database values are authoritative.
+ */
+export const NETWORK_INQUIRY_LIMITS = {
+  perEmailPerHour: 5,
+  perEmailPerDay: 20,
+  perSignedInUserPerHour: 10,
+  guestPerPartnerPerHour: 30,
+} as const;
+
+/** SQLSTATE raised by the throttle; PostgREST maps `PTxyz` to HTTP xyz (429). */
+export const NETWORK_INQUIRY_RATE_LIMIT_CODE = "PT429";
+
+export function isNetworkInquiryRateLimited(error: unknown): boolean {
+  const e = error as { code?: unknown; status?: unknown } | null | undefined;
+  return e?.code === NETWORK_INQUIRY_RATE_LIMIT_CODE || e?.status === 429;
+}
+
+/** User-facing message for a failed inquiry insert. */
+export function networkInquiryErrorMessage(error: unknown): string {
+  if (isNetworkInquiryRateLimited(error)) {
+    const message = (error as { message?: unknown }).message;
+    return typeof message === "string" && message.trim()
+      ? message
+      : "Too many part requests. Please try again later.";
+  }
+  const message = (error as { message?: unknown } | null | undefined)?.message;
+  return typeof message === "string" && message.trim()
+    ? message
+    : "Could not send the part request. Please try again.";
+}

@@ -1,9 +1,15 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   bearerToken,
   buildNetworkInquiryRow,
+  isNetworkInquiryRateLimited,
   NETWORK_INQUIRY_BUYER_COLUMNS,
+  NETWORK_INQUIRY_LIMITS,
   NETWORK_INQUIRY_PARTNER_COLUMNS,
+  NETWORK_INQUIRY_RATE_LIMIT_CODE,
+  networkInquiryErrorMessage,
 } from "./network-inquiry";
 
 const input = {
@@ -78,5 +84,60 @@ describe("bearerToken", () => {
     expect(bearerToken("Basic abc")).toBeNull();
     expect(bearerToken("Bearer")).toBeNull();
     expect(bearerToken("Bearer a b")).toBeNull();
+  });
+});
+
+describe("inquiry rate limiting", () => {
+  const migration = readFileSync(
+    resolve(
+      __dirname,
+      "..",
+      "..",
+      "supabase/migrations/20260927120000_parts_network_security_followups.sql",
+    ),
+    "utf8",
+  );
+  const limit = (name: string) => {
+    const m = new RegExp(`${name}\\s+constant int := (\\d+);`).exec(migration);
+    if (!m) throw new Error(`${name} not found`);
+    return Number(m[1]);
+  };
+
+  it("mirrors the limits enforced by the database trigger", () => {
+    expect(NETWORK_INQUIRY_LIMITS).toEqual({
+      perEmailPerHour: limit("c_per_email_hour"),
+      perEmailPerDay: limit("c_per_email_day"),
+      perSignedInUserPerHour: limit("c_per_user_hour"),
+      guestPerPartnerPerHour: limit("c_guest_per_business_hour"),
+    });
+    expect(migration).toContain(`ERRCODE = '${NETWORK_INQUIRY_RATE_LIMIT_CODE}'`);
+  });
+
+  it("recognizes the PostgREST rate-limit error", () => {
+    expect(isNetworkInquiryRateLimited({ code: "PT429", message: "x" })).toBe(true);
+    expect(isNetworkInquiryRateLimited({ status: 429 })).toBe(true);
+    expect(isNetworkInquiryRateLimited({ code: "42501" })).toBe(false);
+    expect(isNetworkInquiryRateLimited(null)).toBe(false);
+  });
+
+  it("surfaces the database message for throttled requests", () => {
+    expect(
+      networkInquiryErrorMessage({
+        code: "PT429",
+        message: "Too many part requests from this e-mail address. Please try again later.",
+      }),
+    ).toBe("Too many part requests from this e-mail address. Please try again later.");
+    expect(networkInquiryErrorMessage({ code: "PT429", message: "" })).toBe(
+      "Too many part requests. Please try again later.",
+    );
+  });
+
+  it("falls back to a generic message", () => {
+    expect(networkInquiryErrorMessage({ code: "42501", message: "new row violates" })).toBe(
+      "new row violates",
+    );
+    expect(networkInquiryErrorMessage(undefined)).toBe(
+      "Could not send the part request. Please try again.",
+    );
   });
 });
