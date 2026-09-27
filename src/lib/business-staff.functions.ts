@@ -78,7 +78,8 @@ export const listBusinessStaff = createServerFn({ method: "POST" })
         active: true,
         on_shift: false,
         created_at: null,
-        display_name: profiles[business.owner_id]?.name ?? "Business owner",
+        display_name:
+          (business.owner_id ? profiles[business.owner_id]?.name : undefined) ?? "Business owner",
       },
       ...staffRows.map((r) => ({
         ...r,

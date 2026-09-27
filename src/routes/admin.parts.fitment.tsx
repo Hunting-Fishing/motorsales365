@@ -563,7 +563,19 @@ function vehicleLabel(row: any) {
     .join(" · ");
 }
 
-function TextField({ label, value, onChange, placeholder, type = "text" }: any) {
+function TextField({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+}: {
+  label: string;
+  value: string | number | null | undefined;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: string;
+}) {
   return (
     <div>
       <Label>{label}</Label>
@@ -577,13 +589,23 @@ function TextField({ label, value, onChange, placeholder, type = "text" }: any) 
   );
 }
 
-function SelectField({ label, value, onChange, children }: any) {
+function SelectField({
+  label,
+  value,
+  onChange,
+  children,
+}: {
+  label: string;
+  value: string | number | null | undefined;
+  onChange: (value: string) => void;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <Label>{label}</Label>
       <select
         className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-        value={value}
+        value={value ?? ""}
         onChange={(event) => onChange(event.target.value)}
       >
         {children}

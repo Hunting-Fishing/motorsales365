@@ -928,11 +928,19 @@ function ReceivingExceptionDialog({
           <div>
             <Label>Part</Label>
             <Select value={lineId} onValueChange={setLineId}>
-              <SelectTrigger><SelectValue placeholder="Choose inspected part" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose inspected part" />
+              </SelectTrigger>
               <SelectContent>
                 {lines.map((line: any) => (
                   <SelectItem key={line.id} value={line.id}>
-                    {line.name_snapshot} ({Math.max(0, Number(line.accepted_quantity || line.requested_quantity) - Number(line.received_quantity))} open)
+                    {line.name_snapshot} (
+                    {Math.max(
+                      0,
+                      Number(line.accepted_quantity || line.requested_quantity) -
+                        Number(line.received_quantity),
+                    )}{" "}
+                    open)
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -942,28 +950,45 @@ function ReceivingExceptionDialog({
             <div>
               <Label>Issue</Label>
               <Select value={exceptionType} onValueChange={setExceptionType}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {['damaged', 'incorrect', 'short'].map((value) => (
-                    <SelectItem key={value} value={value}>{labelStatus(value)}</SelectItem>
+                  {["damaged", "incorrect", "short"].map((value) => (
+                    <SelectItem key={value} value={value}>
+                      {labelStatus(value)}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label>Affected quantity</Label>
-              <Input type="number" min={0.01} max={remaining || undefined} step="any" value={quantity}
-                onChange={(event) => setQuantity(Number(event.target.value) || 0)} />
+              <Input
+                type="number"
+                min={0.01}
+                max={remaining || undefined}
+                step="any"
+                value={quantity}
+                onChange={(event) => setQuantity(Number(event.target.value) || 0)}
+              />
             </div>
           </div>
           <div>
             <Label>Inspection details</Label>
-            <Textarea required minLength={5} maxLength={4000} value={description}
+            <Textarea
+              required
+              minLength={5}
+              maxLength={4000}
+              value={description}
               onChange={(event) => setDescription(event.target.value)}
-              placeholder="Describe packaging, visible damage, expected part, or missing quantity…" />
+              placeholder="Describe packaging, visible damage, expected part, or missing quantity…"
+            />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
             <Button disabled={busy || !lineId || quantity <= 0 || quantity > remaining}>
               {busy ? "Reporting…" : "Open exception"}
             </Button>
@@ -1298,3 +1323,248 @@ function InstallationDialog({
             <Select value={lineId} onValueChange={setLineId}>
               <SelectTrigger>
                 <SelectValue placeholder="Choose received part" />
+              </SelectTrigger>
+              <SelectContent>
+                {lines.map((line: any) => (
+                  <SelectItem key={line.id} value={line.id}>
+                    {line.name_snapshot} ({Number(line.received_quantity)} received)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Quantity</Label>
+              <Input
+                type="number"
+                min={1}
+                value={quantity}
+                onChange={(event) => setQuantity(Number(event.target.value) || 1)}
+              />
+            </div>
+            <div>
+              <Label>Position</Label>
+              <Input
+                value={position}
+                onChange={(event) => setPosition(event.target.value)}
+                placeholder="Front left, engine bay"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Serial number</Label>
+              <Input
+                value={serialNumber}
+                onChange={(event) => setSerialNumber(event.target.value)}
+              />
+            </div>
+            <div>
+              <Label>Odometer (km)</Label>
+              <Input
+                type="number"
+                min={0}
+                value={odometer}
+                onChange={(event) => setOdometer(event.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <Label>Installation notes</Label>
+            <Textarea value={notes} onChange={(event) => setNotes(event.target.value)} />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button disabled={busy || !lineId}>
+              {busy ? "Recording…" : "Record installation"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function LocationDialog({
+  open,
+  businessId,
+  onClose,
+  onSaved,
+}: {
+  open: boolean;
+  businessId: string;
+  onClose: () => void;
+  onSaved: () => Promise<void>;
+}) {
+  const upsert = useServerFn(upsertBusinessPartsLocation);
+  const [form, setForm] = useState({
+    code: "",
+    name: "",
+    locationType: "store",
+    addressLine: "",
+    barangay: "",
+    city: "",
+    province: "",
+    region: "",
+    postalCode: "",
+    pickupNotes: "",
+  });
+  const [busy, setBusy] = useState(false);
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    try {
+      await upsert({
+        data: {
+          businessId,
+          ...form,
+          locationType: form.locationType as any,
+          networkVisible: true,
+          active: true,
+        },
+      });
+      toast.success("Stock location added");
+      await onSaved();
+      onClose();
+    } catch (error: any) {
+      toast.error(error?.message ?? "Could not save the location");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add stock location</DialogTitle>
+          <DialogDescription>
+            Use a real store or warehouse so nearby search, pickup, and transfers resolve to the
+            right place.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={submit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Code</Label>
+              <Input
+                required
+                value={form.code}
+                onChange={(event) => setForm({ ...form, code: event.target.value.toUpperCase() })}
+                placeholder="MNL-01"
+              />
+            </div>
+            <div>
+              <Label>Type</Label>
+              <Select
+                value={form.locationType}
+                onValueChange={(value) => setForm({ ...form, locationType: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {["store", "warehouse", "repair_shop", "counter", "mobile", "other"].map(
+                    (value) => (
+                      <SelectItem key={value} value={value}>
+                        {labelStatus(value)}
+                      </SelectItem>
+                    ),
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            <Label>Location name</Label>
+            <Input
+              required
+              value={form.name}
+              onChange={(event) => setForm({ ...form, name: event.target.value })}
+              placeholder="Quezon City Parts Counter"
+            />
+          </div>
+          <div>
+            <Label>Address</Label>
+            <Input
+              value={form.addressLine}
+              onChange={(event) => setForm({ ...form, addressLine: event.target.value })}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Barangay</Label>
+              <Input
+                value={form.barangay}
+                onChange={(event) => setForm({ ...form, barangay: event.target.value })}
+              />
+            </div>
+            <div>
+              <Label>City</Label>
+              <Input
+                required
+                value={form.city}
+                onChange={(event) => setForm({ ...form, city: event.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Province</Label>
+              <Input
+                required
+                value={form.province}
+                onChange={(event) => setForm({ ...form, province: event.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Region</Label>
+              <Input
+                value={form.region}
+                onChange={(event) => setForm({ ...form, region: event.target.value })}
+              />
+            </div>
+          </div>
+          <div>
+            <Label>Pickup notes</Label>
+            <Textarea
+              value={form.pickupNotes}
+              onChange={(event) => setForm({ ...form, pickupNotes: event.target.value })}
+              placeholder="Counter hours, landmark, contact instructions"
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button disabled={busy}>{busy ? "Saving…" : "Add location"}</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function EmptyState({ icon: Icon, title, body }: { icon: any; title: string; body: string }) {
+  return (
+    <Card className="p-8 text-center">
+      <Icon className="mx-auto h-8 w-8 text-muted-foreground" />
+      <p className="mt-3 font-semibold">{title}</p>
+      <p className="mx-auto mt-1 max-w-xl text-sm text-muted-foreground">{body}</p>
+    </Card>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const destructive = ["declined", "rejected", "cancelled"].includes(status);
+  const complete = ["received", "refunded", "replaced", "credit_issued", "closed"].includes(status);
+  return (
+    <Badge variant={destructive ? "destructive" : complete ? "secondary" : "outline"}>
+      {labelStatus(status)}
+    </Badge>
+  );
+}
+
+function labelStatus(value: string) {
+  return value.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
