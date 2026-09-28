@@ -151,7 +151,8 @@ export const searchNetworkStock = createServerFn({ method: "POST" })
     q = hasOrigin ? q.range(0, 499) : q.range(offset, offset + limit - 1);
     const { data: rows, error, count } = await q;
     if (error) throw error;
-    let list = (rows ?? []) as NetworkStockRow[];
+    // `fitment_profiles` is typed as generic Json by the Supabase generator.
+    let list = (rows ?? []) as unknown as NetworkStockRow[];
     let total = count ?? null;
     if (hasOrigin) {
       list = list
@@ -252,7 +253,7 @@ export const getNetworkStockForSku = createServerFn({ method: "POST" })
 
     const { data: rows, error } = await q;
     if (error) throw error;
-    return (rows ?? []) as NetworkStockRow[];
+    return (rows ?? []) as unknown as NetworkStockRow[];
   });
 
 export const submitNetworkPartInquiry = createServerFn({ method: "POST" })
