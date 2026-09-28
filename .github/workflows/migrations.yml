@@ -1,0 +1,230 @@
+name: Migrations
+
+# Applies supabase/migrations to STAGING, verifies RLS there, then (after manual
+# approval in the `production` GitHub Environment) applies them to PRODUCTION
+# and regenerates database types.
+#
+# Triggers:
+#   - push to main that changes supabase/migrations/**: deploy.yml detects the
+#     change and calls this workflow BEFORE deploying the app, so a release never
+#     ships code ahead of its schema and there is exactly one approval per release.
+#   - workflow_dispatch: run by hand (e.g. staging only, or to retry).
+#
+# Every job skips with a clear notice when its secrets are not configured.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "How far to go"
+        type: choice
+        options:
+          - staging-only
+          - staging-then-production
+        default: staging-only
+  workflow_call:
+    inputs:
+      ref:
+        description: "Commit to migrate from (defaults to the triggering SHA)"
+        type: string
+        required: false
+        default: ""
+      target:
+        type: string
+        required: false
+        default: staging-then-production
+    outputs:
+      staging_status:
+        value: ${{ jobs.staging.outputs.status }}
+      production_status:
+        value: ${{ jobs.production.outputs.status }}
+
+permissions:
+  contents: read
+
+# Never run two migration workflows at once (each target is a shared database).
+concurrency:
+  group: supabase-migrations
+  cancel-in-progress: false
+
+env:
+  SUPABASE_CLI_VERSION: 2.118.0
+  PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF || 'wjxaajgvddtrxxtocxen' }}
+  # More pending migrations than this almost always means the remote migration
+  # history does not match the repository (e.g. history never recorded). Stop
+  # and reconcile with `supabase migration list` / `supabase migration repair`.
+  MAX_PENDING_MIGRATIONS: ${{ vars.MAX_PENDING_MIGRATIONS || '10' }}
+
+jobs:
+  staging:
+    name: Staging — dry-run, apply, adversarial RLS suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      status: ${{ steps.result.outputs.status }}
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      STAGING_PROJECT_REF: ${{ secrets.STAGING_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+      STAGING_DB_URL: ${{ secrets.STAGING_DB_URL }}
+    steps:
+      - name: Check configuration
+        id: cfg
+        run: |
+          missing=""
+          [ -n "${SUPABASE_ACCESS_TOKEN}" ] || missing="${missing} SUPABASE_ACCESS_TOKEN"
+          [ -n "${STAGING_PROJECT_REF}" ] || missing="${missing} STAGING_PROJECT_REF"
+          [ -n "${SUPABASE_DB_PASSWORD}" ] || missing="${missing} STAGING_DB_PASSWORD"
+          if [ -n "${missing}" ]; then
+            echo "::notice title=Staging migrations skipped::Missing secret(s):${missing}. See docs/CI_CD.md."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          elif [ "${STAGING_PROJECT_REF}" = "${PRODUCTION_PROJECT_REF}" ]; then
+            echo "::error::STAGING_PROJECT_REF equals the production project ref. Refusing."
+            exit 1
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.ready == 'true'
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - uses: supabase/setup-cli@v1
+        if: steps.cfg.outputs.ready == 'true'
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      - name: Link staging project
+        if: steps.cfg.outputs.ready == 'true'
+        run: supabase link --project-ref "${STAGING_PROJECT_REF}" --password "${SUPABASE_DB_PASSWORD}"
+
+      - name: Dry run — pending migrations on staging
+        id: plan
+        if: steps.cfg.outputs.ready == 'true'
+        run: bash scripts/ci/supabase-plan.sh staging
+
+      - name: Apply migrations to staging
+        if: steps.cfg.outputs.ready == 'true' && steps.plan.outputs.pending != '0'
+        run: supabase db push --linked --password "${SUPABASE_DB_PASSWORD}" --skip-vault --yes
+
+      - name: Install psql client
+        if: steps.cfg.outputs.ready == 'true'
+        run: command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client; }
+
+      - name: Adversarial RLS suite against staging
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          if [ ! -f scripts/test-parts-rls-adversarial.sh ]; then
+            echo "::notice::Parts adversarial RLS suite not on this commit yet; skipping."
+            exit 0
+          fi
+          if [ -z "${STAGING_DB_URL}" ]; then
+            # `supabase link` records the project's pooler URL (no password). Use
+            # the session-mode port (5432) so the suite's single session keeps its
+            # SET ROLE / transaction state; GitHub runners have no IPv6 for the
+            # direct db.<ref>.supabase.co host.
+            test -f supabase/.temp/pooler-url || { echo "::error::No pooler URL recorded by supabase link; set secret STAGING_DB_URL."; exit 1; }
+            STAGING_DB_URL="$(python3 - <<'PY'
+          import os, urllib.parse
+          u = urllib.parse.urlsplit(open("supabase/.temp/pooler-url").read().strip())
+          pw = urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe="")
+          netloc = f"{u.username}:{pw}@{u.hostname}:5432"
+          print(urllib.parse.urlunsplit((u.scheme, netloc, u.path or "/postgres", "sslmode=require", "")))
+          PY
+          )"
+          fi
+          echo "::add-mask::${STAGING_DB_URL}"
+          DATABASE_URL="${STAGING_DB_URL}" bash scripts/test-parts-rls-adversarial.sh 2>&1 | tee parts-rls.log
+          if grep -q "SKIP.*parts adversarial RLS suite" parts-rls.log; then
+            echo "::error::Suite skipped: the staging connection lacks postgres privileges."; exit 1
+          fi
+
+      - name: Result
+        id: result
+        if: always()
+        run: |
+          if [ "${{ steps.cfg.outputs.ready }}" != "true" ]; then s=not-configured
+          elif [ "${{ job.status }}" != "success" ]; then s=failed
+          elif [ "${{ steps.plan.outputs.pending }}" = "0" ]; then s=up-to-date
+          else s=applied; fi
+          echo "status=${s}" >> "$GITHUB_OUTPUT"
+          echo "Staging: **${s}**" >> "$GITHUB_STEP_SUMMARY"
+
+  production:
+    name: Production — approval, dry-run, db push
+    needs: staging
+    # Skip (without asking for approval) when only staging was requested, or when
+    # staging is not configured, unless explicitly allowed via a repo variable.
+    if: >-
+      (inputs.target || 'staging-then-production') == 'staging-then-production' &&
+      needs.staging.result == 'success' &&
+      (needs.staging.outputs.status != 'not-configured' || vars.ALLOW_PROD_MIGRATIONS_WITHOUT_STAGING == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+    outputs:
+      status: ${{ steps.result.outputs.status }}
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      # Store PRODUCTION_DB_PASSWORD as an *environment* secret of `production`
+      # so it is only released after a reviewer approves this job.
+      SUPABASE_DB_PASSWORD: ${{ secrets.PRODUCTION_DB_PASSWORD }}
+    steps:
+      - name: Check configuration
+        id: cfg
+        run: |
+          missing=""
+          [ -n "${SUPABASE_ACCESS_TOKEN}" ] || missing="${missing} SUPABASE_ACCESS_TOKEN"
+          [ -n "${SUPABASE_DB_PASSWORD}" ] || missing="${missing} PRODUCTION_DB_PASSWORD"
+          if [ -n "${missing}" ]; then
+            echo "::notice title=Production migrations skipped::Missing secret(s):${missing}. See docs/CI_CD.md."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.ready == 'true'
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - uses: supabase/setup-cli@v1
+        if: steps.cfg.outputs.ready == 'true'
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      - name: Link production project
+        if: steps.cfg.outputs.ready == 'true'
+        run: supabase link --project-ref "${PRODUCTION_PROJECT_REF}" --password "${SUPABASE_DB_PASSWORD}"
+
+      - name: Dry run — pending migrations on production
+        id: plan
+        if: steps.cfg.outputs.ready == 'true'
+        run: bash scripts/ci/supabase-plan.sh production
+
+      - name: Apply migrations to production
+        if: steps.cfg.outputs.ready == 'true' && steps.plan.outputs.pending != '0'
+        run: supabase db push --linked --password "${SUPABASE_DB_PASSWORD}" --skip-vault --yes
+
+      - name: Result
+        id: result
+        if: always()
+        run: |
+          if [ "${{ steps.cfg.outputs.ready }}" != "true" ]; then s=not-configured
+          elif [ "${{ job.status }}" != "success" ]; then s=failed
+          elif [ "${{ steps.plan.outputs.pending }}" = "0" ]; then s=up-to-date
+          else s=applied; fi
+          echo "status=${s}" >> "$GITHUB_OUTPUT"
+          echo "Production: **${s}**" >> "$GITHUB_STEP_SUMMARY"
+
+  types:
+    name: Regenerate types after production migration
+    needs: production
+    if: needs.production.outputs.status == 'applied'
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/supabase-types.yml
+    secrets: inherit

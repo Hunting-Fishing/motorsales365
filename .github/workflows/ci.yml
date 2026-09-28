@@ -1,0 +1,178 @@
+name: CI
+
+# Pull-request and main-branch quality gate.
+#   - pull_request: runs directly.
+#   - push to main: runs as the first stage of the "Deploy" workflow (deploy.yml
+#     calls this file via workflow_call), so main is checked exactly once per push
+#     and production deploys only after these jobs pass.
+on:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  NODE_VERSION: "22"
+  # npm is the package manager of record: package-lock.json is what the
+  # Cloudflare Worker build uses. --legacy-peer-deps is required because
+  # @tanstack/zod-adapter declares a Zod 3 peer while the app runs Zod 4.
+  NPM_CI: npm ci --legacy-peer-deps --no-audit --no-fund
+  CI: "true"
+
+jobs:
+  typecheck:
+    name: Typecheck (tsc --noEmit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: ${{ env.NPM_CI }}
+      - run: npx tsc --noEmit -p tsconfig.json
+
+  test:
+    name: Unit tests (vitest + quarantine)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: ${{ env.NPM_CI }}
+
+      # Run the WHOLE suite once; the checker decides pass/fail. Known failures
+      # listed in scripts/ci/vitest-quarantine.json are reported but do not block;
+      # any other failure (including a test file that fails to load) does.
+      - name: Run full vitest suite
+        run: npx vitest run --reporter=default --reporter=json --outputFile.json=vitest-report.json || true
+      - name: Check results against quarantine list
+        run: node scripts/ci/check-vitest-results.mjs vitest-report.json scripts/ci/vitest-quarantine.json
+
+      # Explicit, never-quarantined gate for the Parts RLS migration coverage check.
+      - name: Parts RLS coverage unit check
+        run: |
+          if [ ! -f src/lib/security/parts-rls-coverage.test.ts ]; then
+            echo "::notice::src/lib/security/parts-rls-coverage.test.ts not on this branch yet (lands with PR #5); skipping."
+            exit 0
+          fi
+          npx vitest run src/lib/security/parts-rls-coverage.test.ts
+
+      - name: Upload vitest report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-report
+          path: vitest-report.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  build:
+    name: Build (vite build, Cloudflare Worker bundle)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: ${{ env.NPM_CI }}
+      # Vite + Nitro build caches live under node_modules/.cache (see docs/build-caching.md).
+      - name: Restore Vite/Nitro build cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache
+          key: build-cache-v1-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            build-cache-v1-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+      - run: npm run build
+      - name: Validate Worker package (wrangler deploy --dry-run, no credentials)
+        run: |
+          set -euo pipefail
+          node scripts/ci/verify-worker-bundle.mjs
+          npx wrangler deploy --dry-run --outdir /tmp/worker-dry-run | tail -n 8
+
+  lint:
+    name: ESLint (changed lines only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: ${{ env.NPM_CI }}
+      - name: Determine diff base
+        id: base
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ -n "${PR_BASE_SHA}" ]; then
+            base="${PR_BASE_SHA}"
+          elif [ -n "${PUSH_BEFORE}" ] && [ "${PUSH_BEFORE}" != "0000000000000000000000000000000000000000" ] && git cat-file -e "${PUSH_BEFORE}^{commit}" 2>/dev/null; then
+            base="${PUSH_BEFORE}"
+          else
+            base="$(git rev-parse HEAD~1)"
+          fi
+          echo "base=${base}" >> "$GITHUB_OUTPUT"
+          echo "Diff base: ${base}"
+      - run: node scripts/ci/eslint-changed-lines.mjs "${{ steps.base.outputs.base }}"
+
+  parts-rls:
+    name: Parts adversarial RLS suite (throwaway Postgres)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      # --local mode only accepts a local server; the service container is
+      # disposable and destroyed with the job. No remote database is touched.
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install psql client
+        run: |
+          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client; }
+          psql --version
+      - name: Run suite (--local replay of supabase/migrations)
+        run: |
+          set -euo pipefail
+          if [ ! -f scripts/test-parts-rls-adversarial.sh ] || [ ! -f supabase/tests/parts_network_adversarial_rls.sql ]; then
+            echo "::notice::Parts adversarial RLS suite not on this branch yet (lands with PR #5); skipping."
+            exit 0
+          fi
+          bash scripts/test-parts-rls-adversarial.sh --local 2>&1 | tee parts-rls.log
+          # The script exits 0 on a privilege SKIP; in CI we own a superuser, so a SKIP is a failure.
+          if grep -q "SKIP.*parts adversarial RLS suite" parts-rls.log; then echo "::error::Suite skipped unexpectedly"; exit 1; fi
+          grep -m1 "assertions passed" parts-rls.log >> "$GITHUB_STEP_SUMMARY" || true

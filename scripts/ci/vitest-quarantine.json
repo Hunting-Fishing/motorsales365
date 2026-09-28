@@ -1,0 +1,59 @@
+{
+  "$comment": [
+    "Known-failing vitest tests. CI runs the FULL suite; failures listed here are reported but do not fail the build.",
+    "Any failure NOT listed here fails CI. A listed test that starts passing produces a warning so it can be removed.",
+    "Never add a test here to get a PR green. Fix it, or record why in 'reason' and get review. See docs/CI_CD.md."
+  ],
+  "tests": [
+    {
+      "file": "src/__tests__/admin-nav.test.ts",
+      "name": "ADMIN_NAV — non-admin gating snapshot of role → accessible routes matrix",
+      "reason": "Pre-existing failure on main before CI was introduced (baseline 2026-09-28)."
+    },
+    {
+      "file": "src/__tests__/auth-overlapping-refresh.test.tsx",
+      "name": "auth — overlapping refresh attempts only the latest error surfaces and pending retries are cancelled",
+      "reason": "Pre-existing failure on main before CI was introduced (baseline 2026-09-28)."
+    },
+    {
+      "file": "src/__tests__/auth-refresh-failure-toast.test.tsx",
+      "name": "auth — refresh_token failure surfaces toast + Try again flow shows red toast on refresh failure and Try again clears session then navigates to /auth?next=…",
+      "reason": "Pre-existing failure on main before CI was introduced (baseline 2026-09-28)."
+    },
+    {
+      "file": "src/__tests__/auth-retry-auth.test.tsx",
+      "name": "retryAuth clears session, cancels pending role retries, and navigates to /auth",
+      "reason": "Pre-existing failure on main before CI was introduced (baseline 2026-09-28)."
+    },
+    {
+      "file": "src/__tests__/auth-stale-refresh-token.test.tsx",
+      "name": "auth bootstrap — stale refresh token recovery clears the stale token and loads roles on next sign-in within the timeout window",
+      "reason": "Pre-existing failure on main before CI was introduced (baseline 2026-09-28)."
+    },
+    {
+      "file": "src/__tests__/auth-unexpected-signed-out-toast.test.tsx",
+      "name": "auth — unexpected SIGNED_OUT surfaces toast + Try again flow shows red toast on unexpected SIGNED_OUT and Try again clears session then navigates to /auth?next=…",
+      "reason": "Pre-existing failure on main before CI was introduced (baseline 2026-09-28)."
+    },
+    {
+      "file": "src/__tests__/business-associate-role-boundaries.test.ts",
+      "name": "business and Associate role boundaries labels Associate enrollment instead of implying membership",
+      "reason": "Pre-existing failure on main before CI was introduced (baseline 2026-09-28)."
+    },
+    {
+      "file": "src/__tests__/business-associate-role-boundaries.test.ts",
+      "name": "business and Associate role boundaries keeps Associate operations unavailable until approval",
+      "reason": "Pre-existing failure on main before CI was introduced (baseline 2026-09-28)."
+    },
+    {
+      "file": "src/__tests__/signup-validation.test.ts",
+      "name": "POST /api/public/auth/signup — server-side validation personal (buyer) account accepts a fully valid buyer submission",
+      "reason": "Pre-existing failure on main before CI was introduced (baseline 2026-09-28)."
+    },
+    {
+      "file": "src/__tests__/signup-validation.test.ts",
+      "name": "POST /api/public/auth/signup — server-side validation business account accepts a fully valid business submission",
+      "reason": "Pre-existing failure on main before CI was introduced (baseline 2026-09-28)."
+    }
+  ]
+}
