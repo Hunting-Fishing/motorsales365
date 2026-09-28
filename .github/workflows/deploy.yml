@@ -1,0 +1,226 @@
+name: Deploy
+
+# Release pipeline for the self-hosted Cloudflare Worker `motorsales365`
+# (custom domains 365motorsales.com / www.365motorsales.com).
+#
+# push to main:  CI (ci.yml) -> migrations (migrations.yml, only if
+#                supabase/migrations changed) -> production deploy
+#                (GitHub Environment `production`, manual approval).
+# pull_request:  upload a preview version of the Worker (never receives
+#                production traffic) and comment its URL on the PR.
+#
+# Deploy jobs only act when the repository variable DEPLOY_VIA_ACTIONS is
+# "true". Until then Cloudflare Workers Builds (the Git integration on the
+# Worker) remains the deployer and these jobs skip with a notice, so the two
+# systems never deploy the same commit twice. See docs/CI_CD.md.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_migrations:
+        description: "Run migrations.yml (staging -> production) before deploying"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "22"
+  NPM_CI: npm ci --legacy-peer-deps --no-audit --no-fund
+  WORKER_NAME: motorsales365
+  PRODUCTION_URL: https://www.365motorsales.com
+  SUPABASE_REF: wjxaajgvddtrxxtocxen
+
+jobs:
+  # ---------------------------------------------------------------- main ----
+  ci:
+    name: CI
+    if: github.event_name != 'pull_request'
+    uses: ./.github/workflows/ci.yml
+
+  changes:
+    name: Detect migration changes
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      migrations: ${{ steps.decide.outputs.migrations }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            migrations:
+              - 'supabase/migrations/**'
+      - id: decide
+        env:
+          CHANGED: ${{ steps.filter.outputs.migrations }}
+          FORCED: ${{ inputs.run_migrations }}
+        run: |
+          if [ "${CHANGED}" = "true" ] || [ "${FORCED}" = "true" ]; then m=true; else m=false; fi
+          echo "migrations=${m}" >> "$GITHUB_OUTPUT"
+          echo "Migrations to apply in this release: ${m}" >> "$GITHUB_STEP_SUMMARY"
+
+  migrations:
+    name: Migrations
+    needs: [ci, changes]
+    if: needs.changes.outputs.migrations == 'true'
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/migrations.yml
+    with:
+      ref: ${{ github.sha }}
+      target: staging-then-production
+    secrets: inherit
+
+  production:
+    name: Deploy production Worker
+    needs: [ci, changes, migrations]
+    # Run after CI passed and migrations either succeeded or were not needed.
+    if: >-
+      always() && github.event_name != 'pull_request' &&
+      needs.ci.result == 'success' && needs.changes.result == 'success' &&
+      (needs.migrations.result == 'success' || needs.migrations.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    environment:
+      name: production
+      url: ${{ env.PRODUCTION_URL }}
+    steps:
+      - name: Check configuration and migration state
+        id: cfg
+        env:
+          DEPLOY_VIA_ACTIONS: ${{ vars.DEPLOY_VIA_ACTIONS }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          MIGRATIONS_NEEDED: ${{ needs.changes.outputs.migrations }}
+          PROD_MIGRATION_STATUS: ${{ needs.migrations.outputs.production_status }}
+        run: |
+          if [ "${MIGRATIONS_NEEDED}" = "true" ] && [ "${PROD_MIGRATION_STATUS}" != "applied" ] && [ "${PROD_MIGRATION_STATUS}" != "up-to-date" ]; then
+            echo "::error title=Deploy blocked::This release changes supabase/migrations but production migrations are '${PROD_MIGRATION_STATUS:-not run}'. Apply them (configure migration secrets and re-run, or run migrations.yml) before deploying code that depends on them."
+            exit 1
+          fi
+          if [ "${DEPLOY_VIA_ACTIONS}" != "true" ]; then
+            echo "::notice title=Deploy skipped::Repository variable DEPLOY_VIA_ACTIONS is not 'true'; Cloudflare Workers Builds is still the production deployer. See docs/CI_CD.md."
+            echo "ready=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if [ -z "${CF_TOKEN}" ] || [ -z "${CF_ACCOUNT}" ]; then
+            echo "::notice title=Deploy skipped::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID secrets are not set."
+            echo "ready=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.ready == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.ready == 'true'
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - if: steps.cfg.outputs.ready == 'true'
+        run: ${{ env.NPM_CI }}
+      - name: Restore Vite/Nitro build cache
+        if: steps.cfg.outputs.ready == 'true'
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache
+          key: build-cache-v1-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            build-cache-v1-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+      - name: Build
+        if: steps.cfg.outputs.ready == 'true'
+        run: npm run build
+      - name: Verify Worker identity and Supabase target
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          node scripts/ci/verify-worker-bundle.mjs
+      - name: Deploy to Cloudflare
+        if: steps.cfg.outputs.ready == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          packageManager: npm
+          # The build writes .wrangler/deploy/config.json -> .output/server/wrangler.json.
+          # Runtime secrets/vars live on the Worker (keep_vars: true) and are untouched.
+          command: deploy --config .output/server/wrangler.json --message "${{ github.sha }} via GitHub Actions"
+      - name: Smoke test production
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          for path in / /businesses /map; do
+            code="$(curl -sS -o /tmp/page.html -w '%{http_code}' --retry 5 --retry-delay 5 --retry-all-errors --max-time 60 "${PRODUCTION_URL}${path}")"
+            echo "${PRODUCTION_URL}${path} -> ${code}"
+            [ "${code}" = "200" ] || { echo "::error::${path} returned ${code}. Roll back with: npx wrangler rollback --name ${WORKER_NAME}"; exit 1; }
+          done
+          echo "Deployed ${GITHUB_SHA} to ${PRODUCTION_URL}" >> "$GITHUB_STEP_SUMMARY"
+
+  # ------------------------------------------------------------- previews ---
+  preview:
+    name: Preview Worker version
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: write
+    concurrency:
+      group: preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - name: Check configuration
+        id: cfg
+        env:
+          DEPLOY_VIA_ACTIONS: ${{ vars.DEPLOY_VIA_ACTIONS }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          IS_FORK: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          if [ "${IS_FORK}" = "true" ]; then echo "::notice::Fork PR: no preview (secrets unavailable)."; echo "ready=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ "${DEPLOY_VIA_ACTIONS}" != "true" ]; then echo "::notice::DEPLOY_VIA_ACTIONS is not 'true'; Cloudflare Workers Builds posts the preview URL for this branch instead."; echo "ready=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ -z "${CF_TOKEN}" ] || [ -z "${CF_ACCOUNT}" ]; then echo "::notice::Cloudflare secrets not set; skipping preview."; echo "ready=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.ready == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.ready == 'true'
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - if: steps.cfg.outputs.ready == 'true'
+        run: ${{ env.NPM_CI }}
+      - name: Build
+        if: steps.cfg.outputs.ready == 'true'
+        run: npm run build
+      # `versions upload` creates a version WITHOUT routing production traffic to it.
+      # Previews use the production Supabase project (the committed .env.production);
+      # treat preview links as production data.
+      - name: Upload preview version
+        id: upload
+        if: steps.cfg.outputs.ready == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          packageManager: npm
+          command: versions upload --config .output/server/wrangler.json --preview-alias pr-${{ github.event.pull_request.number }} --message "PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.head.sha }}"
+      - name: Comment preview URL
+        if: steps.cfg.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OUTPUT: ${{ steps.upload.outputs.command-output }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          url="$(printf '%s\n' "${OUTPUT}" | grep -oE 'https://pr-[^ ]+\.workers\.dev' | head -n 1 || true)"
+          [ -n "${url}" ] || url="$(printf '%s\n' "${OUTPUT}" | grep -oE 'https://[^ ]+\.workers\.dev' | head -n 1 || true)"
+          [ -n "${url}" ] || { echo "No preview URL found in wrangler output"; exit 0; }
+          body="Preview for ${GITHUB_SHA::7} (${{ github.event.pull_request.head.sha }}): ${url}"
+          gh pr comment "${PR}" --repo "${GITHUB_REPOSITORY}" --edit-last --body "${body}" 2>/dev/null || gh pr comment "${PR}" --repo "${GITHUB_REPOSITORY}" --body "${body}"
