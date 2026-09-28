@@ -3,7 +3,7 @@
  * Each entry powers one expandable row: title, pitch, how-it-works,
  * why-useful bullets, competitive positioning, and a deep link into the app.
  *
- * Screenshots are optional. If present they reference an .asset.json pointer
+ * Screenshots are optional. If present they reference an image file
  * under src/assets/features/. Missing screenshots render a designed placeholder.
  */
 
