@@ -9,7 +9,7 @@ Convention for the header (place at the very top of the file):
 ```ts
 /**
  * SYNC GROUP: <group-name>
- * Source of truth: .lovable/sync-groups.md#<group-name>
+ * Source of truth: docs/sync-groups.md#<group-name>
  * On change: bump VERSION + update sync-groups.md
  * VERSION: 1
  */
@@ -28,7 +28,7 @@ Public per-vehicle profile (`/passport/$slug`) — owner timeline, service histo
 
 **Also update when this changes**
 - `/terms` §data-handling and `/privacy` (passport data + retention)
-- `.lovable/june7-audit.md` — bump item #14
+- `docs/history/june7-audit.md` — bump item #14
 
 **Schema invariants**
 - `vehicles.is_public = true` is the gate for everything public
