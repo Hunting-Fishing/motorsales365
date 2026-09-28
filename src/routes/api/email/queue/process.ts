@@ -70,7 +70,7 @@ export const Route = createFileRoute("/api/email/queue/process")({
         }
 
         // Verify the caller is authorized with the service role key.
-        // The pg_cron job (see docs/LOVABLE_EXIT_CHECKLIST.md) sends it as a Bearer token.
+        // The pg_cron job (process-email-queue) sends it as a Bearer token.
         const authHeader = request.headers.get("Authorization");
         if (!authHeader?.startsWith("Bearer ")) {
           return Response.json({ error: "Unauthorized" }, { status: 401 });

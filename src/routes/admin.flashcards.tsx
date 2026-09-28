@@ -289,7 +289,7 @@ function AdminFlashcardsPage() {
           <CardTitle className="flex items-center gap-2 text-base">
             <Database className="h-4 w-4" /> Current snapshot
           </CardTitle>
-          <CardDescription>What the game will load from Lovable Cloud.</CardDescription>
+          <CardDescription>What the game will load from the database.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label="Cards" value={content?.cardCount.toLocaleString() ?? "—"} />
@@ -415,7 +415,7 @@ function AdminFlashcardsPage() {
           </CardTitle>
           <CardDescription>
             Fetches <code>game/data/cards.json</code> and <code>game/data/taxonomy.json</code>{" "}
-            from the upstream repo and replaces the snapshot stored in Lovable Cloud.
+            from the upstream repo and replaces the snapshot stored in the database.
             Safe to run any time — user progress lives in a separate table.
           </CardDescription>
         </CardHeader>

@@ -31,7 +31,7 @@ async function assertAdmin(context: any) {
 export const listPaymentMethods = createServerFn({ method: "GET" }).handler(async () => {
   // Use the publishable-key client (anon role) — the public SELECT policy on
   // payment_method_config allows reading enabled rows. Avoids the JWT-format
-  // issue that can hit service-role Data API reads on Lovable Cloud.
+  // issue that can hit service-role Data API reads on hosted Supabase.
   const { createClient } = await import("@supabase/supabase-js");
   const supabase = createClient(
     process.env.SUPABASE_URL!,

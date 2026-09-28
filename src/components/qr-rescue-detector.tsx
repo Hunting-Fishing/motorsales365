@@ -2,7 +2,8 @@ import { useEffect } from "react";
 
 /**
  * Watches for scans of legacy QR codes that were printed with a stale
- * preview host (e.g. `<uuid>.lovableproject.com/r/<code>`). If any such
+ * preview host that embeds the legacy project id (e.g.
+ * `<project-id>.<legacy-preview-domain>/r/<code>`). If any such
  * request lands on our origin — via referrer, an auth-bridge redirect
  * param, or an encoded URL parameter — we extract the referral code and
  * bounce the visitor to the canonical `/r/<code>` route.
@@ -12,11 +13,9 @@ import { useEffect } from "react";
  * corrected client-side.
  */
 
-const LEGACY_HOST_PATTERNS = [
-  /lovableproject\.com/i,
-  /id-preview--[0-9a-f-]+\.lovable\.app/i,
-  /0738c881-614d-4885-8d75-1b7c90e0835e/i,
-];
+// Every legacy preview/project host embedded the original project id, so
+// matching on the id alone covers all of them.
+const LEGACY_HOST_PATTERNS = [/0738c881-614d-4885-8d75-1b7c90e0835e/i];
 
 const REDIRECT_PARAM_KEYS = [
   "redirect_to",

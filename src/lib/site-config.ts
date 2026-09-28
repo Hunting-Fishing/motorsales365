@@ -2,7 +2,7 @@
  * Canonical site URL helpers.
  *
  * The app is published at www.365motorsales.com (with the apex 365motorsales.com
- * redirecting to www). Preview/sandbox hosts (lovableproject.com, lovable.app,
+ * redirecting to www). Preview/sandbox hosts (*.workers.dev previews,
  * localhost, etc.) must never leak into emails, share links, QR codes, or SEO
  * tags. Use siteOrigin() / siteUrl() anywhere you'd otherwise reach for
  * window.location.origin.

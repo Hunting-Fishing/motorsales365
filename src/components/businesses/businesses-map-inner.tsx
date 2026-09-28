@@ -56,7 +56,7 @@ function pinDivIcon(
       </div>`;
     return L.divIcon({
       html,
-      className: "lovable-map-pin",
+      className: "ms365-map-pin",
       iconSize: [size, size],
       iconAnchor: [size / 2, size / 2],
       popupAnchor: [0, -size / 2 + 4],
@@ -75,7 +75,7 @@ function pinDivIcon(
     </svg>`;
   return L.divIcon({
     html,
-    className: "lovable-map-pin",
+    className: "ms365-map-pin",
     iconSize: [w, h],
     iconAnchor: [w / 2, h],
     popupAnchor: [0, -h + 6],

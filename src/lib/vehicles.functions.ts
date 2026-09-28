@@ -1,6 +1,6 @@
 /**
  * SYNC GROUP: vehicle-passport
- * Source of truth: .lovable/sync-groups.md#vehicle-passport
+ * Source of truth: docs/sync-groups.md#vehicle-passport
  * Siblings: src/routes/passport.$slug.tsx, src/routes/dashboard.vehicles.tsx,
  *           src/components/passport-share-section.tsx
  * On change: bump VERSION + update sync-groups.md
