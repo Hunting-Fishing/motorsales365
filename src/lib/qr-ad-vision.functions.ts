@@ -13,7 +13,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText } from "ai";
-import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { AI_MODELS, aiModel, isAiConfigured } from "@/lib/ai/provider.server";
 import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
 
 const inputSchema = z.object({
@@ -91,22 +91,13 @@ export const detectScanHereWithVision = createServerFn({ method: "POST" })
   .middleware([requireAdminRoleAudited("qrAds.smartFit")])
   .inputValidator((input: unknown) => inputSchema.parse(input))
   .handler(async ({ data }): Promise<VisionDetection> => {
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) {
-      throw new Error("Smart fit is unavailable — LOVABLE_API_KEY is missing.");
+    if (!isAiConfigured()) {
+      throw new Error("Smart fit is unavailable — AI_API_KEY is missing.");
     }
 
     const { bytes, mediaType } = await fetchImageAsBytes(data.imageUrl);
 
-    const gateway = createOpenAICompatible({
-      name: "lovable",
-      baseURL: "https://ai.gateway.lovable.dev/v1",
-      headers: {
-        "Lovable-API-Key": key,
-        "X-Lovable-AIG-SDK": "vercel-ai-sdk",
-      },
-    });
-    const model = gateway("google/gemini-2.5-flash");
+    const model = aiModel(AI_MODELS.flash);
 
     let text: string;
     try {

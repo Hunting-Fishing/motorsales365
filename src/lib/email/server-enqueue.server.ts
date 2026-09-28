@@ -7,10 +7,7 @@ import * as React from "react";
 import { render } from "@react-email/components";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { TEMPLATES } from "@/lib/email-templates/registry";
-
-const SITE_NAME = "motorsales365";
-const SENDER_DOMAIN = "notify.365motorsales.com";
-const FROM_DOMAIN = "365motorsales.com";
+import { emailFrom } from "@/lib/email/config";
 
 function generateToken(): string {
   const bytes = new Uint8Array(32);
@@ -94,8 +91,7 @@ export async function enqueueTransactionalEmailServer(params: ServerEnqueueParam
       payload: {
         message_id: messageId,
         to: recipient,
-        from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
-        sender_domain: SENDER_DOMAIN,
+        from: emailFrom(),
         subject,
         html,
         text,

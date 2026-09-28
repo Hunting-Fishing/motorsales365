@@ -8,8 +8,6 @@ const getEnv = (key: string): string => {
 
 export type StripeEnv = "sandbox" | "live";
 
-const GATEWAY_STRIPE_BASE = "https://connector-gateway.lovable.dev/stripe";
-
 export function getConnectionApiKey(env: StripeEnv): string {
   return env === "sandbox" ? getEnv("STRIPE_SANDBOX_API_KEY") : getEnv("STRIPE_LIVE_API_KEY");
 }
@@ -20,47 +18,29 @@ export function getWebhookSecret(env: StripeEnv): string {
     : getEnv("PAYMENTS_LIVE_WEBHOOK_SECRET");
 }
 
+/**
+ * Stripe client talking directly to https://api.stripe.com.
+ * STRIPE_LIVE_API_KEY / STRIPE_SANDBOX_API_KEY must be real Stripe secret
+ * (sk_live_/sk_test_) or restricted (rk_) keys from the Stripe dashboard.
+ */
 export function createStripeClient(env: StripeEnv): Stripe {
-  const connectionApiKey = getConnectionApiKey(env);
-  const lovableApiKey = getEnv("LOVABLE_API_KEY");
-
-  return new Stripe(connectionApiKey, {
+  return new Stripe(getConnectionApiKey(env), {
     apiVersion: "2026-03-25.dahlia",
-    httpClient: Stripe.createFetchHttpClient(((input: URL | RequestInfo, init?: RequestInit) => {
-      const original =
-        typeof input === "string" || input instanceof URL ? input.toString() : input.url;
-      const gatewayUrl = original.replace("https://api.stripe.com", GATEWAY_STRIPE_BASE);
-      return fetch(gatewayUrl, {
-        ...init,
-        headers: {
-          ...Object.fromEntries(new Headers(init?.headers).entries()),
-          "X-Connection-Api-Key": connectionApiKey,
-          "Lovable-API-Key": lovableApiKey,
-        },
-      });
-    }) as typeof fetch),
+    // Workers runtime: use fetch instead of Node's http module.
+    httpClient: Stripe.createFetchHttpClient(),
   });
 }
 
 const ALLOWED_RETURN_ORIGINS = new Set<string>([
   "https://www.365motorsales.com",
   "https://365motorsales.com",
-  "https://motorsales365.lovable.app",
-  "https://id-preview--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app",
-  "https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app",
-  "https://project--0738c881-614d-4885-8d75-1b7c90e0835e-dev.lovable.app",
   "https://localhost:8080",
   "http://localhost:8080",
 ]);
 
-// Allow any Lovable preview/sandbox subdomain (e.g. *.lovableproject.com,
-// *.lovable.app, *.sandbox.lovable.dev) so in-editor previews work without
-// hardcoding every per-session host.
-const ALLOWED_RETURN_HOST_SUFFIXES = [
-  ".lovableproject.com",
-  ".lovable.app",
-  ".sandbox.lovable.dev",
-];
+// Extra trusted host suffixes (HTTPS only). Kept empty on purpose: preview
+// deployments should use Stripe sandbox mode against an explicit origin.
+const ALLOWED_RETURN_HOST_SUFFIXES: string[] = [];
 
 /**
  * Validate a client-supplied `returnUrl` against an allowlist of trusted

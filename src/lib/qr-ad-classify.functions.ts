@@ -6,7 +6,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText } from "ai";
-import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { AI_MODELS, aiModel, isAiConfigured } from "@/lib/ai/provider.server";
 import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
 import {
   classifierTaxonomyPrompt,
@@ -68,16 +68,10 @@ Return ONLY a JSON object — no prose, no markdown fences:
 }
 
 async function classifyOne(imageUrl: string): Promise<ClassifyResult> {
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key) throw new Error("Auto-categorize unavailable — LOVABLE_API_KEY missing.");
+  if (!isAiConfigured()) throw new Error("Auto-categorize unavailable — AI_API_KEY missing.");
 
   const { bytes, mediaType } = await fetchImageAsBytes(imageUrl);
-  const gateway = createOpenAICompatible({
-    name: "lovable",
-    baseURL: "https://ai.gateway.lovable.dev/v1",
-    headers: { "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
-  });
-  const model = gateway("google/gemini-2.5-flash");
+  const model = aiModel(AI_MODELS.flash);
 
   let text: string;
   try {

@@ -1746,7 +1746,7 @@ export const FEATURES: Feature[] = [
     name: "AI listing description helper",
     pitch: "Draft a compelling ad copy from your specs and photos.",
     howItWorks:
-      "Uses Lovable AI Gateway to draft a 3–5 line description from make/model/year/mileage and detected condition. You edit, then post.",
+      "Uses the AI provider to draft a 3–5 line description from make/model/year/mileage and detected condition. You edit, then post.",
     whyUseful: [
       "Faster listings",
       "Better-written ads sell faster",

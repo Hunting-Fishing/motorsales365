@@ -253,7 +253,7 @@ function AdminQrAdsPage() {
       }
     } catch (e: any) {
       const msg = String(e?.message ?? "");
-      if (/credits exhausted|LOVABLE_API_KEY/i.test(msg)) throw e;
+      if (/credits exhausted|AI_API_KEY/i.test(msg)) throw e;
     }
     if (source === "none" && target.kind === "custom") {
       const slot = await detectQrSlotFromUrl(imageUrl);
@@ -311,7 +311,7 @@ function AdminQrAdsPage() {
         } catch (e: any) {
           failed++;
           const msg = String(e?.message ?? "");
-          if (/credits exhausted|LOVABLE_API_KEY/i.test(msg)) { cursor = targets.length; toast.error(msg); }
+          if (/credits exhausted|AI_API_KEY/i.test(msg)) { cursor = targets.length; toast.error(msg); }
         }
         processed++;
         toast.loading(
