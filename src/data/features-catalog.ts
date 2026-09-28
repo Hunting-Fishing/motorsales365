@@ -2284,7 +2284,7 @@ export const FEATURES: Feature[] = [
     id: "developer-mcp",
     module: "shop-manager",
     name: "MCP endpoint for developer integrations",
-    pitch: "Machine-readable tool interface at /.mcp for integrations and agents.",
+    pitch: "Machine-readable tool interface at /mcp for integrations and agents.",
     howItWorks:
       "OAuth-protected MCP server exposes a curated tool surface for AI agents and third-party integrations, with per-tool auth.",
     whyUseful: [

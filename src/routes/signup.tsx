@@ -3,9 +3,8 @@ import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import { supabase } from "@/integrations/supabase/client";
 
-
-import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -805,15 +804,15 @@ function SignupPage() {
     const returnTo = search.redirect
       ? `${siteOrigin()}/login?redirect=${encodeURIComponent(search.redirect)}`
       : siteOrigin();
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: returnTo,
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: returnTo },
     });
-    if (result.error) {
+    if (oauthError) {
       toast.error("Could not sign up with Google");
       return;
     }
-    if (result.redirected) return;
-    goAfterSignup(POST_SIGNUP_ROUTE[intent]);
+    // On success the browser is redirected to Google; nothing else to do here.
   };
 
 
