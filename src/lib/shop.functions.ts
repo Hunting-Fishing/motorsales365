@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireDomainRole } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
+import { GRADE_META, planSearchShelf, shelfSlug } from "@/lib/marketplace-search";
 import { scrapeLazadaProduct } from "@/lib/lazada-scraper.server";
 import { scrapeAliExpressProduct } from "@/lib/aliexpress-scraper.server";
 import type { Database } from "@/integrations/supabase/types";
@@ -222,6 +223,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
         priceMax?: number;
         sort?: "featured" | "newest" | "price_asc" | "price_desc" | "popular";
         network?: string;
+        grade?: "budget" | "everyday" | "professional";
       } = {},
     ) =>
       z
@@ -244,6 +246,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
           priceMax: z.number().nonnegative().optional(),
           sort: z.enum(["featured", "newest", "price_asc", "price_desc", "popular"]).optional(),
           network: z.string().max(40).optional(),
+          grade: z.enum(["budget", "everyday", "professional"]).optional(),
         })
         .parse(input),
     )
@@ -346,7 +349,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
     let q = supabaseAdmin
       .from("shop_products")
       .select(
-        "id, slug, title, brand, image_url, price_php, currency, featured, category_id, click_count, universal_fit, is_deal, deal_ends_at, deal_price_php",
+        "id, slug, title, brand, image_url, price_php, currency, featured, category_id, click_count, universal_fit, is_deal, deal_ends_at, deal_price_php, tags",
       )
       .eq("active", true);
     if (cat && catIds.length <= 1) {
@@ -369,6 +372,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
     if (data.dealsOnly) q = q.eq("is_deal", true);
     if (data.search) q = q.ilike("title", `%${data.search}%`);
     if (data.brand) q = q.ilike("brand", data.brand);
+    if (data.grade) q = q.contains("tags", [`grade:${data.grade}`]);
     if (typeof data.priceMin === "number") q = q.gte("price_php", data.priceMin);
     if (typeof data.priceMax === "number") q = q.lte("price_php", data.priceMax);
     const sort = data.sort ?? "featured";
@@ -971,6 +975,7 @@ const NETWORK_SLUGS = [
   "tiktok",
   "amazon",
   "aliexpress",
+  "alibaba",
   "carousell",
   "ebay",
   "zalora",
@@ -1745,3 +1750,104 @@ export const adminRecategorizeProducts = createServerFn({ method: "POST" })
     }
     return { scanned, updated, unmatched };
   });
+
+export const adminCreateSearchShelf = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminCreateSearchShelf")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        term: z.string().min(2).max(80),
+        categoryId: z.string().uuid(),
+        count: z.number().int().min(3).max(10),
+        networkSlugs: z.array(z.string().min(1).max(40)).min(1).max(12),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: nets, error } = await supabase
+      .from("affiliate_networks")
+      .select("id, slug, name, tag_param, tag_value, deeplink_template, active")
+      .in("slug", data.networkSlugs);
+    if (error) throw new Error(error.message);
+
+    const order = new Map(data.networkSlugs.map((slug, i) => [slug, i]));
+    const networks = ((nets ?? []) as any[]).slice().sort(
+      (a, b) => (order.get(a.slug) ?? 99) - (order.get(b.slug) ?? 99),
+    );
+    const skipped: string[] = [];
+    for (const slug of data.networkSlugs) {
+      if (!networks.some((n) => n.slug === slug)) {
+        skipped.push(`${slug}: add this store under Networks before it can be filled.`);
+      }
+    }
+
+    const planned = planSearchShelf({
+      term: data.term,
+      count: data.count,
+      networks,
+    });
+    skipped.push(...planned.skipped);
+    if (planned.links.length === 0) {
+      throw new Error(skipped.join(" ") || "No links could be built.");
+    }
+
+    const shelf = shelfSlug(data.term) || "search";
+    const ids: string[] = [];
+    for (const link of planned.links) {
+      const meta = GRADE_META[link.grade];
+      let slug = `${shelf}-${link.grade}-${link.networkSlug}`.replace(/[^a-z0-9-]/g, "").slice(0, 100);
+      const { data: existing } = await supabase
+        .from("shop_products")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (existing) slug = `${slug}-${Date.now().toString(36)}`.slice(0, 120);
+
+      const description = [
+        `${meta.blurb} Opens ${link.networkName} search for “${link.query}”.`,
+        "Price and stock stay with the seller. This is a search link, not a single checked listing.",
+        link.note ?? "",
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .slice(0, 2000);
+
+      const { data: row, error: insErr } = await supabase
+        .from("shop_products")
+        .insert({
+          slug,
+          title: link.title.slice(0, 200),
+          description,
+          brand: link.networkName.slice(0, 120),
+          category_id: data.categoryId,
+          tags: [`grade:${link.grade}`, `market:${link.networkSlug}`, `shelf:${shelf}`.slice(0, 60)],
+          active: true,
+          featured: false,
+          universal_fit: true,
+          created_by: userId,
+        } as any)
+        .select("id")
+        .single();
+      if (insErr) throw new Error(insErr.message);
+
+      await syncProductCategoryLinks(supabase as any, row.id, data.categoryId);
+
+      const { error: linkErr } = await supabase.from("shop_product_links").insert({
+        product_id: row.id,
+        network_id: link.networkId,
+        url: link.url,
+        sku: `grade:${link.grade}`,
+      } as any);
+      if (linkErr) throw new Error(linkErr.message);
+      ids.push(row.id);
+    }
+
+    return {
+      created: ids.length,
+      ids,
+      skipped,
+      notes: planned.links.map((l) => l.note).filter((n): n is string => !!n),
+    };
+  });
+

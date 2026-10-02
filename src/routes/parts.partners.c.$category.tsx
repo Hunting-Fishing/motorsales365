@@ -18,7 +18,7 @@ import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
 import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
-import { ShopSortBar, type ShopSort, type ShopNetwork } from "@/components/shop/shop-sort-bar";
+import { ShopSortBar, type ShopSort, type ShopNetwork, type ShopGrade } from "@/components/shop/shop-sort-bar";
 
 import { X } from "lucide-react";
 
@@ -32,7 +32,8 @@ const catSearch = z.object({
     z.enum(["featured", "price_asc", "price_desc", "popular", "newest"]),
     "featured",
   ).default("featured"),
-  network: fallback(z.enum(["", "shopee", "lazada", "aliexpress"]), "").default(""),
+  network: fallback(z.enum(["", "shopee", "lazada", "aliexpress", "alibaba", "amazon"]), "").default(""),
+  grade: fallback(z.enum(["", "budget", "everyday", "professional"]), "").default(""),
 });
 
 export const Route = createFileRoute("/parts/partners/c/$category")({
@@ -87,6 +88,7 @@ function ShopCategory() {
       : {}),
     ...(search.brand ? { brand: search.brand } : {}),
     ...(search.network ? { network: search.network } : {}),
+    ...(search.grade ? { grade: search.grade } : {}),
     sort: search.sort,
   };
   const { data } = useQuery({
@@ -95,7 +97,7 @@ function ShopCategory() {
   });
   const products = data?.products ?? [];
 
-  const hasAnyFilter = !!(search.brand || activeVehicle || search.network);
+  const hasAnyFilter = !!(search.brand || activeVehicle || search.network || search.grade);
 
   const onApplyFilters = (next: {
     categorySlug: string;
@@ -120,6 +122,8 @@ function ShopCategory() {
     navigate({ search: (prev: any) => ({ ...prev, sort: s }) });
   const setNetwork = (n: ShopNetwork) =>
     navigate({ search: (prev: any) => ({ ...prev, network: n }) });
+  const setGrade = (g: ShopGrade) =>
+    navigate({ search: (prev: any) => ({ ...prev, grade: g }) });
 
   return (
     <SiteLayout>
@@ -189,8 +193,10 @@ function ShopCategory() {
         <ShopSortBar
           sort={search.sort}
           network={search.network}
+          grade={search.grade}
           onSortChange={setSort}
           onNetworkChange={setNetwork}
+          onGradeChange={setGrade}
         />
 
         {products.length === 0 ? (
@@ -204,7 +210,8 @@ function ShopCategory() {
         )}
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
-          Disclosure: 365 MotorSales earns a commission on qualifying purchases. See our{" "}
+          Disclosure: 365 MotorSales earns a commission on qualifying purchases. As an Amazon
+          Associate I earn from qualifying purchases. See our{" "}
           <Link to="/affiliate-disclosure" className="underline">
             affiliate disclosure
           </Link>

@@ -19,7 +19,8 @@ import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
-import { ShopSortBar, type ShopSort, type ShopNetwork } from "@/components/shop/shop-sort-bar";
+import { ShopSortBar, type ShopSort, type ShopNetwork, type ShopGrade } from "@/components/shop/shop-sort-bar";
+import { GRADE_META, gradeFromTags, marketFromTags } from "@/lib/marketplace-search";
 
 import { useGarage, formatVehicle, type GarageVehicle } from "@/lib/garage";
 import { X } from "lucide-react";
@@ -36,7 +37,8 @@ const shopSearch = z.object({
     z.enum(["featured", "price_asc", "price_desc", "popular", "newest"]),
     "featured",
   ).default("featured"),
-  network: fallback(z.enum(["", "shopee", "lazada", "aliexpress"]), "").default(""),
+  network: fallback(z.enum(["", "shopee", "lazada", "aliexpress", "alibaba", "amazon"]), "").default(""),
+  grade: fallback(z.enum(["", "budget", "everyday", "professional"]), "").default(""),
 });
 
 export const Route = createFileRoute("/parts/partners/")({
@@ -104,6 +106,7 @@ function ShopIndex() {
     ...(search.brand ? { brand: search.brand } : {}),
     ...(search.category ? { categorySlug: search.category } : {}),
     ...(search.network ? { network: search.network } : {}),
+    ...(search.grade ? { grade: search.grade } : {}),
   };
   const { data: featData } = useQuery({
     queryKey: ["shop-featured", filterArgs],
@@ -179,8 +182,10 @@ function ShopIndex() {
     navigate({ search: (prev: any) => ({ ...prev, sort: s }) });
   const setNetwork = (n: ShopNetwork) =>
     navigate({ search: (prev: any) => ({ ...prev, network: n }) });
+  const setGrade = (g: ShopGrade) =>
+    navigate({ search: (prev: any) => ({ ...prev, grade: g }) });
 
-  const hasAnyFilter = !!(search.brand || search.category || activeVehicle || search.network);
+  const hasAnyFilter = !!(search.brand || search.category || activeVehicle || search.network || search.grade);
 
   return (
     <SiteLayout>
@@ -191,8 +196,8 @@ function ShopIndex() {
             Tools, parts &amp; detailing
           </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Curated picks from Shopee, Lazada and AliExpress. Buy direct from the seller — we earn a
-            small commission so the site stays free for you.
+            Compare Budget, Everyday, and Professional options from Shopee, Lazada, AliExpress,
+            Alibaba, and Amazon. You buy from the seller. We may earn a commission.
           </p>
 
           <div className="mt-6 hidden rounded-xl border bg-card p-4 shadow-sm md:block">
@@ -352,8 +357,10 @@ function ShopIndex() {
             <ShopSortBar
               sort={search.sort}
               network={search.network}
+              grade={search.grade}
               onSortChange={setSort}
               onNetworkChange={setNetwork}
+              onGradeChange={setGrade}
               className="w-full sm:w-auto"
             />
           </div>
@@ -369,8 +376,8 @@ function ShopIndex() {
         </section>
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
-          Disclosure: 365 MotorSales earns a commission on qualifying purchases. Prices and
-          availability are set by the seller.
+          Disclosure: 365 MotorSales earns a commission on qualifying purchases. As an Amazon
+          Associate I earn from qualifying purchases. Prices and availability are set by the seller.
         </p>
       </div>
 
@@ -422,10 +429,21 @@ export function ProductGrid({
                   <div className="aspect-square w-full bg-muted" />
                 )}
                 <CardContent className="p-3">
+                  <div className="mb-1 flex flex-wrap gap-1">
+                    {gradeFromTags(p.tags) && (
+                      <Badge variant="secondary" className="text-[10px]">
+                        {GRADE_META[gradeFromTags(p.tags)!].label}
+                      </Badge>
+                    )}
+                    {(p.brand || marketFromTags(p.tags)) && (
+                      <Badge variant="outline" className="text-[10px]">
+                        {p.brand || marketFromTags(p.tags)}
+                      </Badge>
+                    )}
+                  </div>
                   <p className="line-clamp-2 text-sm font-medium group-hover:text-primary">
                     {p.title}
                   </p>
-                  {p.brand && <p className="text-xs text-muted-foreground">{p.brand}</p>}
                   <div className="mt-1 flex items-center justify-between gap-1">
                     <div className="flex items-baseline gap-1">
                       {effective != null ? (

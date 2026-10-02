@@ -64,6 +64,7 @@ import { detectNetworkSlug, cleanShopUrl, urlMatchesNetwork } from "@/lib/shop-u
 import { getYearOptions, getMakesForYear, getModelsForYear } from "@/data/vehicles";
 import { getEnginesFor } from "@/data/vehicle-engines";
 import { CategoryKeywordEditor } from "@/components/admin/category-keyword-editor";
+import { SearchShelfDialog } from "@/components/admin/search-shelf-dialog";
 
 export const Route = createFileRoute("/admin/shop")({
   component: AdminShop,
@@ -273,6 +274,10 @@ function ProductsTab() {
           <Button size="sm" variant="outline" onClick={() => refetch()} disabled={isFetching}>
             {isFetching ? "Refreshing…" : "Refresh"}
           </Button>
+          <SearchShelfDialog
+            categories={catData?.categories ?? []}
+            onCreated={() => qc.invalidateQueries({ queryKey: ["admin-shop-products"] })}
+          />
           <Button onClick={() => setEditing({})}>
             <Plus className="mr-1 h-4 w-4" />
             New product
