@@ -4,7 +4,7 @@
 //
 // ────────────────────────────────────────────────────────────────────────
 // CRON CONTRACT
-//   URL:    https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app/api/public/hooks/parts-wanted-digest
+//   URL:    https://www.365motorsales.com/api/public/hooks/parts-wanted-digest
 //   Method: POST (no body)
 //   Auth:   verifyInternalCronToken (header `x-cron-token`)
 // ────────────────────────────────────────────────────────────────────────

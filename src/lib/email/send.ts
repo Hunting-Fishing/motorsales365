@@ -8,19 +8,19 @@ interface SendTransactionalEmailParams {
 }
 
 /**
- * Sends a transactional email via the Lovable Emails infrastructure.
- * The send route validates the caller's Supabase JWT and enqueues
- * the email through the durable pgmq pipeline.
+ * Sends a transactional email through the app's own email pipeline.
+ * The send route validates the caller's Supabase JWT and enqueues the email
+ * in the durable pgmq queue; /api/email/queue/process delivers it via the
+ * configured provider (see src/lib/email/provider.server.ts).
  *
- * NOTE: requires the email domain to be configured and email infrastructure
- * scaffolded — emails will fail-soft (logged) until that's done.
+ * Fail-soft: errors are logged and returned, never thrown.
  */
 export async function sendTransactionalEmail(params: SendTransactionalEmailParams) {
   try {
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    const response = await fetch("/lovable/email/transactional/send", {
+    const response = await fetch("/api/email/transactional/send", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

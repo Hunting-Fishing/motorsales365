@@ -3,13 +3,13 @@
  * changes. Called by pg_cron every 6 hours.
  *
  * ─── CRON CONTRACT — do not rename without updating pg_cron schedule ───
- *   URL:    https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app/api/public/hooks/refresh-lazada
+ *   URL:    https://www.365motorsales.com/api/public/hooks/refresh-lazada
  *   Method: POST, body `{ "limit": number }` (optional, default 25, max 100)
  *   Auth:   `apikey` header = SUPABASE_ANON_KEY
  * ────────────────────────────────────────────────────────────────────────
  *
- * Bypasses Lovable's published-site auth via the `/api/public/` prefix,
- * then enforces the header check below.
+ * Lives under the public `/api/public/` prefix and enforces the header
+ * check below.
  *
  * Body (optional): { "limit": number } — defaults to 25, capped at 100.
  *   Keeping batches small protects against Lazada rate-limiting and Worker

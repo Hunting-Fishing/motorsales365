@@ -101,6 +101,7 @@ import { Route as PartnersNetworkRouteImport } from './routes/partners.network'
 import { Route as PartnerProgramTermsRouteImport } from './routes/partner-program.terms'
 import { Route as PartnerProgramInfoRouteImport } from './routes/partner-program.info'
 import { Route as PartnerProgramApplyRouteImport } from './routes/partner-program.apply'
+import { Route as OauthConsentRouteImport } from './routes/oauth.consent'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnMechanicsRouteImport } from './routes/learn.mechanics'
@@ -210,7 +211,6 @@ import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
 import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
 import { Route as AuthenticatedCompleteProfileRouteImport } from './routes/_authenticated/complete-profile'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
-import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as PartsPartnersIndexRouteImport } from './routes/parts.partners.index'
 import { Route as ListingIdIndexRouteImport } from './routes/listing.$id.index'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
@@ -225,7 +225,6 @@ import { Route as PartsPartnersCategoriesRouteImport } from './routes/parts.part
 import { Route as PartsCSlugRouteImport } from './routes/parts.c.$slug'
 import { Route as PartnersPartsOnboardingRouteImport } from './routes/partners.parts.onboarding'
 import { Route as PartnersAssociateApplyRouteImport } from './routes/partners.associate.apply'
-import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 import { Route as DocumentCheckCountryQuickGuideRouteImport } from './routes/document-check.$country.quick-guide'
 import { Route as DashboardTeamPerformanceRouteImport } from './routes/dashboard.team.performance'
@@ -252,6 +251,8 @@ import { Route as ApiPublicMigrationExportRouteImport } from './routes/api/publi
 import { Route as ApiPublicIpLocationRouteImport } from './routes/api/public/ip-location'
 import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocode'
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
+import { Route as ApiEmailEventsRouteImport } from './routes/api/email/events'
+import { Route as ApiEmailAuthHookRouteImport } from './routes/api/email/auth-hook'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as ApiAdminBackfillProfilesRouteImport } from './routes/api/admin/backfill-profiles'
 import { Route as AdminStaffAcademyAssetsRouteImport } from './routes/admin.staff-academy.assets'
@@ -318,8 +319,6 @@ import { Route as AuthenticatedAdminClubDiscountPromotionsRouteImport } from './
 import { Route as AuthenticatedAccountTrustScoreRouteImport } from './routes/_authenticated/account.trust-score'
 import { Route as AuthenticatedAccountRewardsRouteImport } from './routes/_authenticated/account.rewards'
 import { Route as AuthenticatedAccountDisputesRouteImport } from './routes/_authenticated/account.disputes'
-import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
-import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as DashboardBusinessBusinessIdIndexRouteImport } from './routes/dashboard.business.$businessId.index'
 import { Route as PartsPartnersStoreSlugRouteImport } from './routes/parts.partners.store.$slug'
 import { Route as PartsPartnersPSlugRouteImport } from './routes/parts.partners.p.$slug'
@@ -327,11 +326,6 @@ import { Route as PartsPartnersDepartmentSlugRouteImport } from './routes/parts.
 import { Route as PartsPartnersCCategoryRouteImport } from './routes/parts.partners.c.$category'
 import { Route as PartsPartnersBrandSlugRouteImport } from './routes/parts.partners.brand.$slug'
 import { Route as PartsPNetworkSkuRouteImport } from './routes/parts.p.$network.$sku'
-import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
-import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
-import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LearnSlugWatchLessonIdRouteImport } from './routes/learn_.$slug.watch.$lessonId'
 import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.team.leads_.$id'
 import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
@@ -372,6 +366,8 @@ import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/r
 import { Route as ApiPublicFlashcardsContentRouteImport } from './routes/api/public/flashcards.content'
 import { Route as ApiPublicAuthSignupFailureLogRouteImport } from './routes/api/public/auth/signup-failure-log'
 import { Route as ApiPublicAuthSignupRouteImport } from './routes/api/public/auth/signup'
+import { Route as ApiEmailTransactionalSendRouteImport } from './routes/api/email/transactional/send'
+import { Route as ApiEmailQueueProcessRouteImport } from './routes/api/email/queue/process'
 import { Route as AdminAdvertisementsAnalyticsCodeRouteImport } from './routes/admin.advertisements.analytics.$code'
 import { Route as AuthenticatedWorkspaceWorkOrdersNewRouteImport } from './routes/_authenticated/workspace.work-orders.new'
 import { Route as AuthenticatedWorkspaceWorkOrdersIdRouteImport } from './routes/_authenticated/workspace.work-orders.$id'
@@ -855,6 +851,11 @@ const PartnerProgramApplyRoute = PartnerProgramApplyRouteImport.update({
   id: '/apply',
   path: '/apply',
   getParentRoute: () => PartnerProgramRoute,
+} as any)
+const OauthConsentRoute = OauthConsentRouteImport.update({
+  id: '/oauth/consent',
+  path: '/oauth/consent',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ListingCheckoutRoute = ListingCheckoutRouteImport.update({
   id: '/listing/checkout',
@@ -1407,12 +1408,6 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const PartsPartnersIndexRoute = PartsPartnersIndexRouteImport.update({
   id: '/partners/',
   path: '/partners/',
@@ -1484,11 +1479,6 @@ const PartnersAssociateApplyRoute = PartnersAssociateApplyRouteImport.update({
   id: '/associate/apply',
   path: '/associate/apply',
   getParentRoute: () => PartnersRoute,
-} as any)
-const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
-  id: '/lovable/email/suppression',
-  path: '/lovable/email/suppression',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const ListingIdEditRoute = ListingIdEditRouteImport.update({
   id: '/edit',
@@ -1630,6 +1620,16 @@ const ApiPublicGeocodeRoute = ApiPublicGeocodeRouteImport.update({
 const ApiPublicGeoSearchRoute = ApiPublicGeoSearchRouteImport.update({
   id: '/api/public/geo-search',
   path: '/api/public/geo-search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEmailEventsRoute = ApiEmailEventsRouteImport.update({
+  id: '/api/email/events',
+  path: '/api/email/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEmailAuthHookRoute = ApiEmailAuthHookRouteImport.update({
+  id: '/api/email/auth-hook',
+  path: '/api/email/auth-hook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminCreateUserRoute = ApiAdminCreateUserRouteImport.update({
@@ -2018,17 +2018,6 @@ const AuthenticatedAccountDisputesRoute =
     path: '/account/disputes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const Char91DotmcpChar93InvokeToolToolRoute =
-  Char91DotmcpChar93InvokeToolToolRouteImport.update({
-    id: '/.mcp/invoke-tool/$tool',
-    path: '/.mcp/invoke-tool/$tool',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
-  id: '/.lovable/oauth/consent',
-  path: '/.lovable/oauth/consent',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DashboardBusinessBusinessIdIndexRoute =
   DashboardBusinessBusinessIdIndexRouteImport.update({
     id: '/',
@@ -2065,34 +2054,6 @@ const PartsPNetworkSkuRoute = PartsPNetworkSkuRouteImport.update({
   id: '/p/$network/$sku',
   path: '/p/$network/$sku',
   getParentRoute: () => PartsRoute,
-} as any)
-const LovableEmailTransactionalSendRoute =
-  LovableEmailTransactionalSendRouteImport.update({
-    id: '/lovable/email/transactional/send',
-    path: '/lovable/email/transactional/send',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailTransactionalPreviewRoute =
-  LovableEmailTransactionalPreviewRouteImport.update({
-    id: '/lovable/email/transactional/preview',
-    path: '/lovable/email/transactional/preview',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
-  id: '/lovable/email/auth/webhook',
-  path: '/lovable/email/auth/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
-  id: '/lovable/email/auth/preview',
-  path: '/lovable/email/auth/preview',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const LearnSlugWatchLessonIdRoute = LearnSlugWatchLessonIdRouteImport.update({
   id: '/learn_/$slug/watch/$lessonId',
@@ -2324,6 +2285,17 @@ const ApiPublicAuthSignupRoute = ApiPublicAuthSignupRouteImport.update({
   path: '/api/public/auth/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiEmailTransactionalSendRoute =
+  ApiEmailTransactionalSendRouteImport.update({
+    id: '/api/email/transactional/send',
+    path: '/api/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiEmailQueueProcessRoute = ApiEmailQueueProcessRouteImport.update({
+  id: '/api/email/queue/process',
+  path: '/api/email/queue/process',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminAdvertisementsAnalyticsCodeRoute =
   AdminAdvertisementsAnalyticsCodeRouteImport.update({
     id: '/$code',
@@ -2518,7 +2490,6 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/complete-profile': typeof AuthenticatedCompleteProfileRoute
   '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
@@ -2628,6 +2599,7 @@ export interface FileRoutesByFullPath {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/oauth/consent': typeof OauthConsentRoute
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
@@ -2671,8 +2643,6 @@ export interface FileRoutesByFullPath {
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
-  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
@@ -2739,6 +2709,8 @@ export interface FileRoutesByFullPath {
   '/admin/staff-academy/assets': typeof AdminStaffAcademyAssetsRoute
   '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
+  '/api/email/auth-hook': typeof ApiEmailAuthHookRoute
+  '/api/email/events': typeof ApiEmailEventsRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/ip-location': typeof ApiPublicIpLocationRoute
@@ -2765,7 +2737,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
-  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/associate/apply': typeof PartnersAssociateApplyRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/parts/c/$slug': typeof PartsCSlugRoute
@@ -2801,6 +2772,8 @@ export interface FileRoutesByFullPath {
   '/workspace/work-orders/$id': typeof AuthenticatedWorkspaceWorkOrdersIdRoute
   '/workspace/work-orders/new': typeof AuthenticatedWorkspaceWorkOrdersNewRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
+  '/api/email/queue/process': typeof ApiEmailQueueProcessRoute
+  '/api/email/transactional/send': typeof ApiEmailTransactionalSendRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/auth/signup-failure-log': typeof ApiPublicAuthSignupFailureLogRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
@@ -2841,11 +2814,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
   '/learn/$slug/watch/$lessonId': typeof LearnSlugWatchLessonIdRoute
-  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
-  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
-  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
   '/parts/partners/brand/$slug': typeof PartsPartnersBrandSlugRoute
   '/parts/partners/c/$category': typeof PartsPartnersCCategoryRoute
@@ -2896,7 +2864,6 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/complete-profile': typeof AuthenticatedCompleteProfileRoute
   '/admin/accounts': typeof AdminAccountsRouteWithChildren
@@ -3001,6 +2968,7 @@ export interface FileRoutesByTo {
   '/learn/flashcards': typeof LearnFlashcardsRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/oauth/consent': typeof OauthConsentRoute
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
@@ -3044,8 +3012,6 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopIndexRoute
   '/wanted-parts': typeof WantedPartsIndexRoute
   '/wanted': typeof WantedIndexRoute
-  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
@@ -3112,6 +3078,8 @@ export interface FileRoutesByTo {
   '/admin/staff-academy/assets': typeof AdminStaffAcademyAssetsRoute
   '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
+  '/api/email/auth-hook': typeof ApiEmailAuthHookRoute
+  '/api/email/events': typeof ApiEmailEventsRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/ip-location': typeof ApiPublicIpLocationRoute
@@ -3137,7 +3105,6 @@ export interface FileRoutesByTo {
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
-  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/associate/apply': typeof PartnersAssociateApplyRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/parts/c/$slug': typeof PartsCSlugRoute
@@ -3173,6 +3140,8 @@ export interface FileRoutesByTo {
   '/workspace/work-orders/$id': typeof AuthenticatedWorkspaceWorkOrdersIdRoute
   '/workspace/work-orders/new': typeof AuthenticatedWorkspaceWorkOrdersNewRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
+  '/api/email/queue/process': typeof ApiEmailQueueProcessRoute
+  '/api/email/transactional/send': typeof ApiEmailTransactionalSendRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/auth/signup-failure-log': typeof ApiPublicAuthSignupFailureLogRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
@@ -3213,11 +3182,6 @@ export interface FileRoutesByTo {
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
   '/learn/$slug/watch/$lessonId': typeof LearnSlugWatchLessonIdRoute
-  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
-  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
-  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
   '/parts/partners/brand/$slug': typeof PartsPartnersBrandSlugRoute
   '/parts/partners/c/$category': typeof PartsPartnersCCategoryRoute
@@ -3280,7 +3244,6 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/complete-profile': typeof AuthenticatedCompleteProfileRoute
   '/_authenticated/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
@@ -3390,6 +3353,7 @@ export interface FileRoutesById {
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/oauth/consent': typeof OauthConsentRoute
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
@@ -3433,8 +3397,6 @@ export interface FileRoutesById {
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
-  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/account/disputes': typeof AuthenticatedAccountDisputesRoute
   '/_authenticated/account/rewards': typeof AuthenticatedAccountRewardsRoute
   '/_authenticated/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
@@ -3501,6 +3463,8 @@ export interface FileRoutesById {
   '/admin/staff-academy/assets': typeof AdminStaffAcademyAssetsRoute
   '/api/admin/backfill-profiles': typeof ApiAdminBackfillProfilesRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
+  '/api/email/auth-hook': typeof ApiEmailAuthHookRoute
+  '/api/email/events': typeof ApiEmailEventsRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/ip-location': typeof ApiPublicIpLocationRoute
@@ -3527,7 +3491,6 @@ export interface FileRoutesById {
   '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
-  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/partners/associate/apply': typeof PartnersAssociateApplyRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/parts/c/$slug': typeof PartsCSlugRoute
@@ -3563,6 +3526,8 @@ export interface FileRoutesById {
   '/_authenticated/workspace/work-orders/$id': typeof AuthenticatedWorkspaceWorkOrdersIdRoute
   '/_authenticated/workspace/work-orders/new': typeof AuthenticatedWorkspaceWorkOrdersNewRoute
   '/admin/advertisements/analytics/$code': typeof AdminAdvertisementsAnalyticsCodeRoute
+  '/api/email/queue/process': typeof ApiEmailQueueProcessRoute
+  '/api/email/transactional/send': typeof ApiEmailTransactionalSendRoute
   '/api/public/auth/signup': typeof ApiPublicAuthSignupRoute
   '/api/public/auth/signup-failure-log': typeof ApiPublicAuthSignupFailureLogRoute
   '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
@@ -3603,11 +3568,6 @@ export interface FileRoutesById {
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads_/$id': typeof DashboardTeamLeadsIdRoute
   '/learn_/$slug/watch/$lessonId': typeof LearnSlugWatchLessonIdRoute
-  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
-  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
-  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/parts/p/$network/$sku': typeof PartsPNetworkSkuRoute
   '/parts/partners/brand/$slug': typeof PartsPartnersBrandSlugRoute
   '/parts/partners/c/$category': typeof PartsPartnersCCategoryRoute
@@ -3670,7 +3630,6 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/verified'
     | '/verify-email'
-    | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/complete-profile'
     | '/workspace'
@@ -3780,6 +3739,7 @@ export interface FileRouteTypes {
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
+    | '/oauth/consent'
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
@@ -3823,8 +3783,6 @@ export interface FileRouteTypes {
     | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
-    | '/.lovable/oauth/consent'
-    | '/.mcp/invoke-tool/$tool'
     | '/account/disputes'
     | '/account/rewards'
     | '/account/trust-score'
@@ -3891,6 +3849,8 @@ export interface FileRouteTypes {
     | '/admin/staff-academy/assets'
     | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
+    | '/api/email/auth-hook'
+    | '/api/email/events'
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/ip-location'
@@ -3917,7 +3877,6 @@ export interface FileRouteTypes {
     | '/dashboard/team/performance'
     | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
-    | '/lovable/email/suppression'
     | '/partners/associate/apply'
     | '/partners/parts/onboarding'
     | '/parts/c/$slug'
@@ -3953,6 +3912,8 @@ export interface FileRouteTypes {
     | '/workspace/work-orders/$id'
     | '/workspace/work-orders/new'
     | '/admin/advertisements/analytics/$code'
+    | '/api/email/queue/process'
+    | '/api/email/transactional/send'
     | '/api/public/auth/signup'
     | '/api/public/auth/signup-failure-log'
     | '/api/public/flashcards/content'
@@ -3993,11 +3954,6 @@ export interface FileRouteTypes {
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
     | '/learn/$slug/watch/$lessonId'
-    | '/lovable/email/auth/preview'
-    | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
-    | '/lovable/email/transactional/preview'
-    | '/lovable/email/transactional/send'
     | '/parts/p/$network/$sku'
     | '/parts/partners/brand/$slug'
     | '/parts/partners/c/$category'
@@ -4048,7 +4004,6 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/verified'
     | '/verify-email'
-    | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/complete-profile'
     | '/admin/accounts'
@@ -4153,6 +4108,7 @@ export interface FileRouteTypes {
     | '/learn/flashcards'
     | '/learn/mechanics'
     | '/listing/checkout'
+    | '/oauth/consent'
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
@@ -4196,8 +4152,6 @@ export interface FileRouteTypes {
     | '/shop'
     | '/wanted-parts'
     | '/wanted'
-    | '/.lovable/oauth/consent'
-    | '/.mcp/invoke-tool/$tool'
     | '/account/disputes'
     | '/account/rewards'
     | '/account/trust-score'
@@ -4264,6 +4218,8 @@ export interface FileRouteTypes {
     | '/admin/staff-academy/assets'
     | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
+    | '/api/email/auth-hook'
+    | '/api/email/events'
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/ip-location'
@@ -4289,7 +4245,6 @@ export interface FileRouteTypes {
     | '/dashboard/team/performance'
     | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
-    | '/lovable/email/suppression'
     | '/partners/associate/apply'
     | '/partners/parts/onboarding'
     | '/parts/c/$slug'
@@ -4325,6 +4280,8 @@ export interface FileRouteTypes {
     | '/workspace/work-orders/$id'
     | '/workspace/work-orders/new'
     | '/admin/advertisements/analytics/$code'
+    | '/api/email/queue/process'
+    | '/api/email/transactional/send'
     | '/api/public/auth/signup'
     | '/api/public/auth/signup-failure-log'
     | '/api/public/flashcards/content'
@@ -4365,11 +4322,6 @@ export interface FileRouteTypes {
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
     | '/learn/$slug/watch/$lessonId'
-    | '/lovable/email/auth/preview'
-    | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
-    | '/lovable/email/transactional/preview'
-    | '/lovable/email/transactional/send'
     | '/parts/p/$network/$sku'
     | '/parts/partners/brand/$slug'
     | '/parts/partners/c/$category'
@@ -4431,7 +4383,6 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/verified'
     | '/verify-email'
-    | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/complete-profile'
     | '/_authenticated/workspace'
@@ -4541,6 +4492,7 @@ export interface FileRouteTypes {
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
+    | '/oauth/consent'
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
@@ -4584,8 +4536,6 @@ export interface FileRouteTypes {
     | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
-    | '/.lovable/oauth/consent'
-    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/account/disputes'
     | '/_authenticated/account/rewards'
     | '/_authenticated/account/trust-score'
@@ -4652,6 +4602,8 @@ export interface FileRouteTypes {
     | '/admin/staff-academy/assets'
     | '/api/admin/backfill-profiles'
     | '/api/admin/create-user'
+    | '/api/email/auth-hook'
+    | '/api/email/events'
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/ip-location'
@@ -4678,7 +4630,6 @@ export interface FileRouteTypes {
     | '/dashboard/team/performance'
     | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
-    | '/lovable/email/suppression'
     | '/partners/associate/apply'
     | '/partners/parts/onboarding'
     | '/parts/c/$slug'
@@ -4714,6 +4665,8 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/work-orders/$id'
     | '/_authenticated/workspace/work-orders/new'
     | '/admin/advertisements/analytics/$code'
+    | '/api/email/queue/process'
+    | '/api/email/transactional/send'
     | '/api/public/auth/signup'
     | '/api/public/auth/signup-failure-log'
     | '/api/public/flashcards/content'
@@ -4754,11 +4707,6 @@ export interface FileRouteTypes {
     | '/dashboard/rides_/$id/edit'
     | '/dashboard/team/leads_/$id'
     | '/learn_/$slug/watch/$lessonId'
-    | '/lovable/email/auth/preview'
-    | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
-    | '/lovable/email/transactional/preview'
-    | '/lovable/email/transactional/send'
     | '/parts/p/$network/$sku'
     | '/parts/partners/brand/$slug'
     | '/parts/partners/c/$category'
@@ -4821,7 +4769,6 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   VerifiedRoute: typeof VerifiedRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
-  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiRobotsDottxtRoute: typeof ApiRobotsDottxtRoute
   BSlugRoute: typeof BSlugRoute
@@ -4846,6 +4793,7 @@ export interface RootRouteChildren {
   LearnMechanicsRoute: typeof LearnMechanicsRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   ListingCheckoutRoute: typeof ListingCheckoutRoute
+  OauthConsentRoute: typeof OauthConsentRoute
   PassportPremiumCheckoutRoute: typeof PassportPremiumCheckoutRoute
   PassportSlugRoute: typeof PassportSlugRoute
   PayManualRoute: typeof PayManualRoute
@@ -4869,10 +4817,10 @@ export interface RootRouteChildren {
   RidesIndexRoute: typeof RidesIndexRoute
   WantedPartsIndexRoute: typeof WantedPartsIndexRoute
   WantedIndexRoute: typeof WantedIndexRoute
-  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
-  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiAdminBackfillProfilesRoute: typeof ApiAdminBackfillProfilesRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
+  ApiEmailAuthHookRoute: typeof ApiEmailAuthHookRoute
+  ApiEmailEventsRoute: typeof ApiEmailEventsRoute
   ApiPublicGeoSearchRoute: typeof ApiPublicGeoSearchRoute
   ApiPublicGeocodeRoute: typeof ApiPublicGeocodeRoute
   ApiPublicIpLocationRoute: typeof ApiPublicIpLocationRoute
@@ -4880,7 +4828,8 @@ export interface RootRouteChildren {
   ApiPublicMigrationTargetPreflightRoute: typeof ApiPublicMigrationTargetPreflightRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   ApiPublicReverseGeocodeRoute: typeof ApiPublicReverseGeocodeRoute
-  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiEmailQueueProcessRoute: typeof ApiEmailQueueProcessRoute
+  ApiEmailTransactionalSendRoute: typeof ApiEmailTransactionalSendRoute
   ApiPublicAuthSignupRoute: typeof ApiPublicAuthSignupRoute
   ApiPublicAuthSignupFailureLogRoute: typeof ApiPublicAuthSignupFailureLogRoute
   ApiPublicFlashcardsContentRoute: typeof ApiPublicFlashcardsContentRoute
@@ -4907,11 +4856,6 @@ export interface RootRouteChildren {
   ApiSellerStaffDeactivateRoute: typeof ApiSellerStaffDeactivateRoute
   ApiSellerStaffResetPasswordRoute: typeof ApiSellerStaffResetPasswordRoute
   LearnSlugWatchLessonIdRoute: typeof LearnSlugWatchLessonIdRoute
-  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
-  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
-  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
-  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
-  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
   ApiPublicTrainingPartnersIdClickRoute: typeof ApiPublicTrainingPartnersIdClickRoute
 }
 
@@ -5560,6 +5504,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/partner-program/apply'
       preLoaderRoute: typeof PartnerProgramApplyRouteImport
       parentRoute: typeof PartnerProgramRoute
+    }
+    '/oauth/consent': {
+      id: '/oauth/consent'
+      path: '/oauth/consent'
+      fullPath: '/oauth/consent'
+      preLoaderRoute: typeof OauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/listing/checkout': {
       id: '/listing/checkout'
@@ -6324,13 +6275,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.mcp/list-tools': {
-      id: '/.mcp/list-tools'
-      path: '/.mcp/list-tools'
-      fullPath: '/.mcp/list-tools'
-      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/parts/partners/': {
       id: '/parts/partners/'
       path: '/partners'
@@ -6428,13 +6372,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/partners/associate/apply'
       preLoaderRoute: typeof PartnersAssociateApplyRouteImport
       parentRoute: typeof PartnersRoute
-    }
-    '/lovable/email/suppression': {
-      id: '/lovable/email/suppression'
-      path: '/lovable/email/suppression'
-      fullPath: '/lovable/email/suppression'
-      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/listing/$id/edit': {
       id: '/listing/$id/edit'
@@ -6616,6 +6553,20 @@ declare module '@tanstack/react-router' {
       path: '/api/public/geo-search'
       fullPath: '/api/public/geo-search'
       preLoaderRoute: typeof ApiPublicGeoSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/email/events': {
+      id: '/api/email/events'
+      path: '/api/email/events'
+      fullPath: '/api/email/events'
+      preLoaderRoute: typeof ApiEmailEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/email/auth-hook': {
+      id: '/api/email/auth-hook'
+      path: '/api/email/auth-hook'
+      fullPath: '/api/email/auth-hook'
+      preLoaderRoute: typeof ApiEmailAuthHookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/create-user': {
@@ -7080,20 +7031,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountDisputesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/.mcp/invoke-tool/$tool': {
-      id: '/.mcp/invoke-tool/$tool'
-      path: '/.mcp/invoke-tool/$tool'
-      fullPath: '/.mcp/invoke-tool/$tool'
-      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/.lovable/oauth/consent': {
-      id: '/.lovable/oauth/consent'
-      path: '/.lovable/oauth/consent'
-      fullPath: '/.lovable/oauth/consent'
-      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dashboard/business/$businessId/': {
       id: '/dashboard/business/$businessId/'
       path: '/'
@@ -7142,41 +7079,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/parts/p/$network/$sku'
       preLoaderRoute: typeof PartsPNetworkSkuRouteImport
       parentRoute: typeof PartsRoute
-    }
-    '/lovable/email/transactional/send': {
-      id: '/lovable/email/transactional/send'
-      path: '/lovable/email/transactional/send'
-      fullPath: '/lovable/email/transactional/send'
-      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/transactional/preview': {
-      id: '/lovable/email/transactional/preview'
-      path: '/lovable/email/transactional/preview'
-      fullPath: '/lovable/email/transactional/preview'
-      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/auth/webhook': {
-      id: '/lovable/email/auth/webhook'
-      path: '/lovable/email/auth/webhook'
-      fullPath: '/lovable/email/auth/webhook'
-      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/auth/preview': {
-      id: '/lovable/email/auth/preview'
-      path: '/lovable/email/auth/preview'
-      fullPath: '/lovable/email/auth/preview'
-      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/learn_/$slug/watch/$lessonId': {
       id: '/learn_/$slug/watch/$lessonId'
@@ -7456,6 +7358,20 @@ declare module '@tanstack/react-router' {
       path: '/api/public/auth/signup'
       fullPath: '/api/public/auth/signup'
       preLoaderRoute: typeof ApiPublicAuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/email/transactional/send': {
+      id: '/api/email/transactional/send'
+      path: '/api/email/transactional/send'
+      fullPath: '/api/email/transactional/send'
+      preLoaderRoute: typeof ApiEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/email/queue/process': {
+      id: '/api/email/queue/process'
+      path: '/api/email/queue/process'
+      fullPath: '/api/email/queue/process'
+      preLoaderRoute: typeof ApiEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/advertisements/analytics/$code': {
@@ -8712,7 +8628,6 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   VerifiedRoute: VerifiedRoute,
   VerifyEmailRoute: VerifyEmailRoute,
-  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
@@ -8738,6 +8653,7 @@ const rootRouteChildren: RootRouteChildren = {
   LearnMechanicsRoute: LearnMechanicsRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   ListingCheckoutRoute: ListingCheckoutRoute,
+  OauthConsentRoute: OauthConsentRoute,
   PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
   PassportSlugRoute: PassportSlugRoute,
   PayManualRoute: PayManualRoute,
@@ -8761,10 +8677,10 @@ const rootRouteChildren: RootRouteChildren = {
   RidesIndexRoute: RidesIndexRoute,
   WantedPartsIndexRoute: WantedPartsIndexRoute,
   WantedIndexRoute: WantedIndexRoute,
-  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
-  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiAdminBackfillProfilesRoute: ApiAdminBackfillProfilesRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
+  ApiEmailAuthHookRoute: ApiEmailAuthHookRoute,
+  ApiEmailEventsRoute: ApiEmailEventsRoute,
   ApiPublicGeoSearchRoute: ApiPublicGeoSearchRoute,
   ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,
   ApiPublicIpLocationRoute: ApiPublicIpLocationRoute,
@@ -8773,7 +8689,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicMigrationTargetPreflightRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   ApiPublicReverseGeocodeRoute: ApiPublicReverseGeocodeRoute,
-  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiEmailQueueProcessRoute: ApiEmailQueueProcessRoute,
+  ApiEmailTransactionalSendRoute: ApiEmailTransactionalSendRoute,
   ApiPublicAuthSignupRoute: ApiPublicAuthSignupRoute,
   ApiPublicAuthSignupFailureLogRoute: ApiPublicAuthSignupFailureLogRoute,
   ApiPublicFlashcardsContentRoute: ApiPublicFlashcardsContentRoute,
@@ -8801,11 +8718,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSellerStaffDeactivateRoute: ApiSellerStaffDeactivateRoute,
   ApiSellerStaffResetPasswordRoute: ApiSellerStaffResetPasswordRoute,
   LearnSlugWatchLessonIdRoute: LearnSlugWatchLessonIdRoute,
-  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
-  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
-  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
-  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
-  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
   ApiPublicTrainingPartnersIdClickRoute: ApiPublicTrainingPartnersIdClickRoute,
 }
 export const routeTree = rootRouteImport

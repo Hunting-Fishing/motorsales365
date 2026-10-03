@@ -5,10 +5,10 @@
  */
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 
-const authStatus = process.env.LOVABLE_BROWSER_AUTH_STATUS;
-const storageKey = process.env.LOVABLE_BROWSER_SUPABASE_STORAGE_KEY;
-const sessionJson = process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON;
-const cookiesJson = process.env.LOVABLE_BROWSER_SUPABASE_COOKIES_JSON;
+const authStatus = process.env.E2E_AUTH_STATUS;
+const storageKey = process.env.E2E_SUPABASE_STORAGE_KEY;
+const sessionJson = process.env.E2E_SUPABASE_SESSION_JSON;
+const cookiesJson = process.env.E2E_SUPABASE_COOKIES_JSON;
 const HAS_SESSION = authStatus === "injected" && !!storageKey && !!sessionJson;
 
 const MOBILE_WIDTHS = [

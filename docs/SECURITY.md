@@ -110,8 +110,8 @@ Every server function that touches another user's data verifies:
 `resolveShopRedirect` validates input via a Zod schema (UUID for
 `productId` / `visitorId`, length-and-charset for `networkSlug`).
 
-Stripe `returnUrl` is validated against an allowlist (`365motorsales.com`,
-`motorsales365.lovable.app`, the preview/dev Lovable subdomains) in every
+Stripe `returnUrl` is validated against an allowlist (`www.365motorsales.com`,
+`365motorsales.com`, `localhost:8080`) in every
 Stripe checkout, portal, boost, and business-subscription handler before
 the URL is passed to Stripe.
 

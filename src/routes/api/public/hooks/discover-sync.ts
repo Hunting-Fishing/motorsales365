@@ -3,7 +3,7 @@
  * admin discovery queue with new/updated businesses.
  *
  * ─── CRON CONTRACT — do not rename without updating pg_cron schedule ───
- *   URL:    https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app/api/public/hooks/discover-sync
+ *   URL:    https://www.365motorsales.com/api/public/hooks/discover-sync
  *   Method: POST
  *   Auth:   `x-cron-token` header = internal_cron_tokens('discover_sync')
  * ────────────────────────────────────────────────────────────────────────

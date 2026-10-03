@@ -3,7 +3,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const GATEWAY = "https://connector-gateway.lovable.dev/google_maps";
+// Google Places API (New) — called directly with a server-side API key.
+const PLACES_API_URL = "https://places.googleapis.com/v1";
 
 // Google place type -> our business_types.slug
 const TYPE_MAP: Record<string, string> = {
@@ -41,13 +42,11 @@ async function assertStaff(ctx: { supabase: any; userId: string }) {
   if (error || !data) throw new Error("Forbidden: staff only");
 }
 
-function gatewayHeaders() {
-  const lov = process.env.LOVABLE_API_KEY;
+function placesHeaders() {
   const gm = process.env.GOOGLE_MAPS_API_KEY;
-  if (!lov || !gm) throw new Error("Google Maps connector is not configured");
+  if (!gm) throw new Error("Google Maps is not configured (GOOGLE_MAPS_API_KEY missing)");
   return {
-    Authorization: `Bearer ${lov}`,
-    "X-Connection-Api-Key": gm,
+    "X-Goog-Api-Key": gm,
     "Content-Type": "application/json",
   };
 }
@@ -114,9 +113,9 @@ export const searchGooglePlaces = createServerFn({ method: "POST" })
       "nextPageToken",
     ].join(",");
 
-    const res = await fetch(`${GATEWAY}/places/v1/places:searchText`, {
+    const res = await fetch(`${PLACES_API_URL}/places:searchText`, {
       method: "POST",
-      headers: { ...gatewayHeaders(), "X-Goog-FieldMask": fieldMask },
+      headers: { ...placesHeaders(), "X-Goog-FieldMask": fieldMask },
       body: JSON.stringify(body),
     });
     if (!res.ok) {

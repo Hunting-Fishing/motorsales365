@@ -3,7 +3,7 @@
  * Each entry powers one expandable row: title, pitch, how-it-works,
  * why-useful bullets, competitive positioning, and a deep link into the app.
  *
- * Screenshots are optional. If present they reference an .asset.json pointer
+ * Screenshots are optional. If present they reference an image file
  * under src/assets/features/. Missing screenshots render a designed placeholder.
  */
 
@@ -1746,7 +1746,7 @@ export const FEATURES: Feature[] = [
     name: "AI listing description helper",
     pitch: "Draft a compelling ad copy from your specs and photos.",
     howItWorks:
-      "Uses Lovable AI Gateway to draft a 3–5 line description from make/model/year/mileage and detected condition. You edit, then post.",
+      "Uses the AI provider to draft a 3–5 line description from make/model/year/mileage and detected condition. You edit, then post.",
     whyUseful: [
       "Faster listings",
       "Better-written ads sell faster",
@@ -2284,7 +2284,7 @@ export const FEATURES: Feature[] = [
     id: "developer-mcp",
     module: "shop-manager",
     name: "MCP endpoint for developer integrations",
-    pitch: "Machine-readable tool interface at /.mcp for integrations and agents.",
+    pitch: "Machine-readable tool interface at /mcp for integrations and agents.",
     howItWorks:
       "OAuth-protected MCP server exposes a curated tool surface for AI agents and third-party integrations, with per-tool auth.",
     whyUseful: [

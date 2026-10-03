@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site-layout";
-import gcashLogo from "@/assets/payments/gcash.webp.asset.json";
-import stripeLogo from "@/assets/payments/stripe.jpg.asset.json";
+import gcashLogo from "@/assets/payments/gcash.webp";
+import stripeLogo from "@/assets/payments/stripe.jpg";
 
 export const Route = createFileRoute("/payments")({
   head: () => ({
@@ -30,7 +30,7 @@ function PaymentsPage() {
           <div className="flex flex-col items-center text-center">
             <div className="w-full overflow-hidden rounded-xl">
               <img
-                src={gcashLogo.url}
+                src={gcashLogo}
                 alt="GCash logo"
                 className="block aspect-[16/9] w-full object-cover"
                 loading="lazy"
@@ -45,7 +45,7 @@ function PaymentsPage() {
           <div className="flex flex-col items-center text-center">
             <div className="w-full overflow-hidden rounded-xl">
               <img
-                src={stripeLogo.url}
+                src={stripeLogo}
                 alt="Stripe logo"
                 className="block aspect-[16/9] w-full object-cover"
                 loading="lazy"

@@ -5,7 +5,7 @@
 //
 // ───────────────────────────────────────────────────────────────────────────
 // CRON CONTRACT — do not change without updating the pg_cron schedule.
-//   URL:    https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app/api/public/hooks/ops-alerts-digest
+//   URL:    https://www.365motorsales.com/api/public/hooks/ops-alerts-digest
 //   Method: POST (no body)
 //   Auth:   verifyInternalCronToken (header `x-cron-token`)
 //   If you rename or move this route the cron job stops silently. Update the

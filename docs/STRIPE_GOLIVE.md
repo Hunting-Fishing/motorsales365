@@ -4,39 +4,40 @@ The full Stripe integration is scaffolded and running in **sandbox** today
 (test card `4242 4242 4242 4242`). To accept real money, complete the steps
 below in order. No code changes are required.
 
-## 1. Claim the Stripe sandbox account
+## 1. Own the Stripe account
 
-In Lovable, open **Connectors → Lovable Cloud → Payments** and follow the
-"Claim your Stripe account" link. Create the Stripe account (or sign in to an
-existing one) and verify the email.
+Sign in to [dashboard.stripe.com](https://dashboard.stripe.com) with the
+account that owns 365 MotorSales payments (the app talks to
+`api.stripe.com` directly — there is no intermediary connector).
 
 ## 2. Activate live payments in Stripe
 
 Complete the Stripe onboarding wizard (business details, bank account, 2FA,
-review & submit). When prompted to copy products from sandbox to live,
-choose **Copy** and include the **Lovable** app.
+review & submit). Copy the sandbox products/prices to live when prompted.
 
-## 3. Install the Lovable app on the live account
+## 3. Server secrets (Cloudflare Worker `motorsales365`)
 
-If you skipped the copy step above, install the Lovable Stripe app on the
-live account from the same Payments tab in Lovable.
+From **Developers → API keys** create a secret or restricted key per mode and
+set them as Worker secrets (`npx wrangler secret put NAME`):
 
-## 4. Live API keys (automatic)
+- `STRIPE_LIVE_API_KEY` (`sk_live_…` / `rk_live_…`)
+- `STRIPE_SANDBOX_API_KEY` (`sk_test_…` / `rk_test_…`)
 
-Once the app is installed on live, Lovable provisions these secrets
-automatically — no manual action needed:
+## 4. Webhooks
 
-- `STRIPE_LIVE_API_KEY`
-- `PAYMENTS_LIVE_WEBHOOK_SECRET`
+In **Developers → Webhooks** add an endpoint per mode:
 
-The sandbox equivalents (`STRIPE_SANDBOX_API_KEY`,
-`PAYMENTS_SANDBOX_WEBHOOK_SECRET`) are already in place.
+- live: `https://www.365motorsales.com/api/public/payments/webhook?env=live`
+- sandbox: `https://www.365motorsales.com/api/public/payments/webhook?env=sandbox`
+
+Store each signing secret as `PAYMENTS_LIVE_WEBHOOK_SECRET` /
+`PAYMENTS_SANDBOX_WEBHOOK_SECRET`.
 
 ## 5. Live publishable token
 
-After publishing the project, Lovable writes the live publishable token to
-`.env.production` as `VITE_PAYMENTS_CLIENT_TOKEN` (`pk_live_...`). The orange
-"test mode" banner disappears automatically.
+Put the live publishable key (`pk_live_…`) in `.env.production` as
+`VITE_PAYMENTS_CLIENT_TOKEN` and redeploy. The orange "test mode" banner
+disappears automatically.
 
 ## 6. (Optional) Enable transactional payment emails
 
