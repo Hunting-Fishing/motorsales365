@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { confirm } from "@/components/ui/confirm-dialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   adminListProducts,
   adminUpsertProduct,
@@ -220,6 +220,80 @@ function DirectoryTable({ entries }: { entries: DirectoryEntry[] }) {
   );
 }
 
+function PullDetailsBar({ onPulled }: { onPulled: (initial: any) => void }) {
+  const [url, setUrl] = useState("");
+  const pull = useMutation({
+    mutationFn: () => {
+      const trimmed = url.trim();
+      const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+      return scrapeShopUrl({ data: { url: withProto } });
+    },
+    onSuccess: (res: any) => {
+      if (res?.error && !res?.suggested?.title) {
+        toast.error(res.error);
+        return;
+      }
+      const s = res.suggested ?? {};
+      const ready = [
+        s.title ? "title" : null,
+        s.price_php != null ? "price" : null,
+        s.image_url ? "photo" : null,
+      ].filter(Boolean);
+      toast.success(
+        ready.length
+          ? `Pulled ${ready.join(", ")}. Review, then save.`
+          : "Opened the form. That page did not share details.",
+      );
+      const warn = ((res.warnings ?? []) as string[]).find((w) => /price/i.test(w));
+      if (warn && s.price_php == null) toast.message(warn);
+      onPulled({
+        title: s.title ?? "",
+        slug: s.title ? slugifyClient(s.title) : "",
+        description: s.description ?? "",
+        brand: s.brand ?? "",
+        image_url: s.image_url ?? "",
+        category_id: s.category_id ?? null,
+        price_php: s.price_php ?? null,
+        __pulledUrl: res.cleanedUrl || url.trim(),
+        __networkId: res.networkId ?? null,
+        __networkSlug: res.networkSlug ?? null,
+      });
+      setUrl("");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Could not pull that link"),
+  });
+
+  return (
+    <div className="mb-4 rounded-lg border bg-muted/40 p-3">
+      <p className="text-sm font-medium">Pull details from a product link</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Paste one product URL from Shopee, Lazada, AliExpress, Alibaba, Amazon, or another
+        connected store. Title, photo, and price fill in when the page shares them. Nothing goes
+        live until you save.
+      </p>
+      <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+        <Input
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://"
+          className="h-11"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+        />
+        <Button
+          type="button"
+          className="h-11 sm:w-40"
+          disabled={pull.isPending || url.trim().length < 8}
+          onClick={() => pull.mutate()}
+        >
+          {pull.isPending ? "Pulling…" : "Pull details"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function ProductsTab() {
   const qc = useQueryClient();
   const { data, isLoading, isFetching, error, refetch } = useQuery({
@@ -293,6 +367,7 @@ function ProductsTab() {
         </div>
       </CardHeader>
       <CardContent>
+        <PullDetailsBar onPulled={(initial) => setEditing(initial)} />
         <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
           <Input
             placeholder="Search title, brand, tag…"
@@ -497,7 +572,7 @@ function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggest
     active: initial.active ?? true,
     universal_fit: initial.universal_fit ?? false,
   });
-  const [importUrl, setImportUrl] = useState(seedUrl ?? "");
+  const [importUrl, setImportUrl] = useState(initial.__pulledUrl || seedUrl || "");
   const [importNetwork, setImportNetwork] = useState<string>("auto");
   const [importInfo, setImportInfo] = useState<{
     networkSlug: string | null;
@@ -505,7 +580,17 @@ function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggest
     cleanedUrl: string;
     networkId: string | null;
     resolvedFrom: string | null;
-  } | null>(null);
+  } | null>(
+    initial.__pulledUrl
+      ? {
+          networkSlug: initial.__networkSlug ?? null,
+          detectedSlug: initial.__networkSlug ?? null,
+          cleanedUrl: initial.__pulledUrl,
+          networkId: initial.__networkId ?? null,
+          resolvedFrom: null,
+        }
+      : null,
+  );
 
   // Active networks for the manual selector (shared with LinksDialog).
   const { data: networksData } = useQuery({
@@ -522,7 +607,20 @@ function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggest
       scrapeShopUrl({
         data: {
           url: importUrl,
-          ...(importNetwork !== "auto" ? { networkSlug: importNetwork as any } : {}),
+          ...(importNetwork !== "auto" &&
+          [
+            "shopee",
+            "lazada",
+            "tiktok",
+            "amazon",
+            "aliexpress",
+            "alibaba",
+            "carousell",
+            "ebay",
+            "zalora",
+          ].includes(importNetwork)
+            ? { networkSlug: importNetwork as any }
+            : {}),
         },
       }),
     onSuccess: (res: any) => {
@@ -555,6 +653,12 @@ function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggest
     },
     onError: (e: any) => toast.error(e.message ?? "Fetch failed"),
   });
+
+  useEffect(() => {
+    if (seedUrl && !initial.__pulledUrl) importMut.mutate();
+    // Opened from a suggestion: pull once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const mut = useMutation({
     mutationFn: async () => {
@@ -611,10 +715,10 @@ function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggest
         <div className="grid gap-3">
           <div className="rounded-lg border bg-muted/40 p-3 space-y-2">
             <Label className="flex items-center gap-2 text-sm">
-              <Sparkles className="h-4 w-4 text-primary" /> Import from affiliate URL
+              <Sparkles className="h-4 w-4 text-primary" /> Pull details from a product link
             </Label>
             <Input
-              placeholder="Paste Shopee / Lazada / TikTok / Amazon product URL…"
+              placeholder="Paste a Shopee, Lazada, AliExpress, Alibaba, or Amazon product URL"
               value={importUrl}
               onChange={(e) => setImportUrl(e.target.value)}
               className="h-11 text-base"
@@ -626,27 +730,11 @@ function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggest
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="auto">Auto-detect</SelectItem>
-                  {(
-                    [
-                      "shopee",
-                      "lazada",
-                      "tiktok",
-                      "amazon",
-                      "aliexpress",
-                      "carousell",
-                      "ebay",
-                      "zalora",
-                    ] as const
-                  )
-                    .filter((slug) => activeNetworks.some((n: any) => n.slug === slug))
-                    .map((slug) => {
-                      const n = activeNetworks.find((x: any) => x.slug === slug);
-                      return (
-                        <SelectItem key={slug} value={slug}>
-                          {n?.name ?? slug}
-                        </SelectItem>
-                      );
-                    })}
+                  {activeNetworks.map((n: any) => (
+                    <SelectItem key={n.id} value={n.slug}>
+                      {n.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Button
@@ -655,7 +743,7 @@ function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggest
                 disabled={!importUrl || importMut.isPending}
                 className="h-11 w-full sm:flex-1"
               >
-                {importMut.isPending ? "Fetching…" : "Fetch product info"}
+                {importMut.isPending ? "Pulling…" : "Pull details"}
               </Button>
             </div>
             {importInfo && (
@@ -668,15 +756,17 @@ function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggest
                 <p>
                   {importInfo.networkSlug ? (
                     <>
-                      Using <strong>{importInfo.networkSlug}</strong>
-                      {importInfo.networkId
-                        ? " · network linked ✓"
-                        : " · no matching active network"}
+                      Store: <strong>{importInfo.networkSlug}</strong>
+                      {importInfo.networkId ? " · connected" : " · connect this store under Stores"}
                     </>
                   ) : (
-                    "Unknown host — fields pre-filled from page metadata."
-                  )}{" "}
-                  Empty fields below were auto-filled; review before saving.
+                    "Store not recognized — fields were filled from the page."
+                  )}
+                </p>
+                <p>
+                  Title {form.title ? "ready" : "missing"} · Price{" "}
+                  {form.price_php != null && form.price_php !== "" ? "ready" : "missing"} · Photo{" "}
+                  {form.image_url ? "ready" : "missing"}
                 </p>
                 {importInfo.detectedSlug &&
                   importInfo.networkSlug &&

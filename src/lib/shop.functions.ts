@@ -1047,13 +1047,16 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const { cats, keywordsById } = await loadCategoryKeywordMap();
 
 
-    // Try a per-network scraper (currently only lazada has a custom path).
-    // Anything else (or a failed custom path) falls through to Firecrawl.
+    // Try a per-network scraper (currently Lazada and AliExpress).
+    // Then read the page's own title, photo, and price. Firecrawl is only
+    // used when those two do not already return a title.
     const marketplace = await runNetworkScraper(networkSlug, cleanedUrl);
+    const pageFacts = marketplace?.title ? null : await pullPageFacts(cleanedUrl);
 
-    if (!apiKey && !marketplace) {
+    if (!apiKey && !marketplace && !pageFacts) {
       return {
-        error: "Scraper not configured — please connect Firecrawl.",
+        error:
+          "Could not read that page. Check the link, or type the title and price. A deeper pull needs Firecrawl connected.",
         suggested: null,
         cleanedUrl,
         resolvedFrom,
@@ -1090,7 +1093,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     let extracted: any = null;
     let metadata: any = null;
     let html: string | null = null;
-    if (apiKey && !marketplace) {
+    if (apiKey && !marketplace?.title && !pageFacts?.title) {
       try {
         const { default: Firecrawl } = await import("@mendable/firecrawl-js");
         const firecrawl = new Firecrawl({ apiKey });
@@ -1135,6 +1138,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const title =
       pickStr(
         marketplace?.title,
+        pageFacts?.title,
         ld?.name,
         extracted?.title,
         metadata?.ogTitle,
@@ -1142,11 +1146,13 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
         metadata?.title,
       ).slice(0, 200) || null;
     const brand = sanitizeBrand(
-      pickStr(marketplace?.brand, ld?.brand, extracted?.brand).slice(0, 120) || null,
+      pickStr(marketplace?.brand, pageFacts?.brand, ld?.brand, extracted?.brand).slice(0, 120) ||
+        null,
     );
     const description =
       pickStr(
         marketplace?.description,
+        pageFacts?.description,
         ld?.description,
         extracted?.description,
         metadata?.ogDescription,
@@ -1157,6 +1163,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     // Image: JSON-LD > og:image > extractor; reject icons.
     const image_url = pickFirstNonIconImage(
       marketplace?.image_url,
+      pageFacts?.image_url,
       ld?.image,
       metadata?.ogImage,
       metadata?.["og:image"],
@@ -1168,6 +1175,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const fx = await loadFxMap();
     const rawPrice =
       marketplace?.price ??
+      pageFacts?.price ??
       ld?.price ??
       metadata?.["og:price:amount"] ??
       metadata?.["product:price:amount"] ??
@@ -1175,6 +1183,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       null;
     const rawCurrency =
       marketplace?.currency ??
+      pageFacts?.currency ??
       ld?.currency ??
       metadata?.["og:price:currency"] ??
       metadata?.["product:price:currency"] ??
@@ -1185,6 +1194,9 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       ? pickPricePhp(marketplace.sale_price, marketplace?.currency ?? rawCurrency ?? "PHP", fx)
       : null;
     const is_deal = !!(sale_price_php && price_php && sale_price_php < price_php);
+    if (pageFacts && !marketplace) {
+      warnings.push("Pulled from the product page. Check the price before you save.");
+    }
     if (rawPrice && price_php == null) {
       warnings.push("Could not store price — please enter PHP price manually.");
     } else if (!rawPrice) {
@@ -1365,6 +1377,73 @@ type MarketplaceProductData = {
   category_hint?: string;
   url?: string;
 };
+
+function decodeHtml(value: string) {
+  return value
+    .replace(/&/g, "&")
+    .replace(/"/g, '"')
+    .replace(/&#39;|'/g, "'")
+    .replace(/</g, "<")
+    .replace(/>/g, ">")
+    .trim();
+}
+
+async function pullPageFacts(url: string): Promise<MarketplaceProductData | null> {
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      redirect: "follow",
+      headers: {
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+        accept: "text/html,application/xhtml+xml",
+        "accept-language": "en-PH,en;q=0.9",
+      },
+      signal: AbortSignal.timeout(12_000),
+    });
+    const type = res.headers.get("content-type") ?? "";
+    if (!res.ok || !/html|xml|text/i.test(type)) return null;
+    const html = (await res.text()).slice(0, 900_000);
+    const ld = extractJsonLdProduct(html);
+    const meta = (name: string) => {
+      const prop = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const a = html.match(
+        new RegExp(`<meta[^>]+(?:property|name)=["']${prop}["'][^>]+content=["']([^"']+)["']`, "i"),
+      );
+      const b = html.match(
+        new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${prop}["']`, "i"),
+      );
+      return decodeHtml(a?.[1] || b?.[1] || "");
+    };
+    const titleTag = decodeHtml(html.match(/<title>([^<]{1,300})<\/title>/i)?.[1] ?? "");
+    let title = (ld?.name || meta("og:title") || titleTag).replace(/\s+/g, " ").trim();
+    if (/access denied|robot check|captcha|just a moment|verify you are human/i.test(title)) {
+      title = "";
+    }
+    const image = pickFirstNonIconImage(ld?.image, meta("og:image"));
+    const amount = meta("product:price:amount") || meta("og:price:amount");
+    const parsedAmount = Number(String(amount).replace(/[^\d.]/g, ""));
+    const price =
+      ld?.price && ld.price > 0
+        ? ld.price
+        : Number.isFinite(parsedAmount) && parsedAmount > 0
+          ? parsedAmount
+          : undefined;
+    const description = (ld?.description || meta("og:description") || "").slice(0, 2000);
+    if (!title && !image) return null;
+    return {
+      title: title.slice(0, 200) || undefined,
+      brand: ld?.brand,
+      description: description || undefined,
+      image_url: image ?? undefined,
+      price,
+      currency: ld?.currency || meta("product:price:currency") || meta("og:price:currency") || undefined,
+      url: meta("og:url") || res.url || undefined,
+    };
+  } catch {
+    return null;
+  }
+}
 
 async function fetchLazadaProductData(input: string): Promise<MarketplaceProductData | null> {
   const result = await scrapeLazadaProduct(input);
