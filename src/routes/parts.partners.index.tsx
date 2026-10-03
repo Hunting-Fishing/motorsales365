@@ -20,6 +20,7 @@ import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 import { ShopSortBar, type ShopSort, type ShopNetwork, type ShopGrade } from "@/components/shop/shop-sort-bar";
+import { SuggestPartLink } from "@/components/shop/suggest-part-link";
 import { GRADE_META, gradeFromTags, marketFromTags } from "@/lib/marketplace-search";
 
 import { useGarage, formatVehicle, type GarageVehicle } from "@/lib/garage";
@@ -46,13 +47,13 @@ export const Route = createFileRoute("/parts/partners/")({
   validateSearch: zodValidator(shopSearch),
   head: () => ({
     meta: [
-      { title: "Shop — Car detailing, tools & parts | 365 MotorSales" },
+      { title: "Part Picks — tools, parts & detailing | 365 MotorSales" },
       {
         name: "description",
         content:
           "Curated car detailing products, mechanic tools, parts and accessories. Search by your vehicle's make and model to find parts that fit.",
       },
-      { property: "og:title", content: "365 MotorSales Shop" },
+      { property: "og:title", content: "Part Picks | 365 MotorSales" },
       {
         property: "og:description",
         content: "Detailing, tools, parts and accessories — best prices from top PH marketplaces.",
@@ -191,7 +192,7 @@ function ShopIndex() {
     <SiteLayout>
       <section className="border-b bg-gradient-to-b from-primary/10 to-background">
         <div className="container mx-auto px-4 py-10 md:py-14">
-          <Badge className="mb-3">Shop</Badge>
+          <Badge className="mb-3">Part Picks</Badge>
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight">
             Tools, parts &amp; detailing
           </h1>
@@ -374,6 +375,8 @@ function ShopIndex() {
             <ProductGrid products={latest} vehicle={activeVehicle} />
           )}
         </section>
+
+        <SuggestPartLink />
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
           Disclosure: 365 MotorSales earns a commission on qualifying purchases. As an Amazon

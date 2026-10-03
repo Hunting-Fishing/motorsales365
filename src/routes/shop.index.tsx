@@ -80,7 +80,7 @@ function StorePage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Marketplace and affiliate listings now live under{" "}
             <Link to="/parts/partners" className="text-primary underline">
-              Parts → Partner links
+              Parts → Part Picks
             </Link>
             . The 365 Store only carries products we make ourselves.
           </p>

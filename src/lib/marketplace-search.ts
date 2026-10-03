@@ -1,4 +1,4 @@
-// Search-shelf planner for Partner links.
+// Search-shelf planner for Part Picks.
 // Builds marketplace search URLs (not scraped SKUs) and splits them into
 // Budget / Everyday / Professional lanes.
 

@@ -19,6 +19,7 @@ import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
 import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 import { ShopSortBar, type ShopSort, type ShopNetwork, type ShopGrade } from "@/components/shop/shop-sort-bar";
+import { SuggestPartLink } from "@/components/shop/suggest-part-link";
 
 import { X } from "lucide-react";
 
@@ -208,6 +209,8 @@ function ShopCategory() {
         ) : (
           <ProductGrid products={products} vehicle={activeVehicle} />
         )}
+
+        <SuggestPartLink />
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
           Disclosure: 365 MotorSales earns a commission on qualifying purchases. As an Amazon

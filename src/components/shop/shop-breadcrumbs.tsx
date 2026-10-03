@@ -14,7 +14,7 @@ export function ShopBreadcrumbs({ trail }: { trail: BreadcrumbItem[] }) {
       </Link>
       <ChevronRight className="h-3.5 w-3.5 opacity-60" />
       <Link to="/parts/partners" className="hover:text-foreground">
-        Partner links
+        Part Picks
       </Link>
       {trail.map((item, i) => {
         const last = i === trail.length - 1;

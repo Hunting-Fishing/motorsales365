@@ -76,7 +76,7 @@ export function SearchShelfDialog({
         </DialogHeader>
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            Type a part, like bidirectional OBD2. This adds 3–10 Partner links in that category,
+            Type a part, like bidirectional OBD2. This adds 3–10 Part Picks in that category,
             split into Budget, Everyday, and Professional. Each card opens that store’s search.
             It does not invent a price.
           </p>

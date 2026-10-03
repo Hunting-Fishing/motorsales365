@@ -8,6 +8,7 @@ import {
   adminDeleteProduct,
   adminListNetworks,
   adminUpsertNetwork,
+  adminEnsureCoreStores,
   adminProductLinks,
   adminUpsertLink,
   adminDeleteLink,
@@ -15,6 +16,8 @@ import {
   adminUpsertFitment,
   adminDeleteFitment,
   listShopCategories,
+  adminListShopSuggestions,
+  adminResolveShopSuggestion,
   scrapeShopUrl,
   rescrapeShopProduct,
   backfillMissingShopPrices,
@@ -74,15 +77,16 @@ function AdminShop() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-3xl">Affiliate Shop</h1>
+        <h1 className="font-display text-3xl">Part Picks</h1>
         <p className="text-muted-foreground">
-          Manage curated products, affiliate networks, and outbound links.
+          Add and edit links. Visitors can browse and suggest a link. They cannot publish or edit.
         </p>
       </div>
       <Tabs defaultValue="products">
         <TabsList className="w-full justify-start overflow-x-auto sm:w-auto">
           <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="networks">Networks</TabsTrigger>
+          <TabsTrigger value="networks">Stores</TabsTrigger>
+          <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
           <TabsTrigger value="keywords" className="whitespace-nowrap">
             Category mapping
           </TabsTrigger>
@@ -95,6 +99,9 @@ function AdminShop() {
         </TabsContent>
         <TabsContent value="networks" className="mt-4">
           <NetworksTab />
+        </TabsContent>
+        <TabsContent value="suggestions" className="mt-4">
+          <SuggestionsTab />
         </TabsContent>
         <TabsContent value="keywords" className="mt-4">
           <CategoryKeywordEditor />
@@ -475,7 +482,7 @@ function slugifyClient(s: string): string {
     .slice(0, 80);
 }
 
-function ProductDialog({ initial, categories, onClose, onSaved }: any) {
+function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggestionId }: any) {
   const [form, setForm] = useState({
     id: initial.id,
     slug: initial.slug ?? "",
@@ -489,7 +496,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     active: initial.active ?? true,
     universal_fit: initial.universal_fit ?? false,
   });
-  const [importUrl, setImportUrl] = useState("");
+  const [importUrl, setImportUrl] = useState(seedUrl ?? "");
   const [importNetwork, setImportNetwork] = useState<string>("auto");
   const [importInfo, setImportInfo] = useState<{
     networkSlug: string | null;
@@ -570,6 +577,15 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
           toast.warning(`Saved product, but couldn’t add link: ${e?.message ?? "error"}`);
         }
       }
+      if (suggestionId && saved?.id) {
+        try {
+          await adminResolveShopSuggestion({
+            data: { id: suggestionId, status: "added", productId: saved.id },
+          });
+        } catch (e: any) {
+          toast.warning(`Saved, but the suggestion was not marked added: ${e?.message ?? "error"}`);
+        }
+      }
       return saved;
     },
     onSuccess: () => {
@@ -585,6 +601,12 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
         <DialogHeader>
           <DialogTitle>{form.id ? "Edit product" : "New product"}</DialogTitle>
         </DialogHeader>
+        {seedUrl && (
+          <p className="text-sm text-muted-foreground">
+            The suggested link is filled in. Fetch it, review, then save. It stays off the site
+            until you save.
+          </p>
+        )}
         <div className="grid gap-3">
           <div className="rounded-lg border bg-muted/40 p-3 space-y-2">
             <Label className="flex items-center gap-2 text-sm">
@@ -800,6 +822,7 @@ function LinksDialog({ product, onClose }: any) {
   });
   const [networkId, setNetworkId] = useState<string>("");
   const [url, setUrl] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [touchedNetwork, setTouchedNetwork] = useState(false);
   const [urlError, setUrlError] = useState("");
 
@@ -855,13 +878,19 @@ function LinksDialog({ product, onClose }: any) {
         throw new Error(`URL host does not match ${selectedNetwork.name}.`);
       }
       return adminUpsertLink({
-        data: { product_id: product.id, network_id: networkId, url: finalUrl } as any,
+        data: {
+          ...(editingId ? { id: editingId } : {}),
+          product_id: product.id,
+          network_id: networkId,
+          url: finalUrl,
+        } as any,
       });
     },
     onSuccess: () => {
-      toast.success("Link saved");
+      toast.success(editingId ? "Link updated" : "Link saved");
       setUrl("");
       setNetworkId("");
+      setEditingId(null);
       setTouchedNetwork(false);
       setUrlError("");
       qc.invalidateQueries({ queryKey: ["admin-product-links", product.id] });
@@ -896,6 +925,21 @@ function LinksDialog({ product, onClose }: any) {
               <Button
                 size="sm"
                 variant="ghost"
+                title="Edit link"
+                onClick={() => {
+                  setEditingId(l.id);
+                  setUrl(l.url ?? "");
+                  setNetworkId(l.network_id ?? l.network?.id ?? "");
+                  setTouchedNetwork(true);
+                  setUrlError("");
+                }}
+                className="shrink-0"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
                 title="Copy link"
                 onClick={async () => {
                   try {
@@ -921,7 +965,9 @@ function LinksDialog({ product, onClose }: any) {
             </div>
           ))}
           <div className="rounded border p-3 space-y-3">
-            <p className="text-sm font-semibold">Add affiliate link</p>
+            <p className="text-sm font-semibold">
+              {editingId ? "Edit this link" : "Add a link"}
+            </p>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Paste the full product URL</Label>
               <Input
@@ -1000,12 +1046,27 @@ function LinksDialog({ product, onClose }: any) {
             <Button variant="outline" onClick={onClose} className="h-11 w-full sm:w-auto">
               Cancel
             </Button>
+            {editingId && (
+              <Button
+                variant="ghost"
+                className="h-11 w-full sm:w-auto"
+                onClick={() => {
+                  setEditingId(null);
+                  setUrl("");
+                  setNetworkId("");
+                  setTouchedNetwork(false);
+                  setUrlError("");
+                }}
+              >
+                Cancel edit
+              </Button>
+            )}
             <Button
               onClick={() => add.mutate()}
               disabled={!networkId || !url || !!urlError || add.isPending}
               className="h-11 w-full sm:w-auto"
             >
-              {add.isPending ? "Saving…" : "Add link"}
+              {add.isPending ? "Saving…" : editingId ? "Save changes" : "Add link"}
             </Button>
           </div>
         </div>
@@ -1018,15 +1079,33 @@ function NetworksTab() {
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["admin-networks"], queryFn: () => adminListNetworks() });
   const [editing, setEditing] = useState<any | null>(null);
+  const ensure = useMutation({
+    mutationFn: () => adminEnsureCoreStores(),
+    onSuccess: (res) => {
+      const added = res.created.length ? `Added ${res.created.join(", ")}.` : "Those stores are already connected.";
+      toast.success(added);
+      qc.invalidateQueries({ queryKey: ["admin-networks"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Could not connect stores"),
+  });
 
   return (
     <Card>
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
-        <CardTitle>Affiliate networks</CardTitle>
-        <Button onClick={() => setEditing({})}>
-          <Plus className="mr-1 h-4 w-4" />
-          New network
-        </Button>
+        <CardTitle>Stores</CardTitle>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            onClick={() => ensure.mutate()}
+            disabled={ensure.isPending}
+          >
+            {ensure.isPending ? "Connecting…" : "Connect the five stores"}
+          </Button>
+          <Button onClick={() => setEditing({})}>
+            <Plus className="mr-1 h-4 w-4" />
+            New store
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -1068,8 +1147,10 @@ function NetworksTab() {
           </table>
         </div>
         <p className="mt-4 text-xs text-muted-foreground">
-          Tag value is appended to outbound URLs via <code>tag_param</code>, or substituted into{" "}
-          <code>deeplink_template</code> as <code>{`{{tag}}`}</code> and <code>{`{{url}}`}</code>.
+          Part Picks reads these stores. Keep the slugs exactly shopee, lazada, aliexpress, alibaba,
+          and amazon. For Amazon, set tag param to <code>tag</code> and tag value to your Store ID{" "}
+          <code>366industries-20</code>. A future store works when its deeplink template contains{" "}
+          <code>{"{QUERY}"}</code>.
         </p>
       </CardContent>
       {editing && (
@@ -1479,5 +1560,103 @@ function FitmentDialog({ product, onClose }: any) {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function SuggestionsTab() {
+  const qc = useQueryClient();
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["shop-link-suggestions"],
+    queryFn: () => adminListShopSuggestions(),
+  });
+  const { data: catData } = useQuery({
+    queryKey: ["shop-cats"],
+    queryFn: () => listShopCategories(),
+    staleTime: 60_000,
+  });
+  const [seed, setSeed] = useState<{ url: string; suggestionId: string } | null>(null);
+  const rows = (data?.suggestions ?? []) as any[];
+  const pending = rows.filter((r) => r.status === "pending");
+
+  const resolve = useMutation({
+    mutationFn: (input: { id: string; status: "dismissed" | "pending" }) =>
+      adminResolveShopSuggestion({ data: input }),
+    onSuccess: () => {
+      toast.success("Updated");
+      qc.invalidateQueries({ queryKey: ["shop-link-suggestions"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Could not update"),
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Suggestions ({pending.length} waiting)</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Visitors can send a link. Nothing here is public until you add it as a Part Pick.
+        </p>
+      </CardHeader>
+      <CardContent>
+        {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+        {error && (
+          <p className="text-sm text-destructive">{(error as any).message ?? "Could not load suggestions."}</p>
+        )}
+        {!isLoading && rows.length === 0 && (
+          <p className="text-sm text-muted-foreground">No suggestions yet.</p>
+        )}
+        <div className="space-y-3">
+          {rows.map((r) => (
+            <div key={r.id} className="rounded-lg border p-3 text-sm">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant={r.status === "pending" ? "secondary" : "outline"}>{r.status}</Badge>
+                <span className="text-xs text-muted-foreground">
+                  {r.created_at ? new Date(r.created_at).toLocaleString() : ""}
+                </span>
+              </div>
+              <a
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 block truncate text-primary hover:underline"
+              >
+                {r.url}
+              </a>
+              {r.note && <p className="mt-1 text-muted-foreground">{r.note}</p>}
+              {r.status === "pending" && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => setSeed({ url: r.url, suggestionId: r.id })}
+                  >
+                    Add to Part Picks
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => resolve.mutate({ id: r.id, status: "dismissed" })}
+                  >
+                    Dismiss
+                  </Button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </CardContent>
+      {seed && (
+        <ProductDialog
+          initial={{}}
+          categories={catData?.categories ?? []}
+          seedUrl={seed.url}
+          suggestionId={seed.suggestionId}
+          onClose={() => setSeed(null)}
+          onSaved={() => {
+            setSeed(null);
+            qc.invalidateQueries({ queryKey: ["shop-link-suggestions"] });
+            qc.invalidateQueries({ queryKey: ["admin-shop-products"] });
+          }}
+        />
+      )}
+    </Card>
   );
 }

@@ -1851,3 +1851,148 @@ export const adminCreateSearchShelf = createServerFn({ method: "POST" })
     };
   });
 
+
+const CORE_STORES = [
+  { slug: "shopee", name: "Shopee", sort_order: 10, tag_param: null as string | null },
+  { slug: "lazada", name: "Lazada", sort_order: 20, tag_param: null },
+  { slug: "aliexpress", name: "AliExpress", sort_order: 30, tag_param: null },
+  { slug: "alibaba", name: "Alibaba", sort_order: 40, tag_param: null },
+  { slug: "amazon", name: "Amazon", sort_order: 50, tag_param: "tag" },
+] as const;
+
+export const adminEnsureCoreStores = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminEnsureCoreStores")])
+  .handler(async ({ context }) => {
+    const { supabase } = context;
+    const { data: existing, error } = await supabase
+      .from("affiliate_networks")
+      .select("id, slug, tag_param")
+      .in(
+        "slug",
+        CORE_STORES.map((s) => s.slug),
+      );
+    if (error) throw new Error(error.message);
+    const bySlug = new Map((existing ?? []).map((n) => [n.slug, n]));
+    const created: string[] = [];
+    const already: string[] = [];
+    for (const store of CORE_STORES) {
+      const row = bySlug.get(store.slug);
+      if (!row) {
+        const { error: insErr } = await supabase.from("affiliate_networks").insert({
+          slug: store.slug,
+          name: store.name,
+          sort_order: store.sort_order,
+          active: true,
+          tag_param: store.tag_param,
+        });
+        if (insErr) throw new Error(insErr.message);
+        created.push(store.name);
+        continue;
+      }
+      already.push(store.name);
+      if (store.slug === "amazon" && !row.tag_param) {
+        const { error: upErr } = await supabase
+          .from("affiliate_networks")
+          .update({ tag_param: "tag" })
+          .eq("id", row.id);
+        if (upErr) throw new Error(upErr.message);
+      }
+    }
+    return { created, already };
+  });
+
+function suggestionSetupError(message: string) {
+  if (/shop_link_suggestions|schema cache|does not exist/i.test(message)) {
+    return "Suggestions are not ready yet. Apply the shop_link_suggestions database migration, then try again.";
+  }
+  return message;
+}
+
+function cleanSuggestionUrl(raw: string): string {
+  const trimmed = raw.trim();
+  const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  let parsed: URL;
+  try {
+    parsed = new URL(withProto);
+  } catch {
+    throw new Error("Paste a full link, starting with https://");
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("Only http and https links can be suggested.");
+  }
+  return parsed.toString().slice(0, 2000);
+}
+
+export const suggestShopLink = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        url: z.string().min(4).max(2000),
+        note: z.string().max(400).optional(),
+        company: z.string().max(200).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    if ((data.company ?? "").trim()) return { ok: true as const };
+    const url = cleanSuggestionUrl(data.url);
+    const db = supabaseAdmin as any;
+    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count, error: countErr } = await db
+      .from("shop_link_suggestions")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", since);
+    if (countErr) throw new Error(suggestionSetupError(countErr.message));
+    if ((count ?? 0) >= 40) throw new Error("Too many suggestions right now. Try again later.");
+
+    const { data: dup, error: dupErr } = await db
+      .from("shop_link_suggestions")
+      .select("id")
+      .eq("url", url)
+      .eq("status", "pending")
+      .limit(1);
+    if (dupErr) throw new Error(suggestionSetupError(dupErr.message));
+    if (dup && dup.length > 0) return { ok: true as const, duplicate: true };
+
+    const note = (data.note ?? "").trim().slice(0, 400) || null;
+    const { error } = await db.from("shop_link_suggestions").insert({
+      url,
+      note,
+      status: "pending",
+    });
+    if (error) throw new Error(suggestionSetupError(error.message));
+    return { ok: true as const };
+  });
+
+export const adminListShopSuggestions = createServerFn({ method: "GET" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminListShopSuggestions")])
+  .handler(async () => {
+    const db = supabaseAdmin as any;
+    const { data, error } = await db
+      .from("shop_link_suggestions")
+      .select("id, url, note, status, product_id, created_at")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(suggestionSetupError(error.message));
+    return { suggestions: data ?? [] };
+  });
+
+export const adminResolveShopSuggestion = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminResolveShopSuggestion")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(["pending", "added", "dismissed"]),
+        productId: z.string().uuid().optional().nullable(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const db = supabaseAdmin as any;
+    const patch: { status: string; product_id?: string | null } = { status: data.status };
+    if (data.productId) patch.product_id = data.productId;
+    const { error } = await db.from("shop_link_suggestions").update(patch).eq("id", data.id);
+    if (error) throw new Error(suggestionSetupError(error.message));
+    return { ok: true as const };
+  });
