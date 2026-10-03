@@ -250,6 +250,7 @@ function ProductsTab() {
 
   const all = (data?.products ?? []) as any[];
   const filtered = all.filter((p) => {
+    if ((p.tags ?? []).some((t: string) => String(t).startsWith("suggestion:"))) return false;
     if (statusFilter === "active" && !p.active) return false;
     if (statusFilter === "inactive" && p.active) return false;
     if (statusFilter === "featured" && !p.featured) return false;
