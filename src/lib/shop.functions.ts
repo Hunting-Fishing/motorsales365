@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireDomainRole } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
+import { getAmazonItem, searchAmazonItem } from "@/lib/amazon-creators.server";
 import { GRADE_META, planSearchShelf, shelfSlug } from "@/lib/marketplace-search";
 import { scrapeLazadaProduct } from "@/lib/lazada-scraper.server";
 import { scrapeAliExpressProduct } from "@/lib/aliexpress-scraper.server";
@@ -1047,11 +1048,46 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const { cats, keywordsById } = await loadCategoryKeywordMap();
 
 
-    // Try a per-network scraper (currently Lazada and AliExpress).
-    // Then read the page's own title, photo, and price. Firecrawl is only
-    // used when those two do not already return a title.
-    const marketplace = await runNetworkScraper(networkSlug, cleanedUrl);
-    const pageFacts = marketplace?.title ? null : await pullPageFacts(cleanedUrl);
+    const isAmazon = (forcedSlug ?? detectedSlug) === "amazon";
+    let marketplace: MarketplaceProductData | null = null;
+    if (isAmazon) {
+      const pulled = await getAmazonItem(cleanedUrl);
+      if (!pulled.configured) {
+        return {
+          error: pulled.error,
+          suggested: null,
+          cleanedUrl,
+          resolvedFrom,
+          networkSlug,
+          detectedSlug,
+          networkId,
+        };
+      }
+      if (!pulled.item) {
+        return {
+          error: pulled.error || "Amazon did not return that product.",
+          suggested: null,
+          cleanedUrl,
+          resolvedFrom,
+          networkSlug,
+          detectedSlug,
+          networkId,
+        };
+      }
+      const item = pulled.item;
+      marketplace = {
+        title: item.title ?? undefined,
+        brand: item.brand ?? undefined,
+        description: item.description ?? undefined,
+        image_url: item.image ?? undefined,
+        price: item.price ?? undefined,
+        currency: item.currency ?? undefined,
+        url: item.detailPageURL,
+      };
+    } else {
+      marketplace = await runNetworkScraper(networkSlug, cleanedUrl);
+    }
+    const pageFacts = isAmazon || marketplace?.title ? null : await pullPageFacts(cleanedUrl);
 
     if (!apiKey && !marketplace && !pageFacts) {
       return {
@@ -1873,6 +1909,7 @@ export const adminCreateSearchShelf = createServerFn({ method: "POST" })
 
     const shelf = shelfSlug(data.term) || "search";
     const ids: string[] = [];
+    const fx = await loadFxMap();
     for (const link of planned.links) {
       const meta = GRADE_META[link.grade];
       let slug = `${shelf}-${link.grade}-${link.networkSlug}`.replace(/[^a-z0-9-]/g, "").slice(0, 100);
@@ -1883,7 +1920,13 @@ export const adminCreateSearchShelf = createServerFn({ method: "POST" })
         .maybeSingle();
       if (existing) slug = `${slug}-${Date.now().toString(36)}`.slice(0, 120);
 
-      const description = [
+      let title = link.title;
+      let brand = link.networkName;
+      let url = link.url;
+      let imageUrl: string | null = null;
+      let pricePhp: number | null = null;
+      let sku = `grade:${link.grade}`;
+      let description = [
         `${meta.blurb} Opens ${link.networkName} search for “${link.query}”.`,
         "Price and stock stay with the seller. This is a search link, not a single checked listing.",
         link.note ?? "",
@@ -1892,13 +1935,44 @@ export const adminCreateSearchShelf = createServerFn({ method: "POST" })
         .join(" ")
         .slice(0, 2000);
 
+      if (link.networkSlug === "amazon") {
+        const found = await searchAmazonItem(link.query, link.grade === "budget");
+        if (!found.configured) {
+          if (!skipped.some((s) => s.startsWith("Amazon is still a tagged search"))) {
+            skipped.push(
+              "Amazon is still a tagged search link. Product title, photo, and price need Creators API credentials on the server.",
+            );
+          }
+        } else if (found.item?.title) {
+          const item = found.item;
+          title = `${item.title} · ${meta.label}`;
+          brand = item.brand || "Amazon";
+          url = item.detailPageURL;
+          imageUrl = item.image;
+          sku = item.asin;
+          pricePhp = pickPricePhp(item.price, item.currency, fx);
+          description = [
+            item.description || "",
+            "Opens the Amazon product page with Store ID 366industries-20.",
+            "As an Amazon Associate I earn from qualifying purchases.",
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .slice(0, 2000);
+        } else if (found.error) {
+          skipped.push(`Amazon: ${found.error}`);
+        }
+      }
+
       const { data: row, error: insErr } = await supabase
         .from("shop_products")
         .insert({
           slug,
-          title: link.title.slice(0, 200),
+          title: title.slice(0, 200),
           description,
-          brand: link.networkName.slice(0, 120),
+          brand: brand.slice(0, 120),
+          image_url: imageUrl,
+          price_php: pricePhp,
           category_id: data.categoryId,
           tags: [`grade:${link.grade}`, `market:${link.networkSlug}`, `shelf:${shelf}`.slice(0, 60)],
           active: true,
@@ -1915,8 +1989,8 @@ export const adminCreateSearchShelf = createServerFn({ method: "POST" })
       const { error: linkErr } = await supabase.from("shop_product_links").insert({
         product_id: row.id,
         network_id: link.networkId,
-        url: link.url,
-        sku: `grade:${link.grade}`,
+        url,
+        sku,
       } as any);
       if (linkErr) throw new Error(linkErr.message);
       ids.push(row.id);

@@ -1239,9 +1239,13 @@ function NetworksTab() {
         </div>
         <p className="mt-4 text-xs text-muted-foreground">
           Part Picks reads these stores. Keep the slugs exactly shopee, lazada, aliexpress, alibaba,
-          and amazon. For Amazon, set tag param to <code>tag</code> and tag value to your Store ID{" "}
-          <code>366industries-20</code>. A future store works when its deeplink template contains{" "}
-          <code>{"{QUERY}"}</code>.
+          and amazon. For Amazon, set tag param to <code>tag</code> and tag value to{" "}
+          <code>366industries-20</code>. Title, photo, and price for an Amazon product come from
+          the Creators API (Tools → Creators API in Associates Central), not from scraping the
+          page. That API opens after 10 qualifying sales in 30 days. The server then needs{" "}
+          <code>AMAZON_CREATORS_CREDENTIAL_ID</code>, <code>AMAZON_CREATORS_CREDENTIAL_SECRET</code>
+          , and <code>AMAZON_CREATORS_VERSION</code>. A future store works when its deeplink
+          template contains <code>{"{QUERY}"}</code>.
         </p>
       </CardContent>
       {editing && (

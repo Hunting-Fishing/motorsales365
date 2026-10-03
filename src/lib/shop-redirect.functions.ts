@@ -12,6 +12,9 @@ function applyTag(url: string, network: any): string {
     if (network?.tag_param && network?.tag_value) {
       const u = new URL(url);
       u.searchParams.set(network.tag_param, network.tag_value);
+      if (network?.slug === "amazon" && !u.searchParams.get("linkCode")) {
+        u.searchParams.set("linkCode", "ogi");
+      }
       return u.toString();
     }
   } catch {

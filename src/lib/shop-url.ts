@@ -182,9 +182,13 @@ export function cleanShopUrl(input: string): string {
   }
   // Amazon: collapse to /dp/<ASIN> when present
   if (/(^|\.)amazon\./i.test(url.hostname)) {
+    const tag = url.searchParams.get("tag");
+    const linkCode = url.searchParams.get("linkCode");
     const m = url.pathname.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
     if (m) url.pathname = `/dp/${m[1].toUpperCase()}`;
     url.search = "";
+    if (tag) url.searchParams.set("tag", tag);
+    if (linkCode) url.searchParams.set("linkCode", linkCode);
   }
   // Drop trailing empty query/fragment
   if ([...url.searchParams.keys()].length === 0) url.search = "";
