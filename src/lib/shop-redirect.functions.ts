@@ -4,6 +4,9 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 function applyTag(url: string, network: any): string {
   try {
+    if (network?.slug === "lazada" && /(^|\.)c\.lazada\./i.test(new URL(url).hostname)) {
+      return url;
+    }
     if (network?.deeplink_template && network?.tag_value) {
       return network.deeplink_template
         .replace("{{url}}", encodeURIComponent(url))

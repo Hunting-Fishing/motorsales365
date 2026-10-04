@@ -5,6 +5,7 @@ import { requireDomainRole } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
 import { amazonDetailUrl, extractAmazonAsin, getAmazonItem, searchAmazonItem } from "@/lib/amazon-creators.server";
+import { getLazadaProduct, trackLazadaUrl } from "@/lib/lazada-affiliate.server";
 import { GRADE_META, planSearchShelf, shelfSlug } from "@/lib/marketplace-search";
 import { scrapeLazadaProduct } from "@/lib/lazada-scraper.server";
 import { scrapeAliExpressProduct } from "@/lib/aliexpress-scraper.server";
@@ -1049,7 +1050,9 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
 
 
     const isAmazon = (forcedSlug ?? detectedSlug) === "amazon";
+    const isLazada = (forcedSlug ?? detectedSlug) === "lazada";
     let marketplace: MarketplaceProductData | null = null;
+    let lazadaManualWarning: string | null = null;
     if (isAmazon) {
       const pulled = await getAmazonItem(cleanedUrl);
       if (pulled.configured && pulled.item) {
@@ -1096,10 +1099,79 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
           networkId,
         };
       }
+    } else if (isLazada) {
+      const pulled = await getLazadaProduct(cleanedUrl);
+      if (pulled.configured && pulled.item && (pulled.item.title || pulled.item.promotionUrl)) {
+        const item = pulled.item;
+        marketplace = {
+          title: item.title ?? undefined,
+          brand: item.brand ?? undefined,
+          description: item.seller ? `Sold by ${item.seller} on Lazada.` : undefined,
+          image_url: item.image ?? undefined,
+          price: item.price ?? undefined,
+          currency: item.currency ?? undefined,
+          url: item.promotionUrl ?? undefined,
+        };
+      } else if (!pulled.configured) {
+        marketplace = await runNetworkScraper(networkSlug, cleanedUrl);
+        if (!marketplace?.title) {
+          const warnings = [pulled.error];
+          if (!networkId) warnings.push("Turn on the Lazada store under Stores, or this link will not attach.");
+          return {
+            suggested: {
+              title: null,
+              brand: null,
+              description: null,
+              image_url: null,
+              price_php: null,
+              sale_price_php: null,
+              is_deal: false,
+              currency: "PHP",
+              category_id: null,
+              category_name: null,
+              confidence: 0,
+            },
+            warnings,
+            cleanedUrl,
+            resolvedFrom,
+            networkSlug: networkSlug ?? "lazada",
+            detectedSlug,
+            networkId,
+          };
+        }
+        lazadaManualWarning = pulled.error;
+      } else {
+        const warnings = [
+          pulled.error ||
+            "Lazada did not return that product. The link is ready. Type the title and price, then save.",
+        ];
+        if (!networkId) warnings.push("Turn on the Lazada store under Stores, or this link will not attach.");
+        return {
+          suggested: {
+            title: null,
+            brand: null,
+            description: null,
+            image_url: null,
+            price_php: null,
+            sale_price_php: null,
+            is_deal: false,
+            currency: "PHP",
+            category_id: null,
+            category_name: null,
+            confidence: 0,
+          },
+          warnings,
+          cleanedUrl,
+          resolvedFrom,
+          networkSlug: networkSlug ?? "lazada",
+          detectedSlug,
+          networkId,
+        };
+      }
     } else {
       marketplace = await runNetworkScraper(networkSlug, cleanedUrl);
     }
-    const pageFacts = isAmazon || marketplace?.title ? null : await pullPageFacts(cleanedUrl);
+    const pageFacts = isAmazon || isLazada || marketplace?.title ? null : await pullPageFacts(cleanedUrl);
 
     if (!apiKey && !marketplace && !pageFacts) {
       return {
@@ -1245,6 +1317,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     if (pageFacts && !marketplace) {
       warnings.push("Pulled from the product page. Check the price before you save.");
     }
+    if (lazadaManualWarning) warnings.push(lazadaManualWarning);
     if (rawPrice && price_php == null) {
       warnings.push("Could not store price — please enter PHP price manually.");
     } else if (!rawPrice) {
@@ -1946,6 +2019,28 @@ export const adminCreateSearchShelf = createServerFn({ method: "POST" })
         .filter(Boolean)
         .join(" ")
         .slice(0, 2000);
+
+      if (link.networkSlug === "lazada") {
+        const tracked = await trackLazadaUrl(url);
+        if (!tracked.configured) {
+          if (!skipped.some((s) => s.startsWith("Lazada is still a catalog link"))) {
+            skipped.push(
+              "Lazada is still a catalog link. Tracking links need the Lazada Affiliate Open API on the server (App Key, App Secret, and User Token).",
+            );
+          }
+        } else if (tracked.promotionUrl) {
+          url = tracked.promotionUrl;
+          if (tracked.productName) title = `${tracked.productName} · ${meta.label}`;
+          description = [
+            `${meta.blurb} Opens a Lazada tracking link for “${link.query}”.`,
+            "Price and stock stay with the seller.",
+          ]
+            .join(" ")
+            .slice(0, 2000);
+        } else if (tracked.error) {
+          skipped.push(`Lazada: ${tracked.error}`);
+        }
+      }
 
       if (link.networkSlug === "amazon") {
         const found = await searchAmazonItem(link.query, link.grade === "budget");

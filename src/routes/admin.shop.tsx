@@ -239,16 +239,20 @@ function PullDetailsBar({ onPulled }: { onPulled: (initial: any) => void }) {
         s.price_php != null ? "price" : null,
         s.image_url ? "photo" : null,
       ].filter(Boolean);
-      const amazonManual = (res.warnings ?? []).some((w: string) => /366industries-20|tagged link/i.test(w));
+      const note = ((res.warnings ?? []) as string[])[0];
       toast.success(
         ready.length
           ? `Pulled ${ready.join(", ")}. Review, then save.`
-          : amazonManual
-            ? "Amazon link is ready. Type the title and price, then save."
+          : note
+            ? "Link is ready. Type the title and price, then save."
             : "Opened the form. That page did not share details.",
       );
-      const warn = ((res.warnings ?? []) as string[]).find((w) => /price/i.test(w));
-      if (warn && s.price_php == null) toast.message(warn);
+      if (note && (!ready.length || /tracking link|Open API|Creators API|366industries/i.test(note))) {
+        toast.message(note);
+      } else {
+        const warn = ((res.warnings ?? []) as string[]).find((w) => /price/i.test(w));
+        if (warn && s.price_php == null) toast.message(warn);
+      }
       onPulled({
         title: s.title ?? "",
         slug: s.title ? slugifyClient(s.title) : "",
@@ -1249,8 +1253,12 @@ function NetworksTab() {
           the Creators API (Tools → Creators API in Associates Central), not from scraping the
           page. That API opens after 10 qualifying sales in 30 days. The server then needs{" "}
           <code>AMAZON_CREATORS_CREDENTIAL_ID</code>, <code>AMAZON_CREATORS_CREDENTIAL_SECRET</code>
-          , and <code>AMAZON_CREATORS_VERSION</code>. A future store works when its deeplink
-          template contains <code>{"{QUERY}"}</code>.
+          , and <code>AMAZON_CREATORS_VERSION</code>. For Lazada, open Affiliate, then Integration,
+          then Open API, and set <code>LAZADA_AFFILIATE_APP_KEY</code>,{" "}
+          <code>LAZADA_AFFILIATE_APP_SECRET</code>, and <code>LAZADA_AFFILIATE_USER_TOKEN</code>.
+          That turns a product page into Lazada’s own tracking link and fills the title, photo,
+          and price from the product feed. A future store works when its deeplink template
+          contains <code>{"{QUERY}"}</code>.
         </p>
       </CardContent>
       {editing && (
