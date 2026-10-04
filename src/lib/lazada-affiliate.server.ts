@@ -6,7 +6,7 @@
 import { createHmac } from "node:crypto";
 
 const SETUP_ERROR =
-  "Lazada did not fill this from the affiliate API yet. In Lazada Affiliate open Integration, then Open API, and copy the App Key, App Secret, and User Token. Set LAZADA_AFFILIATE_APP_KEY, LAZADA_AFFILIATE_APP_SECRET, and LAZADA_AFFILIATE_USER_TOKEN on the server. Until then, type the title and price. The click is not a Lazada tracking link until those are set.";
+  "Lazada Affiliate still shows LiteApp Key, LiteApp Secret, and User Token as Pending, so this is not a tracking link yet. After Lazada approves Open API, set LAZADA_AFFILIATE_APP_KEY, LAZADA_AFFILIATE_APP_SECRET, and LAZADA_AFFILIATE_USER_TOKEN. Type the title and price to save this product now.";
 
 export type LazadaCatalogItem = {
   productId: string | null;

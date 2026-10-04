@@ -1254,11 +1254,12 @@ function NetworksTab() {
           page. That API opens after 10 qualifying sales in 30 days. The server then needs{" "}
           <code>AMAZON_CREATORS_CREDENTIAL_ID</code>, <code>AMAZON_CREATORS_CREDENTIAL_SECRET</code>
           , and <code>AMAZON_CREATORS_VERSION</code>. For Lazada, open Affiliate, then Integration,
-          then Open API, and set <code>LAZADA_AFFILIATE_APP_KEY</code>,{" "}
+          then Open API. The three values there are LiteApp Key, LiteApp Secret, and User Token.
+          While they say Pending, Lazada has not approved the API yet, so Part Picks cannot pull a
+          tracking link. After they appear, set <code>LAZADA_AFFILIATE_APP_KEY</code>,{" "}
           <code>LAZADA_AFFILIATE_APP_SECRET</code>, and <code>LAZADA_AFFILIATE_USER_TOKEN</code>.
-          That turns a product page into Lazada’s own tracking link and fills the title, photo,
-          and price from the product feed. A future store works when its deeplink template
-          contains <code>{"{QUERY}"}</code>.
+          You can still paste a Lazada product and type the title and price before that. A future
+          store works when its deeplink template contains <code>{"{QUERY}"}</code>.
         </p>
       </CardContent>
       {editing && (
