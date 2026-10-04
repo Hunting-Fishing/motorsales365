@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireDomainRole } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
-import { getAmazonItem, searchAmazonItem } from "@/lib/amazon-creators.server";
+import { amazonDetailUrl, extractAmazonAsin, getAmazonItem, searchAmazonItem } from "@/lib/amazon-creators.server";
 import { GRADE_META, planSearchShelf, shelfSlug } from "@/lib/marketplace-search";
 import { scrapeLazadaProduct } from "@/lib/lazada-scraper.server";
 import { scrapeAliExpressProduct } from "@/lib/aliexpress-scraper.server";
@@ -1052,38 +1052,50 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     let marketplace: MarketplaceProductData | null = null;
     if (isAmazon) {
       const pulled = await getAmazonItem(cleanedUrl);
-      if (!pulled.configured) {
+      if (pulled.configured && pulled.item) {
+        const item = pulled.item;
+        marketplace = {
+          title: item.title ?? undefined,
+          brand: item.brand ?? undefined,
+          description: item.description ?? undefined,
+          image_url: item.image ?? undefined,
+          price: item.price ?? undefined,
+          currency: item.currency ?? undefined,
+          url: item.detailPageURL,
+        };
+      } else {
+        const asin = extractAmazonAsin(cleanedUrl);
+        const tagged = asin ? amazonDetailUrl(asin) : cleanedUrl;
+        const warning = !pulled.configured
+          ? "Amazon did not fill the title, photo, or price yet. The link is tagged with Store ID 366industries-20. Type the title and price, then save."
+          : pulled.error ||
+            "Amazon did not return that product. The tagged link is ready. Type the title and price, then save.";
+        const warnings = [warning];
+        if (!networkId) {
+          warnings.push("Turn on the Amazon store under Stores, or this link will not attach.");
+        }
         return {
-          error: pulled.error,
-          suggested: null,
-          cleanedUrl,
+          suggested: {
+            title: null,
+            brand: null,
+            description: null,
+            image_url: null,
+            price_php: null,
+            sale_price_php: null,
+            is_deal: false,
+            currency: "PHP",
+            category_id: null,
+            category_name: null,
+            confidence: 0,
+          },
+          warnings,
+          cleanedUrl: tagged,
           resolvedFrom,
-          networkSlug,
+          networkSlug: networkSlug ?? "amazon",
           detectedSlug,
           networkId,
         };
       }
-      if (!pulled.item) {
-        return {
-          error: pulled.error || "Amazon did not return that product.",
-          suggested: null,
-          cleanedUrl,
-          resolvedFrom,
-          networkSlug,
-          detectedSlug,
-          networkId,
-        };
-      }
-      const item = pulled.item;
-      marketplace = {
-        title: item.title ?? undefined,
-        brand: item.brand ?? undefined,
-        description: item.description ?? undefined,
-        image_url: item.image ?? undefined,
-        price: item.price ?? undefined,
-        currency: item.currency ?? undefined,
-        url: item.detailPageURL,
-      };
     } else {
       marketplace = await runNetworkScraper(networkSlug, cleanedUrl);
     }

@@ -229,7 +229,7 @@ function PullDetailsBar({ onPulled }: { onPulled: (initial: any) => void }) {
       return scrapeShopUrl({ data: { url: withProto } });
     },
     onSuccess: (res: any) => {
-      if (res?.error && !res?.suggested?.title) {
+      if (res?.error && !res?.suggested) {
         toast.error(res.error);
         return;
       }
@@ -239,10 +239,13 @@ function PullDetailsBar({ onPulled }: { onPulled: (initial: any) => void }) {
         s.price_php != null ? "price" : null,
         s.image_url ? "photo" : null,
       ].filter(Boolean);
+      const amazonManual = (res.warnings ?? []).some((w: string) => /366industries-20|tagged link/i.test(w));
       toast.success(
         ready.length
           ? `Pulled ${ready.join(", ")}. Review, then save.`
-          : "Opened the form. That page did not share details.",
+          : amazonManual
+            ? "Amazon link is ready. Type the title and price, then save."
+            : "Opened the form. That page did not share details.",
       );
       const warn = ((res.warnings ?? []) as string[]).find((w) => /price/i.test(w));
       if (warn && s.price_php == null) toast.message(warn);
@@ -624,7 +627,7 @@ function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggest
         },
       }),
     onSuccess: (res: any) => {
-      if (res.error) {
+      if (res.error && !res.suggested) {
         toast.error(res.error);
         return;
       }
@@ -649,7 +652,9 @@ function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggest
         networkId: res.networkId,
         resolvedFrom: res.resolvedFrom ?? null,
       });
-      toast.success("Fetched — review and save.");
+      const note = ((res.warnings ?? []) as string[])[0];
+      if (!s.title && note) toast.message(note);
+      else toast.success("Fetched — review and save.");
     },
     onError: (e: any) => toast.error(e.message ?? "Fetch failed"),
   });
