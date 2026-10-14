@@ -102,7 +102,7 @@ baseline/recovery and release gates before live application.
 The bounded activity card can follow, using only explicit active vehicle links;
 never reuse the owner-only sharing/history screen inside shop CRM.
 
-## Bounded activity slice (reader candidate only; no UI consumer yet)
+## Bounded activity slice (implemented offline; not released)
 
 Build a read-only Customer Vehicle Activity card for one selected native customer
 vehicle. A new authenticated reader must resolve the visible customer, matching
@@ -140,5 +140,15 @@ A-to-B-to-A can revive old link approval without a proven tenure invariant. Four
 separate retained-source privacy regressions and required transfer/retention gates
 are documented in `evidence/VEHICLE_OWNERSHIP_CONSENT_GATES.md`.
 
-The authenticated adapter and card remain the next independent implementation
-slice. No live database/application release or production capability is claimed.
+The separate authenticated adapter/card slice is now implemented in the customer
+detail route. It requires explicit exact-customer vehicle selection; isolates
+source caches by account/customer/vehicle; hides stale rows during refresh/error;
+and keeps loading, unavailable and visible-empty states separate. The server
+rejects an expected-account/middleware-subject mismatch before any RPC, strictly
+validates bounded fixed response fields, and retains the authenticated client.
+No service fallback, attachments, sharing or write actions are added. See
+`evidence/CUSTOMER_VEHICLE_ACTIVITY_UI.md` for semantics, verification limits and
+remaining browser/mobile, primary-reader, authority and release gates. The three
+reader RPCs are still unapplied. No live database/application release or production
+capability is claimed; do not ship the consumer before the compatible reviewed
+database/consent/recovery release.

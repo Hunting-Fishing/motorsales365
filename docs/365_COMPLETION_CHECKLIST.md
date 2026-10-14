@@ -657,7 +657,9 @@ or unapproved live execution is authorized by this checkpoint.
 
 Branch `feature/crm-vehicle-activity-readers`, stacked on native prerequisite PR
 #21. Draft PR #22: `https://github.com/Hunting-Fishing/motorsales365/pull/22`,
-code `343557b`; full-checkout CI is pending. Three new invoker-only SQL/STABLE readers derive customer/native vehicle/shop/
+Code `343557b`; latest reader documentation head `ec4671e` passed all six
+full-checkout CI gates (run `38629630823`), verified before the UI slice.
+Three new invoker-only SQL/STABLE readers derive customer/native vehicle/shop/
 active link/current visible owner in one snapshot, retain existing RLS, return
 fixed receipt/installation/work-order summaries, and cap each at 26 rows with
 deterministic ordering. Exact new EXECUTE ACLs, collision/default/inheritance
@@ -668,8 +670,8 @@ Global source correspondence is 404/422 with 18 unclassified, not applied parity
 Focused reader tests pass 13/13; separate retained receipt/ownership tests pass
 4/4. CI now runs these memory-only regressions sequentially.
 Complete local tooling passes 134/134; focused lint, format and diff checks pass.
-Full-checkout CI remains pending publication; application changes are a separate
-next slice, not part of this reader-only commit. See
+Full-checkout CI is verified; application changes are a separate
+slice, not part of this reader-only commit. See
 `evidence/CUSTOMER_VEHICLE_ACTIVITY_READ_CONTRACT.md` for hashes and exact proof
 limits; `evidence/VEHICLE_OWNERSHIP_CONSENT_GATES.md` records the privacy boundary.
 The current-owner-based existing receipt policy can expose prior-creator private
@@ -678,8 +680,8 @@ business rows/files were accessed and no live incident or mitigation is claimed.
 Ordinary staff/private-vehicle reads deliberately remain unavailable. A-to-B-to-A
 can revive old approval without a proven link invalidation/tenure invariant.
 
-Next: publish/review/verify this exact slice, then implement the authenticated
-read adapter and account/customer/native-vehicle/source-isolated activity card.
+Next: the independently stacked UI/adapter slice below is implemented; verify its
+exact publication head and continue the documented native/consent dependencies.
 Retain independent errors/empty/unavailable states, currency/date/cap semantics,
 context cancellation/late-result tests and no owner-only reader reuse. Production
 needs trusted native authority, audited owner writers and serialized consent
@@ -687,3 +689,41 @@ invalidation/reapproval, private financial-evidence retention decisions, reviewe
 private consent projection, baseline/forward recovery/API tests and hosting gates.
 Bootstrap/totals approval remains pending; do not repeat or apply it. No upload,
 live DDL/data/history repair or broader production permission is implied.
+
+## Customer vehicle activity UI and adapter: 2026-10-15
+
+Branch `feature/crm-vehicle-activity-card`, stacked on verified reader PR #22
+(`ec4671e`). The customer detail route now mounts the read-only three-source card
+for an explicitly selected matching native vehicle. Signed-out mounting, account/
+customer remounts, account/customer/vehicle/source query keys, AbortSignal forwarding
+and refresh/error stale-row masking protect context isolation. The authenticated
+server adapter asserts the expected account against the middleware subject before
+RPC dispatch and validates strict bounded source envelopes; no admin client,
+owner-reader fallback, attachment, sharing or write controls are used.
+
+Mocked handler tests pass 34/34, component tests 18/18 and route/child integration
+tests 13/13. Full local application tests pass 482/482 across 41 files. Local
+TypeScript checks pass, including the final test additions; publication CI is pending.
+Focused lint has no errors (four existing route any warnings), format/diff checks
+pass. Independent read-only review found no further concrete UI/adapter issue.
+These are not live JWT/RLS/HTTP, browser/mobile, owner pilot or complete route/
+organization acceptance. Existing OCR browser CI does not test this new card.
+See `evidence/CUSTOMER_VEHICLE_ACTIVITY_UI.md` for exact semantics and limitations.
+
+SQL impact: none in this UI slice. Three reader APIs remain unapplied and release-
+blocked; no data/history/platform changes or application upload. Do not deploy the
+consumer before the compatible reviewed database/consent/recovery release. JSON
+numeric summaries are not exact-decimal financial reconciliation or settlement.
+Hosting still fails separately; a green preview wrapper is not a release.
+
+Exact next action: publish/review/verify this UI head, then finish native
+current-employee/current-shop/module and receipt helper declaration/supersession/
+writer/security closure against the retained sources and metadata. Rehearse the
+companion roster guard with actual constraints/all triggers/legacy and multi-roster
+cases. Audit every owner writer and serialize owner changes/approval/revocation
+with atomic link invalidation and fresh reapproval before private linked-vehicle
+acceptance. Keep the private financial-evidence retention decision explicit.
+Continue baseline/forward recovery/API and hosting gates, primary-reader/cache/
+role audit, receipt mobile/corpus/owner acceptance, then atomic billing and the
+retail/recruitment pipeline slices. Bootstrap/totals owner approval remains pending
+without a repeated question. The existing heartbeat remains active, not continuous.

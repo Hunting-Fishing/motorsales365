@@ -6,7 +6,8 @@ Parent: native prerequisite PR #21, latest head `e5a76ba`, all six CI gates pass
 (run `38626559572`). The separate Cloudflare hosting check still fails; the preview
 wrapper skipped upload. Nothing in this slice deploys the sparse checkout.
 Draft PR #22: `https://github.com/Hunting-Fishing/motorsales365/pull/22`,
-code `343557b`, stacked on #21; publication CI is pending.
+code `343557b`, stacked on #21; latest documentation head `ec4671e` passed all
+six CI gates (run `38629630823`). No migration/application release occurred.
 
 ## Exact candidate and recovery
 
@@ -84,7 +85,7 @@ previous owners, mixed currency/nulls, distinct IDs, deterministic caps/ties,
 permission errors versus empty/unavailable, source catalog/data preservation,
 default/inheritance collision rollback, exact ACLs and recovery drift/dependencies.
 Complete local tooling passes 134/134; focused ESLint, Prettier and diff checks
-pass. Full-checkout CI remains a publication gate for this candidate slice.
+pass. All six full-checkout CI gates pass at the reader documentation head above.
 
 These are not a full historical schema replay, production data/JWT/HTTP/PostgREST,
 real concurrent-transfer/transaction, complete helper closure or UI proof. SQL
