@@ -614,7 +614,10 @@ skipped upload because `DEPLOY_VIA_ACTIONS` is unset. No hosting release is clai
 
 ## Native role/membership prerequisite: 2026-10-15
 
-Branch `security/native-role-membership-proof`, stacked on PR #20. Two original
+Draft PR #21: `https://github.com/Hunting-Fishing/motorsales365/pull/21`, code
+commit `55dd9d5`, branch `security/native-role-membership-proof`, stacked on PR #20.
+Code-head CI run `38626505461` is pending; this publication checkpoint changes
+documentation only. Two original
 declaration sources now map the text role and profile-ID membership helpers; the
 enum overload is a distinct declared node. Fresh read-only six-function metadata
 and eight bounded memory-only regressions pin and reproduce four unchanged
