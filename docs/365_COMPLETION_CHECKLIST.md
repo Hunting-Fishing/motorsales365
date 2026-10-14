@@ -508,3 +508,26 @@ continue independent application/baseline work. Staff mutation affected-row
 confirmation is an independent application slice; no production deployment is
 authorized. Companion guard design must handle other trigger side effects and
 multi-roster/offboarding constraints rather than trusting definer current_user.
+
+## Staff mutation confirmation: 2026-10-15
+
+Branch `fix/staff-mutation-confirmation`, stacked on helper-candidate PR #18.
+Roster upsert/update/removal now require exactly one confirmed returned ID before
+reporting success; update/removal retain the requested business/staff filters and
+verify that ID. Manager authorization is strictly boolean and lookup/database
+errors propagate without automatic retries. Self-shift and manager flows retain
+the authenticated writer. No SQL, grants, migration history or live data changed.
+
+Focused mocked handler tests pass 47/47, focused lint passes (existing source
+`any` warnings remain), formatting and diff checks pass. Full local application
+tests pass 417/417 across 38 files. Full-checkout CI is pending; no deployment is
+claimed. These tests are not live RLS/JWT/HTTP or trigger acceptance, and missing
+confirmation is not evidence of transaction rollback. Refresh before retrying.
+See `evidence/BUSINESS_STAFF_AUTHORITY_GATES.md` for the retained-source chat-trigger,
+shift CHECK and multi-roster cleanup dependencies that a guard must address.
+
+Next: publish and verify the application slice independently of helper release
+approval. Continue the offline native baseline dependency inventory/validator;
+it must explicitly retain unknown coverage and cannot authorize history adoption,
+full migration replay, data repair or deployment. Production helper candidates
+remain unapplied pending a separately scoped owner decision and release gates.
