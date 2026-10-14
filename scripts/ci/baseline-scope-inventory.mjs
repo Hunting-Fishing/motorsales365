@@ -360,7 +360,17 @@ export function analyzeBaselineScope(manifest, files, options) {
         fail(`Invalid evidence JSON: ${pin.id}`);
       }
       boundedJson(parsed);
-      if (!parsed || parsed.project !== manifest.project)
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+        fail(`Evidence project mismatch: ${pin.id}`);
+      // Check every present spelling: malformed/conflicting project must not
+      // fall through to projectRef. Manifest identity and lineage stay strict.
+      const hasProject = Object.hasOwn(parsed, "project");
+      const hasProjectRef = Object.hasOwn(parsed, "projectRef");
+      if (
+        (!hasProject && !hasProjectRef) ||
+        (hasProject && parsed.project !== manifest.project) ||
+        (hasProjectRef && parsed.projectRef !== manifest.project)
+      )
         fail(`Evidence project mismatch: ${pin.id}`);
       evidence.set(pin.id, parsed);
     }
