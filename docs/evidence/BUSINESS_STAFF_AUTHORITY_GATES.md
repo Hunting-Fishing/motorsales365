@@ -113,3 +113,10 @@ null-JWT, legacy-ID and distinct business/shop-ID behavior under locked native
 ACLs, then contrast fixture-only client denial with retained operator/service
 provisioning. Close or replace untrusted definer entry paths before treating
 native profile writes as trusted; production action still needs separate approval.
+
+That bootstrap dependency now has seven passing memory-only regressions, including
+exact retained/live definition correspondence, real inspected identity constraints,
+legacy uniqueness/no-partial-write behavior and fixture-only EXECUTE containment.
+Fresh catalog metadata confirms native profile shop_id has no FK; the proposed
+FK failure contrast is deliberately separate. See `NATIVE_BOOTSTRAP_AUTHORITY_PROOF.md`.
+No bootstrap restriction or profile correction has been applied live.
