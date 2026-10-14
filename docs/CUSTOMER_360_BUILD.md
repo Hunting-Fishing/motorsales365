@@ -164,3 +164,11 @@ list revalidation/error hides cached rows/options/counts. A preseeded successful
 cache is not current visibility evidence. No grant, SQL, write or service fallback
 is added. See `evidence/CUSTOMER_DETAIL_REQUEST_BOUND_READS.md` for verification
 and remaining separate-snapshot, other-card, native-authority and release gates.
+
+The next commercial history slice replaces invoice/quote browser reads with
+the same caller-bound customer gate and independently fresh bounded snapshots.
+It preserves TEXT invoice IDs/dates, sorts by recorded timestamps instead of
+arbitrary date text, and labels 26-fetch/25-display limits without implying
+lifetime financial totals. No invoice mutation or legacy converter is called.
+See `evidence/CUSTOMER_COMMERCIAL_REQUEST_BOUND_READS.md`; communications and
+reminder reads/entry integrity remain separate unfinished dependencies.
