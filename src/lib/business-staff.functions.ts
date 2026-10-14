@@ -13,12 +13,25 @@ const ROLES = [
 type StaffRole = (typeof ROLES)[number];
 
 async function assertManager(supabase: any, userId: string, businessId: string) {
-  const { data: ok } = await supabase.rpc("has_business_role", {
+  const { data: ok, error } = await supabase.rpc("has_business_role", {
     _user: userId,
     _business: businessId,
     _role: "manager",
   });
-  if (!ok) throw new Error("Forbidden");
+  if (error) throw error;
+  if (ok !== true) throw new Error("Forbidden");
+}
+
+function assertSingleStaffChange(rows: unknown, expectedId?: string) {
+  if (
+    !Array.isArray(rows) ||
+    rows.length !== 1 ||
+    typeof rows[0]?.id !== "string" ||
+    !rows[0].id ||
+    (expectedId !== undefined && rows[0].id !== expectedId)
+  ) {
+    throw new Error("Staff change could not be confirmed. Refresh the roster before trying again.");
+  }
 }
 
 export const listBusinessStaff = createServerFn({ method: "POST" })
@@ -58,7 +71,7 @@ export const listBusinessStaff = createServerFn({ method: "POST" })
       if (!grantByUser.has(grant.user_id)) grantByUser.set(grant.user_id, grant);
     }
     const ids = [business.owner_id, ...staffRows.map((r) => r.user_id)];
-    let profiles: Record<string, { name: string; email?: string }> = {};
+    const profiles: Record<string, { name: string; email?: string }> = {};
     if (ids.length) {
       const { data: profs } = await supabase
         .from("public_profiles")
@@ -138,28 +151,33 @@ export const addBusinessStaffByEmail = createServerFn({ method: "POST" })
         "No account with that email yet. Ask them to sign up first, then invite again.",
       );
     }
-    const { data: business } = await supabase
+    const { data: business, error: businessError } = await supabase
       .from("businesses")
       .select("owner_id")
       .eq("id", data.businessId)
       .maybeSingle();
+    if (businessError) throw businessError;
     if (business?.owner_id === target.id) {
       throw new Error("The business owner already has full access and cannot be added as staff.");
     }
 
-    const { error } = await supabase.from("business_staff").upsert(
-      {
-        business_id: data.businessId,
-        user_id: target.id,
-        role: data.role,
-        title: data.title ?? null,
-        duties: data.duties ?? [],
-        active: true,
-        invited_by: userId,
-      },
-      { onConflict: "business_id,user_id" },
-    );
+    const { data: changedRows, error } = await supabase
+      .from("business_staff")
+      .upsert(
+        {
+          business_id: data.businessId,
+          user_id: target.id,
+          role: data.role,
+          title: data.title ?? null,
+          duties: data.duties ?? [],
+          active: true,
+          invited_by: userId,
+        },
+        { onConflict: "business_id,user_id" },
+      )
+      .select("id");
     if (error) throw error;
+    assertSingleStaffChange(changedRows);
     return { ok: true };
   });
 
@@ -180,12 +198,13 @@ export const updateBusinessStaff = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
 
     // Drivers can toggle their own on_shift; managers can change everything.
-    const { data: row } = await supabase
+    const { data: row, error: rowError } = await supabase
       .from("business_staff")
       .select("user_id")
       .eq("id", data.staffId)
       .eq("business_id", data.businessId)
       .maybeSingle();
+    if (rowError) throw rowError;
     if (!row) throw new Error("Not found");
 
     const isSelfShiftToggle =
@@ -207,12 +226,14 @@ export const updateBusinessStaff = createServerFn({ method: "POST" })
     if (data.active !== undefined) patch.active = data.active;
     if (data.on_shift !== undefined) patch.on_shift = data.on_shift;
 
-    const { error } = await supabase
+    const { data: changedRows, error } = await supabase
       .from("business_staff")
       .update(patch)
       .eq("id", data.staffId)
-      .eq("business_id", data.businessId);
+      .eq("business_id", data.businessId)
+      .select("id");
     if (error) throw error;
+    assertSingleStaffChange(changedRows, data.staffId);
     return { ok: true };
   });
 
@@ -222,12 +243,14 @@ export const removeBusinessStaff = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertManager(supabase, userId, data.businessId);
-    const { error } = await supabase
+    const { data: changedRows, error } = await supabase
       .from("business_staff")
       .delete()
       .eq("id", data.staffId)
-      .eq("business_id", data.businessId);
+      .eq("business_id", data.businessId)
+      .select("id");
     if (error) throw error;
+    assertSingleStaffChange(changedRows, data.staffId);
     return { ok: true };
   });
 

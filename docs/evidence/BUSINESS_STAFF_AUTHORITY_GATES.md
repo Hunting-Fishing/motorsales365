@@ -120,3 +120,46 @@ legacy uniqueness/no-partial-write behavior and fixture-only EXECUTE containment
 Fresh catalog metadata confirms native profile shop_id has no FK; the proposed
 FK failure contrast is deliberately separate. See `NATIVE_BOOTSTRAP_AUTHORITY_PROOF.md`.
 No bootstrap restriction or profile correction has been applied live.
+
+## Application confirmation prerequisite: 2026-10-15
+
+`src/lib/business-staff.functions.ts` now requests returned `id` rows for roster
+invitation upsert, update and removal, and reports success only for one confirmed
+row (the requested ID for update/removal). RLS may otherwise produce a successful
+response with zero changed rows. Manager RPC results must be boolean `true`;
+authorization, lookup and mutation errors propagate without automatic retry.
+The original authenticated writer, business/staff filters and self-shift versus
+manager contract remain intact. No RLS, grants or role-delegation policy changed.
+
+The 47 mocked handler-contract tests cover successful scoped writes, self-shift,
+non-manager promotion refusal, malformed authorization/results, zero/multiple/
+wrong IDs and database/lookup failures. They are not live JWT/HTTP/RLS or trigger
+integration acceptance. An unconfirmed response does not prove that no mutation
+committed; the message asks the operator to refresh before retrying, not to assume
+rollback. Supabase documents the opt-in returned-row behavior for
+[update](https://supabase.com/docs/reference/javascript/update) and
+[delete](https://supabase.com/docs/reference/javascript/delete).
+
+## Additional retained-source guard dependencies
+
+These are source findings, not new live-state or offboarding verification:
+
+- `20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql` attaches
+  `business_staff_team_thread_sync` to **every** UPDATE. Its definer writer calls
+  `ensure_business_team_thread`, so a shift/no-op guard must account for chat
+  membership effects as well as the column-targeted native bridge. Do not replay
+  that migration's backfill to obtain the function/trigger definitions.
+- The retained employee ledger accepts `on_shift`, `on_break`, `completed` and
+  `manager_closed`, while the later member bridge writes `clocked_out` on
+  deactivation. The reduced authority fixture does not retain that CHECK and is
+  not proof of real offboarding success. A forward candidate must rehearse the
+  actual constraints and all enabled triggers before choosing a compatible fix.
+- Bridge cleanup scopes open shifts/register sessions and native roles by user,
+  not consistently by shop. Multi-roster offboarding and the single native shop
+  binding need an explicit contract; do not infer permission for cross-shop
+  cleanup, existing-binding repair or an automatic active-shop selection.
+- `current_user`, `session_user` and the current role GUC describe PostgreSQL
+  execution context, not immutable original human authority. Audited role
+  memberships, exposed invoker/definer wrappers and every writer remain required
+  before granting a privileged bypass. No bypass or roster SQL guard is released
+  by this application confirmation change.

@@ -479,7 +479,8 @@ baseline/CRM acceptance work; native CRM remains the implementation path.
 
 Draft PR #18: `https://github.com/Hunting-Fishing/motorsales365/pull/18`, code
 commit `6d0e3e4`, branch `security/helper-execute-containment`, stacked on PR #17.
-Full-checkout CI run `38620925454` is pending; no passing build is inferred.
+Latest documentation head `88a8977` supersedes the cancelled initial CI run;
+full-checkout CI run `38621075525` is pending. No passing build is inferred.
 Parent docs head
 `ab18832` passed all six CI gates (run `38617896701`). The completed scanner/UI and
 authority proofs were not rebuilt. Fresh read-only helper catalog checks at
@@ -508,3 +509,29 @@ continue independent application/baseline work. Staff mutation affected-row
 confirmation is an independent application slice; no production deployment is
 authorized. Companion guard design must handle other trigger side effects and
 multi-roster/offboarding constraints rather than trusting definer current_user.
+
+## Staff mutation confirmation: 2026-10-15
+
+Draft PR #19: `https://github.com/Hunting-Fishing/motorsales365/pull/19`, code
+commit `0ac43d2`, branch `fix/staff-mutation-confirmation`, stacked on
+helper-candidate PR #18. Full-checkout CI run `38621319248` is pending at the code
+head; this publication checkpoint is documentation-only.
+Roster upsert/update/removal now require exactly one confirmed returned ID before
+reporting success; update/removal retain the requested business/staff filters and
+verify that ID. Manager authorization is strictly boolean and lookup/database
+errors propagate without automatic retries. Self-shift and manager flows retain
+the authenticated writer. No SQL, grants, migration history or live data changed.
+
+Focused mocked handler tests pass 47/47, focused lint passes (existing source
+`any` warnings remain), formatting and diff checks pass. Full local application
+tests pass 417/417 across 38 files. Full-checkout CI is pending; no deployment is
+claimed. These tests are not live RLS/JWT/HTTP or trigger acceptance, and missing
+confirmation is not evidence of transaction rollback. Refresh before retrying.
+See `evidence/BUSINESS_STAFF_AUTHORITY_GATES.md` for the retained-source chat-trigger,
+shift CHECK and multi-roster cleanup dependencies that a guard must address.
+
+Next: publish and verify the application slice independently of helper release
+approval. Continue the offline native baseline dependency inventory/validator;
+it must explicitly retain unknown coverage and cannot authorize history adoption,
+full migration replay, data repair or deployment. Production helper candidates
+remain unapplied pending a separately scoped owner decision and release gates.
