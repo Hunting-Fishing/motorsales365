@@ -227,7 +227,8 @@ The subsequent docs-only head `7240f02` also passed all six GitHub CI gates
 
 ## PDF OCR and replay-safety checkpoint: 2026-10-15
 
-Implementation branch: `feature/receipt-pdf-local`, stacked on PR #12. Bounded
+Implementation branch: `feature/receipt-pdf-local`, draft PR #13 stacked on PR #12.
+Verified code commit: `21e651c`. Bounded
 same-origin PDF rendering and sequential page OCR are implemented for receipts
 of 1–3 pages, with no upload during scanning. Unsupported, unreadable or failed
 pages reject the entire operation. Conflicting metadata requires explicit manual
@@ -240,9 +241,14 @@ PDF and an image-only PDF, with zero external requests. Four-page, malformed and
 oversized-viewport PDFs reject. The synthetic rendered preview was visually
 inspected and is legible/unclipped. All 325 application tests and 36 Node tooling
 regressions pass. Explicit lint on the new source/scripts has no errors; nine
-pre-existing receipt-panel typing warnings remain. Type/build results and the
-review commit/PR will be recorded after the final checks; publication is not yet
-claimed at this checkpoint.
+pre-existing receipt-panel typing warnings remain. All six GitHub CI gates pass
+at `21e651c` (run `38604862474`): full build/Worker dry-run, TypeScript, application
+and isolated receipt DB suites, lint, actual browser OCR/PDF and 247 adversarial
+SQL assertions. Built assets verify 15 OCR and 202 PDF files by bytes/hash; the
+server-package boundary check excludes both engines. Local TypeScript first
+caught untyped test callback mocks; they were corrected against the public
+scanner contract, and complete-checkout TypeScript then passed. No safeguards
+were relaxed. This final PDF checkpoint update is docs-only.
 
 Migration replay safety: 13 new offline/PGlite regressions reproduce the unchanged
 historical cost-fix patch on original and already-corrected disposable fixtures.
@@ -254,8 +260,8 @@ The complete reproducible baseline remains unfinished; no applied SQL was edited
 
 No schema migration or production deployment is part of this slice. Cloudflare
 authentication and failed hosting-build details remain unresolved. Do not deploy
-this sparse checkout. Next: verify complete-checkout CI and finish the review
-checkpoint, then deliver account-isolated native customer/vehicle activity and
+this sparse checkout. Next: finish account-isolated vehicle/work-order drill-down
+and child-card caches, then deliver bounded native customer/vehicle activity and
 the disposable baseline/recovery prerequisites. External CRM candidate selection
 remains unresolved pending recovery of the actual repositories/licenses. Keep
 resource-heavy local checks sequential on this 16 GB computer.

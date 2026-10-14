@@ -72,6 +72,10 @@ no offline-availability promise or paid service is introduced.
 - CI runs the real browser test and complete-checkout build/package checks.
   Synthetic fixture generation is in memory; its ignored PNG preview is not a
   customer attachment or production artifact.
+- All six GitHub CI gates passed at `21e651c` (run `38604862474`), including
+  complete-checkout TypeScript, build, Worker dry-run, packaged asset hashes,
+  browser-only engine boundary and 247 disposable PostgreSQL assertions.
+  Published as draft PR #13, stacked on the image OCR PR #12.
 
 No schema migration, production database mutation or production deployment is
 included. The sparse local checkout omits other public media and must not be
