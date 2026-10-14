@@ -1,7 +1,7 @@
 /**
  * Regression test: a stale/invalid refresh token persisted in localStorage
  * must not wedge the app in a "Signing you in…" state. The auth bootstrap
- * should clear the bad token via signOut({ scope: "local" }), then when a
+ * receives the SDK's signed-out initial session, then when a
  * fresh sign-in comes through onAuthStateChange, loadRoles should succeed
  * (with retry-on-flake) and rolesLoading should flip to false.
  */
@@ -65,15 +65,15 @@ vi.mock("@/integrations/supabase/client", () => {
           data: { user: null },
           error: { message: "Invalid Refresh Token", status: 400 },
         }),
-        getSession: vi
-          .fn()
-          .mockResolvedValue({ data: { session: null }, error: null }),
+        getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
         signOut: vi.fn((opts?: { scope?: string }) => {
           if (opts?.scope === "local") return signOutLocal();
           return Promise.resolve({ error: null });
         }),
         onAuthStateChange: (cb: AuthListener) => {
           listeners.push(cb);
+          // Supabase resolves persisted credentials before INITIAL_SESSION.
+          queueMicrotask(() => cb("INITIAL_SESSION", null));
           return {
             data: {
               subscription: {
@@ -111,14 +111,14 @@ describe("auth bootstrap — stale refresh token recovery", () => {
     signOutLocal.mockClear();
   });
 
-  it("clears the stale token and loads roles on next sign-in within the timeout window", async () => {
+  it("releases a signed-out initial session and loads roles on next sign-in", async () => {
     const { result } = renderHook(() => useAuth(), { wrapper });
 
-    // 1) Bootstrap sees the stale token, calls signOut({ scope: "local" }),
-    //    releases loading, and renders as signed-out.
+    // 1) The SDK reports no initial session after persisted-token recovery.
+    //    The provider releases loading and renders as signed-out.
     await waitFor(() => expect(result.current.loading).toBe(false), { timeout: 3000 });
 
-    expect(signOutLocal).toHaveBeenCalledTimes(1);
+    expect(signOutLocal).not.toHaveBeenCalled();
     expect(result.current.user).toBeNull();
     expect(result.current.effectiveRoles).toEqual([]);
 
@@ -145,4 +145,3 @@ describe("auth bootstrap — stale refresh token recovery", () => {
     expect(result.current.loading).toBe(false);
   });
 });
-
