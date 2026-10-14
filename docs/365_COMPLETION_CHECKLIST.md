@@ -49,6 +49,11 @@ Inventory PR #20 latest docs head `ff24159` also passed all six CI gates (run
 `38623862186`), verified on this resume. Hosting still fails separately; the green
 preview wrapper is not an upload. Do not repeat completed scanner/UI/proof work.
 
+Native prerequisite PR #21 latest docs head `e5a76ba` passed all six CI gates
+(run `38626559572`), verified on this resume. The next offline activity reader
+candidate is implemented/tested but unapplied; its linked-private-vehicle and
+ownership-tenure limitations remain explicit release gates, not completed consent.
+
 ## Recovery evidence
 
 - [x] Confirm receipt/history release PR #10 is merged on current main.
@@ -616,8 +621,8 @@ skipped upload because `DEPLOY_VIA_ACTIONS` is unset. No hosting release is clai
 
 Draft PR #21: `https://github.com/Hunting-Fishing/motorsales365/pull/21`, code
 commit `55dd9d5`, branch `security/native-role-membership-proof`, stacked on PR #20.
-Code-head CI run `38626505461` is pending; this publication checkpoint changes
-documentation only. Two original
+Code-head CI run `38626505461` was superseded by the documentation push; latest
+head `e5a76ba` passed all six gates (run `38626559572`). Two original
 declaration sources now map the text role and profile-ID membership helpers; the
 enum overload is a distinct declared node. Fresh read-only six-function metadata
 and eight bounded memory-only regressions pin and reproduce four unchanged
@@ -634,7 +639,7 @@ or historical SQL/evidence changed in this slice. See
 `evidence/NATIVE_ROLE_MEMBERSHIP_PROOF.md` for scope, source/evidence hashes,
 advisor links and exact remaining dependencies. Focused eight tests and the
 20 inventory regressions pass; complete local tooling passes 117/117. Focused
-lint/format/diff checks pass. Full-checkout CI publication is the next gate;
+lint/format/diff checks pass. Full-checkout CI is verified;
 application source is unchanged from the verified 417-test parent. No application
 deployment is claimed.
 
@@ -647,3 +652,37 @@ the strict read must remain unavailable for that case, not silently widen RLS.
 Owner tenure, private-vehicle consent and mutable native authority remain release
 prerequisites. Helper containment decision remains pending; no repeated question
 or unapproved live execution is authorized by this checkpoint.
+
+## Customer vehicle activity reader candidate: 2026-10-15
+
+Branch `feature/crm-vehicle-activity-readers`, stacked on native prerequisite PR
+#21. Three new invoker-only SQL/STABLE readers derive customer/native vehicle/shop/
+active link/current visible owner in one snapshot, retain existing RLS, return
+fixed receipt/installation/work-order summaries, and cap each at 26 rows with
+deterministic ordering. Exact new EXECUTE ACLs, collision/default/inheritance
+rollback and opt-in RESTRICT recovery are tested. No old SQL or source table/
+helper/grant/policy/data changes. Candidate is **unapplied and release-blocked**.
+Global source correspondence is 404/422 with 18 unclassified, not applied parity.
+
+Focused reader tests pass 13/13; separate retained receipt/ownership tests pass
+4/4. CI now runs these memory-only regressions sequentially. See
+Complete local tooling passes 134/134; focused lint, format and diff checks pass.
+Full-checkout CI remains pending publication; application changes are a separate
+next slice, not part of this reader-only commit.
+`evidence/CUSTOMER_VEHICLE_ACTIVITY_READ_CONTRACT.md` for hashes and exact proof
+limits; `evidence/VEHICLE_OWNERSHIP_CONSENT_GATES.md` records the privacy boundary.
+The current-owner-based existing receipt policy can expose prior-creator private
+receipt/object metadata after a privileged synthetic owner change; no live
+business rows/files were accessed and no live incident or mitigation is claimed.
+Ordinary staff/private-vehicle reads deliberately remain unavailable. A-to-B-to-A
+can revive old approval without a proven link invalidation/tenure invariant.
+
+Next: publish/review/verify this exact slice, then implement the authenticated
+read adapter and account/customer/native-vehicle/source-isolated activity card.
+Retain independent errors/empty/unavailable states, currency/date/cap semantics,
+context cancellation/late-result tests and no owner-only reader reuse. Production
+needs trusted native authority, audited owner writers and serialized consent
+invalidation/reapproval, private financial-evidence retention decisions, reviewed
+private consent projection, baseline/forward recovery/API tests and hosting gates.
+Bootstrap/totals approval remains pending; do not repeat or apply it. No upload,
+live DDL/data/history repair or broader production permission is implied.
