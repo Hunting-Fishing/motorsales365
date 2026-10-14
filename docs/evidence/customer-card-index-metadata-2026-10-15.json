@@ -1,0 +1,36 @@
+{
+  "formatVersion": 1,
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "mode": "read-only-catalog",
+  "scope": "Selected communications/reminder index definitions, validity and readiness only. No business rows, query plans, mutations, RPC, DDL or history/platform changes.",
+  "indexes": [
+    {
+      "observed_at_utc": "2026-10-14 21:17:49.905593",
+      "table_name": "customer_communications",
+      "valid": true,
+      "ready": true,
+      "definition": "CREATE UNIQUE INDEX customer_communications_pkey ON shop_manager.customer_communications USING btree (id)"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:17:49.905593",
+      "table_name": "customer_reminders",
+      "valid": true,
+      "ready": true,
+      "definition": "CREATE INDEX customer_reminders_customer_idx ON shop_manager.customer_reminders USING btree (customer_id)"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:17:49.905593",
+      "table_name": "customer_reminders",
+      "valid": true,
+      "ready": true,
+      "definition": "CREATE INDEX customer_reminders_due_idx ON shop_manager.customer_reminders USING btree (due_date) WHERE (status = 'pending'::text)"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:17:49.905593",
+      "table_name": "customer_reminders",
+      "valid": true,
+      "ready": true,
+      "definition": "CREATE UNIQUE INDEX customer_reminders_pkey ON shop_manager.customer_reminders USING btree (id)"
+    }
+  ]
+}

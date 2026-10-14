@@ -6,7 +6,8 @@ invoice/quote acceptance, authority repair or deployment.
 
 Published as draft PR #27, code `56105e7` and test correction `0be35b0`, stacked on verified PR #26 docs
 `9b1fa59` (six CI gates, run `38636725539`). Latest stable-snapshot verification
-and remote CI are recorded below/on the completion checklist.
+and remote CI are recorded below/on the completion checklist. Latest docs head
+`de3ac1e` passed all six CI gates (run `38638332580`), verified on the next resume.
 
 ## Scope and native compatibility
 
@@ -68,7 +69,7 @@ no unexpected/quarantined failures. Focused ESLint/format/diff checks and final
 full TypeScript check pass against corrected stable files. Independent
 server/source review found no concrete blocker; the invoice fixture and
 observer-option test corrections are verified by a second full 576/576 run and
-report checker. Remote CI is pending. No tooling changes (prior suite 156/156).
+report checker. Full-checkout CI is verified. No tooling changes (prior suite 156/156).
 No paid resource, SQL/grant/platform change or deployment.
 Supabase privilege/security guidance is used to retain the caller client and
 avoid widening permissions for the application reader.
