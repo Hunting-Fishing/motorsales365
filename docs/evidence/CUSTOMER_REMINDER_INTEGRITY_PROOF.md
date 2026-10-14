@@ -5,7 +5,8 @@ stacked on communications PR #28 documentation head `b6478f7`. Offline behavior
 proof only: **not a production incident, authority fix, complete native schema,
 baseline/history approval or live reminder-entry acceptance**.
 
-Published as draft PR #29, code `78f9460`. Remote CI pending at publication;
+Published as draft PR #29, code `78f9460`; latest docs head `0b8bbed` passed
+all six CI gates (run `38640844619`), verified on the next slice's resume;
 the verified communications parent `b6478f7` passed all six gates (run `38639864235`).
 
 ## Exact execution boundary
