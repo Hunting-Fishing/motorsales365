@@ -82,7 +82,7 @@ const MOBILE_SECTIONS: MobileSection[] = [
       { to: "/businesses", label: "Businesses" },
       { to: "/map", label: "Map" },
       { to: "/parts", label: "Parts" },
-      { to: "/parts/partners", label: "Partner links" },
+      { to: "/parts/partners", label: "Part Picks" },
     ],
   },
   {
