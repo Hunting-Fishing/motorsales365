@@ -303,9 +303,15 @@ BEGIN
           rls_adversarial.id('vehicle_customer'), 'A public pad', rls_adversarial.id('e_owner'));
 
   -- Customer ledger: consent to A only; one private A event.
-  INSERT INTO rls_adversarial.fx VALUES ('customer_account', gen_random_uuid());
-  INSERT INTO public.customer_accounts (id, user_id, display_name)
-  VALUES (rls_adversarial.id('customer_account'), rls_adversarial.id('customer'), 'RLS Customer');
+  -- Receipt/history installation triggers may already create this account.
+  -- Reuse its identity so consent and history tests attack the same customer.
+  WITH account AS (
+    INSERT INTO public.customer_accounts (user_id, display_name)
+    VALUES (rls_adversarial.id('customer'), 'RLS Customer')
+    ON CONFLICT (user_id) DO UPDATE SET display_name = EXCLUDED.display_name
+    RETURNING id
+  )
+  INSERT INTO rls_adversarial.fx SELECT 'customer_account', id FROM account;
   INSERT INTO public.customer_business_consents (customer_account_id, business_id, status)
   VALUES (rls_adversarial.id('customer_account'), rls_adversarial.id('biz_a'), 'granted');
   INSERT INTO public.vehicle_history_events (vehicle_id, customer_account_id, business_id, event_type, title, public_summary_allowed, actor_id)
