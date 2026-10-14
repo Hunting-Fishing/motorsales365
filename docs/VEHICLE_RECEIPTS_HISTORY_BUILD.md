@@ -135,3 +135,23 @@ formal correction workflows and ownership-transfer document permissions need a
 separate implementation before broad history-report rollout. Shop linking currently
 uses the existing customer-linked Shop Manager vehicle access model; unassigned
 company assets must first have a supported shop/customer identity.
+
+## Rollout verification — 2026-10-14
+
+The live 365 project `wjxaajgvddtrxxtocxen` passed a transaction-only migration
+validation, then the migration was applied successfully. New receipt/line/shop-link
+tables have RLS enabled and deny anonymous table reads. Both receipt buckets are
+private. Public receipt RPC wrappers are SECURITY INVOKER.
+
+A live transaction test recorded an owner purchase and installation, verified an
+unrelated authenticated account could neither read nor install its items, then
+rolled all test data back. Existing service-record and legacy-receipt counts were
+zero, so no file relocation was needed.
+
+The security advisor's two new internal-table no-policy notices are resolved with
+explicit deny policies in `20261014064816_receipt_internal_deny_policies.sql`.
+Other advisor findings predate this feature and are separate platform work.
+
+The GitHub release is tracked in PR #10. Receipt AI remains dependent on the
+server-side provider/model variables; this session cannot manage Cloudflare Worker
+secrets, so successful live AI extraction has not been claimed.
