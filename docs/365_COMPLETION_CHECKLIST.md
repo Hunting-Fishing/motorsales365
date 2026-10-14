@@ -439,3 +439,29 @@ Next is a pinned disposable bootstrap/locked-ACL proof, then the companion guard
 candidate. The bounded catalog writer search is not complete dynamic-call coverage.
 Original scanner chat recovery still returns tool errors even though CRM context
 now loads; the rebuilt scanner remains verified independently, not recovered source.
+
+## Bootstrap prerequisite proof: 2026-10-15
+
+Branch: `security/bootstrap-authority-proof`, stacked on PR #16. Seven new
+memory-only tests execute the pinned original profile bootstrap and retain the
+historical direct authenticated grant. They reproduce locked-table/RPC bypass,
+anonymous null-subject provisioning, distinct business/shop UUID storage,
+legacy uniqueness, existing-null-shop return-without-update and a hypothetical
+FK's atomic failure. Full definition/body fingerprints match the fresh catalog.
+The relevant live constraints were inspected read-only: email NOT NULL UNIQUE,
+user_id FK/partial unique index, and no profile shop_id FK. No live profile row
+was read or mutated and no business function invoked. No migration is added.
+
+See `evidence/NATIVE_BOOTSTRAP_AUTHORITY_PROOF.md`. Fixture-only full client denial
+preserves owner/service/function/table authority; PUBLIC-only denial leaves the
+historical authenticated grant. This is test evidence, not production containment.
+Focused tests pass 7/7; complete local tooling passes 72/72, with lint/format clean.
+Independent review confirmed the no-FK versus hypothetical-FK distinction and
+historical-versus-live grant difference. Full-checkout CI follows publication;
+application source is unchanged from the verified 370-test parent.
+Next: verify/publish the slice, prepare exact scoped bootstrap/helper containment
+and recovery candidates for separate release authority, then the companion roster/
+native guard and its application compatibility tests. Do not blindly add a shop
+FK, repair existing bindings or substitute a profile-only ACL change for trusted
+membership. Keep the unchanged historical replay chain frozen and continue the
+baseline/CRM acceptance work; native CRM remains the implementation path.
