@@ -30,6 +30,12 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/businesses", changefreq: "daily", priority: "0.8" },
   { path: "/rides", changefreq: "daily", priority: "0.7" },
   { path: "/businesses/submit", changefreq: "monthly", priority: "0.5" },
+  { path: "/partners", changefreq: "weekly", priority: "0.8" },
+  { path: "/partners/network", changefreq: "daily", priority: "0.7" },
+  { path: "/partners/parts", changefreq: "monthly", priority: "0.7" },
+  { path: "/parts/network", changefreq: "daily", priority: "0.8" },
+  { path: "/shop-manager", changefreq: "monthly", priority: "0.7" },
+  { path: "/franchise", changefreq: "monthly", priority: "0.6" },
   { path: "/parts/partners", changefreq: "daily", priority: "0.8" },
   { path: "/parts/partners/categories", changefreq: "weekly", priority: "0.6" },
   { path: "/learn", changefreq: "weekly", priority: "0.7" },
@@ -80,7 +86,6 @@ export const Route = createFileRoute("/sitemap.xml")({
         for (const pc of PARTS_CATEGORIES) {
           entries.push({ path: `/parts/c/${pc.slug}`, changefreq: "daily", priority: "0.7" });
         }
-
 
         try {
           const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -207,7 +212,6 @@ export const Route = createFileRoute("/sitemap.xml")({
         } catch (err) {
           console.warn("[sitemap] dynamic entries failed", err);
         }
-
 
         const urls = entries.map((e) =>
           [

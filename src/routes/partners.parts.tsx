@@ -7,9 +7,9 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { submitPartnerApplication } from "@/lib/partner-applications.functions";
 
-const TITLE = "Parts Partner Program — Sell on 365 MotorSales Philippines";
+const TITLE = "365 Associate Network for Parts Suppliers — Sell on 365 MotorSales";
 const DESCRIPTION =
-  "Wholesalers, retailers, salvage yards, and online parts shops: list inventory or plug your catalog into 365MotorSales via affiliate, API, dropship, or wholesale partnership.";
+  "Parts stores, distributors, wholesalers, salvage yards, and online suppliers: connect inventory and supply repair shops through the 365 MotorSales Associate Network.";
 const URL = "https://www.365motorsales.com/partners/parts";
 
 export const Route = createFileRoute("/partners/parts")({
@@ -31,28 +31,28 @@ const PARTNERSHIPS = [
   {
     key: "affiliate",
     icon: Globe2,
-    title: "Affiliate placement",
+    title: "Network + affiliate placement",
     blurb:
-      "Get a 'Shop on [Your Store]' button on relevant vehicle and parts listings. We send tagged traffic, you pay commission on sale.",
+      "Publish a verified storefront and place opted-in inventory in front of shops and buyers. Outbound sales can use tracked affiliate links.",
   },
   {
     key: "api",
     icon: Zap,
-    title: "Catalog API",
+    title: "Inventory and catalog connection",
     blurb:
-      "Push your inventory and pricing to us via API. Buyers see real stock, real prices, and check out from your store.",
+      "Start with Shop Manager, a catalog feed, or an API. Approved stock can show real availability and listed pricing by location.",
   },
   {
     key: "wholesale",
     icon: Boxes,
-    title: "Wholesale supply",
+    title: "Wholesale network supply",
     blurb:
-      "Be one of our wholesale sources for the 365 outlets D2C parts program (PartSouq-style OEM by VIN).",
+      "Become a source for independent repair shops and future 365 outlets, including OEM and hard-to-find parts requests.",
   },
   {
     key: "dropship",
     icon: ShieldCheck,
-    title: "Dropship",
+    title: "Dropship fulfilment",
     blurb:
       "We sell, you ship. We handle the buyer, the listing, the support; you fulfill from your warehouse.",
   },
@@ -103,12 +103,12 @@ function PartnersPartsPage() {
             <Handshake className="h-7 w-7 shrink-0 text-primary" />
             <div>
               <h1 className="font-display text-2xl font-bold sm:text-3xl">
-                Sell your parts on 365 MotorSales
+                Supply the 365 Associate Network
               </h1>
               <p className="mt-1 max-w-2xl text-sm text-muted-foreground sm:text-base">
-                We're building the Philippines' parts marketplace — vehicle listings, OEM
-                catalog by VIN, parts-wanted alerts, and salvage-yard directory. Partner
-                with us via affiliate, API, wholesale, or dropship.
+                Connect your store, warehouse, or catalog to repair shops and buyers across the
+                Philippines. Start with network inventory, a verified storefront, parts-wanted
+                requests, affiliate traffic, wholesale supply, or dropship fulfilment.
               </p>
             </div>
           </div>
@@ -119,7 +119,7 @@ function PartnersPartsPage() {
           <div className="flex items-start gap-2">
             <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
             <div>
-              <p className="text-sm font-semibold">Ready to be a verified supplier?</p>
+              <p className="text-sm font-semibold">Ready to be a verified Associate supplier?</p>
               <p className="text-xs text-muted-foreground">
                 Skip the short form — go straight to full onboarding with document upload (Mayor's
                 permit, BIR 2303, DTI/SEC, ID).
@@ -162,7 +162,7 @@ function PartnersPartsPage() {
             onSubmit={onSubmit}
             className="rounded-xl border border-border bg-card p-5 space-y-3"
           >
-            <h2 className="text-base font-semibold">Apply for a partnership</h2>
+            <h2 className="text-base font-semibold">Register your interest</h2>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Company name *">
@@ -225,7 +225,7 @@ function PartnersPartsPage() {
                   {[
                     "Retailer",
                     "Wholesaler / Distributor",
-                    "Salvage yard / Parter-out",
+                    "Salvage yard / Parts-out",
                     "OEM dealer",
                     "Manufacturer",
                     "Online marketplace",

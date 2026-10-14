@@ -1,12 +1,15 @@
 {
-  "source_directory": "supabase/migrations",
-  "file_count": 397,
-  "first_migration": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
-  "last_migration": "20260830165959_harden_signup_attribution_rpc_grants.sql",
+  "generated_from": "supabase/migrations",
+  "total_source_migration_files": 388,
+  "first_source_migration": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+  "last_source_migration": "20260805085754_f4e0fcae-45f3-42a2-b801-44216b32a6bc.sql",
+  "chunk_count": 7,
+  "chunk_target_size_bytes": 204800,
   "chunks": [
     {
       "chunk": "chunk_001.sql",
-      "files": [
+      "source_migration_count": 63,
+      "source_migrations": [
         "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
         "20260501224438_ca85ed23-9689-4604-8f3c-b709823c9510.sql",
         "20260501230554_3b5b6d77-5384-48ee-b77e-615fc2263ad5.sql",
@@ -69,7 +72,13 @@
         "20260519054723_5240c8fa-4d7f-4e43-9409-ba5417f672d5.sql",
         "20260521080657_c8af3a11-70d2-4287-9298-36a238334b1d.sql",
         "20260521083454_95a0eb1c-2bfe-4887-b9ec-66aa7b587cb0.sql",
-        "20260521093754_d4c431fc-bd43-4d2c-8a3e-2a77ee9369b6.sql",
+        "20260521093754_d4c431fc-bd43-4d2c-8a3e-2a77ee9369b6.sql"
+      ]
+    },
+    {
+      "chunk": "chunk_002.sql",
+      "source_migration_count": 68,
+      "source_migrations": [
         "20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql",
         "20260522104828_c3809a3b-82da-4574-a337-d01968648c9b.sql",
         "20260522111105_2c76877e-25cd-41b5-aed4-03377ce2bb42.sql",
@@ -78,15 +87,7 @@
         "20260522154420_43b47bf7-cd96-4923-9329-2ae7dadfbef3.sql",
         "20260523101642_b10e46d3-8424-4a6c-b124-908ca9b23ea6.sql",
         "20260524133901_0b73cc17-e47e-4d09-a47b-be80c742536d.sql",
-        "20260525021220_1704181b-8d1c-446c-9098-3b6bf1b4497b.sql"
-      ],
-      "source_bytes": 212438,
-      "first": "20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
-      "last": "20260525021220_1704181b-8d1c-446c-9098-3b6bf1b4497b.sql"
-    },
-    {
-      "chunk": "chunk_002.sql",
-      "files": [
+        "20260525021220_1704181b-8d1c-446c-9098-3b6bf1b4497b.sql",
         "20260525110546_bcdd53df-2d19-4f55-bc0e-4b364fa2db0a.sql",
         "20260525122358_a9ae8cc8-acf8-4ce2-b2fd-52154331f6c3.sql",
         "20260525122506_288550cc-cdd5-4c54-8926-9990a6df896a.sql",
@@ -145,7 +146,13 @@
         "20260603080421_6b8a7673-45ea-4d4b-85d2-d834969ba292.sql",
         "20260603080924_baf447bb-08b3-4e28-8ff7-fce134194605.sql",
         "20260604122237_2389a56f-bfe5-45e0-8114-a798b2889648.sql",
-        "20260604164158_05bc3b50-bcb2-4dca-b5f3-b10d454f38c5.sql",
+        "20260604164158_05bc3b50-bcb2-4dca-b5f3-b10d454f38c5.sql"
+      ]
+    },
+    {
+      "chunk": "chunk_003.sql",
+      "source_migration_count": 67,
+      "source_migrations": [
         "20260605033802_58c5391b-eb0e-40fd-babd-8203a211081e.sql",
         "20260605033831_236da73f-d912-4947-a953-a016ec283c83.sql",
         "20260605043935_47d06dfd-d146-4628-b75e-d0c94e3b40f0.sql",
@@ -165,15 +172,7 @@
         "20260606143827_5cbab52d-1b9d-4e45-b109-418dc8815f1c.sql",
         "20260606151712_d29167db-53b3-42d2-8cb5-edf9e0cfe07d.sql",
         "20260606153104_ec1a9e78-3646-41da-a10b-8e55504ae07d.sql",
-        "20260606155429_15fa1afb-0a0c-4938-8921-a8e2a28e7510.sql"
-      ],
-      "source_bytes": 213298,
-      "first": "20260525110546_bcdd53df-2d19-4f55-bc0e-4b364fa2db0a.sql",
-      "last": "20260606155429_15fa1afb-0a0c-4938-8921-a8e2a28e7510.sql"
-    },
-    {
-      "chunk": "chunk_003.sql",
-      "files": [
+        "20260606155429_15fa1afb-0a0c-4938-8921-a8e2a28e7510.sql",
         "20260606160435_8e863801-e6fe-4c68-a13d-6b55b72594f8.sql",
         "20260607011511_9237f748-0bd6-4f28-a805-5d1cbd92e9a4.sql",
         "20260607014744_58bd8014-ca74-40d7-b9d9-c61666f826c3.sql",
@@ -220,7 +219,13 @@
         "20260612083700_a84d7d79-b5c4-45b0-a897-5d9cc8211d55.sql",
         "20260612083840_d97f4a0f-e475-415c-b725-117c1d8854fc.sql",
         "20260612095918_23be51e3-0d54-4b89-9256-2ae888bf7934.sql",
-        "20260612101500_207a2c27-ab68-4f15-9c77-df3f81333e51.sql",
+        "20260612101500_207a2c27-ab68-4f15-9c77-df3f81333e51.sql"
+      ]
+    },
+    {
+      "chunk": "chunk_004.sql",
+      "source_migration_count": 61,
+      "source_migrations": [
         "20260612105044_94140c07-aee7-4c48-a6d3-beba9a7e0f98.sql",
         "20260613035610_c210e9ab-f101-44b8-9bc3-ad6dd05e0ff9.sql",
         "20260613041354_d7a99bca-9ea5-4580-8838-8e5059e5816e.sql",
@@ -239,15 +244,7 @@
         "20260616033348_a261b9e7-281d-4e16-bf61-1f3043a80d12.sql",
         "20260616035936_bd7cf61d-c7b3-4584-a54e-03f8bed4a751.sql",
         "20260616041102_c21d2dd8-e20c-401e-a314-86a096e7b2c9.sql",
-        "20260616042054_404ed953-9c9e-47e3-9eaf-b25e7d5ebdf9.sql"
-      ],
-      "source_bytes": 216719,
-      "first": "20260606160435_8e863801-e6fe-4c68-a13d-6b55b72594f8.sql",
-      "last": "20260616042054_404ed953-9c9e-47e3-9eaf-b25e7d5ebdf9.sql"
-    },
-    {
-      "chunk": "chunk_004.sql",
-      "files": [
+        "20260616042054_404ed953-9c9e-47e3-9eaf-b25e7d5ebdf9.sql",
         "20260616051838_15d109db-c2ae-477f-a7d4-6f1b8ad10740.sql",
         "20260616052943_f30fe80d-b361-4bd7-9f15-ba34f9d58b35.sql",
         "20260616053812_7785b594-fe6e-4d48-a742-c85ad046bb3e.sql",
@@ -289,7 +286,13 @@
         "20260627034903_28b06ca4-999d-446e-96f6-385b12704814.sql",
         "20260627064717_e3493d02-195d-4e15-bbca-e55115084ae2.sql",
         "20260627073311_09ed7204-70a9-4715-b90e-306cbd292ba3.sql",
-        "20260627102129_aa019b19-2de8-42ec-b3eb-0dfacac9c83d.sql",
+        "20260627102129_aa019b19-2de8-42ec-b3eb-0dfacac9c83d.sql"
+      ]
+    },
+    {
+      "chunk": "chunk_005.sql",
+      "source_migration_count": 69,
+      "source_migrations": [
         "20260627112833_1ec2290c-82f7-4ce8-9c26-b00513855013.sql",
         "20260627114738_c46dc744-e570-41a8-b80d-536ecbe7a5cd.sql",
         "20260627114834_89899757-a064-4f38-8146-4d4c41a5c70b.sql",
@@ -325,15 +328,7 @@
         "20260706045431_7f2e9b7f-0a44-499c-8482-f19f453b658d.sql",
         "20260706045715_97c676ff-485d-46a0-a0e6-cc08a8da583d.sql",
         "20260706053153_e5511901-f040-4b61-b703-264d0911ac16.sql",
-        "20260706054357_10431f45-ac66-46e5-a269-94edb188c7ea.sql"
-      ],
-      "source_bytes": 214043,
-      "first": "20260616051838_15d109db-c2ae-477f-a7d4-6f1b8ad10740.sql",
-      "last": "20260706054357_10431f45-ac66-46e5-a269-94edb188c7ea.sql"
-    },
-    {
-      "chunk": "chunk_005.sql",
-      "files": [
+        "20260706054357_10431f45-ac66-46e5-a269-94edb188c7ea.sql",
         "20260706060958_d3327508-28b4-441c-8c04-04a1ae4ec6a3.sql",
         "20260707030403_7ec9381d-6c4b-4bca-899d-b4e894adb6f8.sql",
         "20260707031454_7349bfbb-6ba5-415f-ba4a-63cd39c90f88.sql",
@@ -366,7 +361,13 @@
         "20260710040652_dc16ddc2-7a94-4dff-9bd2-18d0ca42895f.sql",
         "20260710045307_201d3de0-c3d7-4e00-ac7a-289796cc509a.sql",
         "20260710051539_39c40ffd-84f4-4989-af0d-330b19a37527.sql",
-        "20260710053418_5ad16e5f-34db-4532-9dfc-af38d4f013a1.sql",
+        "20260710053418_5ad16e5f-34db-4532-9dfc-af38d4f013a1.sql"
+      ]
+    },
+    {
+      "chunk": "chunk_006.sql",
+      "source_migration_count": 27,
+      "source_migrations": [
         "20260711010354_064bbdf4-d81e-4437-98d9-b75c0c57afcb.sql",
         "20260711011141_9f8294d9-bbfa-4fdb-a058-d364cdfed91f.sql",
         "20260711044610_4ba7cad7-f972-4860-893d-7bb76399edd4.sql",
@@ -387,21 +388,19 @@
         "20260713012516_8b3939aa-63d7-4e0d-8c85-0246b3bb8a21.sql",
         "20260713022238_540630d7-d0d4-436b-b5a0-58f9dc07811f.sql",
         "20260713044701_64bcbe3c-76cf-4ed0-ba80-4e9c57766705.sql",
-        "20260713062739_e0144043-a7a4-43b7-8fc6-050ea0304634.sql"
-      ],
-      "source_bytes": 194797,
-      "first": "20260706060958_d3327508-28b4-441c-8c04-04a1ae4ec6a3.sql",
-      "last": "20260713062739_e0144043-a7a4-43b7-8fc6-050ea0304634.sql"
-    },
-    {
-      "chunk": "chunk_006.sql",
-      "files": [
+        "20260713062739_e0144043-a7a4-43b7-8fc6-050ea0304634.sql",
         "20260713063318_90b3f5d4-5173-4f8a-b355-7634671276fe.sql",
         "20260713063430_0a07d0d9-729b-4662-ac1e-d561b0a2ce85.sql",
         "20260713070220_28789e9e-20ef-4e63-a727-e686ff8c5c7c.sql",
         "20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
         "20260713070515_c57f9258-c8b3-4973-9eff-2d03ccade037.sql",
-        "20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql",
+        "20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql"
+      ]
+    },
+    {
+      "chunk": "chunk_007.sql",
+      "source_migration_count": 33,
+      "source_migrations": [
         "20260713081429_d9cdd366-04dd-4e51-939f-541106ff205e.sql",
         "20260713081559_69ad9a73-edab-4719-b16e-38541b8ba91a.sql",
         "20260713081649_7763bb16-35c5-4c76-a8f9-36c3f58090ce.sql",
@@ -432,30 +431,10 @@
         "20260720052948_61b323c1-58ce-4316-996c-4cac73e5da99.sql",
         "20260726172206_6d55b8f9-1c75-4b3e-825a-33a66205de65.sql",
         "20260727022952_6eba5acb-4c7c-43c0-8d0b-b4064c1cd289.sql",
-        "20260728125715_52a60fda-14fe-4758-bf19-22284e3e7468.sql"
-      ],
-      "source_bytes": 212543,
-      "first": "20260713063318_90b3f5d4-5173-4f8a-b355-7634671276fe.sql",
-      "last": "20260728125715_52a60fda-14fe-4758-bf19-22284e3e7468.sql"
-    },
-    {
-      "chunk": "chunk_007.sql",
-      "files": [
+        "20260728125715_52a60fda-14fe-4758-bf19-22284e3e7468.sql",
         "20260805084402_cd07847a-26f0-4c31-a2fe-ab0088684f77.sql",
-        "20260805085754_f4e0fcae-45f3-42a2-b801-44216b32a6bc.sql",
-        "20260829180321_harden_public_projection_views.sql",
-        "20260829180438_move_projection_helpers_private.sql",
-        "20260829180611_revoke_anon_authenticated_only_rpcs.sql",
-        "20260829202547_revoke_direct_execute_maintenance_rpcs.sql",
-        "20260829213343_repair_r32_demo_legacy_lovable_media.sql",
-        "20260830014500_harden_trigger_function_execute_privileges.sql",
-        "20260830015000_restrict_internal_security_definer_helpers.sql",
-        "20260830165926_harden_internal_security_definer_rpc_grants.sql",
-        "20260830165959_harden_signup_attribution_rpc_grants.sql"
-      ],
-      "source_bytes": 28036,
-      "first": "20260805084402_cd07847a-26f0-4c31-a2fe-ab0088684f77.sql",
-      "last": "20260830165959_harden_signup_attribution_rpc_grants.sql"
+        "20260805085754_f4e0fcae-45f3-42a2-b801-44216b32a6bc.sql"
+      ]
     }
   ]
 }

@@ -23,14 +23,16 @@ function AffiliateDisclosure() {
         <h1>Affiliate disclosure</h1>
         <p className="lead">
           365 MotorSales participates in affiliate programs with marketplaces like Shopee, Lazada,
-          AliExpress and select brand stores. This page explains what that means for you.
+          AliExpress, Alibaba, Amazon, and select brand stores. This page explains what that means
+          for you.
         </p>
 
         <h2>How it works</h2>
         <p>
           When you click an outbound product link in our Shop, we may add a tracking tag that tells
           the marketplace the visit came from us. If you go on to buy something, we earn a small
-          commission from the seller — the price you pay does not change.
+          commission from the seller — the price you pay does not change. As an Amazon Associate I
+          earn from qualifying purchases.
         </p>
 
         <h2>How it affects what you see</h2>

@@ -21,6 +21,8 @@ import {
   Inbox,
   Archive,
   ArchiveRestore,
+  BadgeCheck,
+  Handshake,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,6 +59,7 @@ type Row = {
   hours: unknown | null;
   phone: string | null;
   vanity_slug: string | null;
+  associate_status?: "submitted" | "reviewing" | "approved" | "rejected" | "suspended" | null;
 };
 
 type Extras = {
@@ -308,10 +311,22 @@ function MyBusinessesPage() {
         .eq("owner_id", user.id)
         .order("created_at", { ascending: false });
       const list: Row[] = data ?? [];
+      const ids = list.map((r) => r.id);
+      if (ids.length > 0) {
+        const { data: applications } = await (supabase as any)
+          .from("business_associate_applications")
+          .select("business_id,status")
+          .in("business_id", ids);
+        const statusByBusiness = new Map(
+          (applications ?? []).map((application: any) => [application.business_id, application.status]),
+        );
+        list.forEach((business) => {
+          business.associate_status = (statusByBusiness.get(business.id) as Row["associate_status"]) ?? null;
+        });
+      }
       setRows(list);
       setLoading(false);
 
-      const ids = list.map((r) => r.id);
       if (ids.length === 0) return;
 
       const [svc, prd, ph, inq] = await Promise.all([
@@ -523,6 +538,17 @@ function MyBusinessesPage() {
                     </Link>
                     {statusBadge(b.status)}
                     {tierBadge(b.subscription_tier)}
+                    {b.associate_status === "approved" ? (
+                      <Badge className="border border-amber-500/50 bg-amber-400/15 text-amber-800 hover:bg-amber-400/20">
+                        <BadgeCheck className="mr-1 h-3 w-3" /> 365 Associate
+                      </Badge>
+                    ) : b.associate_status === "submitted" || b.associate_status === "reviewing" ? (
+                      <Badge variant="outline">Associate application pending</Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-muted-foreground">
+                        Not a 365 Associate
+                      </Badge>
+                    )}
                   </div>
                   <div className="text-xs text-muted-foreground">
                     {[b.city, b.region].filter(Boolean).join(" · ")}
@@ -569,6 +595,15 @@ function MyBusinessesPage() {
                       Manage page
                     </Link>
                   </Button>
+                  {b.associate_status !== "approved" &&
+                    b.associate_status !== "submitted" &&
+                    b.associate_status !== "reviewing" && (
+                      <Button size="sm" variant="outline" asChild>
+                        <Link to="/partners/associate/apply">
+                          <Handshake className="mr-1 h-3.5 w-3.5" /> Join Associate Network
+                        </Link>
+                      </Button>
+                    )}
                   <Button size="sm" variant="outline" asChild>
                     <Link to="/dashboard/businesses/$id/analytics" params={{ id: b.id }}>
                       Analytics

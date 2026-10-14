@@ -15,7 +15,7 @@ export const Route = createFileRoute("/dashboard/partner-network")({
       {
         name: "description",
         content:
-          "Track your 365 partner network application, verification status, and published storefront.",
+          "Track your 365 Associate Network application, verification status, and published storefront.",
       },
       { property: "og:title", content: "My Partner Network Status — 365 MotorSales" },
       {
@@ -42,9 +42,9 @@ function MyPartnerNetwork() {
     <SiteLayout>
       <div className="container mx-auto max-w-3xl px-4 py-8">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-          <Network className="h-3.5 w-3.5" /> Partner network
+          <Network className="h-3.5 w-3.5" /> Associate Network
         </span>
-        <h1 className="mt-3 font-display text-3xl font-bold">My partner applications</h1>
+        <h1 className="mt-3 font-display text-3xl font-bold">My Associate applications</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Applications submitted with your account email appear here. We review documents before any
           storefront or network tool goes live.
@@ -57,14 +57,14 @@ function MyPartnerNetwork() {
             <Card className="p-6 text-center">
               <p className="font-medium">No partner application yet.</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Join the 365 network as a parts vendor, shop, or franchise partner.
+                Join the 365 network as a parts supplier, store, or independent repair shop.
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 <Button asChild>
-                  <Link to="/partners/parts/onboarding">Start an application</Link>
+                  <Link to="/partners">Choose an Associate track</Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link to="/partners">Partner overview</Link>
+                  <Link to="/partners">Associate overview</Link>
                 </Button>
               </div>
             </Card>
@@ -90,10 +90,7 @@ function MyPartnerNetwork() {
                   </div>
                   {a.storefront_published && a.storefront_slug && (
                     <Button asChild size="sm" variant="outline">
-                      <Link
-                        to="/parts/partners/store/$slug"
-                        params={{ slug: a.storefront_slug }}
-                      >
+                      <Link to="/parts/partners/store/$slug" params={{ slug: a.storefront_slug }}>
                         View storefront <ExternalLink className="ml-1 h-3 w-3" />
                       </Link>
                     </Button>

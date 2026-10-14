@@ -23,7 +23,9 @@ export const listBusinessInventory = createServerFn({ method: "POST" })
 
     const { data: rows, error } = await supabase
       .from("business_inventory_items")
-      .select("*")
+      .select(
+        "*, business_inventory_locations:location_id(name,code), parts_catalog:catalog_part_id(id,title,manufacturer,manufacturer_part_number,catalog_status,active), business_part_cross_references(part_number,number_type,supplier_name,active)",
+      )
       .eq("business_id", data.businessId)
       .order("name", { ascending: true });
     if (error) throw error;
@@ -46,6 +48,7 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       cost?: number | null;
       price?: number | null;
       location?: string | null;
+      location_id?: string | null;
       active?: boolean;
       network_visible?: boolean;
       catalog_part_id?: string | null;
@@ -59,10 +62,21 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertManager(supabase, userId, data.businessId);
 
+    if (data.catalog_part_id) {
+      const { data: canonicalPart, error: canonicalError } = await supabase
+        .from("parts_catalog")
+        .select("id")
+        .eq("id", data.catalog_part_id)
+        .eq("active", true)
+        .eq("catalog_status", "active")
+        .maybeSingle();
+      if (canonicalError) throw canonicalError;
+      if (!canonicalPart) throw new Error("Select an active canonical catalogue product");
+    }
+
     if (!data.id) {
-      const { enforceLimit, planLimitErrorPayload, PlanLimitError } = await import(
-        "@/lib/business-plan-enforcement.server"
-      );
+      const { enforceLimit, planLimitErrorPayload, PlanLimitError } =
+        await import("@/lib/business-plan-enforcement.server");
       try {
         await enforceLimit(supabase as any, data.businessId, "inventory_skus", userId);
       } catch (e) {
@@ -73,12 +87,36 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
 
     // Whitelist of extra columns the client may set through the multi-step form.
     const EXTRA_COLS = new Set([
-      "barcode","manufacturer_part_number","main_category","status","manufacturer",
-      "supplier","description","markup_percentage","date_purchased","last_price_update",
-      "qty_on_hold","qty_on_order","min_stock_level","max_stock_level","weight_lbs",
-      "dimensions","color","material","model_year","oem_part_number","warranty_period",
-      "universal_part","tax_rate","environmental_fee","core_charge","hazmat_fee",
-      "tax_exempt","date_last_ordered","date_last_used","web_links",
+      "barcode",
+      "manufacturer_part_number",
+      "main_category",
+      "status",
+      "manufacturer",
+      "supplier",
+      "description",
+      "markup_percentage",
+      "date_purchased",
+      "last_price_update",
+      "qty_on_hold",
+      "qty_on_order",
+      "min_stock_level",
+      "max_stock_level",
+      "weight_lbs",
+      "dimensions",
+      "color",
+      "material",
+      "model_year",
+      "oem_part_number",
+      "warranty_period",
+      "universal_part",
+      "tax_rate",
+      "environmental_fee",
+      "core_charge",
+      "hazmat_fee",
+      "tax_exempt",
+      "date_last_ordered",
+      "date_last_used",
+      "web_links",
     ]);
     const extra: Record<string, any> = {};
     if (data.extra && typeof data.extra === "object") {
@@ -100,12 +138,13 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       cost: data.cost ?? null,
       price: data.price ?? null,
       location: data.location ?? null,
+      location_id: data.location_id ?? null,
       active: data.active ?? true,
       network_visible: data.network_visible ?? true,
       catalog_part_id: data.catalog_part_id ?? null,
       ...extra,
     };
-    const { data: row, error } = await supabase
+    const { data: row, error } = await (supabase as any)
       .from("business_inventory_items")
       .upsert(payload)
       .select("*")
@@ -114,12 +153,9 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
     return row;
   });
 
-
 export const adjustBusinessInventory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (d: { itemId: string; businessId: string; delta: number; reason?: string }) => d,
-  )
+  .inputValidator((d: { itemId: string; businessId: string; delta: number; reason?: string }) => d)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: isMember } = await supabase.rpc("is_business_member", {
@@ -162,4 +198,40 @@ export const deleteBusinessInventoryItem = createServerFn({ method: "POST" })
     const { error } = await supabase.from("business_inventory_items").delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
+  });
+
+export const getCanonicalLinkCapability = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { businessId: string }) => d)
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: canManage, error: managerError } = await (supabase as any).rpc(
+      "has_business_role",
+      { _user: userId, _business: data.businessId, _role: "manager" },
+    );
+    if (managerError) throw managerError;
+    const { data: allowed, error } = await (supabase as any).rpc("has_active_business_permission", {
+      _user: userId,
+      _business: data.businessId,
+      _permission_key: "canonical_inventory_link",
+    });
+    if (error) throw error;
+    return { allowed: allowed === true, canManage: canManage === true };
+  });
+
+export const linkBusinessInventoryCanonicalPart = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { businessId: string; itemId: string; catalogPartId: string | null }) => d)
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: row, error } = await (supabase as any).rpc(
+      "link_business_inventory_catalog_part",
+      {
+        _business_id: data.businessId,
+        _inventory_item_id: data.itemId,
+        _catalog_part_id: data.catalogPartId,
+      },
+    );
+    if (error) throw error;
+    return row;
   });
