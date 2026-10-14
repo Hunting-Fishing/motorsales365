@@ -31,6 +31,12 @@ No non-internal profile triggers were present in the catalog inspection.
 No profile mutation was attempted. This is an observed mutable-tenant-binding
 release risk, not a claim of executed cross-shop access.
 
+A follow-up read-only definition check also confirmed the live zero-argument
+current-shop helper returns `profiles.shop_id WHERE id = auth.uid() LIMIT 1`,
+with no independent membership predicate (definition MD5
+`be63946995c909e4a224b0e4989eaaf7`). This catalog identifier is not migration
+provenance or permission to change the live helper.
+
 The current-shop helper uses `profiles.id = auth.uid()`, whereas the employee
 resolver accepts `user_id OR id` and prefers user_id. Bridge upserts preserve
 legacy row IDs, so module and shop resolution can disagree. `ensure_profile_for`

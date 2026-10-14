@@ -273,7 +273,8 @@ resource-heavy local checks sequential on this 16 GB computer.
 ## CRM drill-down continuation: 2026-10-15
 
 Branch: `feature/crm-drilldown-isolation`, draft PR #14 stacked on the verified
-PDF slice. Verified code commit: `5945c33`.
+PDF slice. Verified application commit: `5945c33`; verified follow-up/test commit:
+`117412b`.
 Vehicle/work-order detail and time/technician/inspection child-card caches now
 include account identity. Signed-out UI is hidden, drafts reset on account/target
 changes, late old-context callbacks are ignored, dependent reads require a visible
@@ -310,6 +311,9 @@ despite real synthetic RLS denial, and verify proposed fixture-only revocations.
 They are added to CI; total tooling regressions are now 41. No containment SQL
 is applied. Live ACLs differ from retained direct authenticated grants, which is
 documented explicitly rather than inferred from old source.
+All six GitHub gates also pass at `117412b` (run `38608648139`); job logs confirm
+370/370 application tests, 41/41 tooling regressions and both isolated receipt
+database suites. This final handoff update changes documentation only.
 
 Identity follow-up found a prerequisite to converter hardening: native shop,
 business and public organization IDs are distinct, and current profile shop
@@ -324,8 +328,9 @@ public identifiers, Maps browser configuration and public-format payment client
 tokens. This does not verify provider key restrictions, runtime secrets or Git
 history; the environment/security audit remains incomplete.
 
-Next: verify the added ACL-test CI checkpoint, then prepare disposable trusted
-shop/role binding and membership-tampering tests before invoice authorization,
+Next: verify any new docs-head checks without repeating the completed OCR/UI
+slices, then prepare disposable trusted shop/role binding and membership-tampering
+tests before invoice authorization,
 atomicity and concurrency implementation. Continue the
 baseline/recovery path. Native bounded receipt/installation activity follows;
 retail/recruitment pipelines, wider account/role UI audits and owner/pilot
