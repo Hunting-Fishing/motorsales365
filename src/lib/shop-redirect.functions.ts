@@ -4,6 +4,9 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 function applyTag(url: string, network: any): string {
   try {
+    if (network?.slug === "lazada" && /(^|\.)c\.lazada\./i.test(new URL(url).hostname)) {
+      return url;
+    }
     if (network?.deeplink_template && network?.tag_value) {
       return network.deeplink_template
         .replace("{{url}}", encodeURIComponent(url))
@@ -12,6 +15,9 @@ function applyTag(url: string, network: any): string {
     if (network?.tag_param && network?.tag_value) {
       const u = new URL(url);
       u.searchParams.set(network.tag_param, network.tag_value);
+      if (network?.slug === "amazon" && !u.searchParams.get("linkCode")) {
+        u.searchParams.set("linkCode", "ogi");
+      }
       return u.toString();
     }
   } catch {

@@ -54,9 +54,43 @@ function ResetPasswordPage() {
       return;
     }
 
-    // Hash flow: #access_token=… or #type=recovery
-    if (hash.includes("type=recovery") || hash.includes("access_token")) {
-      setState("set");
+    // Legacy implicit flow: Supabase returns the recovery session in the URL
+    // fragment. Do not merely show the form: updateUser requires that this
+    // access/refresh token pair has first been installed as the active session.
+    if (hash.includes("access_token")) {
+      const hashParams = new URLSearchParams(hash.slice(1));
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
+
+      if (!accessToken || !refreshToken) {
+        setState("invalid");
+        return;
+      }
+
+      supabase.auth
+        .setSession({ access_token: accessToken, refresh_token: refreshToken })
+        .then(({ error }) => {
+          if (error) {
+            setState(classifyAuthError(error.message));
+            return;
+          }
+          setState("set");
+          window.history.replaceState({}, "", "/reset-password");
+        });
+      return;
+    }
+
+    // An event-only fragment has no usable credentials. Check for an existing
+    // persisted recovery session before showing an actionable error.
+    if (hash.includes("type=recovery")) {
+      supabase.auth.getSession().then(({ data, error }) => {
+        if (error || !data.session) {
+          setState("invalid");
+          return;
+        }
+        setState("set");
+        window.history.replaceState({}, "", "/reset-password");
+      });
       return;
     }
 

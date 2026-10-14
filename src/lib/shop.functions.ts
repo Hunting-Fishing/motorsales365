@@ -4,6 +4,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireDomainRole } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
+import { amazonDetailUrl, extractAmazonAsin, getAmazonItem, searchAmazonItem } from "@/lib/amazon-creators.server";
+import { getLazadaProduct, trackLazadaUrl } from "@/lib/lazada-affiliate.server";
+import { GRADE_META, planSearchShelf, shelfSlug } from "@/lib/marketplace-search";
 import { scrapeLazadaProduct } from "@/lib/lazada-scraper.server";
 import { scrapeAliExpressProduct } from "@/lib/aliexpress-scraper.server";
 import type { Database } from "@/integrations/supabase/types";
@@ -222,6 +225,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
         priceMax?: number;
         sort?: "featured" | "newest" | "price_asc" | "price_desc" | "popular";
         network?: string;
+        grade?: "budget" | "everyday" | "professional";
       } = {},
     ) =>
       z
@@ -244,6 +248,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
           priceMax: z.number().nonnegative().optional(),
           sort: z.enum(["featured", "newest", "price_asc", "price_desc", "popular"]).optional(),
           network: z.string().max(40).optional(),
+          grade: z.enum(["budget", "everyday", "professional"]).optional(),
         })
         .parse(input),
     )
@@ -346,7 +351,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
     let q = supabaseAdmin
       .from("shop_products")
       .select(
-        "id, slug, title, brand, image_url, price_php, currency, featured, category_id, click_count, universal_fit, is_deal, deal_ends_at, deal_price_php",
+        "id, slug, title, brand, image_url, price_php, currency, featured, category_id, click_count, universal_fit, is_deal, deal_ends_at, deal_price_php, tags",
       )
       .eq("active", true);
     if (cat && catIds.length <= 1) {
@@ -369,6 +374,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
     if (data.dealsOnly) q = q.eq("is_deal", true);
     if (data.search) q = q.ilike("title", `%${data.search}%`);
     if (data.brand) q = q.ilike("brand", data.brand);
+    if (data.grade) q = q.contains("tags", [`grade:${data.grade}`]);
     if (typeof data.priceMin === "number") q = q.gte("price_php", data.priceMin);
     if (typeof data.priceMax === "number") q = q.lte("price_php", data.priceMax);
     const sort = data.sort ?? "featured";
@@ -971,6 +977,7 @@ const NETWORK_SLUGS = [
   "tiktok",
   "amazon",
   "aliexpress",
+  "alibaba",
   "carousell",
   "ebay",
   "zalora",
@@ -1042,13 +1049,134 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const { cats, keywordsById } = await loadCategoryKeywordMap();
 
 
-    // Try a per-network scraper (currently only lazada has a custom path).
-    // Anything else (or a failed custom path) falls through to Firecrawl.
-    const marketplace = await runNetworkScraper(networkSlug, cleanedUrl);
+    const isAmazon = (forcedSlug ?? detectedSlug) === "amazon";
+    const isLazada = (forcedSlug ?? detectedSlug) === "lazada";
+    let marketplace: MarketplaceProductData | null = null;
+    let lazadaManualWarning: string | null = null;
+    if (isAmazon) {
+      const pulled = await getAmazonItem(cleanedUrl);
+      if (pulled.configured && pulled.item) {
+        const item = pulled.item;
+        marketplace = {
+          title: item.title ?? undefined,
+          brand: item.brand ?? undefined,
+          description: item.description ?? undefined,
+          image_url: item.image ?? undefined,
+          price: item.price ?? undefined,
+          currency: item.currency ?? undefined,
+          url: item.detailPageURL,
+        };
+      } else {
+        const asin = extractAmazonAsin(cleanedUrl);
+        const tagged = asin ? amazonDetailUrl(asin) : cleanedUrl;
+        const warning = !pulled.configured
+          ? "Amazon did not fill the title, photo, or price yet. The link is tagged with Store ID 366industries-20. Type the title and price, then save."
+          : pulled.error ||
+            "Amazon did not return that product. The tagged link is ready. Type the title and price, then save.";
+        const warnings = [warning];
+        if (!networkId) {
+          warnings.push("Turn on the Amazon store under Stores, or this link will not attach.");
+        }
+        return {
+          suggested: {
+            title: null,
+            brand: null,
+            description: null,
+            image_url: null,
+            price_php: null,
+            sale_price_php: null,
+            is_deal: false,
+            currency: "PHP",
+            category_id: null,
+            category_name: null,
+            confidence: 0,
+          },
+          warnings,
+          cleanedUrl: tagged,
+          resolvedFrom,
+          networkSlug: networkSlug ?? "amazon",
+          detectedSlug,
+          networkId,
+        };
+      }
+    } else if (isLazada) {
+      const pulled = await getLazadaProduct(cleanedUrl);
+      if (pulled.configured && pulled.item && (pulled.item.title || pulled.item.promotionUrl)) {
+        const item = pulled.item;
+        marketplace = {
+          title: item.title ?? undefined,
+          brand: item.brand ?? undefined,
+          description: item.seller ? `Sold by ${item.seller} on Lazada.` : undefined,
+          image_url: item.image ?? undefined,
+          price: item.price ?? undefined,
+          currency: item.currency ?? undefined,
+          url: item.promotionUrl ?? undefined,
+        };
+      } else if (!pulled.configured) {
+        marketplace = await runNetworkScraper(networkSlug, cleanedUrl);
+        if (!marketplace?.title) {
+          const warnings = [pulled.error];
+          if (!networkId) warnings.push("Turn on the Lazada store under Stores, or this link will not attach.");
+          return {
+            suggested: {
+              title: null,
+              brand: null,
+              description: null,
+              image_url: null,
+              price_php: null,
+              sale_price_php: null,
+              is_deal: false,
+              currency: "PHP",
+              category_id: null,
+              category_name: null,
+              confidence: 0,
+            },
+            warnings,
+            cleanedUrl,
+            resolvedFrom,
+            networkSlug: networkSlug ?? "lazada",
+            detectedSlug,
+            networkId,
+          };
+        }
+        lazadaManualWarning = pulled.error;
+      } else {
+        const warnings = [
+          pulled.error ||
+            "Lazada did not return that product. The link is ready. Type the title and price, then save.",
+        ];
+        if (!networkId) warnings.push("Turn on the Lazada store under Stores, or this link will not attach.");
+        return {
+          suggested: {
+            title: null,
+            brand: null,
+            description: null,
+            image_url: null,
+            price_php: null,
+            sale_price_php: null,
+            is_deal: false,
+            currency: "PHP",
+            category_id: null,
+            category_name: null,
+            confidence: 0,
+          },
+          warnings,
+          cleanedUrl,
+          resolvedFrom,
+          networkSlug: networkSlug ?? "lazada",
+          detectedSlug,
+          networkId,
+        };
+      }
+    } else {
+      marketplace = await runNetworkScraper(networkSlug, cleanedUrl);
+    }
+    const pageFacts = isAmazon || isLazada || marketplace?.title ? null : await pullPageFacts(cleanedUrl);
 
-    if (!apiKey && !marketplace) {
+    if (!apiKey && !marketplace && !pageFacts) {
       return {
-        error: "Scraper not configured — please connect Firecrawl.",
+        error:
+          "Could not read that page. Check the link, or type the title and price. A deeper pull needs Firecrawl connected.",
         suggested: null,
         cleanedUrl,
         resolvedFrom,
@@ -1085,7 +1213,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     let extracted: any = null;
     let metadata: any = null;
     let html: string | null = null;
-    if (apiKey && !marketplace) {
+    if (apiKey && !marketplace?.title && !pageFacts?.title) {
       try {
         const { default: Firecrawl } = await import("@mendable/firecrawl-js");
         const firecrawl = new Firecrawl({ apiKey });
@@ -1130,6 +1258,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const title =
       pickStr(
         marketplace?.title,
+        pageFacts?.title,
         ld?.name,
         extracted?.title,
         metadata?.ogTitle,
@@ -1137,11 +1266,13 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
         metadata?.title,
       ).slice(0, 200) || null;
     const brand = sanitizeBrand(
-      pickStr(marketplace?.brand, ld?.brand, extracted?.brand).slice(0, 120) || null,
+      pickStr(marketplace?.brand, pageFacts?.brand, ld?.brand, extracted?.brand).slice(0, 120) ||
+        null,
     );
     const description =
       pickStr(
         marketplace?.description,
+        pageFacts?.description,
         ld?.description,
         extracted?.description,
         metadata?.ogDescription,
@@ -1152,6 +1283,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     // Image: JSON-LD > og:image > extractor; reject icons.
     const image_url = pickFirstNonIconImage(
       marketplace?.image_url,
+      pageFacts?.image_url,
       ld?.image,
       metadata?.ogImage,
       metadata?.["og:image"],
@@ -1163,6 +1295,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const fx = await loadFxMap();
     const rawPrice =
       marketplace?.price ??
+      pageFacts?.price ??
       ld?.price ??
       metadata?.["og:price:amount"] ??
       metadata?.["product:price:amount"] ??
@@ -1170,6 +1303,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       null;
     const rawCurrency =
       marketplace?.currency ??
+      pageFacts?.currency ??
       ld?.currency ??
       metadata?.["og:price:currency"] ??
       metadata?.["product:price:currency"] ??
@@ -1180,6 +1314,10 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       ? pickPricePhp(marketplace.sale_price, marketplace?.currency ?? rawCurrency ?? "PHP", fx)
       : null;
     const is_deal = !!(sale_price_php && price_php && sale_price_php < price_php);
+    if (pageFacts && !marketplace) {
+      warnings.push("Pulled from the product page. Check the price before you save.");
+    }
+    if (lazadaManualWarning) warnings.push(lazadaManualWarning);
     if (rawPrice && price_php == null) {
       warnings.push("Could not store price — please enter PHP price manually.");
     } else if (!rawPrice) {
@@ -1360,6 +1498,73 @@ type MarketplaceProductData = {
   category_hint?: string;
   url?: string;
 };
+
+function decodeHtml(value: string) {
+  return value
+    .replace(/&/g, "&")
+    .replace(/"/g, '"')
+    .replace(/&#39;|'/g, "'")
+    .replace(/</g, "<")
+    .replace(/>/g, ">")
+    .trim();
+}
+
+async function pullPageFacts(url: string): Promise<MarketplaceProductData | null> {
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      redirect: "follow",
+      headers: {
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+        accept: "text/html,application/xhtml+xml",
+        "accept-language": "en-PH,en;q=0.9",
+      },
+      signal: AbortSignal.timeout(12_000),
+    });
+    const type = res.headers.get("content-type") ?? "";
+    if (!res.ok || !/html|xml|text/i.test(type)) return null;
+    const html = (await res.text()).slice(0, 900_000);
+    const ld = extractJsonLdProduct(html);
+    const meta = (name: string) => {
+      const prop = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const a = html.match(
+        new RegExp(`<meta[^>]+(?:property|name)=["']${prop}["'][^>]+content=["']([^"']+)["']`, "i"),
+      );
+      const b = html.match(
+        new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${prop}["']`, "i"),
+      );
+      return decodeHtml(a?.[1] || b?.[1] || "");
+    };
+    const titleTag = decodeHtml(html.match(/<title>([^<]{1,300})<\/title>/i)?.[1] ?? "");
+    let title = (ld?.name || meta("og:title") || titleTag).replace(/\s+/g, " ").trim();
+    if (/access denied|robot check|captcha|just a moment|verify you are human/i.test(title)) {
+      title = "";
+    }
+    const image = pickFirstNonIconImage(ld?.image, meta("og:image"));
+    const amount = meta("product:price:amount") || meta("og:price:amount");
+    const parsedAmount = Number(String(amount).replace(/[^\d.]/g, ""));
+    const price =
+      ld?.price && ld.price > 0
+        ? ld.price
+        : Number.isFinite(parsedAmount) && parsedAmount > 0
+          ? parsedAmount
+          : undefined;
+    const description = (ld?.description || meta("og:description") || "").slice(0, 2000);
+    if (!title && !image) return null;
+    return {
+      title: title.slice(0, 200) || undefined,
+      brand: ld?.brand,
+      description: description || undefined,
+      image_url: image ?? undefined,
+      price,
+      currency: ld?.currency || meta("product:price:currency") || meta("og:price:currency") || undefined,
+      url: meta("og:url") || res.url || undefined,
+    };
+  } catch {
+    return null;
+  }
+}
 
 async function fetchLazadaProductData(input: string): Promise<MarketplaceProductData | null> {
   const result = await scrapeLazadaProduct(input);
@@ -1744,4 +1949,363 @@ export const adminRecategorizeProducts = createServerFn({ method: "POST" })
       updated += 1;
     }
     return { scanned, updated, unmatched };
+  });
+
+export const adminCreateSearchShelf = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminCreateSearchShelf")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        term: z.string().min(2).max(80),
+        categoryId: z.string().uuid(),
+        count: z.number().int().min(3).max(10),
+        networkSlugs: z.array(z.string().min(1).max(40)).min(1).max(12),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: nets, error } = await supabase
+      .from("affiliate_networks")
+      .select("id, slug, name, tag_param, tag_value, deeplink_template, active")
+      .in("slug", data.networkSlugs);
+    if (error) throw new Error(error.message);
+
+    const order = new Map(data.networkSlugs.map((slug, i) => [slug, i]));
+    const networks = ((nets ?? []) as any[]).slice().sort(
+      (a, b) => (order.get(a.slug) ?? 99) - (order.get(b.slug) ?? 99),
+    );
+    const skipped: string[] = [];
+    for (const slug of data.networkSlugs) {
+      if (!networks.some((n) => n.slug === slug)) {
+        skipped.push(`${slug}: add this store under Networks before it can be filled.`);
+      }
+    }
+
+    const planned = planSearchShelf({
+      term: data.term,
+      count: data.count,
+      networks,
+    });
+    skipped.push(...planned.skipped);
+    if (planned.links.length === 0) {
+      throw new Error(skipped.join(" ") || "No links could be built.");
+    }
+
+    const shelf = shelfSlug(data.term) || "search";
+    const ids: string[] = [];
+    const fx = await loadFxMap();
+    for (const link of planned.links) {
+      const meta = GRADE_META[link.grade];
+      let slug = `${shelf}-${link.grade}-${link.networkSlug}`.replace(/[^a-z0-9-]/g, "").slice(0, 100);
+      const { data: existing } = await supabase
+        .from("shop_products")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (existing) slug = `${slug}-${Date.now().toString(36)}`.slice(0, 120);
+
+      let title = link.title;
+      let brand = link.networkName;
+      let url = link.url;
+      let imageUrl: string | null = null;
+      let pricePhp: number | null = null;
+      let sku = `grade:${link.grade}`;
+      let description = [
+        `${meta.blurb} Opens ${link.networkName} search for “${link.query}”.`,
+        "Price and stock stay with the seller. This is a search link, not a single checked listing.",
+        link.note ?? "",
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .slice(0, 2000);
+
+      if (link.networkSlug === "lazada") {
+        const tracked = await trackLazadaUrl(url);
+        if (!tracked.configured) {
+          if (!skipped.some((s) => s.startsWith("Lazada is still a catalog link"))) {
+            skipped.push(
+              "Lazada is still a catalog link. Tracking links need the Lazada Affiliate Open API on the server (App Key, App Secret, and User Token).",
+            );
+          }
+        } else if (tracked.promotionUrl) {
+          url = tracked.promotionUrl;
+          if (tracked.productName) title = `${tracked.productName} · ${meta.label}`;
+          description = [
+            `${meta.blurb} Opens a Lazada tracking link for “${link.query}”.`,
+            "Price and stock stay with the seller.",
+          ]
+            .join(" ")
+            .slice(0, 2000);
+        } else if (tracked.error) {
+          skipped.push(`Lazada: ${tracked.error}`);
+        }
+      }
+
+      if (link.networkSlug === "amazon") {
+        const found = await searchAmazonItem(link.query, link.grade === "budget");
+        if (!found.configured) {
+          if (!skipped.some((s) => s.startsWith("Amazon is still a tagged search"))) {
+            skipped.push(
+              "Amazon is still a tagged search link. Product title, photo, and price need Creators API credentials on the server.",
+            );
+          }
+        } else if (found.item?.title) {
+          const item = found.item;
+          title = `${item.title} · ${meta.label}`;
+          brand = item.brand || "Amazon";
+          url = item.detailPageURL;
+          imageUrl = item.image;
+          sku = item.asin;
+          pricePhp = pickPricePhp(item.price, item.currency, fx);
+          description = [
+            item.description || "",
+            "Opens the Amazon product page with Store ID 366industries-20.",
+            "As an Amazon Associate I earn from qualifying purchases.",
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .slice(0, 2000);
+        } else if (found.error) {
+          skipped.push(`Amazon: ${found.error}`);
+        }
+      }
+
+      const { data: row, error: insErr } = await supabase
+        .from("shop_products")
+        .insert({
+          slug,
+          title: title.slice(0, 200),
+          description,
+          brand: brand.slice(0, 120),
+          image_url: imageUrl,
+          price_php: pricePhp,
+          category_id: data.categoryId,
+          tags: [`grade:${link.grade}`, `market:${link.networkSlug}`, `shelf:${shelf}`.slice(0, 60)],
+          active: true,
+          featured: false,
+          universal_fit: true,
+          created_by: userId,
+        } as any)
+        .select("id")
+        .single();
+      if (insErr) throw new Error(insErr.message);
+
+      await syncProductCategoryLinks(supabase as any, row.id, data.categoryId);
+
+      const { error: linkErr } = await supabase.from("shop_product_links").insert({
+        product_id: row.id,
+        network_id: link.networkId,
+        url,
+        sku,
+      } as any);
+      if (linkErr) throw new Error(linkErr.message);
+      ids.push(row.id);
+    }
+
+    return {
+      created: ids.length,
+      ids,
+      skipped,
+      notes: planned.links.map((l) => l.note).filter((n): n is string => !!n),
+    };
+  });
+
+
+const CORE_STORES = [
+  { slug: "shopee", name: "Shopee", sort_order: 10, tag_param: null as string | null },
+  { slug: "lazada", name: "Lazada", sort_order: 20, tag_param: null },
+  { slug: "aliexpress", name: "AliExpress", sort_order: 30, tag_param: null },
+  { slug: "alibaba", name: "Alibaba", sort_order: 40, tag_param: null },
+  { slug: "amazon", name: "Amazon", sort_order: 50, tag_param: "tag" },
+] as const;
+
+export const adminEnsureCoreStores = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminEnsureCoreStores")])
+  .handler(async ({ context }) => {
+    const { supabase } = context;
+    const { data: existing, error } = await supabase
+      .from("affiliate_networks")
+      .select("id, slug, tag_param")
+      .in(
+        "slug",
+        CORE_STORES.map((s) => s.slug),
+      );
+    if (error) throw new Error(error.message);
+    const bySlug = new Map((existing ?? []).map((n) => [n.slug, n]));
+    const created: string[] = [];
+    const already: string[] = [];
+    for (const store of CORE_STORES) {
+      const row = bySlug.get(store.slug);
+      if (!row) {
+        const { error: insErr } = await supabase.from("affiliate_networks").insert({
+          slug: store.slug,
+          name: store.name,
+          sort_order: store.sort_order,
+          active: true,
+          tag_param: store.tag_param,
+        });
+        if (insErr) throw new Error(insErr.message);
+        created.push(store.name);
+        continue;
+      }
+      already.push(store.name);
+      if (store.slug === "amazon" && !row.tag_param) {
+        const { error: upErr } = await supabase
+          .from("affiliate_networks")
+          .update({ tag_param: "tag" })
+          .eq("id", row.id);
+        if (upErr) throw new Error(upErr.message);
+      }
+    }
+    return { created, already };
+  });
+
+function cleanSuggestionUrl(raw: string): string {
+  const trimmed = raw.trim();
+  const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  let parsed: URL;
+  try {
+    parsed = new URL(withProto);
+  } catch {
+    throw new Error("Paste a full link, starting with https://");
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("Only http and https links can be suggested.");
+  }
+  return parsed.toString().slice(0, 2000);
+}
+
+function suggestionStatus(tags: string[] | null | undefined): "pending" | "added" | "dismissed" {
+  const list = tags ?? [];
+  if (list.includes("suggestion:added")) return "added";
+  if (list.includes("suggestion:dismissed")) return "dismissed";
+  return "pending";
+}
+
+function withSuggestionStatus(tags: string[] | null | undefined, status: string): string[] {
+  return [...(tags ?? []).filter((tag) => !tag.startsWith("suggestion:")), `suggestion:${status}`];
+}
+
+export const suggestShopLink = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        url: z.string().min(4).max(2000),
+        note: z.string().max(400).optional(),
+        company: z.string().max(200).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    if ((data.company ?? "").trim()) return { ok: true as const };
+    const url = cleanSuggestionUrl(data.url);
+    const db = supabaseAdmin as any;
+    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count, error: countErr } = await db
+      .from("shop_products")
+      .select("id", { count: "exact", head: true })
+      .contains("tags", ["suggestion:pending"])
+      .gte("created_at", since);
+    if (countErr) throw new Error(countErr.message);
+    if ((count ?? 0) >= 40) throw new Error("Too many suggestions right now. Try again later.");
+
+    const { data: dup, error: dupErr } = await db
+      .from("shop_products")
+      .select("id")
+      .contains("tags", ["suggestion:pending"])
+      .eq("description", url)
+      .limit(1);
+    if (dupErr) throw new Error(dupErr.message);
+    if (dup && dup.length > 0) return { ok: true as const, duplicate: true };
+
+    const note = (data.note ?? "").trim().slice(0, 180);
+    const slug = `suggestion-${Date.now().toString(36)}`;
+    const { data: row, error } = await db
+      .from("shop_products")
+      .insert({
+        slug,
+        title: (note || "Suggested link").slice(0, 200),
+        description: url,
+        tags: ["suggestion:pending"],
+        active: false,
+        featured: false,
+        universal_fit: false,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+
+    const networkSlug = detectNetworkSlug(url);
+    if (networkSlug && row?.id) {
+      const { data: net } = await db
+        .from("affiliate_networks")
+        .select("id")
+        .eq("slug", networkSlug)
+        .eq("active", true)
+        .maybeSingle();
+      if (net?.id) {
+        await db.from("shop_product_links").insert({
+          product_id: row.id,
+          network_id: net.id,
+          url,
+        });
+      }
+    }
+    return { ok: true as const };
+  });
+
+export const adminListShopSuggestions = createServerFn({ method: "GET" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminListShopSuggestions")])
+  .handler(async () => {
+    const db = supabaseAdmin as any;
+    const { data, error } = await db
+      .from("shop_products")
+      .select("id, title, description, tags, created_at")
+      .or(
+        "tags.cs.{suggestion:pending},tags.cs.{suggestion:added},tags.cs.{suggestion:dismissed}",
+      )
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    const suggestions = (data ?? []).map((row: any) => ({
+      id: row.id,
+      url: row.description ?? "",
+      note: row.title && row.title !== "Suggested link" ? row.title : null,
+      status: suggestionStatus(row.tags),
+      product_id: null,
+      created_at: row.created_at,
+    }));
+    return { suggestions };
+  });
+
+export const adminResolveShopSuggestion = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminResolveShopSuggestion")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(["pending", "added", "dismissed"]),
+        productId: z.string().uuid().optional().nullable(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const db = supabaseAdmin as any;
+    const { data: row, error: readErr } = await db
+      .from("shop_products")
+      .select("id, tags")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (readErr) throw new Error(readErr.message);
+    if (!row) throw new Error("Suggestion not found");
+    const { error } = await db
+      .from("shop_products")
+      .update({
+        tags: withSuggestionStatus(row.tags, data.status),
+        active: false,
+      })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
   });

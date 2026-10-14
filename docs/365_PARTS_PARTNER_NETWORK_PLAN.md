@@ -7,7 +7,14 @@
 **Controlled by:** [`365_PLATFORM_PROGRAM_INDEX.md`](./365_PLATFORM_PROGRAM_INDEX.md)
 **Status:** Initial control baseline (`proposed`); not build or launch authorization
 **Version:** 0.1
-**Updated:** 2026-08-06
+**Updated:** 2026-08-31
+
+> **Feature-branch implementation note (2026-08-31):** The additive catalogue,
+> fitment, location, ordering/transfer, receiving, installed-component, return,
+> and warranty foundations are implemented on `feature/365-associate-network`.
+> This is not a production-launch claim: database migration, synthetic
+> end-to-end validation, commercial decisions, and the applicable gates below
+> still precede external pilot use.
 
 ## 1. Purpose and scope
 
@@ -72,10 +79,10 @@ Labels follow the platform status vocabulary. Nothing below is
 | Short stock reservations (1–168 h) | Reservation writes adjust available quantity | `internal-test` |
 | Shop Manager inventory and invoice-from-inventory | Business inventory plus invoice line sourcing, stock deduction, GL postings | `in-build` |
 | Shop Manager tiering and checkout | Plan tables, regional pricing, entitlement layer, Stripe checkout | `in-build` |
-| Canonical catalog with OEM part numbers, supersession and VIN fitment | Not implemented | `research` |
+| Canonical catalog with OEM/alternate numbers, supersession and VIN/chassis fitment | Additive `parts_catalog`, number, vehicle-profile and fitment migrations plus internal lookup UI | `in-build` |
 | Partner enrollment as a distinct commercial product | Not implemented | `proposed` |
-| Order, fulfilment, return and warranty records | Not implemented | `proposed` |
-| Installed-component registry | Not implemented | `proposed` |
+| Order, fulfilment, transfer, receipt, return and warranty records | Tenant-scoped tables and atomic lifecycle RPCs implemented on the feature branch | `in-build` |
+| Installed-component registry | Work-order-linked registry and vehicle-history read surface implemented on the feature branch | `in-build` |
 
 ## 3. Architecture rules (non-negotiable)
 
@@ -212,7 +219,7 @@ country-scoped, RLS-enabled and shipped with explicit `GRANT`s.
 
 | Object | Purpose |
 |---|---|
-| `parts_products` | Canonical product: part number, brand, OEM references, domain, country scope |
+| `parts_catalog` (extended) | Existing canonical product table, expanded with manufacturer identity, product type, country scope, provenance and warranty fields |
 | `parts_product_numbers` | Alternate, OEM, aftermarket and superseded numbers |
 | `parts_fitment` | Applicability to asset identity/domain profile, with source and confidence |
 | `parts_partners` | Parts enrollment per organization: status, documents, terms version, tier |
@@ -227,6 +234,28 @@ country-scoped, RLS-enabled and shipped with explicit `GRANT`s.
 Existing surfaces (`network_stock` view, inquiry tables, exposure status and
 audit log, business inventory and invoices) are reconciled into this model rather
 than duplicated.
+
+### 6.1 Existing Philippine catalogue import contract
+
+The current `365_RUSI_Historical_Master_Catalogue.xlsx` is a vehicle catalogue
+and fitment-evidence source, not a parts catalogue. Import it into
+`parts_vehicle_profiles` without inventing missing identifiers:
+
+| Workbook field | Network field / rule |
+|---|---|
+| Catalogue ID | `source_reference` |
+| Canonical Model | `model` (`make = RUSI`) |
+| Exact Badge / Variant | `variant` |
+| Engine / Motor | `engine_description`; populate `engine_code` only when an actual code is evidenced |
+| Evidence dates | Map numeric dates to `year_min` / `year_max`; keep unknown years `NULL` |
+| Confidence and Evidence Tier | Preserve in `attributes` and fitment confidence; do not promote low-confidence rows automatically |
+| Aliases / Alternate Spellings | Preserve in `attributes.vehicle_aliases`; never treat an alias as a chassis code |
+| Primary / Secondary Source URL | `source_reference` plus structured provenance in `attributes` |
+| Unresolved Leads | Import only as `pending`, never as approved fitment |
+
+Frame/chassis codes, engine codes, OR/CR identifiers, and parts-fiche evidence
+must be added only from a cited source. A model name, badge, displacement, or
+seller listing is not a substitute for a chassis code.
 
 ## 7. Program gates
 

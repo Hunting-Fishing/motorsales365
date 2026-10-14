@@ -243,8 +243,8 @@ function ProductPage() {
             )}
 
             <p className="pt-2 text-xs text-muted-foreground">
-              We earn a commission on qualifying purchases. You pay the marketplace directly at no
-              extra cost.
+              We earn a commission on qualifying purchases. As an Amazon Associate I earn from
+              qualifying purchases. You pay the marketplace directly at no extra cost.
             </p>
           </div>
         </div>
