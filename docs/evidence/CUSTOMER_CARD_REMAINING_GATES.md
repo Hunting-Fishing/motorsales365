@@ -12,6 +12,20 @@ Communications read/freshness hardening is subsequently tracked in
 known-incompatible entry form without implementing logging. Reminder integrity,
 trusted entry and database-authority/performance gates remain unfinished.
 
+Subsequent PR #29 proves selected actual reminder policy/integrity behavior
+offline (`CUSTOMER_REMINDER_INTEGRITY_PROOF.md`). PR #30 replaces reminder
+browser reads and disables unverified mutation controls in the review candidate
+(`CUSTOMER_REMINDERS_REQUEST_BOUND_READS.md`). The source observations below
+describe the earlier snapshot, not untouched current application code. Commercial
+and communications read-hardening steps are also completed locally; their entry,
+native-authority and release gates remain open.
+
+Next mandatory reminder-read dependency is a same-statement invoker join of the
+visible customer and reminders on both customer and shop. The new dual-filter
+two-query reader does not atomically establish current parent visibility. Review
+new-function ACLs, exact recovery and disposable authorization/move/delete cases
+before changing the adapter; no production release or RLS widening is authorized.
+
 ## Current narrow metadata
 
 Project `wjxaajgvddtrxxtocxen`, read-only catalog SELECTs only:

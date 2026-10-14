@@ -47,6 +47,11 @@ CI gates passed (run `38639864235`), 642 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
+Latest local application candidate: draft PR #30, code `a2eff76`, 706 application
+tests across 47 files and full TypeScript pass. CI is pending verification. It
+gates reminder mutations and scopes reads, but must not ship before a reviewed
+same-statement invoker reminder read and native authority/recovery prerequisites.
+
 Inventory PR #20 latest docs head `ff24159` also passed all six CI gates (run
 `38623862186`), verified on this resume. Hosting still fails separately; the green
 preview wrapper is not an upload. Do not repeat completed scanner/UI/proof work.
@@ -208,12 +213,14 @@ target matching matters within a shop. Timestamp maintenance is not human audit
 attribution. These are source/fixture behaviors, not asserted live incidents.
 
 Verification: 13/13 focused, full local tooling169/169 sequentially, ESLint/format/
-diff and independent review pass. Dedicated CI step added; remote CI pending.
+diff and independent review pass. Dedicated CI step added; latest docs head
+`0b8bbed` passed all six CI gates (run `38640844619`), verified on this resume.
 Application remains the verified642-test parent. Migration impact: none.
 Deployment: none. See `evidence/CUSTOMER_REMINDER_INTEGRITY_PROOF.md` for exact pins,
 execution boundaries and limits. Inventory/global provenance counts unchanged.
 
-Exact next action: verify PR #29 checks, then implement bounded actor-bound
+Original next action (completed by the following checkpoint): verify PR #29 checks,
+then implement bounded actor-bound
 reminder reads with explicit visible-customer/shop and returned-row consistency,
 freshness/cap/error/unavailable semantics. Keep known-invalid/unconfirmed writes
 gated until separate trusted attribution, database authority and affected-row
@@ -221,6 +228,42 @@ contracts pass. Continue native writer/provisioning/security/offboarding closure
 baseline/upgrade/recovery, private consent/tenure/retention, index/load, pilot and
 hosting gates. Count-only native identity audit is still design-only, not live
 data evidence or permission to publish business counts/repair bindings.
+
+## Latest reminder read checkpoint (2026-10-15)
+
+Draft PR #30, code `a2eff76`, branch
+`completion/customer-reminders-request-bound`, stacked on verified PR #29 docs
+`0b8bbed`. An authenticated caller-bound reader derives shop identity from the
+visible customer, applies both customer/shop predicates, validates all 101 fetched
+rows and displays at most 100 with an honest cap. Account/customer remounts,
+post-mount fetch requirements and refresh/error masking isolate rows/counts/caps.
+Native unconstrained text/status vocabulary and nullable dates are preserved;
+this is an all-status earliest-due snapshot, not an actionable or complete queue.
+The known-invalid/unconfirmed reminder create/complete/delete paths are disabled
+in this review candidate pending a separately verified trusted writer.
+
+Verification: 42 handler +22 UI focused tests; full application706/706 across
+47 files, report checker exit0/no quarantine, final full TypeScript and focused
+ESLint/format/diff pass; independent source review clean. Tooling unchanged at
+169/169. CI pending verification. Migration impact: none. Deployment: none.
+No live business row/RPC/write/grant/history or platform change. Narrow parent
+column metadata and snapshot/test limitations are recorded in
+`evidence/CUSTOMER_REMINDERS_REQUEST_BOUND_READS.md`. Global correspondence stays
+404/422 with18 unclassified; inventory/baseline/replay flags are not promoted.
+
+Exact next action: verify PR #30 checks, then implement/test a separately reviewed
+SQL/STABLE/SECURITY INVOKER reminder read joining the invoker-visible customer to
+reminders on BOTH customer and shop within one statement. Two separate reads
+still permit a move/delete visibility race; dual filters are not atomic privacy
+acceptance. Preserve unavailable versus visible-empty, fixed projections/order/
+101 sentinel, auth-only new-function ACLs and guarded recovery. Do not ship the
+direct-table consumer first or widen source RLS. Native writer/provisioning/
+delegation/offboarding closure and baseline/upgrade/recovery remain parallel
+prerequisites, then trusted entry/affected rows and indexed queue pagination.
+Count-only identity reconnaissance is design-only in
+`evidence/NATIVE_IDENTITY_DIAGNOSTIC_DESIGN.md`; no production counts were read
+or permission to publish counts/repair bindings inferred. Keep private consent/
+tenure/retention, original OCR/owner/mobile pilot and hosting gates open.
 
 ## Recovery evidence (original scope, retained below)
 

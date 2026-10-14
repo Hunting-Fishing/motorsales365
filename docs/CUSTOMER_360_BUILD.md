@@ -182,3 +182,16 @@ explicit disabled-entry gate; no messages or writes occur. Logging repair remain
 a separate trusted-attribution contract. See
 `evidence/CUSTOMER_COMMUNICATIONS_REQUEST_BOUND_READS.md` for verification limits,
 the observed missing customer/date index and remaining reminder/authority gates.
+
+The reminder read candidate now derives shop scope from the caller-visible
+customer, filters by customer and shop, strictly validates 101 fetched rows and
+displays at most 100 with independent freshness, errors and explicit caps.
+Native text/status values remain unaltered; this is an all-status earliest-due
+snapshot, not a complete task queue. Unverified create/complete/delete controls
+are disabled in the local review candidate. No production workflow changed.
+See `evidence/CUSTOMER_REMINDERS_REQUEST_BOUND_READS.md` (draft PR #30, code
+`a2eff76`;706 application tests). The two reads are not atomic: before release,
+implement a same-statement invoker customer/reminder join without widening RLS,
+then satisfy native authority, trusted entry, recovery/index/load and role/API
+acceptance. The preceding actual-source reminder integrity proof (PR #29) passes
+169 tooling tests; source-level proof is not live business or entry acceptance.
