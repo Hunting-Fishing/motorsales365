@@ -82,3 +82,34 @@ not a live ACL/RLS adjustment. Fresh provenance/complete grants/policies/writers
 impact analysis, scoped recovery and separately explicit owner release authority
 are required before production changes. Existing compromised-state detection and
 repair, if needed, require their own reviewed read/data scope.
+
+## Privileged writer inventory follow-up
+
+Retained source identifies `ensure_profile_for(uuid)` as another prerequisite:
+it accepts a supplied user ID, has no caller check, and can INSERT a native
+profile despite direct table/column restrictions. It resolves existing profiles
+by id only and can assign an owned business ID as shop_id. No verified app caller
+was found. A fresh bounded live catalog check confirms postgres SECURITY DEFINER,
+definition MD5 `77cb775bfedfb78996b31fcbdd3ada4c`, ACL
+`{=X/postgres,postgres=X/postgres,service_role=X/postgres}` and effective anon/
+authenticated/service execution. It was not invoked or modified.
+
+The same catalog check confirms direct anon/authenticated execution is denied for
+the member bridge and its trigger function; service execution remains available.
+That does not stop automatic trigger invocation from permitted roster writes.
+Only these three functions matched the bounded native-schema literal-write/name
+search. Dynamic SQL, unqualified names and other-schema indirect call paths can
+escape it; this is not a complete live writer inventory.
+
+Retained server roster upsert/update/delete use the authenticated context client;
+the admin client there is only for the bounded email lookup. Business claim
+approval changes public business ownership via a privileged path and needs its
+own authorization/ownership audit; associate enrollment and organization invites
+are not native profile/roster provisioning. Names in `sm_functions.txt` without
+retained definitions are not proof of callable writers or permission to alter them.
+
+Exact next test dependency: hash-pin and reproduce bootstrap self/other-user,
+null-JWT, legacy-ID and distinct business/shop-ID behavior under locked native
+ACLs, then contrast fixture-only client denial with retained operator/service
+provisioning. Close or replace untrusted definer entry paths before treating
+native profile writes as trusted; production action still needs separate approval.

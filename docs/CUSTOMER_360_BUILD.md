@@ -45,6 +45,14 @@ organization-level acceptance testing and receipt OCR recovery remain separate
 delivery slices. Existing query scoping supplements database authorization;
 it does not replace RLS or establish a new organization identity contract.
 
+The interrupted CRM chat is now recovered: its actual options were ERPNext and
+Dolibarr, with no recorded adoption decision. Current pinned license/stack/API
+evidence and the optional-adapter acceptance boundary are in
+`evidence/CRM_CANDIDATES_RECOVERED.md`. Native CRM remains the implementation path;
+neither external application is installed or integrated. Original scanner source
+recovery and actual live OCR/owner acceptance remain separate from the rebuilt,
+CI-verified PR #12/#13 scanner.
+
 ## Drill-down isolation follow-up (2026-10-15)
 
 The vehicle/work-order screens linked from Customer 360 now scope their detail,
