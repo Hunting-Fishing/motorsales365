@@ -239,9 +239,25 @@ the next conservative inventory/companion-contract slice before any guard releas
 
 That conservative inventory increment now declares concrete chat/timestamp/
 work-location/incoming writer paths in draft PR #35 (code `8e52323`), a strict evidence projectRef identity adapter
-and an explicit offboarding/audit unknown.26 metadata tests pass; all mandatory
+and an explicit offboarding/audit unknown. Documentation head `d7fb4cc` passed
+all six CI gates (run `38651770280`), verified on the chat-policy follow-up.
+26 metadata tests pass; all mandatory
 table facets and release/parity/baseline flags remain unreviewed/false. No source
 SQL, live query, API or permissions change. See
 `evidence/NATIVE_STAFF_DEPENDENCY_INVENTORY.md`. Next is selected current chat
 policy/helper/incoming-attachment metadata and corresponding disposable policy
 composition, then the offline companion contract; no production guard is released.
+
+Draft PR #36 (code `a5e141d`) now compares the selected current chat policies and
+incoming attachments and rehearses actual chat DDL/helpers/policies offline.
+16 policy +5 artifact/source-pin tests and 241 full sequential tooling tests pass;
+independent review is clean. Raw constant writes differ from scoped/returning
+updates, so the app's current request shape cannot substitute for a database
+authority contract. Dated metadata/function body matches are not live incidents,
+full writer/role closure, mitigation or deployment. No migration or production
+permission/data/history change. Remote checks await verification on the published
+documentation head. See `evidence/NATIVE_CHAT_MEMBERSHIP_POLICY_PROOF.md`.
+Next is the six source chat writer/message/notification boundary in
+`evidence/NATIVE_CHAT_WRITER_REHEARSAL_PLAN.md`, then the offline companion guard
+contract; native authority, baseline/recovery, consent/OCR/pilot and hosting gates
+remain open. The recurring heartbeat continues; no duplicate automation is added.

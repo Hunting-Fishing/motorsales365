@@ -1,0 +1,309 @@
+{
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "scope": "Catalog metadata only; no application rows, counts, function invocation, grants, or migrations. Separate observations, not a shared snapshot; query does not enforce read-only transaction or timeouts.",
+  "observed_at_utc": "2026-10-14 23:14:53.057469",
+  "functions": [
+    {
+      "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "sql",
+      "signature": "is_active_thread_member(uuid,uuid)",
+      "volatility": "s",
+      "body_md5_lf": "61f935d9a18601ec2959b5e6deb0daa2",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": true,
+      "definition_md5": "baab71ff6acbe8f78a35acca539c32cb",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "sql",
+      "signature": "is_thread_member(uuid,uuid)",
+      "volatility": "s",
+      "body_md5_lf": "d2ff7e170a41d64730922dd019340262",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": true,
+      "definition_md5": "a06a7b0bf7ba6f84eb10212c9a8961de",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    }
+  ],
+  "tables": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "table": "chat_thread_members",
+      "schema": "public",
+      "columns": [
+        {
+          "acl": null,
+          "name": "thread_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "invited_by",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "status",
+          "type": "text",
+          "default": "'active'::text",
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "last_read_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "joined_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "chat_thread_members_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX chat_thread_members_pkey ON public.chat_thread_members USING btree (thread_id, user_id)"
+        },
+        {
+          "name": "idx_chat_thread_members_user",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "definition": "CREATE INDEX idx_chat_thread_members_user ON public.chat_thread_members USING btree (user_id, status)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Active members can invite",
+          "check": "(is_active_thread_member(thread_id, auth.uid()) OR (EXISTS ( SELECT 1\n   FROM chat_threads t\n  WHERE ((t.id = chat_thread_members.thread_id) AND (t.created_by = auth.uid())))))",
+          "roles": [
+            "authenticated"
+          ],
+          "using": null,
+          "command": "a",
+          "permissive": true
+        },
+        {
+          "name": "Members see member rows",
+          "check": null,
+          "roles": [
+            "authenticated"
+          ],
+          "using": "is_thread_member(thread_id, auth.uid())",
+          "command": "r",
+          "permissive": true
+        },
+        {
+          "name": "User can update own membership",
+          "check": "(user_id = auth.uid())",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(user_id = auth.uid())",
+          "command": "w",
+          "permissive": true
+        }
+      ],
+      "force_rls": false,
+      "constraints": [
+        {
+          "name": "chat_thread_members_invited_by_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (invited_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "chat_thread_members_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (thread_id, user_id)"
+        },
+        {
+          "name": "chat_thread_members_status_check",
+          "type": "c",
+          "validated": true,
+          "definition": "CHECK ((status = ANY (ARRAY['invited'::text, 'active'::text, 'left'::text])))"
+        },
+        {
+          "name": "chat_thread_members_thread_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (thread_id) REFERENCES chat_threads(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_thread_members_user_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "user_triggers": []
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "table": "chat_threads",
+      "schema": "public",
+      "columns": [
+        {
+          "acl": null,
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "business_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "kind",
+          "type": "text",
+          "default": "'group'::text",
+          "not_null": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "chat_threads_business_idx",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "definition": "CREATE INDEX chat_threads_business_idx ON public.chat_threads USING btree (business_id)"
+        },
+        {
+          "name": "chat_threads_business_team_unique",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX chat_threads_business_team_unique ON public.chat_threads USING btree (business_id) WHERE (kind = 'team'::text)"
+        },
+        {
+          "name": "chat_threads_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX chat_threads_pkey ON public.chat_threads USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Anyone can create threads",
+          "check": "(created_by = auth.uid())",
+          "roles": [
+            "authenticated"
+          ],
+          "using": null,
+          "command": "a",
+          "permissive": true
+        },
+        {
+          "name": "Creator can update thread",
+          "check": "(created_by = auth.uid())",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(created_by = auth.uid())",
+          "command": "w",
+          "permissive": true
+        },
+        {
+          "name": "Members view threads",
+          "check": null,
+          "roles": [
+            "authenticated"
+          ],
+          "using": "is_thread_member(id, auth.uid())",
+          "command": "r",
+          "permissive": true
+        }
+      ],
+      "force_rls": false,
+      "constraints": [
+        {
+          "name": "chat_threads_business_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (business_id) REFERENCES businesses(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_threads_created_by_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_threads_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "user_triggers": []
+    }
+  ]
+}
