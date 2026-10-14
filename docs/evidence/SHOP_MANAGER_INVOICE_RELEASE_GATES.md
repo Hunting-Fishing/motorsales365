@@ -21,9 +21,31 @@ tested. Do not present these catalog findings as an executed production exploit.
 The MD5 values identify the observed catalog definitions; they are not migration
 provenance hashes, signatures or proof of release approval.
 
+Additional ACL observation at 17:38 UTC: both functions declare EXECUTE for
+PUBLIC, postgres and service_role. Anonymous/authenticated execution currently
+comes through PUBLIC, not a separately declared client-role entry. The original
+repository source has an explicit authenticated grant. This difference is why
+retained source evidence must not be substituted for fresh live ACL evidence.
+
 Live `shop_manager.invoices.due_date` is NOT NULL with no default. The current
 browser conversion omits that field. This is a schema compatibility blocker,
 not evidence that a live customer invoice was successfully created in this run.
+
+## Disposable authorization proof
+
+`node --test scripts/ci/shop-manager-invoice-security.test.mjs` passes 5/5 tests.
+It executes exact SHA-256-verified historical function/grant substrings in four
+always-closed, memory-only PGlite databases. Non-superuser/non-BYPASSRLS roles
+have genuine RLS denial for another synthetic shop, while the historical definer
+calls return an existing invoice ID and separately mutate totals. A proposed
+full fixture-only EXECUTE revocation blocks both client roles (SQLSTATE 42501)
+while retaining database-owner/nested execution. It also blocks legitimate
+authenticated clients: this is not a compatibility or operational-release test.
+
+The PUBLIC-only revocation regression demonstrates the retained source's direct
+authenticated grant, not today's live ACL. Fixtures omit application posting/
+stock triggers, API exposure, JWT validation, concurrency and the full schema.
+No migration or containment approval is created by passing these tests.
 
 ## Repository integrity findings
 
@@ -60,7 +82,10 @@ not evidence that a live customer invoice was successfully created in this run.
 2. Inventory call sites and effective grants, nested functions/triggers and API
    exposure. Refresh catalog definitions/grants immediately before a release;
    retain the exact ACL pre-state and a reviewed recovery path.
-3. Build a forward-only hardened converter on disposable PostgreSQL/Supabase.
+3. Establish a non-self-writable tenant/role authority first; see
+   `SHOP_MANAGER_IDENTITY_CONTRACT_AUDIT.md`. A current-shop helper backed only by
+   self-editable profile fields cannot be treated as sufficient authorization.
+   Then build a forward-only hardened converter on disposable PostgreSQL/Supabase.
    Verify active account/shop/module rights, lock the work order **before** the
    idempotency check, use authoritative line rows, set required dates and preserve
    reviewed draft billing policy. Commit header/items/work-order link together.

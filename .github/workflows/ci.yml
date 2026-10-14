@@ -66,7 +66,7 @@ jobs:
       - run: ${{ env.NPM_CI }}
 
       - name: Verify test report and migration evidence gates
-        run: node --test scripts/ci/check-vitest-results.test.mjs scripts/ci/migration-provenance.test.mjs scripts/ci/migration-replay-preflight.test.mjs scripts/vehicle-receipts/verify-ocr-assets.test.mjs scripts/vehicle-receipts/verify-pdf-assets.test.mjs
+        run: node --test scripts/ci/check-vitest-results.test.mjs scripts/ci/migration-provenance.test.mjs scripts/ci/migration-replay-preflight.test.mjs scripts/ci/shop-manager-invoice-security.test.mjs scripts/vehicle-receipts/verify-ocr-assets.test.mjs scripts/vehicle-receipts/verify-pdf-assets.test.mjs
 
       - name: Receipt and installed-component database regressions
         run: |

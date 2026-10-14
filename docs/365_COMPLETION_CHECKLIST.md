@@ -38,8 +38,9 @@ Security reconciliation branch: `completion/365-security`.
 7. [ ] Reconcile PR #9 and validate provider configuration and authentication.
 8. [ ] Approve a single organization/shop/customer/vehicle identity contract and
        verify multiple-organization access boundaries, including cache separation.
-9. [ ] Recover or rebuild local receipt OCR; bundle workers, PDF rendering and
-       language assets; preserve manual review and private file handling.
+9. [x] Rebuild English on-device image/PDF receipt OCR; bundle workers, PDF
+       rendering and language assets; preserve manual review and private file handling.
+       Wider corpus/mobile/owner acceptance remains a separate pilot gate.
 10. [ ] Deliver CRM Customer 360 and activity/task follow-ups using existing
         customer, vehicle, receipt, invoice and work-order records.
 11. [ ] Deliver separate retail and business-recruitment pipelines, consent-aware
@@ -271,7 +272,8 @@ resource-heavy local checks sequential on this 16 GB computer.
 
 ## CRM drill-down continuation: 2026-10-15
 
-Branch: `feature/crm-drilldown-isolation`, stacked on the verified PDF slice.
+Branch: `feature/crm-drilldown-isolation`, draft PR #14 stacked on the verified
+PDF slice. Verified code commit: `5945c33`.
 Vehicle/work-order detail and time/technician/inspection child-card caches now
 include account identity. Signed-out UI is hidden, drafts reset on account/target
 changes, late old-context callbacks are ignored, dependent reads require a visible
@@ -282,8 +284,11 @@ relaxed. See `CUSTOMER_360_BUILD.md`.
 
 All 370 application tests pass, including 45 new focused regressions and partial
 invoice failure warnings/invalidation. Explicit lint has zero errors and 33
-existing schema-typing warnings. Type/build and publication evidence is pending
-final review checks. No schema migration or deployment is included.
+existing schema-typing warnings. Local TypeScript passes. All six GitHub CI gates
+passed at `5945c33` (run `38607348255`), including full build/package dry-run,
+TypeScript, application/tooling/receipt DB suites, lint, real-browser image/PDF
+OCR and 247 disposable PostgreSQL assertions. No schema migration or deployment
+is included. The separate Cloudflare hosting check still fails.
 
 New priority release blocker: read-only live catalog inspection confirmed
 `convert_work_order_to_invoice(uuid)` and `calculate_work_order_totals(uuid)` are
@@ -300,14 +305,28 @@ related helper restrictions need explicitly scoped authority too. Continue safe
 offline preparation while authority is pending. Existing applied migrations and
 live privileges remain untouched.
 
+Five focused memory-only PGlite ACL tests now prove historical definer bypass
+despite real synthetic RLS denial, and verify proposed fixture-only revocations.
+They are added to CI; total tooling regressions are now 41. No containment SQL
+is applied. Live ACLs differ from retained direct authenticated grants, which is
+documented explicitly rather than inferred from old source.
+
+Identity follow-up found a prerequisite to converter hardening: native shop,
+business and public organization IDs are distinct, and current profile shop
+binding is self-writable under observed grants/policies. Catalog inspection found
+no non-internal profile triggers; no profile mutation or API exploit was attempted.
+See `evidence/SHOP_MANAGER_IDENTITY_CONTRACT_AUDIT.md`. Do not trust a writable
+profile shop ID as sufficient tenant authority or infer linkage from names/emails.
+
 Tracked environment-name/format inspection covered `.env`, `.env.development`
 and `.env.production` without printing values: Supabase publishable formats and
 public identifiers, Maps browser configuration and public-format payment client
 tokens. This does not verify provider key restrictions, runtime secrets or Git
 history; the environment/security audit remains incomplete.
 
-Next: finish complete-checkout review gates, then prepare isolated authorization,
-atomicity and concurrency tests for the invoice release dependency and the
+Next: verify the added ACL-test CI checkpoint, then prepare disposable trusted
+shop/role binding and membership-tampering tests before invoice authorization,
+atomicity and concurrency implementation. Continue the
 baseline/recovery path. Native bounded receipt/installation activity follows;
 retail/recruitment pipelines, wider account/role UI audits and owner/pilot
 acceptance remain unfinished. Do not deploy the sparse local artifact.
