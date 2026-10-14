@@ -36,3 +36,19 @@ if (!hit) {
 }
 console.log(`Worker bundle OK: name=${config.name}, main=${config.main}, Supabase=${expectedRef}`);
 console.log(`Same-origin OCR assets OK: ${verifyOcrAssets(path.dirname(assetsDir))} files`);
+// The OCR engine belongs in a browser worker, never the Cloudflare server.
+const serverDir = path.resolve(path.dirname(configPath));
+for (const file of fs
+  .readdirSync(serverDir, { recursive: true })
+  .filter((name) => /\.(?:m?js)$/.test(name))) {
+  const code = fs.readFileSync(path.join(serverDir, file), "utf8");
+  if (
+    ["TesseractCore", "tesseract.js-core", "worker-script/node"].some((marker) =>
+      code.includes(marker),
+    )
+  ) {
+    console.error(`Browser OCR engine leaked into server bundle: ${file}`);
+    process.exit(1);
+  }
+}
+console.log("OCR server boundary OK: no browser engine in the server package");

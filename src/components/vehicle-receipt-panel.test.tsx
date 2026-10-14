@@ -10,7 +10,10 @@ vi.mock("@/lib/receipt-ocr.client", () => ({ scanReceiptImage: localOcr.scan }))
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({ user: auth.userId ? { id: auth.userId } : null }),
 }));
-vi.mock("@tanstack/react-start", () => ({ useServerFn: (fn: unknown) => fn }));
+vi.mock("@tanstack/react-start", () => ({
+  useServerFn: (fn: unknown) => fn,
+  createClientOnlyFn: (fn: unknown) => fn,
+}));
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: { storage: { from: () => ({ upload: localOcr.upload }) } },
 }));

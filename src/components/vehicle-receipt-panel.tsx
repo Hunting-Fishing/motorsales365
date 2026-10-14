@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
+import { createClientOnlyFn, useServerFn } from "@tanstack/react-start";
 import { Receipt, Plus, ScanLine, Loader2, Lock, Wrench, Trash2, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,22 @@ import {
 import { PART_CATEGORIES, localReceiptDate, validateReceiptFile } from "@/lib/vehicle-receipts";
 import type { ReceiptLine, ReceiptTarget, VehicleReceipt } from "@/lib/vehicle-receipts";
 import type { ReceiptOcrProgress } from "@/lib/receipt-ocr.client";
+
+// The import itself must be client-only, not just the exported scanner body.
+// Start's SSR import protection rejects any server-visible .client module edge.
+const scanReceiptOnDevice = createClientOnlyFn(
+  async (
+    file: File,
+    options: {
+      signal: AbortSignal;
+      onProgress: (progress: ReceiptOcrProgress) => void;
+    },
+  ) => {
+    const { scanReceiptImage } = await import("@/lib/receipt-ocr.client");
+    if (options.signal.aborted) throw new DOMException("Local scan cancelled", "AbortError");
+    return scanReceiptImage(file, options);
+  },
+);
 import {
   recordVehicleReceiptExpense,
   getVehicleReceipts,
@@ -423,9 +439,8 @@ function ReceiptEditor({
     setError("");
     setLocalProgress({ stage: "Preparing scanner", progress: 0 });
     try {
-      const { scanReceiptImage } = await import("@/lib/receipt-ocr.client");
       if (controller.signal.aborted) return;
-      const result = await scanReceiptImage(file, {
+      const result = await scanReceiptOnDevice(file, {
         signal: controller.signal,
         onProgress: (progress) => {
           if (mounted.current && !controller.signal.aborted) setLocalProgress(progress);
