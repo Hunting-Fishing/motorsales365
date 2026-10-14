@@ -45,6 +45,10 @@ CI gates passed (run `38621477091`), 417 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
+Inventory PR #20 latest docs head `ff24159` also passed all six CI gates (run
+`38623862186`), verified on this resume. Hosting still fails separately; the green
+preview wrapper is not an upload. Do not repeat completed scanner/UI/proof work.
+
 ## Recovery evidence
 
 - [x] Confirm receipt/history release PR #10 is merged on current main.
@@ -607,3 +611,39 @@ invoker consent-at-read contract. Helper production approval remains pending;
 do not repeat the question or apply unapproved files. Latest hosting check on
 `e99c880` still fails with no GitHub log/annotations; the preview wrapper explicitly
 skipped upload because `DEPLOY_VIA_ACTIONS` is unset. No hosting release is claimed.
+
+## Native role/membership prerequisite: 2026-10-15
+
+Draft PR #21: `https://github.com/Hunting-Fishing/motorsales365/pull/21`, code
+commit `55dd9d5`, branch `security/native-role-membership-proof`, stacked on PR #20.
+Code-head CI run `38626505461` is pending; this publication checkpoint changes
+documentation only. Two original
+declaration sources now map the text role and profile-ID membership helpers; the
+enum overload is a distinct declared node. Fresh read-only six-function metadata
+and eight bounded memory-only regressions pin and reproduce four unchanged
+lookup/operating-manager definitions. The fixtures confirm text/enum differences,
+global role versus scoped membership, legacy id/user_id mismatch and privileged
+lookup despite direct table denial, without native fixture ACL/data changes.
+No business function or customer/profile row was accessed live. This is behavior
+proof, not authority mitigation, full baseline or HTTP/JWT acceptance.
+
+The inventory now pins 31 sources/six evidence files and declares 72 objects,
+60 reachable, four cycles and 470 unresolved findings. Global source evidence is
+still 404/421; all baseline/replay/parity/release flags remain false. No migration
+or historical SQL/evidence changed in this slice. See
+`evidence/NATIVE_ROLE_MEMBERSHIP_PROOF.md` for scope, source/evidence hashes,
+advisor links and exact remaining dependencies. Focused eight tests and the
+20 inventory regressions pass; complete local tooling passes 117/117. Focused
+lint/format/diff checks pass. Full-checkout CI publication is the next gate;
+application source is unchanged from the verified 417-test parent. No application
+deployment is claimed.
+
+Next: publish/verify this exact slice, then finish the current-employee/current-
+shop/module and receipt access-helper declaration/supersession/writer/security
+closure before the companion guard. In parallel prepare the bounded invoker-only
+Customer 360 activity read contract/tests with real public-vehicle RLS. Linked-shop
+staff cannot currently select a private owner vehicle even with an approved link;
+the strict read must remain unavailable for that case, not silently widen RLS.
+Owner tenure, private-vehicle consent and mutable native authority remain release
+prerequisites. Helper containment decision remains pending; no repeated question
+or unapproved live execution is authorized by this checkpoint.

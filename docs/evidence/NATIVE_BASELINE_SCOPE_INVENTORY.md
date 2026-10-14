@@ -4,19 +4,20 @@ Updated 2026-10-15 Asia/Manila. This is an initial hand-reviewed registry and
 read-only validator, **not a baseline migration or release approval**.
 
 `baseline-native-scope-v1.json` pins selected original SQL and dated evidence
-files at source snapshot `88a8977f4d2fd79420b7c447ab5686eb01510e9c`. Its roots cover
+files. Current SQL source snapshot is `ff24159586178e955c329ba0083daab9d306a1ed`;
+the initial PR #20 snapshot/counts below are retained as historical evidence. Its roots cover
 native identity/staff, customers/work orders and receipt/history entry points.
 Unknown objects, security attachments, data assertions, external platform
 prerequisites and pending forward sources remain explicit rather than guessed.
 Native profile `shop_id` is a logical binding, not an invented foreign key.
 
-Initial selected scope: 29 SQL sources and five evidence files, 71 declared
+Initial PR #20 selected scope: 29 SQL sources and five evidence files, 71 declared
 objects, eight roots and 158 edges. Sixty objects are reachable; four DFS
 back-edge cycles and 467 unresolved findings remain. Findings include repeated
 unreviewed facets and explicit external prerequisites, not 467 confirmed defects
 or a completion percentage. Seventeen sources have supported hash correspondence,
 seven remain unclassified in this narrow inventory and five are pending-forward.
-The manifest LF SHA-256 is
+The initial manifest LF SHA-256 was
 `4e32fb1e4ab80ae3074231e09ffd1c83044da35b580dd3fbfba238f190de4ba5`.
 
 ## What the validator actually checks
@@ -81,15 +82,20 @@ No application artifact is uploaded; the sparse checkout must not be deployed.
 Next, resolve the native identity/roster and receipt access-helper declaration,
 supersession, security-attachment and writer closure against pinned source and
 fresh narrowly scoped metadata. Do not promote a source-observed facet to full
-coverage. The next concrete declaration sources already located (not yet mapped
-into this initial manifest) are
+coverage. The following concrete declaration sources are now mapped and their
+selected unchanged definitions match the fresh catalog and isolated regressions:
 `20260713081559_69ad9a73-edab-4719-b16e-38541b8ba91a.sql` for the text overload of
 `has_role(uuid,text)` and
 `20260713081649_7763bb16-35c5-4c76-a8f9-36c3f58090ce.sql` for
 `user_belongs_to_shop(uuid,uuid)`. The operating-manager caller explicitly casts
 role literals to text. Do not substitute the enum overload or infer legacy
 `id=user_id` equivalence from these declarations. Source recovery alone does not
-establish current catalog/permission parity or trusted membership.
+establish complete catalog/permission parity or trusted membership. See
+`NATIVE_ROLE_MEMBERSHIP_PROOF.md`: eight new tests, 31 sources/six evidence files,
+72 declared objects/60 reachable, four cycles and 470 explicit unknown findings.
+The current manifest LF SHA-256 is
+`c775403f37ebfe9cefcdaca671f997e6a5537e8e30ddc1063ff7ef2022593156`.
+All release/parity/replay flags remain false; dated earlier evidence is unchanged.
 Rehearse a companion guard with actual CHECKs/all enabled triggers and
 legacy/self-shift/manager/multi-roster cases before authorized atomic invoicing.
 Then construct a separately reviewed baseline with explicit platform/reference
