@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
+import { createClientOnlyFn, useServerFn } from "@tanstack/react-start";
 import { Receipt, Plus, ScanLine, Loader2, Lock, Wrench, Trash2, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,9 +15,27 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { PART_CATEGORIES, localReceiptDate, validateReceiptFile } from "@/lib/vehicle-receipts";
 import type { ReceiptLine, ReceiptTarget, VehicleReceipt } from "@/lib/vehicle-receipts";
+import type { ReceiptOcrProgress } from "@/lib/receipt-ocr.client";
+
+// The import itself must be client-only, not just the exported scanner body.
+// Start's SSR import protection rejects any server-visible .client module edge.
+const scanReceiptOnDevice = createClientOnlyFn(
+  async (
+    file: File,
+    options: {
+      signal: AbortSignal;
+      onProgress: (progress: ReceiptOcrProgress) => void;
+    },
+  ) => {
+    const { scanReceiptImage } = await import("@/lib/receipt-ocr.client");
+    if (options.signal.aborted) throw new DOMException("Local scan cancelled", "AbortError");
+    return scanReceiptImage(file, options);
+  },
+);
 import {
   recordVehicleReceiptExpense,
   getVehicleReceipts,
@@ -345,6 +363,16 @@ function ReceiptEditor({
     [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [uploadPath, setUploadPath] = useState<string | null>(receipt?.file_path ?? null);
+  const localScan = useRef<AbortController | null>(null);
+  const mounted = useRef(true);
+  const [localProgress, setLocalProgress] = useState<ReceiptOcrProgress | null>(null);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      localScan.current?.abort();
+    };
+  }, []);
   async function ensureReceipt() {
     let current = id,
       path = uploadPath;
@@ -403,6 +431,55 @@ function ReceiptEditor({
       toast.message("Scan complete. Check every item and fill any missing fields.");
     });
   }
+  async function extractLocal() {
+    if (!file || busy) return;
+    const controller = new AbortController();
+    localScan.current = controller;
+    setBusy(true);
+    setError("");
+    setLocalProgress({ stage: "Preparing scanner", progress: 0 });
+    try {
+      if (controller.signal.aborted) return;
+      const result = await scanReceiptOnDevice(file, {
+        signal: controller.signal,
+        onProgress: (progress) => {
+          if (mounted.current && !controller.signal.aborted) setLocalProgress(progress);
+        },
+      });
+      if (!mounted.current || controller.signal.aborted) return;
+      if (
+        !result.vendor &&
+        !result.purchased_on &&
+        !result.currency &&
+        result.total === null &&
+        !result.items.length
+      ) {
+        throw new Error(
+          "No readable receipt details found. Your entries were kept; try a clearer photo or enter the receipt manually.",
+        );
+      }
+      if (result.vendor) setVendor(result.vendor);
+      if (result.purchased_on) setDate(result.purchased_on);
+      if (result.currency) setCurrency(result.currency);
+      if (result.total !== null) setTotal(result.total.toString());
+      if (result.items.length) setItems(result.items);
+      toast.message("On-device scan complete. Review every suggestion before saving.");
+    } catch (err) {
+      if (mounted.current && !controller.signal.aborted) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Could not scan this photo. You can enter the receipt manually.",
+        );
+      }
+    } finally {
+      if (localScan.current === controller) localScan.current = null;
+      if (mounted.current) {
+        setBusy(false);
+        setLocalProgress(null);
+      }
+    }
+  }
   async function persist(confirm: boolean) {
     await run(async () => {
       const current = await ensureReceipt();
@@ -431,6 +508,9 @@ function ReceiptEditor({
       <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{receipt ? "Review receipt" : "Add a vehicle receipt"}</DialogTitle>
+          <DialogDescription>
+            Check the receipt details and review every purchased item before confirming.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           {!attached && (
@@ -460,6 +540,32 @@ function ReceiptEditor({
             </div>
           )}
           <div className="rounded-lg border p-3 space-y-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy || !file || file.type === "application/pdf"}
+              onClick={extractLocal}
+            >
+              <ScanLine className="mr-1 h-4 w-4" /> Scan on this device
+            </Button>
+            {localProgress && (
+              <div>
+                <p role="status" className="text-sm" aria-live="polite">
+                  {localProgress.stage} — {Math.round(localProgress.progress * 100)}%
+                </p>
+                <Button type="button" variant="ghost" onClick={() => localScan.current?.abort()}>
+                  Cancel local scan
+                </Button>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              JPG, PNG and WebP photos are read on this device in English. Scanning replaces the
+              current suggestions but does not upload the photo. Saving uploads the attachment to
+              private storage. Check supplier, date, currency and every item. PDFs currently use
+              manual entry or the separate AI option below.
+            </p>
+          </div>
+          <div className="rounded-lg border p-3 space-y-2">
             <label className="flex items-start gap-2 text-sm">
               <input
                 type="checkbox"
@@ -486,7 +592,7 @@ function ReceiptEditor({
               AI suggests details. You confirm them. You can enter everything manually.
             </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-4">
+          <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-4">
             <div className="sm:col-span-2">
               <Label htmlFor="receipt-vendor">Supplier / shop</Label>
               <Input
@@ -525,8 +631,8 @@ function ReceiptEditor({
                 onChange={(e) => setTotal(e.target.value)}
               />
             </div>
-          </div>
-          <div className="space-y-3">
+          </fieldset>
+          <fieldset disabled={busy} className="space-y-3">
             {items.map((item, i) => (
               <div key={i} className="space-y-2 rounded-lg border p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -628,7 +734,7 @@ function ReceiptEditor({
                 </label>
               </div>
             ))}
-          </div>
+          </fieldset>
           <Button
             type="button"
             variant="outline"

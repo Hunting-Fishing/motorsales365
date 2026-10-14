@@ -5,12 +5,17 @@ import { VehicleReceiptPanel } from "./vehicle-receipt-panel";
 import * as api from "@/lib/vehicle-receipts.functions";
 import type { VehicleReceipt } from "@/lib/vehicle-receipts";
 const auth = vi.hoisted(() => ({ userId: "owner-a" as string | null }));
+const localOcr = vi.hoisted(() => ({ scan: vi.fn(), upload: vi.fn() }));
+vi.mock("@/lib/receipt-ocr.client", () => ({ scanReceiptImage: localOcr.scan }));
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({ user: auth.userId ? { id: auth.userId } : null }),
 }));
-vi.mock("@tanstack/react-start", () => ({ useServerFn: (fn: unknown) => fn }));
+vi.mock("@tanstack/react-start", () => ({
+  useServerFn: (fn: unknown) => fn,
+  createClientOnlyFn: (fn: unknown) => fn,
+}));
 vi.mock("@/integrations/supabase/client", () => ({
-  supabase: { storage: { from: () => ({ upload: vi.fn().mockResolvedValue({ error: null }) }) } },
+  supabase: { storage: { from: () => ({ upload: localOcr.upload }) } },
 }));
 vi.mock("@/lib/vehicle-receipts.functions", () => ({
   getVehicleReceipts: vi.fn(),
@@ -58,6 +63,25 @@ function show(
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  localOcr.upload.mockResolvedValue({ error: null });
+  localOcr.scan.mockResolvedValue({
+    vendor: "Local supplier",
+    purchased_on: "2026-10-15",
+    currency: "PHP",
+    total: 250,
+    items: [
+      {
+        description: "Oil filter",
+        category: null,
+        brand: null,
+        part_number: null,
+        quantity: null,
+        total: null,
+        confidence: 0.25,
+        reviewed: false,
+      },
+    ],
+  });
   auth.userId = "owner-a";
   vi.mocked(api.getVehicleReceipts).mockResolvedValue({ receipts: [], linkedVehicleId: null });
   vi.mocked(api.listVehicleShopLinks).mockResolvedValue([]);
@@ -65,6 +89,139 @@ beforeEach(() => {
   vi.mocked(api.saveVehicleReceipt).mockResolvedValue(null);
 });
 describe("vehicle receipt workflow", () => {
+  it("scans a selected photo without creating a receipt, uploading or calling the AI provider", async () => {
+    show();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Add receipt" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Add receipt" }));
+    const dialog = within(screen.getByRole("dialog"));
+    fireEvent.change(dialog.getByLabelText("Receipt image or PDF (optional for manual entry)"), {
+      target: { files: [new File(["photo"], "receipt.png", { type: "image/png" })] },
+    });
+    fireEvent.click(dialog.getByRole("button", { name: "Scan on this device" }));
+    await waitFor(() =>
+      expect(dialog.getByLabelText("Supplier / shop")).toHaveValue("Local supplier"),
+    );
+    expect(dialog.getByLabelText("Item description")).toHaveValue("Oil filter");
+    expect(dialog.getByRole("button", { name: "Confirm purchases" })).toBeDisabled();
+    expect(api.startVehicleReceipt).not.toHaveBeenCalled();
+    expect(api.extractVehicleReceipt).not.toHaveBeenCalled();
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+    expect(localOcr.upload).not.toHaveBeenCalled();
+  });
+  it("keeps PDF local scanning disabled and retains manual entry", async () => {
+    show();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Add receipt" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Add receipt" }));
+    const dialog = within(screen.getByRole("dialog"));
+    fireEvent.change(dialog.getByLabelText("Receipt image or PDF (optional for manual entry)"), {
+      target: { files: [new File(["pdf"], "receipt.pdf", { type: "application/pdf" })] },
+    });
+    expect(dialog.getByRole("button", { name: "Scan on this device" })).toBeDisabled();
+    expect(dialog.getByLabelText("Item description")).toBeEnabled();
+    expect(localOcr.scan).not.toHaveBeenCalled();
+  });
+  it("cancels local extraction without replacing manual values or uploading", async () => {
+    localOcr.scan.mockImplementationOnce(
+      (_file: File, options: { signal: AbortSignal }) =>
+        new Promise((_resolve, reject) =>
+          options.signal.addEventListener("abort", () =>
+            reject(new DOMException("Cancelled", "AbortError")),
+          ),
+        ),
+    );
+    show();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Add receipt" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Add receipt" }));
+    const dialog = within(screen.getByRole("dialog"));
+    fireEvent.change(dialog.getByLabelText("Supplier / shop"), {
+      target: { value: "Manual supplier" },
+    });
+    fireEvent.change(dialog.getByLabelText("Receipt image or PDF (optional for manual entry)"), {
+      target: { files: [new File(["photo"], "receipt.png", { type: "image/png" })] },
+    });
+    fireEvent.click(dialog.getByRole("button", { name: "Scan on this device" }));
+    await waitFor(() => expect(localOcr.scan).toHaveBeenCalled());
+    fireEvent.click(dialog.getByRole("button", { name: "Cancel local scan" }));
+    await waitFor(() =>
+      expect(dialog.getByRole("button", { name: "Scan on this device" })).toBeEnabled(),
+    );
+    expect(dialog.getByLabelText("Supplier / shop")).toHaveValue("Manual supplier");
+    expect(localOcr.upload).not.toHaveBeenCalled();
+  });
+  it("shows a local scan failure without hiding manual entry", async () => {
+    localOcr.scan.mockRejectedValueOnce(new Error("Could not read photo"));
+    show();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Add receipt" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Add receipt" }));
+    const dialog = within(screen.getByRole("dialog"));
+    fireEvent.change(dialog.getByLabelText("Receipt image or PDF (optional for manual entry)"), {
+      target: { files: [new File(["photo"], "receipt.png", { type: "image/png" })] },
+    });
+    fireEvent.click(dialog.getByRole("button", { name: "Scan on this device" }));
+    await dialog.findByText("Could not read photo");
+    expect(dialog.getByLabelText("Item description")).toBeEnabled();
+    expect(api.startVehicleReceipt).not.toHaveBeenCalled();
+  });
+  it("keeps manual details when local OCR finds nothing readable", async () => {
+    localOcr.scan.mockResolvedValueOnce({
+      vendor: null,
+      purchased_on: null,
+      currency: null,
+      total: null,
+      items: [],
+    });
+    show();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Add receipt" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Add receipt" }));
+    const dialog = within(screen.getByRole("dialog"));
+    fireEvent.change(dialog.getByLabelText("Supplier / shop"), {
+      target: { value: "Manual shop" },
+    });
+    fireEvent.change(dialog.getByLabelText("Item description"), {
+      target: { value: "Manual part" },
+    });
+    fireEvent.change(dialog.getByLabelText("Receipt image or PDF (optional for manual entry)"), {
+      target: { files: [new File(["photo"], "receipt.png", { type: "image/png" })] },
+    });
+    fireEvent.click(dialog.getByRole("button", { name: "Scan on this device" }));
+    await dialog.findByText(/No readable receipt details found/);
+    expect(dialog.getByLabelText("Supplier / shop")).toHaveValue("Manual shop");
+    expect(dialog.getByLabelText("Item description")).toHaveValue("Manual part");
+    expect(api.startVehicleReceipt).not.toHaveBeenCalled();
+  });
+  it("aborts a local scan and ignores late private results on account change", async () => {
+    let finish!: (value: unknown) => void;
+    localOcr.scan.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const { rerender, view } = show();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Add receipt" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Add receipt" }));
+    const dialog = within(screen.getByRole("dialog"));
+    fireEvent.change(dialog.getByLabelText("Receipt image or PDF (optional for manual entry)"), {
+      target: { files: [new File(["photo"], "receipt.png", { type: "image/png" })] },
+    });
+    fireEvent.click(dialog.getByRole("button", { name: "Scan on this device" }));
+    await waitFor(() => expect(localOcr.scan).toHaveBeenCalled());
+    const signal = localOcr.scan.mock.calls[0][1].signal as AbortSignal;
+    auth.userId = "owner-b";
+    rerender(view());
+    expect(signal.aborted).toBe(true);
+    finish({
+      vendor: "Late private supplier",
+      purchased_on: null,
+      currency: null,
+      total: null,
+      items: [],
+    });
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(screen.queryByText("Late private supplier")).not.toBeInTheDocument();
+    expect(localOcr.upload).not.toHaveBeenCalled();
+    expect(api.startVehicleReceipt).not.toHaveBeenCalled();
+  });
   it("requires manual category and human review before confirming purchases", async () => {
     const { client } = show();
     const invalidate = vi.spyOn(client, "invalidateQueries");

@@ -1,6 +1,6 @@
 # 365 application completion checklist
 
-Updated: 2026-10-14 (Asia/Manila)
+Updated: 2026-10-15 (Asia/Manila)
 
 ## Authority and source
 
@@ -59,7 +59,7 @@ deployment status and next dependency. A merged PR is not proof that its databas
 or live customer workflow was verified. Do not infer an overall percentage from
 route counts or documentation checkboxes.
 
-## Current checkpoint
+## Earlier foundation checkpoints (historical)
 
 The working branch includes the original CI branch history and today's receipt
 release. Windows build commands and the legacy MCP path adapter are verified by
@@ -184,8 +184,47 @@ Local image OCR should run before upload,
 keep every suggestion unreviewed, bundle assets on the same origin and retain
 manual/provider fallbacks. PDF rendering is a separate bounded slice.
 
-Next: complete TypeScript/build verification for this follow-up, then compare
-the twelve unmatched existing migration sources to their split/deployed final
-objects. Recover or rebuild the scanner before claiming receipt scan-to-entry
-completion. Keep resource-heavy checks sequential on this 16 GB computer;
-concurrent TypeScript and Vite left less than 1 GB free during this run.
+The receipt-cache follow-up at `b43adfb` passed all complete-checkout GitHub
+checks (build, typecheck, unit, lint, PostgreSQL). It is not a deployment.
+
+## Current heartbeat checkpoint: 2026-10-15
+
+Implementation branch: `feature/receipt-ocr-local`, stacked on the existing
+Customer 360 branch; published as draft PR #12. Verified code commit: `7ebe425`.
+The first local image OCR slice is implemented: same-origin
+pinned worker/core/model assets, conservative unreviewed suggestions, no upload
+during scanning, cancellation, and manual/provider fallbacks. Saving separately
+uploads the attachment to existing private storage. Local PDF scanning remains
+unfinished. See `RECEIPT_OCR_DELIVERY.md` for exact behavior and limitations.
+
+Real browser smoke verification reads a synthetic receipt through the actual
+worker, relaxed-SIMD core and English model with zero third-party requests.
+The source is guarded as client-only for the application's SSR build. Empty
+results preserve existing entries; account changes abort and ignore late results.
+Bounded encoded-header checks reject oversized PNG/JPEG/WebP before decoding.
+Current validation: 283/283 application tests, 18/18 tooling regressions and real
+browser scans of all three image formats pass. Local TypeScript passes. All six
+GitHub CI gates passed for `7ebe425` (run `38600950050`): full build/Worker package,
+typecheck, unit tests, changed-line lint, real-browser OCR and 247 PostgreSQL
+security assertions. Built OCR assets pass byte/hash verification, and the server
+package check confirms that the browser OCR engine was stripped. The import
+boundary was corrected after CI caught an initial server-visible client import.
+No production release is inferred. This final checkpoint update is docs-only.
+Both isolated receipt/installation DB regression suites still pass. No schema
+migration or production deployment is included in this slice.
+
+Read-only migration audit: all twelve unmatched existing sources were
+investigated. Eleven have explained split/subsequent-fix/object correspondence,
+not exact full-source identity. The PH reference seed still lacks source proof;
+the prior aggregate check covered identities only, not every seeded attribute.
+The audit verified 21 retained source hashes, scoped function/object/permission
+checks, residual anonymous lifecycle grants, and the historical cost-fix replay
+hazard. See `evidence/migration-object-audit-2026-10-15.md`. Keep the provenance
+classifier fail-closed; source correspondence does not approve history repair.
+
+Next: verify any new CI results and implement bounded local PDF rendering with
+same-origin assets, explicit page/pixel limits and reviewed merging. In parallel, design
+and test a reproducible migration baseline on disposable/staging data before
+releasing the pending security/trigger corrections. Cloudflare authentication
+and failed hosting build details remain unresolved. Keep resource-heavy checks
+sequential on this 16 GB computer.
