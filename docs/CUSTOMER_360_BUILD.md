@@ -152,3 +152,15 @@ remaining browser/mobile, primary-reader, authority and release gates. The three
 reader RPCs are still unapplied. No live database/application release or production
 capability is claimed; do not ship the consumer before the compatible reviewed
 database/consent/recovery release.
+
+## Primary/detail request boundary (implemented offline; not released)
+
+The customer route now replaces its three older browser queries with a fixed,
+request-bound authenticated server reader for customer/vehicles/work orders.
+Expected-account mismatch fails before handler reads; lists independently check
+customer visibility, strictly validate returned scope/shape and fetch 101/display
+100 with honest cap labels. Primary revalidation/error masks all private children;
+list revalidation/error hides cached rows/options/counts. A preseeded successful
+cache is not current visibility evidence. No grant, SQL, write or service fallback
+is added. See `evidence/CUSTOMER_DETAIL_REQUEST_BOUND_READS.md` for verification
+and remaining separate-snapshot, other-card, native-authority and release gates.

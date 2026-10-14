@@ -1,0 +1,250 @@
+{
+  "formatVersion": 1,
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "mode": "read-only-catalog",
+  "scope": "Selected customer_reminders/customer_communications columns, defaults, constraints and table triggers only. No business rows, RPC, mutation, DDL or history/platform changes.",
+  "tables": [
+    {
+      "observed_at_utc": "2026-10-14 20:54:47.578436",
+      "relname": "customer_communications",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "customer_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "date",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "direction",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "staff_member_id",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "staff_member_name",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "template_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "template_name",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "customer_communications_customer_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (customer_id) REFERENCES shop_manager.customers(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "customer_communications_direction_check",
+          "type": "c",
+          "validated": true,
+          "definition": "CHECK ((direction = ANY (ARRAY['incoming'::text, 'outgoing'::text])))"
+        },
+        {
+          "name": "customer_communications_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "customer_communications_status_check",
+          "type": "c",
+          "validated": true,
+          "definition": "CHECK ((status = ANY (ARRAY['completed'::text, 'pending'::text, 'failed'::text])))"
+        },
+        {
+          "name": "customer_communications_type_check",
+          "type": "c",
+          "validated": true,
+          "definition": "CHECK ((type = ANY (ARRAY['email'::text, 'phone'::text, 'text'::text, 'in-person'::text])))"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "RI_ConstraintTrigger_c_27882",
+          "enabled": "O",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_27882\" AFTER INSERT ON shop_manager.customer_communications FROM shop_manager.customers NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_27883",
+          "enabled": "O",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_27883\" AFTER UPDATE ON shop_manager.customer_communications FROM shop_manager.customers NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        }
+      ]
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:54:47.578436",
+      "relname": "customer_reminders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "shop_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "customer_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "vehicle_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "reminder_type",
+          "type": "text",
+          "default": "'follow_up'::text",
+          "not_null": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "due_date",
+          "type": "date",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": "'pending'::text",
+          "not_null": true
+        },
+        {
+          "name": "assigned_to",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "customer_reminders_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "customer_reminders_touch",
+          "enabled": "O",
+          "internal": false,
+          "definition": "CREATE TRIGGER customer_reminders_touch BEFORE UPDATE ON shop_manager.customer_reminders FOR EACH ROW EXECUTE FUNCTION shop_manager.touch_updated_at()"
+        }
+      ]
+    }
+  ]
+}
