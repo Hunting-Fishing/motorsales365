@@ -13,6 +13,38 @@ Starting main: `70ab892a8b7c05eac288ea4a6cce7a002d316f00`.
 Implementation branch: `completion/365-foundation`.
 Security reconciliation branch: `completion/365-security`.
 
+## Current resumption order (2026-10-15)
+
+1. Preserve the approved converter-only live restriction. Helper-candidate PR
+   #18 passed all six CI gates at `88a8977`; a single separate owner decision for
+   bootstrap/totals containment is pending. Do not treat the earlier approval as
+   authority for those helpers or the remaining quote-conversion path.
+2. Continue native migration/authority work in parallel: resolve the initial
+   dependency inventory's identity, role/module helper and trigger/security
+   attachment closure; rehearse the companion roster/native guard with actual
+   constraints and all trigger effects. Keep unknown bindings and offboarding
+   behavior explicit, not silently repaired.
+3. Construct and verify a separately reviewed disposable baseline/forward upgrade
+   and database/private-storage recovery. Keep historical replay/history adoption
+   frozen. Resolve hosting authentication and full artifact release gates before
+   any application deployment.
+4. Continue native Customer 360 with the bounded read-only, owner-approved-linked
+   vehicle activity card specified in `CUSTOMER_360_BUILD.md`. Establish strict
+   consent-at-read semantics before production acceptance; no owner-only history
+   or invoice shortcut. Original scanner recovery and owner/mobile OCR pilot
+   acceptance remain open despite passing rebuilt image/PDF browser tests.
+5. After trusted tenant authority, implement authorized atomic/idempotent
+   invoicing, then retail/recruitment assignments and consent-aware follow-ups,
+   parts/stock/accounting/warranty and history correction/transfer/sharing checks.
+   Complete responsive role acceptance, billing/support/recovery and the bounded
+   Philippine pilot from the delivery sequence below. Native CRM remains the
+   implementation path; ERPNext/Dolibarr adoption is not approved.
+
+Latest verified application slice: PR #19, documentation head `e99c880`, all six
+CI gates passed (run `38621477091`), 417 application tests. These are review
+branches, not merged/deployed production acceptance. The heartbeat stays active
+without duplicate reminders for an unchanged pending owner decision.
+
 ## Recovery evidence
 
 - [x] Confirm receipt/history release PR #10 is merged on current main.
@@ -480,7 +512,8 @@ baseline/CRM acceptance work; native CRM remains the implementation path.
 Draft PR #18: `https://github.com/Hunting-Fishing/motorsales365/pull/18`, code
 commit `6d0e3e4`, branch `security/helper-execute-containment`, stacked on PR #17.
 Latest documentation head `88a8977` supersedes the cancelled initial CI run;
-full-checkout CI run `38621075525` is pending. No passing build is inferred.
+all six full-checkout CI gates passed (run `38621075525`). This is not live release
+approval; the separately scoped owner decision was requested once and is pending.
 Parent docs head
 `ab18832` passed all six CI gates (run `38617896701`). The completed scanner/UI and
 authority proofs were not rebuilt. Fresh read-only helper catalog checks at
@@ -514,8 +547,8 @@ multi-roster/offboarding constraints rather than trusting definer current_user.
 
 Draft PR #19: `https://github.com/Hunting-Fishing/motorsales365/pull/19`, code
 commit `0ac43d2`, branch `fix/staff-mutation-confirmation`, stacked on
-helper-candidate PR #18. Full-checkout CI run `38621319248` is pending at the code
-head; this publication checkpoint is documentation-only.
+helper-candidate PR #18. The initial code-head CI was superseded; latest docs head
+`e99c880` passed all six gates (run `38621477091`).
 Roster upsert/update/removal now require exactly one confirmed returned ID before
 reporting success; update/removal retain the requested business/staff filters and
 verify that ID. Manager authorization is strictly boolean and lookup/database
@@ -524,7 +557,7 @@ the authenticated writer. No SQL, grants, migration history or live data changed
 
 Focused mocked handler tests pass 47/47, focused lint passes (existing source
 `any` warnings remain), formatting and diff checks pass. Full local application
-tests pass 417/417 across 38 files. Full-checkout CI is pending; no deployment is
+tests pass 417/417 across 38 files. Full-checkout CI passes; no deployment is
 claimed. These tests are not live RLS/JWT/HTTP or trigger acceptance, and missing
 confirmation is not evidence of transaction rollback. Refresh before retrying.
 See `evidence/BUSINESS_STAFF_AUTHORITY_GATES.md` for the retained-source chat-trigger,
@@ -535,3 +568,33 @@ approval. Continue the offline native baseline dependency inventory/validator;
 it must explicitly retain unknown coverage and cannot authorize history adoption,
 full migration replay, data repair or deployment. Production helper candidates
 remain unapplied pending a separately scoped owner decision and release gates.
+
+## Offline native dependency inventory: 2026-10-15
+
+Branch `review/native-baseline-scope-inventory`, stacked on PR #19. The new
+read-only validator and initial manifest pin 29 SQL sources plus five evidence
+files, with 71 declared objects/158 edges and 60 reachable objects. It reports
+four cycles and 467 explicit unknown-coverage findings (including repeated
+unreviewed facets, not confirmed defect counts). Mandatory table and attachment
+facets, constrained paths, project/hash evidence and bounded reads prevent silent
+coverage upgrades. All replay/baseline/applied-lineage/parity/release flags remain
+false. The CLI deliberately returns 1 for this valid but incomplete inventory.
+
+Twenty focused tests pass; full local tooling passes 109/109. Focused lint,
+formatting and diff checks pass. Full-checkout CI publication is the next gate.
+See `evidence/NATIVE_BASELINE_SCOPE_INVENTORY.md` for the exact manifest hash,
+scope and limits. Source evidence remains 404/421 globally, with 17 unclassified;
+the selected inventory's seven unclassified source pins are a different count.
+Five forward sources remain separate. No SQL source, live schema/data/history,
+application deployment or platform configuration changed in this slice.
+
+Next: publish and verify this exact review slice, then close the native identity/
+roster and receipt helper declaration/supersession/writer/security attachment
+closure, starting with the helpers already identified in the manifest. Build
+the companion guard against real shift constraints, all native/chat triggers,
+legacy identity and delegated-manager/multi-roster behavior. Continue the planned
+read-only CRM activity slice independently; production acceptance needs a reviewed
+invoker consent-at-read contract. Helper production approval remains pending;
+do not repeat the question or apply unapproved files. Latest hosting check on
+`e99c880` still fails with no GitHub log/annotations; the preview wrapper explicitly
+skipped upload because `DEPLOY_VIA_ACTIONS` is unset. No hosting release is claimed.

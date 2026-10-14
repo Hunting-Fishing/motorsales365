@@ -101,3 +101,34 @@ atomic converter with stable retry behavior and draft billing policy, then compl
 baseline/recovery and release gates before live application.
 The bounded activity card can follow, using only explicit active vehicle links;
 never reuse the owner-only sharing/history screen inside shop CRM.
+
+## Next bounded activity slice (planned, not implemented)
+
+Build a read-only Customer Vehicle Activity card for one selected native customer
+vehicle. A new authenticated reader must resolve the visible customer, matching
+native vehicle and explicit active owner-approved `vehicle_shop_links` row for
+that shop on every source request. Resolve `shops.business_id` independently for
+network installation records; never assume shop/business/organization IDs match.
+Missing, revoked, mismatched or ambiguous links dispatch no downstream reads.
+
+Use fixed summary projections and independent lists of confirmed receipt
+purchases, shop-recorded installations and work-order opened/current-status
+snapshots. Fetch 26/display 25 per source with stable date/ID ordering; retain
+receipt currency and label each limit. Do not infer payment, historical status
+changes, independently verified repairs or lifetime totals. Exclude private/draft
+receipts, require sharing for owner-origin records and deduplicate receipt IDs.
+Do not return attachments, storage paths, owner sharing controls or write actions.
+
+Cache by account/customer/native vehicle/source, remount selection across account
+or customer changes, suppress signed-out reads and expose independent generic
+errors/retries. Test mismatched/revoked links, source scoping, currency/date/null
+mapping, caps/ties, late results and all account/customer/vehicle transitions.
+Do not reuse the unbounded full-row receipt reader or owner-only history UI.
+
+Separate link-check and activity requests have a revocation race. Snapshot/cache
+semantics must be explicit; production acceptance of strict consent-at-read needs
+a reviewed invoker join/read contract and disposable authorization regressions,
+not another unrestricted definer helper. Current link-policy/owner-transfer
+semantics, native mutable membership, the pending direct-installation correction
+and full baseline/recovery prerequisites remain separate release gates. This
+plan adds no source implementation, SQL or production capability.

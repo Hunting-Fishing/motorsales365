@@ -1,0 +1,2281 @@
+{
+  "formatVersion": 1,
+  "scopeId": "native-identity-customer-workorder-receipts-initial-inventory",
+  "repository": "Hunting-Fishing/motorsales365",
+  "project": "wjxaajgvddtrxxtocxen",
+  "sourceCommit": "88a8977f4d2fd79420b7c447ab5686eb01510e9c",
+  "observedAtUtc": "2026-10-14T19:09:06Z",
+  "normalization": "CRLF-to-LF-only",
+  "sources": [
+    {
+      "id": "publicProfiles",
+      "path": "supabase/migrations/20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql",
+      "sha256Lf": "53dd7b960d83bbda344e9a1bb266c13ac4885b627ec2ca96e6fc96d2ceaa0bc7",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "publicBusinesses",
+      "path": "supabase/migrations/20260512054457_90aac1ba-c3f0-48ff-a9b4-06739ddd2108.sql",
+      "sha256Lf": "7ab71ad92eec0d9e9647fc8ffa46ef2b35c561c76b85d29ad41f9c32261fde8c",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "publicVehicles",
+      "path": "supabase/migrations/20260525155935_31efaded-ef49-43e7-945b-f213f41edda7.sql",
+      "sha256Lf": "d295c784c97c5ee99dfbec99e4255651350f2a600187f1431fe1b0d264c54d3f",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "publicStaff",
+      "path": "supabase/migrations/20260616033348_a261b9e7-281d-4e16-bf61-1f3043a80d12.sql",
+      "sha256Lf": "69afe9112531bd75d0bc68d4b31461d9e1c9aae41337ebdf79e6f40056447d62",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "staffCatalog"]
+    },
+    {
+      "id": "nativeBaseA",
+      "path": "supabase/migrations/20260713062739_e0144043-a7a4-43b7-8fc6-050ea0304634.sql",
+      "sha256Lf": "2d70f03ea5b89882d5f0c9288f621d2b376e30a071d0bd8ac1746c4dc6dd5848",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "nativeBaseB",
+      "path": "supabase/migrations/20260713063318_90b3f5d4-5173-4f8a-b355-7634671276fe.sql",
+      "sha256Lf": "f958d20e3b1ce5472cf292288f4710aab0ea858e5fd4f701bd0680cc0b039e71",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "nativeBaseC",
+      "path": "supabase/migrations/20260713063430_0a07d0d9-729b-4662-ac1e-d561b0a2ce85.sql",
+      "sha256Lf": "9020a916146b5739d36736df80253c455e65df311ab294c706d4569241cd5b51",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "staffTeamThreads",
+      "path": "supabase/migrations/20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql",
+      "sha256Lf": "2231cdf09ee79ed8a8e0d93ef55176c2e32f245494f55c93dba5e5cbe4a171d7",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "nativeResolvers",
+      "path": "supabase/migrations/20260713081429_d9cdd366-04dd-4e51-939f-541106ff205e.sql",
+      "sha256Lf": "30dfd8df0c3537efb5155a8891804e00444b180f55e674b56d522e473e2f4144",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "nativePoliciesBootstrap",
+      "path": "supabase/migrations/20260713081838_b99aba93-f19b-4aec-b7a1-3bdb86faadc6.sql",
+      "sha256Lf": "5ea2e85cf05bf006dcb684ef063f9ef15f38fdfcc9dccd2c050f4c0a5a115647",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "nativeExpenses",
+      "path": "supabase/migrations/20260714032507_f944b167-9bbe-4f1b-a49b-48dec9a68a68.sql",
+      "sha256Lf": "d79ac62b79830d5031c48f4e520f6fb205023fc821921f0347dc7f135f252eda",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "nativeWorkflow",
+      "path": "supabase/migrations/20260715012303_a5daad1f-ca4a-4606-b07d-3f38ec8c7ee9.sql",
+      "sha256Lf": "08729a1af4909c61d5bc557083db8fddf85ea63ceb614ebf39653a8b8da57ae5",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "lifecycle",
+      "path": "supabase/migrations/20260831041834_associate_parts_order_lifecycle.sql",
+      "sha256Lf": "3fc2cdc241821d00fb37d7c75684062ba5c01d0519092e76e37d09b82380f654",
+      "lineageClass": "unclassified",
+      "evidenceRefs": ["correspondenceAudit"]
+    },
+    {
+      "id": "customerLedger",
+      "path": "supabase/migrations/20260831114500_associate_privacy_customer_vehicle_ledger.sql",
+      "sha256Lf": "da2965899dfd286fec0bf4560872aaa313f407c1b1cb39e1585c2cd7f09efe1d",
+      "lineageClass": "unclassified",
+      "evidenceRefs": ["correspondenceAudit"]
+    },
+    {
+      "id": "employeeLedger",
+      "path": "supabase/migrations/20260831124952_employee_operations_ledger.sql",
+      "sha256Lf": "2386ee30a1b12cd124445adf3da3568c35e567e96aa9f7b83e6cd4211ccae6b2",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "employeeModules",
+      "path": "supabase/migrations/20260831130502_employee_module_access.sql",
+      "sha256Lf": "103dcc61d3136e4deee11a42300cc46025ee114b26b7f381b492721f77a72d04",
+      "lineageClass": "unclassified",
+      "evidenceRefs": ["correspondenceAudit"]
+    },
+    {
+      "id": "registers",
+      "path": "supabase/migrations/20260831193523_counter_sales_registers_pricebook.sql",
+      "sha256Lf": "e2736908cc1e3343e4cb1a784c0f839ff198e0754c015f39b831fb3482f0327c",
+      "lineageClass": "unclassified",
+      "evidenceRefs": ["correspondenceAudit"]
+    },
+    {
+      "id": "staffBridge",
+      "path": "supabase/migrations/20260901025424_business_staff_shop_manager_bridge.sql",
+      "sha256Lf": "a49e50ecd9a621d4162ff58666ab98584d9aa009775732ce4cf8b645d8c21a9e",
+      "lineageClass": "unclassified",
+      "evidenceRefs": ["correspondenceAudit", "staffCatalog"]
+    },
+    {
+      "id": "driverModules",
+      "path": "supabase/migrations/20260901025637_add_driver_module_access.sql",
+      "sha256Lf": "ee6d043f23fe25f7f849fdd2d2cc104983a0ae3594d2f269e22d748ad498cff8",
+      "lineageClass": "unclassified",
+      "evidenceRefs": ["correspondenceAudit"]
+    },
+    {
+      "id": "staffBoundaryCorrection",
+      "path": "supabase/migrations/20260901090422_correct_business_role_and_associate_boundaries.sql",
+      "sha256Lf": "bd5de1d18b1e22e361e161a249e22d36759cc24ba9b9636de5dd762b90a7ccd4",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes", "correspondenceAudit"]
+    },
+    {
+      "id": "assistantManager",
+      "path": "supabase/migrations/20260902151438_assistant_manager_temporary_canonical_permission.sql",
+      "sha256Lf": "1ac1aaed2fb7fe17bd10a73a1f62f9eab4764248bf257518b84b14db23752522",
+      "lineageClass": "unclassified",
+      "evidenceRefs": ["staffCatalog"]
+    },
+    {
+      "id": "partsHardening",
+      "path": "supabase/migrations/20260927090000_parts_network_cross_org_rls_hardening.sql",
+      "sha256Lf": "0bdeb54f03c6a329835819a012bd58ca75f0f3800b736f15548b9ebb44417e0d",
+      "lineageClass": "pending-forward",
+      "evidenceRefs": ["correspondenceAudit"]
+    },
+    {
+      "id": "partsFollowups",
+      "path": "supabase/migrations/20260927120000_parts_network_security_followups.sql",
+      "sha256Lf": "074feb25f80e497033d09d9a51332905930913e5a89b511d27f122f27df1f2bc",
+      "lineageClass": "pending-forward",
+      "evidenceRefs": ["correspondenceAudit"]
+    },
+    {
+      "id": "receipts",
+      "path": "supabase/migrations/20261014043336_vehicle_receipts_shared_history.sql",
+      "sha256Lf": "73de34ce2f20b6fb0b2bb9b343fd48cbed7e09091e0000f931fc7aa51637d21d",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "receiptDenyPolicies",
+      "path": "supabase/migrations/20261014064816_receipt_internal_deny_policies.sql",
+      "sha256Lf": "2ba0a8002f98cec062341207b5cc2d2fb8875eb600fd442f4dc9e73bda6c1200",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "directVehicleCorrection",
+      "path": "supabase/migrations/20261014140802_preserve_direct_installed_vehicle.sql",
+      "sha256Lf": "44e931d06afb9999a63b15837d543bc54743e94fd708ee48bdec96f75bd58047",
+      "lineageClass": "pending-forward",
+      "evidenceRefs": ["correspondenceAudit"]
+    },
+    {
+      "id": "converterContainment",
+      "path": "supabase/migrations/20261014175040_contain_legacy_invoice_conversion_execute.sql",
+      "sha256Lf": "a0a4132c9f17eb4df1d49f0ff735a3da651728b8d1d4d81e979a4e5bc033c1f0",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["converterSource"]
+    },
+    {
+      "id": "bootstrapCandidate",
+      "path": "supabase/migrations/20261014185003_contain_legacy_profile_bootstrap_execute.sql",
+      "sha256Lf": "53c9081e23d9a31846f39a730a5c7cb5bd589716f224d11a7ed9a76e73d00aba",
+      "lineageClass": "pending-forward",
+      "evidenceRefs": []
+    },
+    {
+      "id": "totalsCandidate",
+      "path": "supabase/migrations/20261014185052_contain_legacy_work_order_totals_execute.sql",
+      "sha256Lf": "f87c6852dce4cff8be7f33d97aeadceddd223c2e4a3f310185f149a60297baf7",
+      "lineageClass": "pending-forward",
+      "evidenceRefs": []
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "id": "provenance",
+      "path": "docs/evidence/migration-provenance-2026-10-14.json",
+      "sha256Lf": "d41709e5a9b669cfd5d352a95d24195b2660f843bdb416318c1168ed68ec36e4"
+    },
+    {
+      "id": "historyHashes",
+      "path": "docs/evidence/post-cutover-migration-hashes-2026-10-14.json",
+      "sha256Lf": "a9e8a49e1d36821833bfeb3acc208ec06e0e139841755c63f1fa292bd88c91ec"
+    },
+    {
+      "id": "converterSource",
+      "path": "docs/evidence/invoice-containment-migration-2026-10-15.json",
+      "sha256Lf": "c2302bc10ad3dba0e190295f8c2aabd418b67038feb44e011e10cfa5ec5cc5d2"
+    },
+    {
+      "id": "staffCatalog",
+      "path": "docs/evidence/business-staff-authority-metadata-2026-10-15.json",
+      "sha256Lf": "439938311ff14837cb26c5c8e52928054e3e18c3596ed17a9ad9348125efb6a3"
+    },
+    {
+      "id": "correspondenceAudit",
+      "path": "docs/evidence/migration-object-audit-2026-10-15.md",
+      "sha256Lf": "cde396be3c4a722a854d95b8cbcd84ae2eb1481e57d3f48d282ee62ff8cc3dfc"
+    }
+  ],
+  "roots": [
+    "table:shop_manager.profiles",
+    "table:public.business_staff",
+    "table:shop_manager.customers",
+    "table:shop_manager.work_orders",
+    "table:public.vehicle_receipts",
+    "table:public.vehicle_receipt_items",
+    "table:public.vehicle_history_events",
+    "function:public.save_vehicle_receipt(uuid,text,date,text,numeric,jsonb,boolean)"
+  ],
+  "objects": [
+    {
+      "id": "table:shop_manager.profiles",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeBaseB", "nativePoliciesBootstrap", "staffBridge"],
+      "dependencies": [
+        {
+          "id": "binding:native-profile-operational-shop",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        { "id": "external:auth.users", "relation": "foreign-key", "reviewStatus": "unverified" },
+        {
+          "id": "external:identity-constraints-policies-grants-and-trigger-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "legacyIdVersusUserId": "unreviewed",
+        "effectiveColumnAcl": "unreviewed"
+      }
+    },
+    {
+      "id": "binding:native-profile-operational-shop",
+      "kind": "logical-binding",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeResolvers", "staffBridge"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.shops",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "logicalProfileShopIdNotForeignKey": "source-observed",
+        "independentMembershipAuthority": "unreviewed",
+        "legacyUnlinkedShopAuthority": "unreviewed",
+        "activeShopSelection": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.shops",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeBaseB", "staffBridge"],
+      "dependencies": [
+        {
+          "id": "table:public.businesses",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:public.organizations-distinct-from-businesses",
+          "relation": "logical-binding",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "organizationIdIsNotTrustedPublicOrganizationLink": "source-observed"
+      }
+    },
+    {
+      "id": "table:shop_manager.roles",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeResolvers"],
+      "dependencies": [
+        {
+          "id": "external:role-types-and-catalog-initialization",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.user_roles",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeBaseB", "staffBridge", "assistantManager"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.profiles",
+          "relation": "logical-binding",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "authActorVersusNativeProfileRoleIdentity": "unreviewed"
+      }
+    },
+    {
+      "id": "table:public.business_staff",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": [
+        "publicStaff",
+        "staffBridge",
+        "staffBoundaryCorrection",
+        "assistantManager",
+        "staffTeamThreads"
+      ],
+      "dependencies": [
+        {
+          "id": "table:public.businesses",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:auth.users",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:public.has_business_role(uuid,uuid,public.business_staff_role)",
+          "relation": "policy-helper",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "trigger:public.business_staff.sync_business_staff_to_shop_manager",
+          "relation": "contains",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "trigger:public.business_staff.business_staff_team_thread_sync",
+          "relation": "contains",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "selfWritableAuthorityRisk": "source-observed",
+        "trustedRosterWriterBoundary": "unreviewed"
+      }
+    },
+    {
+      "id": "table:public.businesses",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["publicBusinesses"],
+      "dependencies": [
+        {
+          "id": "external:auth.users",
+          "relation": "logical-binding",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:public.organizations-distinct-from-businesses",
+          "relation": "logical-binding",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "ownerMutationAuthority": "unreviewed"
+      }
+    },
+    {
+      "id": "table:public.profiles",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["publicProfiles"],
+      "dependencies": [
+        {
+          "id": "external:auth.users",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "notNativeEmployeeProfile": "source-observed"
+      }
+    },
+    {
+      "id": "function:shop_manager.get_current_user_shop_id()",
+      "kind": "function",
+      "signature": "shop_manager.get_current_user_shop_id()",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeResolvers"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.profiles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        { "id": "external:auth.uid()", "relation": "calls", "reviewStatus": "source-observed" }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "legacyIdentityResolution": "unreviewed",
+        "trustedMembershipPredicate": "unreviewed"
+      }
+    },
+    {
+      "id": "function:shop_manager.current_employee_profile()",
+      "kind": "function",
+      "signature": "shop_manager.current_employee_profile()",
+      "disposition": "candidate",
+      "sourceRefs": ["employeeLedger"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.profiles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        { "id": "external:auth.uid()", "relation": "calls", "reviewStatus": "source-observed" }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "legacyIdentityResolution": "unreviewed"
+      }
+    },
+    {
+      "id": "function:shop_manager.employee_allowed_modules()",
+      "kind": "function",
+      "signature": "shop_manager.employee_allowed_modules()",
+      "disposition": "candidate",
+      "sourceRefs": ["employeeModules", "driverModules"],
+      "dependencies": [
+        {
+          "id": "function:shop_manager.current_employee_profile()",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.user_roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:module-permission-and-override-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "laterSupersession": "unreviewed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "visibilityIsNotGranularWritePermission": "source-observed"
+      }
+    },
+    {
+      "id": "function:shop_manager.is_shop_operations_manager(uuid,uuid)",
+      "kind": "function",
+      "signature": "shop_manager.is_shop_operations_manager(uuid,uuid)",
+      "disposition": "candidate",
+      "sourceRefs": ["employeeLedger"],
+      "dependencies": [
+        {
+          "id": "function:shop_manager.user_belongs_to_shop(uuid,uuid)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:shop_manager.has_role(uuid,text)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "independentMembershipAuthority": "unreviewed"
+      }
+    },
+    {
+      "id": "function:public.has_business_role(uuid,uuid,public.business_staff_role)",
+      "kind": "function",
+      "signature": "public.has_business_role(uuid,uuid,public.business_staff_role)",
+      "disposition": "candidate",
+      "sourceRefs": ["publicStaff", "assistantManager"],
+      "dependencies": [
+        {
+          "id": "table:public.businesses",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.business_staff",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:role-types-and-catalog-initialization",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "trustedRosterAuthority": "unreviewed"
+      }
+    },
+    {
+      "id": "function:public.is_business_member(uuid,uuid)",
+      "kind": "function",
+      "signature": "public.is_business_member(uuid,uuid)",
+      "disposition": "candidate",
+      "sourceRefs": ["publicStaff"],
+      "dependencies": [
+        {
+          "id": "table:public.businesses",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.business_staff",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "trustedRosterAuthority": "unreviewed"
+      }
+    },
+    {
+      "id": "function:shop_manager.sync_business_staff_member(uuid,uuid,boolean,text,text)",
+      "kind": "function",
+      "signature": "shop_manager.sync_business_staff_member(uuid,uuid,boolean,text,text)",
+      "disposition": "candidate",
+      "sourceRefs": ["staffBridge", "assistantManager"],
+      "dependencies": [
+        {
+          "id": "table:public.businesses",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.profiles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:auth.users",
+          "relation": "external-prerequisite",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.shops",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.profiles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.user_roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.cash_registers",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.register_sessions",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.employee_shifts",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "laterSupersession": "unreviewed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "indirectTriggerWriterAuthorization": "unreviewed",
+        "legacyIdentityCompatibility": "unreviewed"
+      }
+    },
+    {
+      "id": "function:shop_manager.sync_business_staff_trigger()",
+      "kind": "function",
+      "signature": "shop_manager.sync_business_staff_trigger()",
+      "disposition": "candidate",
+      "sourceRefs": ["staffBridge", "staffBoundaryCorrection"],
+      "dependencies": [
+        {
+          "id": "function:shop_manager.sync_business_staff_member(uuid,uuid,boolean,text,text)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.businesses",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "latestBoundaryCorrection": "unreviewed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed"
+      }
+    },
+    {
+      "id": "trigger:public.business_staff.sync_business_staff_to_shop_manager",
+      "kind": "trigger",
+      "disposition": "candidate",
+      "sourceRefs": ["staffBridge", "staffBoundaryCorrection"],
+      "dependencies": [
+        {
+          "id": "function:shop_manager.sync_business_staff_trigger()",
+          "relation": "trigger-function",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "identity": "source-observed",
+        "attachment": "source-observed",
+        "definition": "source-observed",
+        "enabledAndUpdateTargetList": "unreviewed",
+        "latestBoundaryCorrection": "unreviewed"
+      }
+    },
+    {
+      "id": "trigger:public.business_staff.business_staff_team_thread_sync",
+      "kind": "trigger",
+      "disposition": "unverified",
+      "sourceRefs": ["staffTeamThreads"],
+      "dependencies": [
+        {
+          "id": "function:public.trg_staff_sync_team_thread()",
+          "relation": "trigger-function",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "identity": "source-observed",
+        "attachment": "source-observed",
+        "definition": "source-observed",
+        "everyUpdateIncludingShiftAndNoOpUpdates": "source-observed",
+        "enabledCurrentStateAndLaterSupersession": "unreviewed"
+      }
+    },
+    {
+      "id": "function:public.trg_staff_sync_team_thread()",
+      "kind": "function",
+      "signature": "public.trg_staff_sync_team_thread()",
+      "disposition": "unverified",
+      "sourceRefs": ["staffTeamThreads"],
+      "dependencies": [
+        {
+          "id": "function:public.ensure_business_team_thread(uuid)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:business-team-chat-tables-membership-and-writer-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "definerChatMembershipWriter": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "shiftNoOpAndRosterGuardCompatibility": "unreviewed"
+      }
+    },
+    {
+      "id": "function:public.ensure_business_team_thread(uuid)",
+      "kind": "function",
+      "signature": "public.ensure_business_team_thread(uuid)",
+      "disposition": "unverified",
+      "sourceRefs": ["staffTeamThreads"],
+      "dependencies": [
+        {
+          "id": "table:public.businesses",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.business_staff",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:business-team-chat-tables-membership-and-writer-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "definerThreadAndMembershipWriter": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "ownerAndExistingActiveStaffCompatibility": "unreviewed"
+      }
+    },
+    {
+      "id": "external:business-team-chat-tables-membership-and-writer-closure",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "chatThreadsAndChatThreadMembersDefinitions": "unreviewed",
+        "chatMembershipTriggersPoliciesGrantsAndOwner": "unreviewed",
+        "businessCreateTeamThreadCallerClosure": "unreviewed",
+        "noFullChatOrNotificationBaselineClaim": "source-observed"
+      }
+    },
+    {
+      "id": "function:shop_manager.ensure_profile_for(uuid)",
+      "kind": "function",
+      "signature": "shop_manager.ensure_profile_for(uuid)",
+      "disposition": "candidate",
+      "sourceRefs": ["nativePoliciesBootstrap", "bootstrapCandidate"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.profiles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.businesses",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:auth.users",
+          "relation": "external-prerequisite",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "pendingAclCandidateNotApplied": "source-observed",
+        "legacyMappingCompatibility": "unreviewed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.cash_registers",
+      "kind": "table",
+      "disposition": "unverified",
+      "sourceRefs": ["registers"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.shops",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:register-and-employee-operating-context-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.register_sessions",
+      "kind": "table",
+      "disposition": "unverified",
+      "sourceRefs": ["registers"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.cash_registers",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.employee_shifts",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:register-and-employee-operating-context-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.employee_shifts",
+      "kind": "table",
+      "disposition": "unverified",
+      "sourceRefs": ["employeeLedger"],
+      "dependencies": [
+        {
+          "id": "external:register-and-employee-operating-context-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.customers",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeBaseA", "nativePoliciesBootstrap"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.shops",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:shop_manager.get_current_user_shop_id()",
+          "relation": "policy-helper",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:customer-workorder-constraint-and-trigger-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "crossShopCustomerIsolation": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.vehicles",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeBaseB", "nativePoliciesBootstrap"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.customers",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:customer-workorder-constraint-and-trigger-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "distinctFromCustomerOwnedPublicVehicle": "source-observed"
+      }
+    },
+    {
+      "id": "table:shop_manager.work_orders",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeBaseC", "nativePoliciesBootstrap", "nativeWorkflow"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.shops",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.customers",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.vehicles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:shop_manager.get_current_user_shop_id()",
+          "relation": "policy-helper",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:customer-workorder-constraint-and-trigger-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "crossEntityShopConsistency": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.work_order_job_lines",
+      "kind": "table",
+      "disposition": "unverified",
+      "sourceRefs": ["nativeWorkflow"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.work_orders",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:customer-workorder-constraint-and-trigger-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "fullDeclarationLineage": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.work_order_parts",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeBaseC", "nativeWorkflow"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.work_orders",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:inventory-stock-and-accounting-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.invoices",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeBaseA", "nativePoliciesBootstrap", "nativeWorkflow"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.customers",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:inventory-stock-and-accounting-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "dueDateAndIdempotencyContract": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.invoice_items",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeBaseA", "nativeWorkflow"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.invoices",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:inventory-stock-and-accounting-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed"
+      }
+    },
+    {
+      "id": "function:shop_manager.calculate_work_order_totals(uuid)",
+      "kind": "function",
+      "signature": "shop_manager.calculate_work_order_totals(uuid)",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeWorkflow", "totalsCandidate"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.work_orders",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.work_order_job_lines",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.work_order_parts",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "pendingAclCandidateNotApplied": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "indirectCallerClosure": "unreviewed"
+      }
+    },
+    {
+      "id": "function:shop_manager.convert_work_order_to_invoice(uuid)",
+      "kind": "function",
+      "signature": "shop_manager.convert_work_order_to_invoice(uuid)",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeWorkflow", "converterContainment"],
+      "dependencies": [
+        {
+          "id": "function:shop_manager.calculate_work_order_totals(uuid)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.work_orders",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.invoices",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.invoice_items",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:inventory-stock-and-accounting-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "exactConverterContainmentSourceMappingOnly": "source-observed",
+        "currentEffectiveAcl": "unreviewed",
+        "atomicAuthorizedWorkflowAndConcurrency": "unreviewed"
+      }
+    },
+    {
+      "id": "function:shop_manager.convert_quote_to_work_order(uuid)",
+      "kind": "function",
+      "signature": "shop_manager.convert_quote_to_work_order(uuid)",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeWorkflow"],
+      "dependencies": [
+        {
+          "id": "function:shop_manager.calculate_work_order_totals(uuid)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.work_orders",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:quotes-and-quote-items-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "indirectDefinerTotalsPath": "source-observed",
+        "callerShopAuthorization": "unreviewed"
+      }
+    },
+    {
+      "id": "table:shop_manager.expenses",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeExpenses", "receipts"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.vehicles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.vehicle_receipts",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:inventory-stock-and-accounting-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "receiptExpenseIdempotencyAndCurrency": "unreviewed"
+      }
+    },
+    {
+      "id": "table:public.vehicles",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["publicVehicles", "receipts"],
+      "dependencies": [
+        {
+          "id": "external:auth.users",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:owned-vehicle-service-garage-and-ride-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "ownerPublicSummaryAndPrivateEvidenceBoundaries": "unreviewed"
+      }
+    },
+    {
+      "id": "table:public.customer_accounts",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["customerLedger", "receipts"],
+      "dependencies": [
+        {
+          "id": "external:auth.users",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "accountEnsureRpcClosure": "unreviewed"
+      }
+    },
+    {
+      "id": "table:public.customer_business_consents",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["customerLedger"],
+      "dependencies": [
+        {
+          "id": "table:public.customer_accounts",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.businesses",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:public.is_business_member(uuid,uuid)",
+          "relation": "policy-helper",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:associate-consent-and-admin-helper-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "expiryRevocationAndConsentWriterAuthority": "unreviewed"
+      }
+    },
+    {
+      "id": "table:public.vehicle_history_events",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["customerLedger", "receipts"],
+      "dependencies": [
+        {
+          "id": "table:public.vehicles",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.customer_accounts",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.customer_business_consents",
+          "relation": "policy-helper",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:public.is_business_member(uuid,uuid)",
+          "relation": "policy-helper",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:associate-consent-and-admin-helper-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "anonymousProjectionColumnAcl": "unreviewed",
+        "sourceEventUniqueIndex": "unreviewed",
+        "serviceAndComponentTriggerClosure": "unreviewed"
+      }
+    },
+    {
+      "id": "table:public.installed_components",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["lifecycle", "receipts", "directVehicleCorrection"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.vehicles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.vehicles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.vehicle_shop_links",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.vehicle_history_events",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:parts-order-installation-and-warranty-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "directOwnedVehicleForwardCorrectionNotApplied": "source-observed"
+      }
+    },
+    {
+      "id": "table:public.vehicle_receipts",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts"],
+      "dependencies": [
+        {
+          "id": "table:public.vehicles",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.vehicles",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:auth.users",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "policy:public.vehicle_receipts.receipt_read",
+          "relation": "contains",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:receipt-routine-trigger-and-grant-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "reviewedEntryAndNoAutomaticAccounting": "unreviewed"
+      }
+    },
+    {
+      "id": "table:public.vehicle_receipt_items",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts"],
+      "dependencies": [
+        {
+          "id": "table:public.vehicle_receipts",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:vehicle_receipts_private.receipt_access(uuid,boolean)",
+          "relation": "policy-helper",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:receipt-routine-trigger-and-grant-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "humanReviewInstallAndSharingSemantics": "unreviewed"
+      }
+    },
+    {
+      "id": "table:public.vehicle_shop_links",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.vehicles",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.vehicles",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.shops",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:vehicle_receipts_private.owns_vehicle(uuid)",
+          "relation": "policy-helper",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:vehicle_receipts_private.shop_access(uuid,boolean)",
+          "relation": "policy-helper",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "approvalRevocationAndNoVinOnlyAuthority": "unreviewed"
+      }
+    },
+    {
+      "id": "table:vehicle_receipts_private.link_requests",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts", "receiptDenyPolicies"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.vehicles",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:auth.users",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "nonExposedSchemaAndDirectClientDenial": "unreviewed"
+      }
+    },
+    {
+      "id": "table:vehicle_receipts_private.scan_budgets",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts", "receiptDenyPolicies"],
+      "dependencies": [
+        {
+          "id": "external:auth.users",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "columns": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "nonExposedSchemaAndDirectClientDenial": "unreviewed"
+      }
+    },
+    {
+      "id": "policy:public.vehicle_receipts.receipt_read",
+      "kind": "policy",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts"],
+      "dependencies": [
+        {
+          "id": "function:vehicle_receipts_private.receipt_access(uuid,boolean)",
+          "relation": "policy-helper",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "identity": "source-observed",
+        "attachment": "source-observed",
+        "definition": "source-observed",
+        "effectiveRolesAndPolicyComposition": "unreviewed"
+      }
+    },
+    {
+      "id": "function:vehicle_receipts_private.owns_vehicle(uuid)",
+      "kind": "function",
+      "signature": "vehicle_receipts_private.owns_vehicle(uuid)",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts"],
+      "dependencies": [
+        {
+          "id": "table:public.vehicles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        { "id": "external:auth.uid()", "relation": "calls", "reviewStatus": "source-observed" }
+      ],
+      "facets": { "definition": "source-observed", "ownerSearchPathAndExecuteAcl": "unreviewed" }
+    },
+    {
+      "id": "function:vehicle_receipts_private.shop_access(uuid,boolean)",
+      "kind": "function",
+      "signature": "vehicle_receipts_private.shop_access(uuid,boolean)",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.vehicles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.customers",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.profiles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.user_roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:shop_manager.employee_allowed_modules()",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:shop_manager.is_shop_operations_manager(uuid,uuid)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "trustedTenantAndWriteAuthority": "unreviewed"
+      }
+    },
+    {
+      "id": "function:vehicle_receipts_private.receipt_access(uuid,boolean)",
+      "kind": "function",
+      "signature": "vehicle_receipts_private.receipt_access(uuid,boolean)",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts"],
+      "dependencies": [
+        {
+          "id": "table:public.vehicle_receipts",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.vehicle_shop_links",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:vehicle_receipts_private.owns_vehicle(uuid)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:vehicle_receipts_private.shop_access(uuid,boolean)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "sharingAndRevokedLinkIsolation": "unreviewed"
+      }
+    },
+    {
+      "id": "function:vehicle_receipts_private.sync_history(uuid)",
+      "kind": "function",
+      "signature": "vehicle_receipts_private.sync_history(uuid)",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts"],
+      "dependencies": [
+        {
+          "id": "table:public.vehicle_receipts",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.vehicle_receipt_items",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.customer_accounts",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.vehicle_history_events",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.shops",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "reviewedEventIdempotencyAndDateSemantics": "unreviewed"
+      }
+    },
+    {
+      "id": "function:public.save_vehicle_receipt(uuid,text,date,text,numeric,jsonb,boolean)",
+      "kind": "function",
+      "signature": "public.save_vehicle_receipt(uuid,text,date,text,numeric,jsonb,boolean)",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts"],
+      "dependencies": [
+        {
+          "id": "function:vehicle_receipts_private.save_receipt(uuid,text,date,text,numeric,jsonb,boolean)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": { "definition": "source-observed", "invokerWrapperAndExecuteAcl": "unreviewed" }
+    },
+    {
+      "id": "function:vehicle_receipts_private.save_receipt(uuid,text,date,text,numeric,jsonb,boolean)",
+      "kind": "function",
+      "signature": "vehicle_receipts_private.save_receipt(uuid,text,date,text,numeric,jsonb,boolean)",
+      "disposition": "candidate",
+      "sourceRefs": ["receipts"],
+      "dependencies": [
+        {
+          "id": "function:vehicle_receipts_private.receipt_access(uuid,boolean)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "function:vehicle_receipts_private.sync_history(uuid)",
+          "relation": "calls",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.vehicle_receipts",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:public.vehicle_receipt_items",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:storage.objects",
+          "relation": "external-prerequisite",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "humanReviewAndPrivateAttachmentPrerequisite": "unreviewed"
+      }
+    },
+    {
+      "id": "function:shop_manager.user_belongs_to_shop(uuid,uuid)",
+      "kind": "function",
+      "signature": "shop_manager.user_belongs_to_shop(uuid,uuid)",
+      "disposition": "unverified",
+      "sourceRefs": ["employeeLedger"],
+      "dependencies": [
+        {
+          "id": "external:identity-constraints-policies-grants-and-trigger-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "callSiteOnlyNotDefinitionPin": "source-observed",
+        "definitionAndSupersession": "unreviewed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "trustedMembershipAuthority": "unreviewed"
+      }
+    },
+    {
+      "id": "function:shop_manager.has_role(uuid,text)",
+      "kind": "function",
+      "signature": "shop_manager.has_role(uuid,text)",
+      "disposition": "unverified",
+      "sourceRefs": ["employeeLedger"],
+      "dependencies": [
+        {
+          "id": "external:role-types-and-catalog-initialization",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:identity-constraints-policies-grants-and-trigger-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "textOverloadCallSiteOnlyNotEnumOverloadEquivalence": "source-observed",
+        "definitionAndSupersession": "unreviewed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "trustedRoleAuthority": "unreviewed"
+      }
+    },
+    {
+      "id": "external:auth.users",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "platformManagedInstallation": "unreviewed",
+        "roleOwnershipAndApiBoundary": "unreviewed",
+        "noAuthRowsOrSecretsInInventory": "source-observed"
+      }
+    },
+    {
+      "id": "external:auth.uid()",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "platformManagedInstallation": "unreviewed",
+        "verifiedJwtActorAndSessionContract": "unreviewed"
+      }
+    },
+    {
+      "id": "external:public.organizations-distinct-from-businesses",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "objectAndMembershipClosure": "unreviewed",
+        "noBusinessIdEqualsOrganizationIdAssumption": "source-observed"
+      }
+    },
+    {
+      "id": "external:role-types-and-catalog-initialization",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "publicAndNativeEnumsAreDistinct": "source-observed",
+        "enumValueOrderAndLaterAdditions": "unreviewed",
+        "separatelyReviewedCatalogSeed": "unreviewed"
+      }
+    },
+    {
+      "id": "external:identity-constraints-policies-grants-and-trigger-closure",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "allLaterAlterationsAndSecurityAttachments": "unreviewed",
+        "freshCatalogAndDeclarationLineage": "unreviewed",
+        "profileShopIdHasNoInventedForeignKey": "source-observed"
+      }
+    },
+    {
+      "id": "external:module-permission-and-override-closure",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "modulePermissionObjectsAndOperatingContext": "unreviewed",
+        "roleOverrideAndTemporaryPermissionPrecedence": "unreviewed",
+        "allRoutineCallersIncludingDynamicSql": "unreviewed"
+      }
+    },
+    {
+      "id": "external:register-and-employee-operating-context-closure",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "workLocationsShiftAndRegisterDependencies": "unreviewed",
+        "notWholeHistoricalRegisterReplay": "source-observed",
+        "counterCostReplayTrapRemainsBlocked": "source-observed"
+      }
+    },
+    {
+      "id": "external:customer-workorder-constraint-and-trigger-closure",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "allLaterForeignKeysDefaultsSequencesAndIndexes": "unreviewed",
+        "childRowTenantPolicyClosure": "unreviewed",
+        "notificationHistoryAndAccountingTriggerClosure": "unreviewed"
+      }
+    },
+    {
+      "id": "external:inventory-stock-and-accounting-closure",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "inventoryPaymentsExpensesAndJournalObjects": "unreviewed",
+        "postingAndReversalTriggers": "unreviewed",
+        "stockAndAccountingDataInvariants": "unreviewed",
+        "sequencesAndEffectivePrivileges": "unreviewed"
+      }
+    },
+    {
+      "id": "external:quotes-and-quote-items-closure",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "tableDeclarationAndTenantAttachments": "unreviewed",
+        "quoteConversionAtomicAuthorization": "unreviewed"
+      }
+    },
+    {
+      "id": "external:owned-vehicle-service-garage-and-ride-closure",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "serviceRecordsGarageAndRidesDefinitions": "unreviewed",
+        "ownershipAndPrivateReceiptGuards": "unreviewed",
+        "serviceHistorySynchronization": "unreviewed"
+      }
+    },
+    {
+      "id": "external:associate-consent-and-admin-helper-closure",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "associateEligibilityAndPublicAdminRoleObjects": "unreviewed",
+        "accountConsentAndHistoryRpcClosure": "unreviewed",
+        "consentRevocationTests": "unreviewed"
+      }
+    },
+    {
+      "id": "external:parts-order-installation-and-warranty-closure",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "lifecycleSplitLineageAndFullObjectClosure": "unreviewed",
+        "pendingPartsSecurityForwardSet": "unreviewed",
+        "installationVehicleConstraintAndHistoryTriggers": "unreviewed"
+      }
+    },
+    {
+      "id": "external:receipt-routine-trigger-and-grant-closure",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [
+        {
+          "id": "table:public.installed_components",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.expenses",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:owned-vehicle-service-garage-and-ride-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:storage.objects",
+          "relation": "external-prerequisite",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:storage.buckets",
+          "relation": "external-prerequisite",
+          "reviewStatus": "source-observed"
+        }
+      ],
+      "facets": {
+        "allRemainingPublicWrappersAndPrivateImplementations": "unreviewed",
+        "startInstallShareDiscardScanLinkExpenseAndVisibilityRoutines": "unreviewed",
+        "serviceGarageRideComponentAndExpenseGuards": "unreviewed",
+        "schemaUsageDefaultAndEffectiveExecuteAcl": "unreviewed",
+        "noFullRoutineClosureClaim": "source-observed"
+      }
+    },
+    {
+      "id": "external:storage.objects",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "platformManagedInstallation": "unreviewed",
+        "privateBucketReadUploadDeleteAndServicePolicies": "unreviewed",
+        "actualObjectPresenceAndRecovery": "unreviewed"
+      }
+    },
+    {
+      "id": "external:storage.buckets",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "platformManagedInstallation": "unreviewed",
+        "receiptAndServiceBucketReferenceConfigurationIsNotSchema": "source-observed",
+        "privateSizeAndMimeConfiguration": "unreviewed"
+      }
+    }
+  ],
+  "platformPrerequisites": [
+    {
+      "id": "platform:postgres-supabase-version-and-extensions",
+      "reason": "Pin and independently verify the target PostgreSQL/Supabase versions, required extensions, schema ownership and defaults. This offline inventory installs or upgrades none.",
+      "reviewStatus": "unverified"
+    },
+    {
+      "id": "platform:auth-storage-roles-and-api-exposure",
+      "reason": "Platform-managed auth/storage schemas, anon/authenticated/service roles, JWT actor semantics and exposed-schema configuration require a separately reviewed disposable Supabase environment; fixture stubs cannot certify them.",
+      "reviewStatus": "unverified"
+    },
+    {
+      "id": "platform:two-empty-target-replay-and-existing-state-upgrade",
+      "reason": "No candidate baseline SQL is generated or executed. Deterministic clean initialization twice, the explicit forward upgrade path and adversarial role behavior remain unverified.",
+      "reviewStatus": "unverified"
+    },
+    {
+      "id": "platform:backup-restore-private-storage-and-release-boundary",
+      "reason": "Verified database/private-storage recovery, complete deploy artifacts and an explicit reviewed release boundary remain prerequisites. Source correspondence is not recovery or release authorization.",
+      "reviewStatus": "unverified"
+    }
+  ],
+  "forwardOnlySources": [
+    "partsHardening",
+    "partsFollowups",
+    "directVehicleCorrection",
+    "bootstrapCandidate",
+    "totalsCandidate"
+  ],
+  "excludedExecutions": [
+    {
+      "id": "execution:team-thread-backfill-and-unrelated-notification-realtime-setup",
+      "sourceRefs": ["staffTeamThreads"],
+      "reason": "Pin the known staff-trigger/definer-writer chain without executing the whole chat source. Its existing-business team-thread backfill, unrelated tow/marketplace notifications and realtime publication changes remain outside this scope. Known chat dependency references do not authorize messages or customer communications."
+    },
+    {
+      "id": "execution:all-historical-chain-replay-and-history-adoption",
+      "sourceRefs": ["nativeBaseA", "nativeBaseB", "nativeBaseC", "registers"],
+      "reason": "All files are read-only pinned evidence inputs. No historical-chain replay, timestamp repair, applied-history adoption, SQL concatenation or deployment is authorized by this inventory; the documented counter-cost replay trap remains unresolved."
+    },
+    {
+      "id": "execution:temporary-ingress-auth-transfer-demo-reseed-and-acceptance",
+      "sourceRefs": [],
+      "reason": "Temporary migration ingress/auth-transfer operations, playground/demo reseeding and acceptance mutation scripts are outside the candidate baseline. This exclusion identifies a forbidden execution category, not proof that every historical occurrence has been enumerated."
+    },
+    {
+      "id": "execution:staff-provisioning-backfill-loops",
+      "sourceRefs": ["staffBridge", "assistantManager"],
+      "reason": "Retain the provisioning routine/trigger source lineage but do not execute whole-source staff loops or rewrite live profile/shop/role identities. Existing-state compatibility requires separately tested synthetic fixtures."
+    },
+    {
+      "id": "execution:receipt-customer-account-and-service-history-backfills",
+      "sourceRefs": ["customerLedger", "receipts"],
+      "reason": "Account/history INSERT-SELECT backfills and consent/customer data conversions remain separate data work. Pinned schema/function text does not authorize their execution or prove backfilled row completeness."
+    },
+    {
+      "id": "execution:implicit-role-seeds-and-private-bucket-upserts",
+      "sourceRefs": ["nativeResolvers", "receipts"],
+      "reason": "Role initialization and private receipt/service bucket upserts are reference configuration/data operations requiring separate pinned declarations and tests, not silent schema-only baseline inclusions."
+    },
+    {
+      "id": "execution:pending-forward-and-unapproved-helper-changes",
+      "sourceRefs": [
+        "partsHardening",
+        "partsFollowups",
+        "directVehicleCorrection",
+        "bootstrapCandidate",
+        "totalsCandidate"
+      ],
+      "reason": "Forward files are inventory pins only. They must not be inferred applied, executed by an inventory check or folded into an observed-state baseline; helper candidates require separate scoped approval and release evidence."
+    }
+  ],
+  "separateDataAssertions": [
+    {
+      "id": "data:staff-team-chat-membership-and-shift-guard-compatibility",
+      "reason": "The staff team-thread trigger runs on every UPDATE and can call definer thread/membership writers even for shift or no-op updates. Verify actual-owner, roster and chat memberships plus guard compatibility in separately reviewed synthetic fixtures; none are executed or inferred complete here.",
+      "status": "unverified"
+    },
+    {
+      "id": "data:scope-is-initial-and-incomplete",
+      "reason": "This hand-reviewed seed registry is not comprehensive SQL parsing or complete catalog coverage. Missing routine/table/security attachment closures and all current-state parity remain explicit unknowns.",
+      "status": "unverified"
+    },
+    {
+      "id": "data:ph-chassis-reference-identity-and-no-fabricated-fitment",
+      "reason": "The PH chassis seed has no independently verified same-name retained history record in the dated audit. Verify separately scoped reference identity/count invariants; do not rerun or invent fitment.",
+      "status": "unverified"
+    },
+    {
+      "id": "data:staff-legacy-identity-shop-business-organization-linkage",
+      "reason": "Verify differing native profile id/user_id, nullable auth linkage, legitimate roster authority and distinct operational shop/business/public-organization identities without email/name/VIN inference or silent backfills.",
+      "status": "unverified"
+    },
+    {
+      "id": "data:role-catalog-and-extension-prerequisites",
+      "reason": "Enum values/order, native/public role catalogs, required reference rows and extension functions need independent deterministic initialization and compatibility tests.",
+      "status": "unverified"
+    },
+    {
+      "id": "data:receipt-history-account-and-consent-backfill-completeness",
+      "reason": "Schema/source hashes do not prove existing receipt/item/account/history rows, date semantics, event uniqueness, consent expiry/revocation or installation lineage.",
+      "status": "unverified"
+    },
+    {
+      "id": "data:accounting-stock-and-atomic-invoicing",
+      "reason": "Verify posting/reversals, inventory links, tax/currency handling, due dates, concurrency/idempotency and actor/shop authorization separately; passing inventory validation proves none of them.",
+      "status": "unverified"
+    },
+    {
+      "id": "data:private-storage-configuration-objects-and-recovery",
+      "reason": "Private bucket flags, MIME/size limits, attachment objects, policy behavior and recoverable storage backups are distinct from schema inventory and are not inspected here.",
+      "status": "unverified"
+    }
+  ]
+}
