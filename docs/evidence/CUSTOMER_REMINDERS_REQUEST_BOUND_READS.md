@@ -7,8 +7,8 @@ and trusted native authority remain explicit release gates before shipping this
 direct-table consumer.
 
 Draft PR #30: `https://github.com/Hunting-Fishing/motorsales365/pull/30`, code
-`a2eff76`. CI status is recorded in the completion checklist; no production
-application or database release occurred.
+`a2eff76`. Docs head `f4c86c1` passed all six CI gates (run `38642371142`),
+verified on this resume; no production application or database release occurred.
 
 ## Current bounded application contract
 

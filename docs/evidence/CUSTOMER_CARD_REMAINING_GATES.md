@@ -26,6 +26,12 @@ two-query reader does not atomically establish current parent visibility. Review
 new-function ACLs, exact recovery and disposable authorization/move/delete cases
 before changing the adapter; no production release or RLS widening is authorized.
 
+PR #31 now implements that invoker API and guarded recovery offline, with22 new
+tests/191 full tooling passes (`CUSTOMER_REMINDERS_INVOKER_READ_CONTRACT.md`).
+The migration is unapplied and the adapter still uses two queries. Next verify
+PR #31 and implement the strict one-RPC adapter, retaining all native authority,
+compatible migration/recovery/API/role/load and trusted-entry release gates.
+
 ## Current narrow metadata
 
 Project `wjxaajgvddtrxxtocxen`, read-only catalog SELECTs only:
