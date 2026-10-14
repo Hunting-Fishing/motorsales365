@@ -31,7 +31,9 @@ Public per-vehicle profile (`/passport/$slug`) — owner timeline, service histo
 - `.lovable/june7-audit.md` — bump item #14
 
 **Schema invariants**
-- `vehicles.is_public = true` is the gate for everything public
+- Passport summaries require `vehicles.is_public = true`; published ride summaries require a published ride linked to its owner’s vehicle and per-event opt-in.
+- Receipt originals and private storage paths never appear in public projections. Raw service-record Data API access is owner/admin only.
+- 2026-10-14: private receipt review, owner-approved shop links, parts-garage vehicle identity and shared purchase/install/service history added; rollout tracked in `docs/VEHICLE_RECEIPTS_HISTORY_BUILD.md`.
 - `vehicles.disclosures` = `{ flood: 'none'|'minor'|'major', accident: 'none'|'minor'|'major', notes?: string }`
 - `vehicle_photos` RLS: anon SELECT only when parent vehicle `is_public`
 

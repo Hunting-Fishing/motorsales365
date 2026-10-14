@@ -1,9 +1,10 @@
+import { PublicVehicleHistory } from "@/components/public-vehicle-history";
 /**
  * SYNC GROUP: vehicle-passport
  * Source of truth: .lovable/sync-groups.md#vehicle-passport
  * Extracted from src/routes/passport.$slug.tsx to avoid TanStack
  * router-plugin code-splitter parse bug on large inline components.
- * VERSION: 3
+ * VERSION: 4
  */
 import { Link } from "@tanstack/react-router";
 import {
@@ -49,10 +50,7 @@ export function PassportPage({
 }) {
   const v: any = vehicle;
   const name = v.nickname || `${v.year ? v.year + " " : ""}${v.make} ${v.model}`;
-  const totalSpent = records.reduce(
-    (s: number, r: any) => s + Number(r.cost_php || 0),
-    0,
-  );
+  const totalSpent = records.reduce((s: number, r: any) => s + Number(r.cost_php || 0), 0);
   const lastMileage = records.find((r: any) => r.mileage_km)?.mileage_km;
   const disclosures = (v.disclosures || {}) as {
     flood?: string;
@@ -80,11 +78,13 @@ export function PassportPage({
               <Badge variant="secondary" className="gap-1 print:hidden">
                 <ShieldCheck className="h-3 w-3" /> Verified passport
               </Badge>
-              {v.passport_premium && v.passport_premium_until && new Date(v.passport_premium_until) > new Date() && (
-                <Badge className="gap-1 bg-amber-500 text-white print:hidden">
-                  <Crown className="h-3 w-3" /> Premium
-                </Badge>
-              )}
+              {v.passport_premium &&
+                v.passport_premium_until &&
+                new Date(v.passport_premium_until) > new Date() && (
+                  <Badge className="gap-1 bg-amber-500 text-white print:hidden">
+                    <Crown className="h-3 w-3" /> Premium
+                  </Badge>
+                )}
               <span className="hidden text-xs uppercase tracking-wide text-muted-foreground print:inline">
                 Verified vehicle passport — 365motorsales.com
               </span>
@@ -93,16 +93,12 @@ export function PassportPage({
               {name}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              {v.make} {v.model} {v.year ? `· ${v.year}` : ""}{" "}
-              {v.color ? `· ${v.color}` : ""}{" "}
+              {v.make} {v.model} {v.year ? `· ${v.year}` : ""} {v.color ? `· ${v.color}` : ""}{" "}
               {v.plate_number ? `· ${v.plate_number}` : ""}
             </p>
             <div className="mt-5 grid grid-cols-3 gap-3 print:grid-cols-3">
               <Stat label="Records" value={records.length.toString()} />
-              <Stat
-                label="Total spent"
-                value={totalSpent > 0 ? formatPHP(totalSpent) : "—"}
-              />
+              <Stat label="Total spent" value={totalSpent > 0 ? formatPHP(totalSpent) : "—"} />
               <Stat
                 label="Latest mileage"
                 value={lastMileage ? `${lastMileage.toLocaleString()} km` : "—"}
@@ -197,6 +193,10 @@ export function PassportPage({
           </div>
         )}
 
+        <div className="mt-6">
+          <PublicVehicleHistory slug={v.passport_slug} surface="passport" />
+        </div>
+
         <div className="mt-6 rounded-xl border border-border bg-card p-5 print:border-0 print:bg-white print:p-0">
           <h2 className="font-display text-lg font-semibold">Service history</h2>
           <p className="text-xs text-muted-foreground print:text-gray-500">
@@ -227,16 +227,6 @@ export function PassportPage({
                       {r.cost_php ? ` · ${formatPHP(r.cost_php)}` : ""}
                     </p>
                     {r.notes && <p className="mt-1.5 text-sm">{r.notes}</p>}
-                    {r.receipt_url && (
-                      <a
-                        href={r.receipt_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-1.5 inline-flex items-center gap-1 text-xs text-primary hover:underline print:hidden"
-                      >
-                        View receipt <ExternalLink className="h-3 w-3" />
-                      </a>
-                    )}
                   </div>
                 </li>
               ))}

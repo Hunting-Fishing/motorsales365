@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const VehicleInput = z.object({
+  vehicleId: z.string().uuid().optional().nullable(),
   category: z.enum(["car", "motorcycle"]),
   make: z.string().min(1).max(100),
   model: z.string().min(1).max(100),
@@ -15,9 +16,9 @@ export const getGarageVehicle = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("user_garage_vehicles")
-      .select("category, make, model, year, trim, engine")
+      .select("vehicleId:vehicle_id, category, make, model, year, trim, engine")
       .eq("user_id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -29,20 +30,28 @@ export const setGarageVehicle = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => VehicleInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase
-      .from("user_garage_vehicles")
-      .upsert(
-        {
-          user_id: userId,
-          category: data.category,
-          make: data.make,
-          model: data.model,
-          year: data.year ?? null,
-          trim: data.trim ?? null,
-          engine: data.engine ?? null,
-        },
-        { onConflict: "user_id" },
-      );
+    if (data.vehicleId) {
+      const owned = await supabase
+        .from("vehicles")
+        .select("id")
+        .eq("id", data.vehicleId)
+        .eq("owner_user_id", userId)
+        .maybeSingle();
+      if (owned.error || !owned.data) throw new Error("Vehicle owner access required");
+    }
+    const { error } = await (supabase as any).from("user_garage_vehicles").upsert(
+      {
+        user_id: userId,
+        vehicle_id: data.vehicleId ?? null,
+        category: data.category,
+        make: data.make,
+        model: data.model,
+        year: data.year ?? null,
+        trim: data.trim ?? null,
+        engine: data.engine ?? null,
+      },
+      { onConflict: "user_id" },
+    );
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -51,10 +60,7 @@ export const clearGarageVehicle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase
-      .from("user_garage_vehicles")
-      .delete()
-      .eq("user_id", userId);
+    const { error } = await supabase.from("user_garage_vehicles").delete().eq("user_id", userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

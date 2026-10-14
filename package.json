@@ -18,7 +18,9 @@
     "smoke:signup:failure-log": "node scripts/smoke-signup-failure-log.mjs",
     "smoke:signup:failure-log:ref": "node scripts/smoke-signup-failure-log-ref.mjs",
     "smoke:signup:matrix": "node scripts/smoke-signup-matrix.mjs",
-    "test:e2e:signup": "playwright test e2e/signup-*.spec.ts"
+    "test:e2e:signup": "playwright test e2e/signup-*.spec.ts",
+    "test:vehicle-receipts:db": "node scripts/vehicle-receipts/test-database.mjs",
+    "receipts:migrate-legacy": "node scripts/vehicle-receipts/migrate-legacy-receipts.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.51",
@@ -109,9 +111,11 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.9",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "2.13.1",
     "@playwright/test": "^1.61.1",
+    "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/google.maps": "^3.64.1",
