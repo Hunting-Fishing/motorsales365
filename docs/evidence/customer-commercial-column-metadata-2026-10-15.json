@@ -1,0 +1,120 @@
+{
+  "formatVersion": 1,
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "mode": "read-only-catalog",
+  "scope": "Selected native invoice/quote column types, nullability and defaults only. No business rows, RPC, mutations, DDL or history/platform changes.",
+  "columns": [
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "invoices",
+      "column_name": "id",
+      "type": "text",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "invoices",
+      "column_name": "date",
+      "type": "text",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "invoices",
+      "column_name": "due_date",
+      "type": "text",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "invoices",
+      "column_name": "status",
+      "type": "text",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "invoices",
+      "column_name": "total",
+      "type": "numeric",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "invoices",
+      "column_name": "created_at",
+      "type": "timestamp with time zone",
+      "not_null": false,
+      "column_default": "now()"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "invoices",
+      "column_name": "customer_id",
+      "type": "uuid",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "quotes",
+      "column_name": "id",
+      "type": "uuid",
+      "not_null": true,
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "quotes",
+      "column_name": "quote_number",
+      "type": "text",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "quotes",
+      "column_name": "customer_id",
+      "type": "uuid",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "quotes",
+      "column_name": "status",
+      "type": "text",
+      "not_null": true,
+      "column_default": "'draft'::text"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "quotes",
+      "column_name": "total_amount",
+      "type": "numeric(10,2)",
+      "not_null": false,
+      "column_default": "0"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "quotes",
+      "column_name": "expiry_date",
+      "type": "date",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:00:13.169187",
+      "relname": "quotes",
+      "column_name": "created_at",
+      "type": "timestamp with time zone",
+      "not_null": true,
+      "column_default": "now()"
+    }
+  ]
+}

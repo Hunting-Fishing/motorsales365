@@ -42,8 +42,8 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest fully CI-verified application slice: PR #23, documentation head `3a3f1f2`, all six
-CI gates passed (run `38631111334`), 482 application tests. These are review
+Latest fully CI-verified application slice: PR #26, documentation head `9b1fa59`, all six
+CI gates passed (run `38636725539`), 522 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
@@ -101,11 +101,12 @@ Verification: 29 handler +24 integration focused tests pass; full application
 suite 522/522 across 42 files, report checker exit 0/no quarantined failures.
 Final full TypeScript check, formatting/diff and focused ESLint pass (zero errors,
 one existing route `any` warning). Independent source review clean. Existing
-tooling 156/156 unchanged. Remote CI pending at publication. No deployment; the
+tooling 156/156 unchanged. Latest docs head `9b1fa59` passed all six CI gates
+(run `38636725539`), verified on this resume. No deployment; the
 sparse checkout still omits public media and the activity APIs remain unapplied.
 See `evidence/CUSTOMER_DETAIL_REQUEST_BOUND_READS.md` for snapshot/test limits.
 
-Exact next action: verify PR #26 checks; then replace the commercial invoice/quote
+Exact next action: replace the commercial invoice/quote
 browser readers with strict actor-bound customer-scoped reads and independent
 freshness masking, preserving native TEXT invoice IDs/dates after catalog checks.
 Then communications reads, reminder integrity fixtures/reads, and separately
@@ -117,7 +118,41 @@ and narrow catalog pins: `evidence/CUSTOMER_CARD_REMAINING_GATES.md`.
 Continue native writer/attachment/provisioning/offboarding closure in parallel;
 all consent/tenure, baseline/recovery, mobile/pilot and hosting gates remain open.
 
-## Recovery evidence (original scope, retained)
+## Latest commercial history checkpoint (2026-10-15)
+
+Draft PR #27, code `56105e7`, test correction `0be35b0`, branch
+`completion/customer-commercial-request-bound`, stacked on verified PR #26
+docs head `9b1fa59`. Invoice/quote summaries now use independent authenticated
+caller-bound reads with customer visibility gates, strict complete native DTOs,
+actor/cancellation checks and deterministic 26-fetch/25-return snapshots. Browser
+reads are removed for these two sources; refresh/error/unavailable hides both old
+rows and cap captions. Source retries remain independent; account/customer changes
+unmount private observers and abort old signals.
+
+Invoice IDs/date/due_date remain native TEXT. Source sorting uses recorded
+created_at timestamps, not arbitrary date strings, and labels this explicitly.
+Valid calendar dates avoid timezone day shifts; invalid legacy/year-zero text is
+not normalized. PHP display preserves received JS-number precision where possible,
+not exact SQL NUMERIC precision. No invoice mutation, converter, SQL/grant,
+business communication, migration or deployment. All earlier live restrictions
+and release gates remain unchanged.
+
+Verification: 36 handler +23 UI focused tests; full application suite 576/576
+across 43 files/report checker exit 0; final stable-snapshot full typecheck passes.
+Focused ESLint/format/diff and independent source review pass. Tooling unchanged
+at 156/156. Latest remote CI pending. See
+`evidence/CUSTOMER_COMMERCIAL_REQUEST_BOUND_READS.md` for narrow metadata pins,
+compatibility, separate-snapshot and mocked-test limits.
+
+Exact next action: verify PR #27 checks, then implement request-bound bounded
+communications reads with independent freshness/cap handling. Logging mutation
+repair remains separate from reading: observed CHECK/NOT NULL vocabulary/staff
+requirements conflict with the current form. Rehearse reminders' actual scoped
+policy/integrity behavior offline before bounded reminder reads and trusted entry
+contracts. Continue native writer/security/provisioning/offboarding closure and
+baseline/upgrade/recovery; no authority or production acceptance is inferred.
+
+## Recovery evidence (original scope, retained below)
 
 - [x] Confirm receipt/history release PR #10 is merged on current main.
 - [x] Confirm five existing open PRs: #2, #5, #7, #8, #9.

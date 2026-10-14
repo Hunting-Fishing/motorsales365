@@ -5,7 +5,8 @@ stacked on the native composition proof. Application-only candidate; no live
 release, schema/grant changes or completed tenant-authority claim.
 
 Published as draft PR #26, code `0357afb`, stacked on PR #25 docs head `9152836`
-(all six CI gates, run `38635100444`). PR #26 remote CI pending at publication.
+(all six CI gates, run `38635100444`). PR #26 latest docs head `9b1fa59` passed
+all six CI gates (run `38636725539`), verified on the next slice's resume.
 
 ## Changed read boundary
 

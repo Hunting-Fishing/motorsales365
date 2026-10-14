@@ -3,6 +3,10 @@
 2026-10-15 Asia/Manila. Bounded source review and metadata-only observations;
 not live business acceptance, an authority repair or deployment.
 
+This reconnaissance records the PR #26 source snapshot. The subsequent commercial
+read-only implementation is tracked in `CUSTOMER_COMMERCIAL_REQUEST_BOUND_READS.md`;
+it does not resolve the communications/reminder or database-authority gates below.
+
 ## Current narrow metadata
 
 Project `wjxaajgvddtrxxtocxen`, read-only catalog SELECTs only:
