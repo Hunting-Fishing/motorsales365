@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { smSupabase } from "@/lib/shop-manager/db";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
 
 type CommRow = {
   id: string;
@@ -36,14 +37,22 @@ const TYPE_ICON: Record<string, any> = {
 
 export function CustomerCommunicationsLog({ customerId }: { customerId: string }) {
   const qc = useQueryClient();
+  const { user } = useAuth();
+  const queryKey = ["shop-manager", user?.id, "customer_communications", customerId];
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("call");
   const [direction, setDirection] = useState("outbound");
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
 
-  const { data: rows = [], isLoading } = useQuery({
-    queryKey: ["shop-manager", "customer_communications", customerId],
+  const {
+    data: rows = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey,
+    enabled: !!user,
     queryFn: async () => {
       const { data, error } = await (smSupabase as any)
         .from("customer_communications")
@@ -74,18 +83,23 @@ export function CustomerCommunicationsLog({ customerId }: { customerId: string }
       setSubject("");
       setContent("");
       setOpen(false);
-      qc.invalidateQueries({ queryKey: ["shop-manager", "customer_communications", customerId] });
+      qc.invalidateQueries({ queryKey });
     },
     onError: (e: any) => toast.error(e?.message ?? "Failed to log"),
   });
 
+  if (!user) return null;
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-base flex items-center gap-2">
           <MessageSquare className="h-4 w-4" /> Communications ({rows.length})
         </CardTitle>
-        <Button size="sm" variant={open ? "secondary" : "default"} onClick={() => setOpen((v) => !v)}>
+        <Button
+          size="sm"
+          variant={open ? "secondary" : "default"}
+          onClick={() => setOpen((v) => !v)}
+        >
           <Plus className="h-4 w-4 mr-1" /> {open ? "Cancel" : "Log entry"}
         </Button>
       </CardHeader>
@@ -94,7 +108,9 @@ export function CustomerCommunicationsLog({ customerId }: { customerId: string }
           <div className="rounded border p-3 space-y-2 bg-muted/30">
             <div className="grid grid-cols-2 gap-2">
               <Select value={type} onValueChange={setType}>
-                <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="call">Call</SelectItem>
                   <SelectItem value="email">Email</SelectItem>
@@ -103,7 +119,9 @@ export function CustomerCommunicationsLog({ customerId }: { customerId: string }
                 </SelectContent>
               </Select>
               <Select value={direction} onValueChange={setDirection}>
-                <SelectTrigger><SelectValue placeholder="Direction" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Direction" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="inbound">Inbound</SelectItem>
                   <SelectItem value="outbound">Outbound</SelectItem>
@@ -111,10 +129,23 @@ export function CustomerCommunicationsLog({ customerId }: { customerId: string }
                 </SelectContent>
               </Select>
             </div>
-            <Input placeholder="Subject (optional)" value={subject} onChange={(e) => setSubject(e.target.value)} />
-            <Textarea placeholder="What happened?" value={content} onChange={(e) => setContent(e.target.value)} rows={3} />
+            <Input
+              placeholder="Subject (optional)"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            />
+            <Textarea
+              placeholder="What happened?"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={3}
+            />
             <div className="flex justify-end">
-              <Button size="sm" disabled={create.isPending || !content} onClick={() => create.mutate()}>
+              <Button
+                size="sm"
+                disabled={create.isPending || !content}
+                onClick={() => create.mutate()}
+              >
                 {create.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : null}
                 Save entry
               </Button>
@@ -122,7 +153,14 @@ export function CustomerCommunicationsLog({ customerId }: { customerId: string }
           </div>
         )}
 
-        {isLoading ? (
+        {isError ? (
+          <div role="alert" className="space-y-2 text-sm">
+            <p>Could not load communications.</p>
+            <Button variant="outline" size="sm" onClick={() => void refetch()}>
+              Retry communications
+            </Button>
+          </div>
+        ) : isLoading ? (
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading…
           </div>
@@ -138,15 +176,23 @@ export function CustomerCommunicationsLog({ customerId }: { customerId: string }
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium capitalize">{r.type ?? "note"}</span>
-                      {r.direction ? <Badge variant="outline" className="text-[10px]">{r.direction}</Badge> : null}
+                      {r.direction ? (
+                        <Badge variant="outline" className="text-[10px]">
+                          {r.direction}
+                        </Badge>
+                      ) : null}
                       <span className="text-xs text-muted-foreground ml-auto">
                         {r.date ? new Date(r.date).toLocaleString() : ""}
                       </span>
                     </div>
                     {r.subject ? <div className="font-medium mt-0.5">{r.subject}</div> : null}
-                    {r.content ? <div className="text-muted-foreground whitespace-pre-wrap">{r.content}</div> : null}
+                    {r.content ? (
+                      <div className="text-muted-foreground whitespace-pre-wrap">{r.content}</div>
+                    ) : null}
                     {r.staff_member_name ? (
-                      <div className="text-xs text-muted-foreground mt-1">by {r.staff_member_name}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        by {r.staff_member_name}
+                      </div>
                     ) : null}
                   </div>
                 </li>

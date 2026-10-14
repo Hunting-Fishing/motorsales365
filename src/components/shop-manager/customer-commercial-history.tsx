@@ -40,7 +40,8 @@ export function CustomerCommercialHistory({ customerId }: { customerId: string }
     queryKey: ["shop-manager", user?.id, "customer", customerId, "invoices"],
     enabled: !!user,
     queryFn: async (): Promise<Invoice[]> => {
-      const { data, error } = await smSupabase
+      // Generated types currently describe public, not the shop_manager schema.
+      const { data, error } = await (smSupabase as any)
         .from("invoices")
         .select("id,date,due_date,status,total")
         .eq("customer_id", customerId)
@@ -54,7 +55,7 @@ export function CustomerCommercialHistory({ customerId }: { customerId: string }
     queryKey: ["shop-manager", user?.id, "customer", customerId, "quotes"],
     enabled: !!user,
     queryFn: async (): Promise<Quote[]> => {
-      const { data, error } = await smSupabase
+      const { data, error } = await (smSupabase as any)
         .from("quotes")
         .select("id,quote_number,created_at,expiry_date,status,total_amount")
         .eq("customer_id", customerId)
