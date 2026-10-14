@@ -211,7 +211,19 @@ caller RPC, validating the full strict context/envelope and101 rows before100 +
 hasMore. Request cancellation is forwarded and SDK retries explicitly disabled;
 there is no direct-table or privileged fallback if the unapplied API is absent.
 UI/result shape and disabled writes stay unchanged.59 handler +22 UI focused
-tests,723 full application tests and full TypeScript pass; CI pending verification.
+tests,723 full application tests and full TypeScript pass. Docs `9edbd21` passed
+all six CI gates (run `38646246443`), verified on the native diagnostic follow-up.
 See `evidence/CUSTOMER_REMINDERS_RPC_ADAPTER.md`. Catalog-only refresh confirms
 the API remains absent and approved invoice restriction retained at its dated
 snapshot; no live release/record/permission change or new helper approval.
+
+The native identity diagnostic design now has two fixed offline-tested review
+queries (17 core counts;10 optional shop/business counts),15 new memory-only
+regressions and a dedicated CI gate in draft PR #33 (code `8de974e`), with206/206
+full sequential tooling tests and independent review passing. Remote CI pending
+verification. No production count/plan or installed RPC,
+guard or repair is supplied. See `evidence/NATIVE_IDENTITY_COUNT_DIAGNOSTIC.md`.
+Next is the unchanged-source staff/chat/native transaction rehearsal with actual
+status CHECKs and all observed staff triggers, before a companion guard; see
+`evidence/NATIVE_STAFF_TRIGGER_REHEARSAL_PLAN.md`. Narrow catalog metadata is not
+complete native authority/offboarding, applied parity or production acceptance.

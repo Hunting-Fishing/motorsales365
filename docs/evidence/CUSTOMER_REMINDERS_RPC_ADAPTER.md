@@ -8,7 +8,8 @@ Parent docs `e51125c` passed all six CI gates (run `38644991112`), verified on
 this follow-up. The separate hosting build still fails; preview upload is skipped.
 Draft PR #32: `https://github.com/Hunting-Fishing/motorsales365/pull/32`, code
 `dff0aa8`, branch `completion/customer-reminders-rpc-adapter`, stacked on #31.
-Remote CI pending verification at publication. No production release occurred.
+Latest docs head `9edbd21` passed all six CI gates (run `38646246443`), verified
+on the native diagnostic follow-up. No production release occurred.
 
 ## Request and response boundary
 
