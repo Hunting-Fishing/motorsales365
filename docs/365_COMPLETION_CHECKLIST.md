@@ -300,11 +300,10 @@ omits live NOT NULL `due_date`, has wrong line mappings and lacks atomic/idempot
 creation. Do not wire the legacy RPC as a shortcut. Exact evidence and ordered
 acceptance gates: `evidence/SHOP_MANAGER_INVOICE_RELEASE_GATES.md`.
 
-Owner action requested once: approve or decline tested temporary production
-restriction of the legacy invoice converter. No response/approval is inferred;
-related helper restrictions need explicitly scoped authority too. Continue safe
-offline preparation while authority is pending. Existing applied migrations and
-live privileges remain untouched.
+The initial checkpoint requested owner approval for tested temporary converter
+restriction. The owner subsequently approved this exact converter-only action;
+see the following containment checkpoint. Related helpers/profile changes remain
+outside that approval. Existing applied migrations must remain untouched.
 
 Five focused memory-only PGlite ACL tests now prove historical definer bypass
 despite real synthetic RLS denial, and verify proposed fixture-only revocations.
@@ -335,3 +334,36 @@ atomicity and concurrency implementation. Continue the
 baseline/recovery path. Native bounded receipt/installation activity follows;
 retail/recruitment pipelines, wider account/role UI audits and owner/pilot
 acceptance remain unfinished. Do not deploy the sparse local artifact.
+
+## Tenant-authority proof and approved containment: 2026-10-15
+
+Branch: `security/native-tenant-authority`, stacked on PR #14. Its docs head
+`bbb93f0` passed all six CI gates (run `38609286187`); no completed OCR/UI work
+was repeated. Six new disposable authority regressions reproduce profile UPDATE
+and INSERT shop pivots under ordinary authenticated roles, show the legacy
+id/user_id resolver mismatch, and contrast fixture-only safe-column grants.
+No profile/customer rows were touched live.
+
+The owner explicitly approved tested temporary restriction of ONLY
+`shop_manager.convert_work_order_to_invoice(uuid)`. Fresh catalog/source checks
+match its archived body and current complete ACL. CLI-generated forward file:
+`20261014175040_contain_legacy_invoice_conversion_execute.sql`. It is guarded,
+atomic and converter-only; it retains owner/service access and checks the totals
+helper unchanged. Six additional tests execute this exact file and the exact
+operator-opt-in review-only rollback in memory, including postcondition failure
+after REVOKE and full automatic statement rollback.
+
+Local focused tests: 12/12. CI tooling now includes both suites (53 tests total).
+No production application is claimed yet. Before executing this one approved ACL
+file: publish/review, require CI, refresh unchanged target state and retain the
+scoped recovery record. Do not db-push or repair the whole historical chain.
+See `evidence/INVOICE_CONVERTER_CONTAINMENT_RELEASE.md` for source/ACL fingerprints,
+impact, recovery rehearsal and exact release status. Restoring PUBLIC access
+would reopen the risk and is not automatically authorized.
+
+Next: complete the approved converter-only containment and role/catalog
+postchecks; then prepare the trusted profile/membership guard candidate offline.
+The exposed totals helper and profile binding still need separately scoped
+release authority; invoice atomicity and the global baseline/recovery gates remain.
+No application deployment, customer communication or paid resource is authorized
+by this checkpoint.

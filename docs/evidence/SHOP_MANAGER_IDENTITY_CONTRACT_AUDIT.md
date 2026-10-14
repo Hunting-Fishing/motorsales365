@@ -85,3 +85,15 @@ approval gates. Preserve applied historical migrations.
 
 Migration pointers are under `supabase/migrations/`. Source correspondence does
 not replace the fresh catalog observations or establish full deployed parity.
+
+## Disposable proof checkpoint
+
+`scripts/ci/shop-manager-profile-authority.test.mjs` passes six tests using five
+sequential memory-only PGlite databases and hash-pinned original SQL. Ordinary
+authenticated roles first see only their own customers, then a self-profile shop
+UPDATE or self INSERT changes the current-shop helper and exposes the other
+synthetic shop despite no fixture membership. Legacy id/user_id resolver mismatch
+is reproduced. A fixture-only column-grant contrast blocks both pivots while
+allowing a display-name edit. Test/statement/lock waiting is bounded, and every
+database closes. These are retained-source behavior proofs, not live exploitation
+or approval of a production profile-policy fix.
