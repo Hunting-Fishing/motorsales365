@@ -74,6 +74,12 @@ credentials or an external database. The suite is included in the CI tooling
 command. It does not test the production API, all RLS policies, onboarding,
 restoration, concurrent provisioning or the complete identity contract.
 
+Published draft PR #17, code `babc86f`: all six CI gates passed in run
+`38616653784`, including 72 tooling tests, 370 application tests, both receipt DB
+suites, 247 disposable PostgreSQL assertions, lint, TypeScript, actual-browser
+OCR/PDF and the full build/package dry-run. No app deployment or migration follows
+from these results. The subsequent handoff update changes documentation only.
+
 ## Next dependency and production limits
 
 Prepare an independently reviewed exact bootstrap containment/replacement

@@ -443,6 +443,10 @@ now loads; the rebuilt scanner remains verified independently, not recovered sou
 ## Bootstrap prerequisite proof: 2026-10-15
 
 Branch: `security/bootstrap-authority-proof`, stacked on PR #16. Seven new
+tests are published as draft PR #17:
+`https://github.com/Hunting-Fishing/motorsales365/pull/17`. Verified code commit:
+`babc86f`; all six CI gates passed (run `38616653784`). Parent docs head `5d7673b`
+also passed all six gates (run `38615611889`). The new
 memory-only tests execute the pinned original profile bootstrap and retain the
 historical direct authenticated grant. They reproduce locked-table/RPC bypass,
 anonymous null-subject provisioning, distinct business/shop UUID storage,
@@ -457,9 +461,14 @@ preserves owner/service/function/table authority; PUBLIC-only denial leaves the
 historical authenticated grant. This is test evidence, not production containment.
 Focused tests pass 7/7; complete local tooling passes 72/72, with lint/format clean.
 Independent review confirmed the no-FK versus hypothetical-FK distinction and
-historical-versus-live grant difference. Full-checkout CI follows publication;
-application source is unchanged from the verified 370-test parent.
-Next: verify/publish the slice, prepare exact scoped bootstrap/helper containment
+historical-versus-live grant difference. Full-checkout CI passes: 72 tooling tests,
+370 application tests, both receipt DB suites, 247 disposable PostgreSQL assertions,
+lint, TypeScript, real-browser image/PDF OCR and full build/package dry-run.
+Application source is unchanged from the verified parent. No application upload
+or live workflow execution is claimed; hosting is still a separate unresolved
+release gate. This verification handoff changes documentation only.
+Next: verify any latest documentation-head checks without repeating completed
+scanner/UI/proof work; prepare exact scoped bootstrap/helper containment
 and recovery candidates for separate release authority, then the companion roster/
 native guard and its application compatibility tests. Do not blindly add a shop
 FK, repair existing bindings or substitute a profile-only ACL change for trusted
