@@ -42,15 +42,21 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest fully CI-verified application slice: PR #28, documentation head `b6478f7`, all six
-CI gates passed (run `38639864235`), 642 application tests. These are review
+Latest fully CI-verified application slice: PR #30, documentation head `f4c86c1`, all six
+CI gates passed (run `38642371142`), 706 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
-Latest local application candidate: draft PR #30, code `a2eff76`, 706 application
-tests across 47 files and full TypeScript pass. CI is pending verification. It
+Latest application candidate: draft PR #30, code `a2eff76`, 706 application
+tests across 47 files and full TypeScript pass. CI is verified above. It
 gates reminder mutations and scopes reads, but must not ship before a reviewed
 same-statement invoker reminder read and native authority/recovery prerequisites.
+
+Latest database read candidate: draft PR #31, code `797876c`,22 new focused tests
+and 191/191 full sequential tooling pass. The CLI-generated reminder invoker API
+is unapplied, with guarded recovery; app adapter still uses two statements.
+Verify PR #31 CI, then implement its strict one-RPC adapter. Current explicit
+source composition is404/423 matched,19 unclassified; release flags remain false.
 
 Inventory PR #20 latest docs head `ff24159` also passed all six CI gates (run
 `38623862186`), verified on this resume. Hosting still fails separately; the green
@@ -237,7 +243,8 @@ Draft PR #30, code `a2eff76`, branch
 visible customer, applies both customer/shop predicates, validates all 101 fetched
 rows and displays at most 100 with an honest cap. Account/customer remounts,
 post-mount fetch requirements and refresh/error masking isolate rows/counts/caps.
-Native unconstrained text/status vocabulary and nullable dates are preserved;
+Native unconstrained text/status vocabulary, calendar due dates and nullable
+notes/completion timestamps are preserved;
 this is an all-status earliest-due snapshot, not an actionable or complete queue.
 The known-invalid/unconfirmed reminder create/complete/delete paths are disabled
 in this review candidate pending a separately verified trusted writer.
@@ -245,13 +252,15 @@ in this review candidate pending a separately verified trusted writer.
 Verification: 42 handler +22 UI focused tests; full application706/706 across
 47 files, report checker exit0/no quarantine, final full TypeScript and focused
 ESLint/format/diff pass; independent source review clean. Tooling unchanged at
-169/169. CI pending verification. Migration impact: none. Deployment: none.
+169/169. Docs head `f4c86c1` passed all six CI gates (run `38642371142`),
+verified on this resume. Migration impact: none. Deployment: none.
 No live business row/RPC/write/grant/history or platform change. Narrow parent
 column metadata and snapshot/test limitations are recorded in
 `evidence/CUSTOMER_REMINDERS_REQUEST_BOUND_READS.md`. Global correspondence stays
 404/422 with18 unclassified; inventory/baseline/replay flags are not promoted.
 
-Exact next action: verify PR #30 checks, then implement/test a separately reviewed
+Original next action (now being implemented offline): verify PR #30 checks, then
+implement/test a separately reviewed
 SQL/STABLE/SECURITY INVOKER reminder read joining the invoker-visible customer to
 reminders on BOTH customer and shop within one statement. Two separate reads
 still permit a move/delete visibility race; dual filters are not atomic privacy
@@ -264,6 +273,56 @@ Count-only identity reconnaissance is design-only in
 `evidence/NATIVE_IDENTITY_DIAGNOSTIC_DESIGN.md`; no production counts were read
 or permission to publish counts/repair bindings inferred. Keep private consent/
 tenure/retention, original OCR/owner/mobile pilot and hosting gates open.
+
+## Latest same-statement reminder contract checkpoint (2026-10-15)
+
+Draft PR #31, code `797876c`, branch `completion/customer-reminders-invoker-read`,
+stacked on CI-verified PR #30 docs `f4c86c1`. CLI 2.121.0 generated
+`20261014214406_customer_reminders_invoker_read.sql`; it creates one new public
+SQL/STABLE/SECURITY INVOKER reminder reader with empty search_path. A materialized
+caller-visible customer context joins reminders on BOTH customer and shop in one
+query snapshot, with exact available/context-ID/row envelope and stable 101-row
+due/UUID sentinel bound. It does not widen source RLS, invoke bootstrap, write
+records or fix native identity. Stronger transaction isolation may retain an older
+transaction snapshot; this is not continuous/retroactive revocation.
+
+Only the new API's owner/authenticated EXECUTE is normalized. Unique-name,
+postgres operator, selected customer-schema, exact body/configuration/API-shape/
+ACL and effective anon/service-denial guards refuse drift. Builtin type OIDs and
+signatures are explicit, including temporary-type shadowing. Review-only opt-in
+DROP RESTRICT recovery outside migration history resets ambient operator
+resolution, checks exact shape/body/ACL/effective access, refuses dependencies
+and preserves unrelated overloads/source state. No production change is implied.
+
+Verification: 22/22 focused memory tests (26.03s), full local sequential tooling
+191/191 (104.22s), focused ESLint/format/diff and independent review pass. CI
+pending verification. Actual selected reminder/helper/native policies run on
+explicit synthetic supports; same-actor visible B-parent/stale A-child proves
+the shop join independently of RLS. No live business rows/RPCs were read or
+changed. Application source remains PR #30's verified 706 tests/full TypeScript.
+Migration impact: one new unapplied forward candidate. Deployment: none. Full
+baseline/staging/advisors/native-PG concurrency/API/role acceptance not verified.
+Exact hashes, controls and limits: `evidence/CUSTOMER_REMINDERS_INVOKER_READ_CONTRACT.md`.
+
+Adding this file changes explicit in-memory source composition from404/422 with18
+unclassified to404/423 with19. Base-only CLI is403/423 with20; all423 timestamps
+unique. No mismatch category appeared. Provenance/replay/inventory CLIs retain
+intentional exit1 and all approval/parity/replay/baseline flags false. Original
+35-source/7-evidence inventory remains pinned and bounded,73 objects/61 reachable/
+four cycles/481 findings; this new candidate is not silently adopted into it.
+Historical SQL, immutable observations and source provenance are unchanged.
+
+Exact next action: verify PR #31 latest checks, then replace the reminder
+two-query adapter with this one caller-bound RPC. Strictly validate available
+context/customer/shop and every row including sentinel, reject contradictory/
+malformed payloads, preserve honest unavailability and actor/cancellation/
+freshness/error gates and 100 + hasMore display. Do not deploy the consumer before a compatible approved
+database release. Continue native identity/provisioning/delegation/offboarding/
+security-writer closure, separately reviewed baseline/upgrade/recovery, then
+trusted reminder entry/affected rows and index/load/queue pagination. Private
+consent/tenure/retention, scanner source recovery/owner/mobile pilot and hosting
+remain open. Pending helper-containment owner decision is unchanged; do not
+re-ask/apply or infer authority for it.
 
 ## Recovery evidence (original scope, retained below)
 

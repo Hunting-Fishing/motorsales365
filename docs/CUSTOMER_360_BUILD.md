@@ -195,3 +195,13 @@ implement a same-statement invoker customer/reminder join without widening RLS,
 then satisfy native authority, trusted entry, recovery/index/load and role/API
 acceptance. The preceding actual-source reminder integrity proof (PR #29) passes
 169 tooling tests; source-level proof is not live business or entry acceptance.
+
+The same-statement reminder invoker contract is now implemented/tested offline
+in draft PR #31 (code `797876c`;22 focused/191 tooling tests). It joins both
+customer and shop within one caller snapshot, preserves source RLS, guards only
+the new API's execution and includes review-only exact recovery. It is unapplied;
+the app adapter still uses two reads and must switch separately before any
+compatible approved release. See
+`evidence/CUSTOMER_REMINDERS_INVOKER_READ_CONTRACT.md`. This does not resolve
+mutable native identity, baseline/recovery, actual API/role/load acceptance or
+trusted entry. No application deployment or live database/permission change.
