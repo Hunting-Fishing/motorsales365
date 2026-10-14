@@ -81,9 +81,15 @@ no idempotent work-order link. The legacy RPC is not a safe substitute because
 it has authorization, concurrency, tax/status and inventory-posting differences.
 See `evidence/SHOP_MANAGER_INVOICE_RELEASE_GATES.md` for exact observations.
 
-Before expanding commercial activity: obtain a scoped containment decision,
-prepare/test an authorized atomic converter with stable retry behavior and draft
-billing policy, then complete baseline/recovery and release gates before live
-application. No production permissions, customer records or schema were changed.
+The owner-approved converter-only temporary restriction was applied and catalog-
+verified on 2026-10-15 Asia/Manila after six CI gates passed; anon/authenticated
+execution is denied, owner/service execution retained. The function body and
+totals helper are unchanged. See `evidence/INVOICE_CONVERTER_CONTAINMENT_RELEASE.md`.
+No customer records or application deployment changed. The totals helper and
+mutable profile/membership authority remain unresolved and are outside this approval.
+
+Before expanding commercial activity: prepare/test an independently authorized
+atomic converter with stable retry behavior and draft billing policy, then complete
+baseline/recovery and release gates before live application.
 The bounded activity card can follow, using only explicit active vehicle links;
 never reuse the owner-only sharing/history screen inside shop CRM.

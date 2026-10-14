@@ -1,7 +1,8 @@
 # Approved converter-only containment: release record
 
-Updated 2026-10-15 Asia/Manila. Status: prepared and locally tested, **not yet
-applied**. The owner selected “Approve tested temporary restriction” in this
+Updated 2026-10-15 Asia/Manila. Status: **applied and catalog-verified** at
+2026-10-14 18:04:02 UTC (2026-10-15 02:04:02 Asia/Manila).
+The owner selected “Approve tested temporary restriction” in this
 chat. Authority is only for `shop_manager.convert_work_order_to_invoice(uuid)`;
 the totals helper, profile bindings and other functions are outside that approval.
 
@@ -58,8 +59,12 @@ Six new memory-only PGlite tests execute the actual migration and actual recover
 file unchanged: client denial, preserved postgres/service/helper behavior, exact
 rerun, refusal on definition/owner/ACL drift and atomic rollback after inherited
 access fails a postcondition. Six separate profile-authority tests reproduce
-the mutable-binding risk; they do not alter production. Full CI remains required
-before this release record is marked applied.
+the mutable-binding risk; they do not alter production. All six GitHub CI gates
+passed at `1d500beb42ef7956cb3f6f209575a3182e232c14` in run `38611328319`:
+370 application tests, 53 tooling regressions, both receipt database suites,
+247 disposable PostgreSQL security assertions, lint, TypeScript, actual-browser
+image/PDF OCR, and the full build/Worker package dry-run. This is draft PR #15,
+stacked on PR #14; no merge or application upload is claimed.
 
 ## Recovery readiness and limits
 
@@ -87,13 +92,48 @@ authenticated execution, retained postgres/service execution, unchanged converte
 body and totals helper, and the recorded migration source. Do not invoke the
 business functions or mutate customer rows to verify a permission change.
 
-Production application and postchecks: pending.
+## Applied result and migration identity
+
+The migration tool reported success for this **single file**. Its generated
+remote history version is `20261014180351`, name
+`contain_legacy_invoice_conversion_execute`; the local CLI version remains
+`20261014175040`. The stored history contains exactly one statement, 3,914 UTF-8
+bytes, SHA-256
+`a0a4132c9f17eb4df1d49f0ff735a3da651728b8d1d4d81e979a4e5bc033c1f0`:
+an exact byte match to the reviewed file. Preserve both timestamps; do not repair
+history or rename applied SQL to hide the difference. This source mapping is
+not a verified full replay or global baseline.
+
+The scoped export is `invoice-containment-migration-2026-10-15.json`; the older
+October 14 snapshots remain unchanged. Two added provenance regressions check
+the actual file/hash/bytes/remote mapping and compose evidence in memory only.
+They prove the historical report still blocks (15 unresolved sources and the
+cost-fix replay trap), with all three release/baseline/replay approval flags false.
+The composed source evidence is 404 of 419 files, not global schema parity.
+Reproduce these checks with `node --test scripts/ci/migration-provenance.test.mjs`.
+Older two-input CLI commands intentionally use only their declared older evidence;
+they do not automatically discover or adopt this supplement.
+
+Fresh live catalog postchecks on project `wjxaajgvddtrxxtocxen`, database
+`postgres`, operator `postgres`:
+
+| Object        | OID   | anon / authenticated EXECUTE | postgres / service_role EXECUTE | Result                                                                                             |
+| ------------- | ----- | ---------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Converter     | 29005 | false / false                | true / true                     | ACL now `{postgres=X/postgres,service_role=X/postgres}`; original body/definition hashes unchanged |
+| Totals helper | 29002 | true / true                  | true / true                     | Original ACL/body/definition hashes unchanged; outside approval                                    |
+
+No business RPC was invoked, customer row mutated, app deployed or rollback
+executed. These are database catalog/effective-privilege checks, not a live
+PostgREST/JWT or end-to-end invoice test. Existing authenticated RPC callers,
+if any, remain deliberately unavailable pending an authorized replacement.
+
 Remaining risks: exposed totals helper, mutable shop authority, invoice atomicity/
 idempotency/date/mapping/stock policy and full migration-baseline recovery gates.
 
 ## Advisor snapshot
 
-The pre-release security advisor returned four finding categories; this narrow
+The pre- and post-release security advisors returned the same four finding
+categories; this narrow
 change does not certify the project or resolve the other findings:
 [RLS without policies](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy),
 [extension in public](https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public),

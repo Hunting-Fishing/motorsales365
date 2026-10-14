@@ -142,6 +142,23 @@ passing is evidence for its tested fixture, not proof that live release has run.
 
 ## Rollback and operating prerequisites
 
+### Separately approved, applied ACL containment
+
+The owner-approved converter-only permission restriction was applied outside the
+blocked historical replay on 2026-10-15 Asia/Manila after exact-source disposable
+tests, passing CI, fresh guarded preconditions and scoped recovery rehearsal.
+Local `20261014175040_contain_legacy_invoice_conversion_execute.sql` maps by exact
+3,914-byte SHA-256 source to remote `20261014180351`; neither version was repaired.
+Its scoped source export is `invoice-containment-migration-2026-10-15.json` and its
+live privilege/hash postchecks are in `INVOICE_CONVERTER_CONTAINMENT_RELEASE.md`.
+This exception authorizes no other live change and does not complete the baseline
+or release the three pending forward files above. Earlier evidence remains an
+immutable dated observation. Two provenance regressions compose it with this
+supplement in memory only: 404/419 sources evidenced, 15 unresolved, the cost trap
+still present, and all replay/baseline/release approval flags false.
+
+### Broader release still requires
+
 - Capture a fresh verified database backup and confirm restoration on a separate
   target with measured recovery time. Include private storage backup/versioning
   and application configuration; database schema snapshots alone are not backup.

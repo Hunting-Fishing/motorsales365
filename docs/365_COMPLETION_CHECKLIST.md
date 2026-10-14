@@ -353,17 +353,36 @@ helper unchanged. Six additional tests execute this exact file and the exact
 operator-opt-in review-only rollback in memory, including postcondition failure
 after REVOKE and full automatic statement rollback.
 
-Local focused tests: 12/12. CI tooling now includes both suites (53 tests total).
-No production application is claimed yet. Before executing this one approved ACL
-file: publish/review, require CI, refresh unchanged target state and retain the
-scoped recovery record. Do not db-push or repair the whole historical chain.
+Local focused tests: 12/12. All six CI gates passed at `1d500be`
+(run `38611328319`): 370 application tests, 53 tooling regressions, both receipt
+database suites, 247 disposable PostgreSQL assertions, TypeScript, lint, browser
+OCR/PDF and full build/package dry-run. Published draft PR #15:
+`https://github.com/Hunting-Fishing/motorsales365/pull/15`.
+
+The approved converter-only ACL migration was applied successfully and live
+catalog-verified at 2026-10-14 18:04:02 UTC. Converter EXECUTE is now denied to
+anon/authenticated and retained for postgres/service_role. Converter definition/
+body hashes and totals-helper ACL/body/definition are unchanged. No business
+function was invoked or customer row mutated. Remote migration version
+`20261014180351` records exactly the local `20261014175040` file: one statement,
+3,914 bytes, raw SHA-256 `a0a4132c9f17eb4df1d49f0ff735a3da651728b8d1d4d81e979a4e5bc033c1f0`.
+Preserve the separate versions; do not db-push or repair the whole historical chain.
+The immutable scoped export is `evidence/invoice-containment-migration-2026-10-15.json`.
+Two new actual-source provenance regressions verify this mapping and the composed
+report without changing older snapshots: 404 of 419 source files have evidence,
+15 remain unresolved, and historical replay/baseline/release approval stays blocked.
+Local tooling now totals 55 tests; these two evidence checks follow the already
+verified 53-test release commit and are included in the existing CI test command.
 See `evidence/INVOICE_CONVERTER_CONTAINMENT_RELEASE.md` for source/ACL fingerprints,
 impact, recovery rehearsal and exact release status. Restoring PUBLIC access
 would reopen the risk and is not automatically authorized.
 
-Next: complete the approved converter-only containment and role/catalog
-postchecks; then prepare the trusted profile/membership guard candidate offline.
+Next: retain the exact applied-source mapping and prepare the trusted profile/
+membership guard candidate offline, including indirect staff-provisioning writes.
 The exposed totals helper and profile binding still need separately scoped
 release authority; invoice atomicity and the global baseline/recovery gates remain.
-No application deployment, customer communication or paid resource is authorized
-by this checkpoint.
+The four global advisor categories remain; this narrow permission change is not
+project-wide security clearance. Cloudflare hosting remains unverified/failed;
+no application deployment, customer communication or paid resource is authorized
+by this checkpoint. Recovery was rehearsed, not run live. Keep the recurring
+completion heartbeat active: the agreed 365 scope is not complete.
