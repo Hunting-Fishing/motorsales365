@@ -29,6 +29,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as PartsRouteImport } from './routes/parts'
+import { Route as PartnersRouteImport } from './routes/partners'
 import { Route as PartnerTrainingRouteImport } from './routes/partner-training'
 import { Route as PartnerProgramRouteImport } from './routes/partner-program'
 import { Route as MyQrRouteImport } from './routes/my-qr'
@@ -63,6 +64,7 @@ import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as ShopManagerIndexRouteImport } from './routes/shop-manager.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as PartsIndexRouteImport } from './routes/parts.index'
+import { Route as PartnersIndexRouteImport } from './routes/partners.index'
 import { Route as PartnerProgramIndexRouteImport } from './routes/partner-program.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as GamesIndexRouteImport } from './routes/games.index'
@@ -95,6 +97,7 @@ import { Route as PartsSearchRouteImport } from './routes/parts.search'
 import { Route as PartsNetworkRouteImport } from './routes/parts.network'
 import { Route as PartsCategoriesRouteImport } from './routes/parts.categories'
 import { Route as PartnersPartsRouteImport } from './routes/partners.parts'
+import { Route as PartnersNetworkRouteImport } from './routes/partners.network'
 import { Route as PartnerProgramTermsRouteImport } from './routes/partner-program.terms'
 import { Route as PartnerProgramInfoRouteImport } from './routes/partner-program.info'
 import { Route as PartnerProgramApplyRouteImport } from './routes/partner-program.apply'
@@ -131,6 +134,7 @@ import { Route as DashboardQrAdsRouteImport } from './routes/dashboard.qr-ads'
 import { Route as DashboardPromoterResourcesRouteImport } from './routes/dashboard.promoter-resources'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardPartnerProgramRouteImport } from './routes/dashboard.partner-program'
+import { Route as DashboardPartnerNetworkRouteImport } from './routes/dashboard.partner-network'
 import { Route as DashboardPartnerRouteImport } from './routes/dashboard.partner'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
@@ -198,6 +202,7 @@ import { Route as AdminClubDiscountRouteImport } from './routes/admin.club-disco
 import { Route as AdminClaimsRouteImport } from './routes/admin.claims'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as AdminAssociateApplicationsRouteImport } from './routes/admin.associate-applications'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as AdminAdvertisementsRouteImport } from './routes/admin.advertisements'
@@ -219,6 +224,7 @@ import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.rec
 import { Route as PartsPartnersCategoriesRouteImport } from './routes/parts.partners.categories'
 import { Route as PartsCSlugRouteImport } from './routes/parts.c.$slug'
 import { Route as PartnersPartsOnboardingRouteImport } from './routes/partners.parts.onboarding'
+import { Route as PartnersAssociateApplyRouteImport } from './routes/partners.associate.apply'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 import { Route as DocumentCheckCountryQuickGuideRouteImport } from './routes/document-check.$country.quick-guide'
@@ -241,6 +247,8 @@ import { Route as ClubsApplySuccessRouteImport } from './routes/clubs.apply.succ
 import { Route as BusinessesSlugBookRouteImport } from './routes/businesses.$slug.book'
 import { Route as ApiPublicReverseGeocodeRouteImport } from './routes/api/public/reverse-geocode'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
+import { Route as ApiPublicMigrationTargetPreflightRouteImport } from './routes/api/public/migration-target-preflight'
+import { Route as ApiPublicMigrationExportRouteImport } from './routes/api/public/migration-export'
 import { Route as ApiPublicIpLocationRouteImport } from './routes/api/public/ip-location'
 import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocode'
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
@@ -250,6 +258,7 @@ import { Route as AdminStaffAcademyAssetsRouteImport } from './routes/admin.staf
 import { Route as AdminStaffAcademyIdRouteImport } from './routes/admin.staff-academy.$id'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
 import { Route as AdminPartsOutreachRouteImport } from './routes/admin.parts.outreach'
+import { Route as AdminPartsFitmentRouteImport } from './routes/admin.parts.fitment'
 import { Route as AdminPartsFeedsRouteImport } from './routes/admin.parts.feeds'
 import { Route as AdminPartsCommissionsRouteImport } from './routes/admin.parts.commissions'
 import { Route as AdminPartsAnalyticsRouteImport } from './routes/admin.parts.analytics'
@@ -279,6 +288,7 @@ import { Route as AuthenticatedWorkspaceSchedulingRouteImport } from './routes/_
 import { Route as AuthenticatedWorkspaceReportsRouteImport } from './routes/_authenticated/workspace.reports'
 import { Route as AuthenticatedWorkspaceQuotesRouteImport } from './routes/_authenticated/workspace.quotes'
 import { Route as AuthenticatedWorkspacePurchaseOrdersRouteImport } from './routes/_authenticated/workspace.purchase-orders'
+import { Route as AuthenticatedWorkspaceOperationsRouteImport } from './routes/_authenticated/workspace.operations'
 import { Route as AuthenticatedWorkspaceLoyaltyRouteImport } from './routes/_authenticated/workspace.loyalty'
 import { Route as AuthenticatedWorkspaceLeaveRequestsRouteImport } from './routes/_authenticated/workspace.leave-requests'
 import { Route as AuthenticatedWorkspaceLeaveRouteImport } from './routes/_authenticated/workspace.leave'
@@ -289,6 +299,7 @@ import { Route as AuthenticatedWorkspaceInspectionsRouteImport } from './routes/
 import { Route as AuthenticatedWorkspaceExpensesRouteImport } from './routes/_authenticated/workspace.expenses'
 import { Route as AuthenticatedWorkspaceDiscountsRouteImport } from './routes/_authenticated/workspace.discounts'
 import { Route as AuthenticatedWorkspaceCustomersRouteImport } from './routes/_authenticated/workspace.customers'
+import { Route as AuthenticatedWorkspaceCounterSaleRouteImport } from './routes/_authenticated/workspace.counter-sale'
 import { Route as AuthenticatedWorkspaceCertificatesRouteImport } from './routes/_authenticated/workspace.certificates'
 import { Route as AuthenticatedWorkspaceAutomationRouteImport } from './routes/_authenticated/workspace.automation'
 import { Route as AuthenticatedWorkspaceAppointmentsRouteImport } from './routes/_authenticated/workspace.appointments'
@@ -329,6 +340,8 @@ import { Route as DashboardBusinessesIdDomainRouteImport } from './routes/dashbo
 import { Route as DashboardBusinessesIdAnalyticsRouteImport } from './routes/dashboard.businesses_.$id.analytics'
 import { Route as DashboardBusinessBusinessIdStaffRouteImport } from './routes/dashboard.business.$businessId.staff'
 import { Route as DashboardBusinessBusinessIdSettingsRouteImport } from './routes/dashboard.business.$businessId.settings'
+import { Route as DashboardBusinessBusinessIdPartsOperationsRouteImport } from './routes/dashboard.business.$businessId.parts-operations'
+import { Route as DashboardBusinessBusinessIdOperationsRouteImport } from './routes/dashboard.business.$businessId.operations'
 import { Route as DashboardBusinessBusinessIdInvoicesRouteImport } from './routes/dashboard.business.$businessId.invoices'
 import { Route as DashboardBusinessBusinessIdInventoryRouteImport } from './routes/dashboard.business.$businessId.inventory'
 import { Route as DashboardBusinessBusinessIdFleetRouteImport } from './routes/dashboard.business.$businessId.fleet'
@@ -482,6 +495,11 @@ const PaymentsRoute = PaymentsRouteImport.update({
 const PartsRoute = PartsRouteImport.update({
   id: '/parts',
   path: '/parts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnersRoute = PartnersRouteImport.update({
+  id: '/partners',
+  path: '/partners',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerTrainingRoute = PartnerTrainingRouteImport.update({
@@ -653,6 +671,11 @@ const PartsIndexRoute = PartsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PartsRoute,
 } as any)
+const PartnersIndexRoute = PartnersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnersRoute,
+} as any)
 const PartnerProgramIndexRoute = PartnerProgramIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -809,9 +832,14 @@ const PartsCategoriesRoute = PartsCategoriesRouteImport.update({
   getParentRoute: () => PartsRoute,
 } as any)
 const PartnersPartsRoute = PartnersPartsRouteImport.update({
-  id: '/partners/parts',
-  path: '/partners/parts',
-  getParentRoute: () => rootRouteImport,
+  id: '/parts',
+  path: '/parts',
+  getParentRoute: () => PartnersRoute,
+} as any)
+const PartnersNetworkRoute = PartnersNetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
+  getParentRoute: () => PartnersRoute,
 } as any)
 const PartnerProgramTermsRoute = PartnerProgramTermsRouteImport.update({
   id: '/terms',
@@ -992,6 +1020,11 @@ const DashboardProfileRoute = DashboardProfileRouteImport.update({
 const DashboardPartnerProgramRoute = DashboardPartnerProgramRouteImport.update({
   id: '/partner-program',
   path: '/partner-program',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPartnerNetworkRoute = DashboardPartnerNetworkRouteImport.update({
+  id: '/partner-network',
+  path: '/partner-network',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardPartnerRoute = DashboardPartnerRouteImport.update({
@@ -1331,6 +1364,12 @@ const AdminAuditRoute = AdminAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAssociateApplicationsRoute =
+  AdminAssociateApplicationsRouteImport.update({
+    id: '/associate-applications',
+    path: '/associate-applications',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -1440,6 +1479,11 @@ const PartnersPartsOnboardingRoute = PartnersPartsOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
   getParentRoute: () => PartnersPartsRoute,
+} as any)
+const PartnersAssociateApplyRoute = PartnersAssociateApplyRouteImport.update({
+  id: '/associate/apply',
+  path: '/associate/apply',
+  getParentRoute: () => PartnersRoute,
 } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
@@ -1561,6 +1605,18 @@ const ApiPublicPaymentEventsRoute = ApiPublicPaymentEventsRouteImport.update({
   path: '/api/public/payment-events',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMigrationTargetPreflightRoute =
+  ApiPublicMigrationTargetPreflightRouteImport.update({
+    id: '/api/public/migration-target-preflight',
+    path: '/api/public/migration-target-preflight',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicMigrationExportRoute =
+  ApiPublicMigrationExportRouteImport.update({
+    id: '/api/public/migration-export',
+    path: '/api/public/migration-export',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicIpLocationRoute = ApiPublicIpLocationRouteImport.update({
   id: '/api/public/ip-location',
   path: '/api/public/ip-location',
@@ -1605,6 +1661,11 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
 const AdminPartsOutreachRoute = AdminPartsOutreachRouteImport.update({
   id: '/outreach',
   path: '/outreach',
+  getParentRoute: () => AdminPartsRoute,
+} as any)
+const AdminPartsFitmentRoute = AdminPartsFitmentRouteImport.update({
+  id: '/fitment',
+  path: '/fitment',
   getParentRoute: () => AdminPartsRoute,
 } as any)
 const AdminPartsFeedsRoute = AdminPartsFeedsRouteImport.update({
@@ -1777,6 +1838,12 @@ const AuthenticatedWorkspacePurchaseOrdersRoute =
     path: '/purchase-orders',
     getParentRoute: () => AuthenticatedWorkspaceRoute,
   } as any)
+const AuthenticatedWorkspaceOperationsRoute =
+  AuthenticatedWorkspaceOperationsRouteImport.update({
+    id: '/operations',
+    path: '/operations',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
 const AuthenticatedWorkspaceLoyaltyRoute =
   AuthenticatedWorkspaceLoyaltyRouteImport.update({
     id: '/loyalty',
@@ -1835,6 +1902,12 @@ const AuthenticatedWorkspaceCustomersRoute =
   AuthenticatedWorkspaceCustomersRouteImport.update({
     id: '/customers',
     path: '/customers',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceCounterSaleRoute =
+  AuthenticatedWorkspaceCounterSaleRouteImport.update({
+    id: '/counter-sale',
+    path: '/counter-sale',
     getParentRoute: () => AuthenticatedWorkspaceRoute,
   } as any)
 const AuthenticatedWorkspaceCertificatesRoute =
@@ -2064,6 +2137,18 @@ const DashboardBusinessBusinessIdSettingsRoute =
   DashboardBusinessBusinessIdSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => DashboardBusinessBusinessIdRoute,
+  } as any)
+const DashboardBusinessBusinessIdPartsOperationsRoute =
+  DashboardBusinessBusinessIdPartsOperationsRouteImport.update({
+    id: '/parts-operations',
+    path: '/parts-operations',
+    getParentRoute: () => DashboardBusinessBusinessIdRoute,
+  } as any)
+const DashboardBusinessBusinessIdOperationsRoute =
+  DashboardBusinessBusinessIdOperationsRouteImport.update({
+    id: '/operations',
+    path: '/operations',
     getParentRoute: () => DashboardBusinessBusinessIdRoute,
   } as any)
 const DashboardBusinessBusinessIdInvoicesRoute =
@@ -2412,6 +2497,7 @@ export interface FileRoutesByFullPath {
   '/my-qr': typeof MyQrRoute
   '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
+  '/partners': typeof PartnersRouteWithChildren
   '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -2440,6 +2526,7 @@ export interface FileRoutesByFullPath {
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/associate-applications': typeof AdminAssociateApplicationsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
@@ -2507,6 +2594,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/partner': typeof DashboardPartnerRouteWithChildren
+  '/dashboard/partner-network': typeof DashboardPartnerNetworkRoute
   '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
@@ -2543,6 +2631,7 @@ export interface FileRoutesByFullPath {
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
+  '/partners/network': typeof PartnersNetworkRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/network': typeof PartsNetworkRoute
@@ -2575,6 +2664,7 @@ export interface FileRoutesByFullPath {
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/partner-program/': typeof PartnerProgramIndexRoute
+  '/partners/': typeof PartnersIndexRoute
   '/parts/': typeof PartsIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop-manager/': typeof ShopManagerIndexRoute
@@ -2601,6 +2691,7 @@ export interface FileRoutesByFullPath {
   '/workspace/appointments': typeof AuthenticatedWorkspaceAppointmentsRoute
   '/workspace/automation': typeof AuthenticatedWorkspaceAutomationRouteWithChildren
   '/workspace/certificates': typeof AuthenticatedWorkspaceCertificatesRoute
+  '/workspace/counter-sale': typeof AuthenticatedWorkspaceCounterSaleRoute
   '/workspace/customers': typeof AuthenticatedWorkspaceCustomersRouteWithChildren
   '/workspace/discounts': typeof AuthenticatedWorkspaceDiscountsRoute
   '/workspace/expenses': typeof AuthenticatedWorkspaceExpensesRoute
@@ -2611,6 +2702,7 @@ export interface FileRoutesByFullPath {
   '/workspace/leave': typeof AuthenticatedWorkspaceLeaveRoute
   '/workspace/leave-requests': typeof AuthenticatedWorkspaceLeaveRequestsRoute
   '/workspace/loyalty': typeof AuthenticatedWorkspaceLoyaltyRoute
+  '/workspace/operations': typeof AuthenticatedWorkspaceOperationsRoute
   '/workspace/purchase-orders': typeof AuthenticatedWorkspacePurchaseOrdersRouteWithChildren
   '/workspace/quotes': typeof AuthenticatedWorkspaceQuotesRouteWithChildren
   '/workspace/reports': typeof AuthenticatedWorkspaceReportsRouteWithChildren
@@ -2640,6 +2732,7 @@ export interface FileRoutesByFullPath {
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
+  '/admin/parts/fitment': typeof AdminPartsFitmentRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/admin/staff-academy/$id': typeof AdminStaffAcademyIdRoute
@@ -2649,6 +2742,8 @@ export interface FileRoutesByFullPath {
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/ip-location': typeof ApiPublicIpLocationRoute
+  '/api/public/migration-export': typeof ApiPublicMigrationExportRoute
+  '/api/public/migration-target-preflight': typeof ApiPublicMigrationTargetPreflightRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
@@ -2671,6 +2766,7 @@ export interface FileRoutesByFullPath {
   '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/partners/associate/apply': typeof PartnersAssociateApplyRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/parts/c/$slug': typeof PartsCSlugRoute
   '/parts/partners/categories': typeof PartsPartnersCategoriesRoute
@@ -2735,6 +2831,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
   '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRouteWithChildren
+  '/dashboard/business/$businessId/operations': typeof DashboardBusinessBusinessIdOperationsRoute
+  '/dashboard/business/$businessId/parts-operations': typeof DashboardBusinessBusinessIdPartsOperationsRoute
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
@@ -2804,6 +2902,7 @@ export interface FileRoutesByTo {
   '/admin/accounts': typeof AdminAccountsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/associate-applications': typeof AdminAssociateApplicationsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
@@ -2870,6 +2969,7 @@ export interface FileRoutesByTo {
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/partner-network': typeof DashboardPartnerNetworkRoute
   '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
@@ -2904,6 +3004,7 @@ export interface FileRoutesByTo {
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
+  '/partners/network': typeof PartnersNetworkRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/network': typeof PartsNetworkRoute
@@ -2936,6 +3037,7 @@ export interface FileRoutesByTo {
   '/games': typeof GamesIndexRoute
   '/learn': typeof LearnIndexRoute
   '/partner-program': typeof PartnerProgramIndexRoute
+  '/partners': typeof PartnersIndexRoute
   '/parts': typeof PartsIndexRoute
   '/rides': typeof RidesIndexRoute
   '/shop-manager': typeof ShopManagerIndexRoute
@@ -2962,6 +3064,7 @@ export interface FileRoutesByTo {
   '/workspace/appointments': typeof AuthenticatedWorkspaceAppointmentsRoute
   '/workspace/automation': typeof AuthenticatedWorkspaceAutomationRouteWithChildren
   '/workspace/certificates': typeof AuthenticatedWorkspaceCertificatesRoute
+  '/workspace/counter-sale': typeof AuthenticatedWorkspaceCounterSaleRoute
   '/workspace/customers': typeof AuthenticatedWorkspaceCustomersRouteWithChildren
   '/workspace/discounts': typeof AuthenticatedWorkspaceDiscountsRoute
   '/workspace/expenses': typeof AuthenticatedWorkspaceExpensesRoute
@@ -2972,6 +3075,7 @@ export interface FileRoutesByTo {
   '/workspace/leave': typeof AuthenticatedWorkspaceLeaveRoute
   '/workspace/leave-requests': typeof AuthenticatedWorkspaceLeaveRequestsRoute
   '/workspace/loyalty': typeof AuthenticatedWorkspaceLoyaltyRoute
+  '/workspace/operations': typeof AuthenticatedWorkspaceOperationsRoute
   '/workspace/purchase-orders': typeof AuthenticatedWorkspacePurchaseOrdersRouteWithChildren
   '/workspace/quotes': typeof AuthenticatedWorkspaceQuotesRouteWithChildren
   '/workspace/reports': typeof AuthenticatedWorkspaceReportsRouteWithChildren
@@ -3001,6 +3105,7 @@ export interface FileRoutesByTo {
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
+  '/admin/parts/fitment': typeof AdminPartsFitmentRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/admin/staff-academy/$id': typeof AdminStaffAcademyIdRoute
@@ -3010,6 +3115,8 @@ export interface FileRoutesByTo {
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/ip-location': typeof ApiPublicIpLocationRoute
+  '/api/public/migration-export': typeof ApiPublicMigrationExportRoute
+  '/api/public/migration-target-preflight': typeof ApiPublicMigrationTargetPreflightRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
@@ -3031,6 +3138,7 @@ export interface FileRoutesByTo {
   '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/partners/associate/apply': typeof PartnersAssociateApplyRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/parts/c/$slug': typeof PartsCSlugRoute
   '/parts/partners/categories': typeof PartsPartnersCategoriesRoute
@@ -3095,6 +3203,8 @@ export interface FileRoutesByTo {
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
   '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRouteWithChildren
+  '/dashboard/business/$businessId/operations': typeof DashboardBusinessBusinessIdOperationsRoute
+  '/dashboard/business/$businessId/parts-operations': typeof DashboardBusinessBusinessIdPartsOperationsRoute
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
@@ -3149,6 +3259,7 @@ export interface FileRoutesById {
   '/my-qr': typeof MyQrRoute
   '/partner-program': typeof PartnerProgramRouteWithChildren
   '/partner-training': typeof PartnerTrainingRoute
+  '/partners': typeof PartnersRouteWithChildren
   '/parts': typeof PartsRouteWithChildren
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -3177,6 +3288,7 @@ export interface FileRoutesById {
   '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/associate-applications': typeof AdminAssociateApplicationsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
@@ -3244,6 +3356,7 @@ export interface FileRoutesById {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/partner': typeof DashboardPartnerRouteWithChildren
+  '/dashboard/partner-network': typeof DashboardPartnerNetworkRoute
   '/dashboard/partner-program': typeof DashboardPartnerProgramRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
@@ -3280,6 +3393,7 @@ export interface FileRoutesById {
   '/partner-program/apply': typeof PartnerProgramApplyRoute
   '/partner-program/info': typeof PartnerProgramInfoRoute
   '/partner-program/terms': typeof PartnerProgramTermsRoute
+  '/partners/network': typeof PartnersNetworkRoute
   '/partners/parts': typeof PartnersPartsRouteWithChildren
   '/parts/categories': typeof PartsCategoriesRoute
   '/parts/network': typeof PartsNetworkRoute
@@ -3312,6 +3426,7 @@ export interface FileRoutesById {
   '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/partner-program/': typeof PartnerProgramIndexRoute
+  '/partners/': typeof PartnersIndexRoute
   '/parts/': typeof PartsIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop-manager/': typeof ShopManagerIndexRoute
@@ -3338,6 +3453,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/appointments': typeof AuthenticatedWorkspaceAppointmentsRoute
   '/_authenticated/workspace/automation': typeof AuthenticatedWorkspaceAutomationRouteWithChildren
   '/_authenticated/workspace/certificates': typeof AuthenticatedWorkspaceCertificatesRoute
+  '/_authenticated/workspace/counter-sale': typeof AuthenticatedWorkspaceCounterSaleRoute
   '/_authenticated/workspace/customers': typeof AuthenticatedWorkspaceCustomersRouteWithChildren
   '/_authenticated/workspace/discounts': typeof AuthenticatedWorkspaceDiscountsRoute
   '/_authenticated/workspace/expenses': typeof AuthenticatedWorkspaceExpensesRoute
@@ -3348,6 +3464,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/leave': typeof AuthenticatedWorkspaceLeaveRoute
   '/_authenticated/workspace/leave-requests': typeof AuthenticatedWorkspaceLeaveRequestsRoute
   '/_authenticated/workspace/loyalty': typeof AuthenticatedWorkspaceLoyaltyRoute
+  '/_authenticated/workspace/operations': typeof AuthenticatedWorkspaceOperationsRoute
   '/_authenticated/workspace/purchase-orders': typeof AuthenticatedWorkspacePurchaseOrdersRouteWithChildren
   '/_authenticated/workspace/quotes': typeof AuthenticatedWorkspaceQuotesRouteWithChildren
   '/_authenticated/workspace/reports': typeof AuthenticatedWorkspaceReportsRouteWithChildren
@@ -3377,6 +3494,7 @@ export interface FileRoutesById {
   '/admin/parts/analytics': typeof AdminPartsAnalyticsRoute
   '/admin/parts/commissions': typeof AdminPartsCommissionsRoute
   '/admin/parts/feeds': typeof AdminPartsFeedsRoute
+  '/admin/parts/fitment': typeof AdminPartsFitmentRoute
   '/admin/parts/outreach': typeof AdminPartsOutreachRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/admin/staff-academy/$id': typeof AdminStaffAcademyIdRoute
@@ -3386,6 +3504,8 @@ export interface FileRoutesById {
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/ip-location': typeof ApiPublicIpLocationRoute
+  '/api/public/migration-export': typeof ApiPublicMigrationExportRoute
+  '/api/public/migration-target-preflight': typeof ApiPublicMigrationTargetPreflightRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
@@ -3408,6 +3528,7 @@ export interface FileRoutesById {
   '/document-check/$country/quick-guide': typeof DocumentCheckCountryQuickGuideRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/partners/associate/apply': typeof PartnersAssociateApplyRoute
   '/partners/parts/onboarding': typeof PartnersPartsOnboardingRoute
   '/parts/c/$slug': typeof PartsCSlugRoute
   '/parts/partners/categories': typeof PartsPartnersCategoriesRoute
@@ -3472,6 +3593,8 @@ export interface FileRoutesById {
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
   '/dashboard/business/$businessId/invoices': typeof DashboardBusinessBusinessIdInvoicesRouteWithChildren
+  '/dashboard/business/$businessId/operations': typeof DashboardBusinessBusinessIdOperationsRoute
+  '/dashboard/business/$businessId/parts-operations': typeof DashboardBusinessBusinessIdPartsOperationsRoute
   '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
   '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses_/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
@@ -3526,6 +3649,7 @@ export interface FileRouteTypes {
     | '/my-qr'
     | '/partner-program'
     | '/partner-training'
+    | '/partners'
     | '/parts'
     | '/payments'
     | '/pricing'
@@ -3554,6 +3678,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements'
     | '/admin/alerts'
     | '/admin/analytics'
+    | '/admin/associate-applications'
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/claims'
@@ -3621,6 +3746,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/partner'
+    | '/dashboard/partner-network'
     | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
@@ -3657,6 +3783,7 @@ export interface FileRouteTypes {
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
+    | '/partners/network'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/network'
@@ -3689,6 +3816,7 @@ export interface FileRouteTypes {
     | '/games/'
     | '/learn/'
     | '/partner-program/'
+    | '/partners/'
     | '/parts/'
     | '/rides/'
     | '/shop-manager/'
@@ -3715,6 +3843,7 @@ export interface FileRouteTypes {
     | '/workspace/appointments'
     | '/workspace/automation'
     | '/workspace/certificates'
+    | '/workspace/counter-sale'
     | '/workspace/customers'
     | '/workspace/discounts'
     | '/workspace/expenses'
@@ -3725,6 +3854,7 @@ export interface FileRouteTypes {
     | '/workspace/leave'
     | '/workspace/leave-requests'
     | '/workspace/loyalty'
+    | '/workspace/operations'
     | '/workspace/purchase-orders'
     | '/workspace/quotes'
     | '/workspace/reports'
@@ -3754,6 +3884,7 @@ export interface FileRouteTypes {
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
     | '/admin/parts/feeds'
+    | '/admin/parts/fitment'
     | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
     | '/admin/staff-academy/$id'
@@ -3763,6 +3894,8 @@ export interface FileRouteTypes {
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/ip-location'
+    | '/api/public/migration-export'
+    | '/api/public/migration-target-preflight'
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
@@ -3785,6 +3918,7 @@ export interface FileRouteTypes {
     | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/partners/associate/apply'
     | '/partners/parts/onboarding'
     | '/parts/c/$slug'
     | '/parts/partners/categories'
@@ -3849,6 +3983,8 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId/fleet'
     | '/dashboard/business/$businessId/inventory'
     | '/dashboard/business/$businessId/invoices'
+    | '/dashboard/business/$businessId/operations'
+    | '/dashboard/business/$businessId/parts-operations'
     | '/dashboard/business/$businessId/settings'
     | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses/$id/analytics'
@@ -3918,6 +4054,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/alerts'
     | '/admin/analytics'
+    | '/admin/associate-applications'
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/claims'
@@ -3984,6 +4121,7 @@ export interface FileRouteTypes {
     | '/dashboard/learning'
     | '/dashboard/likes'
     | '/dashboard/messages'
+    | '/dashboard/partner-network'
     | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
@@ -4018,6 +4156,7 @@ export interface FileRouteTypes {
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
+    | '/partners/network'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/network'
@@ -4050,6 +4189,7 @@ export interface FileRouteTypes {
     | '/games'
     | '/learn'
     | '/partner-program'
+    | '/partners'
     | '/parts'
     | '/rides'
     | '/shop-manager'
@@ -4076,6 +4216,7 @@ export interface FileRouteTypes {
     | '/workspace/appointments'
     | '/workspace/automation'
     | '/workspace/certificates'
+    | '/workspace/counter-sale'
     | '/workspace/customers'
     | '/workspace/discounts'
     | '/workspace/expenses'
@@ -4086,6 +4227,7 @@ export interface FileRouteTypes {
     | '/workspace/leave'
     | '/workspace/leave-requests'
     | '/workspace/loyalty'
+    | '/workspace/operations'
     | '/workspace/purchase-orders'
     | '/workspace/quotes'
     | '/workspace/reports'
@@ -4115,6 +4257,7 @@ export interface FileRouteTypes {
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
     | '/admin/parts/feeds'
+    | '/admin/parts/fitment'
     | '/admin/parts/outreach'
     | '/admin/redemptions/$staffId'
     | '/admin/staff-academy/$id'
@@ -4124,6 +4267,8 @@ export interface FileRouteTypes {
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/ip-location'
+    | '/api/public/migration-export'
+    | '/api/public/migration-target-preflight'
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
@@ -4145,6 +4290,7 @@ export interface FileRouteTypes {
     | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/partners/associate/apply'
     | '/partners/parts/onboarding'
     | '/parts/c/$slug'
     | '/parts/partners/categories'
@@ -4209,6 +4355,8 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId/fleet'
     | '/dashboard/business/$businessId/inventory'
     | '/dashboard/business/$businessId/invoices'
+    | '/dashboard/business/$businessId/operations'
+    | '/dashboard/business/$businessId/parts-operations'
     | '/dashboard/business/$businessId/settings'
     | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses/$id/analytics'
@@ -4262,6 +4410,7 @@ export interface FileRouteTypes {
     | '/my-qr'
     | '/partner-program'
     | '/partner-training'
+    | '/partners'
     | '/parts'
     | '/payments'
     | '/pricing'
@@ -4290,6 +4439,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements'
     | '/admin/alerts'
     | '/admin/analytics'
+    | '/admin/associate-applications'
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/claims'
@@ -4357,6 +4507,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/partner'
+    | '/dashboard/partner-network'
     | '/dashboard/partner-program'
     | '/dashboard/profile'
     | '/dashboard/promoter-resources'
@@ -4393,6 +4544,7 @@ export interface FileRouteTypes {
     | '/partner-program/apply'
     | '/partner-program/info'
     | '/partner-program/terms'
+    | '/partners/network'
     | '/partners/parts'
     | '/parts/categories'
     | '/parts/network'
@@ -4425,6 +4577,7 @@ export interface FileRouteTypes {
     | '/games/'
     | '/learn/'
     | '/partner-program/'
+    | '/partners/'
     | '/parts/'
     | '/rides/'
     | '/shop-manager/'
@@ -4451,6 +4604,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/appointments'
     | '/_authenticated/workspace/automation'
     | '/_authenticated/workspace/certificates'
+    | '/_authenticated/workspace/counter-sale'
     | '/_authenticated/workspace/customers'
     | '/_authenticated/workspace/discounts'
     | '/_authenticated/workspace/expenses'
@@ -4461,6 +4615,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/leave'
     | '/_authenticated/workspace/leave-requests'
     | '/_authenticated/workspace/loyalty'
+    | '/_authenticated/workspace/operations'
     | '/_authenticated/workspace/purchase-orders'
     | '/_authenticated/workspace/quotes'
     | '/_authenticated/workspace/reports'
@@ -4490,6 +4645,7 @@ export interface FileRouteTypes {
     | '/admin/parts/analytics'
     | '/admin/parts/commissions'
     | '/admin/parts/feeds'
+    | '/admin/parts/fitment'
     | '/admin/parts/outreach'
     | '/admin/redemptions_/$staffId'
     | '/admin/staff-academy/$id'
@@ -4499,6 +4655,8 @@ export interface FileRouteTypes {
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/ip-location'
+    | '/api/public/migration-export'
+    | '/api/public/migration-target-preflight'
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
@@ -4521,6 +4679,7 @@ export interface FileRouteTypes {
     | '/document-check/$country/quick-guide'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/partners/associate/apply'
     | '/partners/parts/onboarding'
     | '/parts/c/$slug'
     | '/parts/partners/categories'
@@ -4585,6 +4744,8 @@ export interface FileRouteTypes {
     | '/dashboard/business/$businessId/fleet'
     | '/dashboard/business/$businessId/inventory'
     | '/dashboard/business/$businessId/invoices'
+    | '/dashboard/business/$businessId/operations'
+    | '/dashboard/business/$businessId/parts-operations'
     | '/dashboard/business/$businessId/settings'
     | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses_/$id/analytics'
@@ -4639,6 +4800,7 @@ export interface RootRouteChildren {
   MyQrRoute: typeof MyQrRoute
   PartnerProgramRoute: typeof PartnerProgramRouteWithChildren
   PartnerTrainingRoute: typeof PartnerTrainingRoute
+  PartnersRoute: typeof PartnersRouteWithChildren
   PartsRoute: typeof PartsRouteWithChildren
   PaymentsRoute: typeof PaymentsRouteWithChildren
   PricingRoute: typeof PricingRoute
@@ -4684,7 +4846,6 @@ export interface RootRouteChildren {
   LearnMechanicsRoute: typeof LearnMechanicsRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   ListingCheckoutRoute: typeof ListingCheckoutRoute
-  PartnersPartsRoute: typeof PartnersPartsRouteWithChildren
   PassportPremiumCheckoutRoute: typeof PassportPremiumCheckoutRoute
   PassportSlugRoute: typeof PassportSlugRoute
   PayManualRoute: typeof PayManualRoute
@@ -4715,6 +4876,8 @@ export interface RootRouteChildren {
   ApiPublicGeoSearchRoute: typeof ApiPublicGeoSearchRoute
   ApiPublicGeocodeRoute: typeof ApiPublicGeocodeRoute
   ApiPublicIpLocationRoute: typeof ApiPublicIpLocationRoute
+  ApiPublicMigrationExportRoute: typeof ApiPublicMigrationExportRoute
+  ApiPublicMigrationTargetPreflightRoute: typeof ApiPublicMigrationTargetPreflightRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   ApiPublicReverseGeocodeRoute: typeof ApiPublicReverseGeocodeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -4892,6 +5055,13 @@ declare module '@tanstack/react-router' {
       path: '/parts'
       fullPath: '/parts'
       preLoaderRoute: typeof PartsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partners': {
+      id: '/partners'
+      path: '/partners'
+      fullPath: '/partners'
+      preLoaderRoute: typeof PartnersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner-training': {
@@ -5132,6 +5302,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartsIndexRouteImport
       parentRoute: typeof PartsRoute
     }
+    '/partners/': {
+      id: '/partners/'
+      path: '/'
+      fullPath: '/partners/'
+      preLoaderRoute: typeof PartnersIndexRouteImport
+      parentRoute: typeof PartnersRoute
+    }
     '/partner-program/': {
       id: '/partner-program/'
       path: '/'
@@ -5351,10 +5528,17 @@ declare module '@tanstack/react-router' {
     }
     '/partners/parts': {
       id: '/partners/parts'
-      path: '/partners/parts'
+      path: '/parts'
       fullPath: '/partners/parts'
       preLoaderRoute: typeof PartnersPartsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartnersRoute
+    }
+    '/partners/network': {
+      id: '/partners/network'
+      path: '/network'
+      fullPath: '/partners/network'
+      preLoaderRoute: typeof PartnersNetworkRouteImport
+      parentRoute: typeof PartnersRoute
     }
     '/partner-program/terms': {
       id: '/partner-program/terms'
@@ -5606,6 +5790,13 @@ declare module '@tanstack/react-router' {
       path: '/partner-program'
       fullPath: '/dashboard/partner-program'
       preLoaderRoute: typeof DashboardPartnerProgramRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/partner-network': {
+      id: '/dashboard/partner-network'
+      path: '/partner-network'
+      fullPath: '/dashboard/partner-network'
+      preLoaderRoute: typeof DashboardPartnerNetworkRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/partner': {
@@ -6077,6 +6268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAuditRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/associate-applications': {
+      id: '/admin/associate-applications'
+      path: '/associate-applications'
+      fullPath: '/admin/associate-applications'
+      preLoaderRoute: typeof AdminAssociateApplicationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/analytics': {
       id: '/admin/analytics'
       path: '/analytics'
@@ -6223,6 +6421,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/partners/parts/onboarding'
       preLoaderRoute: typeof PartnersPartsOnboardingRouteImport
       parentRoute: typeof PartnersPartsRoute
+    }
+    '/partners/associate/apply': {
+      id: '/partners/associate/apply'
+      path: '/associate/apply'
+      fullPath: '/partners/associate/apply'
+      preLoaderRoute: typeof PartnersAssociateApplyRouteImport
+      parentRoute: typeof PartnersRoute
     }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
@@ -6378,6 +6583,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/migration-target-preflight': {
+      id: '/api/public/migration-target-preflight'
+      path: '/api/public/migration-target-preflight'
+      fullPath: '/api/public/migration-target-preflight'
+      preLoaderRoute: typeof ApiPublicMigrationTargetPreflightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/migration-export': {
+      id: '/api/public/migration-export'
+      path: '/api/public/migration-export'
+      fullPath: '/api/public/migration-export'
+      preLoaderRoute: typeof ApiPublicMigrationExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/ip-location': {
       id: '/api/public/ip-location'
       path: '/api/public/ip-location'
@@ -6439,6 +6658,13 @@ declare module '@tanstack/react-router' {
       path: '/outreach'
       fullPath: '/admin/parts/outreach'
       preLoaderRoute: typeof AdminPartsOutreachRouteImport
+      parentRoute: typeof AdminPartsRoute
+    }
+    '/admin/parts/fitment': {
+      id: '/admin/parts/fitment'
+      path: '/fitment'
+      fullPath: '/admin/parts/fitment'
+      preLoaderRoute: typeof AdminPartsFitmentRouteImport
       parentRoute: typeof AdminPartsRoute
     }
     '/admin/parts/feeds': {
@@ -6644,6 +6870,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspacePurchaseOrdersRouteImport
       parentRoute: typeof AuthenticatedWorkspaceRoute
     }
+    '/_authenticated/workspace/operations': {
+      id: '/_authenticated/workspace/operations'
+      path: '/operations'
+      fullPath: '/workspace/operations'
+      preLoaderRoute: typeof AuthenticatedWorkspaceOperationsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
     '/_authenticated/workspace/loyalty': {
       id: '/_authenticated/workspace/loyalty'
       path: '/loyalty'
@@ -6712,6 +6945,13 @@ declare module '@tanstack/react-router' {
       path: '/customers'
       fullPath: '/workspace/customers'
       preLoaderRoute: typeof AuthenticatedWorkspaceCustomersRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/counter-sale': {
+      id: '/_authenticated/workspace/counter-sale'
+      path: '/counter-sale'
+      fullPath: '/workspace/counter-sale'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCounterSaleRouteImport
       parentRoute: typeof AuthenticatedWorkspaceRoute
     }
     '/_authenticated/workspace/certificates': {
@@ -6992,6 +7232,20 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/dashboard/business/$businessId/settings'
       preLoaderRoute: typeof DashboardBusinessBusinessIdSettingsRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/parts-operations': {
+      id: '/dashboard/business/$businessId/parts-operations'
+      path: '/parts-operations'
+      fullPath: '/dashboard/business/$businessId/parts-operations'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdPartsOperationsRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/operations': {
+      id: '/dashboard/business/$businessId/operations'
+      path: '/operations'
+      fullPath: '/dashboard/business/$businessId/operations'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdOperationsRouteImport
       parentRoute: typeof DashboardBusinessBusinessIdRoute
     }
     '/dashboard/business/$businessId/invoices': {
@@ -7603,6 +7857,7 @@ interface AuthenticatedWorkspaceRouteChildren {
   AuthenticatedWorkspaceAppointmentsRoute: typeof AuthenticatedWorkspaceAppointmentsRoute
   AuthenticatedWorkspaceAutomationRoute: typeof AuthenticatedWorkspaceAutomationRouteWithChildren
   AuthenticatedWorkspaceCertificatesRoute: typeof AuthenticatedWorkspaceCertificatesRoute
+  AuthenticatedWorkspaceCounterSaleRoute: typeof AuthenticatedWorkspaceCounterSaleRoute
   AuthenticatedWorkspaceCustomersRoute: typeof AuthenticatedWorkspaceCustomersRouteWithChildren
   AuthenticatedWorkspaceDiscountsRoute: typeof AuthenticatedWorkspaceDiscountsRoute
   AuthenticatedWorkspaceExpensesRoute: typeof AuthenticatedWorkspaceExpensesRoute
@@ -7613,6 +7868,7 @@ interface AuthenticatedWorkspaceRouteChildren {
   AuthenticatedWorkspaceLeaveRoute: typeof AuthenticatedWorkspaceLeaveRoute
   AuthenticatedWorkspaceLeaveRequestsRoute: typeof AuthenticatedWorkspaceLeaveRequestsRoute
   AuthenticatedWorkspaceLoyaltyRoute: typeof AuthenticatedWorkspaceLoyaltyRoute
+  AuthenticatedWorkspaceOperationsRoute: typeof AuthenticatedWorkspaceOperationsRoute
   AuthenticatedWorkspacePurchaseOrdersRoute: typeof AuthenticatedWorkspacePurchaseOrdersRouteWithChildren
   AuthenticatedWorkspaceQuotesRoute: typeof AuthenticatedWorkspaceQuotesRouteWithChildren
   AuthenticatedWorkspaceReportsRoute: typeof AuthenticatedWorkspaceReportsRouteWithChildren
@@ -7639,6 +7895,8 @@ const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
       AuthenticatedWorkspaceAutomationRouteWithChildren,
     AuthenticatedWorkspaceCertificatesRoute:
       AuthenticatedWorkspaceCertificatesRoute,
+    AuthenticatedWorkspaceCounterSaleRoute:
+      AuthenticatedWorkspaceCounterSaleRoute,
     AuthenticatedWorkspaceCustomersRoute:
       AuthenticatedWorkspaceCustomersRouteWithChildren,
     AuthenticatedWorkspaceDiscountsRoute: AuthenticatedWorkspaceDiscountsRoute,
@@ -7655,6 +7913,8 @@ const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
     AuthenticatedWorkspaceLeaveRequestsRoute:
       AuthenticatedWorkspaceLeaveRequestsRoute,
     AuthenticatedWorkspaceLoyaltyRoute: AuthenticatedWorkspaceLoyaltyRoute,
+    AuthenticatedWorkspaceOperationsRoute:
+      AuthenticatedWorkspaceOperationsRoute,
     AuthenticatedWorkspacePurchaseOrdersRoute:
       AuthenticatedWorkspacePurchaseOrdersRouteWithChildren,
     AuthenticatedWorkspaceQuotesRoute:
@@ -7824,6 +8084,7 @@ interface AdminPartsRouteChildren {
   AdminPartsAnalyticsRoute: typeof AdminPartsAnalyticsRoute
   AdminPartsCommissionsRoute: typeof AdminPartsCommissionsRoute
   AdminPartsFeedsRoute: typeof AdminPartsFeedsRoute
+  AdminPartsFitmentRoute: typeof AdminPartsFitmentRoute
   AdminPartsOutreachRoute: typeof AdminPartsOutreachRoute
 }
 
@@ -7831,6 +8092,7 @@ const AdminPartsRouteChildren: AdminPartsRouteChildren = {
   AdminPartsAnalyticsRoute: AdminPartsAnalyticsRoute,
   AdminPartsCommissionsRoute: AdminPartsCommissionsRoute,
   AdminPartsFeedsRoute: AdminPartsFeedsRoute,
+  AdminPartsFitmentRoute: AdminPartsFitmentRoute,
   AdminPartsOutreachRoute: AdminPartsOutreachRoute,
 }
 
@@ -7843,6 +8105,7 @@ interface AdminRouteChildren {
   AdminAdvertisementsRoute: typeof AdminAdvertisementsRouteWithChildren
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminAssociateApplicationsRoute: typeof AdminAssociateApplicationsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminClaimsRoute: typeof AdminClaimsRoute
@@ -7899,6 +8162,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAdvertisementsRoute: AdminAdvertisementsRouteWithChildren,
   AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminAssociateApplicationsRoute: AdminAssociateApplicationsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminClaimsRoute: AdminClaimsRoute,
@@ -8043,6 +8307,8 @@ interface DashboardBusinessBusinessIdRouteChildren {
   DashboardBusinessBusinessIdFleetRoute: typeof DashboardBusinessBusinessIdFleetRoute
   DashboardBusinessBusinessIdInventoryRoute: typeof DashboardBusinessBusinessIdInventoryRoute
   DashboardBusinessBusinessIdInvoicesRoute: typeof DashboardBusinessBusinessIdInvoicesRouteWithChildren
+  DashboardBusinessBusinessIdOperationsRoute: typeof DashboardBusinessBusinessIdOperationsRoute
+  DashboardBusinessBusinessIdPartsOperationsRoute: typeof DashboardBusinessBusinessIdPartsOperationsRoute
   DashboardBusinessBusinessIdSettingsRoute: typeof DashboardBusinessBusinessIdSettingsRoute
   DashboardBusinessBusinessIdStaffRoute: typeof DashboardBusinessBusinessIdStaffRoute
   DashboardBusinessBusinessIdIndexRoute: typeof DashboardBusinessBusinessIdIndexRoute
@@ -8060,6 +8326,10 @@ const DashboardBusinessBusinessIdRouteChildren: DashboardBusinessBusinessIdRoute
       DashboardBusinessBusinessIdInventoryRoute,
     DashboardBusinessBusinessIdInvoicesRoute:
       DashboardBusinessBusinessIdInvoicesRouteWithChildren,
+    DashboardBusinessBusinessIdOperationsRoute:
+      DashboardBusinessBusinessIdOperationsRoute,
+    DashboardBusinessBusinessIdPartsOperationsRoute:
+      DashboardBusinessBusinessIdPartsOperationsRoute,
     DashboardBusinessBusinessIdSettingsRoute:
       DashboardBusinessBusinessIdSettingsRoute,
     DashboardBusinessBusinessIdStaffRoute:
@@ -8085,6 +8355,7 @@ interface DashboardRouteChildren {
   DashboardLikesRoute: typeof DashboardLikesRoute
   DashboardMessagesRoute: typeof DashboardMessagesRoute
   DashboardPartnerRoute: typeof DashboardPartnerRouteWithChildren
+  DashboardPartnerNetworkRoute: typeof DashboardPartnerNetworkRoute
   DashboardPartnerProgramRoute: typeof DashboardPartnerProgramRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardPromoterResourcesRoute: typeof DashboardPromoterResourcesRoute
@@ -8122,6 +8393,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLikesRoute: DashboardLikesRoute,
   DashboardMessagesRoute: DashboardMessagesRoute,
   DashboardPartnerRoute: DashboardPartnerRouteWithChildren,
+  DashboardPartnerNetworkRoute: DashboardPartnerNetworkRoute,
   DashboardPartnerProgramRoute: DashboardPartnerProgramRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardPromoterResourcesRoute: DashboardPromoterResourcesRoute,
@@ -8238,6 +8510,36 @@ const PartnerProgramRouteWithChildren = PartnerProgramRoute._addFileChildren(
   PartnerProgramRouteChildren,
 )
 
+interface PartnersPartsRouteChildren {
+  PartnersPartsOnboardingRoute: typeof PartnersPartsOnboardingRoute
+}
+
+const PartnersPartsRouteChildren: PartnersPartsRouteChildren = {
+  PartnersPartsOnboardingRoute: PartnersPartsOnboardingRoute,
+}
+
+const PartnersPartsRouteWithChildren = PartnersPartsRoute._addFileChildren(
+  PartnersPartsRouteChildren,
+)
+
+interface PartnersRouteChildren {
+  PartnersNetworkRoute: typeof PartnersNetworkRoute
+  PartnersPartsRoute: typeof PartnersPartsRouteWithChildren
+  PartnersIndexRoute: typeof PartnersIndexRoute
+  PartnersAssociateApplyRoute: typeof PartnersAssociateApplyRoute
+}
+
+const PartnersRouteChildren: PartnersRouteChildren = {
+  PartnersNetworkRoute: PartnersNetworkRoute,
+  PartnersPartsRoute: PartnersPartsRouteWithChildren,
+  PartnersIndexRoute: PartnersIndexRoute,
+  PartnersAssociateApplyRoute: PartnersAssociateApplyRoute,
+}
+
+const PartnersRouteWithChildren = PartnersRoute._addFileChildren(
+  PartnersRouteChildren,
+)
+
 interface PartsRouteChildren {
   PartsCategoriesRoute: typeof PartsCategoriesRoute
   PartsNetworkRoute: typeof PartsNetworkRoute
@@ -8348,18 +8650,6 @@ const ListingIdRouteWithChildren = ListingIdRoute._addFileChildren(
   ListingIdRouteChildren,
 )
 
-interface PartnersPartsRouteChildren {
-  PartnersPartsOnboardingRoute: typeof PartnersPartsOnboardingRoute
-}
-
-const PartnersPartsRouteChildren: PartnersPartsRouteChildren = {
-  PartnersPartsOnboardingRoute: PartnersPartsOnboardingRoute,
-}
-
-const PartnersPartsRouteWithChildren = PartnersPartsRoute._addFileChildren(
-  PartnersPartsRouteChildren,
-)
-
 interface RCodeRouteChildren {
   RCodePosterRoute: typeof RCodePosterRoute
   RCodeQrRoute: typeof RCodeQrRoute
@@ -8401,6 +8691,7 @@ const rootRouteChildren: RootRouteChildren = {
   MyQrRoute: MyQrRoute,
   PartnerProgramRoute: PartnerProgramRouteWithChildren,
   PartnerTrainingRoute: PartnerTrainingRoute,
+  PartnersRoute: PartnersRouteWithChildren,
   PartsRoute: PartsRouteWithChildren,
   PaymentsRoute: PaymentsRouteWithChildren,
   PricingRoute: PricingRoute,
@@ -8447,7 +8738,6 @@ const rootRouteChildren: RootRouteChildren = {
   LearnMechanicsRoute: LearnMechanicsRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   ListingCheckoutRoute: ListingCheckoutRoute,
-  PartnersPartsRoute: PartnersPartsRouteWithChildren,
   PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
   PassportSlugRoute: PassportSlugRoute,
   PayManualRoute: PayManualRoute,
@@ -8478,6 +8768,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicGeoSearchRoute: ApiPublicGeoSearchRoute,
   ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,
   ApiPublicIpLocationRoute: ApiPublicIpLocationRoute,
+  ApiPublicMigrationExportRoute: ApiPublicMigrationExportRoute,
+  ApiPublicMigrationTargetPreflightRoute:
+    ApiPublicMigrationTargetPreflightRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   ApiPublicReverseGeocodeRoute: ApiPublicReverseGeocodeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,

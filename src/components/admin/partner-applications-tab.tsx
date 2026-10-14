@@ -223,7 +223,7 @@ function StorefrontEditor({ row, onSaved }: { row: Row; onSaved: () => void }) {
       </p>
       <div className="grid gap-2 sm:grid-cols-2">
         <label className="flex flex-col gap-1">
-          <span className="font-medium">URL slug (/shop/…)</span>
+          <span className="font-medium">URL slug (/parts/partners/store/…)</span>
           <input
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
@@ -272,11 +272,11 @@ function StorefrontEditor({ row, onSaved }: { row: Row; onSaved: () => void }) {
           disabled={saving || !slug}
           className={`rounded px-3 py-1 text-xs font-medium ${published ? "bg-amber-600 text-white" : "bg-emerald-600 text-white"} disabled:opacity-50`}
         >
-          {published ? "Unpublish" : "Publish to /shop/" + (slug || "…")}
+          {published ? "Unpublish" : "Publish to /parts/partners/store/" + (slug || "…")}
         </button>
         {published && slug && (
           <a
-            href={`/shop/${slug}`}
+            href={`/parts/partners/store/${slug}`}
             target="_blank"
             rel="noopener"
             className="text-primary hover:underline"

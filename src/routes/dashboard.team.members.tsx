@@ -57,7 +57,7 @@ function MembersPage() {
 }
 
 function SellerMembersPage() {
-  const { orgId } = Route.useSearch();
+  const orgId = Route.useSearch().orgId ?? "";
   const qc = useQueryClient();
   const fetchMembers = useServerFn(listOrgMembers);
   const fetchInvites = useServerFn(listOrgInvites);

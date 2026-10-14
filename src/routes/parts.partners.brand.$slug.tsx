@@ -44,7 +44,7 @@ export const Route = createFileRoute("/parts/partners/brand/$slug")({
 function BrandPage() {
   const { slug } = Route.useParams();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/workspace/brand/$slug" });
+  const navigate = useNavigate({ from: "/parts/partners/brand/$slug" });
   const [garage] = useGarage();
   const brandName = slugToName(slug);
 
@@ -119,7 +119,7 @@ function BrandPage() {
         {products.length === 0 ? (
           <p className="text-muted-foreground">
             No {brandName} products found right now.{" "}
-            <Link to="/workspace" className="underline">
+            <Link to="/parts/partners" className="underline">
               Browse all shop
             </Link>
             .
@@ -129,7 +129,8 @@ function BrandPage() {
         )}
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
-          Disclosure: 365 MotorSales earns a commission on qualifying purchases. See our{" "}
+          Disclosure: 365 MotorSales earns a commission on qualifying purchases. As an Amazon
+          Associate I earn from qualifying purchases. See our{" "}
           <Link to="/affiliate-disclosure" className="underline">
             affiliate disclosure
           </Link>

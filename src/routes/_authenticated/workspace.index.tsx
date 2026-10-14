@@ -25,9 +25,9 @@ import {
   BookOpen,
   CalendarDays,
   ClipboardCheck,
+  ArrowRightLeft,
+  ScanLine,
 } from "lucide-react";
-
-
 
 import { useShopRealtime } from "@/hooks/use-shop-realtime";
 import { SiteLayout } from "@/components/site-layout";
@@ -40,7 +40,10 @@ export const Route = createFileRoute("/_authenticated/workspace/")({
   head: () => ({
     meta: [
       { title: "Shop Manager — 365 Motor Sales" },
-      { name: "description", content: "Live KPIs, recent work orders, and low-stock alerts for your shop." },
+      {
+        name: "description",
+        content: "Live KPIs, recent work orders, and low-stock alerts for your shop.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -50,12 +53,16 @@ export const Route = createFileRoute("/_authenticated/workspace/")({
       <div className="mx-auto max-w-4xl px-4 py-10">
         <h1 className="text-2xl font-bold">Shop Manager</h1>
         <p className="mt-2 text-destructive">{String((error as any)?.message ?? error)}</p>
-        <Button className="mt-4" onClick={reset}>Retry</Button>
+        <Button className="mt-4" onClick={reset}>
+          Retry
+        </Button>
       </div>
     </SiteLayout>
   ),
   notFoundComponent: () => (
-    <SiteLayout><div className="mx-auto max-w-4xl px-4 py-10">Not found.</div></SiteLayout>
+    <SiteLayout>
+      <div className="mx-auto max-w-4xl px-4 py-10">Not found.</div>
+    </SiteLayout>
   ),
 });
 
@@ -66,25 +73,36 @@ async function fetchDashboard() {
     sm.from("customers").select("id", { count: "exact", head: true }),
     sm.from("inventory_items").select("id", { count: "exact", head: true }),
     sm.from("invoices").select("id,total,status").limit(1000),
-    sm.from("inventory_items").select("id,name,sku,quantity,reorder_point").order("quantity", { ascending: true }).limit(6),
-    sm.from("work_orders")
+    sm
+      .from("inventory_items")
+      .select("id,name,sku,quantity,reorder_point")
+      .order("quantity", { ascending: true })
+      .limit(6),
+    sm
+      .from("work_orders")
       .select("id,work_order_number,status,created_at,total_cost,customers(first_name,last_name)")
       .order("created_at", { ascending: false })
       .limit(6),
   ]);
 
-  const openWO = (wo.data ?? []).filter((w: any) =>
-    !["completed", "closed", "cancelled", "canceled"].includes(String(w.status ?? "").toLowerCase()),
+  const openWO = (wo.data ?? []).filter(
+    (w: any) =>
+      !["completed", "closed", "cancelled", "canceled"].includes(
+        String(w.status ?? "").toLowerCase(),
+      ),
   ).length;
-  const invoiceTotal = (invc.data ?? []).reduce((sum: number, i: any) => sum + Number(i.total ?? 0), 0);
-  const outstandingInvoices = (invc.data ?? []).filter((i: any) =>
-    !["paid", "void", "cancelled"].includes(String(i.status ?? "").toLowerCase()),
+  const invoiceTotal = (invc.data ?? []).reduce(
+    (sum: number, i: any) => sum + Number(i.total ?? 0),
+    0,
+  );
+  const outstandingInvoices = (invc.data ?? []).filter(
+    (i: any) => !["paid", "void", "cancelled"].includes(String(i.status ?? "").toLowerCase()),
   ).length;
   const low = (lowStock.data ?? []).filter((i: any) => (i.quantity ?? 0) <= (i.reorder_point ?? 0));
 
   return {
     counts: {
-      workOrders: wo.count ?? (wo.data?.length ?? 0),
+      workOrders: wo.count ?? wo.data?.length ?? 0,
       openWO,
       customers: cust.count ?? 0,
       inventory: inv.count ?? 0,
@@ -97,11 +115,14 @@ async function fetchDashboard() {
 }
 
 const QUICK_LINKS = [
+  { title: "Employee Operations", icon: ScanLine, to: "/workspace/operations" as const },
+  { title: "Counter Sale", icon: Receipt, to: "/workspace/counter-sale" as const },
   { title: "Work Orders", icon: ClipboardList, to: "/workspace/work-orders" as const },
   { title: "Inspections", icon: ClipboardCheck, to: "/workspace/inspections" as const },
   { title: "Customers", icon: Users2, to: "/workspace/customers" as const },
   { title: "Vehicles", icon: Car, to: "/workspace/vehicles" as const },
   { title: "Inventory", icon: Boxes, to: "/workspace/inventory" as const },
+  { title: "365 Parts Network", icon: ArrowRightLeft, to: "/parts/network" as const },
   { title: "Purchase Orders", icon: PackageSearch, to: "/workspace/purchase-orders" as const },
   { title: "Invoices", icon: Receipt, to: "/workspace/invoices" as const },
   { title: "Quotes", icon: FileText, to: "/workspace/quotes" as const },
@@ -127,11 +148,21 @@ const QUICK_LINKS = [
   { title: "Settings", icon: Settings, to: "/workspace/settings" as const },
 ];
 
-
-
 function ShopHome() {
   useShopRealtime();
-  const { data, isLoading } = useQuery({ queryKey: ["shop-manager", "dashboard"], queryFn: fetchDashboard });
+  const access = useQuery({
+    queryKey: ["shop-manager", "employee-operations", "context"],
+    queryFn: async () => {
+      const { data, error } = await (smSupabase as any).rpc("employee_operating_context");
+      if (error) throw error;
+      return data as { allowed_modules?: string[] };
+    },
+    retry: false,
+  });
+  const { data, isLoading } = useQuery({
+    queryKey: ["shop-manager", "dashboard"],
+    queryFn: fetchDashboard,
+  });
 
   return (
     <SiteLayout>
@@ -145,65 +176,133 @@ function ShopHome() {
         </div>
 
         {isLoading || !data ? (
-          <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading dashboard…</div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading dashboard…
+          </div>
         ) : (
           <>
             <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <KpiCard icon={ClipboardList} label="Open Work Orders" value={data.counts.openWO} to="/workspace/work-orders" sub={`${data.counts.workOrders} total`} />
-              <KpiCard icon={Users2} label="Customers" value={data.counts.customers} to="/workspace/customers" />
-              <KpiCard icon={Boxes} label="Inventory Items" value={data.counts.inventory} to="/workspace/inventory" sub={data.lowStock.length ? `${data.lowStock.length} low-stock` : "healthy"} />
-              <KpiCard icon={Receipt} label="Invoiced" value={`₱${data.counts.invoiceTotal.toLocaleString()}`} to="/workspace/invoices" sub={`${data.counts.outstandingInvoices} outstanding`} />
+              <KpiCard
+                icon={ClipboardList}
+                label="Open Work Orders"
+                value={data.counts.openWO}
+                to="/workspace/work-orders"
+                sub={`${data.counts.workOrders} total`}
+              />
+              <KpiCard
+                icon={Users2}
+                label="Customers"
+                value={data.counts.customers}
+                to="/workspace/customers"
+              />
+              <KpiCard
+                icon={Boxes}
+                label="Inventory Items"
+                value={data.counts.inventory}
+                to="/workspace/inventory"
+                sub={data.lowStock.length ? `${data.lowStock.length} low-stock` : "healthy"}
+              />
+              <KpiCard
+                icon={Receipt}
+                label="Invoiced"
+                value={`₱${data.counts.invoiceTotal.toLocaleString()}`}
+                to="/workspace/invoices"
+                sub={`${data.counts.outstandingInvoices} outstanding`}
+              />
             </div>
 
             <div className="mb-8 grid gap-6 lg:grid-cols-3">
               <Card className="lg:col-span-2">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                  <CardTitle className="text-base flex items-center gap-2"><BarChart3 className="h-4 w-4 text-primary" /> Recent Work Orders</CardTitle>
-                  <Button asChild size="sm" variant="ghost"><Link to="/workspace/work-orders">View all</Link></Button>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-primary" /> Recent Work Orders
+                  </CardTitle>
+                  <Button asChild size="sm" variant="ghost">
+                    <Link to="/workspace/work-orders">View all</Link>
+                  </Button>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {data.recent.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No work orders yet.</p>
-                  ) : data.recent.map((w: any) => (
-                    <Link
-                      key={w.id}
-                      to="/workspace/work-orders/$id"
-                      params={{ id: w.id }}
-                      className="flex items-center justify-between rounded border p-2 text-sm hover:bg-muted/50"
-                    >
-                      <span className="font-mono">{w.work_order_number ?? w.id.slice(0, 8)}</span>
-                      <span className="text-muted-foreground truncate mx-3">
-                        {w.customers ? `${w.customers.first_name ?? ""} ${w.customers.last_name ?? ""}`.trim() : "—"}
-                      </span>
-                      <Badge variant="outline">{w.status ?? "—"}</Badge>
-                    </Link>
-                  ))}
+                  ) : (
+                    data.recent.map((w: any) => (
+                      <Link
+                        key={w.id}
+                        to="/workspace/work-orders/$id"
+                        params={{ id: w.id }}
+                        className="flex items-center justify-between rounded border p-2 text-sm hover:bg-muted/50"
+                      >
+                        <span className="font-mono">{w.work_order_number ?? w.id.slice(0, 8)}</span>
+                        <span className="text-muted-foreground truncate mx-3">
+                          {w.customers
+                            ? `${w.customers.first_name ?? ""} ${w.customers.last_name ?? ""}`.trim()
+                            : "—"}
+                        </span>
+                        <Badge variant="outline">{w.status ?? "—"}</Badge>
+                      </Link>
+                    ))
+                  )}
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="text-base">Low Stock</CardTitle>
-                  <Button asChild size="sm" variant="ghost"><Link to="/workspace/inventory">Inventory</Link></Button>
+                  <Button asChild size="sm" variant="ghost">
+                    <Link to="/workspace/inventory">Inventory</Link>
+                  </Button>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {data.lowStock.length === 0 ? (
                     <p className="text-sm text-muted-foreground">All items above reorder point.</p>
-                  ) : data.lowStock.map((i: any) => (
-                    <div key={i.id} className="flex items-center justify-between rounded border p-2 text-sm">
-                      <span className="truncate">{i.name ?? i.sku ?? "—"}</span>
-                      <Badge variant="destructive">{i.quantity ?? 0} left</Badge>
-                    </div>
-                  ))}
+                  ) : (
+                    data.lowStock.map((i: any) => (
+                      <div
+                        key={i.id}
+                        className="flex items-center justify-between rounded border p-2 text-sm"
+                      >
+                        <span className="truncate">{i.name ?? i.sku ?? "—"}</span>
+                        <Badge variant="destructive">{i.quantity ?? 0} left</Badge>
+                      </div>
+                    ))
+                  )}
                 </CardContent>
               </Card>
             </div>
           </>
         )}
 
-        <h2 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wide">Modules</h2>
+        <h2 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+          Modules
+        </h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {QUICK_LINKS.map((m) => (
+          {QUICK_LINKS.filter((m) => {
+            const allowed = access.data?.allowed_modules;
+            if (!allowed?.length) return true;
+            const moduleByTitle: Record<string, string> = {
+              "Employee Operations": "operations",
+              Customers: "customers",
+              Vehicles: "vehicles",
+              "Work Orders": "work_orders",
+              Inspections: "inspections",
+              Inventory: "inventory",
+              "365 Parts Network": "parts_network",
+              "Purchase Orders": "purchase_orders",
+              Invoices: "invoices",
+              Quotes: "quotes",
+              Calendar: "appointments",
+              Vendors: "vendors",
+              "Vendor Bills": "vendor_bills",
+              Technicians: "technicians",
+              Reports: "reports",
+              Accounting: "accounting",
+              Discounts: "discounts",
+              Scheduling: "scheduling",
+              Settings: "settings",
+            };
+            const required = moduleByTitle[m.title];
+            return !required || allowed.includes(required);
+          }).map((m) => (
             <Link key={m.title} to={m.to as any} className="block">
               <Card className="transition hover:border-primary/50 hover:shadow-sm">
                 <CardHeader className="flex flex-row items-center gap-3 space-y-0">
@@ -217,19 +316,36 @@ function ShopHome() {
 
         <div className="mt-10 text-sm text-muted-foreground">
           Looking for pricing?{" "}
-          <Link to="/shop-manager" className="underline hover:text-foreground">See Shop Manager plans</Link>.
+          <Link to="/shop-manager" className="underline hover:text-foreground">
+            See Shop Manager plans
+          </Link>
+          .
         </div>
       </div>
     </SiteLayout>
   );
 }
 
-function KpiCard({ icon: Icon, label, value, sub, to }: { icon: any; label: string; value: React.ReactNode; sub?: string; to: any }) {
+function KpiCard({
+  icon: Icon,
+  label,
+  value,
+  sub,
+  to,
+}: {
+  icon: any;
+  label: string;
+  value: React.ReactNode;
+  sub?: string;
+  to: any;
+}) {
   return (
     <Link to={to} className="block">
       <Card className="transition hover:border-primary/50 hover:shadow-sm">
         <CardContent className="pt-6">
-          <div className="flex items-center gap-2 text-muted-foreground text-sm"><Icon className="h-4 w-4" /> {label}</div>
+          <div className="flex items-center gap-2 text-muted-foreground text-sm">
+            <Icon className="h-4 w-4" /> {label}
+          </div>
           <div className="mt-2 text-2xl font-bold">{value}</div>
           {sub ? <div className="text-xs text-muted-foreground mt-1">{sub}</div> : null}
         </CardContent>

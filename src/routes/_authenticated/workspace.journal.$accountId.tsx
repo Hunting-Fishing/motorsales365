@@ -42,10 +42,10 @@ function fmt(n: number) {
 function sourceLink(src: string | null, id: string | null): { to: string; label: string } | null {
   if (!src || !id) return null;
   const s = src.toLowerCase();
-  if (s.includes("invoice")) return { to: `/shop/invoices/${id}`, label: "Invoice" };
-  if (s.includes("payment")) return { to: `/shop/payments`, label: "Payment" };
-  if (s.includes("bill")) return { to: `/shop/bills/${id}`, label: "Bill" };
-  if (s.includes("work") || s.includes("ro")) return { to: `/shop/work-orders/${id}`, label: "Work Order" };
+  if (s.includes("invoice")) return { to: `/workspace/invoices/${id}`, label: "Invoice" };
+  if (s.includes("payment")) return { to: `/workspace/invoices`, label: "Payment" };
+  if (s.includes("bill")) return { to: `/workspace/vendor-bills/${id}`, label: "Bill" };
+  if (s.includes("work") || s.includes("ro")) return { to: `/workspace/work-orders/${id}`, label: "Work Order" };
   return { to: "#", label: src };
 }
 

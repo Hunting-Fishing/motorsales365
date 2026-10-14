@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { smSupabase } from "@/lib/shop-manager/db";
+import { smSupabase, supabase } from "@/lib/shop-manager/db";
 
 type Vehicle = {
   id: string;
@@ -56,6 +56,19 @@ type WorkOrder = {
   created_at: string | null;
 };
 
+type InstalledComponent = {
+  id: string;
+  name_snapshot: string;
+  part_number_snapshot: string | null;
+  serial_number: string | null;
+  position: string | null;
+  installed_quantity: number;
+  installed_at: string;
+  installed_odometer_km: number | null;
+  warranty_ends_at: string | null;
+  work_order_id: string | null;
+};
+
 async function fetchVehicle(id: string): Promise<Vehicle | null> {
   const { data, error } = await (smSupabase as any)
     .from("vehicles")
@@ -77,6 +90,18 @@ async function fetchWorkOrders(vehicleId: string): Promise<WorkOrder[]> {
     .limit(100);
   if (error) throw error;
   return (data ?? []) as WorkOrder[];
+}
+
+async function fetchInstalledComponents(vehicleId: string): Promise<InstalledComponent[]> {
+  const { data, error } = await (supabase as any)
+    .from("installed_components")
+    .select(
+      "id,name_snapshot,part_number_snapshot,serial_number,position,installed_quantity,installed_at,installed_odometer_km,warranty_ends_at,work_order_id",
+    )
+    .eq("shop_manager_vehicle_id", vehicleId)
+    .order("installed_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as InstalledComponent[];
 }
 
 export const Route = createFileRoute("/_authenticated/workspace/vehicles/$id")({
@@ -148,6 +173,11 @@ function VehicleDetail() {
   const workOrdersQ = useQuery({
     queryKey: ["shop-manager", "vehicle", id, "work-orders"],
     queryFn: () => fetchWorkOrders(id),
+    enabled: !!vehicleQ.data,
+  });
+  const installedQ = useQuery({
+    queryKey: ["shop-manager", "vehicle", id, "installed-components"],
+    queryFn: () => fetchInstalledComponents(id),
     enabled: !!vehicleQ.data,
   });
 
@@ -273,6 +303,65 @@ function VehicleDetail() {
         ) : null}
 
         <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Wrench className="h-4 w-4" /> Installed components ({installedQ.data?.length ?? 0})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {installedQ.isLoading ? (
+              <p className="text-sm text-muted-foreground">Loading installed parts…</p>
+            ) : installedQ.isError ? (
+              <p className="text-sm text-muted-foreground">
+                Installed components are available after this Shop Manager workspace is linked to
+                its 365 Associate business.
+              </p>
+            ) : installedQ.data?.length ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Part</TableHead>
+                    <TableHead>Installed</TableHead>
+                    <TableHead>Position</TableHead>
+                    <TableHead>Warranty</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {installedQ.data.map((component) => (
+                    <TableRow key={component.id}>
+                      <TableCell>
+                        <p className="font-medium">{component.name_snapshot}</p>
+                        <p className="font-mono text-xs text-muted-foreground">
+                          {component.part_number_snapshot || component.serial_number || "—"}
+                        </p>
+                      </TableCell>
+                      <TableCell>
+                        {fmtDate(component.installed_at)}
+                        {component.installed_odometer_km != null ? (
+                          <p className="text-xs text-muted-foreground">
+                            {component.installed_odometer_km.toLocaleString()} km
+                          </p>
+                        ) : null}
+                      </TableCell>
+                      <TableCell>{component.position || "—"}</TableCell>
+                      <TableCell>
+                        {component.warranty_ends_at
+                          ? `Until ${fmtDate(component.warranty_ends_at)}`
+                          : "Not recorded"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No network parts have been recorded as installed on this vehicle.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
               <Wrench className="h-4 w-4" /> Service history ({workOrdersQ.data?.length ?? 0})
@@ -312,9 +401,7 @@ function VehicleDetail() {
                       <TableCell>
                         <Badge variant="outline">{w.status || "—"}</Badge>
                       </TableCell>
-                      <TableCell className="max-w-md truncate">
-                        {w.description || "—"}
-                      </TableCell>
+                      <TableCell className="max-w-md truncate">{w.description || "—"}</TableCell>
                       <TableCell className="text-right">{fmtCurrency(w.total_cost)}</TableCell>
                     </TableRow>
                   ))}

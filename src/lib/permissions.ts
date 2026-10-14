@@ -22,7 +22,7 @@ export const PERMISSION_CATALOG: PermissionDef[] = [
   { key: "nav.accounts", label: "Accounts", category: "Navigation" },
   { key: "nav.analytics", label: "Analytics", category: "Navigation" },
   { key: "nav.advertisements", label: "Advertisements", category: "Navigation" },
-  { key: "nav.shop", label: "Affiliate Shop", category: "Navigation" },
+  { key: "nav.shop", label: "Part Picks", category: "Navigation" },
   { key: "nav.referrals", label: "Referrals", category: "Navigation" },
   { key: "nav.qr-ads", label: "QR Advertisements", category: "Navigation" },
   { key: "nav.businesses", label: "Directory", category: "Navigation" },
