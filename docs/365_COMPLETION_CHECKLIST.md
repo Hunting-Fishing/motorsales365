@@ -19,7 +19,10 @@ Security reconciliation branch: `completion/365-security`.
    #18 passed all six CI gates at `88a8977`; a single separate owner decision for
    bootstrap/totals containment is pending. Do not treat the earlier approval as
    authority for those helpers or the remaining quote-conversion path.
-2. Continue native migration/authority work in parallel: resolve the initial
+2. Continue native migration/authority work in parallel: the operator-private
+   identity count review queries are implemented/tested offline, not executed
+   against production. Next rehearse unchanged staff/chat/native offboarding
+   transactions with actual CHECKs and all three observed staff triggers; resolve the initial
    dependency inventory's identity, role/module helper and trigger/security
    attachment closure; rehearse the companion roster/native guard with actual
    constraints and all trigger effects. Keep unknown bindings and offboarding
@@ -42,13 +45,13 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest fully CI-verified application slice: PR #30, documentation head `f4c86c1`, all six
-CI gates passed (run `38642371142`), 706 application tests. These are review
+Latest fully CI-verified application slice: PR #32, documentation head `9edbd21`, all six
+CI gates passed (run `38646246443`),723 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
 Latest application candidate: draft PR #32, code `dff0aa8`,723 application tests
-across47 files and full TypeScript pass; CI pending verification. It switches
+across47 files and full TypeScript pass; all six CI gates verified above. It switches
 reminder reads to the caller-only single-RPC API and keeps writes gated. The API
 is unapplied: do not ship the consumer before compatible database, native
 authority and recovery release prerequisites.
@@ -345,7 +348,8 @@ Verification:59 handler +22 existing UI focused tests; final stable application
 723/723 across47 files, report checker exit0/no quarantine, final full TypeScript,
 focused ESLint/format/diff and independent review pass. UI/result shape and
 disabled mutation controls unchanged. Tooling unchanged from191/191 verified
-parent. Remote CI pending verification. Migration impact: none in this adapter;
+parent. Docs head `9edbd21` passed all six CI gates (run `38646246443`), verified
+on this resume. Migration impact: none in this adapter;
 parent API remains unapplied. Deployment: none. No live business row/RPC/write,
 permission/history/platform mutation or helper reapplication.
 
@@ -357,7 +361,8 @@ Exact artifact/hash/contracts/limits: `evidence/CUSTOMER_REMINDERS_RPC_ADAPTER.m
 Explicit provenance stays404/423 with19 unclassified; inventory/parity/baseline/
 replay/release flags stay false. No sparse local build or artifact deployment.
 
-Exact next action: verify PR #32 latest checks. Continue the unfinished native
+Original next action (implemented offline in the checkpoint below): verify PR #32 latest checks.
+Continue the unfinished native
 authority dependency: implement/test the fixed operator-private count-only query
 from `evidence/NATIVE_IDENTITY_DIAGNOSTIC_DESIGN.md` on disposable fixtures first,
 and finish actual profile/module/roster/provisioning/delegation/offboarding writer
@@ -370,6 +375,48 @@ reference/affected-row contracts and queue/index pagination. Keep private
 consent/tenure/retention, scanner source recovery/owner/mobile pilot and hosting
 release prerequisites open. Pending helper-containment decision unchanged;
 no repeat prompt or live application is authorized by these CI results.
+
+## Latest native identity diagnostic checkpoint (2026-10-15)
+
+Draft PR #33 (`https://github.com/Hunting-Fishing/motorsales365/pull/33`), code
+`8de974e`, branch `security/native-identity-count-diagnostic`, stacked on verified PR #32
+docs `9edbd21`. Two fixed review-only SELECTs implement the earlier design:
+17 core identity/namespace/auth/duplicate/shadow counts and10 optional wider
+explicit shop/business-link counts. No API/view/function/migration is installed;
+no production rows/counts/plan or helper RPC was executed. Counts remain private
+and live scope/visibility/operator/plan/timeouts prerequisites are unresolved.
+
+The15 new sequential always-closed PGlite tests pass, covering real retained
+selected DDL/FK/index attachment, exact int8 output/partitions, collision!=link,
+duplicates/shadows/orphans, source-state preservation, least-column non-bypass
+reads, missing-permission failure and explicitly synthetic RLS undercounting.
+Full sequential tooling passes206/206 (119.16s), focused lint/format/diff and
+independent review pass. CI adds a dedicated offline gate. Application source remains the723-test verified
+parent; this is not hosted authentication, full native authority or load proof.
+Exact hashes and publication verification: `evidence/NATIVE_IDENTITY_COUNT_DIAGNOSTIC.md`.
+Remote CI is pending verification on the published documentation head.
+
+Narrow read-only catalog snapshots at22:28 UTC confirm three enabled noninternal
+staff triggers, actual validated chat/shift status CHECKs and selected five
+function fingerprints/ACLs. Effective anon/auth execution is false, service true;
+this does not prevent automatic triggers from permitted roster writes. No live
+workflow was exercised. `evidence/native-staff-trigger-catalog-2026-10-15.json`
+is metadata, not complete writer/policy/security-attachment closure.
+
+Migration impact: none; retained history and all production permissions/data
+unchanged. Explicit source composition remains404/423,19 unclassified; no
+inventory/baseline/replay/parity/release flag is promoted. Deployment: none;
+hosting remains separately blocked and sparse artifacts must not be deployed.
+
+Exact next action: implement/review the six-case unchanged-source staff/chat/
+native transaction rehearsal in `evidence/NATIVE_STAFF_TRIGGER_REHEARSAL_PLAN.md`.
+Retain the real status CHECKs; test complete rollback, identity-only/no-op updates,
+owner deletion and multi-roster cleanup before defining a companion guard.
+Then resolve remaining direct writers/policies/attachments, owner/delegation/
+self-shift/audit contracts, baseline/forward/recovery and actual API/role tests.
+Private consent/tenure/retention, scanner recovery/owner/mobile pilot, trusted
+entry/billing/retail/recruitment and hosting acceptance remain open. Existing
+bootstrap/totals approval request stays pending without another prompt.
 
 ## Recovery evidence (original scope, retained below)
 

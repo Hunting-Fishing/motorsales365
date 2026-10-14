@@ -1,0 +1,507 @@
+{
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "mode": "read-only-catalog",
+  "scope": "Four selected staff/chat/shift table catalog records plus five selected function fingerprints/ACLs; no business rows/counts/RPCs, DDL, grant, history or platform writes.",
+  "tablesObservedAtUtc": "2026-10-14 22:28:03.478815",
+  "tables": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "table": "business_staff",
+      "schema": "public",
+      "triggers": [
+        {
+          "name": "RI_ConstraintTrigger_c_22764",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_ins\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_22764\" AFTER INSERT ON public.business_staff FROM businesses NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_22765",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_22765\" AFTER UPDATE ON public.business_staff FROM businesses NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        },
+        {
+          "name": "business_staff_team_thread_sync",
+          "enabled": "O",
+          "function": "trg_staff_sync_team_thread()",
+          "internal": false,
+          "definition": "CREATE TRIGGER business_staff_team_thread_sync AFTER INSERT OR DELETE OR UPDATE ON public.business_staff FOR EACH ROW EXECUTE FUNCTION trg_staff_sync_team_thread()"
+        },
+        {
+          "name": "sync_business_staff_to_shop_manager",
+          "enabled": "O",
+          "function": "shop_manager.sync_business_staff_trigger()",
+          "internal": false,
+          "definition": "CREATE TRIGGER sync_business_staff_to_shop_manager AFTER INSERT OR DELETE OR UPDATE OF role, title, active ON public.business_staff FOR EACH ROW EXECUTE FUNCTION shop_manager.sync_business_staff_trigger()"
+        },
+        {
+          "name": "trg_business_staff_updated",
+          "enabled": "O",
+          "function": "set_updated_at()",
+          "internal": false,
+          "definition": "CREATE TRIGGER trg_business_staff_updated BEFORE UPDATE ON public.business_staff FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+        }
+      ],
+      "force_rls": false,
+      "constraints": [
+        {
+          "name": "business_staff_business_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (business_id) REFERENCES businesses(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "business_staff_business_id_user_id_key",
+          "type": "u",
+          "validated": true,
+          "definition": "UNIQUE (business_id, user_id)"
+        },
+        {
+          "name": "business_staff_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "table": "chat_thread_members",
+      "schema": "public",
+      "triggers": [
+        {
+          "name": "RI_ConstraintTrigger_c_25431",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_ins\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_25431\" AFTER INSERT ON public.chat_thread_members FROM chat_threads NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_25432",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_25432\" AFTER UPDATE ON public.chat_thread_members FROM chat_threads NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_25436",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_ins\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_25436\" AFTER INSERT ON public.chat_thread_members FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_25437",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_25437\" AFTER UPDATE ON public.chat_thread_members FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_25441",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_ins\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_25441\" AFTER INSERT ON public.chat_thread_members FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_25442",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_25442\" AFTER UPDATE ON public.chat_thread_members FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        }
+      ],
+      "force_rls": false,
+      "constraints": [
+        {
+          "name": "chat_thread_members_invited_by_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (invited_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "chat_thread_members_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (thread_id, user_id)"
+        },
+        {
+          "name": "chat_thread_members_status_check",
+          "type": "c",
+          "validated": true,
+          "definition": "CHECK ((status = ANY (ARRAY['invited'::text, 'active'::text, 'left'::text])))"
+        },
+        {
+          "name": "chat_thread_members_thread_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (thread_id) REFERENCES chat_threads(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_thread_members_user_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ]
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "table": "chat_threads",
+      "schema": "public",
+      "triggers": [
+        {
+          "name": "RI_ConstraintTrigger_a_25429",
+          "enabled": "O",
+          "function": "\"RI_FKey_cascade_del\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_25429\" AFTER DELETE ON public.chat_threads FROM chat_thread_members NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_cascade_del\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_a_25430",
+          "enabled": "O",
+          "function": "\"RI_FKey_noaction_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_25430\" AFTER UPDATE ON public.chat_threads FROM chat_thread_members NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_noaction_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_a_25454",
+          "enabled": "O",
+          "function": "\"RI_FKey_cascade_del\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_25454\" AFTER DELETE ON public.chat_threads FROM chat_thread_messages NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_cascade_del\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_a_25455",
+          "enabled": "O",
+          "function": "\"RI_FKey_noaction_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_25455\" AFTER UPDATE ON public.chat_threads FROM chat_thread_messages NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_noaction_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_25416",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_ins\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_25416\" AFTER INSERT ON public.chat_threads FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_25417",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_25417\" AFTER UPDATE ON public.chat_threads FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_28596",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_ins\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_28596\" AFTER INSERT ON public.chat_threads FROM businesses NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_28597",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_28597\" AFTER UPDATE ON public.chat_threads FROM businesses NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        }
+      ],
+      "force_rls": false,
+      "constraints": [
+        {
+          "name": "chat_threads_business_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (business_id) REFERENCES businesses(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_threads_created_by_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_threads_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=r/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "table": "employee_shifts",
+      "schema": "shop_manager",
+      "triggers": [
+        {
+          "name": "RI_ConstraintTrigger_a_33194",
+          "enabled": "O",
+          "function": "\"RI_FKey_restrict_del\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_33194\" AFTER DELETE ON shop_manager.employee_shifts FROM shop_manager.employee_shift_events NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_restrict_del\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_a_33195",
+          "enabled": "O",
+          "function": "\"RI_FKey_noaction_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_33195\" AFTER UPDATE ON shop_manager.employee_shifts FROM shop_manager.employee_shift_events NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_noaction_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_a_33283",
+          "enabled": "O",
+          "function": "\"RI_FKey_setnull_del\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_33283\" AFTER DELETE ON shop_manager.employee_shifts FROM shop_manager.employee_operational_events NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_setnull_del\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_a_33284",
+          "enabled": "O",
+          "function": "\"RI_FKey_noaction_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_33284\" AFTER UPDATE ON shop_manager.employee_shifts FROM shop_manager.employee_operational_events NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_noaction_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_a_33423",
+          "enabled": "O",
+          "function": "\"RI_FKey_restrict_del\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_33423\" AFTER DELETE ON shop_manager.employee_shifts FROM shop_manager.register_sessions NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_restrict_del\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_a_33424",
+          "enabled": "O",
+          "function": "\"RI_FKey_noaction_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_33424\" AFTER UPDATE ON shop_manager.employee_shifts FROM shop_manager.register_sessions NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_noaction_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_a_33496",
+          "enabled": "O",
+          "function": "\"RI_FKey_noaction_del\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_33496\" AFTER DELETE ON shop_manager.employee_shifts FROM shop_manager.counter_sales NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_noaction_del\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_a_33497",
+          "enabled": "O",
+          "function": "\"RI_FKey_noaction_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_33497\" AFTER UPDATE ON shop_manager.employee_shifts FROM shop_manager.counter_sales NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_noaction_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_33158",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_ins\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_33158\" AFTER INSERT ON shop_manager.employee_shifts FROM shop_manager.shops NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_33159",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_33159\" AFTER UPDATE ON shop_manager.employee_shifts FROM shop_manager.shops NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_33163",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_ins\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_33163\" AFTER INSERT ON shop_manager.employee_shifts FROM shop_manager.profiles NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_33164",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_33164\" AFTER UPDATE ON shop_manager.employee_shifts FROM shop_manager.profiles NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_33168",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_ins\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_33168\" AFTER INSERT ON shop_manager.employee_shifts FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_33169",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_33169\" AFTER UPDATE ON shop_manager.employee_shifts FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_33173",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_ins\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_33173\" AFTER INSERT ON shop_manager.employee_shifts FROM shop_manager.employee_work_locations NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_33174",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_33174\" AFTER UPDATE ON shop_manager.employee_shifts FROM shop_manager.employee_work_locations NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_33178",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_ins\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_33178\" AFTER INSERT ON shop_manager.employee_shifts FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_33179",
+          "enabled": "O",
+          "function": "\"RI_FKey_check_upd\"()",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_33179\" AFTER UPDATE ON shop_manager.employee_shifts FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        }
+      ],
+      "force_rls": false,
+      "constraints": [
+        {
+          "name": "employee_shifts_check",
+          "type": "c",
+          "validated": true,
+          "definition": "CHECK (((clocked_out_at IS NULL) OR (clocked_out_at >= clocked_in_at)))"
+        },
+        {
+          "name": "employee_shifts_closed_by_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (closed_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "employee_shifts_location_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (location_id) REFERENCES shop_manager.employee_work_locations(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "employee_shifts_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "employee_shifts_profile_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (profile_id) REFERENCES shop_manager.profiles(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "employee_shifts_shop_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (shop_id) REFERENCES shop_manager.shops(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "employee_shifts_status_check",
+          "type": "c",
+          "validated": true,
+          "definition": "CHECK ((status = ANY (ARRAY['on_shift'::text, 'on_break'::text, 'completed'::text, 'manager_closed'::text])))"
+        },
+        {
+          "name": "employee_shifts_user_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE RESTRICT"
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "observed_at_utc": "2026-10-14 22:28:36.246141",
+      "signature": "ensure_business_team_thread(uuid)",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "config": ["search_path=public"],
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "definition_md5": "af5f35c551b5166bff62f13c908ad09c",
+      "body_md5_lf": "27f7116c7d2dd662b07990ae22f7aea6",
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 22:28:36.246153",
+      "signature": "set_updated_at()",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "security_definer": false,
+      "volatility": "v",
+      "config": ["search_path=public"],
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "definition_md5": "79bdd57c6d1eda0a97a0f17733c0f713",
+      "body_md5_lf": "5b733ab523bad442e4b10f836de9e4ba",
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 22:28:36.246154",
+      "signature": "shop_manager.sync_business_staff_member(uuid,uuid,boolean,text,text)",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "config": ["search_path=shop_manager, public, auth, pg_temp"],
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "definition_md5": "402ef8741c2c78f2b0b9e4c7240fa9c4",
+      "body_md5_lf": "3953299c83e7f20a19f4a7f60b12ba84",
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 22:28:36.246156",
+      "signature": "shop_manager.sync_business_staff_trigger()",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "config": ["search_path=shop_manager, public, pg_temp"],
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "definition_md5": "7eda4e3d3d50670b1e27ae46528cb847",
+      "body_md5_lf": "16868098a0e6e594f4d013a09f117af0",
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 22:28:36.246157",
+      "signature": "trg_staff_sync_team_thread()",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "config": ["search_path=public"],
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "definition_md5": "217abef5cd5687f24a3da697ba5a4c9d",
+      "body_md5_lf": "b6c1d106f82fc26edef65f28189a3470",
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "service_execute": true
+    }
+  ],
+  "limits": "Narrow snapshots, not complete writers/role inheritance/security attachments, current business data, applied history or live workflow acceptance. Internal trigger OID names are observation-specific."
+}

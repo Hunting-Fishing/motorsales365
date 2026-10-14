@@ -1,8 +1,12 @@
-# Native identity count-only diagnostic: design, not execution
+# Native identity count-only diagnostic: design and implementation boundary
 
 2026-10-15 Asia/Manila. Bounded source reconnaissance only. No production
 identity rows/counts were queried, saved or published. This is not a guard,
 data assertion result, binding repair or permission to expose business counts.
+The design below is now implemented and tested **offline only** as two separate
+fixed review files. See `NATIVE_IDENTITY_COUNT_DIAGNOSTIC.md` for exact metric
+definitions, source/fixture pins, tests and operator prerequisites. No production
+count or plan was executed; the wider shop/business scope remains optional.
 
 Before a native guard/data upgrade, a tested operator-private count-only SELECT
 may help characterize profiles, shops, public businesses and auth-user bindings.
@@ -50,12 +54,13 @@ Under `supabase/migrations/`:
   Existing bootstrap/roster authority proofs remain separate prerequisites.
 
 These are recovered source references, not current live data/schema assertions
-or applied-history provenance. Main must review the exact source/query before
-any later execution; no reusable query artifact has yet been implemented.
+or applied-history provenance. The main agent reviewed the selected source/query
+and disposable proof. The fixed review artifacts are not an installed API or
+an authorized live diagnostic; review the unchanged files before any later use.
 
 ## Prerequisites and synthetic tests
 
-Implement and independently test the fixed query on disposable fixtures first:
+The offline implementation independently tests the fixed queries on disposable fixtures:
 empty result; five-bucket and identity partitions; namespace collisions; duplicate
 groups/no join inflation; same/different/NULL shop shadows; false/absent-auth
 negative controls; valid/orphan/duplicate shop-business links; numeric-only fixed
