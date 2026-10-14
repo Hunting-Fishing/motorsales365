@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { confirm } from "@/components/ui/confirm-dialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   adminListProducts,
   adminUpsertProduct,
   adminDeleteProduct,
   adminListNetworks,
   adminUpsertNetwork,
+  adminEnsureCoreStores,
   adminProductLinks,
   adminUpsertLink,
   adminDeleteLink,
@@ -15,6 +16,8 @@ import {
   adminUpsertFitment,
   adminDeleteFitment,
   listShopCategories,
+  adminListShopSuggestions,
+  adminResolveShopSuggestion,
   scrapeShopUrl,
   rescrapeShopProduct,
   backfillMissingShopPrices,
@@ -64,6 +67,7 @@ import { detectNetworkSlug, cleanShopUrl, urlMatchesNetwork } from "@/lib/shop-u
 import { getYearOptions, getMakesForYear, getModelsForYear } from "@/data/vehicles";
 import { getEnginesFor } from "@/data/vehicle-engines";
 import { CategoryKeywordEditor } from "@/components/admin/category-keyword-editor";
+import { SearchShelfDialog } from "@/components/admin/search-shelf-dialog";
 
 export const Route = createFileRoute("/admin/shop")({
   component: AdminShop,
@@ -73,15 +77,16 @@ function AdminShop() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-3xl">Affiliate Shop</h1>
+        <h1 className="font-display text-3xl">Part Picks</h1>
         <p className="text-muted-foreground">
-          Manage curated products, affiliate networks, and outbound links.
+          Add and edit links. Visitors can browse and suggest a link. They cannot publish or edit.
         </p>
       </div>
       <Tabs defaultValue="products">
         <TabsList className="w-full justify-start overflow-x-auto sm:w-auto">
           <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="networks">Networks</TabsTrigger>
+          <TabsTrigger value="networks">Stores</TabsTrigger>
+          <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
           <TabsTrigger value="keywords" className="whitespace-nowrap">
             Category mapping
           </TabsTrigger>
@@ -94,6 +99,9 @@ function AdminShop() {
         </TabsContent>
         <TabsContent value="networks" className="mt-4">
           <NetworksTab />
+        </TabsContent>
+        <TabsContent value="suggestions" className="mt-4">
+          <SuggestionsTab />
         </TabsContent>
         <TabsContent value="keywords" className="mt-4">
           <CategoryKeywordEditor />
@@ -212,6 +220,87 @@ function DirectoryTable({ entries }: { entries: DirectoryEntry[] }) {
   );
 }
 
+function PullDetailsBar({ onPulled }: { onPulled: (initial: any) => void }) {
+  const [url, setUrl] = useState("");
+  const pull = useMutation({
+    mutationFn: () => {
+      const trimmed = url.trim();
+      const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+      return scrapeShopUrl({ data: { url: withProto } });
+    },
+    onSuccess: (res: any) => {
+      if (res?.error && !res?.suggested) {
+        toast.error(res.error);
+        return;
+      }
+      const s = res.suggested ?? {};
+      const ready = [
+        s.title ? "title" : null,
+        s.price_php != null ? "price" : null,
+        s.image_url ? "photo" : null,
+      ].filter(Boolean);
+      const note = ((res.warnings ?? []) as string[])[0];
+      toast.success(
+        ready.length
+          ? `Pulled ${ready.join(", ")}. Review, then save.`
+          : note
+            ? "Link is ready. Type the title and price, then save."
+            : "Opened the form. That page did not share details.",
+      );
+      if (note && (!ready.length || /tracking link|Open API|Creators API|366industries/i.test(note))) {
+        toast.message(note);
+      } else {
+        const warn = ((res.warnings ?? []) as string[]).find((w) => /price/i.test(w));
+        if (warn && s.price_php == null) toast.message(warn);
+      }
+      onPulled({
+        title: s.title ?? "",
+        slug: s.title ? slugifyClient(s.title) : "",
+        description: s.description ?? "",
+        brand: s.brand ?? "",
+        image_url: s.image_url ?? "",
+        category_id: s.category_id ?? null,
+        price_php: s.price_php ?? null,
+        __pulledUrl: res.cleanedUrl || url.trim(),
+        __networkId: res.networkId ?? null,
+        __networkSlug: res.networkSlug ?? null,
+      });
+      setUrl("");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Could not pull that link"),
+  });
+
+  return (
+    <div className="mb-4 rounded-lg border bg-muted/40 p-3">
+      <p className="text-sm font-medium">Pull details from a product link</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Paste one product URL from Shopee, Lazada, AliExpress, Alibaba, Amazon, or another
+        connected store. Title, photo, and price fill in when the page shares them. Nothing goes
+        live until you save.
+      </p>
+      <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+        <Input
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://"
+          className="h-11"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+        />
+        <Button
+          type="button"
+          className="h-11 sm:w-40"
+          disabled={pull.isPending || url.trim().length < 8}
+          onClick={() => pull.mutate()}
+        >
+          {pull.isPending ? "Pulling…" : "Pull details"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function ProductsTab() {
   const qc = useQueryClient();
   const { data, isLoading, isFetching, error, refetch } = useQuery({
@@ -242,6 +331,7 @@ function ProductsTab() {
 
   const all = (data?.products ?? []) as any[];
   const filtered = all.filter((p) => {
+    if ((p.tags ?? []).some((t: string) => String(t).startsWith("suggestion:"))) return false;
     if (statusFilter === "active" && !p.active) return false;
     if (statusFilter === "inactive" && p.active) return false;
     if (statusFilter === "featured" && !p.featured) return false;
@@ -273,6 +363,10 @@ function ProductsTab() {
           <Button size="sm" variant="outline" onClick={() => refetch()} disabled={isFetching}>
             {isFetching ? "Refreshing…" : "Refresh"}
           </Button>
+          <SearchShelfDialog
+            categories={catData?.categories ?? []}
+            onCreated={() => qc.invalidateQueries({ queryKey: ["admin-shop-products"] })}
+          />
           <Button onClick={() => setEditing({})}>
             <Plus className="mr-1 h-4 w-4" />
             New product
@@ -280,6 +374,7 @@ function ProductsTab() {
         </div>
       </CardHeader>
       <CardContent>
+        <PullDetailsBar onPulled={(initial) => setEditing(initial)} />
         <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
           <Input
             placeholder="Search title, brand, tag…"
@@ -470,7 +565,7 @@ function slugifyClient(s: string): string {
     .slice(0, 80);
 }
 
-function ProductDialog({ initial, categories, onClose, onSaved }: any) {
+function ProductDialog({ initial, categories, onClose, onSaved, seedUrl, suggestionId }: any) {
   const [form, setForm] = useState({
     id: initial.id,
     slug: initial.slug ?? "",
@@ -484,7 +579,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     active: initial.active ?? true,
     universal_fit: initial.universal_fit ?? false,
   });
-  const [importUrl, setImportUrl] = useState("");
+  const [importUrl, setImportUrl] = useState(initial.__pulledUrl || seedUrl || "");
   const [importNetwork, setImportNetwork] = useState<string>("auto");
   const [importInfo, setImportInfo] = useState<{
     networkSlug: string | null;
@@ -492,7 +587,17 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     cleanedUrl: string;
     networkId: string | null;
     resolvedFrom: string | null;
-  } | null>(null);
+  } | null>(
+    initial.__pulledUrl
+      ? {
+          networkSlug: initial.__networkSlug ?? null,
+          detectedSlug: initial.__networkSlug ?? null,
+          cleanedUrl: initial.__pulledUrl,
+          networkId: initial.__networkId ?? null,
+          resolvedFrom: null,
+        }
+      : null,
+  );
 
   // Active networks for the manual selector (shared with LinksDialog).
   const { data: networksData } = useQuery({
@@ -509,11 +614,24 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
       scrapeShopUrl({
         data: {
           url: importUrl,
-          ...(importNetwork !== "auto" ? { networkSlug: importNetwork as any } : {}),
+          ...(importNetwork !== "auto" &&
+          [
+            "shopee",
+            "lazada",
+            "tiktok",
+            "amazon",
+            "aliexpress",
+            "alibaba",
+            "carousell",
+            "ebay",
+            "zalora",
+          ].includes(importNetwork)
+            ? { networkSlug: importNetwork as any }
+            : {}),
         },
       }),
     onSuccess: (res: any) => {
-      if (res.error) {
+      if (res.error && !res.suggested) {
         toast.error(res.error);
         return;
       }
@@ -538,10 +656,18 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
         networkId: res.networkId,
         resolvedFrom: res.resolvedFrom ?? null,
       });
-      toast.success("Fetched — review and save.");
+      const note = ((res.warnings ?? []) as string[])[0];
+      if (!s.title && note) toast.message(note);
+      else toast.success("Fetched — review and save.");
     },
     onError: (e: any) => toast.error(e.message ?? "Fetch failed"),
   });
+
+  useEffect(() => {
+    if (seedUrl && !initial.__pulledUrl) importMut.mutate();
+    // Opened from a suggestion: pull once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const mut = useMutation({
     mutationFn: async () => {
@@ -565,6 +691,15 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
           toast.warning(`Saved product, but couldn’t add link: ${e?.message ?? "error"}`);
         }
       }
+      if (suggestionId && saved?.id) {
+        try {
+          await adminResolveShopSuggestion({
+            data: { id: suggestionId, status: "added", productId: saved.id },
+          });
+        } catch (e: any) {
+          toast.warning(`Saved, but the suggestion was not marked added: ${e?.message ?? "error"}`);
+        }
+      }
       return saved;
     },
     onSuccess: () => {
@@ -580,13 +715,19 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
         <DialogHeader>
           <DialogTitle>{form.id ? "Edit product" : "New product"}</DialogTitle>
         </DialogHeader>
+        {seedUrl && (
+          <p className="text-sm text-muted-foreground">
+            The suggested link is filled in. Fetch it, review, then save. It stays off the site
+            until you save.
+          </p>
+        )}
         <div className="grid gap-3">
           <div className="rounded-lg border bg-muted/40 p-3 space-y-2">
             <Label className="flex items-center gap-2 text-sm">
-              <Sparkles className="h-4 w-4 text-primary" /> Import from affiliate URL
+              <Sparkles className="h-4 w-4 text-primary" /> Pull details from a product link
             </Label>
             <Input
-              placeholder="Paste Shopee / Lazada / TikTok / Amazon product URL…"
+              placeholder="Paste a Shopee, Lazada, AliExpress, Alibaba, or Amazon product URL"
               value={importUrl}
               onChange={(e) => setImportUrl(e.target.value)}
               className="h-11 text-base"
@@ -598,27 +739,11 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="auto">Auto-detect</SelectItem>
-                  {(
-                    [
-                      "shopee",
-                      "lazada",
-                      "tiktok",
-                      "amazon",
-                      "aliexpress",
-                      "carousell",
-                      "ebay",
-                      "zalora",
-                    ] as const
-                  )
-                    .filter((slug) => activeNetworks.some((n: any) => n.slug === slug))
-                    .map((slug) => {
-                      const n = activeNetworks.find((x: any) => x.slug === slug);
-                      return (
-                        <SelectItem key={slug} value={slug}>
-                          {n?.name ?? slug}
-                        </SelectItem>
-                      );
-                    })}
+                  {activeNetworks.map((n: any) => (
+                    <SelectItem key={n.id} value={n.slug}>
+                      {n.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Button
@@ -627,7 +752,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
                 disabled={!importUrl || importMut.isPending}
                 className="h-11 w-full sm:flex-1"
               >
-                {importMut.isPending ? "Fetching…" : "Fetch product info"}
+                {importMut.isPending ? "Pulling…" : "Pull details"}
               </Button>
             </div>
             {importInfo && (
@@ -640,15 +765,17 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
                 <p>
                   {importInfo.networkSlug ? (
                     <>
-                      Using <strong>{importInfo.networkSlug}</strong>
-                      {importInfo.networkId
-                        ? " · network linked ✓"
-                        : " · no matching active network"}
+                      Store: <strong>{importInfo.networkSlug}</strong>
+                      {importInfo.networkId ? " · connected" : " · connect this store under Stores"}
                     </>
                   ) : (
-                    "Unknown host — fields pre-filled from page metadata."
-                  )}{" "}
-                  Empty fields below were auto-filled; review before saving.
+                    "Store not recognized — fields were filled from the page."
+                  )}
+                </p>
+                <p>
+                  Title {form.title ? "ready" : "missing"} · Price{" "}
+                  {form.price_php != null && form.price_php !== "" ? "ready" : "missing"} · Photo{" "}
+                  {form.image_url ? "ready" : "missing"}
                 </p>
                 {importInfo.detectedSlug &&
                   importInfo.networkSlug &&
@@ -795,6 +922,7 @@ function LinksDialog({ product, onClose }: any) {
   });
   const [networkId, setNetworkId] = useState<string>("");
   const [url, setUrl] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [touchedNetwork, setTouchedNetwork] = useState(false);
   const [urlError, setUrlError] = useState("");
 
@@ -850,13 +978,19 @@ function LinksDialog({ product, onClose }: any) {
         throw new Error(`URL host does not match ${selectedNetwork.name}.`);
       }
       return adminUpsertLink({
-        data: { product_id: product.id, network_id: networkId, url: finalUrl } as any,
+        data: {
+          ...(editingId ? { id: editingId } : {}),
+          product_id: product.id,
+          network_id: networkId,
+          url: finalUrl,
+        } as any,
       });
     },
     onSuccess: () => {
-      toast.success("Link saved");
+      toast.success(editingId ? "Link updated" : "Link saved");
       setUrl("");
       setNetworkId("");
+      setEditingId(null);
       setTouchedNetwork(false);
       setUrlError("");
       qc.invalidateQueries({ queryKey: ["admin-product-links", product.id] });
@@ -891,6 +1025,21 @@ function LinksDialog({ product, onClose }: any) {
               <Button
                 size="sm"
                 variant="ghost"
+                title="Edit link"
+                onClick={() => {
+                  setEditingId(l.id);
+                  setUrl(l.url ?? "");
+                  setNetworkId(l.network_id ?? l.network?.id ?? "");
+                  setTouchedNetwork(true);
+                  setUrlError("");
+                }}
+                className="shrink-0"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
                 title="Copy link"
                 onClick={async () => {
                   try {
@@ -916,7 +1065,9 @@ function LinksDialog({ product, onClose }: any) {
             </div>
           ))}
           <div className="rounded border p-3 space-y-3">
-            <p className="text-sm font-semibold">Add affiliate link</p>
+            <p className="text-sm font-semibold">
+              {editingId ? "Edit this link" : "Add a link"}
+            </p>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Paste the full product URL</Label>
               <Input
@@ -995,12 +1146,27 @@ function LinksDialog({ product, onClose }: any) {
             <Button variant="outline" onClick={onClose} className="h-11 w-full sm:w-auto">
               Cancel
             </Button>
+            {editingId && (
+              <Button
+                variant="ghost"
+                className="h-11 w-full sm:w-auto"
+                onClick={() => {
+                  setEditingId(null);
+                  setUrl("");
+                  setNetworkId("");
+                  setTouchedNetwork(false);
+                  setUrlError("");
+                }}
+              >
+                Cancel edit
+              </Button>
+            )}
             <Button
               onClick={() => add.mutate()}
               disabled={!networkId || !url || !!urlError || add.isPending}
               className="h-11 w-full sm:w-auto"
             >
-              {add.isPending ? "Saving…" : "Add link"}
+              {add.isPending ? "Saving…" : editingId ? "Save changes" : "Add link"}
             </Button>
           </div>
         </div>
@@ -1013,15 +1179,33 @@ function NetworksTab() {
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["admin-networks"], queryFn: () => adminListNetworks() });
   const [editing, setEditing] = useState<any | null>(null);
+  const ensure = useMutation({
+    mutationFn: () => adminEnsureCoreStores(),
+    onSuccess: (res) => {
+      const added = res.created.length ? `Added ${res.created.join(", ")}.` : "Those stores are already connected.";
+      toast.success(added);
+      qc.invalidateQueries({ queryKey: ["admin-networks"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Could not connect stores"),
+  });
 
   return (
     <Card>
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
-        <CardTitle>Affiliate networks</CardTitle>
-        <Button onClick={() => setEditing({})}>
-          <Plus className="mr-1 h-4 w-4" />
-          New network
-        </Button>
+        <CardTitle>Stores</CardTitle>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            onClick={() => ensure.mutate()}
+            disabled={ensure.isPending}
+          >
+            {ensure.isPending ? "Connecting…" : "Connect the five stores"}
+          </Button>
+          <Button onClick={() => setEditing({})}>
+            <Plus className="mr-1 h-4 w-4" />
+            New store
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -1063,8 +1247,19 @@ function NetworksTab() {
           </table>
         </div>
         <p className="mt-4 text-xs text-muted-foreground">
-          Tag value is appended to outbound URLs via <code>tag_param</code>, or substituted into{" "}
-          <code>deeplink_template</code> as <code>{`{{tag}}`}</code> and <code>{`{{url}}`}</code>.
+          Part Picks reads these stores. Keep the slugs exactly shopee, lazada, aliexpress, alibaba,
+          and amazon. For Amazon, set tag param to <code>tag</code> and tag value to{" "}
+          <code>366industries-20</code>. Title, photo, and price for an Amazon product come from
+          the Creators API (Tools → Creators API in Associates Central), not from scraping the
+          page. That API opens after 10 qualifying sales in 30 days. The server then needs{" "}
+          <code>AMAZON_CREATORS_CREDENTIAL_ID</code>, <code>AMAZON_CREATORS_CREDENTIAL_SECRET</code>
+          , and <code>AMAZON_CREATORS_VERSION</code>. For Lazada, open Affiliate, then Integration,
+          then Open API. The three values there are LiteApp Key, LiteApp Secret, and User Token.
+          While they say Pending, Lazada has not approved the API yet, so Part Picks cannot pull a
+          tracking link. After they appear, set <code>LAZADA_AFFILIATE_APP_KEY</code>,{" "}
+          <code>LAZADA_AFFILIATE_APP_SECRET</code>, and <code>LAZADA_AFFILIATE_USER_TOKEN</code>.
+          You can still paste a Lazada product and type the title and price before that. A future
+          store works when its deeplink template contains <code>{"{QUERY}"}</code>.
         </p>
       </CardContent>
       {editing && (
@@ -1474,5 +1669,103 @@ function FitmentDialog({ product, onClose }: any) {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function SuggestionsTab() {
+  const qc = useQueryClient();
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["shop-link-suggestions"],
+    queryFn: () => adminListShopSuggestions(),
+  });
+  const { data: catData } = useQuery({
+    queryKey: ["shop-cats"],
+    queryFn: () => listShopCategories(),
+    staleTime: 60_000,
+  });
+  const [seed, setSeed] = useState<{ url: string; suggestionId: string } | null>(null);
+  const rows = (data?.suggestions ?? []) as any[];
+  const pending = rows.filter((r) => r.status === "pending");
+
+  const resolve = useMutation({
+    mutationFn: (input: { id: string; status: "dismissed" | "pending" }) =>
+      adminResolveShopSuggestion({ data: input }),
+    onSuccess: () => {
+      toast.success("Updated");
+      qc.invalidateQueries({ queryKey: ["shop-link-suggestions"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Could not update"),
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Suggestions ({pending.length} waiting)</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Visitors can send a link. Nothing here is public until you add it as a Part Pick.
+        </p>
+      </CardHeader>
+      <CardContent>
+        {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+        {error && (
+          <p className="text-sm text-destructive">{(error as any).message ?? "Could not load suggestions."}</p>
+        )}
+        {!isLoading && rows.length === 0 && (
+          <p className="text-sm text-muted-foreground">No suggestions yet.</p>
+        )}
+        <div className="space-y-3">
+          {rows.map((r) => (
+            <div key={r.id} className="rounded-lg border p-3 text-sm">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant={r.status === "pending" ? "secondary" : "outline"}>{r.status}</Badge>
+                <span className="text-xs text-muted-foreground">
+                  {r.created_at ? new Date(r.created_at).toLocaleString() : ""}
+                </span>
+              </div>
+              <a
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 block truncate text-primary hover:underline"
+              >
+                {r.url}
+              </a>
+              {r.note && <p className="mt-1 text-muted-foreground">{r.note}</p>}
+              {r.status === "pending" && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => setSeed({ url: r.url, suggestionId: r.id })}
+                  >
+                    Add to Part Picks
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => resolve.mutate({ id: r.id, status: "dismissed" })}
+                  >
+                    Dismiss
+                  </Button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </CardContent>
+      {seed && (
+        <ProductDialog
+          initial={{}}
+          categories={catData?.categories ?? []}
+          seedUrl={seed.url}
+          suggestionId={seed.suggestionId}
+          onClose={() => setSeed(null)}
+          onSaved={() => {
+            setSeed(null);
+            qc.invalidateQueries({ queryKey: ["shop-link-suggestions"] });
+            qc.invalidateQueries({ queryKey: ["admin-shop-products"] });
+          }}
+        />
+      )}
+    </Card>
   );
 }

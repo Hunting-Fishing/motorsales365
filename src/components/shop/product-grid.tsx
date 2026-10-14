@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
+import { GRADE_META, gradeFromTags, marketFromTags } from "@/lib/marketplace-search";
 
 /** Grid of partner (affiliate) products used across the /parts/partners pages. */
 export function ProductGrid({
@@ -44,10 +45,21 @@ export function ProductGrid({
                   <div className="aspect-square w-full bg-muted" />
                 )}
                 <CardContent className="p-3">
+                  <div className="mb-1 flex flex-wrap gap-1">
+                    {gradeFromTags(p.tags) && (
+                      <Badge variant="secondary" className="text-[10px]">
+                        {GRADE_META[gradeFromTags(p.tags)!].label}
+                      </Badge>
+                    )}
+                    {(marketFromTags(p.tags) || p.brand) && (
+                      <Badge variant="outline" className="text-[10px]">
+                        {p.brand || marketFromTags(p.tags)}
+                      </Badge>
+                    )}
+                  </div>
                   <p className="line-clamp-2 text-sm font-medium group-hover:text-primary">
                     {p.title}
                   </p>
-                  {p.brand && <p className="text-xs text-muted-foreground">{p.brand}</p>}
                   <div className="mt-1 flex items-center justify-between gap-1">
                     <div className="flex items-baseline gap-1">
                       {effective != null ? (

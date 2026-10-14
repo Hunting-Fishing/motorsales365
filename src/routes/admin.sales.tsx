@@ -33,7 +33,7 @@ const TILES: Tile[] = [
   { to: "/admin/advertisements/inquiries", label: "Ad Inquiries", desc: "Inbound advertiser inquiries and CRM.", Icon: Inbox },
   { to: "/admin/advertisements/campaigns", label: "Ad Campaigns", desc: "Sponsored placements, scheduling, creative.", Icon: Megaphone },
   { to: "/admin/advertisements/promotions", label: "Promotions & Discounts", desc: "Promo codes and one-off customer discounts.", Icon: Ticket },
-  { to: "/admin/shop", label: "Affiliate Shop", desc: "Affiliate networks, products and click analytics.", Icon: Store },
+  { to: "/admin/shop", label: "Part Picks", desc: "Stores, links, and visitor suggestions.", Icon: Store },
   { to: "/admin/referrals", label: "Referrals", desc: "Staff QR codes and redemption history.", Icon: QrCode },
   { to: "/admin/advertisements/qr-ads", label: "QR Advertisements", desc: "Apply your QR to printable templates (arm band, shirt, banners).", Icon: QrCode },
   { to: "/admin/lead-offers", label: "Lead Marketplace", desc: "Qualified buyer leads businesses pay to unlock.", Icon: Inbox },
