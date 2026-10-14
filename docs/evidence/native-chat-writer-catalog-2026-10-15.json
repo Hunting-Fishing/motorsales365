@@ -1,0 +1,855 @@
+{
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "scope": "Catalog metadata only: two selected tables, six exact chat writers, notify_user and attached functions. No application rows/counts, function invocation or writes. Separate observations, not a shared snapshot; query does not enforce READ ONLY transaction or timeouts.",
+  "observed_at_utc": "2026-10-14 23:34:25.907315",
+  "tables": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "table": "chat_thread_messages",
+      "schema": "public",
+      "columns": [
+        {
+          "acl": null,
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "thread_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "sender_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "body",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "attachment_url",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "attachment_type",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "attachment_thumb_url",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "attachment_path",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "attachment_meta",
+          "type": "jsonb",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "chat_thread_messages_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX chat_thread_messages_pkey ON public.chat_thread_messages USING btree (id)"
+        },
+        {
+          "name": "idx_chat_thread_messages_thread",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "definition": "CREATE INDEX idx_chat_thread_messages_thread ON public.chat_thread_messages USING btree (thread_id, created_at)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Active members can send",
+          "check": "((sender_id = auth.uid()) AND is_active_thread_member(thread_id, auth.uid()))",
+          "roles": [
+            "authenticated"
+          ],
+          "using": null,
+          "command": "a",
+          "permissive": true
+        },
+        {
+          "name": "Members view thread messages",
+          "check": null,
+          "roles": [
+            "authenticated"
+          ],
+          "using": "is_thread_member(thread_id, auth.uid())",
+          "command": "r",
+          "permissive": true
+        }
+      ],
+      "force_rls": false,
+      "constraints": [
+        {
+          "name": "chat_thread_messages_attachment_type_check",
+          "type": "c",
+          "validated": true,
+          "definition": "CHECK ((attachment_type = ANY (ARRAY['image'::text, 'video'::text, 'gif'::text])))"
+        },
+        {
+          "name": "chat_thread_messages_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "chat_thread_messages_sender_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (sender_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_thread_messages_thread_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (thread_id) REFERENCES chat_threads(id) ON DELETE CASCADE"
+        }
+      ],
+      "user_triggers": [
+        {
+          "name": "thread_message_notify",
+          "level": "ROW",
+          "events": [
+            "INSERT"
+          ],
+          "timing": "AFTER",
+          "enabled": "O",
+          "function": "trg_thread_message_notify()",
+          "when_md5": null,
+          "type_bits": 5,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "a4ecd867acdc2ca5e4319cded84b7fc6",
+          "update_columns": []
+        },
+        {
+          "name": "trg_notify_chat_thread_message",
+          "level": "ROW",
+          "events": [
+            "INSERT"
+          ],
+          "timing": "AFTER",
+          "enabled": "O",
+          "function": "tg_notify_chat_thread_message()",
+          "when_md5": null,
+          "type_bits": 5,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "c10bd637246efd456f4ec0e032788782",
+          "update_columns": []
+        },
+        {
+          "name": "trg_touch_chat_thread_on_message",
+          "level": "ROW",
+          "events": [
+            "INSERT"
+          ],
+          "timing": "AFTER",
+          "enabled": "O",
+          "function": "tg_touch_chat_thread()",
+          "when_md5": null,
+          "type_bits": 5,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "e206022c76eb101a41d097df4e1f009b",
+          "update_columns": []
+        }
+      ]
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "table": "user_notifications",
+      "schema": "public",
+      "columns": [
+        {
+          "acl": null,
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "category",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "body",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "link_url",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "entity_type",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "entity_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "metadata",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "not_null": true
+        },
+        {
+          "acl": null,
+          "name": "read_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "acl": null,
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_user_notifications_entity",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "definition": "CREATE INDEX idx_user_notifications_entity ON public.user_notifications USING btree (entity_type, entity_id)"
+        },
+        {
+          "name": "idx_user_notifications_user",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "definition": "CREATE INDEX idx_user_notifications_user ON public.user_notifications USING btree (user_id, read_at, created_at DESC)"
+        },
+        {
+          "name": "user_notifications_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX user_notifications_pkey ON public.user_notifications USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Users can read their own notifications",
+          "check": null,
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(user_id = auth.uid())",
+          "command": "r",
+          "permissive": true
+        },
+        {
+          "name": "Users can update their own notifications read state",
+          "check": "(user_id = auth.uid())",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(user_id = auth.uid())",
+          "command": "w",
+          "permissive": true
+        }
+      ],
+      "force_rls": false,
+      "constraints": [
+        {
+          "name": "user_notifications_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "user_notifications_user_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "user_triggers": [
+        {
+          "name": "trg_user_notifications_lock_columns",
+          "level": "ROW",
+          "events": [
+            "UPDATE"
+          ],
+          "timing": "BEFORE",
+          "enabled": "O",
+          "function": "user_notifications_lock_columns()",
+          "when_md5": "e84e44e5dcb26f26786c647e98590678",
+          "type_bits": 19,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "f3bf2ccfaec7ba9021d4348414bebcc8",
+          "update_columns": []
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "name": "create_group_chat",
+      "owner": "postgres",
+      "schema": "public",
+      "language": "plpgsql",
+      "signature": "create_group_chat(text,uuid[])",
+      "config_md5": "dcd2abd514173991611a622e71d06e6f",
+      "volatility": "v",
+      "body_md5_lf": "3e73d9d337ca7f1c7b5b5322d0dc7ec2",
+      "config_keys": [
+        "search_path"
+      ],
+      "return_type": "uuid",
+      "returns_set": false,
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "return_shape": "uuid",
+      "variadic_type": null,
+      "argument_count": 2,
+      "argument_modes": null,
+      "argument_names": [
+        "p_title",
+        "p_member_ids"
+      ],
+      "argument_types": [
+        "text",
+        "uuid[]"
+      ],
+      "definition_md5": "0adc12b0c4def00933d11cd2313bf69b",
+      "service_execute": true,
+      "security_definer": true,
+      "all_argument_types": null,
+      "identity_arguments": "p_title text, p_member_ids uuid[]",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "4c9184f37cff01bcdc32dc486ec36961"
+        }
+      ],
+      "argument_defaults_md5": null,
+      "authenticated_execute": true,
+      "argument_defaults_count": 0
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "name": "invite_to_thread",
+      "owner": "postgres",
+      "schema": "public",
+      "language": "plpgsql",
+      "signature": "invite_to_thread(uuid,uuid[])",
+      "config_md5": "dcd2abd514173991611a622e71d06e6f",
+      "volatility": "v",
+      "body_md5_lf": "510282e123f3d5bcb1ae8c851c1a2d09",
+      "config_keys": [
+        "search_path"
+      ],
+      "return_type": "integer",
+      "returns_set": false,
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "return_shape": "integer",
+      "variadic_type": null,
+      "argument_count": 2,
+      "argument_modes": null,
+      "argument_names": [
+        "p_thread_id",
+        "p_user_ids"
+      ],
+      "argument_types": [
+        "uuid",
+        "uuid[]"
+      ],
+      "definition_md5": "f7f2b1bd42f6448da9960155c8451722",
+      "service_execute": true,
+      "security_definer": true,
+      "all_argument_types": null,
+      "identity_arguments": "p_thread_id uuid, p_user_ids uuid[]",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "4c9184f37cff01bcdc32dc486ec36961"
+        }
+      ],
+      "argument_defaults_md5": null,
+      "authenticated_execute": true,
+      "argument_defaults_count": 0
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "name": "leave_thread",
+      "owner": "postgres",
+      "schema": "public",
+      "language": "plpgsql",
+      "signature": "leave_thread(uuid)",
+      "config_md5": "dcd2abd514173991611a622e71d06e6f",
+      "volatility": "v",
+      "body_md5_lf": "1a0360b056c42b69b6aa510187128a38",
+      "config_keys": [
+        "search_path"
+      ],
+      "return_type": "void",
+      "returns_set": false,
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "return_shape": "void",
+      "variadic_type": null,
+      "argument_count": 1,
+      "argument_modes": null,
+      "argument_names": [
+        "p_thread_id"
+      ],
+      "argument_types": [
+        "uuid"
+      ],
+      "definition_md5": "889f4e9dec5eb78d3fc2ec1f68dc21e3",
+      "service_execute": true,
+      "security_definer": true,
+      "all_argument_types": null,
+      "identity_arguments": "p_thread_id uuid",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "4c9184f37cff01bcdc32dc486ec36961"
+        }
+      ],
+      "argument_defaults_md5": null,
+      "authenticated_execute": true,
+      "argument_defaults_count": 0
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres,authenticated=X/postgres}",
+      "name": "mark_thread_read",
+      "owner": "postgres",
+      "schema": "public",
+      "language": "plpgsql",
+      "signature": "mark_thread_read(uuid)",
+      "config_md5": "dcd2abd514173991611a622e71d06e6f",
+      "volatility": "v",
+      "body_md5_lf": "dc9feda2e2522833003d1f4c2cfd2658",
+      "config_keys": [
+        "search_path"
+      ],
+      "return_type": "void",
+      "returns_set": false,
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "return_shape": "void",
+      "variadic_type": null,
+      "argument_count": 1,
+      "argument_modes": null,
+      "argument_names": [
+        "p_thread_id"
+      ],
+      "argument_types": [
+        "uuid"
+      ],
+      "definition_md5": "716cb57df780d5692cbe8ca4eb310efa",
+      "service_execute": true,
+      "security_definer": true,
+      "all_argument_types": null,
+      "identity_arguments": "p_thread_id uuid",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "4c9184f37cff01bcdc32dc486ec36961"
+        }
+      ],
+      "argument_defaults_md5": null,
+      "authenticated_execute": true,
+      "argument_defaults_count": 0
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres,authenticated=X/postgres}",
+      "name": "mark_thread_unread",
+      "owner": "postgres",
+      "schema": "public",
+      "language": "plpgsql",
+      "signature": "mark_thread_unread(uuid)",
+      "config_md5": "dcd2abd514173991611a622e71d06e6f",
+      "volatility": "v",
+      "body_md5_lf": "0f7e56af07a7316b6fe7b1bea5825dae",
+      "config_keys": [
+        "search_path"
+      ],
+      "return_type": "void",
+      "returns_set": false,
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "return_shape": "void",
+      "variadic_type": null,
+      "argument_count": 1,
+      "argument_modes": null,
+      "argument_names": [
+        "p_thread_id"
+      ],
+      "argument_types": [
+        "uuid"
+      ],
+      "definition_md5": "dc391464c3740dbcd72b0829764acfcc",
+      "service_execute": true,
+      "security_definer": true,
+      "all_argument_types": null,
+      "identity_arguments": "p_thread_id uuid",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "4c9184f37cff01bcdc32dc486ec36961"
+        }
+      ],
+      "argument_defaults_md5": null,
+      "authenticated_execute": true,
+      "argument_defaults_count": 0
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "name": "notify_user",
+      "owner": "postgres",
+      "schema": "public",
+      "language": "plpgsql",
+      "signature": "notify_user(uuid,text,text,text,text,text,uuid,jsonb)",
+      "config_md5": "dcd2abd514173991611a622e71d06e6f",
+      "volatility": "v",
+      "body_md5_lf": "9748d6bc9c364a786fdcbc6f02b6b033",
+      "config_keys": [
+        "search_path"
+      ],
+      "return_type": "void",
+      "returns_set": false,
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "return_shape": "void",
+      "variadic_type": null,
+      "argument_count": 8,
+      "argument_modes": null,
+      "argument_names": [
+        "_user_id",
+        "_category",
+        "_title",
+        "_body",
+        "_link",
+        "_entity_type",
+        "_entity_id",
+        "_metadata"
+      ],
+      "argument_types": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "uuid",
+        "jsonb"
+      ],
+      "definition_md5": "0734073324a117980e2b94ddb4d20ff9",
+      "service_execute": true,
+      "security_definer": true,
+      "all_argument_types": null,
+      "identity_arguments": "_user_id uuid, _category text, _title text, _body text, _link text, _entity_type text, _entity_id uuid, _metadata jsonb",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "4c9184f37cff01bcdc32dc486ec36961"
+        }
+      ],
+      "argument_defaults_md5": "f3db357cf4f4a03883484fa3281a056c",
+      "authenticated_execute": false,
+      "argument_defaults_count": 1
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "name": "respond_to_thread_invite",
+      "owner": "postgres",
+      "schema": "public",
+      "language": "plpgsql",
+      "signature": "respond_to_thread_invite(uuid,boolean)",
+      "config_md5": "dcd2abd514173991611a622e71d06e6f",
+      "volatility": "v",
+      "body_md5_lf": "2e42175e5de4cd38790463449b619015",
+      "config_keys": [
+        "search_path"
+      ],
+      "return_type": "void",
+      "returns_set": false,
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "return_shape": "void",
+      "variadic_type": null,
+      "argument_count": 2,
+      "argument_modes": null,
+      "argument_names": [
+        "p_thread_id",
+        "p_accept"
+      ],
+      "argument_types": [
+        "uuid",
+        "boolean"
+      ],
+      "definition_md5": "b2e96e5452438d5ef7c565ab3590bebd",
+      "service_execute": true,
+      "security_definer": true,
+      "all_argument_types": null,
+      "identity_arguments": "p_thread_id uuid, p_accept boolean",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "4c9184f37cff01bcdc32dc486ec36961"
+        }
+      ],
+      "argument_defaults_md5": null,
+      "authenticated_execute": true,
+      "argument_defaults_count": 0
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "name": "tg_notify_chat_thread_message",
+      "owner": "postgres",
+      "schema": "public",
+      "language": "plpgsql",
+      "signature": "tg_notify_chat_thread_message()",
+      "config_md5": "dcd2abd514173991611a622e71d06e6f",
+      "volatility": "v",
+      "body_md5_lf": "8dfc4a561822b7c1212f029f96a48dd7",
+      "config_keys": [
+        "search_path"
+      ],
+      "return_type": "trigger",
+      "returns_set": false,
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "return_shape": "trigger",
+      "variadic_type": null,
+      "argument_count": 0,
+      "argument_modes": null,
+      "argument_names": null,
+      "argument_types": [],
+      "definition_md5": "ff5702b8a4c6c58ba9a9146c8411251f",
+      "service_execute": true,
+      "security_definer": true,
+      "all_argument_types": null,
+      "identity_arguments": "",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "4c9184f37cff01bcdc32dc486ec36961"
+        }
+      ],
+      "argument_defaults_md5": null,
+      "authenticated_execute": false,
+      "argument_defaults_count": 0
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "name": "tg_touch_chat_thread",
+      "owner": "postgres",
+      "schema": "public",
+      "language": "plpgsql",
+      "signature": "tg_touch_chat_thread()",
+      "config_md5": "dcd2abd514173991611a622e71d06e6f",
+      "volatility": "v",
+      "body_md5_lf": "9743371d58062a592cc848255c7a298c",
+      "config_keys": [
+        "search_path"
+      ],
+      "return_type": "trigger",
+      "returns_set": false,
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "return_shape": "trigger",
+      "variadic_type": null,
+      "argument_count": 0,
+      "argument_modes": null,
+      "argument_names": null,
+      "argument_types": [],
+      "definition_md5": "5d1bc55deebd0f213027a0ea047a6598",
+      "service_execute": true,
+      "security_definer": false,
+      "all_argument_types": null,
+      "identity_arguments": "",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "4c9184f37cff01bcdc32dc486ec36961"
+        }
+      ],
+      "argument_defaults_md5": null,
+      "authenticated_execute": false,
+      "argument_defaults_count": 0
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "name": "trg_thread_message_notify",
+      "owner": "postgres",
+      "schema": "public",
+      "language": "plpgsql",
+      "signature": "trg_thread_message_notify()",
+      "config_md5": "dcd2abd514173991611a622e71d06e6f",
+      "volatility": "v",
+      "body_md5_lf": "b9a7393a45b677b6ed1d6fe0de663136",
+      "config_keys": [
+        "search_path"
+      ],
+      "return_type": "trigger",
+      "returns_set": false,
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "return_shape": "trigger",
+      "variadic_type": null,
+      "argument_count": 0,
+      "argument_modes": null,
+      "argument_names": null,
+      "argument_types": [],
+      "definition_md5": "71463069af3af05523f3128d0d9e49bd",
+      "service_execute": true,
+      "security_definer": true,
+      "all_argument_types": null,
+      "identity_arguments": "",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "4c9184f37cff01bcdc32dc486ec36961"
+        }
+      ],
+      "argument_defaults_md5": null,
+      "authenticated_execute": false,
+      "argument_defaults_count": 0
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "name": "user_notifications_lock_columns",
+      "owner": "postgres",
+      "schema": "public",
+      "language": "plpgsql",
+      "signature": "user_notifications_lock_columns()",
+      "config_md5": "dcd2abd514173991611a622e71d06e6f",
+      "volatility": "v",
+      "body_md5_lf": "32b13fd5a05b89e0559889a0a88848e9",
+      "config_keys": [
+        "search_path"
+      ],
+      "return_type": "trigger",
+      "returns_set": false,
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "return_shape": "trigger",
+      "variadic_type": null,
+      "argument_count": 0,
+      "argument_modes": null,
+      "argument_names": null,
+      "argument_types": [],
+      "definition_md5": "68fa148902acdc73cce64b35a8e98fcf",
+      "service_execute": true,
+      "security_definer": true,
+      "all_argument_types": null,
+      "identity_arguments": "",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "4c9184f37cff01bcdc32dc486ec36961"
+        }
+      ],
+      "argument_defaults_md5": null,
+      "authenticated_execute": false,
+      "argument_defaults_count": 0
+    }
+  ]
+}

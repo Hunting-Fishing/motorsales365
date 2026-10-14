@@ -1,7 +1,12 @@
 # Native chat writers: next bounded rehearsal plan
 
-2026-10-15 Asia/Manila. Status: **retained-source plan; six current writer
-definitions/ACLs and message/notification attachments not yet observed**.
+2026-10-15 Asia/Manila. Original retained-source plan, now implemented offline in
+draft PR #37 (code `0d5ada9`). The six selected writers, five dependencies and
+message/notification attachments are now observed and composed; see
+`NATIVE_CHAT_WRITER_COMPOSITION_PROOF.md` for the exact dated scope, tests and
+remaining synthetic public_profiles/role/API/delivery boundaries. The original
+plan and evidence requirements remain below as historical design, not the next
+instruction to repeat completed work.
 This is the next dependency after the sixteen selected chat-policy tests in
 `NATIVE_CHAT_MEMBERSHIP_POLICY_PROOF.md`, not another whole-project plan or a
 production mitigation. This plan makes no application, SQL, permission, history

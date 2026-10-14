@@ -27,8 +27,11 @@ Security reconciliation branch: `completion/365-security`.
    incoming writer paths without closing unknowns. Selected current chat policies
    and incoming attachment metadata are now recovered; the unchanged-source
    offline policy proof distinguishes raw constant writes from filtered/returning
-   commands. Next recover six exact chat-writer and message/notification metadata
-   contracts, rehearse those side effects, then define/test
+   commands. Six chat writers and real message/notification attachments are now
+   rehearsed with their selected current metadata, including dual fanouts,
+   invoker timestamp behavior and void no-ops. Next implement the separate caller
+   acknowledgement/error/late-result contract without treating void as a confirmed
+   mutation, then define/test
    the companion authority contract; resolve the initial
    dependency inventory's identity, role/module helper and trigger/security
    attachment closure; rehearse the companion roster/native guard with actual
@@ -540,8 +543,9 @@ grants execute unchanged; reproduction of dated broad table ACLs is explicitly
 fixture-only, not historical grant parity or full role/default-privilege closure.
 Exact metadata/source/test pins and outcomes:
 `evidence/NATIVE_CHAT_MEMBERSHIP_POLICY_PROOF.md` and
-`evidence/NATIVE_INCOMING_ATTACHMENT_INVENTORY.md`. Remote CI awaits verification
-on the published documentation head. Application source stays the previously
+`evidence/NATIVE_INCOMING_ATTACHMENT_INVENTORY.md`. Documentation head `2844477`
+passed all six CI gates (run `38654334163`), verified on the writer follow-up.
+Application source stays the previously
 CI-verified 723-test parent, not newly accepted production behavior.
 
 Migration impact: none. Deployment: none; no production permission/data/history/
@@ -551,7 +555,7 @@ Global correspondence remains 404/423, with 19 unclassified; all baseline/parity
 release flags remain false. Hosting fails separately; sparse artifacts must not
 deploy. Pending bootstrap/totals decision unchanged; no repeat prompt.
 
-Exact next action: verify PR #36 checks; inspect only the six exact chat writer
+Original next action (implemented in the checkpoint below): verify PR #36 checks; inspect only the six exact chat writer
 contracts and message/notification table/attachment metadata described in
 `evidence/NATIVE_CHAT_WRITER_REHEARSAL_PLAN.md`, then compose unchanged-source
 side effects and app acknowledgement controls offline. No production message/RPC
@@ -560,6 +564,61 @@ identity/self-shift/owner/delegation/provenance/valid-offboarding/multi-roster/a
 contract and native-PG concurrency. Separate baseline/forward/storage recovery,
 real API/JWT/role/load, consent/tenure/retention, OCR recovery/owner/mobile pilot,
 trusted entry/invoicing/retail/recruitment and hosting acceptance remain open.
+
+## Latest chat writer/notification checkpoint (2026-10-15)
+
+Draft PR #37 (`https://github.com/Hunting-Fishing/motorsales365/pull/37`), code
+`0d5ada9`, branch `security/native-chat-writer-composition`, stacked on PR #36 docs
+`2844477` (all six CI gates, run `38654334163`). One independently reviewed
+catalog-only SELECT at 23:34:25 UTC captures two tables, six exact writers,
+notify_user and four attached functions. All eleven retained bodies match;
+six writers deny anon/allow authenticated-service, five dependencies deny both
+client roles. Both differently named message notifiers and the invoker timestamp
+attachment actually remain present. No business records/counts, RPC/message or
+delivery ran; protected config/default/trigger values are hashes only.
+
+Fifteen new sequential always-closed memory tests execute unchanged selected DDL,
+critical constraints/policies/indexes, thirteen function definitions and all four
+attachments. Duplicate create targets produce two invitation rows for one member;
+active-only invitation counts differ from the direct-policy creator path;
+false/NULL decline, left read/unread and void no-ops remain distinct. Both fanouts
+insert notifications on team/group; noncreator messages leave thread.updated_at
+unchanged while creator messages update it. The notification guard rejects nine
+listed fields but allows own id replacement. Real FK/NOT NULL/CHECK/PK failures
+explicitly roll back earlier inserts/fanouts/timestamps. These are synthetic
+source outcomes, not live incidents, delivery, mitigations or accepted authority.
+
+Focused composition 15/15 (17.079s), artifact tests 3/3, full sequential tooling
+259/259 (164.79s), lint/format/diff and independent review pass. Exact selected
+eleven-function APIs/default-expression/config/security/fingerprints/raw ACL
+ordering and two-table/four-attachment metadata match; only PG18 NOT NULL catalog
+representation is excluded after exact column checks. Observed ACL reproduction
+is explicitly fixture-only; auth/session/business/public_profiles READ supports
+are synthetic. Current public_profiles/view/profile RLS, full original-human/
+role/default privilege/writer closure, hosted API and concurrency remain unverified.
+Exact evidence and test/source pins: `evidence/NATIVE_CHAT_WRITER_COMPOSITION_PROOF.md`.
+Remote CI awaits verification on the published documentation head; application
+source remains the previously CI-verified 723-test parent.
+
+Migration impact: none. Deployment: none; no production permissions/data/history/
+platform mutation. Selected inventory and global correspondence remain unchanged
+and incomplete (404/423,19 unclassified); no baseline/parity/replay/release flag is
+promoted. Separate hosting failure/skipped production migrations/deploy persist;
+sparse artifacts must not deploy. Pending bootstrap/totals approval is unchanged,
+with no repeated prompt or automatic application.
+
+Exact next action: verify PR #37 checks, then implement/test bounded messaging
+caller acknowledgement and context handling: stop automatic read-state success
+after resolved RPC errors, strictly validate create UUID/invite counts, suppress
+late account/thread callbacks and avoid claiming void results confirm a row
+transition. Preserve ambiguity after dispatched failures: refresh before retry,
+no automatic mutation retries, no service fallback or fabricated success.
+Continue the offline native companion immutable-identity/self-shift/owner/
+delegation/provenance/valid-offboarding/multi-roster/original-actor audit contract
+and independent-session concurrency; selected chat proof does not resolve all
+authority or adopt a production bypass. Keep separate baseline/forward/private
+storage recovery, actual API/JWT/role/load, consent/tenure/retention, OCR recovery/
+owner/mobile pilot, trusted entry/invoicing/retail/recruitment and hosting gates.
 
 ## Recovery evidence (original scope, retained below)
 
