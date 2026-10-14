@@ -64,7 +64,11 @@ Closing/unmounting aborts the local operation and ignores late results.
 - The browser test observes zero third-party requests, correctly extracts the
   labelled supplier/date/currency/total, and keeps the candidate item unreviewed.
 - CI includes the browser smoke test and five asset-verification regressions.
-  Typecheck and complete production compilation remain gates on the published PR.
+  All six CI gates passed at code commit `7ebe425` (run `38600950050`), including
+  typecheck, complete compilation, packaged OCR byte/hash verification and a
+  server-package check rejecting accidental OCR-engine inclusion. The initial
+  client import boundary error was fixed without relaxing import protection.
+  Published as draft PR #12, stacked on the native Customer 360 PR #11.
 
 No schema migration or production deployment is part of this slice. The local
 sparse checkout still omits other public media and must not be deployed.
@@ -88,6 +92,6 @@ Primary references: [Tesseract.js local installation](https://github.com/naptha/
 
 ## Next slice
 
-Verify build/type/browser checks in CI, then implement bounded same-origin PDF
-page rendering with explicit page limits and reviewed merging. A wider photo
+Implement bounded same-origin PDF page rendering with explicit page limits and
+reviewed merging. A wider photo
 corpus, mobile resource tests and business/owner acceptance remain pilot gates.
