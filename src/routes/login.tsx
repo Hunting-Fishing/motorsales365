@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -129,15 +128,15 @@ function LoginPage() {
       const returnTo = redirectTo
         ? `${siteOrigin()}/login?redirect=${encodeURIComponent(redirectTo)}`
         : siteOrigin();
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: returnTo,
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: returnTo },
       });
-      if (result.error) {
+      if (oauthError) {
         toast.error("Could not sign in with Google");
         return;
       }
-      if (result.redirected) return;
-      goToPostLogin();
+      // On success the browser is redirected to Google; nothing else to do here.
     } finally {
       inFlightRef.current = false;
       setGoogleSubmitting(false);

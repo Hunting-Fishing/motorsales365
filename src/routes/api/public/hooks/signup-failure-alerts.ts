@@ -16,7 +16,7 @@
 //
 // ───────────────────────────────────────────────────────────────────────────
 // CRON CONTRACT — do not change without updating the pg_cron schedule.
-//   URL:    https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app/api/public/hooks/signup-failure-alerts
+//   URL:    https://www.365motorsales.com/api/public/hooks/signup-failure-alerts
 //   Method: POST (no body)
 //   Auth:   verifyInternalCronToken (header `x-cron-token`, job_name=signup_failure_alerts)
 // ───────────────────────────────────────────────────────────────────────────

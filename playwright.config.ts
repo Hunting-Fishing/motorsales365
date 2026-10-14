@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 /**
  * Playwright config for end-to-end tests. Assumes the Vite dev server is
- * already running at http://localhost:8080 (Lovable sandbox default).
+ * already running at http://localhost:8080 (`npm run dev`).
  * Run with: `bunx playwright test`.
  */
 export default defineConfig({
@@ -23,11 +23,8 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         launchOptions: {
-          // Lovable sandbox ships a full Chromium at /chromium-*; prefer it
-          // when present so tests don't require `playwright install`.
-          executablePath:
-            process.env.PLAYWRIGHT_CHROMIUM_PATH ||
-            "/chromium-1194/chrome-linux/chrome",
+          // Optional custom Chromium; otherwise use `npx playwright install`.
+          executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
         },
       },
     },

@@ -46,7 +46,7 @@ function PrivacyPage() {
           <Link className="text-primary underline" to="/clubs/apply" search={{}}>/clubs/apply</Link>, we collect
           the formal documents you upload (e.g., LTO Accreditation, SEC Certificate of
           Incorporation, DTI / Business Permit) along with the contact details you supply. These
-          documents are stored in a private Lovable Cloud storage bucket and are visible only to
+          documents are stored in a private cloud storage bucket and are visible only to
           the club's owner/admins and our moderation team. They are retained while the Club remains
           on the Platform and are deleted upon rejection or upon your removal request, subject to
           any legal-retention obligations.

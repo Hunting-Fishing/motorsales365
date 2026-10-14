@@ -1,6 +1,6 @@
 /**
  * SYNC GROUP: inspection-services
- * Source of truth: .lovable/sync-groups.md#inspection-services
+ * Source of truth: docs/sync-groups.md#inspection-services
  * Siblings: src/lib/inspection.functions.ts
  * Public rate card + request form for inspection / transaction-safety upsells (audit #20).
  * VERSION: 1

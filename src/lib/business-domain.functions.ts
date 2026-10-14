@@ -179,10 +179,9 @@ export const resolveBusinessByHost = createServerFn({ method: "GET" })
 
     // Never match our own domains.
     if (
-      host.endsWith(".lovable.app") ||
+      host.endsWith(".workers.dev") ||
       host === "365motorsales.com" ||
       host === "www.365motorsales.com" ||
-      host === "motorsales365.lovable.app" ||
       host === "localhost" ||
       host.endsWith(".localhost")
     ) {

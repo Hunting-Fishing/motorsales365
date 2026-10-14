@@ -2,7 +2,8 @@
 // Called by the cron hook and by the "run now" server function.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const GATEWAY = "https://connector-gateway.lovable.dev/google_maps";
+// Google Places API (New) — called directly with a server-side API key.
+const PLACES_API_URL = "https://places.googleapis.com/v1";
 
 // Mirrors TYPE_MAP in business-seed.functions.ts. Kept here so the sync can
 // run without importing client-safe modules from this server file.
@@ -32,13 +33,11 @@ function mapType(types: string[] | undefined): string | null {
   return null;
 }
 
-function gatewayHeaders() {
-  const lov = process.env.LOVABLE_API_KEY;
+function placesHeaders() {
   const gm = process.env.GOOGLE_MAPS_API_KEY;
-  if (!lov || !gm) throw new Error("Google Maps connector is not configured");
+  if (!gm) throw new Error("Google Maps is not configured (GOOGLE_MAPS_API_KEY missing)");
   return {
-    Authorization: `Bearer ${lov}`,
-    "X-Connection-Api-Key": gm,
+    "X-Goog-Api-Key": gm,
     "Content-Type": "application/json",
   };
 }
@@ -92,9 +91,9 @@ async function runOnePlacesSearch(s: SearchRow): Promise<PlaceResult[]> {
     regionCode: "PH",
     languageCode: "en",
   };
-  const res = await fetch(`${GATEWAY}/places/v1/places:searchText`, {
+  const res = await fetch(`${PLACES_API_URL}/places:searchText`, {
     method: "POST",
-    headers: { ...gatewayHeaders(), "X-Goog-FieldMask": FIELD_MASK },
+    headers: { ...placesHeaders(), "X-Goog-FieldMask": FIELD_MASK },
     body: JSON.stringify(body),
   });
   if (!res.ok) {

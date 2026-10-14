@@ -1119,7 +1119,7 @@ Do not copy the full global knowledge record into every shop. Link it to the wor
 
 ### 5.2 Proposed database tables
 
-Create a dedicated `repair_knowledge` schema after confirming that Lovable/Supabase exposes it through the generated types and API configuration.
+Create a dedicated `repair_knowledge` schema after confirming that Supabase exposes it through the generated types and API configuration.
 
 #### Product modules, subscriptions and entitlements
 

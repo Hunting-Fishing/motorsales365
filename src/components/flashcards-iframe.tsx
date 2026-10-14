@@ -27,7 +27,7 @@ type ProgressMsg = {
  * - When the viewer is signed in, fetches their cloud-side progress and
  *   seeds the iframe via postMessage("flashcards-init", aggregateStats).
  * - Listens for "flashcards-progress" messages from the iframe on every
- *   correct/wrong answer and persists them to Lovable Cloud.
+ *   correct/wrong answer and persists them to Supabase.
  */
 export function FlashcardsIframe({ className, title = "365 Flashcards" }: Props) {
   const [loaded, setLoaded] = useState(false);
@@ -67,7 +67,7 @@ export function FlashcardsIframe({ className, title = "365 Flashcards" }: Props)
     };
   }, [user, loaded, fetchProgress]);
 
-  // Mirror progress events from the iframe to Lovable Cloud.
+  // Mirror progress events from the iframe to Supabase.
   useEffect(() => {
     if (!user) return;
     const handler = (ev: MessageEvent) => {

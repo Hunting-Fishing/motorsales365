@@ -18,15 +18,8 @@ export function ServiceWorkerRegister() {
     const reloadStorageKey = `365ms:reloaded-for-build:${buildId}`;
     const hostname = window.location.hostname;
     const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
-    const isPreviewHost =
-      hostname.startsWith("id-preview--") ||
-      hostname.startsWith("preview--") ||
-      hostname === "lovableproject.com" ||
-      hostname.endsWith(".lovableproject.com") ||
-      hostname === "lovableproject-dev.com" ||
-      hostname.endsWith(".lovableproject-dev.com") ||
-      hostname === "beta.lovable.dev" ||
-      hostname.endsWith(".beta.lovable.dev");
+    // Cloudflare Workers preview URLs (wrangler preview_urls) live on workers.dev.
+    const isPreviewHost = hostname.endsWith(".workers.dev");
     const shouldAutoReloadForNewBuild = !isLocalhost && !isPreviewHost;
     const hasServiceWorker = "serviceWorker" in navigator;
 

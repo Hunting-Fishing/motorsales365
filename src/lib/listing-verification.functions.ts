@@ -10,7 +10,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText } from "ai";
-import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { AI_MODELS, aiModel, isAiConfigured } from "@/lib/ai/provider.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const inputSchema = z.object({
@@ -121,10 +121,9 @@ function compareField(
 async function extractDocFields(
   bytes: Uint8Array,
   mediaType: string,
-  gateway: ReturnType<typeof createOpenAICompatible>,
   docType: "cr" | "or",
 ): Promise<DocFields> {
-  const model = gateway("google/gemini-2.5-flash");
+  const model = aiModel(AI_MODELS.flash);
   const result = await generateText({
     model,
     system: SYSTEM_PROMPT,
@@ -188,13 +187,7 @@ export const verifyListingDocuments = createServerFn({ method: "POST" })
     }>;
     if (docList.length === 0) throw new Error("Upload at least one document first");
 
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("Verification unavailable — AI gateway key missing");
-    const gateway = createOpenAICompatible({
-      name: "lovable",
-      baseURL: "https://ai.gateway.lovable.dev/v1",
-      headers: { "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
-    });
+    if (!isAiConfigured()) throw new Error("Verification unavailable — AI provider key missing");
 
     const extracted: { cr?: DocFields; or?: DocFields } = {};
     for (const d of docList) {
@@ -215,7 +208,7 @@ export const verifyListingDocuments = createServerFn({ method: "POST" })
       }
       const bytes = new Uint8Array(await res.arrayBuffer());
       try {
-        extracted[d.doc_type] = await extractDocFields(bytes, mediaType, gateway, d.doc_type);
+        extracted[d.doc_type] = await extractDocFields(bytes, mediaType, d.doc_type);
       } catch (e) {
         extracted[d.doc_type] = {};
         void e;

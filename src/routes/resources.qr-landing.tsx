@@ -4,7 +4,7 @@ import { QrLandingContent } from "@/components/qr-landing-content";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import bannerAsset from "@/assets/qr-landing-uploaded/365-motor-sales-banner.png.asset.json";
+import bannerAsset from "@/assets/qr-landing-uploaded/365-motor-sales-banner.png";
 
 export const Route = createFileRoute("/resources/qr-landing")({
   head: () => ({
@@ -53,7 +53,7 @@ function ResourceQrLandingPreview() {
         <div className="container mx-auto max-w-7xl px-4 py-6 sm:py-10">
           <div className="overflow-hidden rounded-xl border border-border bg-white grid grid-cols-1 md:grid-cols-[1.2fr_0.8fr]">
             <img
-              src={bannerAsset.url}
+              src={bannerAsset}
               alt="365 Motor Sales — Buy, Sell, List vehicles and equipment nationwide in the Philippines"
               className="block w-full h-auto max-h-48 sm:max-h-64 md:max-h-full object-contain md:object-cover"
               loading="eager"

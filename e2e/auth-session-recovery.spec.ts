@@ -15,17 +15,17 @@
  * driving the supabase-js client's `_notifyAllSubscribers` hook to
  * synthesize the two failure modes without waiting for a real token TTL.
  *
- * Prereqs (Lovable sandbox provides all of these automatically):
+ * Prereqs (inject these env vars before running):
  *   - Vite dev server running at http://localhost:8080
- *   - LOVABLE_BROWSER_AUTH_STATUS=injected
- *   - LOVABLE_BROWSER_SUPABASE_STORAGE_KEY / _SESSION_JSON / _COOKIES_JSON
+ *   - E2E_AUTH_STATUS=injected
+ *   - E2E_SUPABASE_STORAGE_KEY / _SESSION_JSON / _COOKIES_JSON
  */
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 
-const authStatus = process.env.LOVABLE_BROWSER_AUTH_STATUS;
-const storageKey = process.env.LOVABLE_BROWSER_SUPABASE_STORAGE_KEY;
-const sessionJson = process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON;
-const cookiesJson = process.env.LOVABLE_BROWSER_SUPABASE_COOKIES_JSON;
+const authStatus = process.env.E2E_AUTH_STATUS;
+const storageKey = process.env.E2E_SUPABASE_STORAGE_KEY;
+const sessionJson = process.env.E2E_SUPABASE_SESSION_JSON;
+const cookiesJson = process.env.E2E_SUPABASE_COOKIES_JSON;
 
 const HAS_SESSION =
   authStatus === "injected" && !!storageKey && !!sessionJson;
@@ -33,7 +33,7 @@ const HAS_SESSION =
 test.describe("auth session recovery (real browser)", () => {
   test.skip(
     !HAS_SESSION,
-    "Requires an injected Supabase session (LOVABLE_BROWSER_AUTH_STATUS=injected).",
+    "Requires an injected Supabase session (E2E_AUTH_STATUS=injected).",
   );
 
   async function restoreSession(context: BrowserContext, page: Page) {

@@ -26,20 +26,20 @@ import {
 
 import { siteOrigin } from "@/lib/site-config";
 import { formatPHP } from "@/lib/format";
-import carsAndMotorcyclesAsset from "@/assets/qr-landing-uploaded/365-cars-and-motorcycles.png.asset.json";
-import partsAndAccessoriesAsset from "@/assets/qr-landing-uploaded/365-parts-and-accessories.png.asset.json";
-import shopsAndBusinessesAsset from "@/assets/qr-landing-uploaded/365-shops-and-businesses.png.asset.json";
-import towAndDeliveryAsset from "@/assets/qr-landing-uploaded/365-tow-and-delivery.png.asset.json";
-import allPhRegionsAsset from "@/assets/qr-landing-uploaded/all-ph-regions.png.asset.json";
-import createYourFreeAccountAsset from "@/assets/qr-landing-uploaded/create-your-free-account.png.asset.json";
-import growingWeeklyAsset from "@/assets/qr-landing-uploaded/growing-weekly.png.asset.json";
-import nationwideMapAsset from "@/assets/qr-landing-uploaded/nationwide-map.png.asset.json";
-import verifiedAccountsAsset from "@/assets/qr-landing-uploaded/verified-accounts.png.asset.json";
-import scanOrVisitAsset from "@/assets/qr-landing-uploaded/scan-or-visit.png.asset.json";
-import findVehiclesBannerAsset from "@/assets/qr-landing-uploaded/find-vehicles-parts-services-faster.png.asset.json";
-import discoverServicesBannerAsset from "@/assets/qr-landing-uploaded/discover-motor-services-near-you.png.asset.json";
-import postConnectSellBannerAsset from "@/assets/qr-landing-uploaded/post-connect-sell.png.asset.json";
-import onePlatformBannerAsset from "@/assets/qr-landing-uploaded/one-platform-many-opportunities.png.asset.json";
+import carsAndMotorcyclesAsset from "@/assets/qr-landing-uploaded/365-cars-and-motorcycles.png";
+import partsAndAccessoriesAsset from "@/assets/qr-landing-uploaded/365-parts-and-accessories.png";
+import shopsAndBusinessesAsset from "@/assets/qr-landing-uploaded/365-shops-and-businesses.png";
+import towAndDeliveryAsset from "@/assets/qr-landing-uploaded/365-tow-and-delivery.png";
+import allPhRegionsAsset from "@/assets/qr-landing-uploaded/all-ph-regions.png";
+import createYourFreeAccountAsset from "@/assets/qr-landing-uploaded/create-your-free-account.png";
+import growingWeeklyAsset from "@/assets/qr-landing-uploaded/growing-weekly.png";
+import nationwideMapAsset from "@/assets/qr-landing-uploaded/nationwide-map.png";
+import verifiedAccountsAsset from "@/assets/qr-landing-uploaded/verified-accounts.png";
+import scanOrVisitAsset from "@/assets/qr-landing-uploaded/scan-or-visit.png";
+import findVehiclesBannerAsset from "@/assets/qr-landing-uploaded/find-vehicles-parts-services-faster.png";
+import discoverServicesBannerAsset from "@/assets/qr-landing-uploaded/discover-motor-services-near-you.png";
+import postConnectSellBannerAsset from "@/assets/qr-landing-uploaded/post-connect-sell.png";
+import onePlatformBannerAsset from "@/assets/qr-landing-uploaded/one-platform-many-opportunities.png";
 
 type Promo = {
   id: string;
@@ -90,7 +90,7 @@ const AUDIENCE_PANELS: ImagePanel[] = [
     title: "Find the right ride — without scrolling through memes",
     description:
       "Real vehicle filters, verified sellers, direct messaging, and serious listings for Philippine buyers who want to move faster.",
-    image: carsAndMotorcyclesAsset.url,
+    image: carsAndMotorcyclesAsset,
     alt: "Blue car and red motorcycle with Philippine-inspired 365 styling.",
   },
   {
@@ -98,7 +98,7 @@ const AUDIENCE_PANELS: ImagePanel[] = [
     title: "List once. Reach buyers all week.",
     description:
       "Create your account, verify once, then list vehicles, parts, or services with a clean profile buyers can trust.",
-    image: createYourFreeAccountAsset.url,
+    image: createYourFreeAccountAsset,
     alt: "Mobile signup and verification artwork with a car, motorcycle, shield, and Philippine-inspired styling.",
   },
   {
@@ -106,7 +106,7 @@ const AUDIENCE_PANELS: ImagePanel[] = [
     title: "Get found by people already shopping for motor",
     description:
       "Shops, towing, parts stores, and service businesses show up where people search, browse, and compare near them.",
-    image: shopsAndBusinessesAsset.url,
+    image: shopsAndBusinessesAsset,
     alt: "Auto shop and service businesses presented in 365 visual style.",
   },
 ];
@@ -116,7 +116,7 @@ const TRUST_CARDS: VisualCard[] = [
     eyebrow: "Reach",
     title: "All PH regions",
     description: "Vehicles, bikes, businesses, delivery, and service demand visible across the country.",
-    image: allPhRegionsAsset.url,
+    image: allPhRegionsAsset,
     alt: "Map of the Philippines with automotive coverage markers across regions.",
     icon: Car,
   },
@@ -124,7 +124,7 @@ const TRUST_CARDS: VisualCard[] = [
     eyebrow: "Momentum",
     title: "Growing weekly",
     description: "More verified shops, more listings, and more reasons for first-time scanners to stay and explore.",
-    image: growingWeeklyAsset.url,
+    image: growingWeeklyAsset,
     alt: "Automotive business growth artwork with an upward trend line.",
     icon: Store,
   },
@@ -132,7 +132,7 @@ const TRUST_CARDS: VisualCard[] = [
     eyebrow: "Coverage",
     title: "Nationwide map",
     description: "Search by area and connect across Luzon, Visayas, and Mindanao in one motor-focused network.",
-    image: nationwideMapAsset.url,
+    image: nationwideMapAsset,
     alt: "Nationwide map with connected vehicle and motorcycle routes.",
     icon: MapPin,
   },
@@ -140,7 +140,7 @@ const TRUST_CARDS: VisualCard[] = [
     eyebrow: "Trust",
     title: "Verified accounts",
     description: "Identity and business checks help buyers and sellers see who they are really dealing with.",
-    image: verifiedAccountsAsset.url,
+    image: verifiedAccountsAsset,
     alt: "Verified account and security artwork for 365 Motor Sales.",
     icon: Shield,
   },
@@ -152,7 +152,7 @@ const HOW_IT_WORKS_CARDS: VisualCard[] = [
     eyebrow: "Entry",
     title: "Scan or visit",
     description: "You arrived from a QR or link, so there is no app install barrier before browsing.",
-    image: scanOrVisitAsset.url,
+    image: scanOrVisitAsset,
     alt: "Person scanning a QR code on a tricycle with a mobile phone.",
     icon: QrCode,
   },
@@ -161,7 +161,7 @@ const HOW_IT_WORKS_CARDS: VisualCard[] = [
     eyebrow: "Account",
     title: "Create your free account",
     description: "Buyers, sellers, and businesses all start with one clean account and one verification flow.",
-    image: createYourFreeAccountAsset.url,
+    image: createYourFreeAccountAsset,
     alt: "Create account visual with mobile verification and security styling.",
     icon: Users,
   },
@@ -170,7 +170,7 @@ const HOW_IT_WORKS_CARDS: VisualCard[] = [
     eyebrow: "Marketplace",
     title: "List or browse",
     description: "Filter real vehicles, parts, and services or post your own listing in a marketplace built for motor.",
-    image: carsAndMotorcyclesAsset.url,
+    image: carsAndMotorcyclesAsset,
     alt: "Cars and motorcycles marketplace artwork.",
     icon: Search,
   },
@@ -179,7 +179,7 @@ const HOW_IT_WORKS_CARDS: VisualCard[] = [
     eyebrow: "Trust",
     title: "Message & close",
     description: "Talk directly with verified sellers and businesses, then move to inspection, meetup, and deal closing.",
-    image: verifiedAccountsAsset.url,
+    image: verifiedAccountsAsset,
     alt: "Verified marketplace and secure account artwork.",
     icon: MessageSquare,
   },
@@ -190,7 +190,7 @@ const CATEGORY_CARDS: VisualCard[] = [
     eyebrow: "Marketplace",
     title: "Cars & Motorcycles",
     description: "Brand-new, used, and project units across the Philippines in one search experience.",
-    image: carsAndMotorcyclesAsset.url,
+    image: carsAndMotorcyclesAsset,
     alt: "Cars and motorcycles category artwork.",
     icon: Car,
   },
@@ -198,7 +198,7 @@ const CATEGORY_CARDS: VisualCard[] = [
     eyebrow: "Catalog",
     title: "Parts & Accessories",
     description: "OEM, aftermarket, performance, and consumables presented in a cleaner parts-shopping flow.",
-    image: partsAndAccessoriesAsset.url,
+    image: partsAndAccessoriesAsset,
     alt: "Parts and accessories category artwork showing wheels, brakes, suspension, and tools.",
     icon: Wrench,
   },
@@ -206,7 +206,7 @@ const CATEGORY_CARDS: VisualCard[] = [
     eyebrow: "Directory",
     title: "Shops & Businesses",
     description: "Dealerships, repair shops, detailing, tire centers, and motor businesses that want real visibility.",
-    image: shopsAndBusinessesAsset.url,
+    image: shopsAndBusinessesAsset,
     alt: "Shops and businesses category artwork showing automotive businesses.",
     icon: Store,
   },
@@ -214,7 +214,7 @@ const CATEGORY_CARDS: VisualCard[] = [
     eyebrow: "Logistics",
     title: "Tow & Delivery",
     description: "On-demand towing and vehicle delivery presented in the same trusted 365 visual system.",
-    image: towAndDeliveryAsset.url,
+    image: towAndDeliveryAsset,
     alt: "Tow and delivery category artwork showing a flatbed truck carrying a car and motorcycle.",
     icon: Truck,
   },
@@ -225,21 +225,21 @@ const SAFETY_CARDS: VisualCard[] = [
     eyebrow: "Verification",
     title: "Verified identities",
     description: "Sellers and businesses verify by phone, email, ID, and documents before earning visible trust signals.",
-    image: verifiedAccountsAsset.url,
+    image: verifiedAccountsAsset,
     alt: "Verified identity and secure marketplace artwork.",
   },
   {
     eyebrow: "Safe start",
     title: "Meet in safe places",
     description: "Use mapped businesses, public locations, and known service points to keep inspections and meetups safer.",
-    image: scanOrVisitAsset.url,
+    image: scanOrVisitAsset,
     alt: "Real-world QR scan and marketplace entry artwork.",
   },
   {
     eyebrow: "Support",
     title: "Report & moderation",
     description: "Every listing and conversation can be flagged so the platform can respond faster when something looks wrong.",
-    image: createYourFreeAccountAsset.url,
+    image: createYourFreeAccountAsset,
     alt: "Secure account and moderation-support artwork.",
   },
 ];
@@ -444,7 +444,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             <section className="mt-6 sm:mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
               <div>
                 <SectionBanner
-                  image={findVehiclesBannerAsset.url}
+                  image={findVehiclesBannerAsset}
                   alt="365 Motor Sales — Find vehicles, parts and services faster across the Philippines."
                   className="mb-4"
                 />
@@ -504,7 +504,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             <section className="mt-12">
               <div className="mb-6 grid items-center gap-6 md:grid-cols-2">
                 <SectionBanner
-                  image={postConnectSellBannerAsset.url}
+                  image={postConnectSellBannerAsset}
                   alt="Post. Connect. Sell. — Create an account, post listings and connect with buyers."
                   className="w-full"
                 />
@@ -539,7 +539,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             <section className="mt-12">
               <div className="mb-6 grid items-center gap-6 md:grid-cols-2">
                 <SectionBanner
-                  image={onePlatformBannerAsset.url}
+                  image={onePlatformBannerAsset}
                   alt="One platform, many opportunities — Marketplace, services, logistics, learning and growth."
                   className="w-full"
                 />
@@ -574,7 +574,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             <section className="mt-12">
               <div className="mb-6 grid items-center gap-6 md:grid-cols-2">
                 <SectionBanner
-                  image={discoverServicesBannerAsset.url}
+                  image={discoverServicesBannerAsset}
                   alt="Discover motor services near you — from towing to parts stores, nationwide."
                   className="w-full"
                 />

@@ -1,6 +1,6 @@
 /**
  * SYNC GROUP: inspection-services
- * Source of truth: .lovable/sync-groups.md#inspection-services
+ * Source of truth: docs/sync-groups.md#inspection-services
  * Siblings: src/routes/services.inspection.tsx
  * On change: bump VERSION + update sync-groups.md
  * VERSION: 1

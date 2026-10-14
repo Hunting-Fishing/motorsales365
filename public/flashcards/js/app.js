@@ -16,7 +16,7 @@
 
   /* ---- Persistent store (points + mistakes), graceful fallback ----
    * Mirrors per-card progress to the parent window via postMessage so the
-   * React shell can persist it to Lovable Cloud for the signed-in user.
+   * React shell can persist it to Supabase for the signed-in user.
    * Parent may seed aggregate stats back via a `flashcards-init` message. */
   function postToParent(msg){ try { if (window.parent && window.parent !== window) window.parent.postMessage(msg, "*"); } catch (e) {} }
   var Store = (function () {

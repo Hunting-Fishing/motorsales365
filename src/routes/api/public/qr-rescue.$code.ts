@@ -4,9 +4,9 @@ import { createFileRoute } from "@tanstack/react-router";
  * Public pass-through: `/api/public/qr-rescue/<code>` → `/r/<code>?src=qr&rescued=1`.
  *
  * Use this URL for any *new* print run or wherever we need a stable rescue
- * target. If Lovable Support ever configures the legacy preview host to
- * forward requests to our origin, aiming them at this path guarantees the
- * hit is logged AND redirected to the canonical referral landing.
+ * target. If a legacy preview host is ever configured to forward requests
+ * to our origin, aiming them at this path guarantees the hit is logged AND
+ * redirected to the canonical referral landing.
  */
 export const Route = createFileRoute("/api/public/qr-rescue/$code")({
   server: {

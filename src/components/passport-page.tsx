@@ -1,6 +1,6 @@
 /**
  * SYNC GROUP: vehicle-passport
- * Source of truth: .lovable/sync-groups.md#vehicle-passport
+ * Source of truth: docs/sync-groups.md#vehicle-passport
  * Extracted from src/routes/passport.$slug.tsx to avoid TanStack
  * router-plugin code-splitter parse bug on large inline components.
  * VERSION: 3

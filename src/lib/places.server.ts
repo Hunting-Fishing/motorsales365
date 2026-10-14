@@ -2,7 +2,8 @@
 // nearby search (admin-only import flow). Must NOT be imported from client code.
 // The router blocks *.server.ts from the client bundle.
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
+// Google Places API (New) — called directly with a server-side API key.
+const PLACES_API_URL = "https://places.googleapis.com/v1";
 
 // Nominatim usage policy: descriptive User-Agent, <=1 req/sec, attribution in UI.
 // https://operations.osmfoundation.org/policies/nominatim/
@@ -10,14 +11,9 @@ const NOMINATIM_URL = "https://nominatim.openstreetmap.org";
 const NOMINATIM_UA = "365MotorSales/1.0 (https://365motorsales.com; support@365motorsales.com)";
 
 function authHeaders(): Record<string, string> {
-  const lovable = process.env.LOVABLE_API_KEY;
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-  if (!lovable) throw new Error("LOVABLE_API_KEY is not configured");
-  if (!apiKey) throw new Error("Google Maps connector is not linked (GOOGLE_MAPS_API_KEY missing)");
-  return {
-    Authorization: `Bearer ${lovable}`,
-    "X-Connection-Api-Key": apiKey,
-  };
+  if (!apiKey) throw new Error("Google Maps is not configured (GOOGLE_MAPS_API_KEY missing)");
+  return { "X-Goog-Api-Key": apiKey };
 }
 
 export type GeocodeResult = {
@@ -107,7 +103,7 @@ export async function searchNearbyPlaces(opts: {
       },
     },
   };
-  const res = await fetch(`${GATEWAY_URL}/places/v1/places:searchNearby`, {
+  const res = await fetch(`${PLACES_API_URL}/places:searchNearby`, {
     method: "POST",
     headers: {
       ...authHeaders(),

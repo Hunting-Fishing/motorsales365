@@ -3,8 +3,8 @@ import { ExternalLink, Sparkles, ChevronLeft, ChevronRight } from "lucide-react"
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import brLogo from "@/assets/business-ready-logo.png.asset.json";
-import brCover from "@/assets/business-ready-cover.png.asset.json";
+import brLogo from "@/assets/business-ready-logo.png";
+import brCover from "@/assets/business-ready-cover.png";
 
 /**
  * Sponsored Business Ready brand panel for /learn.
@@ -71,7 +71,7 @@ export function BusinessReadyRail({ className }: { className?: string }) {
       >
         {/* Full-bleed banner background */}
         <img
-          src={brCover.url}
+          src={brCover}
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
@@ -91,7 +91,7 @@ export function BusinessReadyRail({ className }: { className?: string }) {
           >
 
             <img
-              src={brLogo.url}
+              src={brLogo}
               alt="Business Ready"
               className="relative h-20 w-20 rounded-xl border bg-background object-contain p-2 shadow-sm"
               loading="lazy"

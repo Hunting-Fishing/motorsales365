@@ -1,6 +1,6 @@
 /**
  * SYNC GROUP: vehicle-passport
- * Source of truth: .lovable/sync-groups.md#vehicle-passport
+ * Source of truth: docs/sync-groups.md#vehicle-passport
  * VERSION: 5
  */
 import { createServerFn } from "@tanstack/react-start";

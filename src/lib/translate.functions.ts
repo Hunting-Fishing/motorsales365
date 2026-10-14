@@ -2,13 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
+import { AI_MODELS, chatCompletion, isAiConfigured } from "@/lib/ai/provider.server";
 
 const codes = SUPPORTED_LANGUAGES.map((l) => l.code) as [string, ...string[]];
 
 /**
  * On-demand translation of user-generated content (listing descriptions,
- * messages) via the Lovable AI Gateway. No API key needed — the gateway
- * injects credentials on Cloudflare Workers.
+ * messages) via the configured OpenAI-compatible AI provider
+ * (see src/lib/ai/provider.server.ts).
  */
 export const translateText = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -21,33 +22,25 @@ export const translateText = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) {
-      return { text: data.text, translated: false, error: "AI gateway unavailable" };
+    if (!isAiConfigured()) {
+      return { text: data.text, translated: false, error: "AI provider unavailable" };
     }
     const langName =
       SUPPORTED_LANGUAGES.find((l) => l.code === data.target)?.label ?? data.target;
 
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a translator. Translate the user's text to the requested target language. Preserve line breaks, numbers, prices, model names, and proper nouns. Return ONLY the translated text — no quotes, no preamble.",
-          },
-          {
-            role: "user",
-            content: `Target language: ${langName}\n\nText:\n${data.text}`,
-          },
-        ],
-      }),
+    const resp = await chatCompletion({
+      model: AI_MODELS.flash,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a translator. Translate the user's text to the requested target language. Preserve line breaks, numbers, prices, model names, and proper nouns. Return ONLY the translated text — no quotes, no preamble.",
+        },
+        {
+          role: "user",
+          content: `Target language: ${langName}\n\nText:\n${data.text}`,
+        },
+      ],
     });
 
     if (!resp.ok) {

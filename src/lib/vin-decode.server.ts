@@ -5,6 +5,7 @@
 
 import type { WmiRow } from "@/data/vin-vds-tables";
 import { lookupVds, lookupWmi, regionFromWmi, type Region } from "@/data/vin-vds-tables";
+import { AI_MODELS, chatCompletion, isAiConfigured } from "@/lib/ai/provider.server";
 
 export type DecodedFields = {
   year?: string;
@@ -185,17 +186,16 @@ export function structuralDecode(vin: string): DecodePartial | null {
   return { fields, sources, region };
 }
 
-// --- AI Gateway fallback -------------------------------------------------
+// --- AI provider fallback -------------------------------------------------
 
-const AI_MODEL = "google/gemini-3-flash-preview";
+const AI_MODEL = AI_MODELS.flashNext;
 
 export async function aiDecode(opts: {
   vin: string;
   region: Region;
   known: DecodedFields;
 }): Promise<DecodePartial | null> {
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key) return null;
+  if (!isAiConfigured()) return null;
 
   const missingList = FIELD_KEYS.filter((k) => !opts.known[k]).join(", ");
   if (!missingList) return null;
@@ -209,17 +209,10 @@ Return strict JSON with exactly these keys (use null when you cannot confidently
 Never invent — a wrong guess is worse than null.`;
 
   try {
-    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Lovable-API-Key": key,
-      },
-      body: JSON.stringify({
-        model: AI_MODEL,
-        messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" },
-      }),
+    const r = await chatCompletion({
+      model: AI_MODEL,
+      messages: [{ role: "user", content: prompt }],
+      responseFormat: { type: "json_object" },
     });
     if (!r.ok) return null;
     const json = (await r.json()) as { choices?: Array<{ message?: { content?: string } }> };
