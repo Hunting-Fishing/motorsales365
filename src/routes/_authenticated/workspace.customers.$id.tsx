@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import { Loader2, ArrowLeft, Car, Wrench, Mail, Phone, MapPin, Building2 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,90 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { smSupabase } from "@/lib/shop-manager/db";
+import { getCustomerDetailSnapshot } from "@/lib/customer-detail.functions";
+import type { CustomerDetail as CustomerRecord } from "@/lib/customer-detail";
 import { CustomerCommunicationsLog } from "@/components/shop-manager/customer-communications-log";
 import { CustomerRemindersCard } from "@/components/shop-manager/customer-reminders-card";
 import { CustomerCommercialHistory } from "@/components/shop-manager/customer-commercial-history";
 import { CustomerVehicleActivity } from "@/components/shop-manager/customer-vehicle-activity";
 import { useAuth } from "@/hooks/use-auth";
-
-type Customer = {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  email: string | null;
-  phone: string | null;
-  address: string | null;
-  city: string | null;
-  state: string | null;
-  postal_code: string | null;
-  country: string | null;
-  company: string | null;
-  notes: string | null;
-  is_fleet: boolean | null;
-  fleet_company: string | null;
-  business_type: string | null;
-  business_email: string | null;
-  business_phone: string | null;
-  communication_preference: string | null;
-  referral_source: string | null;
-  created_at: string | null;
-};
-
-type Vehicle = {
-  id: string;
-  customer_id: string | null;
-  make: string | null;
-  model: string | null;
-  year: number | null;
-  vin: string | null;
-  license_plate: string | null;
-  color: string | null;
-  last_service_date: string | null;
-};
-
-type WorkOrder = {
-  id: string;
-  work_order_number: string | null;
-  status: string | null;
-  description: string | null;
-  total_cost: number | null;
-  created_at: string | null;
-  vehicle_id: string | null;
-};
-
-async function fetchCustomer(id: string): Promise<Customer | null> {
-  const { data, error } = await (smSupabase as any)
-    .from("customers")
-    .select(
-      "id, first_name, last_name, email, phone, address, city, state, postal_code, country, company, notes, is_fleet, fleet_company, business_type, business_email, business_phone, communication_preference, referral_source, created_at",
-    )
-    .eq("id", id)
-    .maybeSingle();
-  if (error) throw error;
-  return data as Customer | null;
-}
-
-async function fetchVehicles(customerId: string): Promise<Vehicle[]> {
-  const { data, error } = await (smSupabase as any)
-    .from("vehicles")
-    .select("id, customer_id, make, model, year, vin, license_plate, color, last_service_date")
-    .eq("customer_id", customerId)
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data ?? []) as Vehicle[];
-}
-
-async function fetchWorkOrders(customerId: string): Promise<WorkOrder[]> {
-  const { data, error } = await (smSupabase as any)
-    .from("work_orders")
-    .select("id, work_order_number, status, description, total_cost, created_at, vehicle_id")
-    .eq("customer_id", customerId)
-    .order("created_at", { ascending: false })
-    .limit(100);
-  if (error) throw error;
-  return (data ?? []) as WorkOrder[];
-}
 
 export const Route = createFileRoute("/_authenticated/workspace/customers/$id")({
   head: () => ({
@@ -142,9 +67,10 @@ function fmtCurrency(n: number | null | undefined) {
 function fmtDate(s: string | null | undefined) {
   if (!s) return "—";
   try {
-    return new Date(s).toLocaleDateString();
+    const date = new Date(s);
+    return Number.isNaN(date.getTime()) ? "—" : date.toLocaleDateString();
   } catch {
-    return s;
+    return "—";
   }
 }
 
@@ -156,22 +82,31 @@ function CustomerDetail() {
 }
 
 function PrivateCustomerDetail({ id, accountId }: { id: string; accountId: string }) {
+  const readCustomer = useServerFn(getCustomerDetailSnapshot);
+  const [refreshing, setRefreshing] = useState(false);
   const customerQ = useQuery({
     queryKey: ["shop-manager", accountId, "customer", id],
-    queryFn: () => fetchCustomer(id),
+    queryFn: ({ signal }) =>
+      readCustomer({
+        data: { expectedAccountId: accountId, customerId: id, kind: "customer" },
+        signal,
+      }),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    placeholderData: undefined,
+    retry: false,
   });
-  const vehiclesQ = useQuery({
-    queryKey: ["shop-manager", accountId, "customer", id, "vehicles"],
-    queryFn: () => fetchVehicles(id),
-    enabled: !!customerQ.data,
-  });
-  const workOrdersQ = useQuery({
-    queryKey: ["shop-manager", accountId, "customer", id, "work-orders"],
-    queryFn: () => fetchWorkOrders(id),
-    enabled: !!customerQ.data,
-  });
+  const refreshCustomer = async () => {
+    setRefreshing(true);
+    try {
+      await customerQ.refetch();
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
-  if (customerQ.isLoading) {
+  if (refreshing || customerQ.isFetching || customerQ.isPending || !customerQ.isFetchedAfterMount) {
     return (
       <SiteLayout>
         <div className="mx-auto max-w-5xl px-4 py-10 flex items-center gap-2 text-muted-foreground">
@@ -186,15 +121,15 @@ function PrivateCustomerDetail({ id, accountId }: { id: string; accountId: strin
       <SiteLayout>
         <div className="mx-auto max-w-4xl px-4 py-10" role="alert">
           <p>Could not load this customer.</p>
-          <Button className="mt-3" onClick={() => void customerQ.refetch()}>
+          <Button className="mt-3" onClick={() => void refreshCustomer()}>
             Retry customer
           </Button>
         </div>
       </SiteLayout>
     );
   }
-  const c = customerQ.data;
-  if (!c) {
+  const c = customerQ.data?.kind === "customer" ? customerQ.data.customer : null;
+  if (!c || c.id.toLowerCase() !== id.toLowerCase()) {
     return (
       <SiteLayout>
         <div className="mx-auto max-w-4xl px-4 py-10 space-y-4">
@@ -208,6 +143,86 @@ function PrivateCustomerDetail({ id, accountId }: { id: string; accountId: strin
       </SiteLayout>
     );
   }
+
+  // Revalidation unmounts private children and list observers. A fresh primary
+  // result is a UI gate, not a replacement for each request's own RLS checks.
+  return <CustomerBody c={c} id={id} accountId={accountId} onRefresh={refreshCustomer} />;
+}
+
+function CustomerBody({
+  c,
+  id,
+  accountId,
+  onRefresh,
+}: {
+  c: CustomerRecord;
+  id: string;
+  accountId: string;
+  onRefresh: () => Promise<void>;
+}) {
+  const readCustomer = useServerFn(getCustomerDetailSnapshot);
+  const [refreshingVehicles, setRefreshingVehicles] = useState(false);
+  const [refreshingWorkOrders, setRefreshingWorkOrders] = useState(false);
+  const vehiclesQ = useQuery({
+    queryKey: ["shop-manager", accountId, "customer", id, "vehicles"],
+    queryFn: ({ signal }) =>
+      readCustomer({
+        data: { expectedAccountId: accountId, customerId: id, kind: "vehicles" },
+        signal,
+      }),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    placeholderData: undefined,
+    retry: false,
+  });
+  const workOrdersQ = useQuery({
+    queryKey: ["shop-manager", accountId, "customer", id, "work-orders"],
+    queryFn: ({ signal }) =>
+      readCustomer({
+        data: { expectedAccountId: accountId, customerId: id, kind: "work_orders" },
+        signal,
+      }),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    placeholderData: undefined,
+    retry: false,
+  });
+  const vehiclesLoading = refreshingVehicles || vehiclesQ.isFetching || vehiclesQ.isPending;
+  const workOrdersLoading = refreshingWorkOrders || workOrdersQ.isFetching || workOrdersQ.isPending;
+  const vehicleResult =
+    !vehiclesLoading &&
+    vehiclesQ.isSuccess &&
+    vehiclesQ.isFetchedAfterMount &&
+    vehiclesQ.data.kind === "vehicles"
+      ? vehiclesQ.data
+      : null;
+  const workOrderResult =
+    !workOrdersLoading &&
+    workOrdersQ.isSuccess &&
+    workOrdersQ.isFetchedAfterMount &&
+    workOrdersQ.data.kind === "work_orders"
+      ? workOrdersQ.data
+      : null;
+  const vehicles = vehicleResult?.available ? vehicleResult.rows : [];
+  const workOrders = workOrderResult?.available ? workOrderResult.rows : [];
+  const retryVehicles = async () => {
+    setRefreshingVehicles(true);
+    try {
+      await vehiclesQ.refetch();
+    } finally {
+      setRefreshingVehicles(false);
+    }
+  };
+  const retryWorkOrders = async () => {
+    setRefreshingWorkOrders(true);
+    try {
+      await workOrdersQ.refetch();
+    } finally {
+      setRefreshingWorkOrders(false);
+    }
+  };
 
   const fullName = [c.first_name, c.last_name].filter(Boolean).join(" ") || "Unnamed customer";
   const addressLine = [c.address, c.city, c.state, c.postal_code, c.country]
@@ -223,11 +238,16 @@ function PrivateCustomerDetail({ id, accountId }: { id: string; accountId: strin
               <ArrowLeft className="h-4 w-4 mr-1" /> Customers
             </Link>
           </Button>
-          <Button asChild size="sm">
-            <Link to="/workspace/work-orders/new" search={{ customerId: c.id } as any}>
-              <Wrench className="h-4 w-4 mr-1" /> New work order
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => void onRefresh()}>
+              Refresh customer
+            </Button>
+            <Button asChild size="sm">
+              <Link to="/workspace/work-orders/new" search={{ customerId: c.id } as any}>
+                <Wrench className="h-4 w-4 mr-1" /> New work order
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div>
@@ -307,63 +327,80 @@ function PrivateCustomerDetail({ id, accountId }: { id: string; accountId: strin
         <CustomerCommercialHistory customerId={c.id} />
         <CustomerVehicleActivity
           customerId={c.id}
-          vehicles={vehiclesQ.data ?? []}
-          vehiclesLoading={vehiclesQ.isPending}
-          vehiclesError={vehiclesQ.isError}
+          vehicles={vehicles}
+          vehiclesLoading={
+            vehiclesLoading || (!vehiclesQ.isError && !vehiclesQ.isFetchedAfterMount)
+          }
+          vehiclesError={vehiclesQ.isError || (!!vehicleResult && !vehicleResult.available)}
         />
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
-              <Car className="h-4 w-4" /> Vehicles ({vehiclesQ.data?.length ?? 0})
+              <Car className="h-4 w-4" /> Vehicles (
+              {vehicleResult?.available
+                ? `${vehicles.length}${vehicleResult.hasMore ? "+" : ""}`
+                : "—"}
+              )
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {vehiclesQ.isError ? (
-              <div role="alert">
-                <p>Could not load vehicles.</p>
-                <Button variant="outline" size="sm" onClick={() => void vehiclesQ.refetch()}>
-                  Retry vehicles
-                </Button>
-              </div>
-            ) : vehiclesQ.isLoading ? (
+            {vehiclesLoading || (!vehiclesQ.isError && !vehiclesQ.isFetchedAfterMount) ? (
               <div className="text-muted-foreground text-sm flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading vehicles…
               </div>
-            ) : (vehiclesQ.data?.length ?? 0) === 0 ? (
+            ) : vehiclesQ.isError ? (
+              <div role="alert">
+                <p>Could not load vehicles.</p>
+                <Button variant="outline" size="sm" onClick={() => void retryVehicles()}>
+                  Retry vehicles
+                </Button>
+              </div>
+            ) : !vehicleResult?.available ? (
+              <p className="text-sm text-muted-foreground">
+                Vehicles unavailable. Refresh customer to check access.
+              </p>
+            ) : vehicles.length === 0 ? (
               <p className="text-sm text-muted-foreground">No vehicles on file.</p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Vehicle</TableHead>
-                    <TableHead>Plate</TableHead>
-                    <TableHead>VIN</TableHead>
-                    <TableHead>Last service</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {vehiclesQ.data!.map((v) => (
-                    <TableRow key={v.id}>
-                      <TableCell>
-                        <Link
-                          to="/workspace/vehicles/$id"
-                          params={{ id: v.id }}
-                          className="text-primary hover:underline font-medium"
-                        >
-                          {[v.year, v.make, v.model].filter(Boolean).join(" ") || "Vehicle"}
-                        </Link>
-                        {v.color ? (
-                          <span className="text-muted-foreground"> · {v.color}</span>
-                        ) : null}
-                      </TableCell>
-                      <TableCell>{v.license_plate || "—"}</TableCell>
-                      <TableCell className="font-mono text-xs">{v.vin || "—"}</TableCell>
-                      <TableCell>{fmtDate(v.last_service_date)}</TableCell>
+              <>
+                {vehicleResult.hasMore ? (
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Showing the 100 most recent visible vehicles.
+                  </p>
+                ) : null}
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Vehicle</TableHead>
+                      <TableHead>Plate</TableHead>
+                      <TableHead>VIN</TableHead>
+                      <TableHead>Last service</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {vehicles.map((v) => (
+                      <TableRow key={v.id}>
+                        <TableCell>
+                          <Link
+                            to="/workspace/vehicles/$id"
+                            params={{ id: v.id }}
+                            className="text-primary hover:underline font-medium"
+                          >
+                            {[v.year, v.make, v.model].filter(Boolean).join(" ") || "Vehicle"}
+                          </Link>
+                          {v.color ? (
+                            <span className="text-muted-foreground"> · {v.color}</span>
+                          ) : null}
+                        </TableCell>
+                        <TableCell>{v.license_plate || "—"}</TableCell>
+                        <TableCell className="font-mono text-xs">{v.vin || "—"}</TableCell>
+                        <TableCell>{fmtDate(v.last_service_date)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </>
             )}
           </CardContent>
         </Card>
@@ -371,56 +408,71 @@ function PrivateCustomerDetail({ id, accountId }: { id: string; accountId: strin
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
-              <Wrench className="h-4 w-4" /> Work order history ({workOrdersQ.data?.length ?? 0})
+              <Wrench className="h-4 w-4" /> Work order history (
+              {workOrderResult?.available
+                ? `${workOrders.length}${workOrderResult.hasMore ? "+" : ""}`
+                : "—"}
+              )
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {workOrdersQ.isError ? (
-              <div role="alert">
-                <p>Could not load work order history.</p>
-                <Button variant="outline" size="sm" onClick={() => void workOrdersQ.refetch()}>
-                  Retry work orders
-                </Button>
-              </div>
-            ) : workOrdersQ.isLoading ? (
+            {workOrdersLoading || (!workOrdersQ.isError && !workOrdersQ.isFetchedAfterMount) ? (
               <div className="text-muted-foreground text-sm flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading history…
               </div>
-            ) : (workOrdersQ.data?.length ?? 0) === 0 ? (
+            ) : workOrdersQ.isError ? (
+              <div role="alert">
+                <p>Could not load work order history.</p>
+                <Button variant="outline" size="sm" onClick={() => void retryWorkOrders()}>
+                  Retry work orders
+                </Button>
+              </div>
+            ) : !workOrderResult?.available ? (
+              <p className="text-sm text-muted-foreground">
+                Work order history unavailable. Refresh customer to check access.
+              </p>
+            ) : workOrders.length === 0 ? (
               <p className="text-sm text-muted-foreground">No work orders yet.</p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>#</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {workOrdersQ.data!.map((w) => (
-                    <TableRow key={w.id}>
-                      <TableCell>
-                        <Link
-                          to="/workspace/work-orders/$id"
-                          params={{ id: w.id }}
-                          className="text-primary hover:underline font-medium"
-                        >
-                          {w.work_order_number || w.id.slice(0, 8)}
-                        </Link>
-                      </TableCell>
-                      <TableCell>{fmtDate(w.created_at)}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{w.status || "—"}</Badge>
-                      </TableCell>
-                      <TableCell className="max-w-md truncate">{w.description || "—"}</TableCell>
-                      <TableCell className="text-right">{fmtCurrency(w.total_cost)}</TableCell>
+              <>
+                {workOrderResult.hasMore ? (
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Showing the 100 most recent visible work orders.
+                  </p>
+                ) : null}
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>#</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead className="text-right">Total</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {workOrders.map((w) => (
+                      <TableRow key={w.id}>
+                        <TableCell>
+                          <Link
+                            to="/workspace/work-orders/$id"
+                            params={{ id: w.id }}
+                            className="text-primary hover:underline font-medium"
+                          >
+                            {w.work_order_number || w.id.slice(0, 8)}
+                          </Link>
+                        </TableCell>
+                        <TableCell>{fmtDate(w.created_at)}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{w.status || "—"}</Badge>
+                        </TableCell>
+                        <TableCell className="max-w-md truncate">{w.description || "—"}</TableCell>
+                        <TableCell className="text-right">{fmtCurrency(w.total_cost)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </>
             )}
           </CardContent>
         </Card>
