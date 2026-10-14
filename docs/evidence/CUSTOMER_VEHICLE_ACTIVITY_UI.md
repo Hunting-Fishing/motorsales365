@@ -4,7 +4,8 @@
 reader candidate PR #22. This is repository implementation, **not a live feature
 release**. No database, storage, historical SQL or platform configuration changes.
 Draft PR #23: `https://github.com/Hunting-Fishing/motorsales365/pull/23`,
-code `9f3f7b8`; full-checkout CI is pending. Reader parent `ec4671e` passed
+code `9f3f7b8`; latest docs head `3a3f1f2` passed all six CI gates
+(run `38631111334`). Reader parent `ec4671e` passed
 all six gates (run `38629630823`), not a database or hosting release.
 
 ## Delivered contract
