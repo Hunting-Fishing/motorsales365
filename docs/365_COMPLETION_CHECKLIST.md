@@ -23,8 +23,10 @@ Security reconciliation branch: `completion/365-security`.
    identity count review queries are implemented/tested offline, not executed
    against production. Unchanged staff/chat/native offboarding transactions are
    now rehearsed offline with actual CHECKs and all three observed staff triggers.
-   Next extend the bounded inventory conservatively and define/test the companion
-   authority contract; resolve the initial
+   The bounded inventory now includes concrete chat/timestamp/work-location and
+   incoming writer paths without closing unknowns. Next recover current selected
+   chat policy/incoming attachment metadata, compose it offline, then define/test
+   the companion authority contract; resolve the initial
    dependency inventory's identity, role/module helper and trigger/security
    attachment closure; rehearse the companion roster/native guard with actual
    constraints and all trigger effects. Keep unknown bindings and offboarding
@@ -441,7 +443,8 @@ role cleanup versus shop-filtered legacy profile detachment. These are synthetic
 source behaviors, not live incident, mitigation or offboarding acceptance.
 
 Focused tests9/9 (6.365s), own-file lint/format and independent read-only review
-pass. Full sequential tooling215/215 (125.53s); remote CI pending verification.
+pass. Full sequential tooling215/215 (125.53s). Docs `4100bbf` passed all six
+CI gates (run `38650592549`), verified on the inventory follow-up.
 Exact publication verification is recorded in
 `evidence/NATIVE_STAFF_TRIGGER_COMPOSITION_PROOF.md`. Five selected function
 fingerprints/config/owners/effective ACLs, three staff attachments and four
@@ -454,7 +457,7 @@ verified parent. Explicit correspondence404/423,19 unclassified and all false
 baseline/replay/parity/release flags remain unchanged. Hosting separately fails;
 sparse artifacts must not deploy. Pending helper approval unchanged.
 
-Exact next action: implement the narrowly tested evidence projectRef identity
+Original next action (implemented in the checkpoint below): implement the narrowly tested evidence projectRef identity
 adapter, then extend the bounded native inventory with concrete chat/timestamp/
 default-location/incoming-business attachments and narrowly dated metadata,
 retaining unknown facets/cycles/false flags. The exact scope and source pins are
@@ -464,6 +467,46 @@ protection, delegation/deletion/invitation provenance, valid atomic offboarding,
 multi-roster scope and audit/concurrency. No production guard/repair is authorized
 by these tests. Continue separate baseline/forward/recovery/API/role/load,
 consent/tenure/retention, OCR recovery/owner/mobile pilot and hosting gates.
+
+## Latest staff dependency inventory checkpoint (2026-10-15)
+
+Draft PR #35 (`https://github.com/Hunting-Fishing/motorsales365/pull/35`), code
+`8e52323`, branch `security/native-staff-dependency-inventory`, stacked on PR #34 docs
+`4100bbf`. A strict evidence project/projectRef identity adapter checks every
+present spelling against the canonical manifest project, with no malformed/
+conflicting fallback or source/applied-class promotion. Two exact source pins,
+one unchanged dated catalog and13 manual graph nodes concretize chat/timestamp/
+work-location and incoming business/shop paths while keeping broader chat and
+offboarding/audit closure explicit. All nine mandatory table facets stay unknown.
+
+Current selected scope37 sources/8 evidence (45 pins),86 objects/74 reachable,
+201 edges,18 reported DFS back-edge cycles and566 unresolved findings; classes
+26 source-correspondence/6 unclassified/5 pending-forward. CLI intentionally
+returns1/explicit_unknown_coverage with valid structure/pins. Findings/cycles are
+review obligations, not defects or a completion percentage. Composed global
+evidence404/423 with19 unclassified and all false release/parity/baseline/replay
+flags remain unchanged. Mixed dated snapshots are not atomic database parity.
+
+Focused metadata tests26/26 (five new), lint and independent read-only review
+pass. Full sequential tooling220/220 (124.94s), format/diff pass.
+Remote CI pending verification on the published documentation head.
+Publication evidence: `evidence/NATIVE_STAFF_DEPENDENCY_INVENTORY.md`.
+Migration impact: none. Deployment: none; no new live query or writer/count/RPC,
+permission/data/history/platform change. Application source remains723-test
+verified parent. Hosting remains a separate blocker; sparse artifacts must not deploy.
+
+Exact next action: verify the published head's checks. Recover narrowly selected
+catalog-only current chat helper/policy and incoming shop/business plus shift/
+register/work-location attachment/index metadata; compare actual corresponding
+source without broad sweep/backfill replay. Compose selected actual chat SELECT/
+UPDATE policy helpers on disposable fixtures before effective-membership claims.
+Then develop the offline companion contract and concurrency tests described in
+`evidence/NATIVE_STAFF_TRIGGER_COMPOSITION_PROOF.md`. Keep owner/delegation/
+invitation/multi-roster/audit choices explicit, not an assumed production guard.
+Separate baseline/forward/private-storage recovery, actual API/JWT/role/load,
+consent/tenure/retention, OCR recovery/owner/mobile pilot, trusted entry/billing/
+retail/recruitment and hosting acceptance remain open. Existing pending helper
+approval remains unchanged; no repeated question or automatic application.
 
 ## Recovery evidence (original scope, retained below)
 

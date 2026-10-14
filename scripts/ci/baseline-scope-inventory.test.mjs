@@ -2,6 +2,7 @@
 // subprocess, filesystem writes, migration execution or generated SQL.
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
@@ -92,6 +93,241 @@ function fixture() {
   return { manifest, files };
 }
 const inspect = ({ manifest, files }) => analyzeBaselineScope(manifest, files);
+function evidenceIdentity(identity) {
+  const item = fixture();
+  const { legacyApplied } = JSON.parse(item.files[1].content);
+  item.files[1].content = JSON.stringify({ ...identity, legacyApplied });
+  item.manifest.evidenceFiles[0].sha256Lf = hash(item.files[1].content);
+  return item;
+}
+
+test("canonical evidence project/projectRef spellings produce identical reports from frozen inputs, never release approval", () => {
+  const expected = inspect(fixture());
+  for (const identity of [
+    { project: canonicalProject },
+    { projectRef: canonicalProject },
+    { project: canonicalProject, projectRef: canonicalProject },
+  ]) {
+    const item = evidenceIdentity(identity);
+    const original = JSON.stringify(item);
+    freeze(item);
+    assert.deepEqual(inspect(item), expected);
+    assert.equal(JSON.stringify(item), original);
+  }
+  for (const key of [
+    "fullReplayVerified",
+    "baselineVerified",
+    "databaseReleaseApproved",
+    "exactAppliedLineageVerified",
+    "schemaParityVerified",
+    "dataParityVerified",
+    "aclParityVerified",
+    "sqlObjectIdentityVerified",
+    "attachmentsVerified",
+  ])
+    assert.equal(expected[key], false);
+});
+
+test("every present evidence identity is exact and canonical; malformed/conflicting fields cannot fall back", () => {
+  assert.throws(() => inspect(evidenceIdentity({})), /Evidence project mismatch/);
+  for (const bad of [
+    null,
+    "",
+    " ",
+    "different",
+    canonicalProject.toUpperCase(),
+    ` ${canonicalProject} `,
+    0,
+    1,
+    false,
+    true,
+    [],
+    {},
+  ]) {
+    for (const identity of [
+      { project: bad },
+      { projectRef: bad },
+      { project: bad, projectRef: canonicalProject },
+      { project: canonicalProject, projectRef: bad },
+    ])
+      assert.throws(() => inspect(evidenceIdentity(identity)), /Evidence project mismatch/);
+  }
+  for (const value of [null, "scalar", 0, false, [], [canonicalProject]]) {
+    const item = fixture();
+    item.files[1].content = JSON.stringify(value);
+    item.manifest.evidenceFiles[0].sha256Lf = hash(item.files[1].content);
+    assert.throws(() => inspect(item), /Evidence project mismatch/);
+  }
+});
+
+test("evidence projectRef cannot replace or extend canonical manifest project", () => {
+  for (const removeProject of [false, true]) {
+    const item = fixture();
+    item.manifest.projectRef = canonicalProject;
+    if (removeProject) delete item.manifest.project;
+    assert.throws(() => inspect(item), /Invalid manifest fields/);
+  }
+  const item = fixture();
+  delete item.manifest.project;
+  assert.throws(() => inspect(item), /Manifest identity\/project\/repository mismatch/);
+});
+
+test("projectRef-only catalog metadata cannot promote source-hash or whole-source/applied correspondence", () => {
+  const item = evidenceIdentity({ projectRef: canonicalProject });
+  item.files[1].content = JSON.stringify({
+    projectRef: canonicalProject,
+    functions: [{ body_md5_lf: "c".repeat(32) }],
+  });
+  item.manifest.evidenceFiles[0].sha256Lf = hash(item.files[1].content);
+  assert.throws(() => inspect(item), /Unsupported source-correspondence evidence/);
+  item.manifest.sources[0].lineageClass = "catalog-correspondence";
+  assert.throws(() => inspect(item), /Unsupported whole-source catalog correspondence/);
+  item.manifest.sources[0].lineageClass = "unclassified";
+  const report = inspect(item);
+  assert.equal(report.exitCode, 1);
+  assert.equal(report.sources[0].sourceHashCorrespondenceSupported, false);
+  assert.equal(report.sources[0].appliedLineageInferred, false);
+  assert.equal(report.sources[0].exactAppliedLineageVerified, false);
+  assert.equal(report.databaseReleaseApproved, false);
+  assert.equal(report.baselineVerified, false);
+  assert.equal(report.declaredCoverageComplete, false);
+  assert.ok(report.findings.some((row) => row.code === "UNCLASSIFIED_SOURCE"));
+});
+
+test("staff/chat inventory adds only bounded dated dependencies and keeps authority/security closure unknown", () => {
+  const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
+  const manifest = JSON.parse(
+    fs.readFileSync(
+      new URL("../../docs/evidence/baseline-native-scope-v1.json", import.meta.url),
+      "utf8",
+    ),
+  );
+  const report = runInventoryCli(["docs/evidence/baseline-native-scope-v1.json"], repositoryRoot);
+  assert.equal(report.exitCode, 1);
+  assert.equal(report.structureValid, true);
+  assert.equal(report.pinsVerified, true);
+  for (const key of [
+    "declaredCoverageComplete",
+    "fullReplayVerified",
+    "baselineVerified",
+    "databaseReleaseApproved",
+    "exactAppliedLineageVerified",
+    "schemaParityVerified",
+    "dataParityVerified",
+    "aclParityVerified",
+    "sqlObjectIdentityVerified",
+    "attachmentsVerified",
+  ])
+    assert.equal(report[key], false);
+  for (const sourceId of ["chatBase", "timestampShared"]) {
+    const row = report.sources.find((source) => source.id === sourceId);
+    assert.equal(row.lineageClass, "source-correspondence");
+    assert.equal(row.sourceHashCorrespondenceSupported, true);
+    assert.equal(row.exactAppliedLineageVerified, false);
+    assert.equal(row.appliedLineageInferred, false);
+  }
+  const evidence = manifest.evidenceFiles.find((row) => row.id === "staffTriggerCatalog");
+  assert.equal(
+    evidence.sha256Lf,
+    "5c10e2399f1bbfe4ba16f1b2cf434fd4d9cbba5e72e18185e748760e16eed567",
+  );
+  const savedCatalog = JSON.parse(
+    fs.readFileSync(path.join(repositoryRoot, evidence.path), "utf8"),
+  );
+  assert.equal(savedCatalog.projectRef, canonicalProject);
+  assert.equal(
+    Object.hasOwn(savedCatalog, "project"),
+    false,
+    "real pinned evidence exercises only the reviewed alias",
+  );
+  const newIds = [
+    "function:public.set_updated_at()",
+    "trigger:public.business_staff.trg_business_staff_updated",
+    "table:public.chat_threads",
+    "table:public.chat_thread_members",
+    "function:public.is_thread_member(uuid,uuid)",
+    "policy:public.chat_thread_members.members_see_member_rows",
+    "policy:public.chat_thread_members.user_can_update_own_membership",
+    "table:shop_manager.employee_work_locations",
+    "function:shop_manager.create_default_employee_work_location()",
+    "trigger:shop_manager.shops.shops_create_employee_work_location",
+    "function:public.trg_business_created_team_thread()",
+    "trigger:public.businesses.business_team_thread_on_create",
+    "external:staff-offboarding-and-audit-writer-closure",
+  ];
+  for (const id of newIds) {
+    assert.ok(report.reachableObjectIds.includes(id), `${id}: declared reachable`);
+    assert.equal(manifest.objects.find((row) => row.id === id).disposition, "unverified");
+  }
+  for (const table of manifest.objects.filter((row) => row.kind === "table"))
+    for (const facet of [
+      "owner",
+      "columns",
+      "defaults",
+      "sequences",
+      "constraints",
+      "indexes",
+      "policies",
+      "grants",
+      "triggers",
+    ])
+      assert.equal(
+        table.facets[facet],
+        "unreviewed",
+        `${table.id}:${facet}: no blanket table promotion`,
+      );
+  for (const record of savedCatalog.functions) {
+    const signature = record.signature.includes(".")
+      ? record.signature
+      : `public.${record.signature}`;
+    const row = manifest.objects.find((node) => node.id === `function:${signature}`);
+    assert.equal(
+      row.facets.catalog20261014EffectiveAnonAndAuthenticatedExecuteDeniedServiceAllowed,
+      "source-observed",
+    );
+    assert.equal(row.facets.ownerSearchPathAndExecuteAcl, "unreviewed");
+  }
+  for (const id of [
+    "trigger:shop_manager.shops.shops_create_employee_work_location",
+    "trigger:public.businesses.business_team_thread_on_create",
+  ]) {
+    const row = manifest.objects.find((node) => node.id === id);
+    assert.equal(row.facets.currentEnabledAttachmentAndLaterSupersession, "unreviewed");
+    assert.ok(
+      !Object.keys(row.facets).some((key) => key.startsWith("catalog")),
+      "source-only incoming attachments are not newly observed live",
+    );
+  }
+  const ownUpdate = manifest.objects.find(
+    (row) => row.id === "policy:public.chat_thread_members.user_can_update_own_membership",
+  );
+  assert.ok(
+    ownUpdate.dependencies.some(
+      (row) =>
+        row.id === "policy:public.chat_thread_members.members_see_member_rows" &&
+        row.relation === "external-prerequisite",
+    ),
+  );
+  assert.equal(ownUpdate.facets.currentPolicyAndPrivilegeAdmission, "unreviewed");
+  assert.ok(
+    report.reachableObjectIds.includes(
+      "external:business-team-chat-tables-membership-and-writer-closure",
+    ),
+  );
+  assert.ok(
+    report.excludedExecutionIds.includes("execution:work-location-bootstrap-and-register-seeds"),
+  );
+  assert.ok(
+    manifest.separateDataAssertions.some(
+      (row) =>
+        row.id === "data:mixed-dated-catalog-observations-not-atomic" &&
+        row.status === "unverified",
+    ),
+  );
+  assert.ok(report.dependencyCycles.length > 0);
+  assert.ok(report.findings.some((row) => row.code === "DEPENDENCY_CYCLE_REQUIRES_REVIEW"));
+});
+
 function modify(change) {
   const item = fixture();
   change(item);
