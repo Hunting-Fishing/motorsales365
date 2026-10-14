@@ -108,6 +108,18 @@ reproduces the failure against the original migration and verifies the fix,
 history synchronization, revoked links, required vehicle and private execution.
 Both receipt database suites pass. The new migration is not yet applied live.
 
-Next: validate the combined security release in PostgreSQL CI and map the
-remaining 25 existing migrations to deployed definitions. Then deliver the
-native CRM and receipt scanner slices.
+Combined security release verified in GitHub Actions at `aff5b68`: all 247
+adversarial SQL assertions passed against disposable PostgreSQL, along with
+complete-checkout build, typecheck, unit tests and changed-line lint. A fixture
+now reuses the customer account automatically created by installation history.
+This is isolated verification, not a live migration or production deployment.
+
+First native Customer 360 slice: quotes and invoices are linked to existing
+Shop Manager customers, with PHP amounts, bounded lists and independent retry
+states. Customer activity caches now include the authenticated account.
+Application suite: 236/236; TypeScript passes; changed-line lint has zero errors.
+See `CUSTOMER_360_BUILD.md`. Full CRM delivery remains incomplete.
+
+Next: finish CRM build verification, publish the stacked review branch, and map
+the remaining 25 existing migrations to deployed definitions. Recover or rebuild
+the receipt scanner before claiming receipt scan-to-entry completion.
