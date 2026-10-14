@@ -187,7 +187,7 @@ manual/provider fallbacks. PDF rendering is a separate bounded slice.
 The receipt-cache follow-up at `b43adfb` passed all complete-checkout GitHub
 checks (build, typecheck, unit, lint, PostgreSQL). It is not a deployment.
 
-## Current heartbeat checkpoint: 2026-10-15
+## Image OCR heartbeat checkpoint: 2026-10-15
 
 Implementation branch: `feature/receipt-ocr-local`, stacked on the existing
 Customer 360 branch; published as draft PR #12. Verified code commit: `7ebe425`.
@@ -222,9 +222,46 @@ checks, residual anonymous lifecycle grants, and the historical cost-fix replay
 hazard. See `evidence/migration-object-audit-2026-10-15.md`. Keep the provenance
 classifier fail-closed; source correspondence does not approve history repair.
 
-Next: verify any new CI results and implement bounded local PDF rendering with
-same-origin assets, explicit page/pixel limits and reviewed merging. In parallel, design
-and test a reproducible migration baseline on disposable/staging data before
-releasing the pending security/trigger corrections. Cloudflare authentication
-and failed hosting build details remain unresolved. Keep resource-heavy checks
-sequential on this 16 GB computer.
+The subsequent docs-only head `7240f02` also passed all six GitHub CI gates
+(run `38601415344`). The separate hosting check still failed; no upload was inferred.
+
+## PDF OCR and replay-safety checkpoint: 2026-10-15
+
+Implementation branch: `feature/receipt-pdf-local`, draft PR #13 stacked on PR #12.
+Verified code commit: `21e651c`. Bounded
+same-origin PDF rendering and sequential page OCR are implemented for receipts
+of 1–3 pages, with no upload during scanning. Unsupported, unreadable or failed
+pages reject the entire operation. Conflicting metadata requires explicit manual
+resolution, amounts retain their page's currency provenance, and all suggestions
+remain unreviewed. Chunk-loading cancellation now releases UI waiting promptly.
+See `RECEIPT_PDF_DELIVERY.md` for resource limits and remaining acceptance gates.
+
+Local actual-browser checks pass for all three image formats, a two-page digital
+PDF and an image-only PDF, with zero external requests. Four-page, malformed and
+oversized-viewport PDFs reject. The synthetic rendered preview was visually
+inspected and is legible/unclipped. All 325 application tests and 36 Node tooling
+regressions pass. Explicit lint on the new source/scripts has no errors; nine
+pre-existing receipt-panel typing warnings remain. All six GitHub CI gates pass
+at `21e651c` (run `38604862474`): full build/Worker dry-run, TypeScript, application
+and isolated receipt DB suites, lint, actual browser OCR/PDF and 247 adversarial
+SQL assertions. Built assets verify 15 OCR and 202 PDF files by bytes/hash; the
+server-package boundary check excludes both engines. Local TypeScript first
+caught untyped test callback mocks; they were corrected against the public
+scanner contract, and complete-checkout TypeScript then passed. No safeguards
+were relaxed. This final PDF checkpoint update is docs-only.
+
+Migration replay safety: 13 new offline/PGlite regressions reproduce the unchanged
+historical cost-fix patch on original and already-corrected disposable fixtures.
+The offline preflight intentionally reports blocked (exit 1) for the current
+historical chain. It executes no SQL and never approves baseline/history repair.
+`evidence/MIGRATION_BASELINE_STRATEGY.md` separates source, schema, data/ACL,
+replay and recovery evidence and identifies the explicit three-file forward set.
+The complete reproducible baseline remains unfinished; no applied SQL was edited.
+
+No schema migration or production deployment is part of this slice. Cloudflare
+authentication and failed hosting-build details remain unresolved. Do not deploy
+this sparse checkout. Next: finish account-isolated vehicle/work-order drill-down
+and child-card caches, then deliver bounded native customer/vehicle activity and
+the disposable baseline/recovery prerequisites. External CRM candidate selection
+remains unresolved pending recovery of the actual repositories/licenses. Keep
+resource-heavy local checks sequential on this 16 GB computer.
