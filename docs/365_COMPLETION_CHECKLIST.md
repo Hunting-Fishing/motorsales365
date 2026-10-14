@@ -474,3 +474,37 @@ native guard and its application compatibility tests. Do not blindly add a shop
 FK, repair existing bindings or substitute a profile-only ACL change for trusted
 membership. Keep the unchanged historical replay chain frozen and continue the
 baseline/CRM acceptance work; native CRM remains the implementation path.
+
+## Helper containment candidates: 2026-10-15
+
+Draft PR #18: `https://github.com/Hunting-Fishing/motorsales365/pull/18`, code
+commit `6d0e3e4`, branch `security/helper-execute-containment`, stacked on PR #17.
+Full-checkout CI run `38620925454` is pending; no passing build is inferred.
+Parent docs head
+`ab18832` passed all six CI gates (run `38617896701`). The completed scanner/UI and
+authority proofs were not rebuilt. Fresh read-only helper catalog checks at
+2026-10-14 18:50 UTC confirm unchanged originals and intact converter containment.
+
+Two separately scoped CLI-generated candidates restrict direct client EXECUTE for
+legacy bootstrap and totals, retaining owner/service. They guard exact definitions,
+owners, target/companion ACLs, effective roles and the restricted converter; each
+has an explicit-review recovery file outside the migration path. Seventeen new
+memory-only tests execute actual candidate/recovery bytes, including real
+post-REVOKE fault/rollback and both execution orders. Complete local tooling passes
+89/89; focused lint, formatting and diff checks pass. Source evidence now covers
+404/421 files; 17 are unclassified, including these unapplied candidates. No applied
+SQL or older evidence changed, no historical replay/history repair occurred.
+See `evidence/HELPER_EXECUTE_CONTAINMENT_CANDIDATES.md` for exact hashes and limits.
+
+Neither candidate is approved or applied. The earlier owner approval was converter-
+only. The retained/live-matching quote converter remains directly client-executable
+and can reach totals as a definer; the reduced fixture confirms this residual
+path. Direct helper restrictions are not a complete quote/tenant authorization fix.
+
+Next: publish/review and verify this exact candidate slice, then request one scoped
+owner decision without repeated reminders. Apply only individually approved files
+after fresh target/recovery prerequisites; otherwise leave them unapplied and
+continue independent application/baseline work. Staff mutation affected-row
+confirmation is an independent application slice; no production deployment is
+authorized. Companion guard design must handle other trigger side effects and
+multi-roster/offboarding constraints rather than trusting definer current_user.
