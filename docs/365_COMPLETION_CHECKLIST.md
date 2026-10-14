@@ -477,7 +477,10 @@ baseline/CRM acceptance work; native CRM remains the implementation path.
 
 ## Helper containment candidates: 2026-10-15
 
-Branch: `security/helper-execute-containment`, stacked on PR #17. Parent docs head
+Draft PR #18: `https://github.com/Hunting-Fishing/motorsales365/pull/18`, code
+commit `6d0e3e4`, branch `security/helper-execute-containment`, stacked on PR #17.
+Full-checkout CI run `38620925454` is pending; no passing build is inferred.
+Parent docs head
 `ab18832` passed all six CI gates (run `38617896701`). The completed scanner/UI and
 authority proofs were not rebuilt. Fresh read-only helper catalog checks at
 2026-10-14 18:50 UTC confirm unchanged originals and intact converter containment.
