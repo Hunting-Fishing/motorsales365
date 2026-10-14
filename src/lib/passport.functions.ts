@@ -1,7 +1,7 @@
 /**
  * SYNC GROUP: vehicle-passport
  * Source of truth: .lovable/sync-groups.md#vehicle-passport
- * VERSION: 5
+ * VERSION: 6
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -25,7 +25,7 @@ export const getPublicPassport = createServerFn({ method: "GET" })
       supabaseAdmin
         .from("vehicle_service_records")
         .select(
-          "id, performed_at, mileage_km, service_type, title, shop_name, cost_php, notes, receipt_url",
+          "id, performed_at, mileage_km, service_type, title, shop_name, cost_php, notes",
         )
         .eq("vehicle_id", vehicle.id)
         .order("performed_at", { ascending: false }),

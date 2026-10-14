@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  getGarageVehicle,
-  setGarageVehicle,
-  clearGarageVehicle,
-} from "@/lib/garage.functions";
+import { getGarageVehicle, setGarageVehicle, clearGarageVehicle } from "@/lib/garage.functions";
 import type { VehicleCategory } from "@/data/vehicles";
 
 export type GarageVehicle = {
+  vehicleId?: string;
   category: VehicleCategory;
   make: string;
   model: string;
@@ -19,7 +16,6 @@ export type GarageVehicle = {
   /** Transmission, e.g. "Manual", "Automatic", "CVT". Optional. */
   transmission?: string;
 };
-
 
 const KEY = "garage_vehicle_v1";
 const EVT = "garage:changed";
@@ -52,6 +48,7 @@ export function setGarage(v: GarageVehicle | null) {
       if (v) {
         await setGarageVehicle({
           data: {
+            vehicleId: v.vehicleId ?? null,
             category: v.category,
             make: v.make,
             model: v.model,
@@ -77,6 +74,7 @@ async function pullFromServer(userId: string) {
     const local = getGarage();
     if (remote) {
       writeLocal({
+        vehicleId: remote.vehicleId ?? undefined,
         category: remote.category,
         make: remote.make,
         model: remote.model,
@@ -88,6 +86,7 @@ async function pullFromServer(userId: string) {
       // Migrate anonymous-cached vehicle to the account once.
       await setGarageVehicle({
         data: {
+          vehicleId: local.vehicleId ?? null,
           category: local.category,
           make: local.make,
           model: local.model,

@@ -1,3 +1,4 @@
+import { PublicVehicleHistory } from "@/components/public-vehicle-history";
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Heart, MapPin, Pencil, Tag, Gauge, Settings, ExternalLink } from "lucide-react";
@@ -285,6 +286,7 @@ function RideProfilePage() {
 
       <div className="container mx-auto grid gap-8 px-4 py-8 lg:grid-cols-[1fr_300px]">
         <div className="space-y-8">
+          <PublicVehicleHistory slug={slug} surface="ride" />
           {/* Description */}
           {ride.description && (
             <section>
@@ -410,7 +412,6 @@ function RideProfilePage() {
             vehicleId={ride.id}
           />
 
-
           {/* Service log timeline */}
           {logs.length > 0 && (
             <section>
@@ -498,7 +499,11 @@ function RideProfilePage() {
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-secondary">
                 {ownerLogo ? (
-                  <img src={ownerLogo} alt={`${ownerName} avatar`} className="h-full w-full object-cover" />
+                  <img
+                    src={ownerLogo}
+                    alt={`${ownerName} avatar`}
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <span className="text-lg font-semibold">{ownerName.charAt(0)}</span>
                 )}

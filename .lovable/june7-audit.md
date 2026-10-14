@@ -118,6 +118,8 @@ Visible (non-auth) landing: How it works · What you need · Plan comparison · 
 ## 14. "365 Vehicle Passport"
 Per-vehicle long-lived profile: owner timeline · service history · photos · mods/upgrades · accident/flood disclosure · maintenance receipts · ownership count (no private names) · transfer page on sale · public/private toggle · QR code.
 
+**2026-10-14 branch build:** Vehicle-linked private image/PDF receipts, reviewed AI suggestions with manual categories, separate purchase/install dates, owner-approved shop links, shared Follow My Ride history and parts-garage identity. Production activation requires the migration, legacy-receipt cleanup and configured vision provider; see `docs/VEHICLE_RECEIPTS_HISTORY_BUILD.md`.
+
 ## 15. Trust / Legal Proof in Footer — "Company Verification" Page
 Legal business name · DTI/SEC reg # · BIR status · address · DPO email · support escalation · refund process · takedown process · complaint process · affiliate disclosure · advertising disclosure · law enforcement contact.
 

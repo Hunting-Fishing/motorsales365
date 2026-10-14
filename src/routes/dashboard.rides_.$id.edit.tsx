@@ -1,3 +1,7 @@
+import { VehicleReceiptPanel } from "@/components/vehicle-receipt-panel";
+import { VehicleHistoryTimeline } from "@/components/vehicle-history-timeline";
+import { listMyVehicles } from "@/lib/vehicles.functions";
+import { linkRideVehicle } from "@/lib/vehicle-receipts.functions";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
@@ -45,6 +49,15 @@ function EditRidePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const publish = useServerFn(publishRide);
+  const listVehicles = useServerFn(listMyVehicles);
+  const linkVehicle = useServerFn(linkRideVehicle);
+  const [vehicleChoices, setVehicleChoices] = useState<any[]>([]);
+  useEffect(() => {
+    if (user)
+      listVehicles()
+        .then(setVehicleChoices)
+        .catch((e) => toast.error(e.message));
+  }, [user?.id]);
   const linkListing = useServerFn(linkRideToListing);
 
   const [ride, setRide] = useState<any>(null);
@@ -287,10 +300,49 @@ function EditRidePage() {
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="photos">Photos ({photos.length})</TabsTrigger>
           <TabsTrigger value="mods">Mods ({mods.length})</TabsTrigger>
+          <TabsTrigger value="receipts">Receipts & history</TabsTrigger>
           <TabsTrigger value="service">Service ({logs.length})</TabsTrigger>
           <TabsTrigger value="ownership">Ownership ({owners.length})</TabsTrigger>
           <TabsTrigger value="listing">Sale</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="receipts" className="space-y-4 pt-4">
+          <Label htmlFor="ride-vehicle-link">Connect to your My Vehicles record</Label>
+          <select
+            id="ride-vehicle-link"
+            className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+            value={ride.vehicle_id || ""}
+            onChange={async (e) => {
+              try {
+                await linkVehicle({ data: { rideId: id, vehicleId: e.target.value || null } });
+                await load();
+              } catch (err: any) {
+                toast.error(err.message);
+              }
+            }}
+          >
+            <option value="">Choose your vehicle</option>
+            {vehicleChoices.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.nickname || `${v.make} ${v.model}`} {v.plate_number || ""}
+              </option>
+            ))}
+          </select>
+          {ride.vehicle_id ? (
+            <>
+              <VehicleReceiptPanel vehicleId={ride.vehicle_id} />
+              <VehicleHistoryTimeline vehicleId={ride.vehicle_id} />
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Select the same vehicle to share one purchase and installation history.{" "}
+              <Link to="/dashboard/vehicles" className="text-primary underline">
+                Add a vehicle
+              </Link>{" "}
+              if it is not listed.
+            </p>
+          )}
+        </TabsContent>
 
         <TabsContent value="details" className="space-y-3 pt-4">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -426,7 +478,12 @@ function EditRidePage() {
                 onBlur={() => saveMod(m)}
                 className="sm:col-span-4"
               />
-              <Button variant="ghost" size="icon" onClick={() => delMod(m.id)} aria-label="Delete modification">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => delMod(m.id)}
+                aria-label="Delete modification"
+              >
                 <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
               </Button>
             </div>
@@ -494,7 +551,12 @@ function EditRidePage() {
                 }
                 onBlur={() => saveLog(s)}
               />
-              <Button variant="ghost" size="icon" onClick={() => delLog(s.id)} aria-label="Delete service log entry">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => delLog(s.id)}
+                aria-label="Delete service log entry"
+              >
                 <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
               </Button>
               <Textarea
@@ -563,7 +625,12 @@ function EditRidePage() {
                 }
                 onBlur={() => saveOwner(o)}
               />
-              <Button variant="ghost" size="icon" onClick={() => delOwner(o.id)} aria-label="Delete previous owner">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => delOwner(o.id)}
+                aria-label="Delete previous owner"
+              >
                 <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
               </Button>
               <Input

@@ -23,7 +23,8 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "July 10, 2026 (Private Seller media limits corrected to 12 photos and 1 video per free listing; 365 Franchise & Partner Program billing remains: setup + monthly membership fees are collected via our card processor at approval; fees are non-refundable once your membership is activated; membership auto-renews monthly until you cancel from your partner dashboard; unpaid renewals may suspend your membership benefits including the ad discount code)";
+  const lastUpdated =
+    "July 10, 2026 (Private Seller media limits corrected to 12 photos and 1 video per free listing; 365 Franchise & Partner Program billing remains: setup + monthly membership fees are collected via our card processor at approval; fees are non-refundable once your membership is activated; membership auto-renews monthly until you cancel from your partner dashboard; unpaid renewals may suspend your membership benefits including the ad discount code)";
 
   return (
     <SiteLayout>
@@ -188,16 +189,16 @@ function TermsPage() {
           motor-related businesses across the Philippines, the Platform may add public listings
           sourced from third-party data providers (such as Google Places) consisting of business
           name, address, map pin, phone, website, hours, rating summary, and a single attributed
-          cover photo. These entries are clearly marked <em>Unclaimed</em> until the rightful
-          owner claims and verifies the page. Owners may claim their listing from the business
-          page using a matching contact channel or supporting document; once verified, the owner
-          gains full editorial control. If you are the owner and prefer that your business is not
-          listed, you may request removal at any time via{" "}
+          cover photo. These entries are clearly marked <em>Unclaimed</em> until the rightful owner
+          claims and verifies the page. Owners may claim their listing from the business page using
+          a matching contact channel or supporting document; once verified, the owner gains full
+          editorial control. If you are the owner and prefer that your business is not listed, you
+          may request removal at any time via{" "}
           <Link className="text-primary underline" to="/support">
             Support
           </Link>{" "}
-          and we will remove the page promptly. Seeded listings do not imply any endorsement of,
-          or affiliation with, 365 MotorSales by the business.
+          and we will remove the page promptly. Seeded listings do not imply any endorsement of, or
+          affiliation with, 365 MotorSales by the business.
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">
@@ -267,21 +268,21 @@ function TermsPage() {
           </li>
         </ul>
 
-        <h2 className="mt-6 text-xl font-semibold">8. Fees, boosts, subscriptions &amp; advertising</h2>
+        <h2 className="mt-6 text-xl font-semibold">
+          8. Fees, boosts, subscriptions &amp; advertising
+        </h2>
         <p className="mt-2 text-muted-foreground">
           Posting and browsing listings is generally free. Certain optional features — including
-          listing boosts, business plans, premium directory placement, and on-site advertising
-          (ad carousels, <strong>exclusive Sponsored Category Slots</strong>, where a single
-          advertiser pays to appear as the featured sponsor at the top of a browse category for
-          a defined period, and <strong>Featured Tow Provider Spotlights</strong> on the
-          <code> /tow </code> page available to verified tow businesses on the Featured or
-          Premium plan) — require payment. Sponsored content is always clearly labeled as
-          "Sponsor", "Sponsored", "Featured", or "Ad" and never displaces organic listings or
-          search results.
+          listing boosts, business plans, premium directory placement, and on-site advertising (ad
+          carousels, <strong>exclusive Sponsored Category Slots</strong>, where a single advertiser
+          pays to appear as the featured sponsor at the top of a browse category for a defined
+          period, and <strong>Featured Tow Provider Spotlights</strong> on the
+          <code> /tow </code> page available to verified tow businesses on the Featured or Premium
+          plan) — require payment. Sponsored content is always clearly labeled as "Sponsor",
+          "Sponsored", "Featured", or "Ad" and never displaces organic listings or search results.
           Private Seller free listings include up to <strong>12 photos</strong> and{" "}
           <strong>1 video</strong> per listing; paid listing tiers may include higher media limits
-          as shown at the time of posting.
-          Current listing/subscription pricing is published on our{" "}
+          as shown at the time of posting. Current listing/subscription pricing is published on our{" "}
           <Link className="text-primary underline" to="/pricing">
             Pricing page
           </Link>
@@ -291,13 +292,12 @@ function TermsPage() {
           <Link className="text-primary underline" to="/advertise">
             Advertise page
           </Link>{" "}
-          and are confirmed in a written proposal before invoicing. Prices are quoted in ₱
-          inclusive of VAT where applicable. The{" "}
-          <strong>Renew &amp; Boost (2 weeks)</strong> option is a one-time ₱150 charge that pins
-          your vehicle listing to the top of search for 14 days and simultaneously renews the
-          listing's expiry by the standard listing-active period; it does not auto-renew and you
-          must repeat the purchase every 2 weeks if you want to stay on top. The{" "}
-          <strong>Vehicle Passport Premium</strong> upgrade (₱299 / 12 months) is a one-time
+          and are confirmed in a written proposal before invoicing. Prices are quoted in ₱ inclusive
+          of VAT where applicable. The <strong>Renew &amp; Boost (2 weeks)</strong> option is a
+          one-time ₱150 charge that pins your vehicle listing to the top of search for 14 days and
+          simultaneously renews the listing's expiry by the standard listing-active period; it does
+          not auto-renew and you must repeat the purchase every 2 weeks if you want to stay on top.
+          The <strong>Vehicle Passport Premium</strong> upgrade (₱299 / 12 months) is a one-time
           per-vehicle purchase that adds a Premium badge to the public passport page, unlocks the
           downloadable PDF history report and branded share card, and extends service-record
           storage. It does not auto-renew; purchasing again extends the existing premium window.
@@ -308,6 +308,13 @@ function TermsPage() {
             Refund Policy
           </Link>{" "}
           or as required by RA 7394.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          Vehicle receipts and history may include owner-entered records and shop attestations. A
+          receipt records a purchase; installation must be entered separately. AI extraction
+          provides suggestions for human review and does not establish fitment, authenticity or
+          official vehicle-history coverage. Owner-entered and shop-attested records are labeled
+          separately from 365-verified records.
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">9. Payments, tax &amp; payment test mode</h2>
@@ -361,16 +368,16 @@ function TermsPage() {
           </li>
         </ul>
         <p className="mt-3 text-muted-foreground">
-          <strong>11a. Optional inspection &amp; transaction-safety services.</strong> 365 MotorSales
-          publishes a catalog of optional add-on services at{" "}
+          <strong>11a. Optional inspection &amp; transaction-safety services.</strong> 365
+          MotorSales publishes a catalog of optional add-on services at{" "}
           <Link className="text-primary underline" to="/services/inspection">
             /services/inspection
           </Link>{" "}
-          — OR/CR document review, seller ID verification, pre-purchase mechanic inspection,
-          vehicle history / Passport reports, and transaction assistance. Prices shown are
-          indicative PHP ranges; the final quote is confirmed in writing before any work begins.
-          365 is <strong>not</strong> an escrow agent, broker, or guarantor of these services: where
-          the actual work is performed by an independent partner (mechanic, document reviewer,
+          — OR/CR document review, seller ID verification, pre-purchase mechanic inspection, vehicle
+          history / Passport reports, and transaction assistance. Prices shown are indicative PHP
+          ranges; the final quote is confirmed in writing before any work begins. 365 is{" "}
+          <strong>not</strong> an escrow agent, broker, or guarantor of these services: where the
+          actual work is performed by an independent partner (mechanic, document reviewer,
           payment-release partner), the contract for that work is between the buyer and that
           partner, and 365's role is limited to introduction, scheduling, and coordination. Refunds
           for pre-paid 365 fees are governed by our{" "}
@@ -379,8 +386,6 @@ function TermsPage() {
           </Link>
           .
         </p>
-
-
 
         <h2 className="mt-6 text-xl font-semibold">
           12. User-generated content &amp; intellectual property
@@ -430,32 +435,40 @@ function TermsPage() {
           Mechanism (for payment-related matters), as appropriate.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">14a. Trust Score, Disputes &amp; Member Rewards</h2>
+        <h2 className="mt-6 text-xl font-semibold">
+          14a. Trust Score, Disputes &amp; Member Rewards
+        </h2>
         <p className="mt-2 text-muted-foreground">
           Every account carries a trust score from <strong>0 to 1000</strong>, starting at{" "}
           <strong>500</strong>. The score is adjusted when reports against your listings are
           accepted or dismissed by our moderation team, when verifications are completed, or when
           buyer disputes are resolved. The full schedule is published at{" "}
-          <Link className="text-primary underline" to="/help/trust-score">/help/trust-score</Link>.
-          Indicative penalties: accepted report −25 pts (additional −10 hide / −30 delete), repeat
+          <Link className="text-primary underline" to="/help/trust-score">
+            /help/trust-score
+          </Link>
+          . Indicative penalties: accepted report −25 pts (additional −10 hide / −30 delete), repeat
           offenses within 30 days carry a 2× multiplier.
         </p>
         <p className="mt-2 text-muted-foreground">
           You may file <strong>one dispute per report</strong> within <strong>14 days</strong> of
-          resolution at <Link className="text-primary underline" to="/account/disputes">My
-          disputes</Link>. We review disputes within five (5) business days. If overturned, the
-          listing is restored and any trust-score penalty is fully refunded. Disputes do not extend
-          statutory rights you may have under Philippine consumer-protection law.
+          resolution at{" "}
+          <Link className="text-primary underline" to="/account/disputes">
+            My disputes
+          </Link>
+          . We review disputes within five (5) business days. If overturned, the listing is restored
+          and any trust-score penalty is fully refunded. Disputes do not extend statutory rights you
+          may have under Philippine consumer-protection law.
         </p>
         <p className="mt-2 text-muted-foreground">
-          Members in tiers Uncommon and above receive quarterly boost credits (1st of Jan/Apr/Jul/Oct)
-          and Legendary members receive a larger annual bonus, provided the account had zero
-          accepted reports in the period. Boost credits and badges are <strong>non-transferable,
-          have no cash value, cannot be refunded, sold, or assigned</strong>, and may be revoked if
-          the account is suspended for a Terms violation. Tier may be downgraded immediately when
-          the score falls below the tier threshold.
+          Members in tiers Uncommon and above receive quarterly boost credits (1st of
+          Jan/Apr/Jul/Oct) and Legendary members receive a larger annual bonus, provided the account
+          had zero accepted reports in the period. Boost credits and badges are{" "}
+          <strong>
+            non-transferable, have no cash value, cannot be refunded, sold, or assigned
+          </strong>
+          , and may be revoked if the account is suspended for a Terms violation. Tier may be
+          downgraded immediately when the score falls below the tier threshold.
         </p>
-
 
         <h2 className="mt-6 text-xl font-semibold">15a. 365 Learn (education portal)</h2>
         <p className="mt-2 text-muted-foreground">
@@ -492,10 +505,12 @@ function TermsPage() {
         <h2 className="mt-6 text-xl font-semibold">15b. Clubs (accredited motoring groups)</h2>
         <p className="mt-2 text-muted-foreground">
           365 MotorSales offers a curated <strong>Clubs</strong> feature at{" "}
-          <Link className="text-primary underline" to="/clubs">/clubs</Link> for motorcycle riding
-          clubs, car clubs, off-road groups and similar motoring organizations. To keep the
-          directory high-signal, Clubs must be approved before being publicly listed and are subject
-          to the following:
+          <Link className="text-primary underline" to="/clubs">
+            /clubs
+          </Link>{" "}
+          for motorcycle riding clubs, car clubs, off-road groups and similar motoring
+          organizations. To keep the directory high-signal, Clubs must be approved before being
+          publicly listed and are subject to the following:
         </p>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
           <li>
@@ -535,10 +550,10 @@ function TermsPage() {
             <strong>Club Member Discount.</strong> Active members of verified clubs (status
             "active", verification confirmed by admin review of accreditation documents) receive a
             5% discount on internal 365 MotorSales purchases only: ad packages, listing boosts,
-            dealer bundles, business subscription plans, and Passport Premium. The discount does
-            not apply to affiliate links, partner products, third-party inspection or towing fees,
-            parts marketplace sales, or any item routed through outside sellers. The discount does
-            not stack with promotional codes, staff promotions, or the multi-business discount; the
+            dealer bundles, business subscription plans, and Passport Premium. The discount does not
+            apply to affiliate links, partner products, third-party inspection or towing fees, parts
+            marketplace sales, or any item routed through outside sellers. The discount does not
+            stack with promotional codes, staff promotions, or the multi-business discount; the
             larger discount applies. The discount rate may be changed or the program withdrawn at
             any time. Membership must be active at the time of purchase — leaving a club, being
             removed, or a club losing verified status removes eligibility immediately for future
@@ -549,7 +564,10 @@ function TermsPage() {
 
         <h2 className="mt-6 text-xl font-semibold">15c. 365 Franchise &amp; Partner Program</h2>
         <p className="mt-2 text-muted-foreground">
-          The <Link className="text-primary underline" to="/franchise">365 Franchise &amp; Partner Program</Link>{" "}
+          The{" "}
+          <Link className="text-primary underline" to="/franchise">
+            365 Franchise &amp; Partner Program
+          </Link>{" "}
           is an optional, application-based membership offered to established motoring shops in the
           Philippines. Two tiers are available:
         </p>
@@ -576,19 +594,19 @@ function TermsPage() {
         </p>
         <p className="mt-2 text-muted-foreground">
           <strong>Discount codes and network pricing.</strong> Any discount code, member number, or
-          preferential parts pricing granted to a franchisee or partner is personal to that shop
-          and may not be shared, resold, or used to procure parts for third parties outside the
-          member shop's ordinary business. Misuse (including reselling discounted parts at market
-          rates outside the member shop, sharing codes on public channels, or false claims about
+          preferential parts pricing granted to a franchisee or partner is personal to that shop and
+          may not be shared, resold, or used to procure parts for third parties outside the member
+          shop's ordinary business. Misuse (including reselling discounted parts at market rates
+          outside the member shop, sharing codes on public channels, or false claims about
           affiliation) is grounds for immediate suspension, reversal of discounts, and
           cost-recovery.
         </p>
         <p className="mt-2 text-muted-foreground">
           <strong>Shared customer CRM.</strong> Members can view service and quote history for
-          customers who have consented to network-wide sharing. Members must handle customer data
-          in accordance with our Privacy Policy and RA 10173, may only use it to serve that
-          customer, and must not export or reuse it for unrelated marketing. Consent can be
-          withdrawn by the customer at any time.
+          customers who have consented to network-wide sharing. Members must handle customer data in
+          accordance with our Privacy Policy and RA 10173, may only use it to serve that customer,
+          and must not export or reuse it for unrelated marketing. Consent can be withdrawn by the
+          customer at any time.
         </p>
         <p className="mt-2 text-muted-foreground">
           <strong>Termination.</strong> Partner memberships are month-to-month and either side may
@@ -646,8 +664,8 @@ function TermsPage() {
             <strong>Export brokerage.</strong> Where 365 MotorSales facilitates introductions to
             overseas buyers or logistics partners, we act solely as a listing and introduction
             venue; we are not the shipper, exporter of record, or customs broker. You are
-            responsible for compliance with Philippine export rules and the destination
-            country's import, tax, and sanctions requirements.
+            responsible for compliance with Philippine export rules and the destination country's
+            import, tax, and sanctions requirements.
           </li>
           <li>
             <strong>Learning &amp; partner training.</strong> Courses, certifications, and partner
@@ -664,8 +682,8 @@ function TermsPage() {
             <strong>Organisation accounts.</strong> Where multiple users access a single
             organisation account, the account owner is responsible for all activity under that
             account, for inviting/removing members, and for ensuring members comply with these
-            Terms. Roles within an organisation do not extend privileges beyond what these Terms
-            and our published policies allow.
+            Terms. Roles within an organisation do not extend privileges beyond what these Terms and
+            our published policies allow.
           </li>
         </ul>
 
@@ -716,49 +734,50 @@ function TermsPage() {
 
         <h2 className="mt-6 text-xl font-semibold">20a. Used parts marketplace addendum</h2>
         <p className="mt-2 text-muted-foreground">
-          The "Used Parts" section (<Link className="text-primary underline" to="/parts">/parts</Link>)
-          is a peer-to-peer listing service for used and salvage automotive parts (engines,
+          The "Used Parts" section (
+          <Link className="text-primary underline" to="/parts">
+            /parts
+          </Link>
+          ) is a peer-to-peer listing service for used and salvage automotive parts (engines,
           transmissions, body panels, electronics, interior, wheels and similar). The following
           rules apply in addition to the general listing rules in these Terms:
         </p>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
           <li>
             <strong>Seller disclosure.</strong> Sellers must accurately disclose the part's
-            condition (new takeoff, used good, used fair, for rebuild, or core), the donor
-            vehicle (year/make/model) where applicable, and any known damage, missing
-            components, or required core return.
+            condition (new takeoff, used good, used fair, for rebuild, or core), the donor vehicle
+            (year/make/model) where applicable, and any known damage, missing components, or
+            required core return.
           </li>
           <li>
-            <strong>Compatibility / fitment.</strong> Buyers are responsible for confirming a
-            part fits their specific vehicle (VIN, trim, engine variant). Fitment data provided
-            by sellers is informational and not guaranteed by 365 MotorSales.
+            <strong>Compatibility / fitment.</strong> Buyers are responsible for confirming a part
+            fits their specific vehicle (VIN, trim, engine variant). Fitment data provided by
+            sellers is informational and not guaranteed by 365 MotorSales.
           </li>
           <li>
-            <strong>No platform warranty.</strong> Used parts are sold by the listing seller,
-            not by 365 MotorSales. Any warranty, return window, or core-return policy is set by
-            the seller in the listing. The Platform provides no warranty (express or implied)
-            on used parts.
+            <strong>No platform warranty.</strong> Used parts are sold by the listing seller, not by
+            365 MotorSales. Any warranty, return window, or core-return policy is set by the seller
+            in the listing. The Platform provides no warranty (express or implied) on used parts.
           </li>
           <li>
-            <strong>Prohibited items.</strong> Airbags must be uninstalled, undeployed, and may
-            not be sold for installation by non-certified persons. Catalytic converters, ECUs
-            tied to specific VINs, and any part requiring proof of lawful provenance must
-            include source documentation. Stolen parts are strictly forbidden and will be
-            reported under RA 6539 (Anti-Carnapping) and RA 10883 (New Anti-Carnapping Act).
+            <strong>Prohibited items.</strong> Airbags must be uninstalled, undeployed, and may not
+            be sold for installation by non-certified persons. Catalytic converters, ECUs tied to
+            specific VINs, and any part requiring proof of lawful provenance must include source
+            documentation. Stolen parts are strictly forbidden and will be reported under RA 6539
+            (Anti-Carnapping) and RA 10883 (New Anti-Carnapping Act).
           </li>
           <li>
             <strong>Quote / messaging only.</strong> Parts transactions are arranged directly
-            between buyer and seller (in-app messaging, phone, or in-person at the seller's
-            yard or shop). The Platform does not currently process payments for used parts and
-            does not hold funds in escrow for this category.
+            between buyer and seller (in-app messaging, phone, or in-person at the seller's yard or
+            shop). The Platform does not currently process payments for used parts and does not hold
+            funds in escrow for this category.
           </li>
           <li>
-            <strong>Vehicles for parts.</strong> A complete vehicle listed for parts-out is
-            still a vehicle listing; sellers must mark it as "for parts only" so buyers
-            understand the condition and registration status.
+            <strong>Vehicles for parts.</strong> A complete vehicle listed for parts-out is still a
+            vehicle listing; sellers must mark it as "for parts only" so buyers understand the
+            condition and registration status.
           </li>
         </ul>
-
 
         <h2 className="mt-6 text-xl font-semibold">21. Contact</h2>
         <p className="mt-2 text-muted-foreground">

@@ -1,10 +1,14 @@
+import { setGarage } from "@/lib/garage";
+import { PrivateServiceReceiptUpload } from "@/components/private-service-receipt-upload";
+import { VehicleReceiptPanel } from "@/components/vehicle-receipt-panel";
+import { VehicleHistoryTimeline } from "@/components/vehicle-history-timeline";
 /**
  * SYNC GROUP: vehicle-passport
  * Source of truth: .lovable/sync-groups.md#vehicle-passport
  * Siblings: src/routes/passport.$slug.tsx, src/lib/vehicles.functions.ts,
  *           src/components/passport-share-section.tsx
  * On change: bump VERSION + update sync-groups.md
- * VERSION: 2
+ * VERSION: 3
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { confirm } from "@/components/ui/confirm-dialog";
@@ -186,8 +190,13 @@ function VehicleDialog({
 }) {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
-  const initialDisc = (vehicle?.disclosures || {}) as { flood?: string; accident?: string; notes?: string };
+  const initialDisc = (vehicle?.disclosures || {}) as {
+    flood?: string;
+    accident?: string;
+    notes?: string;
+  };
   const [form, setForm] = useState({
+    vehicleType: vehicle?.vehicle_type ?? "car",
     make: vehicle?.make ?? "",
     model: vehicle?.model ?? "",
     year: vehicle?.year ?? "",
@@ -212,6 +221,7 @@ function VehicleDialog({
     setSaving(true);
     try {
       const payload = {
+        vehicleType: form.vehicleType as any,
         make: form.make.trim(),
         model: form.model.trim(),
         year: form.year ? Number(form.year) : null,
@@ -256,6 +266,33 @@ function VehicleDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-3">
+          <div>
+            <Label htmlFor="v-type">Vehicle type</Label>
+            <select
+              id="v-type"
+              className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+              value={form.vehicleType}
+              onChange={(e) => setForm({ ...form, vehicleType: e.target.value })}
+            >
+              {[
+                "car",
+                "motorcycle",
+                "scooter",
+                "truck",
+                "suv",
+                "van",
+                "atv",
+                "utv",
+                "boat",
+                "equipment",
+                "other",
+              ].map((t) => (
+                <option key={t} value={t}>
+                  {t.replaceAll("_", " ")}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <Label htmlFor="v-make">Make</Label>
@@ -358,8 +395,13 @@ function VehicleDialog({
               </div>
               <div>
                 <Label>Flood history</Label>
-                <Select value={form.floodLevel} onValueChange={(v) => setForm((f) => ({ ...f, floodLevel: v }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select
+                  value={form.floodLevel}
+                  onValueChange={(v) => setForm((f) => ({ ...f, floodLevel: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None reported</SelectItem>
                     <SelectItem value="minor">Minor</SelectItem>
@@ -369,8 +411,13 @@ function VehicleDialog({
               </div>
               <div>
                 <Label>Accident history</Label>
-                <Select value={form.accidentLevel} onValueChange={(v) => setForm((f) => ({ ...f, accidentLevel: v }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select
+                  value={form.accidentLevel}
+                  onValueChange={(v) => setForm((f) => ({ ...f, accidentLevel: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None reported</SelectItem>
                     <SelectItem value="minor">Minor</SelectItem>
@@ -401,7 +448,6 @@ function VehicleDialog({
             </div>
           </div>
 
-
           <div className="flex items-center justify-between rounded-md border border-border p-3">
             <div className="text-sm">
               <p className="font-medium">Public passport</p>
@@ -414,7 +460,9 @@ function VehicleDialog({
               onCheckedChange={(v) => setForm((f) => ({ ...f, isPublic: v }))}
             />
           </div>
-          <div className="pt-2"><FormFeedbackLink formId="vehicle-edit" /></div>
+          <div className="pt-2">
+            <FormFeedbackLink formId="vehicle-edit" />
+          </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
@@ -458,7 +506,7 @@ function VehicleDetailDialog({
     mileageKm: "",
     costPhp: "",
     notes: "",
-    receiptUrl: "",
+    receiptPath: "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -476,7 +524,7 @@ function VehicleDetailDialog({
           mileageKm: rec.mileageKm ? Number(rec.mileageKm) : null,
           costPhp: rec.costPhp ? Number(rec.costPhp) : null,
           notes: rec.notes.trim() || null,
-          receiptUrl: rec.receiptUrl.trim() || null,
+          receiptPath: rec.receiptPath || null,
         },
       });
       toast.success("Service record added");
@@ -487,7 +535,7 @@ function VehicleDetailDialog({
         mileageKm: "",
         costPhp: "",
         notes: "",
-        receiptUrl: "",
+        receiptPath: "",
       });
       setShowAdd(false);
       refetch();
@@ -545,6 +593,26 @@ function VehicleDetailDialog({
             </DialogHeader>
 
             <div className="flex flex-wrap items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  const v: any = data.vehicle;
+                  setGarage({
+                    vehicleId: v.id,
+                    category: ["motorcycle", "scooter"].includes(v.vehicle_type)
+                      ? "motorcycle"
+                      : "car",
+                    make: v.make,
+                    model: v.model,
+                    year: v.year || undefined,
+                  });
+                  toast.success("Selected this vehicle for 365 Parts");
+                }}
+              >
+                Use for 365 Parts
+              </Button>
+
               <VehicleDialog
                 vehicle={data.vehicle}
                 onSaved={() => {
@@ -589,10 +657,6 @@ function VehicleDetailDialog({
             <div className="mt-2">
               <PassportPremiumSection vehicleId={data.vehicle.id} />
             </div>
-
-
-
-
 
             <div className="mt-2 rounded-xl border border-border bg-card p-4">
               <div className="flex items-center justify-between gap-2">
@@ -693,15 +757,10 @@ function VehicleDetailDialog({
                   {user && (
                     <div>
                       <Label>Receipt (optional)</Label>
-                      <SingleFileUploader
+                      <PrivateServiceReceiptUpload
                         userId={user.id}
-                        bucket="vehicle-media"
-                        prefix={`receipts/${vehicleId}`}
-                        value={rec.receiptUrl || null}
-                        onChange={(url) => setRec({ ...rec, receiptUrl: url ?? "" })}
-                        accept="image/*,application/pdf"
-                        label="Upload receipt"
-                        variant="file"
+                        vehicleId={vehicleId}
+                        onChange={(path) => setRec({ ...rec, receiptPath: path ?? "" })}
                       />
                     </div>
                   )}
@@ -714,6 +773,10 @@ function VehicleDetailDialog({
                 </form>
               )}
 
+              <div className="my-4">
+                <VehicleReceiptPanel vehicleId={vehicleId} />
+              </div>
+              <VehicleHistoryTimeline vehicleId={vehicleId} />
               <div className="mt-3 space-y-2">
                 {data.records.length === 0 && (
                   <p className="rounded-md border border-dashed border-border p-4 text-center text-sm text-muted-foreground">

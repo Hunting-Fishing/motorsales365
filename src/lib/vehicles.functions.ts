@@ -4,7 +4,7 @@
  * Siblings: src/routes/passport.$slug.tsx, src/routes/dashboard.vehicles.tsx,
  *           src/components/passport-share-section.tsx
  * On change: bump VERSION + update sync-groups.md
- * VERSION: 2
+ * VERSION: 3
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -38,6 +38,21 @@ const disclosuresSchema = z
   .nullable();
 
 const vehicleInput = z.object({
+  vehicleType: z
+    .enum([
+      "car",
+      "motorcycle",
+      "scooter",
+      "truck",
+      "suv",
+      "van",
+      "atv",
+      "utv",
+      "boat",
+      "equipment",
+      "other",
+    ])
+    .default("car"),
   make: z.string().trim().min(1).max(60),
   model: z.string().trim().min(1).max(80),
   year: z.number().int().min(1900).max(2100).optional().nullable(),
@@ -88,7 +103,16 @@ export const getMyVehicle = createServerFn({ method: "POST" })
       .select("*")
       .eq("vehicle_id", data.id)
       .order("sort_order", { ascending: true });
-    return { vehicle, records: records ?? [], photos: photos ?? [] };
+    const privateRecords = await Promise.all(
+      (records ?? []).map(async (r: any) => {
+        if (!r.receipt_path) return r; // Owner-only legacy access until the migration utility moves the original.
+        const signed = await supabase.storage
+          .from("vehicle-service-receipts")
+          .createSignedUrl(r.receipt_path, 300);
+        return { ...r, receipt_url: signed.data?.signedUrl ?? null };
+      }),
+    );
+    return { vehicle, records: privateRecords, photos: photos ?? [] };
   });
 
 export const addVehiclePhoto = createServerFn({ method: "POST" })
@@ -136,16 +160,16 @@ export const deleteVehiclePhoto = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-
 export const createVehicle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => vehicleInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: row, error } = await supabase
+    const { data: row, error } = await (supabase as any)
       .from("vehicles")
       .insert({
         owner_user_id: userId,
+        vehicle_type: data.vehicleType,
         make: data.make,
         model: data.model,
         year: data.year ?? null,
@@ -170,9 +194,10 @@ export const updateVehicle = createServerFn({ method: "POST" })
   .inputValidator((d) => vehicleInput.extend({ id: uuid }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("vehicles")
       .update({
+        vehicle_type: data.vehicleType,
         make: data.make,
         model: data.model,
         year: data.year ?? null,
@@ -191,7 +216,6 @@ export const updateVehicle = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
-
 
 export const deleteVehicle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -216,7 +240,7 @@ const recordInput = z.object({
   shopName: z.string().trim().max(120).optional().nullable(),
   costPhp: z.number().min(0).max(99_999_999).optional().nullable(),
   notes: z.string().trim().max(2000).optional().nullable(),
-  receiptUrl: z.string().url().max(2000).optional().nullable(),
+  receiptPath: z.string().max(500).optional().nullable(),
 });
 
 export const addServiceRecord = createServerFn({ method: "POST" })
@@ -224,7 +248,22 @@ export const addServiceRecord = createServerFn({ method: "POST" })
   .inputValidator((d) => recordInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: row, error } = await supabase
+    const owned = await supabase
+      .from("vehicles")
+      .select("id")
+      .eq("id", data.vehicleId)
+      .eq("owner_user_id", userId)
+      .maybeSingle();
+    if (owned.error || !owned.data) throw new Error("Vehicle owner access required");
+    if (data.receiptPath && !data.receiptPath.startsWith(`${userId}/${data.vehicleId}/`))
+      throw new Error("Invalid receipt path");
+    if (data.receiptPath) {
+      const attachment = await supabase.storage
+        .from("vehicle-service-receipts")
+        .download(data.receiptPath);
+      if (attachment.error) throw new Error("Receipt upload is not available");
+    }
+    const { data: row, error } = await (supabase as any)
       .from("vehicle_service_records")
       .insert({
         vehicle_id: data.vehicleId,
@@ -235,7 +274,7 @@ export const addServiceRecord = createServerFn({ method: "POST" })
         shop_name: data.shopName ?? null,
         cost_php: data.costPhp ?? null,
         notes: data.notes ?? null,
-        receipt_url: data.receiptUrl ?? null,
+        receipt_path: data.receiptPath ?? null,
         created_by: userId,
       })
       .select("*")

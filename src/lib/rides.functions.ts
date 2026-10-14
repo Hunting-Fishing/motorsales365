@@ -158,7 +158,7 @@ export const deleteRide = createServerFn({ method: "POST" })
     for (const p of (photos ?? []) as any[]) if (p.storage_path) paths.push(p.storage_path);
 
     const { data: logs } = await supabase
-      .from("ride_service_logs" as never)
+      .from("ride_service_log" as never)
       .select("id")
       .eq("ride_id", data.id);
     const logIds = ((logs ?? []) as any[]).map((l) => l.id);

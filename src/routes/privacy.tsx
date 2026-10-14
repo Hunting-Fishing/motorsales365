@@ -22,7 +22,8 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "July 9, 2026 (365 Franchise & Partner Program billing: when you become an approved partner and pay, we share your name, email, and business identifier with our card processor to create your subscription; billing history remains accessible via the partner dashboard's billing portal; approved partners appear on the public /franchise/partners directory using only your business name, city, province, tier, and public logo/cover image)";
+  const lastUpdated =
+    "July 9, 2026 (365 Franchise & Partner Program billing: when you become an approved partner and pay, we share your name, email, and business identifier with our card processor to create your subscription; billing history remains accessible via the partner dashboard's billing portal; approved partners appear on the public /franchise/partners directory using only your business name, city, province, tier, and public logo/cover image)";
 
   return (
     <SiteLayout>
@@ -43,13 +44,15 @@ function PrivacyPage() {
 
         <p className="mt-3 text-muted-foreground">
           <strong>Club accreditation documents.</strong> When you apply to list a Club at{" "}
-          <Link className="text-primary underline" to="/clubs/apply" search={{}}>/clubs/apply</Link>, we collect
-          the formal documents you upload (e.g., LTO Accreditation, SEC Certificate of
+          <Link className="text-primary underline" to="/clubs/apply" search={{}}>
+            /clubs/apply
+          </Link>
+          , we collect the formal documents you upload (e.g., LTO Accreditation, SEC Certificate of
           Incorporation, DTI / Business Permit) along with the contact details you supply. These
-          documents are stored in a private Lovable Cloud storage bucket and are visible only to
-          the club's owner/admins and our moderation team. They are retained while the Club remains
-          on the Platform and are deleted upon rejection or upon your removal request, subject to
-          any legal-retention obligations.
+          documents are stored in a private Lovable Cloud storage bucket and are visible only to the
+          club's owner/admins and our moderation team. They are retained while the Club remains on
+          the Platform and are deleted upon rejection or upon your removal request, subject to any
+          legal-retention obligations.
         </p>
 
         <p className="mt-3 text-muted-foreground">
@@ -66,10 +69,18 @@ function PrivacyPage() {
           score, with the reason and a timestamp. When you file a dispute we collect your written
           explanation and any evidence files you upload. This data is retained for the lifetime of
           your account plus two (2) years, is visible to our moderation team and to you (via{" "}
-          <Link className="text-primary underline" to="/account/disputes">My disputes</Link> and{" "}
-          <Link className="text-primary underline" to="/account/trust-score">My trust score</Link>),
-          and is not shared with other users or third parties except where required by lawful
-          authority. See <Link className="text-primary underline" to="/help/trust-score">/help/trust-score</Link>{" "}
+          <Link className="text-primary underline" to="/account/disputes">
+            My disputes
+          </Link>{" "}
+          and{" "}
+          <Link className="text-primary underline" to="/account/trust-score">
+            My trust score
+          </Link>
+          ), and is not shared with other users or third parties except where required by lawful
+          authority. See{" "}
+          <Link className="text-primary underline" to="/help/trust-score">
+            /help/trust-score
+          </Link>{" "}
           for how the score works.
         </p>
 
@@ -125,6 +136,24 @@ function PrivacyPage() {
             <strong>Cookies &amp; similar tech:</strong> see Section 6.
           </li>
         </ul>
+
+        <h2 className="mt-6 text-xl font-semibold">Vehicle receipts and history</h2>
+        <p className="mt-2 text-muted-foreground">
+          You may attach receipts and record purchased parts, installation dates and mileage for
+          your vehicles. New receipt files use private storage. AI extraction sends the selected
+          receipt to our configured provider only after you opt in for that scan; manual entry
+          remains available. AI suggestions require your review and do not verify a repair or prove
+          installation.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          You approve connections between your vehicle and a shop. Your personal receipts are shared
+          with connected shops only when you enable receipt sharing. You may revoke that access; a
+          shop keeps its own transaction records, and history already contributed to your vehicle is
+          retained. Public ride and passport pages show only the history summaries you choose to
+          share, never the receipt files. Confirmed history records are retained for traceability;
+          contact support for corrections or deletion requests. Unconfirmed receipt drafts can be
+          discarded from your vehicle record.
+        </p>
 
         <h2 className="mt-6 text-xl font-semibold">3. How we use your data</h2>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
@@ -191,10 +220,10 @@ function PrivacyPage() {
             <strong>Maps &amp; geocoding:</strong> map tiles via <strong>OpenStreetMap</strong>{" "}
             (Leaflet) and address geocoding via <strong>OSM Nominatim</strong>.{" "}
             <strong>Google Places</strong> is used by admins to seed the business directory with
-            publicly available listings (name, address, phone, website, hours, rating, place ID,
-            and one cover photo with attribution). Seeded businesses are marked{" "}
-            <em>Unclaimed</em> until the real owner claims the page; rightful owners can claim
-            their listing from the business page, or request removal at any time via{" "}
+            publicly available listings (name, address, phone, website, hours, rating, place ID, and
+            one cover photo with attribution). Seeded businesses are marked <em>Unclaimed</em> until
+            the real owner claims the page; rightful owners can claim their listing from the
+            business page, or request removal at any time via{" "}
             <Link className="text-primary underline" to="/support">
               Support
             </Link>
@@ -322,11 +351,11 @@ function PrivacyPage() {
           When you use the export-brokerage flow we collect the data needed to introduce you to
           overseas buyers and logistics partners (shipping address, contact details, vehicle or
           parts info, and any documents you upload). This information is shared only with the
-          parties you select for an introduction. Referral participation stores your referral
-          code, attributed sign-ups, and resulting credit balances; we use this to detect
-          self-referral and fraud. Organisation accounts record which user performed each action
-          inside the org (audit log) and which members can see shared listings or messages; the
-          account owner can view this activity for users they invite.
+          parties you select for an introduction. Referral participation stores your referral code,
+          attributed sign-ups, and resulting credit balances; we use this to detect self-referral
+          and fraud. Organisation accounts record which user performed each action inside the org
+          (audit log) and which members can see shared listings or messages; the account owner can
+          view this activity for users they invite.
         </p>
 
         <p className="mt-2 text-muted-foreground">

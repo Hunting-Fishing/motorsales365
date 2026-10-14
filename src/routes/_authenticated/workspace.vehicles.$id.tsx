@@ -1,3 +1,4 @@
+import { VehicleReceiptPanel } from "@/components/vehicle-receipt-panel";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, ArrowLeft, Wrench, Car } from "lucide-react";
@@ -257,6 +258,8 @@ function VehicleDetail() {
             </p>
           ) : null}
         </div>
+
+        <VehicleReceiptPanel shopVehicleId={id} />
 
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
