@@ -8,8 +8,9 @@ Branch `security/native-chat-membership-composition`, stacked on PR #35 docs
 
 Draft PR #36: `https://github.com/Hunting-Fishing/motorsales365/pull/36`, code
 `a5e141d`. Full sequential tooling 241/241 (141.65s), focused lint/format/diff and
-independent source review pass. Remote checks await verification on the published
-documentation head; this is not a merged/released application phase.
+independent source review pass. Documentation head `2844477` passed all six CI
+gates (run `38654334163`), verified on the writer follow-up. This is not a
+merged/released application phase.
 
 ## Narrow current observation
 

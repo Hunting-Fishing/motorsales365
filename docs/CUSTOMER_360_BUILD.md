@@ -255,9 +255,28 @@ independent review is clean. Raw constant writes differ from scoped/returning
 updates, so the app's current request shape cannot substitute for a database
 authority contract. Dated metadata/function body matches are not live incidents,
 full writer/role closure, mitigation or deployment. No migration or production
-permission/data/history change. Remote checks await verification on the published
-documentation head. See `evidence/NATIVE_CHAT_MEMBERSHIP_POLICY_PROOF.md`.
+permission/data/history change. Documentation head `2844477` passed all six CI
+gates (run `38654334163`), verified on the writer follow-up.
+See `evidence/NATIVE_CHAT_MEMBERSHIP_POLICY_PROOF.md`.
 Next is the six source chat writer/message/notification boundary in
 `evidence/NATIVE_CHAT_WRITER_REHEARSAL_PLAN.md`, then the offline companion guard
 contract; native authority, baseline/recovery, consent/OCR/pilot and hosting gates
 remain open. The recurring heartbeat continues; no duplicate automation is added.
+
+Draft PR #37 (code `0d5ada9`) now rehearses the six chat writers and actual
+message/notification side effects with 15 focused +3 artifact tests and 259 full
+sequential tooling tests passing; independent review is clean. All eleven
+selected functions and four attachments match dated metadata. Both fanouts,
+invoker timestamp RLS, void no-ops, duplicate invitation rows, notification-id
+guard omission and real atomic rollback are characterized, not production fixes
+or notification delivery. Source/ACL boundaries and synthetic sender-profile
+support remain explicit in `evidence/NATIVE_CHAT_WRITER_COMPOSITION_PROOF.md`.
+Remote CI awaits verification on the published documentation head. No migration,
+application/production permission/data/history change or deployment occurs.
+
+Next is bounded caller acknowledgement/error/late-context handling (strict
+UUID/count responses, no false read success after resolved RPC errors, no
+row-confirmation claim from void, refresh-before-retry ambiguity), followed by the
+offline native companion authority/offboarding contract. All native identity,
+baseline/recovery, consent/OCR/pilot, real API/concurrency/role and hosting release
+gates remain open; the recurring follow-up is not a completion or revenue promise.
