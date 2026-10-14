@@ -28,8 +28,10 @@ Security reconciliation branch: `completion/365-security`.
    and database/private-storage recovery. Keep historical replay/history adoption
    frozen. Resolve hosting authentication and full artifact release gates before
    any application deployment.
-4. Continue native Customer 360 with the bounded read-only, owner-approved-linked
-   vehicle activity card specified in `CUSTOMER_360_BUILD.md`. Establish strict
+4. Native Customer 360's bounded activity reader/card is implemented offline in
+   PR #22/#23 and passed all six CI gates. Complete native profile/module/receipt
+   authority composition, private-vehicle consent and ownership-tenure gates;
+   do not deploy the unapplied reader APIs/consumer. Establish strict
    consent-at-read semantics before production acceptance; no owner-only history
    or invoice shortcut. Original scanner recovery and owner/mobile OCR pilot
    acceptance remain open despite passing rebuilt image/PDF browser tests.
@@ -40,8 +42,8 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest verified application slice: PR #19, documentation head `e99c880`, all six
-CI gates passed (run `38621477091`), 417 application tests. These are review
+Latest verified application slice: PR #23, documentation head `3a3f1f2`, all six
+CI gates passed (run `38631111334`), 482 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
@@ -53,6 +55,14 @@ Native prerequisite PR #21 latest docs head `e5a76ba` passed all six CI gates
 (run `38626559572`), verified on this resume. The next offline activity reader
 candidate is implemented/tested but unapplied; its linked-private-vehicle and
 ownership-tenure limitations remain explicit release gates, not completed consent.
+
+Latest independent native proof: draft PR #24, code `7f9bfb5`, stacked on verified
+UI PR #23; full-checkout publication checks are pending. Next is the actual
+profile/module/receipt-helper composition and security-attachment closure, not an
+automatic identity repair. At 2026-10-14 20:28:53 UTC, a read-only three-function
+catalog recheck confirmed converter client denial/owner-service retention and
+unchanged PUBLIC-executable bootstrap/totals originals. No RPC was invoked or
+permission changed; the separate helper decision is still pending.
 
 ## Recovery evidence
 
@@ -695,7 +705,8 @@ live DDL/data/history repair or broader production permission is implied.
 Branch `feature/crm-vehicle-activity-card`, stacked on verified reader PR #22
 (`ec4671e`). Draft PR #23:
 `https://github.com/Hunting-Fishing/motorsales365/pull/23`, code `9f3f7b8`;
-publication CI is pending. The customer detail route now mounts the read-only three-source card
+latest documentation head `3a3f1f2` passed all six CI gates (run `38631111334`).
+The customer detail route now mounts the read-only three-source card
 for an explicitly selected matching native vehicle. Signed-out mounting, account/
 customer remounts, account/customer/vehicle/source query keys, AbortSignal forwarding
 and refresh/error stale-row masking protect context isolation. The authenticated
@@ -705,7 +716,7 @@ owner-reader fallback, attachment, sharing or write controls are used.
 
 Mocked handler tests pass 34/34, component tests 18/18 and route/child integration
 tests 13/13. Full local application tests pass 482/482 across 41 files. Local
-TypeScript checks pass, including the final test additions; publication CI is pending.
+TypeScript checks pass, including the final test additions; full-checkout CI is verified.
 Focused lint has no errors (four existing route any warnings), format/diff checks
 pass. Independent read-only review found no further concrete UI/adapter issue.
 These are not live JWT/RLS/HTTP, browser/mobile, owner pilot or complete route/
@@ -729,3 +740,39 @@ Continue baseline/forward recovery/API and hosting gates, primary-reader/cache/
 role audit, receipt mobile/corpus/owner acceptance, then atomic billing and the
 retail/recruitment pipeline slices. Bootstrap/totals owner approval remains pending
 without a repeated question. The existing heartbeat remains active, not continuous.
+
+## Native profile resolution prerequisite: 2026-10-15
+
+Branch `security/native-profile-resolution-proof`, stacked on verified UI PR #23
+(`3a3f1f2`, all six gates, run `38631111334`). Draft PR #24:
+`https://github.com/Hunting-Fishing/motorsales365/pull/24`, code `7f9bfb5`;
+full-checkout CI is pending. Fresh six-helper catalog metadata
+and eight new memory-only regressions pin/execute only the two unchanged native
+profile/current-shop lookups. They confirm legacy-only divergence and nullable
+DESC ordering: a null-user id-shadow can outrank a true legacy user match, while
+an explicit false shadow sorts behind true. The two helpers can resolve different
+shop bindings; no rows proving this condition were inspected live. This is not a
+live incident, repair or trusted identity policy. NULL-composite versus null-shop
+identity, mutable statement-to-statement lookup and definer/ACL/direct-table-denial
+boundaries are tested without native fixture data/schema/ACL changes around reads.
+
+Focused tests pass 8/8, complete local tooling passes 142/142, and ESLint/format/diff
+pass. Independent review found no concrete issue; publication checks are pending.
+Application source remains the verified 482-test
+UI parent. No new migration or live schema/data/history/platform change and no
+application upload. Composed source evidence remains 404/422, 18 unclassified;
+seed inventory flags remain false and are not promoted by metadata observation.
+See `evidence/NATIVE_PROFILE_RESOLUTION_PROOF.md` for exact hashes, source/caller/
+dynamic-trigger reconnaissance and proof limits. An initial wrong one-argument
+shop_access catalog selector was corrected to its actual `(uuid,boolean)` identity;
+no missing-helper defect or business invocation is inferred.
+
+Exact next action: publish/review/verify this proof head, then compose the actual
+unchanged profile/module/receipt helpers with real shop_role_permissions overrides,
+auth-ID/legacy-profile roles, privileged-role early return, absent/empty/read/view/
+manage actions and shop_access read/write behavior. Resolve current source,
+supersession, writers and all native/chat/audit/storage security attachments before
+the companion guard. No automatic NULLS LAST/duplicate/binding/data repair or
+historic replay. Keep owner consent/tenure/private financial retention, forward
+recovery/role API, primary-read/cache, receipt mobile/pilot and hosting gates open.
+The unapproved helper containment decision is unchanged; do not re-ask/apply it.
