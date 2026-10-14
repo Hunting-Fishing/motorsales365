@@ -5,6 +5,9 @@ on verified PR #24 (`985a659`, all six gates, run `38632585607`). Offline behavi
 proof and incremental source inventory only: **not an authority fix, complete
 baseline, live workflow verification or production release**.
 
+Published as draft PR #25, code `89734f1`. Remote CI is pending at publication;
+local proof results below are not a hosting upload or production acceptance.
+
 ## Narrow live observation
 
 `native-access-composition-metadata-2026-10-15.json` contains nine selected helper

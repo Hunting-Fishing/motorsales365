@@ -67,8 +67,9 @@ permission changed; the separate helper decision is still pending.
 
 ## Latest native composition checkpoint (2026-10-15)
 
-Branch `security/native-access-composition-proof`, stacked on verified PR #24
-head `985a659`. Nine unchanged native/module/receipt helpers are composed with
+Draft PR #25, code `89734f1`, branch `security/native-access-composition-proof`,
+stacked on verified PR #24 head `985a659`; remote CI pending at publication.
+Nine unchanged native/module/receipt helpers are composed with
 selected actual override/receipt/link/item DDL and read policies. Fresh catalog
 metadata only confirmed selected definitions/ACLs and override table metadata;
 no business rows/RPCs, live DDL or authority changes. See
@@ -80,7 +81,7 @@ Global correspondence stays 404/422; 18 unclassified; no baseline promotion.
 
 Migration impact: none. Deployment: none; historical replay and sparse artifact
 deployment remain frozen. Production converter containment stays intact; separate
-bootstrap/totals approval remains pending. Exact next action: publish this proof,
+bootstrap/totals approval remains pending. Exact next action: verify PR #25 CI,
 then finish the request-bound Customer 360 primary/vehicle/work-order read and
 stale-visibility slice while continuing native writer/security closure. Module
 visibility is not granular write authority; link timestamp alone is not revocation.
