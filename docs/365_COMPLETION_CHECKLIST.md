@@ -99,6 +99,15 @@ or production SQL was executed. Run:
 
 The script intentionally exits 1 while unclassified files remain.
 
+PostgreSQL CI exposed a receipt-release integration regression: the new
+installed-component trigger erased direct owned-vehicle references when no
+Shop Manager vehicle was supplied. Follow-up migration
+`20261014140802_preserve_direct_installed_vehicle.sql` fixes that case while
+keeping shop-origin links approval-controlled. The isolated regression test
+reproduces the failure against the original migration and verifies the fix,
+history synchronization, revoked links, required vehicle and private execution.
+Both receipt database suites pass. The new migration is not yet applied live.
+
 Next: validate the combined security release in PostgreSQL CI and map the
 remaining 25 existing migrations to deployed definitions. Then deliver the
 native CRM and receipt scanner slices.
