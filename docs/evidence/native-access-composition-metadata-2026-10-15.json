@@ -1,0 +1,381 @@
+{
+  "formatVersion": 1,
+  "project": "wjxaajgvddtrxxtocxen",
+  "mode": "read-only-catalog",
+  "scope": "Nine selected native/module/receipt helper catalog observations and the shop_role_permissions table catalog only. No business rows, business RPC, data mutation, DDL or history/platform changes.",
+  "helpers": [
+    {
+      "observed_at_utc": "2026-10-14 20:34:32.730047+00",
+      "signature": "shop_manager.current_employee_profile()",
+      "oid": 33307,
+      "owner": "postgres",
+      "language": "sql",
+      "prosecdef": true,
+      "provolatile": "s",
+      "proretset": false,
+      "pronargdefaults": 0,
+      "provariadic": 0,
+      "proargnames": null,
+      "proargmodes": null,
+      "result": "shop_manager.profiles",
+      "proconfig": ["search_path=shop_manager, public, pg_temp"],
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "definition_md5": "ce079cfd1e59f97d244cd029bcce7a81",
+      "body_md5": "f4135fe6ed3f063cd52be5c69d1ead08",
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:34:32.730047+00",
+      "signature": "shop_manager.employee_allowed_modules()",
+      "oid": 33330,
+      "owner": "postgres",
+      "language": "plpgsql",
+      "prosecdef": true,
+      "provolatile": "s",
+      "proretset": false,
+      "pronargdefaults": 0,
+      "provariadic": 0,
+      "proargnames": null,
+      "proargmodes": null,
+      "result": "text[]",
+      "proconfig": ["search_path=shop_manager, public, pg_temp"],
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "definition_md5": "7f8c04bf18e0ec979c172df65c2f1593",
+      "body_md5": "509c22d591e17f037ac40d5145f5d545",
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:34:32.730047+00",
+      "signature": "shop_manager.get_current_user_shop_id()",
+      "oid": 28615,
+      "owner": "postgres",
+      "language": "sql",
+      "prosecdef": true,
+      "provolatile": "s",
+      "proretset": false,
+      "pronargdefaults": 0,
+      "provariadic": 0,
+      "proargnames": null,
+      "proargmodes": null,
+      "result": "uuid",
+      "proconfig": ["search_path=public, shop_manager"],
+      "acl": "{=X/postgres,postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "definition_md5": "be63946995c909e4a224b0e4989eaaf7",
+      "body_md5": "6049d4aebd36a1230288e6a2227e1071",
+      "anon_execute": true,
+      "authenticated_execute": true,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:34:32.730047+00",
+      "signature": "shop_manager.has_role(uuid,text)",
+      "oid": 28629,
+      "owner": "postgres",
+      "language": "sql",
+      "prosecdef": true,
+      "provolatile": "s",
+      "proretset": false,
+      "pronargdefaults": 0,
+      "provariadic": 0,
+      "proargnames": ["_user_id", "_role"],
+      "proargmodes": null,
+      "result": "boolean",
+      "proconfig": ["search_path=public, shop_manager"],
+      "acl": "{=X/postgres,postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "definition_md5": "0922679e807df45f65778f92e91c08ca",
+      "body_md5": "968f4a4ddba98dc347c0da5717cbce07",
+      "anon_execute": true,
+      "authenticated_execute": true,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:34:32.730047+00",
+      "signature": "shop_manager.is_shop_operations_manager(uuid,uuid)",
+      "oid": 33301,
+      "owner": "postgres",
+      "language": "sql",
+      "prosecdef": true,
+      "provolatile": "s",
+      "proretset": false,
+      "pronargdefaults": 0,
+      "provariadic": 0,
+      "proargnames": ["_user_id", "_shop_id"],
+      "proargmodes": null,
+      "result": "boolean",
+      "proconfig": ["search_path=shop_manager, public, pg_temp"],
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "definition_md5": "e4acd815f99a4a61a24b3623db2e230c",
+      "body_md5": "7a0da5b98b02455de0d968a12170df77",
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:34:32.730047+00",
+      "signature": "shop_manager.user_belongs_to_shop(uuid,uuid)",
+      "oid": 28638,
+      "owner": "postgres",
+      "language": "sql",
+      "prosecdef": true,
+      "provolatile": "s",
+      "proretset": false,
+      "pronargdefaults": 0,
+      "provariadic": 0,
+      "proargnames": ["_user_id", "_shop_id"],
+      "proargmodes": null,
+      "result": "boolean",
+      "proconfig": ["search_path=public, shop_manager"],
+      "acl": "{=X/postgres,postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "definition_md5": "ef1de965a932a522f9dd61a203338d17",
+      "body_md5": "7786134c6646c4ade72c0107d4219236",
+      "anon_execute": true,
+      "authenticated_execute": true,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:34:32.730047+00",
+      "signature": "vehicle_receipts_private.owns_vehicle(uuid)",
+      "oid": 37846,
+      "owner": "postgres",
+      "language": "sql",
+      "prosecdef": true,
+      "provolatile": "s",
+      "proretset": false,
+      "pronargdefaults": 0,
+      "provariadic": 0,
+      "proargnames": ["_id"],
+      "proargmodes": null,
+      "result": "boolean",
+      "proconfig": ["search_path=pg_catalog, public, pg_temp"],
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "definition_md5": "b12581efcbb745fc5cdd88b522cf50b1",
+      "body_md5": "5a31632411544374b4ff9dc9ab4b1a62",
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:34:32.730047+00",
+      "signature": "vehicle_receipts_private.receipt_access(uuid,boolean)",
+      "oid": 37848,
+      "owner": "postgres",
+      "language": "sql",
+      "prosecdef": true,
+      "provolatile": "s",
+      "proretset": false,
+      "pronargdefaults": 1,
+      "provariadic": 0,
+      "proargnames": ["_id", "_write"],
+      "proargmodes": null,
+      "result": "boolean",
+      "proconfig": ["search_path=pg_catalog, public, vehicle_receipts_private, pg_temp"],
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "definition_md5": "706fb9f0c3efeb409716ada746c79639",
+      "body_md5": "5a1da7f92a8412716d52f7706138d591",
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:34:32.730047+00",
+      "signature": "vehicle_receipts_private.shop_access(uuid,boolean)",
+      "oid": 37847,
+      "owner": "postgres",
+      "language": "sql",
+      "prosecdef": true,
+      "provolatile": "s",
+      "proretset": false,
+      "pronargdefaults": 1,
+      "provariadic": 0,
+      "proargnames": ["_id", "_write"],
+      "proargmodes": null,
+      "result": "boolean",
+      "proconfig": ["search_path=pg_catalog, public, shop_manager, pg_temp"],
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "definition_md5": "90195aa41b56221ce2323d3f4fd487c8",
+      "body_md5": "a4ad71638e5fbd1dd40c1110346097da",
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_execute": true
+    }
+  ],
+  "overrideTable": {
+    "observed_at_utc": "2026-10-14 20:34:31.973345+00",
+    "identity": "shop_manager.shop_role_permissions",
+    "table_contract": {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "oid": "27264",
+      "rls": true,
+      "owner": "postgres",
+      "force_rls": false,
+      "anon_select": false,
+      "service_select": true,
+      "authenticated_delete": false,
+      "authenticated_insert": false,
+      "authenticated_select": false,
+      "authenticated_update": false
+    },
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "default": "gen_random_uuid()",
+        "not_null": true,
+        "column_acl": null
+      },
+      {
+        "name": "shop_id",
+        "type": "uuid",
+        "default": null,
+        "not_null": true,
+        "column_acl": null
+      },
+      {
+        "name": "role_name",
+        "type": "text",
+        "default": null,
+        "not_null": true,
+        "column_acl": null
+      },
+      {
+        "name": "module",
+        "type": "text",
+        "default": null,
+        "not_null": true,
+        "column_acl": null
+      },
+      {
+        "name": "actions",
+        "type": "jsonb",
+        "default": "'{}'::jsonb",
+        "not_null": false,
+        "column_acl": null
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "now()",
+        "not_null": false,
+        "column_acl": null
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "default": "now()",
+        "not_null": false,
+        "column_acl": null
+      },
+      {
+        "name": "created_by",
+        "type": "uuid",
+        "default": null,
+        "not_null": false,
+        "column_acl": null
+      }
+    ],
+    "constraints": [
+      {
+        "name": "shop_role_permissions_created_by_fkey",
+        "type": "f",
+        "validated": true,
+        "definition": "FOREIGN KEY (created_by) REFERENCES shop_manager.profiles(id)"
+      },
+      {
+        "name": "shop_role_permissions_pkey",
+        "type": "p",
+        "validated": true,
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "shop_role_permissions_shop_id_fkey",
+        "type": "f",
+        "validated": true,
+        "definition": "FOREIGN KEY (shop_id) REFERENCES shop_manager.shops(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "shop_role_permissions_shop_id_role_name_module_key",
+        "type": "u",
+        "validated": true,
+        "definition": "UNIQUE (shop_id, role_name, module)"
+      }
+    ],
+    "indexes": [
+      {
+        "valid": true,
+        "definition": "CREATE UNIQUE INDEX shop_role_permissions_pkey ON shop_manager.shop_role_permissions USING btree (id)"
+      },
+      {
+        "valid": true,
+        "definition": "CREATE UNIQUE INDEX shop_role_permissions_shop_id_role_name_module_key ON shop_manager.shop_role_permissions USING btree (shop_id, role_name, module)"
+      }
+    ],
+    "policies": null,
+    "triggers": [
+      {
+        "name": "RI_ConstraintTrigger_c_28102",
+        "enabled": "O",
+        "function": "\"RI_FKey_check_ins\"()",
+        "internal": true,
+        "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_28102\" AFTER INSERT ON shop_manager.shop_role_permissions FROM shop_manager.profiles NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+      },
+      {
+        "name": "RI_ConstraintTrigger_c_28103",
+        "enabled": "O",
+        "function": "\"RI_FKey_check_upd\"()",
+        "internal": true,
+        "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_28103\" AFTER UPDATE ON shop_manager.shop_role_permissions FROM shop_manager.profiles NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+      },
+      {
+        "name": "RI_ConstraintTrigger_c_28107",
+        "enabled": "O",
+        "function": "\"RI_FKey_check_ins\"()",
+        "internal": true,
+        "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_28107\" AFTER INSERT ON shop_manager.shop_role_permissions FROM shop_manager.shops NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+      },
+      {
+        "name": "RI_ConstraintTrigger_c_28108",
+        "enabled": "O",
+        "function": "\"RI_FKey_check_upd\"()",
+        "internal": true,
+        "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_28108\" AFTER UPDATE ON shop_manager.shop_role_permissions FROM shop_manager.shops NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+      }
+    ]
+  },
+  "advisorSummary": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+    },
+    {
+      "name": "extension_in_public",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public"
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable"
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+    }
+  ],
+  "limitations": [
+    "Current catalog observations and selected fingerprints are not complete schema/source/writer/supersession/API/role-inheritance parity or release approval.",
+    "No profile/customer/role-permission/vehicle/receipt/link/business row was inspected; no business function was invoked.",
+    "Internal FK triggers are metadata, not proof that every external/dynamic writer or upstream trigger has been recovered.",
+    "Source-pinned disposable tests still use explicitly synthetic supporting schemas and auth/session settings; no real JWT, HTTP, Storage/download, concurrent transaction or owner pilot acceptance.",
+    "Source correspondence, trusted native authority, private ownership tenure/retention, baseline/recovery and hosting gates remain unresolved."
+  ]
+}

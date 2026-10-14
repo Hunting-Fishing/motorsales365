@@ -4,7 +4,7 @@ Updated 2026-10-15 Asia/Manila. This is an initial hand-reviewed registry and
 read-only validator, **not a baseline migration or release approval**.
 
 `baseline-native-scope-v1.json` pins selected original SQL and dated evidence
-files. Current SQL source snapshot is `ff24159586178e955c329ba0083daab9d306a1ed`;
+files. Current registry source snapshot is `985a65997baa72ec5cfb9ec3cd24fc4b6ce00344`;
 the initial PR #20 snapshot/counts below are retained as historical evidence. Its roots cover
 native identity/staff, customers/work orders and receipt/history entry points.
 Unknown objects, security attachments, data assertions, external platform
@@ -93,9 +93,24 @@ role literals to text. Do not substitute the enum overload or infer legacy
 establish complete catalog/permission parity or trusted membership. See
 `NATIVE_ROLE_MEMBERSHIP_PROOF.md`: eight new tests, 31 sources/six evidence files,
 72 declared objects/60 reachable, four cycles and 470 explicit unknown findings.
-The current manifest LF SHA-256 is
+That dated manifest LF SHA-256 was
 `c775403f37ebfe9cefcdaca671f997e6a5537e8e30ddc1063ff7ef2022593156`.
 All release/parity/replay flags remain false; dated earlier evidence is unchanged.
+
+The subsequent composition increment is recorded in
+`NATIVE_ACCESS_COMPOSITION_PROOF.md`. Current scope: 35 pinned sources, seven
+evidence files, 73 objects, 61 reachable, four cycles and 481 explicit unknown
+findings. Selected source classes are 24 source-correspondence, six unclassified
+and five pending-forward; the global composed ledger is still 404/422 with 18
+unclassified. Four recovered privilege/FK/sweep sources and a corrected stale
+module-source classification are supported by retained hashes, not inferred
+applied lineage. The override table, its native profile/shop dependencies and
+module-reader edge are now declared; mandatory security, writer and delegation
+closure remains unreviewed. Current manifest LF SHA-256:
+`b2f8d5937c3df9d1128b92d08a959ea13849f0e7fa3c8335f1b406b1d8663dd7`.
+Inventory tests pass 21/21; complete local tooling passes 156/156. CLI exit 1
+remains intentional and all baseline/replay/parity/attachment/release flags false.
+
 Rehearse a companion guard with actual CHECKs/all enabled triggers and
 legacy/self-shift/manager/multi-roster cases before authorized atomic invoicing.
 Then construct a separately reviewed baseline with explicit platform/reference

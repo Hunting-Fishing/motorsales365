@@ -3,8 +3,8 @@
   "scopeId": "native-identity-customer-workorder-receipts-initial-inventory",
   "repository": "Hunting-Fishing/motorsales365",
   "project": "wjxaajgvddtrxxtocxen",
-  "sourceCommit": "ff24159586178e955c329ba0083daab9d306a1ed",
-  "observedAtUtc": "2026-10-14T19:36:00.351Z",
+  "sourceCommit": "985a65997baa72ec5cfb9ec3cd24fc4b6ce00344",
+  "observedAtUtc": "2026-10-14T20:34:32.730047Z",
   "normalization": "CRLF-to-LF-only",
   "sources": [
     {
@@ -48,6 +48,34 @@
       "sha256Lf": "f958d20e3b1ce5472cf292288f4710aab0ea858e5fd4f701bd0680cc0b039e71",
       "lineageClass": "source-correspondence",
       "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "nativeDefaultPrivileges",
+      "path": "supabase/migrations/20260713044701_64bcbe3c-76cf-4ed0-ba80-4e9c57766705.sql",
+      "sha256Lf": "7bf224ec3dd224af201b73868146927a6dd14713c13ed68adf049d8e6d644442",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance"]
+    },
+    {
+      "id": "nativeForeignKeysB",
+      "path": "supabase/migrations/20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql",
+      "sha256Lf": "b06be51908df335850c5132d8d5403d1918164bb2faded5195867e21b0a41a68",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance"]
+    },
+    {
+      "id": "nativeClientTableGrants",
+      "path": "supabase/migrations/20260713070515_c57f9258-c8b3-4973-9eff-2d03ccade037.sql",
+      "sha256Lf": "c3b6e173df40642079846415d3eb200f2544c2114f2c19053fbfe2a53b1a0e62",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance"]
+    },
+    {
+      "id": "nativeSecuritySweep",
+      "path": "supabase/migrations/20260805084402_cd07847a-26f0-4c31-a2fe-ab0088684f77.sql",
+      "sha256Lf": "d987fe1e83505eb4002529a5290361fba2ff4af994938986ced9006c1502b321",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance"]
     },
     {
       "id": "nativeBaseC",
@@ -151,8 +179,8 @@
       "id": "driverModules",
       "path": "supabase/migrations/20260901025637_add_driver_module_access.sql",
       "sha256Lf": "ee6d043f23fe25f7f849fdd2d2cc104983a0ae3594d2f269e22d748ad498cff8",
-      "lineageClass": "unclassified",
-      "evidenceRefs": ["correspondenceAudit"]
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "historyHashes", "correspondenceAudit"]
     },
     {
       "id": "staffBoundaryCorrection",
@@ -250,6 +278,11 @@
       "id": "nativeRoleCatalog",
       "path": "docs/evidence/native-role-membership-metadata-2026-10-15.json",
       "sha256Lf": "fedaa75815414a84fea1b2414cc51a8e6ae9b0297a1da80b16e7ba57ee54bb64"
+    },
+    {
+      "id": "nativeAccessCatalog",
+      "path": "docs/evidence/native-access-composition-metadata-2026-10-15.json",
+      "sha256Lf": "aaece0fb7c90dbae55a19f797bc9baff647b64901cc321cb1c43b029b8ee6a4a"
     },
     {
       "id": "correspondenceAudit",
@@ -570,6 +603,11 @@
         },
         {
           "id": "table:shop_manager.roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.shop_role_permissions",
           "relation": "logical-binding",
           "reviewStatus": "source-observed"
         },
@@ -2077,6 +2115,52 @@
         "allLaterAlterationsAndSecurityAttachments": "unreviewed",
         "freshCatalogAndDeclarationLineage": "unreviewed",
         "profileShopIdHasNoInventedForeignKey": "source-observed"
+      }
+    },
+    {
+      "id": "table:shop_manager.shop_role_permissions",
+      "kind": "table",
+      "disposition": "candidate",
+      "sourceRefs": [
+        "nativeBaseB",
+        "nativeForeignKeysB",
+        "nativeDefaultPrivileges",
+        "nativeClientTableGrants",
+        "nativeSecuritySweep"
+      ],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.profiles",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.shops",
+          "relation": "foreign-key",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:module-permission-and-override-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "owner": "unreviewed",
+        "columns": "unreviewed",
+        "defaults": "unreviewed",
+        "sequences": "unreviewed",
+        "constraints": "unreviewed",
+        "indexes": "unreviewed",
+        "policies": "unreviewed",
+        "grants": "unreviewed",
+        "triggers": "unreviewed",
+        "selectedDeclarationDefaultsKeysAndForeignKeys": "source-observed",
+        "catalogColumnsConstraintsIndexesAndClientDenialObserved": "source-observed",
+        "catalogNoPolicyAndOnlyInternalFkTriggersObserved": "source-observed",
+        "conditionalSweepIsNotCompleteSecuritySupersession": "source-observed",
+        "allPrivilegedAndExternalWriterClosure": "unreviewed",
+        "trustedRoleModuleActionAndDelegationContract": "unreviewed"
       }
     },
     {

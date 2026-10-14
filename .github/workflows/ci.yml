@@ -76,6 +76,9 @@ jobs:
       - name: Customer vehicle activity and receipt ownership boundaries (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/customer-vehicle-activity.test.mjs scripts/ci/vehicle-receipt-ownership-boundary.test.mjs
 
+      - name: Native profile, module and receipt authority composition (memory-only)
+        run: node --test scripts/ci/native-access-composition.test.mjs
+
       # Run the WHOLE suite once; the checker decides pass/fail. Known failures
       # listed in scripts/ci/vitest-quarantine.json are reported but do not block;
       # any other failure (including a test file that fails to load) does.

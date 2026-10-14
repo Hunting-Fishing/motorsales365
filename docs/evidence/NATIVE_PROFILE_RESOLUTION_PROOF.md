@@ -5,7 +5,8 @@ on UI PR #23 (`3a3f1f2`, all six gates passed, run `38631111334`). This is an
 offline behavior proof and narrowly scoped catalog refresh, **not a native
 identity repair, authority mitigation, whole baseline or production finding**.
 Draft PR #24: `https://github.com/Hunting-Fishing/motorsales365/pull/24`,
-code `7f9bfb5`; full-checkout publication CI is pending.
+code `7f9bfb5`; latest documentation head `985a659` passed all six CI gates
+(run `38632585607`). No release is inferred.
 
 ## Observed metadata, not business records
 

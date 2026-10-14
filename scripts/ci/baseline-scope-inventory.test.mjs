@@ -535,3 +535,51 @@ test("actual repository inventory is pinned and explicitly incomplete, not appro
   assert.ok(!Object.hasOwn(report, "sql"));
   assert.ok(!JSON.stringify(report).includes("CREATE OR REPLACE FUNCTION"));
 });
+
+test("recovered override scope retains writer/security unknowns and distinct source correspondence", () => {
+  const root = fileURLToPath(new URL("../../", import.meta.url));
+  const report = runInventoryCli(["docs/evidence/baseline-native-scope-v1.json"], root);
+  const table = "table:shop_manager.shop_role_permissions";
+  assert.ok(report.reachableObjectIds.includes(table));
+  for (const facet of [
+    "owner",
+    "columns",
+    "defaults",
+    "sequences",
+    "constraints",
+    "indexes",
+    "policies",
+    "grants",
+    "triggers",
+    "allPrivilegedAndExternalWriterClosure",
+    "trustedRoleModuleActionAndDelegationContract",
+  ])
+    assert.ok(
+      report.findings.some(
+        (row) => row.code === "UNREVIEWED_FACET" && row.id === `${table}:${facet}`,
+      ),
+    );
+  assert.ok(
+    report.findings.some(
+      (row) =>
+        row.code === "UNVERIFIED_OBJECT" &&
+        row.id === "external:module-permission-and-override-closure",
+    ),
+  );
+  for (const id of [
+    "nativeDefaultPrivileges",
+    "nativeForeignKeysB",
+    "nativeClientTableGrants",
+    "nativeSecuritySweep",
+    "driverModules",
+  ]) {
+    const source = report.sources.find((row) => row.id === id);
+    assert.equal(source.lineageClass, "source-correspondence");
+    assert.equal(source.sourceHashCorrespondenceSupported, true);
+    assert.equal(source.exactAppliedLineageVerified, false);
+    assert.equal(source.appliedLineageInferred, false);
+  }
+  assert.equal(report.declaredCoverageComplete, false);
+  assert.equal(report.databaseReleaseApproved, false);
+  assert.equal(report.schemaParityVerified, false);
+});

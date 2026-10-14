@@ -57,14 +57,35 @@ candidate is implemented/tested but unapplied; its linked-private-vehicle and
 ownership-tenure limitations remain explicit release gates, not completed consent.
 
 Latest independent native proof: draft PR #24, code `7f9bfb5`, stacked on verified
-UI PR #23; full-checkout publication checks are pending. Next is the actual
+UI PR #23; latest documentation head `985a659` passed all six CI gates
+(run `38632585607`). Next is the actual
 profile/module/receipt-helper composition and security-attachment closure, not an
 automatic identity repair. At 2026-10-14 20:28:53 UTC, a read-only three-function
 catalog recheck confirmed converter client denial/owner-service retention and
 unchanged PUBLIC-executable bootstrap/totals originals. No RPC was invoked or
 permission changed; the separate helper decision is still pending.
 
-## Recovery evidence
+## Latest native composition checkpoint (2026-10-15)
+
+Branch `security/native-access-composition-proof`, stacked on verified PR #24
+head `985a659`. Nine unchanged native/module/receipt helpers are composed with
+selected actual override/receipt/link/item DDL and read policies. Fresh catalog
+metadata only confirmed selected definitions/ACLs and override table metadata;
+no business rows/RPCs, live DDL or authority changes. See
+`evidence/NATIVE_ACCESS_COMPOSITION_PROOF.md` for exact pins and behavior limits.
+Local tooling passes 156/156 (13 new composition, 21 inventory tests), with clean
+independent review. Current inventory deliberately exits 1: 35 sources/seven
+evidence, 73 objects/61 reachable, four cycles, 481 explicit unknown findings.
+Global correspondence stays 404/422; 18 unclassified; no baseline promotion.
+
+Migration impact: none. Deployment: none; historical replay and sparse artifact
+deployment remain frozen. Production converter containment stays intact; separate
+bootstrap/totals approval remains pending. Exact next action: publish this proof,
+then finish the request-bound Customer 360 primary/vehicle/work-order read and
+stale-visibility slice while continuing native writer/security closure. Module
+visibility is not granular write authority; link timestamp alone is not revocation.
+
+## Recovery evidence (original scope)
 
 - [x] Confirm receipt/history release PR #10 is merged on current main.
 - [x] Confirm five existing open PRs: #2, #5, #7, #8, #9.
@@ -746,7 +767,8 @@ without a repeated question. The existing heartbeat remains active, not continuo
 Branch `security/native-profile-resolution-proof`, stacked on verified UI PR #23
 (`3a3f1f2`, all six gates, run `38631111334`). Draft PR #24:
 `https://github.com/Hunting-Fishing/motorsales365/pull/24`, code `7f9bfb5`;
-full-checkout CI is pending. Fresh six-helper catalog metadata
+latest documentation head `985a659` passed all six CI gates (run `38632585607`).
+Fresh six-helper catalog metadata
 and eight new memory-only regressions pin/execute only the two unchanged native
 profile/current-shop lookups. They confirm legacy-only divergence and nullable
 DESC ordering: a null-user id-shadow can outrank a true legacy user match, while
@@ -757,7 +779,7 @@ identity, mutable statement-to-statement lookup and definer/ACL/direct-table-den
 boundaries are tested without native fixture data/schema/ACL changes around reads.
 
 Focused tests pass 8/8, complete local tooling passes 142/142, and ESLint/format/diff
-pass. Independent review found no concrete issue; publication checks are pending.
+pass. Independent review found no concrete issue; full-checkout CI is verified.
 Application source remains the verified 482-test
 UI parent. No new migration or live schema/data/history/platform change and no
 application upload. Composed source evidence remains 404/422, 18 unclassified;
