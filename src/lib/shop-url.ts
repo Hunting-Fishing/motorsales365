@@ -20,6 +20,7 @@ const HOST_PATTERNS: Array<{ slug: string; test: (host: string, url: URL) => boo
   { slug: "amazon", test: (h) => /(^|\.)amzn\.(to|asia)$/i.test(h) },
   { slug: "carousell", test: (h) => /(^|\.)carousell\.(ph|com|sg|com\.my|com\.hk)$/i.test(h) },
   { slug: "aliexpress", test: (h) => /(^|\.)aliexpress\.(com|us|ru)$/i.test(h) },
+  { slug: "alibaba", test: (h) => /(^|\.)alibaba\.com$/i.test(h) },
   { slug: "ebay", test: (h) => /(^|\.)ebay\.(com|ph|co\.uk|de|com\.au)$/i.test(h) },
   { slug: "zalora", test: (h) => /(^|\.)zalora\.(com\.ph|com\.my|sg|co\.id|com\.hk)$/i.test(h) },
 ];
@@ -181,9 +182,13 @@ export function cleanShopUrl(input: string): string {
   }
   // Amazon: collapse to /dp/<ASIN> when present
   if (/(^|\.)amazon\./i.test(url.hostname)) {
+    const tag = url.searchParams.get("tag");
+    const linkCode = url.searchParams.get("linkCode");
     const m = url.pathname.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
     if (m) url.pathname = `/dp/${m[1].toUpperCase()}`;
     url.search = "";
+    if (tag) url.searchParams.set("tag", tag);
+    if (linkCode) url.searchParams.set("linkCode", linkCode);
   }
   // Drop trailing empty query/fragment
   if ([...url.searchParams.keys()].length === 0) url.search = "";

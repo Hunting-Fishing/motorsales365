@@ -86,10 +86,10 @@ export const ADMIN_NAV: AdminNavItem[] = [
   },
   {
     to: "/admin/shop",
-    label: "Affiliate Shop",
+    label: "Part Picks",
     Icon: Store,
     roles: ["admin", "advertising", "sales"],
-    info: "Manage affiliate products, networks and click analytics.",
+    info: "Add and edit Part Picks links. Shoppers can browse and suggest a link, not publish.",
     section: "Sales & Advertising",
   },
   {
