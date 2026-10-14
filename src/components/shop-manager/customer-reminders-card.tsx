@@ -1,273 +1,154 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, Plus, Check, Trash2, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Bell, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { smSupabase } from "@/lib/shop-manager/db";
 import { useAuth } from "@/hooks/use-auth";
+import { getCustomerRemindersSnapshot } from "@/lib/customer-reminders.functions";
 
-type Reminder = {
-  id: string;
-  customer_id: string;
-  reminder_type: string;
-  title: string;
-  notes: string | null;
-  due_date: string;
-  status: string;
-  completed_at: string | null;
-};
+function calendarDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(`${value}T00:00:00Z`);
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(value) ||
+    year < 1 ||
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  )
+    return "Date format not recognized";
+  return new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeZone: "UTC" }).format(date);
+}
 
-const TYPES = [
-  "follow_up",
-  "service_reminder",
-  "warranty_check",
-  "estimate_follow_up",
-  "call_back",
-  "other",
-];
-
-export function CustomerRemindersCard({ customerId }: { customerId: string }) {
-  const qc = useQueryClient();
-  const { user } = useAuth();
-  const queryKey = ["shop-manager", user?.id, "customer_reminders", customerId];
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
-    reminder_type: "follow_up",
-    title: "",
-    notes: "",
-    due_date: new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10),
+function PrivateReminders({ accountId, customerId }: { accountId: string; customerId: string }) {
+  const read = useServerFn(getCustomerRemindersSnapshot);
+  const [refreshing, setRefreshing] = useState(false);
+  const query = useQuery({
+    queryKey: ["shop-manager", accountId, "customer_reminders", customerId],
+    queryFn: ({ signal }) => read({ data: { expectedAccountId: accountId, customerId }, signal }),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    placeholderData: undefined,
+    retry: false,
   });
-
-  const {
-    data: rows = [],
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey,
-    enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await (smSupabase as any)
-        .from("customer_reminders")
-        .select("id,customer_id,reminder_type,title,notes,due_date,status,completed_at")
-        .eq("customer_id", customerId)
-        .order("due_date", { ascending: true });
-      if (error) throw error;
-      return (data ?? []) as Reminder[];
-    },
-  });
-
-  const create = useMutation({
-    mutationFn: async () => {
-      const { error } = await (smSupabase as any).from("customer_reminders").insert({
-        customer_id: customerId,
-        ...form,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Reminder added");
-      setOpen(false);
-      setForm({ ...form, title: "", notes: "" });
-      qc.invalidateQueries({ queryKey });
-    },
-    onError: (e: any) => toast.error(e.message ?? "Failed"),
-  });
-
-  const complete = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await (smSupabase as any)
-        .from("customer_reminders")
-        .update({ status: "completed", completed_at: new Date().toISOString() })
-        .eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
-  });
-
-  const del = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await (smSupabase as any).from("customer_reminders").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
-  });
-
-  const today = new Date().toISOString().slice(0, 10);
-
-  if (!user) return null;
+  const checking = refreshing || query.isFetching || query.isPending || !query.isFetchedAfterMount;
+  const result = !checking && query.isSuccess ? query.data : null;
+  const rows = result?.available ? result.rows : [];
+  const refresh = async () => {
+    setRefreshing(true);
+    try {
+      await query.refetch();
+    } finally {
+      setRefreshing(false);
+    }
+  };
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-base flex items-center gap-2">
-          <Bell className="h-4 w-4" /> Reminders & Follow-ups
+      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
+        <CardTitle>
+          <h3 className="text-base flex items-center gap-2">
+            <Bell className="h-4 w-4" />
+            Reminders &amp; Follow-ups (
+            {result?.available ? `${rows.length}${result.hasMore ? "+" : ""}` : "—"})
+          </h3>
         </CardTitle>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" variant="outline">
-              <Plus className="h-4 w-4 mr-1" /> New
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>New Reminder</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label>Type</Label>
-                  <Select
-                    value={form.reminder_type}
-                    onValueChange={(v) => setForm({ ...form, reminder_type: v })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {TYPES.map((t) => (
-                        <SelectItem key={t} value={t}>
-                          {t.replace(/_/g, " ")}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Due date</Label>
-                  <Input
-                    type="date"
-                    value={form.due_date}
-                    onChange={(e) => setForm({ ...form, due_date: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div>
-                <Label>Title</Label>
-                <Input
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="Call about brake service quote"
-                />
-              </div>
-              <div>
-                <Label>Notes</Label>
-                <Textarea
-                  value={form.notes}
-                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  rows={3}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                disabled={!form.title.trim() || create.isPending}
-                onClick={() => create.mutate()}
-              >
-                Add
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" disabled={checking} onClick={() => void refresh()}>
+            Refresh reminders
+          </Button>
+          <Button size="sm" disabled>
+            New reminder
+          </Button>
+        </div>
       </CardHeader>
-      <CardContent>
-        {isError ? (
+      <CardContent className="space-y-4">
+        <p className="text-xs text-muted-foreground">
+          Reminder changes are unavailable until shop attribution, target consistency and
+          affected-row confirmation are verified.
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Earliest due dates first; includes all stored statuses. This snapshot is not a complete
+          task queue.
+        </p>
+        {checking ? (
+          <div role="status" className="flex items-center gap-2 text-muted-foreground text-sm">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading reminders…
+          </div>
+        ) : query.isError ? (
           <div role="alert" className="space-y-2 text-sm">
             <p>Could not load reminders.</p>
-            <Button variant="outline" size="sm" onClick={() => void refetch()}>
+            <Button variant="outline" size="sm" onClick={() => void refresh()}>
               Retry reminders
             </Button>
           </div>
-        ) : isLoading ? (
-          <div className="flex items-center gap-2 text-muted-foreground text-sm">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading…
-          </div>
+        ) : !result?.available ? (
+          <p className="text-sm text-muted-foreground">
+            Reminders unavailable for this customer in the current session.
+          </p>
         ) : rows.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No reminders yet.</p>
+          <p className="text-sm text-muted-foreground">No visible reminders in this snapshot.</p>
         ) : (
-          <div className="space-y-2">
-            {rows.map((r) => {
-              const overdue = r.status === "pending" && r.due_date < today;
-              return (
-                <div
-                  key={r.id}
-                  className={`flex items-start gap-3 rounded border p-3 ${overdue ? "border-destructive/50 bg-destructive/5" : ""}`}
-                >
+          <>
+            <ul aria-label="Customer reminder records" className="space-y-2">
+              {rows.slice(0, 100).map((row) => (
+                <li key={row.id} className="flex items-start gap-3 rounded border p-3">
                   <Bell
-                    className={`h-4 w-4 mt-0.5 ${overdue ? "text-destructive" : "text-muted-foreground"}`}
+                    aria-hidden="true"
+                    className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span
-                        className={`font-medium text-sm ${r.status === "completed" ? "line-through text-muted-foreground" : ""}`}
-                      >
-                        {r.title}
+                      <span className="font-medium text-sm break-words">
+                        {row.title || "Untitled reminder"}
                       </span>
                       <Badge variant="outline" className="text-xs">
-                        {r.reminder_type.replace(/_/g, " ")}
+                        {row.reminder_type.replaceAll("_", " ") || "Type not set"}
                       </Badge>
-                      {overdue && (
-                        <Badge variant="destructive" className="text-xs">
-                          Overdue
-                        </Badge>
-                      )}
-                      {r.status === "completed" && (
-                        <Badge variant="secondary" className="text-xs">
-                          Done
-                        </Badge>
-                      )}
+                      <Badge variant="secondary" className="text-xs">
+                        {row.status || "Status not set"}
+                      </Badge>
                     </div>
-                    <div className="text-xs text-muted-foreground mt-0.5">
-                      Due {new Date(r.due_date).toLocaleDateString()}
-                    </div>
-                    {r.notes && <div className="text-sm mt-1 whitespace-pre-wrap">{r.notes}</div>}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Due <time dateTime={row.due_date}>{calendarDate(row.due_date)}</time>
+                    </p>
+                    {row.notes ? (
+                      <p className="text-sm mt-1 whitespace-pre-wrap break-words">{row.notes}</p>
+                    ) : null}
+                    {row.completed_at ? (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Recorded completion time:{" "}
+                        <time dateTime={row.completed_at}>
+                          {new Date(row.completed_at).toLocaleString("en-PH")}
+                        </time>
+                      </p>
+                    ) : null}
                   </div>
-                  <div className="flex gap-1">
-                    {r.status !== "completed" && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => complete.mutate(r.id)}
-                        title="Mark done"
-                      >
-                        <Check className="h-4 w-4" />
-                      </Button>
-                    )}
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => {
-                        if (confirm("Delete reminder?")) del.mutate(r.id);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                </li>
+              ))}
+            </ul>
+            {result.hasMore ? (
+              <p className="text-xs text-muted-foreground">
+                Showing the 100 earliest-due visible reminders.
+              </p>
+            ) : null}
+          </>
         )}
       </CardContent>
     </Card>
+  );
+}
+
+export function CustomerRemindersCard({ customerId }: { customerId: string }) {
+  const { user } = useAuth();
+  if (!user) return null;
+  return (
+    <PrivateReminders
+      key={`${user.id}:${customerId}`}
+      accountId={user.id}
+      customerId={customerId}
+    />
   );
 }
