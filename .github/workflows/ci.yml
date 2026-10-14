@@ -85,6 +85,9 @@ jobs:
       - name: Customer reminder same-statement read contract (memory-only)
         run: node --test scripts/ci/customer-reminders-read-contract.test.mjs
 
+      - name: Native identity count review contracts (memory-only, no production counts)
+        run: node --test --test-concurrency=1 scripts/ci/native-identity-count-diagnostic.test.mjs
+
       # Run the WHOLE suite once; the checker decides pass/fail. Known failures
       # listed in scripts/ci/vitest-quarantine.json are reported but do not block;
       # any other failure (including a test file that fails to load) does.
