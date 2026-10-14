@@ -10,8 +10,8 @@ re-scans don't trigger a new round of investigation.
 
 ### Helper functions executable by `authenticated` / `anon`
 
-Lints: `SUPA_authenticated_security_definer_function_executable` (×18),
-`SUPA_anon_security_definer_function_executable` (×2).
+Lints: `SUPA_authenticated_security_definer_function_executable` (×19),
+`SUPA_anon_security_definer_function_executable` (×3).
 
 These `SECURITY DEFINER` functions MUST keep EXECUTE for the listed roles
 because they back RLS policies on RLS-protected tables. Revoking EXECUTE
@@ -25,6 +25,11 @@ would lock signed-in users out of normal app reads/writes.
 - `current_plan_tier`, `is_business_account`, `user_has_paid_subscription`,
   `is_towing_provider` — entitlement helpers used in RLS for `listings`,
   `verification_requests`, `tow_requests`, etc.
+- `is_network_publishable_business(_business_id uuid)` — backs the Parts
+  network policies on `business_inventory_items`, `business_inventory_locations`,
+  `network_part_inquiries` and the `network_stock` projection (needs EXECUTE for
+  `anon` and `authenticated`). Returns only a boolean about the business's
+  public network state.
 - `is_org_member`, `can_manage_org`, `org_role` — org-membership helpers
   used in RLS for `leads`, `lead_activities`, `organizations`,
   `organization_members`, and in server functions.
@@ -91,7 +96,14 @@ in `scripts/verify-security.sh` (where applicable):
 auth.uid()`) — no email-claim shortcut.
 4. `promotions.code` is readable only by admin + sales.
 5. `provider_tow_rates` is not publicly readable.
-6. `realtime.messages` defaults to deny; the app uses only
+6. Parts network (see `docs/365_PARTS_P2_RLS_ADVERSARIAL_REPORT.md`):
+   `anon` reads only the projection columns of published inventory from
+   partners that pass `is_network_publishable_business`; signed-in
+   non-members read no other organization's inventory rows; owners cannot
+   approve their own network exposure (`trg_guard_business_network_exposure`);
+   inquiries cannot be attributed to another user or pre-set partner
+   lifecycle fields; RPC-only commercial tables are read-only to API roles.
+7. `realtime.messages` defaults to deny; the app uses only
    `postgres_changes` subscriptions which inherit the underlying table's
    RLS.
 
@@ -128,8 +140,12 @@ the URL is passed to Stripe.
    `businesses.id` the caller owns or can manage via their org).
    Requires a service-role / postgres `DATABASE_URL`; with a read-only
    role the script prints `SKIP` and exits 0.
-3. `supabase--linter` — remaining warnings should match the counts above.
-4. `security--run_security_scan` — remaining items should be limited to
+3. `./scripts/test-parts-rls-adversarial.sh` (or `--local` for a throwaway
+   local replay) — Parts Partner Network cross-organization suite for stock,
+   cost, order and PII boundaries. Runs in a rolled-back transaction and needs
+   a service-role / postgres connection.
+4. `supabase--linter` — remaining warnings should match the counts above.
+5. `security--run_security_scan` — remaining items should be limited to
    the intentional categories above plus any scanner false-positives that
    re-flag already-hardened server functions (the scanner does not
    re-read source on every run).
