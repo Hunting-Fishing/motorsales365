@@ -24,8 +24,11 @@ Security reconciliation branch: `completion/365-security`.
    against production. Unchanged staff/chat/native offboarding transactions are
    now rehearsed offline with actual CHECKs and all three observed staff triggers.
    The bounded inventory now includes concrete chat/timestamp/work-location and
-   incoming writer paths without closing unknowns. Next recover current selected
-   chat policy/incoming attachment metadata, compose it offline, then define/test
+   incoming writer paths without closing unknowns. Selected current chat policies
+   and incoming attachment metadata are now recovered; the unchanged-source
+   offline policy proof distinguishes raw constant writes from filtered/returning
+   commands. Next recover six exact chat-writer and message/notification metadata
+   contracts, rehearse those side effects, then define/test
    the companion authority contract; resolve the initial
    dependency inventory's identity, role/module helper and trigger/security
    attachment closure; rehearse the companion roster/native guard with actual
@@ -489,13 +492,15 @@ flags remain unchanged. Mixed dated snapshots are not atomic database parity.
 
 Focused metadata tests26/26 (five new), lint and independent read-only review
 pass. Full sequential tooling220/220 (124.94s), format/diff pass.
-Remote CI pending verification on the published documentation head.
+Documentation head `d7fb4cc` passed all six CI gates (run `38651770280`),
+verified on the chat-policy follow-up. Hosting still fails separately;
+preview wrapper success is not an upload and live migrations/deploy are skipped.
 Publication evidence: `evidence/NATIVE_STAFF_DEPENDENCY_INVENTORY.md`.
 Migration impact: none. Deployment: none; no new live query or writer/count/RPC,
 permission/data/history/platform change. Application source remains723-test
 verified parent. Hosting remains a separate blocker; sparse artifacts must not deploy.
 
-Exact next action: verify the published head's checks. Recover narrowly selected
+Original next action (implemented in the checkpoint below): verify the published head's checks. Recover narrowly selected
 catalog-only current chat helper/policy and incoming shop/business plus shift/
 register/work-location attachment/index metadata; compare actual corresponding
 source without broad sweep/backfill replay. Compose selected actual chat SELECT/
@@ -507,6 +512,54 @@ Separate baseline/forward/private-storage recovery, actual API/JWT/role/load,
 consent/tenure/retention, OCR recovery/owner/mobile pilot, trusted entry/billing/
 retail/recruitment and hosting acceptance remain open. Existing pending helper
 approval remains unchanged; no repeated question or automatic application.
+
+## Latest chat membership policy checkpoint (2026-10-15)
+
+Draft PR #36 (`https://github.com/Hunting-Fishing/motorsales365/pull/36`), code
+`a5e141d`, branch `security/native-chat-membership-composition`, stacked on PR #35
+docs `d7fb4cc` (all six CI gates, run `38651770280`). Two independently reviewed
+catalog-only SELECTs at 23:14:53 UTC capture selected current chat policies/helpers
+and incoming attachments/indexes; no business rows/counts or application function
+ran. Eleven incoming retained function bodies match dated catalog fingerprints.
+These separate metadata observations do not enforce READ ONLY/timeouts or shared
+snapshot parity. Actual notification/commission/signup writers stay excluded
+from the minimal chat fixture, not stubbed or silently replayed.
+
+Sixteen new sequential always-closed memory tests preserve actual chat DDL,
+CHECKs/PKs/FKs/indexes, two helpers and six policies. Raw constant self UPDATE
+without WHERE/RETURNING/RHS column reads can reactivate left or retarget to an
+unseen existing thread; scoped/returning alternatives respectively affect zero
+or fail with 42501 and explicit rollback. Self→left succeeds even with RETURNING,
+then hides next-statement reads. Nominated-user helper execution, invitation/
+upsert/creator/owner controls and physical negatives retain their distinct
+boundaries. No live incident, API reachability or mitigation is inferred.
+
+Focused policy tests 16/16 (14.724s), static artifact/source-map tests 5/5, full sequential
+tooling 241/241 (141.65s), lint/format/diff and independent review pass. Source
+grants execute unchanged; reproduction of dated broad table ACLs is explicitly
+fixture-only, not historical grant parity or full role/default-privilege closure.
+Exact metadata/source/test pins and outcomes:
+`evidence/NATIVE_CHAT_MEMBERSHIP_POLICY_PROOF.md` and
+`evidence/NATIVE_INCOMING_ATTACHMENT_INVENTORY.md`. Remote CI awaits verification
+on the published documentation head. Application source stays the previously
+CI-verified 723-test parent, not newly accepted production behavior.
+
+Migration impact: none. Deployment: none; no production permission/data/history/
+platform mutation. Selected inventory of 37 sources/8 evidence/86 objects remains
+unchanged and incomplete; the new observations are not silently adopted.
+Global correspondence remains 404/423, with 19 unclassified; all baseline/parity/replay/
+release flags remain false. Hosting fails separately; sparse artifacts must not
+deploy. Pending bootstrap/totals decision unchanged; no repeat prompt.
+
+Exact next action: verify PR #36 checks; inspect only the six exact chat writer
+contracts and message/notification table/attachment metadata described in
+`evidence/NATIVE_CHAT_WRITER_REHEARSAL_PLAN.md`, then compose unchanged-source
+side effects and app acknowledgement controls offline. No production message/RPC
+or delivery runs. Finish that entry/writer boundary before the companion immutable
+identity/self-shift/owner/delegation/provenance/valid-offboarding/multi-roster/audit
+contract and native-PG concurrency. Separate baseline/forward/storage recovery,
+real API/JWT/role/load, consent/tenure/retention, OCR recovery/owner/mobile pilot,
+trusted entry/invoicing/retail/recruitment and hosting acceptance remain open.
 
 ## Recovery evidence (original scope, retained below)
 

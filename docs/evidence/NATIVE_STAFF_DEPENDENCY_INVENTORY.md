@@ -9,7 +9,8 @@ Branch `security/native-staff-dependency-inventory`, stacked on PR #34 docs
 `4100bbf`, all six CI gates passed (run `38650592549`), verified on this follow-up.
 Draft PR #35: `https://github.com/Hunting-Fishing/motorsales365/pull/35`, code
 `8e52323`. Full sequential tooling220/220, focused lint/format/diff and independent
-review pass. Remote CI pending verification on the published documentation head.
+review pass. Documentation head `d7fb4cc` passed all six CI gates (run
+`38651770280`), verified on the chat-policy follow-up.
 Application source stays at the723-test verified parent. Hosting remains a
 separate blocker; a green preview wrapper is not an upload/release.
 
@@ -84,6 +85,12 @@ or production count is emitted by the report. No test result authorizes a
 binding/duplicate/history repair, new grant or production rollout.
 
 ## Exact next dependency
+
+The selected metadata/policy step below is now implemented in draft PR #36,
+code `a5e141d`; see `NATIVE_CHAT_MEMBERSHIP_POLICY_PROOF.md`. This inventory's
+declared graph/pins/facets remain unchanged and incomplete. The original bounded
+requirements are retained below; the next resumption action is the six-writer
+and message/notification boundary in `NATIVE_CHAT_WRITER_REHEARSAL_PLAN.md`.
 
 Verify this publication's checks, then recover narrowly selected **catalog only**
 metadata for current chat membership helper/policy composition and the retained
