@@ -1,5 +1,24 @@
 # CI/CD for 365 MotorSales
 
+## Release-safety continuation — 2026-10-15
+
+The `security/staff-authority-release-gates` review branch freezes automatic
+historical migration pushes before credentials, project linking or any apply
+step. The unconditional inline `release-safety` job does not check out a caller-
+selected ref; an older planner cannot bypass it. The direct `supabase-plan.sh`
+entry point also fails closed without CLI execution. Old pending-count limits
+and the staging-bypass variable no longer authorize anything. Staging/production
+apply stages remain unreachable until a reviewed baseline and forward-only
+release/recovery workflow replaces the quarantine. This is repository code,
+not a dispatched workflow, production setting change or application deployment.
+
+Four offline regressions execute both gates with no executable PATH, fake
+credentials and old override variables, and check dependency/deploy wiring.
+These are shell/YAML tests, not a live GitHub/Supabase deployment rehearsal.
+See `evidence/MIGRATION_BASELINE_STRATEGY.md`. The separately owner-approved
+converter ACL containment is applied and verified; its exact-file release does
+not authorize historical replay or any other production change.
+
 ## Verified completion checkpoint — 2026-10-14
 
 The completion branch reconciles this pipeline with receipt release PR #10.
@@ -39,6 +58,10 @@ needs, the one-time setup, and the launch sequence.
 | Deploy trigger today | **Cloudflare Workers Builds** (Git integration on the Worker): every push to `main` builds and deploys production; other branches get preview versions and a "Workers Builds: motorsales365" check on the commit. Every `main` build since 2026-09-10 has failed because of the corrupted generated files that PR #6 fixes, so production still serves the last good build from 2026-09-10 (`a6d6817a`). |
 
 ## 2. Workflows
+
+The table below describes the original pipeline stages. The unconditional freeze
+above supersedes its historical migration-count checks and apply behavior; no
+current migration release can use those counts or bypass settings as authority.
 
 | File                 | Trigger                                                                                             | What it does                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | -------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -87,8 +110,8 @@ Add these under **Settings → Secrets and variables → Actions**.
 | `STAGING_DB_URL`                        | Repo secret, optional                  | adversarial suite on staging | Only needed if the automatic pooler URL does not work. Use the session-pooler connection string (port 5432) from staging → Connect.                                                                                              |
 | `TYPES_PR_TOKEN`                        | Repo secret, optional                  | types PR triggers CI         | Fine-grained PAT for this repo with _Contents_ and _Pull requests_ read/write. Without it, the types PR is opened by `GITHUB_TOKEN` and CI will not start on it automatically (push an empty commit or close and reopen the PR). |
 | `DEPLOY_VIA_ACTIONS`                    | Repo **variable**                      | deploy, previews             | Set to `true` once Workers Builds production deploys are turned off (see §5)                                                                                                                                                     |
-| `ALLOW_PROD_MIGRATIONS_WITHOUT_STAGING` | Repo variable, optional                | migrations                   | `true` lets production migrations run when staging is not configured. The adversarial suite still runs in CI on a throwaway database.                                                                                            |
-| `MAX_PENDING_MIGRATIONS`                | Repo variable, optional                | migrations                   | Default `10`                                                                                                                                                                                                                     |
+| `ALLOW_PROD_MIGRATIONS_WITHOUT_STAGING` | Retired; ignored by reviewed freeze    | none                         | No bypass of staging or release evidence is supported.                                                                                                                                                                           |
+| `MAX_PENDING_MIGRATIONS`                | Retired; ignored by reviewed freeze    | none                         | A count cannot establish provenance, replay safety or release authority.                                                                                                                                                         |
 | `PRODUCTION_PROJECT_REF`                | Repo variable, optional                | migrations, types            | Default `wjxaajgvddtrxxtocxen`                                                                                                                                                                                                   |
 
 Runtime secrets such as the service-role key, Stripe, email, Maps, and AI keys stay
@@ -129,23 +152,18 @@ Rollback: Cloudflare → Worker → Deployments → roll back, or
 
 ## 6. Staging Supabase project
 
-The migrations in this repo are **not a complete history**. When replayed onto an
-empty database, 47 of 413 files fail, because some objects were created outside
-migrations. A staging project therefore has to be seeded from production's schema,
-not built from the migrations:
+The repository is **not a replayable baseline**. Exact execution-source evidence
+does not establish schema/data/ACL parity or successful historical replay. The
+confirmed cost-fix precondition trap and unresolved source/baseline/recovery gates
+must be resolved through the reviewed strategy in
+`evidence/MIGRATION_BASELINE_STRATEGY.md`. Do not copy production history into a
+new project as a substitute for deterministic initialization, or ignore replay
+errors. Schema dumps are not data/private-storage backups or restore proof.
 
-```bash
-# Read-only dump of production schema and migration history
-supabase link --project-ref wjxaajgvddtrxxtocxen
-supabase db dump --linked -f /tmp/prod-schema.sql                      # schema only
-supabase db dump --linked --data-only --schema supabase_migrations -f /tmp/prod-history.sql
-# Restore into the new staging project
-psql "<staging session-pooler URL>" -f /tmp/prod-schema.sql
-psql "<staging session-pooler URL>" -f /tmp/prod-history.sql
-```
-
-After that, `migrations.yml` applies only the new migrations to staging, the same
-ones production will get. Re-seed occasionally so staging does not drift.
+No staging resource is provisioned by this change. Any new charge/resource needs
+the owner's explicit approval. Test candidates first in isolated disposable
+databases without production data or credentials. A real Supabase clean-install,
+existing-state upgrade and recovery rehearsal remains required before unfreezing.
 
 ## 7. One-time setup checklist
 
@@ -154,30 +172,25 @@ ones production will get. Re-seed occasionally so staging does not drift.
 - [ ] Create Environment `production` with required reviewers, restricted to `main`
 - [ ] Add `SUPABASE_ACCESS_TOKEN` (repo) and `PRODUCTION_DB_PASSWORD` (environment)
 - [ ] Allow Actions to create pull requests
-- [ ] Staging: create the project, seed it (§6), add `STAGING_PROJECT_REF` and `STAGING_DB_PASSWORD`. Or set `ALLOW_PROD_MIGRATIONS_WITHOUT_STAGING=true` for now
+- [ ] Complete the reviewed baseline/upgrade/recovery strategy (§6); obtain explicit resource approval before provisioning staging. No staging bypass is supported.
 - [ ] Turn off Workers Builds production deploys and set `DEPLOY_VIA_ACTIONS=true` (§5)
 - [ ] Run **Supabase types** manually once, and review and merge its PR (it replaces the reconstructed `types.ts`)
 - [ ] Add branch protection for the CI checks
 
 ## 8. Launch sequence
 
-1. **Before merging anything**, do §5 (turn off Workers Builds production deploys,
-   set `DEPLOY_VIA_ACTIONS=true`) and §4.1. If Workers Builds stays on, merging #6
-   deploys production immediately, and merging #5 would ship code that expects
-   migration `20260927090000` before that migration is applied.
-2. Merge **#6** (repairs `main`). No workflows exist on `main` yet, so nothing runs.
-3. Merge **this PR**. `deploy.yml` runs CI, finds no migration changes, and waits for
-   approval. Approve it to publish the repaired app (the first deploy since
-   2026-09-10).
-4. Pre-flight the database: run **Migrations** manually with `staging-only`, or check
-   production history with `supabase migration list`. If production reports many
-   pending migrations, reconcile the history before continuing.
-5. Update #5 onto `main` so it gets the full CI, including the RLS suite. Merge
-   **#7 into #5's branch** (its base), then merge **#5** into `main`. One release then
-   carries both migrations (`20260927090000`, `20260927120000`): staging apply and
-   adversarial suite, then **approve** production migrations, then types PR, then
-   **approve** deploy.
-6. Merge the automated types PR when it appears.
+The original September merge sequence is superseded; PR #6/#10 are already merged
+and current stacked review/verification lives in `365_COMPLETION_CHECKLIST.md`.
+Do not merge, switch deployers, configure secrets or dispatch migrations merely
+because an old checklist or green preview wrapper suggests it.
 
-After setup, a normal release needs one approval, or two when it includes
-migrations.
+1. Review current stacked slices and exact CI results; preserve migration history.
+2. Complete trusted identity/permission guards and the deterministic baseline,
+   existing-state forward set and measured recovery prerequisites.
+3. Resolve hosting authentication/build failure and verify the agreed deployer,
+   complete static media, actual preview and protected release controls.
+4. Obtain the explicit release decisions, then replace the temporary freeze with
+   a tested forward-only workflow. Source hashes and manual approval alone do not
+   substitute for staged verification or recoverability.
+5. Verify live role, receipt/history/invoice behavior and recovery evidence after
+   the approved release. A merged PR or build does not establish production success.

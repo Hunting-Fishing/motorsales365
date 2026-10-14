@@ -84,6 +84,21 @@ These counts describe the checked evidence snapshot, not refreshed live state.
 
 ## Candidate baseline construction: required next implementation
 
+The `security/staff-authority-release-gates` review branch quarantines automatic
+historical pushes: a secret-free unconditional inline workflow failure precedes
+staging, and the direct planner entry point independently refuses. Old count/
+staging-bypass variables cannot unfreeze it, nor can a caller-selected source ref.
+This is a temporary repository safeguard, not a completed baseline or a live
+workflow/production configuration change. Four offline shell/YAML regressions
+exercise the failure and dependency wiring. Replace it only with a reviewed,
+tested forward-only release/recovery workflow after the prerequisites below.
+
+The default dependent-job skip behavior is documented in
+[GitHub workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idneeds).
+No always()/continue-on-error escape is present on the freeze or staging job;
+the required-migration application deploy guard remains unchanged. Source checks
+alone still cannot approve a release.
+
 1. **Freeze inputs, not history.** Record the repository commit, project identity,
    evidence observation times and hashes, Postgres/Supabase/PGlite versions, CLI
    version/diff engine, required extensions and platform prerequisites. Preserve

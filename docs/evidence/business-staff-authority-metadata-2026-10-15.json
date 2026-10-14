@@ -1,0 +1,50 @@
+{
+  "project": "wjxaajgvddtrxxtocxen",
+  "observedOn": "2026-10-15",
+  "staffMetadataVerifiedAtUtc": "2026-10-14T18:06:46.449698Z",
+  "scope": "Read-only catalog metadata and function body fingerprints only. No staff/customer row read, live function invocation, mutation, API exploit or full schema parity claim.",
+  "staffTable": {
+    "schema": "public",
+    "table": "business_staff",
+    "owner": "postgres",
+    "rlsEnabled": true,
+    "rlsForced": false,
+    "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+    "authenticatedUpdateColumns": [
+      "id",
+      "business_id",
+      "user_id",
+      "role",
+      "title",
+      "duties",
+      "active",
+      "on_shift",
+      "invited_by",
+      "created_at",
+      "updated_at"
+    ],
+    "updatePolicy": {
+      "name": "staff: owner/manager update",
+      "roles": ["authenticated"],
+      "permissive": true,
+      "using": "(has_business_role(auth.uid(), business_id, 'manager'::business_staff_role) OR (user_id = auth.uid()))",
+      "withCheck": "(has_business_role(auth.uid(), business_id, 'manager'::business_staff_role) OR (user_id = auth.uid()))"
+    }
+  },
+  "bridgeTrigger": {
+    "name": "sync_business_staff_to_shop_manager",
+    "enabled": "O",
+    "definition": "CREATE TRIGGER sync_business_staff_to_shop_manager AFTER INSERT OR DELETE OR UPDATE OF role, title, active ON public.business_staff FOR EACH ROW EXECUTE FUNCTION shop_manager.sync_business_staff_trigger()",
+    "owner": "postgres",
+    "securityDefiner": true,
+    "definitionMd5": "7eda4e3d3d50670b1e27ae46528cb847"
+  },
+  "normalization": "Function body MD5 after removing CR; bounded observation identifier, not cryptographic authentication or current-state refresh.",
+  "functionBodyMd5": {
+    "has_business_role(uuid,uuid,business_staff_role)": "f1fb1a787c944fc485f8a8a84f3f96e9",
+    "is_business_member(uuid,uuid)": "ec58faed439b7f45be8d24c43f676ac4",
+    "is_business_owner(uuid,uuid)": "d6d710b5fdbab8796c3771c960358157",
+    "shop_manager.sync_business_staff_member(uuid,uuid,boolean,text,text)": "3953299c83e7f20a19f4a7f60b12ba84",
+    "shop_manager.sync_business_staff_trigger()": "16868098a0e6e594f4d013a09f117af0"
+  }
+}

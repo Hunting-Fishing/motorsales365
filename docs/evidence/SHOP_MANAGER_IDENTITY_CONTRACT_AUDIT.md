@@ -97,3 +97,20 @@ is reproduced. A fixture-only column-grant contrast blocks both pivots while
 allowing a display-name edit. Test/statement/lock waiting is bounded, and every
 database closes. These are retained-source behavior proofs, not live exploitation
 or approval of a production profile-policy fix.
+
+## Indirect roster authority follow-up
+
+Fresh read-only roster catalog checks and six hash-pinned disposable regressions
+now establish the missing dependency: self-writable `public.business_staff`
+authority can flow through the postgres-definer provisioning trigger into native
+shop/role bindings even when direct native writes and direct bridge EXECUTE are
+denied. Inactive self-reactivation and unchanged role target-list updates also
+reach the bridge. The actual owner and unrelated-actor controls pass; legacy
+profile IDs remain distinct. Five inspected function-body fingerprints correspond
+to unchanged retained bodies in the fixture. No live row mutation/API exploit or
+full schema parity is claimed. See `BUSINESS_STAFF_AUTHORITY_GATES.md` and the dated
+metadata export for limits, exact source tests and the ordered guard contract.
+
+The next candidate must protect both authority surfaces and preserve narrowly
+authorized shift/manager workflows; a profile-only grant fix is insufficient.
+The converter-only approval does not authorize any profile/staff/role change.

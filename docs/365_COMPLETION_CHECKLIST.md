@@ -386,3 +386,36 @@ project-wide security clearance. Cloudflare hosting remains unverified/failed;
 no application deployment, customer communication or paid resource is authorized
 by this checkpoint. Recovery was rehearsed, not run live. Keep the recurring
 completion heartbeat active: the agreed 365 scope is not complete.
+
+## Indirect staff authority and release freeze: 2026-10-15
+
+Branch: `security/staff-authority-release-gates`, stacked on PR #15. Parent release
+evidence head `ac8d663` passed all six CI gates (run `38612738730`), including the
+two new provenance checks. The converter containment remains the only live change.
+
+Six new memory-only, hash-pinned roster regressions prove an ordinary authenticated
+self-row business/owner-role pivot reaches the privileged native profile bridge,
+even with direct native authority writes/direct bridge execution denied. Inactive
+self-reactivation and no-op role target-list effects are covered, plus actual-owner,
+unrelated-actor and legacy-ID controls. Five retained body fingerprints match the
+fresh read-only catalog evidence; no staff/customer rows were read or mutated live.
+See `evidence/BUSINESS_STAFF_AUTHORITY_GATES.md` and its scoped metadata JSON.
+
+The workflow's automatic historical pushes are now frozen **in this review branch**
+by an unconditional inline failure before credential/link/apply steps. The direct
+planner entry point also fails closed; pending-count and no-staging bypasses are
+retired. Independent review caught and removed a caller-selected-ref bypass of
+the first proposed gate. Four offline shell/YAML regressions test both entry
+points and dependency/deployment wiring. No workflow was dispatched, repository
+setting changed, baseline adopted, migration applied or application deployed here.
+Focused verification is 10/10; the complete local tooling command passes 65/65.
+ESLint and formatting checks on both new suites pass. The application source is
+unchanged from the verified 370-test parent; full-checkout CI is required on this
+new review slice before its verification checkpoint is complete.
+
+Next: publish/verify this bounded review slice; then implement an offline companion
+native-profile/roster guard candidate that preserves self-shift/manager operations,
+handles no-op bridge targets and legacy IDs, and audits all privileged writers.
+Separate production authority and scoped recovery are required for these changes.
+Continue independent baseline construction and bounded CRM activity while release
+gates remain unresolved; external CRM candidate/license recovery is still open.

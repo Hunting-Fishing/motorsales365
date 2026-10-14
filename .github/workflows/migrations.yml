@@ -1,6 +1,9 @@
 name: Migrations
 
-# Applies supabase/migrations to STAGING, verifies RLS there, then (after manual
+# FROZEN: the release-safety job fails before credentials/link/apply. The retained
+# stages below are not permission to replay history; replace this quarantine only
+# after a reviewed deterministic baseline and forward-only release/recovery path.
+# Original pipeline applies supabase/migrations to STAGING, then (after manual
 # approval in the `production` GitHub Environment) applies them to PRODUCTION
 # and regenerates database types.
 #
@@ -10,7 +13,8 @@ name: Migrations
 #     ships code ahead of its schema and there is exactly one approval per release.
 #   - workflow_dispatch: run by hand (e.g. staging only, or to retry).
 #
-# Every job skips with a clear notice when its secrets are not configured.
+# The release-safety job intentionally fails without secrets. Retained apply jobs
+# would check configuration if a future reviewed workflow re-enabled them.
 on:
   workflow_dispatch:
     inputs:
@@ -49,14 +53,24 @@ concurrency:
 env:
   SUPABASE_CLI_VERSION: 2.118.0
   PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF || 'wjxaajgvddtrxxtocxen' }}
-  # More pending migrations than this almost always means the remote migration
-  # history does not match the repository (e.g. history never recorded). Stop
-  # and reconcile with `supabase migration list` / `supabase migration repair`.
-  MAX_PENDING_MIGRATIONS: ${{ vars.MAX_PENDING_MIGRATIONS || '10' }}
 
 jobs:
+  release-safety:
+    name: Database release safety (historical push frozen)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Refuse unverified historical replay
+        # Inline and unconditional: an older caller-selected ref must not be
+        # able to replace the freeze with its historical successful planner.
+        run: |
+          printf '%s\n' '::error title=Database release blocked::Automated historical db push is disabled pending verified baseline, forward-only release and recovery evidence.' >&2
+          printf '%s\n' 'Review docs/evidence/MIGRATION_BASELINE_STRATEGY.md. Exact-file containment does not authorize historical replay.' >&2
+          exit 1
+
   staging:
     name: Staging — dry-run, apply, adversarial RLS suite
+    needs: release-safety
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
@@ -155,11 +169,11 @@ jobs:
     name: Production — approval, dry-run, db push
     needs: staging
     # Skip (without asking for approval) when only staging was requested, or when
-    # staging is not configured, unless explicitly allowed via a repo variable.
+    # staging is not configured. There is no environment-variable bypass.
     if: >-
       (inputs.target || 'staging-then-production') == 'staging-then-production' &&
       needs.staging.result == 'success' &&
-      (needs.staging.outputs.status != 'not-configured' || vars.ALLOW_PROD_MIGRATIONS_WITHOUT_STAGING == 'true')
+      (needs.staging.outputs.status == 'applied' || needs.staging.outputs.status == 'up-to-date')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment:
