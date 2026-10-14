@@ -3,8 +3,8 @@
   "scopeId": "native-identity-customer-workorder-receipts-initial-inventory",
   "repository": "Hunting-Fishing/motorsales365",
   "project": "wjxaajgvddtrxxtocxen",
-  "sourceCommit": "88a8977f4d2fd79420b7c447ab5686eb01510e9c",
-  "observedAtUtc": "2026-10-14T19:09:06Z",
+  "sourceCommit": "ff24159586178e955c329ba0083daab9d306a1ed",
+  "observedAtUtc": "2026-10-14T19:36:00.351Z",
   "normalization": "CRLF-to-LF-only",
   "sources": [
     {
@@ -69,6 +69,20 @@
       "sha256Lf": "30dfd8df0c3537efb5155a8891804e00444b180f55e674b56d522e473e2f4144",
       "lineageClass": "source-correspondence",
       "evidenceRefs": ["provenance", "historyHashes"]
+    },
+    {
+      "id": "nativeRoleText",
+      "path": "supabase/migrations/20260713081559_69ad9a73-edab-4719-b16e-38541b8ba91a.sql",
+      "sha256Lf": "23169927a45a5c47406181fb4e2e2c049e5282698f31a840c17cdbc2725a4472",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "nativeRoleCatalog"]
+    },
+    {
+      "id": "nativeMembership",
+      "path": "supabase/migrations/20260713081649_7763bb16-35c5-4c76-a8f9-36c3f58090ce.sql",
+      "sha256Lf": "738cecf5f28c9cc3cce5e2980a6ebb5c324d18fbd5b92aeb151448c89afd7bb9",
+      "lineageClass": "source-correspondence",
+      "evidenceRefs": ["provenance", "nativeRoleCatalog"]
     },
     {
       "id": "nativePoliciesBootstrap",
@@ -231,6 +245,11 @@
       "id": "staffCatalog",
       "path": "docs/evidence/business-staff-authority-metadata-2026-10-15.json",
       "sha256Lf": "439938311ff14837cb26c5c8e52928054e3e18c3596ed17a9ad9348125efb6a3"
+    },
+    {
+      "id": "nativeRoleCatalog",
+      "path": "docs/evidence/native-role-membership-metadata-2026-10-15.json",
+      "sha256Lf": "fedaa75815414a84fea1b2414cc51a8e6ae9b0297a1da80b16e7ba57ee54bb64"
     },
     {
       "id": "correspondenceAudit",
@@ -587,6 +606,8 @@
       ],
       "facets": {
         "definition": "source-observed",
+        "selectedDefinitionMatchesObservedCatalog": "source-observed",
+        "observedCatalogOwnerSearchPathAndExecuteAcl": "source-observed",
         "ownerSearchPathAndExecuteAcl": "unreviewed",
         "independentMembershipAuthority": "unreviewed"
       }
@@ -1904,9 +1925,14 @@
       "id": "function:shop_manager.user_belongs_to_shop(uuid,uuid)",
       "kind": "function",
       "signature": "shop_manager.user_belongs_to_shop(uuid,uuid)",
-      "disposition": "unverified",
-      "sourceRefs": ["employeeLedger"],
+      "disposition": "candidate",
+      "sourceRefs": ["nativeMembership", "employeeLedger"],
       "dependencies": [
+        {
+          "id": "table:shop_manager.profiles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
         {
           "id": "external:identity-constraints-policies-grants-and-trigger-closure",
           "relation": "external-prerequisite",
@@ -1914,8 +1940,11 @@
         }
       ],
       "facets": {
-        "callSiteOnlyNotDefinitionPin": "source-observed",
-        "definitionAndSupersession": "unreviewed",
+        "definition": "source-observed",
+        "selectedDefinitionMatchesObservedCatalog": "source-observed",
+        "profileIdNotUserIdLookup": "source-observed",
+        "observedCatalogOwnerSearchPathAndExecuteAcl": "source-observed",
+        "allCallerAndSupersessionClosure": "unreviewed",
         "ownerSearchPathAndExecuteAcl": "unreviewed",
         "trustedMembershipAuthority": "unreviewed"
       }
@@ -1924,9 +1953,19 @@
       "id": "function:shop_manager.has_role(uuid,text)",
       "kind": "function",
       "signature": "shop_manager.has_role(uuid,text)",
-      "disposition": "unverified",
-      "sourceRefs": ["employeeLedger"],
+      "disposition": "candidate",
+      "sourceRefs": ["nativeRoleText", "employeeLedger"],
       "dependencies": [
+        {
+          "id": "table:shop_manager.user_roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
         {
           "id": "external:role-types-and-catalog-initialization",
           "relation": "external-prerequisite",
@@ -1939,8 +1978,45 @@
         }
       ],
       "facets": {
-        "textOverloadCallSiteOnlyNotEnumOverloadEquivalence": "source-observed",
-        "definitionAndSupersession": "unreviewed",
+        "definition": "source-observed",
+        "textOverloadIsNotEnumInputEquivalence": "source-observed",
+        "selectedDefinitionMatchesObservedCatalog": "source-observed",
+        "observedCatalogOwnerSearchPathAndExecuteAcl": "source-observed",
+        "globalRoleLookupDoesNotEstablishShopMembership": "source-observed",
+        "allCallerAndSupersessionClosure": "unreviewed",
+        "ownerSearchPathAndExecuteAcl": "unreviewed",
+        "trustedRoleAuthority": "unreviewed"
+      }
+    },
+    {
+      "id": "function:shop_manager.has_role(uuid,shop_manager.app_role)",
+      "kind": "function",
+      "signature": "shop_manager.has_role(uuid,shop_manager.app_role)",
+      "disposition": "candidate",
+      "sourceRefs": ["nativeResolvers"],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.user_roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "table:shop_manager.roles",
+          "relation": "logical-binding",
+          "reviewStatus": "source-observed"
+        },
+        {
+          "id": "external:role-types-and-catalog-initialization",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "definition": "source-observed",
+        "selectedDefinitionMatchesObservedCatalog": "source-observed",
+        "observedCatalogOwnerSearchPathAndExecuteAcl": "source-observed",
+        "globalRoleLookupDoesNotEstablishShopMembership": "source-observed",
+        "allCallerAndSupersessionClosure": "unreviewed",
         "ownerSearchPathAndExecuteAcl": "unreviewed",
         "trustedRoleAuthority": "unreviewed"
       }
