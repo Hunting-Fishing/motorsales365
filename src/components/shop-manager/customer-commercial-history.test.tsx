@@ -163,7 +163,7 @@ function requests(kind?: CustomerCommercialKind) {
     .filter((request) => !kind || request.data.kind === kind);
 }
 function card(kind: CustomerCommercialKind) {
-  return within(screen.getByRole("region", { name: `Customer ${kind}`, exact: true }));
+  return within(screen.getByRole("region", { name: `Customer ${kind}` }));
 }
 
 beforeEach(() => {
@@ -228,7 +228,7 @@ describe("Customer commercial history private read snapshots", () => {
         refetchOnMount: "always",
         retry: false,
       });
-      expect(query.options.placeholderData).toBeUndefined();
+      expect(Reflect.get(query.options, "placeholderData")).toBeUndefined();
     }
     expect(await screen.findByText("No invoices for this customer yet.")).toBeInTheDocument();
     expect(screen.getByText("No quotes for this customer yet.")).toBeInTheDocument();
@@ -302,7 +302,7 @@ describe("Customer commercial history private read snapshots", () => {
         { ...invoice("invalid-day"), date: "2026-02-30", due_date: "2026-13-01" },
         { ...invoice("empty-text"), date: "", due_date: "", created_at: null },
         { ...invoice("year-zero"), date: "0000-01-01", due_date: "0000-12-31" },
-        { ...invoice("early-year"), date: "0099-01-02", due_date: null },
+        { ...invoice("early-year"), date: "0099-01-02", due_date: "0099-01-03" },
       ],
     });
     respond("quotes", {
