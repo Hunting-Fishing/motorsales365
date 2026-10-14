@@ -102,7 +102,7 @@ baseline/recovery and release gates before live application.
 The bounded activity card can follow, using only explicit active vehicle links;
 never reuse the owner-only sharing/history screen inside shop CRM.
 
-## Next bounded activity slice (planned, not implemented)
+## Bounded activity slice (reader candidate only; no UI consumer yet)
 
 Build a read-only Customer Vehicle Activity card for one selected native customer
 vehicle. A new authenticated reader must resolve the visible customer, matching
@@ -131,4 +131,14 @@ a reviewed invoker join/read contract and disposable authorization regressions,
 not another unrestricted definer helper. Current link-policy/owner-transfer
 semantics, native mutable membership, the pending direct-installation correction
 and full baseline/recovery prerequisites remain separate release gates. This
-plan adds no source implementation, SQL or production capability.
+read contract now has an **unapplied, release-blocked** SQL candidate and 13
+memory-only authorization/projection/recovery regressions. See
+`evidence/CUSTOMER_VEHICLE_ACTIVITY_READ_CONTRACT.md`. The actual vehicle policies
+keep private owner rows unavailable to ordinary linked staff; no widening was
+introduced. Existing private receipt access follows current ownership, and
+A-to-B-to-A can revive old link approval without a proven tenure invariant. Four
+separate retained-source privacy regressions and required transfer/retention gates
+are documented in `evidence/VEHICLE_OWNERSHIP_CONSENT_GATES.md`.
+
+The authenticated adapter and card remain the next independent implementation
+slice. No live database/application release or production capability is claimed.

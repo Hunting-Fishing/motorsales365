@@ -1,0 +1,114 @@
+{
+  "formatVersion": 1,
+  "project": "wjxaajgvddtrxxtocxen",
+  "observedAtUtc": "2026-10-14T19:39:13.084014Z",
+  "mode": "read-only-catalog-subset",
+  "scope": "Curated fields from a seven-table catalog-only query for the proposed Customer360 read contract. Not a complete schema/grant/constraint export or business-row inspection.",
+  "publicVehicle": {
+    "table": "public.vehicles",
+    "rlsEnabled": true,
+    "forceRls": false,
+    "authenticatedTableSelect": true,
+    "joinColumns": {
+      "id": "uuid NOT NULL",
+      "owner_user_id": "uuid NOT NULL",
+      "is_public": "boolean NOT NULL",
+      "ownership_count": "integer NOT NULL"
+    },
+    "allObservedPoliciesForThisTable": [
+      {
+        "name": "Admins manage vehicles",
+        "command": "ALL",
+        "roles": ["PUBLIC"],
+        "usingObserved": "has_role(auth.uid(), 'admin'::app_role)",
+        "withCheckObserved": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "name": "Owners manage own vehicles",
+        "command": "ALL",
+        "roles": ["PUBLIC"],
+        "usingObserved": "(auth.uid() = owner_user_id)",
+        "withCheckObserved": "(auth.uid() = owner_user_id)"
+      },
+      {
+        "name": "Public vehicles readable",
+        "command": "SELECT",
+        "roles": ["PUBLIC"],
+        "usingObserved": "(is_public = true)",
+        "withCheckObserved": null
+      }
+    ],
+    "derivedBoundary": "No linked-shop private-vehicle SELECT policy was observed. Existing table SELECT does not bypass row policy. A strict invoker join cannot confirm a private owner's row for ordinary shop staff."
+  },
+  "link": {
+    "table": "public.vehicle_shop_links",
+    "rlsEnabled": true,
+    "authenticatedTableSelect": true,
+    "joinColumns": {
+      "shop_vehicle_id": "uuid NOT NULL",
+      "vehicle_id": "uuid NOT NULL",
+      "shop_id": "uuid NOT NULL",
+      "active": "boolean NOT NULL",
+      "approved_by": "uuid NOT NULL",
+      "approved_at": "timestamp with time zone NOT NULL",
+      "revoked_at": "timestamp with time zone"
+    },
+    "selectPolicyObserved": "(vehicle_receipts_private.owns_vehicle(vehicle_id) OR vehicle_receipts_private.shop_access(shop_vehicle_id))"
+  },
+  "installations": {
+    "table": "public.installed_components",
+    "rlsEnabled": true,
+    "authenticatedTableSelect": true,
+    "requiredColumns": {
+      "id": "uuid NOT NULL",
+      "business_id": "uuid NOT NULL",
+      "work_order_id": "uuid",
+      "shop_manager_vehicle_id": "uuid",
+      "public_vehicle_id": "uuid",
+      "name_snapshot": "text NOT NULL",
+      "part_number_snapshot": "text",
+      "installed_quantity": "numeric(12,2) NOT NULL",
+      "installed_at": "timestamp with time zone NOT NULL",
+      "installed_odometer_km": "integer"
+    },
+    "selectPolicyObserved": "is_business_member(( SELECT auth.uid() AS uid), business_id)"
+  },
+  "native": {
+    "allFourTablesRlsEnabled": true,
+    "allFourTablesAuthenticatedTableSelect": true,
+    "tables": {
+      "shop_manager.customers": {
+        "id": "uuid NOT NULL",
+        "shop_id": "uuid NOT NULL",
+        "auth_user_id": "uuid",
+        "user_id": "uuid"
+      },
+      "shop_manager.vehicles": {
+        "id": "uuid NOT NULL",
+        "customer_id": "uuid"
+      },
+      "shop_manager.shops": {
+        "id": "uuid NOT NULL",
+        "organization_id": "uuid NOT NULL",
+        "business_id": "uuid"
+      },
+      "shop_manager.work_orders": {
+        "id": "uuid NOT NULL",
+        "shop_id": "uuid NOT NULL",
+        "customer_id": "uuid",
+        "vehicle_id": "uuid",
+        "work_order_number": "text",
+        "status": "text NOT NULL",
+        "created_at": "timestamp with time zone NOT NULL"
+      }
+    },
+    "derivedBoundary": "Native row policies depend on the current native profile/shop helpers; their observed mutable authority and legacy identity mismatch remain unresolved. This subset does not establish trusted membership."
+  },
+  "limitations": [
+    "No customer/profile/vehicle/link/receipt/installation/work-order row read or mutation, and no business function invocation.",
+    "Receipt columns and row-policy behavior are retained-source evidence in the receipt migration, not an additional receipt catalog query in this subset.",
+    "This is a curated metadata subset: role inheritance, complete column ACLs/defaults/constraints/triggers, every policy dependency, current data integrity and HTTP/JWT/API exposure are not verified.",
+    "Current-owner equality cannot prove a fresh ownership tenure after an A-to-B-to-A transfer. No link ownership epoch is inferred from ownership_count.",
+    "No RLS, grants, function, schema, migration history or platform configuration changed."
+  ]
+}
