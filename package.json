@@ -21,6 +21,7 @@
     "smoke:signup:matrix": "node scripts/smoke-signup-matrix.mjs",
     "test:e2e:signup": "playwright test e2e/signup-*.spec.ts",
     "test:vehicle-receipts:db": "node scripts/vehicle-receipts/test-database.mjs",
+    "test:installed-components:db": "node scripts/vehicle-receipts/test-installed-components.mjs",
     "receipts:migrate-legacy": "node scripts/vehicle-receipts/migrate-legacy-receipts.mjs"
   },
   "dependencies": {
