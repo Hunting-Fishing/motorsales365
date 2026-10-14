@@ -30,7 +30,7 @@ Security reconciliation branch: `completion/365-security`.
    any application deployment.
 4. Native Customer 360's bounded activity reader/card is implemented offline in
    PR #22/#23 and passed all six CI gates. Complete native profile/module/receipt
-   authority composition, private-vehicle consent and ownership-tenure gates;
+   writer/security closure, private-vehicle consent and ownership-tenure gates;
    do not deploy the unapplied reader APIs/consumer. Establish strict
    consent-at-read semantics before production acceptance; no owner-only history
    or invoice shortcut. Original scanner recovery and owner/mobile OCR pilot
@@ -42,7 +42,7 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest verified application slice: PR #23, documentation head `3a3f1f2`, all six
+Latest fully CI-verified application slice: PR #23, documentation head `3a3f1f2`, all six
 CI gates passed (run `38631111334`), 482 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
@@ -68,7 +68,8 @@ permission changed; the separate helper decision is still pending.
 ## Latest native composition checkpoint (2026-10-15)
 
 Draft PR #25, code `89734f1`, branch `security/native-access-composition-proof`,
-stacked on verified PR #24 head `985a659`; remote CI pending at publication.
+stacked on verified PR #24 head `985a659`; latest docs head `9152836` passed all
+six CI gates (run `38635100444`), verified on this resume.
 Nine unchanged native/module/receipt helpers are composed with
 selected actual override/receipt/link/item DDL and read policies. Fresh catalog
 metadata only confirmed selected definitions/ACLs and override table metadata;
@@ -81,12 +82,42 @@ Global correspondence stays 404/422; 18 unclassified; no baseline promotion.
 
 Migration impact: none. Deployment: none; historical replay and sparse artifact
 deployment remain frozen. Production converter containment stays intact; separate
-bootstrap/totals approval remains pending. Exact next action: verify PR #25 CI,
-then finish the request-bound Customer 360 primary/vehicle/work-order read and
+bootstrap/totals approval remains pending. Exact next action: finish and publish
+the request-bound Customer 360 primary/vehicle/work-order read and
 stale-visibility slice while continuing native writer/security closure. Module
 visibility is not granular write authority; link timestamp alone is not revocation.
 
-## Recovery evidence (original scope)
+## Latest Customer 360 read checkpoint (2026-10-15)
+
+Draft PR #26, code `0357afb`, branch `completion/customer-detail-request-bound`,
+stacked on PR #25 docs head `9152836`. Three older browser detail reads now use
+an authenticated request-scoped caller client with strict actor/input/DTO scope
+checks, independent visible-customer gates, cancellation forwarding and 101/100
+bounded lists. Primary refresh/error unmounts all private children/list observers;
+list refresh/error masks stale rows, vehicle options and counts. Caps and
+unavailable/empty states are explicit. No SQL/RPC/grant or business write changed.
+
+Verification: 29 handler +24 integration focused tests pass; full application
+suite 522/522 across 42 files, report checker exit 0/no quarantined failures.
+Final full TypeScript check, formatting/diff and focused ESLint pass (zero errors,
+one existing route `any` warning). Independent source review clean. Existing
+tooling 156/156 unchanged. Remote CI pending at publication. No deployment; the
+sparse checkout still omits public media and the activity APIs remain unapplied.
+See `evidence/CUSTOMER_DETAIL_REQUEST_BOUND_READS.md` for snapshot/test limits.
+
+Exact next action: verify PR #26 checks; then replace the commercial invoice/quote
+browser readers with strict actor-bound customer-scoped reads and independent
+freshness masking, preserving native TEXT invoice IDs/dates after catalog checks.
+Then communications reads, reminder integrity fixtures/reads, and separately
+authorized attribution/entry contracts. Fresh metadata confirmed reminder policy
+is already shop-scoped, but it does not bind customer/shop; reminder create omits
+shop identity and communications form vocabulary/attribution conflicts with current
+CHECK/NOT NULL metadata. No business write was attempted. Detailed ordered gates
+and narrow catalog pins: `evidence/CUSTOMER_CARD_REMAINING_GATES.md`.
+Continue native writer/attachment/provisioning/offboarding closure in parallel;
+all consent/tenure, baseline/recovery, mobile/pilot and hosting gates remain open.
+
+## Recovery evidence (original scope, retained)
 
 - [x] Confirm receipt/history release PR #10 is merged on current main.
 - [x] Confirm five existing open PRs: #2, #5, #7, #8, #9.

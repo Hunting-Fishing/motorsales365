@@ -1,0 +1,112 @@
+{
+  "formatVersion": 1,
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "mode": "read-only-catalog",
+  "scope": "Selected native customer, vehicle and work-order column types/nullability only. No business rows, RPC, DDL, mutations, history or platform changes.",
+  "columns": [
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "customers",
+      "attname": "id",
+      "type": "uuid",
+      "attnotnull": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "customers",
+      "attname": "created_at",
+      "type": "timestamp with time zone",
+      "attnotnull": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "customers",
+      "attname": "is_fleet",
+      "type": "boolean",
+      "attnotnull": false
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "vehicles",
+      "attname": "id",
+      "type": "uuid",
+      "attnotnull": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "vehicles",
+      "attname": "customer_id",
+      "type": "uuid",
+      "attnotnull": false
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "vehicles",
+      "attname": "year",
+      "type": "integer",
+      "attnotnull": false
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "vehicles",
+      "attname": "last_service_date",
+      "type": "timestamp with time zone",
+      "attnotnull": false
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "vehicles",
+      "attname": "created_at",
+      "type": "timestamp with time zone",
+      "attnotnull": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "work_orders",
+      "attname": "id",
+      "type": "uuid",
+      "attnotnull": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "work_orders",
+      "attname": "customer_id",
+      "type": "uuid",
+      "attnotnull": false
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "work_orders",
+      "attname": "vehicle_id",
+      "type": "uuid",
+      "attnotnull": false
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "work_orders",
+      "attname": "total_cost",
+      "type": "numeric",
+      "attnotnull": false
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:37:54.266021+00",
+      "nspname": "shop_manager",
+      "relname": "work_orders",
+      "attname": "created_at",
+      "type": "timestamp with time zone",
+      "attnotnull": true
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "formatVersion": 1,
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "mode": "read-only-catalog",
+  "scope": "Selected customer_reminders/customer_communications table ownership, RLS, ACL and policies only. No business rows, RPC, mutation, DDL or history/platform changes.",
+  "tables": [
+    {
+      "observed_at_utc": "2026-10-14 20:53:31.861799",
+      "nspname": "shop_manager",
+      "relname": "customer_communications",
+      "owner": "postgres",
+      "rls": true,
+      "force_rls": false,
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=arwd/postgres,service_role=arwdDxtm/postgres}",
+      "authenticated_select": true,
+      "authenticated_insert": true,
+      "authenticated_update": true,
+      "authenticated_delete": true,
+      "policies": [
+        {
+          "name": "sm_customer_comms_all",
+          "check": "(EXISTS ( SELECT 1\n   FROM shop_manager.customers c\n  WHERE ((c.id = customer_communications.customer_id) AND (c.shop_id = shop_manager.get_current_user_shop_id()))))",
+          "roles": ["authenticated"],
+          "using": "(EXISTS ( SELECT 1\n   FROM shop_manager.customers c\n  WHERE ((c.id = customer_communications.customer_id) AND (c.shop_id = shop_manager.get_current_user_shop_id()))))",
+          "command": "*",
+          "permissive": true
+        }
+      ]
+    },
+    {
+      "observed_at_utc": "2026-10-14 20:53:31.861799",
+      "nspname": "shop_manager",
+      "relname": "customer_reminders",
+      "owner": "postgres",
+      "rls": true,
+      "force_rls": false,
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=arwd/postgres,service_role=arwdDxtm/postgres}",
+      "authenticated_select": true,
+      "authenticated_insert": true,
+      "authenticated_update": true,
+      "authenticated_delete": true,
+      "policies": [
+        {
+          "name": "shop scoped access reminders_all_authenticated",
+          "check": "(shop_id = shop_manager.get_current_user_shop_id())",
+          "roles": ["authenticated"],
+          "using": "(shop_id = shop_manager.get_current_user_shop_id())",
+          "command": "*",
+          "permissive": true
+        }
+      ]
+    }
+  ]
+}
