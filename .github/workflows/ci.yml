@@ -82,6 +82,9 @@ jobs:
       - name: Customer reminder integrity characterization (memory-only)
         run: node --test scripts/ci/customer-reminder-integrity.test.mjs
 
+      - name: Customer reminder same-statement read contract (memory-only)
+        run: node --test scripts/ci/customer-reminders-read-contract.test.mjs
+
       # Run the WHOLE suite once; the checker decides pass/fail. Known failures
       # listed in scripts/ci/vitest-quarantine.json are reported but do not block;
       # any other failure (including a test file that fails to load) does.
