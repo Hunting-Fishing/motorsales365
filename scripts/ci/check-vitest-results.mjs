@@ -30,6 +30,17 @@ if (!fs.existsSync(reportPath)) {
 }
 
 const report = JSON.parse(fs.readFileSync(reportPath, "utf8"));
+// An empty or incomplete report must never turn a crashed test run green.
+const invalidRun =
+  !Number.isInteger(report.numTotalTests) ||
+  report.numTotalTests <= 0 ||
+  !Array.isArray(report.testResults) ||
+  report.testResults.length === 0 ||
+  (report.unhandledErrors?.length ?? 0) > 0;
+if (invalidRun) {
+  annotate("error", "Vitest did not produce a complete test run, or reported unhandled errors.");
+  process.exit(1);
+}
 const quarantine = JSON.parse(fs.readFileSync(quarantinePath, "utf8")).tests ?? [];
 const key = (file, name) => `${file} :: ${name}`;
 const quarantined = new Map(quarantine.map((q) => [key(q.file, q.name), q]));
@@ -65,6 +76,14 @@ for (const file of report.testResults ?? []) {
 }
 
 const unexpected = failures.filter((f) => !quarantined.has(key(f.file, f.name)));
+const assertionFailures = failures.filter((f) => f.name !== "<file load error>").length;
+if (
+  (report.numFailedTests ?? 0) > assertionFailures ||
+  (report.success === false && failures.length === 0)
+) {
+  annotate("error", "Vitest reported a failed run without complete failure details.");
+  process.exit(1);
+}
 const known = failures.filter((f) => quarantined.has(key(f.file, f.name)));
 const nowPassing = quarantine.filter((q) => passed.has(key(q.file, q.name)));
 const missing = quarantine.filter(

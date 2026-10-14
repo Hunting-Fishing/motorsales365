@@ -10,6 +10,8 @@
 // Usage: node scripts/ci/eslint-changed-lines.mjs <base-ref-or-sha>
 import { execFileSync, spawnSync } from "node:child_process";
 import fs from "node:fs";
+import path from "node:path";
+import { createRequire } from "node:module";
 
 const base = process.argv[2];
 if (!base) {
@@ -55,10 +57,20 @@ if (files.length === 0) {
   process.exit(0);
 }
 
-const res = spawnSync("npx", ["eslint", "--format", "json", "--no-warn-ignored", ...files], {
-  encoding: "utf8",
-  maxBuffer: 256 * 1024 * 1024,
-});
+const require = createRequire(import.meta.url);
+const eslint = path.join(path.dirname(require.resolve("eslint/package.json")), "bin/eslint.js");
+const res = spawnSync(
+  process.execPath,
+  [eslint, "--format", "json", "--no-warn-ignored", ...files],
+  {
+    encoding: "utf8",
+    maxBuffer: 256 * 1024 * 1024,
+  },
+);
+if (res.error) {
+  console.error(`Could not start ESLint: ${res.error.message}`);
+  process.exit(2);
+}
 let results;
 try {
   results = JSON.parse(res.stdout);
@@ -75,7 +87,7 @@ let warnings = 0;
 let preexisting = 0;
 const out = [];
 for (const r of results) {
-  const rel = r.filePath.startsWith(cwd) ? r.filePath.slice(cwd.length + 1) : r.filePath;
+  const rel = path.relative(cwd, r.filePath).split(path.sep).join("/");
   const lines = changed.get(rel) ?? new Set();
   for (const m of r.messages) {
     const onChangedLine = m.fatal || lines.has(m.line);

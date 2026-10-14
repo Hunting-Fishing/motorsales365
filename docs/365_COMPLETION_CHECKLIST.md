@@ -26,9 +26,9 @@ Implementation branch: `completion/365-foundation`.
 
 ## Delivery sequence
 
-1. [ ] Establish portable local build, typecheck, unit and receipt database tests.
-2. [ ] Reconcile CI PR #8 with current main; preserve its existing work.
-3. [ ] Resolve known test failures and document remaining reproducible failures.
+1. [x] Establish portable local build, typecheck, unit and receipt database tests.
+2. [x] Reconcile CI PR #8 locally with current main; preserve its existing work.
+3. [x] Resolve ten known test failures: 179/179 application tests now pass.
 4. [ ] Audit tracked environment variables by purpose; distinguish intentionally
    public browser configuration from credentials requiring restriction/rotation.
 5. [ ] Reconcile security PR #5 and dependent #7 together; test migrations on
@@ -60,5 +60,21 @@ route counts or documentation checkboxes.
 
 ## Current checkpoint
 
-Source acquisition and recovery investigation are in progress. No application
-change, database migration or deployment has been completed in this pass yet.
+The working branch includes the original CI branch history and today's receipt
+release. Windows build commands and the legacy MCP path adapter are verified by
+a successful production compilation. No production deployment is claimed; this
+initial sparse checkout omits static public media and must not be deployed.
+
+Validation: clean npm install; TypeScript passes; application suite 179/179;
+test-report checker regression suite 6/6; isolated receipt database checks pass.
+The ten former test failures came from outdated mocks and source/snapshot
+expectations; authorization behavior was not relaxed to make them pass.
+
+Live read-only database inspection: project healthy; 116 remote migration
+versions recorded versus 415 repository files. The remote history includes
+standalone bootstrap/replay batches and split migrations with different version
+numbers. Do not mark every missing filename applied or push the entire history.
+Receipt migrations 20261014043336 and 20261014064816 are present remotely.
+
+Next: validate CI on GitHub, reconcile security branches #5/#7 and migration
+provenance, then deliver the native CRM/receipt scanner slices.

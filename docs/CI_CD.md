@@ -1,5 +1,26 @@
 # CI/CD for 365 MotorSales
 
+## Verified completion checkpoint — 2026-10-14
+
+The completion branch reconciles this pipeline with receipt release PR #10.
+PR #6 and #10 are already merged on main; the older launch sequence and
+deployment observations below describe the original September CI proposal.
+Do not use those observations as current production status.
+
+Local validation now passes all 179 application tests, with an empty quarantine
+list, plus six test-report gate regression checks and the isolated receipt
+database checks. Windows build commands and the legacy MCP root-path adapter
+pass production compilation. The adapter can be removed with PR #9.
+
+Read-only production inspection confirms 116 migration-history entries, whereas
+the repository has 415 migration files. Bootstrap/replay batches and split
+migrations account for different version histories. Receipt migrations are
+recorded remotely. Automatic migration deployment still requires provenance
+reconciliation; this checkpoint did not repair history or apply live SQL.
+
+Local compilation used a sparse checkout without the static public media.
+Release builds must use the complete checkout, as GitHub Actions does.
+
 This document describes the GitHub Actions pipeline, every secret and variable it
 needs, the one-time setup, and the launch sequence.
 
