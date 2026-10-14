@@ -13,7 +13,9 @@ Draft PR #33: `https://github.com/Hunting-Fishing/motorsales365/pull/33`.
 Code `8de974e`, branch `security/native-identity-count-diagnostic`, stacked on
 `completion/customer-reminders-rpc-adapter`. Full sequential local tooling passes
 206/206 (119.16s), focused ESLint/format/diff and independent read-only review pass.
-Remote CI is pending verification on the published documentation head.
+Latest docs head `1b0696f` passed all six CI gates (run `38648993208`), verified
+on the staff-trigger follow-up. The separate hosting build still fails; preview
+upload and production deployment/migrations did not run.
 
 ## Separate fixed scopes
 
