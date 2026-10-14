@@ -1,0 +1,25 @@
+{
+  "project": "wjxaajgvddtrxxtocxen",
+  "observedOn": "2026-10-15",
+  "verifiedAtUtc": "2026-10-14T18:04:02.341035Z",
+  "normalization": "SHA256 of the sole stored SQL statement after CRLF to LF conversion; no whitespace or comment removal. This source already matches raw bytes.",
+  "scope": "Owner-approved converter-only ACL containment. Exact execution-source mapping, not global schema parity, history repair, replay approval or application deployment.",
+  "history": [
+    {
+      "version": "20261014180351",
+      "name": "contain_legacy_invoice_conversion_execute"
+    }
+  ],
+  "legacyApplied": [],
+  "historySqlHashes": [
+    {
+      "version": "20261014180351",
+      "name": "contain_legacy_invoice_conversion_execute",
+      "sql_sha256_lf": "a0a4132c9f17eb4df1d49f0ff735a3da651728b8d1d4d81e979a4e5bc033c1f0",
+      "statement_count": 1,
+      "source_bytes": 3914,
+      "local_source_file": "20261014175040_contain_legacy_invoice_conversion_execute.sql",
+      "source_commit": "1d500beb42ef7956cb3f6f209575a3182e232c14"
+    }
+  ]
+}

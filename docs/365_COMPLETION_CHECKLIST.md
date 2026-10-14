@@ -300,11 +300,10 @@ omits live NOT NULL `due_date`, has wrong line mappings and lacks atomic/idempot
 creation. Do not wire the legacy RPC as a shortcut. Exact evidence and ordered
 acceptance gates: `evidence/SHOP_MANAGER_INVOICE_RELEASE_GATES.md`.
 
-Owner action requested once: approve or decline tested temporary production
-restriction of the legacy invoice converter. No response/approval is inferred;
-related helper restrictions need explicitly scoped authority too. Continue safe
-offline preparation while authority is pending. Existing applied migrations and
-live privileges remain untouched.
+The initial checkpoint requested owner approval for tested temporary converter
+restriction. The owner subsequently approved this exact converter-only action;
+see the following containment checkpoint. Related helpers/profile changes remain
+outside that approval. Existing applied migrations must remain untouched.
 
 Five focused memory-only PGlite ACL tests now prove historical definer bypass
 despite real synthetic RLS denial, and verify proposed fixture-only revocations.
@@ -335,3 +334,55 @@ atomicity and concurrency implementation. Continue the
 baseline/recovery path. Native bounded receipt/installation activity follows;
 retail/recruitment pipelines, wider account/role UI audits and owner/pilot
 acceptance remain unfinished. Do not deploy the sparse local artifact.
+
+## Tenant-authority proof and approved containment: 2026-10-15
+
+Branch: `security/native-tenant-authority`, stacked on PR #14. Its docs head
+`bbb93f0` passed all six CI gates (run `38609286187`); no completed OCR/UI work
+was repeated. Six new disposable authority regressions reproduce profile UPDATE
+and INSERT shop pivots under ordinary authenticated roles, show the legacy
+id/user_id resolver mismatch, and contrast fixture-only safe-column grants.
+No profile/customer rows were touched live.
+
+The owner explicitly approved tested temporary restriction of ONLY
+`shop_manager.convert_work_order_to_invoice(uuid)`. Fresh catalog/source checks
+match its archived body and current complete ACL. CLI-generated forward file:
+`20261014175040_contain_legacy_invoice_conversion_execute.sql`. It is guarded,
+atomic and converter-only; it retains owner/service access and checks the totals
+helper unchanged. Six additional tests execute this exact file and the exact
+operator-opt-in review-only rollback in memory, including postcondition failure
+after REVOKE and full automatic statement rollback.
+
+Local focused tests: 12/12. All six CI gates passed at `1d500be`
+(run `38611328319`): 370 application tests, 53 tooling regressions, both receipt
+database suites, 247 disposable PostgreSQL assertions, TypeScript, lint, browser
+OCR/PDF and full build/package dry-run. Published draft PR #15:
+`https://github.com/Hunting-Fishing/motorsales365/pull/15`.
+
+The approved converter-only ACL migration was applied successfully and live
+catalog-verified at 2026-10-14 18:04:02 UTC. Converter EXECUTE is now denied to
+anon/authenticated and retained for postgres/service_role. Converter definition/
+body hashes and totals-helper ACL/body/definition are unchanged. No business
+function was invoked or customer row mutated. Remote migration version
+`20261014180351` records exactly the local `20261014175040` file: one statement,
+3,914 bytes, raw SHA-256 `a0a4132c9f17eb4df1d49f0ff735a3da651728b8d1d4d81e979a4e5bc033c1f0`.
+Preserve the separate versions; do not db-push or repair the whole historical chain.
+The immutable scoped export is `evidence/invoice-containment-migration-2026-10-15.json`.
+Two new actual-source provenance regressions verify this mapping and the composed
+report without changing older snapshots: 404 of 419 source files have evidence,
+15 remain unresolved, and historical replay/baseline/release approval stays blocked.
+Local tooling now totals 55 tests; these two evidence checks follow the already
+verified 53-test release commit and are included in the existing CI test command.
+See `evidence/INVOICE_CONVERTER_CONTAINMENT_RELEASE.md` for source/ACL fingerprints,
+impact, recovery rehearsal and exact release status. Restoring PUBLIC access
+would reopen the risk and is not automatically authorized.
+
+Next: retain the exact applied-source mapping and prepare the trusted profile/
+membership guard candidate offline, including indirect staff-provisioning writes.
+The exposed totals helper and profile binding still need separately scoped
+release authority; invoice atomicity and the global baseline/recovery gates remain.
+The four global advisor categories remain; this narrow permission change is not
+project-wide security clearance. Cloudflare hosting remains unverified/failed;
+no application deployment, customer communication or paid resource is authorized
+by this checkpoint. Recovery was rehearsed, not run live. Keep the recurring
+completion heartbeat active: the agreed 365 scope is not complete.
