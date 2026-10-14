@@ -7,11 +7,6 @@ export const customerRemindersInput = z
   })
   .strict();
 
-// Fixed read-only summary. Both bindings are checked against the requested
-// customer and its visible native shop, never a client-supplied shop identifier.
-export const customerRemindersProjection =
-  "id,customer_id,shop_id,reminder_type,title,notes,due_date,status,completed_at";
-
 const uuid = z.string().uuid();
 const reminderSchema = z
   .object({
@@ -27,7 +22,24 @@ const reminderSchema = z
     completed_at: z.iso.datetime({ offset: true }).nullable(),
   })
   .strict();
-const parentSchema = z.object({ id: uuid, shop_id: uuid }).strict();
+const snapshotSchema = z.discriminatedUnion("available", [
+  z
+    .object({
+      available: z.literal(false),
+      customer_id: z.null(),
+      shop_id: z.null(),
+      rows: z.array(z.never()).length(0),
+    })
+    .strict(),
+  z
+    .object({
+      available: z.literal(true),
+      customer_id: uuid,
+      shop_id: uuid,
+      rows: z.array(reminderSchema).max(101),
+    })
+    .strict(),
+]);
 
 export type CustomerReminder = z.infer<typeof reminderSchema>;
 export type CustomerRemindersResult = {
@@ -38,29 +50,23 @@ export type CustomerRemindersResult = {
 
 const sameUuid = (actual: string, expected: string) =>
   actual.toLowerCase() === expected.toLowerCase();
-export function parseCustomerRemindersParent(
+export function parseCustomerRemindersSnapshot(
   payload: unknown,
   customerId: string,
-): z.infer<typeof parentSchema> | null {
-  if (payload === null) return null;
-  const customer = parentSchema.parse(payload);
-  if (!sameUuid(customer.id, customerId)) throw new Error("Invalid reminders snapshot scope.");
-  return customer;
-}
-export function parseCustomerRemindersList(
-  payload: unknown,
-  customerId: string,
-  shopId: string,
 ): CustomerRemindersResult {
-  // Validate all101 records, including the sentinel. Nullable physical shop_id
-  // is not an acceptable matching binding; no text is trimmed/coerced/capped.
-  const rows = z.array(reminderSchema).max(101).parse(payload);
+  // Validate the exact same-statement envelope and all101 rows, including the
+  // sentinel. Never infer a shop or reinterpret errors as an unavailable list.
+  const snapshot = snapshotSchema.parse(payload);
+  if (!snapshot.available) return { available: false, rows: [], hasMore: false };
+  if (!sameUuid(snapshot.customer_id, customerId))
+    throw new Error("Invalid reminders snapshot scope.");
+  const { rows } = snapshot;
   if (
     rows.some(
       (row) =>
-        !sameUuid(row.customer_id, customerId) ||
+        !sameUuid(row.customer_id, snapshot.customer_id) ||
         row.shop_id === null ||
-        !sameUuid(row.shop_id, shopId),
+        !sameUuid(row.shop_id, snapshot.shop_id),
     )
   )
     throw new Error("Invalid reminders snapshot scope.");

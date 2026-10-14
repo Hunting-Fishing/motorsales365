@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getCustomerRemindersSnapshot } from "./customer-reminders.functions";
 import type { CustomerReminder } from "./customer-reminders";
 
-// Synthetic mocked handler/builder tests only. No real middleware, JWT, HTTP,
-// PostgREST, RLS, production rows, catalog parity, atomic visibility or DB cancellation.
+// Synthetic mocked lazy-RPC/handler contracts only. No real middleware, JWT,
+// HTTP/PostgREST/RLS, live invoker API, session revocation or DB cancellation proof.
 const mocks = vi.hoisted(() => ({
   middleware: { name: "requireSupabaseAuth" },
   methods: [] as unknown[],
@@ -38,15 +38,17 @@ vi.mock("@/integrations/supabase/auth-middleware", () => ({
   requireSupabaseAuth: mocks.middleware,
 }));
 vi.mock("@/integrations/supabase/client.server", () => ({
-  supabaseAdmin: { from: mocks.privileged, rpc: mocks.privileged },
+  supabaseAdmin: { from: mocks.privileged, rpc: mocks.privileged, schema: mocks.privileged },
+}));
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: { from: mocks.browser, rpc: mocks.browser, schema: mocks.browser },
 }));
 vi.mock("@/lib/shop-manager/db", () => ({
   smSupabase: { from: mocks.browser },
-  supabase: { from: mocks.browser },
+  supabase: { from: mocks.browser, rpc: mocks.browser },
 }));
 
-type Result = { data: unknown; error: unknown };
-type Operation = { table: string; method: string; args: unknown[] };
+type Response = { data: unknown; error: unknown };
 const uuid = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
 const accountId = uuid(1);
 const customerId = "00000000-0000-4000-8000-0000000000ab";
@@ -56,7 +58,6 @@ const otherShop = uuid(4);
 const failure = "Could not load this customer's reminders snapshot. Refresh and try again.";
 const invalid = "Invalid customer reminders snapshot request.";
 const changed = "Account changed. Refresh before loading this customer's reminders.";
-const projection = "id,customer_id,shop_id,reminder_type,title,notes,due_date,status,completed_at";
 const row = (n = 10): CustomerReminder => ({
   id: uuid(n),
   customer_id: customerId,
@@ -69,63 +70,71 @@ const row = (n = 10): CustomerReminder => ({
   completed_at: null,
 });
 const rowsOf = (length: number) => Array.from({ length }, (_, i) => row(i + 100));
+const envelope = (rows: unknown = []) => ({
+  available: true,
+  customer_id: customerId,
+  shop_id: shopId,
+  rows,
+});
 const request = () => ({ expectedAccountId: accountId, customerId });
 let controller: AbortController;
 
 function client({
-  primary = { data: { id: customerId, shop_id: shopId }, error: null },
-  list = { data: [], error: null },
-  onPrimary,
-  onList,
-  onOperation,
+  response = { data: envelope(), error: null },
+  onRpc,
+  onAbortSignal,
+  onRetry,
+  onResult,
 }: {
-  primary?: Result | PromiseLike<Result>;
-  list?: Result | PromiseLike<Result>;
-  onPrimary?: () => void;
-  onList?: () => void;
-  onOperation?: (table: string, method: string) => void;
+  response?: Response | PromiseLike<Response>;
+  onRpc?: () => void;
+  onAbortSignal?: () => void;
+  onRetry?: () => void;
+  onResult?: () => void;
 } = {}) {
-  const operations: Operation[] = [];
-  const dispatches: string[] = [];
-  const from = vi.fn((table: string) => {
-    const operation = (method: string, ...args: unknown[]) => {
-      operations.push({ table, method, args });
-      onOperation?.(table, method);
-      return builder;
-    };
-    const builder = {
-      select: (value: string) => operation("select", value),
-      eq: (column: string, value: string) => operation("eq", column, value),
-      order: (column: string, options: unknown) => operation("order", column, options),
-      limit: (count: number) => operation("limit", count),
-      abortSignal: (signal: AbortSignal) => operation("abortSignal", signal),
-      maybeSingle: () => operation("maybeSingle"),
-      then: <TResult1 = Result, TResult2 = never>(
-        resolve?: ((result: Result) => TResult1 | PromiseLike<TResult1>) | null,
-        reject?: ((error: unknown) => TResult2 | PromiseLike<TResult2>) | null,
-      ) => {
-        dispatches.push(table);
-        return Promise.resolve(table === "customers" ? primary : list)
-          .then((result) => {
-            if (table === "customers") onPrimary?.();
-            else onList?.();
-            return result;
-          })
-          .then(resolve, reject);
-      },
-    };
-    return builder;
+  const operations: string[] = [];
+  const dispatch = vi.fn(() => {
+    operations.push("dispatch");
   });
-  const native = { from };
-  return {
-    schema: vi.fn((_name: string) => native),
-    from,
-    native,
-    operations,
-    dispatches,
-    rpc: vi.fn(() => {
-      throw new Error("Unexpected RPC fallback");
+  const builder = {
+    abortSignal: vi.fn((_signal: AbortSignal) => {
+      operations.push("abortSignal");
+      onAbortSignal?.();
+      return builder;
     }),
+    retry: vi.fn((_enabled: boolean) => {
+      operations.push("retry");
+      onRetry?.();
+      return builder;
+    }),
+    then: <TResult1 = Response, TResult2 = never>(
+      resolve?: ((result: Response) => TResult1 | PromiseLike<TResult1>) | null,
+      reject?: ((error: unknown) => TResult2 | PromiseLike<TResult2>) | null,
+    ) => {
+      dispatch();
+      return Promise.resolve(response)
+        .then((result) => {
+          onResult?.();
+          return result;
+        })
+        .then(resolve, reject);
+    },
+  };
+  return {
+    rpc: vi.fn((_name: string, _args: unknown) => {
+      operations.push("rpc");
+      onRpc?.();
+      return builder;
+    }),
+    from: vi.fn(() => {
+      throw new Error("Unexpected direct table read");
+    }),
+    schema: vi.fn(() => {
+      throw new Error("Unexpected schema binding");
+    }),
+    builder,
+    dispatch,
+    operations,
   };
 }
 function context(supabase: ReturnType<typeof client>, userId: unknown = accountId) {
@@ -139,38 +148,29 @@ async function call(input: unknown, callerContext: unknown) {
     }) => Promise<unknown>
   )({ data: input, context: callerContext });
 }
+async function expectFailure(promise: Promise<unknown>, message = failure) {
+  const error: unknown = await promise.then(
+    () => null,
+    (reason: unknown) => reason,
+  );
+  expect(error).toBeInstanceOf(Error);
+  expect((error as Error).message).toBe(message);
+}
 function assertNoFallback(caller: ReturnType<typeof client>) {
-  expect(caller.rpc).not.toHaveBeenCalled();
+  expect(caller.from).not.toHaveBeenCalled();
+  expect(caller.schema).not.toHaveBeenCalled();
   expect(mocks.privileged).not.toHaveBeenCalled();
   expect(mocks.browser).not.toHaveBeenCalled();
 }
-function assertCustomerGate(caller: ReturnType<typeof client>) {
-  expect(caller.schema).toHaveBeenCalledExactlyOnceWith("shop_manager");
-  expect(caller.operations.filter((o) => o.table === "customers")).toEqual([
-    { table: "customers", method: "select", args: ["id,shop_id"] },
-    { table: "customers", method: "eq", args: ["id", customerId] },
-    { table: "customers", method: "abortSignal", args: [controller.signal] },
-    { table: "customers", method: "maybeSingle", args: [] },
-  ]);
+function assertRpc(caller: ReturnType<typeof client>) {
+  expect(caller.rpc).toHaveBeenCalledExactlyOnceWith("crm_customer_reminders", {
+    _customer_id: customerId,
+  });
+  expect(caller.builder.abortSignal).toHaveBeenCalledExactlyOnceWith(controller.signal);
+  expect(caller.builder.retry).toHaveBeenCalledExactlyOnceWith(false);
+  expect(caller.dispatch).toHaveBeenCalledTimes(1);
+  expect(caller.operations).toEqual(["rpc", "abortSignal", "retry", "dispatch"]);
   assertNoFallback(caller);
-}
-function assertList(caller: ReturnType<typeof client>, expectedShop = shopId) {
-  assertCustomerGate(caller);
-  expect(caller.from.mock.calls).toEqual([["customers"], ["customer_reminders"]]);
-  expect(caller.dispatches).toEqual(["customers", "customer_reminders"]);
-  expect(caller.operations.filter((o) => o.table === "customer_reminders")).toEqual([
-    { table: "customer_reminders", method: "select", args: [projection] },
-    { table: "customer_reminders", method: "eq", args: ["customer_id", customerId] },
-    { table: "customer_reminders", method: "eq", args: ["shop_id", expectedShop] },
-    {
-      table: "customer_reminders",
-      method: "order",
-      args: ["due_date", { ascending: true, nullsFirst: false }],
-    },
-    { table: "customer_reminders", method: "order", args: ["id", { ascending: true }] },
-    { table: "customer_reminders", method: "limit", args: [101] },
-    { table: "customer_reminders", method: "abortSignal", args: [controller.signal] },
-  ]);
 }
 beforeEach(() => {
   vi.clearAllMocks();
@@ -178,128 +178,128 @@ beforeEach(() => {
   mocks.getRequest.mockReturnValue({ signal: controller.signal });
 });
 
-describe("authenticated customer reminders snapshot handler", () => {
+describe("caller-bound single-RPC customer reminder snapshot adapter", () => {
   it("registers POST and the existing authentication middleware", () => {
     expect(mocks.methods).toEqual([{ method: "POST" }]);
     expect(mocks.middlewares).toEqual([[mocks.middleware]]);
   });
-  it("uses the caller client, strict parent identity/shop projection, dual filters, stable ascending order,101 bound and signals", async () => {
-    const caller = client({ list: { data: [row()], error: null } });
+  it("dispatches exactly one caller RPC with the fixed selector, request signal and SDK retries disabled", async () => {
+    const caller = client({ response: { data: envelope([row()]), error: null } });
     await expect(call(request(), context(caller))).resolves.toEqual({
       available: true,
       rows: [row()],
       hasMore: false,
     });
-    assertList(caller);
+    assertRpc(caller);
   });
-  it("derives the shop exclusively from the visible parent rather than a guessed/client shop", async () => {
+  it("maps only the exact false/null/null/empty envelope to unavailable", async () => {
+    const caller = client({
+      response: {
+        data: { available: false, customer_id: null, shop_id: null, rows: [] },
+        error: null,
+      },
+    });
+    await expect(call(request(), context(caller))).resolves.toEqual({
+      available: false,
+      rows: [],
+      hasMore: false,
+    });
+    assertRpc(caller);
+  });
+  it("preserves visible-empty as available, not unavailable", async () => {
+    const caller = client();
+    await expect(call(request(), context(caller))).resolves.toEqual({
+      available: true,
+      rows: [],
+      hasMore: false,
+    });
+    assertRpc(caller);
+  });
+  it("takes the matching row shop from the same envelope, without guessing or a separate lookup", async () => {
     const rows = [{ ...row(), shop_id: otherShop }];
     const caller = client({
-      primary: { data: { id: customerId, shop_id: otherShop }, error: null },
-      list: { data: rows, error: null },
+      response: { data: { ...envelope(rows), shop_id: otherShop }, error: null },
     });
     await expect(call(request(), context(caller))).resolves.toEqual({
       available: true,
       rows,
       hasMore: false,
     });
-    assertList(caller, otherShop);
+    assertRpc(caller);
   });
-  it("returns unavailable only for a null invisible parent, with no child read", async () => {
-    const caller = client({ primary: { data: null, error: null } });
-    await expect(call(request(), context(caller))).resolves.toEqual({
-      available: false,
-      rows: [],
-      hasMore: false,
-    });
-    assertCustomerGate(caller);
-    expect(caller.dispatches).toEqual(["customers"]);
-    expect(caller.from).toHaveBeenCalledExactlyOnceWith("customers");
-  });
-  it("distinguishes a visible empty list from unavailable", async () => {
-    const caller = client();
-    await expect(call(request(), context(caller))).resolves.toEqual({
-      available: true,
-      rows: [],
-      hasMore: false,
-    });
-    assertList(caller);
-  });
-  it("rejects malformed, missing and extra input including client-supplied shop selectors before handler request/schema access", async () => {
+  it("rejects malformed or extra input, including actor/shop/RPC overrides, before handler request/client binding", async () => {
     for (const input of [
       undefined,
       null,
       {},
       { customerId },
       { expectedAccountId: accountId },
-      { ...request(), customerId: "legacy-customer" },
       { ...request(), expectedAccountId: "other-account" },
+      { ...request(), customerId: "legacy-customer" },
       { ...request(), shopId },
       { ...request(), shop_id: shopId },
-      { ...request(), kind: "reminders" },
+      { ...request(), rpc: "other_reader" },
+      { ...request(), actor: accountId },
       { ...request(), limit: 10000 },
     ]) {
       const caller = client();
-      await expect(call(input, context(caller))).rejects.toThrow(invalid);
-      expect(caller.schema).not.toHaveBeenCalled();
-      expect(caller.from).not.toHaveBeenCalled();
+      await expectFailure(call(input, context(caller)), invalid);
+      expect(caller.rpc).not.toHaveBeenCalled();
       assertNoFallback(caller);
     }
     expect(mocks.getRequest).not.toHaveBeenCalled();
   });
-  it("rejects absent or wrong middleware actors before handler request/schema access", async () => {
+  it("rejects missing/wrong actors before getRequest or the context-client getter", async () => {
     for (const actor of [uuid(999), null, undefined, ""]) {
       const caller = client();
-      const callerContext = actor === undefined ? undefined : context(caller, actor);
-      await expect(call(request(), callerContext)).rejects.toThrow(changed);
-      expect(caller.schema).not.toHaveBeenCalled();
-      expect(caller.from).not.toHaveBeenCalled();
+      const binding = vi.fn(() => caller);
+      const callerContext =
+        actor === undefined
+          ? undefined
+          : {
+              userId: actor,
+              get supabase() {
+                return binding();
+              },
+            };
+      await expectFailure(call(request(), callerContext), changed);
+      expect(binding).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
       assertNoFallback(caller);
     }
     expect(mocks.getRequest).not.toHaveBeenCalled();
   });
-  it("rejects a pre-aborted request before schema dispatch without exposing its reason", async () => {
+  it("rejects a pre-aborted request before RPC construction, without exposing its reason", async () => {
     controller.abort(new Error("PRIVATE cancellation reason"));
     const caller = client();
-    await expect(call(request(), context(caller))).rejects.toThrow(failure);
-    expect(caller.schema).not.toHaveBeenCalled();
-    expect(caller.dispatches).toEqual([]);
+    await expectFailure(call(request(), context(caller)));
+    expect(caller.rpc).not.toHaveBeenCalled();
+    expect(caller.dispatch).not.toHaveBeenCalled();
     assertNoFallback(caller);
   });
 
-  const stages = [
-    "request",
-    "schema",
-    "primary-build",
-    "primary-await",
-    "list-build",
-    "list-await",
-  ] as const;
+  const stages = ["request", "binding", "rpc", "abortSignal", "retry", "result"] as const;
   for (const boundary of ["actor", "cancellation"] as const) {
     it.each(stages)(
-      `rechecks ${boundary} at %s before downstream dispatch or private return`,
+      `rechecks ${boundary} at %s before lazy dispatch or private return`,
       async (stage) => {
         const changeBoundary = () => {
           if (boundary === "actor") callerContext.userId = uuid(998);
           else controller.abort(new Error("PRIVATE boundary reason"));
         };
         const caller = client({
-          list: { data: [row()], error: null },
-          onPrimary: () => {
-            if (stage === "primary-await") changeBoundary();
+          response: { data: envelope([row()]), error: null },
+          onRpc: () => {
+            if (stage === "rpc") changeBoundary();
           },
-          onList: () => {
-            if (stage === "list-await") changeBoundary();
+          onAbortSignal: () => {
+            if (stage === "abortSignal") changeBoundary();
           },
-          onOperation: (table, method) => {
-            if (stage === "primary-build" && table === "customers" && method === "maybeSingle")
-              changeBoundary();
-            if (
-              stage === "list-build" &&
-              table === "customer_reminders" &&
-              method === "abortSignal"
-            )
-              changeBoundary();
+          onRetry: () => {
+            if (stage === "retry") changeBoundary();
+          },
+          onResult: () => {
+            if (stage === "result") changeBoundary();
           },
         });
         const callerContext = context(caller);
@@ -308,93 +308,138 @@ describe("authenticated customer reminders snapshot handler", () => {
             changeBoundary();
             return { signal: controller.signal };
           });
-        if (stage === "schema")
-          caller.schema.mockImplementationOnce(() => {
-            changeBoundary();
-            return caller.native;
+        if (stage === "binding")
+          Object.defineProperty(callerContext, "supabase", {
+            get: () => {
+              changeBoundary();
+              return caller;
+            },
           });
-        await expect(call(request(), callerContext)).rejects.toThrow(failure);
-        const dispatched =
-          stage === "list-await"
-            ? ["customers", "customer_reminders"]
-            : stage === "primary-await" || stage === "list-build"
-              ? ["customers"]
-              : [];
-        expect(caller.dispatches).toEqual(dispatched);
-        if (stage === "request") expect(caller.schema).not.toHaveBeenCalled();
-        if (stage === "request" || stage === "schema") expect(caller.from).not.toHaveBeenCalled();
-        if (stage === "primary-await")
-          expect(caller.from).toHaveBeenCalledExactlyOnceWith("customers");
+        await expectFailure(call(request(), callerContext));
+        expect(caller.dispatch).toHaveBeenCalledTimes(stage === "result" ? 1 : 0);
+        if (stage === "request" || stage === "binding") expect(caller.rpc).not.toHaveBeenCalled();
+        else expect(caller.rpc).toHaveBeenCalledTimes(1);
+        if (stage === "rpc") expect(caller.builder.abortSignal).not.toHaveBeenCalled();
+        if (stage === "abortSignal") expect(caller.builder.retry).not.toHaveBeenCalled();
         assertNoFallback(caller);
       },
     );
   }
-
-  it("requires complete strict parent UUID id/shop fields, rejecting null/missing/mismatched bindings rather than guessing or marking unavailable", async () => {
+  it.each(["request", "binding", "rpc", "abortSignal", "retry"] as const)(
+    "hides private construction errors at %s with no dispatch/fallback",
+    async (stage) => {
+      const reject = () => {
+        throw new Error("PRIVATE construction diagnostic");
+      };
+      const caller = client({
+        onRpc: stage === "rpc" ? reject : undefined,
+        onAbortSignal: stage === "abortSignal" ? reject : undefined,
+        onRetry: stage === "retry" ? reject : undefined,
+      });
+      const callerContext = context(caller);
+      if (stage === "request") mocks.getRequest.mockImplementationOnce(reject);
+      if (stage === "binding") Object.defineProperty(callerContext, "supabase", { get: reject });
+      await expectFailure(call(request(), callerContext));
+      expect(caller.dispatch).not.toHaveBeenCalled();
+      expect(caller.rpc.mock.calls.length).toBeLessThanOrEqual(1);
+      assertNoFallback(caller);
+    },
+  );
+  it("does not recover missing caller clients through another reader", async () => {
+    await expectFailure(call(request(), { userId: accountId }));
+    expect(mocks.privileged).not.toHaveBeenCalled();
+    expect(mocks.browser).not.toHaveBeenCalled();
+  });
+  it("hides RPC backend/transport errors without direct-table, alternate-RPC or privileged fallback", async () => {
+    for (const response of [
+      { data: envelope([row()]), error: { message: "PRIVATE backend error" } },
+      Promise.reject(new Error("PRIVATE transport error")),
+    ]) {
+      const caller = client({ response });
+      await expectFailure(call(request(), context(caller)));
+      assertRpc(caller);
+    }
+  });
+  it("rejects null/malformed/incomplete/extra or contradictory envelopes rather than forging an empty success", async () => {
     for (const payload of [
+      null,
       undefined,
       [],
       {},
-      { id: customerId },
-      { shop_id: shopId },
-      { id: customerId, shop_id: null },
-      { id: customerId, shop_id: "" },
-      { id: customerId, shop_id: "legacy-shop" },
-      { id: null, shop_id: shopId },
-      { id: otherCustomer, shop_id: shopId },
-      { id: customerId, shop_id: shopId, secret: "PRIVATE" },
+      { available: true },
+      { ...envelope(), available: "true" },
+      { ...envelope(), available: null },
+      { ...envelope(), rows: null },
+      { ...envelope(), rows: undefined },
+      { ...envelope(), extra: "PRIVATE" },
+      { ...envelope(), hasMore: false },
+      { available: false, customer_id: null, shop_id: null },
+      { available: false, customer_id: customerId, shop_id: null, rows: [] },
+      { available: false, customer_id: null, shop_id: shopId, rows: [] },
+      { available: false, customer_id: customerId, shop_id: shopId, rows: [] },
+      { available: false, customer_id: null, shop_id: null, rows: [row()] },
     ]) {
-      const caller = client({ primary: { data: payload, error: null } });
-      await expect(call(request(), context(caller))).rejects.toThrow(failure);
-      expect(caller.dispatches).toEqual(["customers"]);
-      expect(caller.from).toHaveBeenCalledTimes(1);
-      assertNoFallback(caller);
+      const caller = client({ response: { data: payload, error: null } });
+      await expectFailure(call(request(), context(caller)));
+      assertRpc(caller);
     }
   });
-  it("hides primary backend/transport errors without downstream reads or fallback", async () => {
-    for (const primary of [
-      { data: { id: customerId, shop_id: shopId }, error: { message: "PRIVATE primary error" } },
-      Promise.reject(new Error("PRIVATE transport")),
-    ]) {
-      const caller = client({ primary });
-      await expect(call(request(), context(caller))).rejects.toThrow(failure);
-      expect(caller.dispatches).toEqual(["customers"]);
-      expect(caller.from).toHaveBeenCalledTimes(1);
-      assertNoFallback(caller);
-    }
+  it.each(["customer_id", "shop_id"] as const)(
+    "requires present non-null UUID visible-envelope %s",
+    async (field) => {
+      const missing = { ...envelope() };
+      delete (missing as Partial<typeof missing>)[field];
+      for (const payload of [
+        missing,
+        { ...envelope(), [field]: null },
+        { ...envelope(), [field]: "" },
+        { ...envelope(), [field]: "legacy-id" },
+      ]) {
+        const caller = client({ response: { data: payload, error: null } });
+        await expectFailure(call(request(), context(caller)));
+        assertRpc(caller);
+      }
+    },
+  );
+  it("requires the requested customer even when a visible envelope has no rows", async () => {
+    const caller = client({
+      response: { data: { ...envelope(), customer_id: otherCustomer }, error: null },
+    });
+    await expectFailure(call(request(), context(caller)));
+    assertRpc(caller);
   });
-  it("returns at most100 in received order with hasMore only for the101st sentinel", async () => {
+  it("validates then caps at100 in received order, with hasMore only for the101st row", async () => {
     for (const length of [0, 1, 99, 100, 101]) {
       const rows = rowsOf(length);
-      const caller = client({ list: { data: rows, error: null } });
+      const caller = client({ response: { data: envelope(rows), error: null } });
       await expect(call(request(), context(caller))).resolves.toEqual({
         available: true,
         rows: rows.slice(0, 100),
         hasMore: length === 101,
       });
-      assertList(caller);
+      assertRpc(caller);
     }
   });
-  it("rejects over101 rather than silently trimming an unbounded response", async () => {
-    const caller = client({ list: { data: rowsOf(102), error: null } });
-    await expect(call(request(), context(caller))).rejects.toThrow(failure);
-    assertList(caller);
+  it("rejects102 rows rather than trusting an overbound RPC response", async () => {
+    const caller = client({ response: { data: envelope(rowsOf(102)), error: null } });
+    await expectFailure(call(request(), context(caller)));
+    assertRpc(caller);
   });
-  it("rejects duplicate UUIDs case-insensitively, including duplicate sentinel IDs", async () => {
+  it("rejects case-insensitive duplicate UUIDs, including a repeated101st identity", async () => {
     const id = "00000000-0000-4000-8000-0000000000ef";
-    const duplicateSentinel = rowsOf(101);
-    duplicateSentinel[100] = { ...duplicateSentinel[0] };
+    const sentinel = rowsOf(101);
+    sentinel[100] = { ...sentinel[0] };
     for (const rows of [
       [row(), row()],
       [
         { ...row(), id },
         { ...row(), id: id.toUpperCase() },
       ],
-      duplicateSentinel,
+      sentinel,
     ]) {
-      const caller = client({ list: { data: rows, error: null } });
-      await expect(call(request(), context(caller))).rejects.toThrow(failure);
-      assertList(caller);
+      const caller = client({ response: { data: envelope(rows), error: null } });
+      await expectFailure(call(request(), context(caller)));
+      assertRpc(caller);
     }
   });
   it.each([
@@ -403,7 +448,7 @@ describe("authenticated customer reminders snapshot handler", () => {
     ["shop_id", otherShop],
     ["shop_id", null],
   ] as const)(
-    "rejects child %s=%s in either a displayed row or the101st sentinel",
+    "rejects cross/null row %s=%s in a displayed row or sentinel",
     async (field, value) => {
       for (const length of [1, 101]) {
         const rows = rowsOf(length);
@@ -411,15 +456,15 @@ describe("authenticated customer reminders snapshot handler", () => {
           ...rows.slice(0, length - 1),
           { ...rows[length - 1], [field]: value },
         ];
-        const caller = client({ list: { data: payload, error: null } });
-        await expect(call(request(), context(caller))).rejects.toThrow(failure);
-        assertList(caller);
+        const caller = client({ response: { data: envelope(payload), error: null } });
+        await expectFailure(call(request(), context(caller)));
+        assertRpc(caller);
       }
     },
   );
-  it("rejects incomplete and malformed sentinel fields before removing the overflow row", async () => {
+  it("validates every sentinel field before trimming the overflow record", async () => {
     const incomplete = { ...row(999) };
-    delete (incomplete as { notes?: string | null }).notes;
+    delete (incomplete as Partial<CustomerReminder>).notes;
     for (const sentinel of [
       incomplete,
       { ...row(999), due_date: "2026-02-29" },
@@ -427,38 +472,55 @@ describe("authenticated customer reminders snapshot handler", () => {
       { ...row(999), title: null },
       { ...row(999), attachment: "PRIVATE" },
     ]) {
-      const caller = client({ list: { data: [...rowsOf(100), sentinel], error: null } });
-      await expect(call(request(), context(caller))).rejects.toThrow(failure);
-      assertList(caller);
+      const caller = client({
+        response: { data: envelope([...rowsOf(100), sentinel]), error: null },
+      });
+      await expectFailure(call(request(), context(caller)));
+      assertRpc(caller);
     }
   });
-  it("rejects malformed, incomplete and extra-field payloads without fabricating an empty list", async () => {
+  it.each([
+    "id",
+    "customer_id",
+    "shop_id",
+    "reminder_type",
+    "title",
+    "notes",
+    "due_date",
+    "status",
+    "completed_at",
+  ] as const)("requires complete row field %s", async (field) => {
     const incomplete = { ...row() };
-    delete (incomplete as { completed_at?: string | null }).completed_at;
-    for (const payload of [
-      null,
-      undefined,
+    delete (incomplete as Partial<CustomerReminder>)[field];
+    const caller = client({ response: { data: envelope([incomplete]), error: null } });
+    await expectFailure(call(request(), context(caller)));
+    assertRpc(caller);
+  });
+  it.each(["id", "customer_id", "reminder_type", "title", "due_date", "status"] as const)(
+    "rejects null required row field %s",
+    async (field) => {
+      const caller = client({
+        response: { data: envelope([{ ...row(), [field]: null }]), error: null },
+      });
+      await expectFailure(call(request(), context(caller)));
+      assertRpc(caller);
+    },
+  );
+  it("rejects malformed/extra row fields and wrong types without private diagnostics", async () => {
+    for (const rows of [
       {},
-      [incomplete],
+      [null],
       [{ ...row(), created_by: "PRIVATE" }],
-      [{ ...row(), id: "legacy-reminder" }],
+      [{ ...row(), id: "legacy-id" }],
       [{ ...row(), notes: 123 }],
       [{ ...row(), shop_id: "legacy-shop" }],
     ]) {
-      const caller = client({ list: { data: payload, error: null } });
-      await expect(call(request(), context(caller))).rejects.toThrow(failure);
-      assertList(caller);
+      const caller = client({ response: { data: envelope(rows), error: null } });
+      await expectFailure(call(request(), context(caller)));
+      assertRpc(caller);
     }
   });
-  it.each(["id", "customer_id", "reminder_type", "title", "due_date", "status"] as const)(
-    "rejects null required field %s",
-    async (field) => {
-      const caller = client({ list: { data: [{ ...row(), [field]: null }], error: null } });
-      await expect(call(request(), context(caller))).rejects.toThrow(failure);
-      assertList(caller);
-    },
-  );
-  it("preserves arbitrary/empty native type/title/status, nullable fields and long text without invented enums/caps/trimming", async () => {
+  it("preserves arbitrary/empty native TEXT and nullable/long notes without enums, coercion, trimming or short caps", async () => {
     const rows = [
       {
         ...row(),
@@ -475,27 +537,27 @@ describe("authenticated customer reminders snapshot handler", () => {
         notes: " Existing note \n".repeat(10000),
       },
     ];
-    const caller = client({ list: { data: rows, error: null } });
+    const caller = client({ response: { data: envelope(rows), error: null } });
     await expect(call(request(), context(caller))).resolves.toEqual({
       available: true,
       rows,
       hasMore: false,
     });
-    assertList(caller);
+    assertRpc(caller);
   });
-  it("accepts real calendar dates and nullable valid offset completion timestamps", async () => {
+  it("accepts real calendar due dates and nullable valid offset completion timestamps", async () => {
     const rows = [
       { ...row(), due_date: "2028-02-29", completed_at: "2028-02-29T12:34:56Z" },
       { ...row(11), due_date: "0001-01-01", completed_at: "2026-10-15T21:31:01.123456+08:00" },
       { ...row(12), completed_at: null },
     ];
-    const caller = client({ list: { data: rows, error: null } });
+    const caller = client({ response: { data: envelope(rows), error: null } });
     await expect(call(request(), context(caller))).resolves.toEqual({
       available: true,
       rows,
       hasMore: false,
     });
-    assertList(caller);
+    assertRpc(caller);
   });
   it("rejects impossible/non-calendar due dates and date-only/local/invalid completion timestamps", async () => {
     for (const patch of [
@@ -508,37 +570,32 @@ describe("authenticated customer reminders snapshot handler", () => {
       { completed_at: "2026-02-30T12:00:00Z" },
       { completed_at: "2026-10-15T12:00:00+25:00" },
     ]) {
-      const caller = client({ list: { data: [{ ...row(), ...patch }], error: null } });
-      await expect(call(request(), context(caller))).rejects.toThrow(failure);
-      assertList(caller);
+      const caller = client({
+        response: { data: envelope([{ ...row(), ...patch }]), error: null },
+      });
+      await expectFailure(call(request(), context(caller)));
+      assertRpc(caller);
     }
   });
-  it("compares UUID scope case-insensitively without changing the returned records or visible parent shop", async () => {
+  it("matches envelope/request/row UUIDs case-insensitively without rewriting returned values", async () => {
     const rows = [
       { ...row(), customer_id: customerId.toUpperCase(), shop_id: shopId.toUpperCase() },
     ];
     const caller = client({
-      primary: {
-        data: { id: customerId.toUpperCase(), shop_id: shopId.toUpperCase() },
+      response: {
+        data: {
+          ...envelope(rows),
+          customer_id: customerId.toUpperCase(),
+          shop_id: shopId.toUpperCase(),
+        },
         error: null,
       },
-      list: { data: rows, error: null },
     });
     await expect(call(request(), context(caller))).resolves.toEqual({
       available: true,
       rows,
       hasMore: false,
     });
-    assertList(caller, shopId.toUpperCase());
-  });
-  it("hides list backend/transport errors without automatic retry or a broader reader", async () => {
-    for (const list of [
-      { data: [row()], error: { message: "PRIVATE list error" } },
-      Promise.reject(new Error("PRIVATE transport")),
-    ]) {
-      const caller = client({ list });
-      await expect(call(request(), context(caller))).rejects.toThrow(failure);
-      assertList(caller);
-    }
+    assertRpc(caller);
   });
 });

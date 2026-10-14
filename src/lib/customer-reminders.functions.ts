@@ -3,30 +3,19 @@ import { getRequest } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   customerRemindersInput,
-  customerRemindersProjection,
-  parseCustomerRemindersParent,
-  parseCustomerRemindersList,
+  parseCustomerRemindersSnapshot,
   type CustomerRemindersResult,
 } from "./customer-reminders";
 
 const failure = "Could not load this customer's reminders snapshot. Refresh and try again.";
 const accountChanged = "Account changed. Refresh before loading this customer's reminders.";
 type Response = { data: unknown; error: unknown };
-type NativeReadBuilder = PromiseLike<Response> & {
-  select(projection: string): NativeReadBuilder;
-  eq(column: "id" | "customer_id" | "shop_id", value: string): NativeReadBuilder;
-  order(
-    column: "due_date" | "id",
-    options: { ascending: true; nullsFirst?: false },
-  ): NativeReadBuilder;
-  limit(count: 101): NativeReadBuilder;
-  abortSignal(signal: AbortSignal): NativeReadBuilder;
-  maybeSingle(): NativeReadBuilder;
+type ReminderReadBuilder = PromiseLike<Response> & {
+  abortSignal(signal: AbortSignal): ReminderReadBuilder;
+  retry(enabled: false): ReminderReadBuilder;
 };
-type NativeReadClient = {
-  schema(name: "shop_manager"): {
-    from(table: "customers" | "customer_reminders"): NativeReadBuilder;
-  };
+type ReminderReadClient = {
+  rpc(name: "crm_customer_reminders", args: { _customer_id: string }): ReminderReadBuilder;
 };
 
 export const getCustomerRemindersSnapshot = createServerFn({ method: "POST" })
@@ -41,7 +30,7 @@ export const getCustomerRemindersSnapshot = createServerFn({ method: "POST" })
       if (context?.userId !== data.expectedAccountId) throw new Error(accountChanged);
     }
     // Bind the query-key actor to the validated middleware actor before handler
-    // request access or schema binding; the browser may have changed accounts.
+    // request access or client binding; the browser may have changed accounts.
     assertActor();
     try {
       const signal = getRequest().signal;
@@ -50,37 +39,20 @@ export const getCustomerRemindersSnapshot = createServerFn({ method: "POST" })
         if (signal.aborted) throw new Error(failure);
       }
       assertReady();
-      // Generated types cover public only. This bounded adapter retains the
-      // middleware caller client, never an admin/browser singleton or RPC.
-      const native = (context.supabase as unknown as NativeReadClient).schema("shop_manager");
+      // Generated types omit this unapplied API. Retain the fixed-bearer caller
+      // client through a narrow adapter, never direct tables or a broader reader.
+      const client = context.supabase as unknown as ReminderReadClient;
       assertReady();
-      const primaryQuery = native
-        .from("customers")
-        .select("id,shop_id")
-        .eq("id", data.customerId)
-        .abortSignal(signal)
-        .maybeSingle();
+      const rpcQuery = client.rpc("crm_customer_reminders", { _customer_id: data.customerId });
       assertReady();
-      const primary = await primaryQuery;
+      const signalQuery = rpcQuery.abortSignal(signal);
       assertReady();
-      if (primary.error) throw new Error(failure);
-      const parent = parseCustomerRemindersParent(primary.data, data.customerId);
-      if (parent === null) return { available: false, rows: [], hasMore: false };
+      const query = signalQuery.retry(false);
       assertReady();
-      const listQuery = native
-        .from("customer_reminders")
-        .select(customerRemindersProjection)
-        .eq("customer_id", data.customerId)
-        .eq("shop_id", parent.shop_id)
-        .order("due_date", { ascending: true, nullsFirst: false })
-        .order("id", { ascending: true })
-        .limit(101)
-        .abortSignal(signal);
+      const response = await query;
       assertReady();
-      const list = await listQuery;
-      assertReady();
-      if (list.error) throw new Error(failure);
-      return parseCustomerRemindersList(list.data, data.customerId, parent.shop_id);
+      if (response.error) throw new Error(failure);
+      return parseCustomerRemindersSnapshot(response.data, data.customerId);
     } catch {
       // Do not expose diagnostics, use a broader fallback, retry automatically,
       // or treat malformed bindings, cancellation and actor loss as an empty list.
@@ -88,7 +60,7 @@ export const getCustomerRemindersSnapshot = createServerFn({ method: "POST" })
     }
   });
 
-// Dual filters improve this application read's integrity, not the underlying
-// shop-only RLS/customer binding. Separate reads are not atomic parent visibility
-// or revocation: a future invoker join and trusted native authority remain release
-// gates. AbortSignal concerns HTTP/client requests, not guaranteed DB cancellation.
+// The unapplied invoker API joins parent/rows in one database statement. That is
+// not retroactive/continuous revocation, fresh session/offboarding verification,
+// or trusted native authority. No live API/RLS acceptance or deployment is inferred;
+// AbortSignal concerns HTTP/client requests, not guaranteed PostgreSQL cancellation.
