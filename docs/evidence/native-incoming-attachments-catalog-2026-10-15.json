@@ -1,0 +1,656 @@
+{
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "scope": "Catalog metadata only; no application rows, counts, function invocation, grants, or migrations. Separate observations, not a shared snapshot; query does not enforce read-only transaction or timeouts.",
+  "observed_at_utc": "2026-10-14 23:14:53.668961",
+  "tables": [
+    {
+      "rls": true,
+      "owner": "postgres",
+      "table": "businesses",
+      "schema": "public",
+      "indexes": [
+        {
+          "name": "businesses_lat_lng_idx",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": "21ff42e14d4582284ab35c26befd3807",
+          "definition_md5": "3031ba3e2eabe2e40efc0a5050fc85f5",
+          "selected_definition": null
+        },
+        {
+          "name": "businesses_network_exposure_status_idx",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": "01f511e8ffc9a2902d43fb4fe30c48f0",
+          "definition_md5": "5476ac1d0e29dd7a3d2763e4b0a277d3",
+          "selected_definition": null
+        },
+        {
+          "name": "businesses_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": null,
+          "definition_md5": "2f94b1c1ec96859e0551bd5d6c0f1b08",
+          "selected_definition": null
+        },
+        {
+          "name": "businesses_slug_key",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": null,
+          "definition_md5": "cb3f88e8fc2dbd89c3da72dd0753bc55",
+          "selected_definition": null
+        },
+        {
+          "name": "businesses_source_external_id_unique",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": "90070b050eee3dab99fa734c93104427",
+          "definition_md5": "cd1a82dfebaacfffc70a0686d9ceef2c",
+          "selected_definition": null
+        },
+        {
+          "name": "businesses_vanity_slug_lower_uidx",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": "1cb767afea69eeac9230028a0f8ac3b2",
+          "definition_md5": "99ca865f91cd0dc11ae3bb1b63365a71",
+          "selected_definition": null
+        },
+        {
+          "name": "idx_businesses_city",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": null,
+          "definition_md5": "a66fd93e16a1bbde2ce5be57cb335819",
+          "selected_definition": null
+        },
+        {
+          "name": "idx_businesses_claim_state",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": "f93e6d33a70c83f2bf0a93541dc3dd4f",
+          "definition_md5": "64c85254afd8d9d070ff39e87a09492a",
+          "selected_definition": null
+        },
+        {
+          "name": "idx_businesses_organization_id",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": null,
+          "definition_md5": "73533000127ad553d849a993943716f6",
+          "selected_definition": null
+        },
+        {
+          "name": "idx_businesses_owner",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": null,
+          "definition_md5": "61b83c2fe3f6cdec1a13d8fd878dfc77",
+          "selected_definition": null
+        },
+        {
+          "name": "idx_businesses_province",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": null,
+          "definition_md5": "b9328e6651bf227b971e323437b5f6b0",
+          "selected_definition": null
+        },
+        {
+          "name": "idx_businesses_region",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": null,
+          "definition_md5": "e7fa8858735747d245ef097ab9900afc",
+          "selected_definition": null
+        },
+        {
+          "name": "idx_businesses_status",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": null,
+          "definition_md5": "207b0fdc5e8e80a39eb9bad47163abb5",
+          "selected_definition": null
+        },
+        {
+          "name": "idx_businesses_tier_featured",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": null,
+          "definition_md5": "8246463eab01415a7e19ce4834d69d0b",
+          "selected_definition": null
+        },
+        {
+          "name": "idx_businesses_type",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": null,
+          "definition_md5": "1cb388a84a7587736491031fca8bfb45",
+          "selected_definition": null
+        },
+        {
+          "name": "uniq_business_custom_domain",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": "52135ccc5b13e5dc3bb7890c8707be38",
+          "definition_md5": "d74743f21db3efbc7601a1492cc3a9a8",
+          "selected_definition": null
+        }
+      ],
+      "force_rls": false,
+      "user_triggers": [
+        {
+          "name": "business_team_thread_on_create",
+          "enabled": "O",
+          "function": "trg_business_created_team_thread()",
+          "when_md5": null,
+          "type_bits": 5,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "d71059a67050dcb42ca599952ca8ed37",
+          "update_columns": []
+        },
+        {
+          "name": "businesses_recompute_intent",
+          "enabled": "O",
+          "function": "trg_businesses_recompute_intent()",
+          "when_md5": null,
+          "type_bits": 29,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "4f5e4ad86054f154ab2fab6543ce99d2",
+          "update_columns": [
+            "owner_id"
+          ]
+        },
+        {
+          "name": "set_businesses_updated_at",
+          "enabled": "O",
+          "function": "tg_set_updated_at()",
+          "when_md5": null,
+          "type_bits": 19,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "c8d391b3dce8a0722f53d1b918b10bed",
+          "update_columns": []
+        },
+        {
+          "name": "trg_block_internal_staff_business",
+          "enabled": "O",
+          "function": "block_internal_staff_business()",
+          "when_md5": null,
+          "type_bits": 7,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "03ddddeb2bccdcbe879cb914ca14ccba",
+          "update_columns": []
+        },
+        {
+          "name": "trg_enforce_business_custom_domain",
+          "enabled": "O",
+          "function": "enforce_business_custom_domain()",
+          "when_md5": null,
+          "type_bits": 23,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "64956e5c5136443e8a6f8635e8a2e49c",
+          "update_columns": [
+            "custom_domain",
+            "custom_domain_status"
+          ]
+        },
+        {
+          "name": "trg_guard_business_owner_update",
+          "enabled": "O",
+          "function": "guard_business_owner_update()",
+          "when_md5": null,
+          "type_bits": 19,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "824b15376cf1d0d5066adafe7311189e",
+          "update_columns": []
+        },
+        {
+          "name": "trg_notify_business_approved",
+          "enabled": "O",
+          "function": "tg_notify_business_approved()",
+          "when_md5": null,
+          "type_bits": 17,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "79a11c342f1e47e6a5c6cd25410cd257",
+          "update_columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "trg_notify_business_archive_change",
+          "enabled": "O",
+          "function": "tg_notify_business_archive_change()",
+          "when_md5": null,
+          "type_bits": 17,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "7a4e95964a0f0915f461203485575be8",
+          "update_columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "trg_notify_business_submitted",
+          "enabled": "O",
+          "function": "tg_notify_business_submitted()",
+          "when_md5": null,
+          "type_bits": 5,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "2551158ae2762f4d91d1b442dad58535",
+          "update_columns": []
+        },
+        {
+          "name": "trg_pp_business_signup_bounty",
+          "enabled": "O",
+          "function": "pp_business_signup_bounty()",
+          "when_md5": null,
+          "type_bits": 5,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "5fdbbce6072088e20b6ba7658f7c837b",
+          "update_columns": []
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "owner": "postgres",
+      "table": "cash_registers",
+      "schema": "shop_manager",
+      "indexes": [
+        {
+          "name": "cash_registers_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": null,
+          "definition_md5": "a344b4d005b16991c6370ac0a545aa45",
+          "selected_definition": null
+        },
+        {
+          "name": "cash_registers_shop_id_name_key",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": null,
+          "definition_md5": "2d0566c705c9462a6e3dddb9e4d68e12",
+          "selected_definition": null
+        }
+      ],
+      "force_rls": false,
+      "user_triggers": []
+    },
+    {
+      "rls": true,
+      "owner": "postgres",
+      "table": "employee_shifts",
+      "schema": "shop_manager",
+      "indexes": [
+        {
+          "name": "employee_shifts_one_open_per_user",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": "290850812a4aab6ad3502349340571f5",
+          "definition_md5": "ee7c1422ebe3605e7a1be168bda1da04",
+          "selected_definition": "CREATE UNIQUE INDEX employee_shifts_one_open_per_user ON shop_manager.employee_shifts USING btree (user_id) WHERE (status = ANY (ARRAY['on_shift'::text, 'on_break'::text]))"
+        },
+        {
+          "name": "employee_shifts_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": null,
+          "definition_md5": "9967cfce24b62401a067034b60cc5166",
+          "selected_definition": null
+        },
+        {
+          "name": "employee_shifts_shop_time_idx",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": null,
+          "definition_md5": "37aa1d44525ee784c27db063aa287673",
+          "selected_definition": null
+        }
+      ],
+      "force_rls": false,
+      "user_triggers": []
+    },
+    {
+      "rls": true,
+      "owner": "postgres",
+      "table": "employee_work_locations",
+      "schema": "shop_manager",
+      "indexes": [
+        {
+          "name": "employee_work_locations_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": null,
+          "definition_md5": "3e51f822f3d4551cfe41b1e464ddb5ec",
+          "selected_definition": null
+        },
+        {
+          "name": "employee_work_locations_shop_id_name_key",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": null,
+          "definition_md5": "7f46bf42d2157eb5eddb3034d8cc0181",
+          "selected_definition": null
+        },
+        {
+          "name": "employee_work_locations_shop_idx",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": null,
+          "definition_md5": "e0a0c4d19ef016176762ae8a2cdd148d",
+          "selected_definition": null
+        }
+      ],
+      "force_rls": false,
+      "user_triggers": []
+    },
+    {
+      "rls": true,
+      "owner": "postgres",
+      "table": "register_sessions",
+      "schema": "shop_manager",
+      "indexes": [
+        {
+          "name": "register_one_open",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": "a59375c5d4f96365eafec323aa6c5b92",
+          "definition_md5": "9e7c96d590bccecae01573453c54053e",
+          "selected_definition": "CREATE UNIQUE INDEX register_one_open ON shop_manager.register_sessions USING btree (register_id) WHERE (status = 'open'::text)"
+        },
+        {
+          "name": "register_sessions_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": null,
+          "definition_md5": "56646ce6465c8af38caea096e7acb6c2",
+          "selected_definition": null
+        }
+      ],
+      "force_rls": false,
+      "user_triggers": []
+    },
+    {
+      "rls": true,
+      "owner": "postgres",
+      "table": "shops",
+      "schema": "shop_manager",
+      "indexes": [
+        {
+          "name": "shop_manager_shops_business_idx",
+          "ready": true,
+          "valid": true,
+          "unique": false,
+          "predicate_md5": "a0da4353e7770f87714c69f5e9e36739",
+          "definition_md5": "ba6749916efcd3ce2611d06e7e39b5d4",
+          "selected_definition": null
+        },
+        {
+          "name": "shops_invite_code_key",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": null,
+          "definition_md5": "8e3885365d8824bd0ffbe4c70d531ac0",
+          "selected_definition": null
+        },
+        {
+          "name": "shops_one_per_business",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": "a0da4353e7770f87714c69f5e9e36739",
+          "definition_md5": "6f3b8a0d076d99785060a99419f03c56",
+          "selected_definition": "CREATE UNIQUE INDEX shops_one_per_business ON shop_manager.shops USING btree (business_id) WHERE (business_id IS NOT NULL)"
+        },
+        {
+          "name": "shops_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": null,
+          "definition_md5": "eec3ac3ec8453621dcff6b83b8a29797",
+          "selected_definition": null
+        },
+        {
+          "name": "shops_slug_key",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "predicate_md5": null,
+          "definition_md5": "fdc3f7c4ae61d0f95d71ab738e6e3889",
+          "selected_definition": null
+        }
+      ],
+      "force_rls": false,
+      "user_triggers": [
+        {
+          "name": "shops_create_employee_work_location",
+          "enabled": "O",
+          "function": "shop_manager.create_default_employee_work_location()",
+          "when_md5": null,
+          "type_bits": 5,
+          "arguments_md5": "8ff36f0a5f717f7187ae41c6fe8874c3",
+          "argument_count": 0,
+          "definition_md5": "03e3444beff79ac7ea89083e36c63300",
+          "update_columns": []
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "signature": "block_internal_staff_business()",
+      "volatility": "v",
+      "body_md5_lf": "4013bf118428ed2335d0889a2ba185af",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "definition_md5": "dd3c9c1ebddb7e68cadf8dec69fac26a",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "signature": "enforce_business_custom_domain()",
+      "volatility": "v",
+      "body_md5_lf": "201a674653b4a01175449620008f8e77",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "definition_md5": "6a0a444bec960647f537c9248de872b5",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "signature": "guard_business_owner_update()",
+      "volatility": "v",
+      "body_md5_lf": "8cb2be4c21b728a5a86e9b06fcf6e94b",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "definition_md5": "e56525d41e0d9ec0cd6608873fc6b714",
+      "service_execute": true,
+      "security_definer": false,
+      "authenticated_execute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "signature": "pp_business_signup_bounty()",
+      "volatility": "v",
+      "body_md5_lf": "6ff565d45c820cd0b7134f5e2977cea1",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "definition_md5": "654d0ac0cb383be9796d3883cd6168b7",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "acl": "{=X/postgres,postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "signature": "shop_manager.create_default_employee_work_location()",
+      "volatility": "v",
+      "body_md5_lf": "cdb5e22b1fcca743c830a08e73b35916",
+      "search_path": [
+        "search_path=shop_manager, public, pg_temp"
+      ],
+      "anon_execute": true,
+      "definition_md5": "bb0877be917c27dbcb2b659d7812fa52",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "signature": "tg_notify_business_approved()",
+      "volatility": "v",
+      "body_md5_lf": "fda41e1bcd640b80cce098c2ee02064f",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "definition_md5": "ce4d2adb4953337c22c5e6bc95753002",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "signature": "tg_notify_business_archive_change()",
+      "volatility": "v",
+      "body_md5_lf": "00dda14f4b2e8a8662ff9676b03da004",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "definition_md5": "16cd3c2fa08e8300e63558d6bc873c29",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "signature": "tg_notify_business_submitted()",
+      "volatility": "v",
+      "body_md5_lf": "11b19dbfb5155289054dc6aa181ac502",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "definition_md5": "6b5be7e69a5385a130d4de9ef16b1201",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "signature": "tg_set_updated_at()",
+      "volatility": "v",
+      "body_md5_lf": "301a884953d37769916294bb60562e05",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "definition_md5": "494198e1eb8f9c98c4cf075ed9d79bb9",
+      "service_execute": true,
+      "security_definer": false,
+      "authenticated_execute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "signature": "trg_business_created_team_thread()",
+      "volatility": "v",
+      "body_md5_lf": "d13017c493f1ab0e1788022d6030130a",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "definition_md5": "3176f1c2c3d3abeb3f01b0c44d8817d9",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "signature": "trg_businesses_recompute_intent()",
+      "volatility": "v",
+      "body_md5_lf": "46b92e78631dff66834b7e4035b4e251",
+      "search_path": [
+        "search_path=public"
+      ],
+      "anon_execute": false,
+      "definition_md5": "6d715f23167595b07aaddd268ee3bf25",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    }
+  ]
+}
