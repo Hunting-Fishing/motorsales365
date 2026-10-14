@@ -172,3 +172,13 @@ arbitrary date text, and labels 26-fetch/25-display limits without implying
 lifetime financial totals. No invoice mutation or legacy converter is called.
 See `evidence/CUSTOMER_COMMERCIAL_REQUEST_BOUND_READS.md`; communications and
 reminder reads/entry integrity remain separate unfinished dependencies.
+
+The communications history slice now uses an authenticated caller-bound read,
+strict native vocabulary/field/scope validation and 201-fetch/200-display snapshots.
+Refresh/error/unavailable states mask stale rows/counts/cap labels. Recorded staff
+labels and statuses are not verified human identity or delivery confirmation.
+The known-incompatible logging form is replaced in the review candidate by an
+explicit disabled-entry gate; no messages or writes occur. Logging repair remains
+a separate trusted-attribution contract. See
+`evidence/CUSTOMER_COMMUNICATIONS_REQUEST_BOUND_READS.md` for verification limits,
+the observed missing customer/date index and remaining reminder/authority gates.

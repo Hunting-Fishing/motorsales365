@@ -1,0 +1,364 @@
+{
+  "formatVersion": 1,
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "mode": "read-only-catalog",
+  "scope": "Selected communications/reminder table owner/RLS/ACL/policies/constraints/triggers/columns/defaults and current-shop/timestamp helper fingerprints only. No business rows, RPC, mutations, DDL or history/platform changes.",
+  "tables": [
+    {
+      "observed_at_utc": "2026-10-14 21:14:13.699192",
+      "relname": "customer_communications",
+      "owner": "postgres",
+      "rls": true,
+      "force_rls": false,
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=arwd/postgres,service_role=arwdDxtm/postgres}",
+      "policies": [
+        {
+          "name": "sm_customer_comms_all",
+          "check": "(EXISTS ( SELECT 1\n   FROM shop_manager.customers c\n  WHERE ((c.id = customer_communications.customer_id) AND (c.shop_id = shop_manager.get_current_user_shop_id()))))",
+          "roles": ["authenticated"],
+          "using": "(EXISTS ( SELECT 1\n   FROM shop_manager.customers c\n  WHERE ((c.id = customer_communications.customer_id) AND (c.shop_id = shop_manager.get_current_user_shop_id()))))",
+          "command": "*",
+          "permissive": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "customer_communications_customer_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (customer_id) REFERENCES shop_manager.customers(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "customer_communications_direction_check",
+          "type": "c",
+          "validated": true,
+          "definition": "CHECK ((direction = ANY (ARRAY['incoming'::text, 'outgoing'::text])))"
+        },
+        {
+          "name": "customer_communications_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "customer_communications_status_check",
+          "type": "c",
+          "validated": true,
+          "definition": "CHECK ((status = ANY (ARRAY['completed'::text, 'pending'::text, 'failed'::text])))"
+        },
+        {
+          "name": "customer_communications_type_check",
+          "type": "c",
+          "validated": true,
+          "definition": "CHECK ((type = ANY (ARRAY['email'::text, 'phone'::text, 'text'::text, 'in-person'::text])))"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "RI_ConstraintTrigger_c_27882",
+          "enabled": "O",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_27882\" AFTER INSERT ON shop_manager.customer_communications FROM shop_manager.customers NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+        },
+        {
+          "name": "RI_ConstraintTrigger_c_27883",
+          "enabled": "O",
+          "internal": true,
+          "definition": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_27883\" AFTER UPDATE ON shop_manager.customer_communications FROM shop_manager.customers NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+        }
+      ]
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:14:13.699192",
+      "relname": "customer_reminders",
+      "owner": "postgres",
+      "rls": true,
+      "force_rls": false,
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=arwd/postgres,service_role=arwdDxtm/postgres}",
+      "policies": [
+        {
+          "name": "shop scoped access reminders_all_authenticated",
+          "check": "(shop_id = shop_manager.get_current_user_shop_id())",
+          "roles": ["authenticated"],
+          "using": "(shop_id = shop_manager.get_current_user_shop_id())",
+          "command": "*",
+          "permissive": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "customer_reminders_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "customer_reminders_touch",
+          "enabled": "O",
+          "internal": false,
+          "definition": "CREATE TRIGGER customer_reminders_touch BEFORE UPDATE ON shop_manager.customer_reminders FOR EACH ROW EXECUTE FUNCTION shop_manager.touch_updated_at()"
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "observed_at_utc": "2026-10-14 21:16:30.757669",
+      "signature": "shop_manager.get_current_user_shop_id()",
+      "owner": "postgres",
+      "language": "sql",
+      "prosecdef": true,
+      "provolatile": "s",
+      "proconfig": ["search_path=public, shop_manager"],
+      "acl": "{=X/postgres,postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "definition_md5": "be63946995c909e4a224b0e4989eaaf7",
+      "body_md5": "6049d4aebd36a1230288e6a2227e1071",
+      "anon_execute": true,
+      "authenticated_execute": true,
+      "service_execute": true
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:30.757669",
+      "signature": "shop_manager.touch_updated_at()",
+      "owner": "postgres",
+      "language": "plpgsql",
+      "prosecdef": false,
+      "provolatile": "v",
+      "proconfig": ["search_path=public"],
+      "acl": "{=X/postgres,postgres=X/postgres,service_role=X/postgres}",
+      "definition_md5": "834ca4f98a66995bc122a337b1b36312",
+      "body_md5": "a27bb088c067b7b77a9f0707b0048e40",
+      "anon_execute": true,
+      "authenticated_execute": true,
+      "service_execute": true
+    }
+  ],
+  "columns": [
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "id",
+      "type": "uuid",
+      "not_null": true,
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "customer_id",
+      "type": "uuid",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "date",
+      "type": "timestamp with time zone",
+      "not_null": true,
+      "column_default": "now()"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "type",
+      "type": "text",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "direction",
+      "type": "text",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "subject",
+      "type": "text",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "content",
+      "type": "text",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "staff_member_id",
+      "type": "text",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "staff_member_name",
+      "type": "text",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "status",
+      "type": "text",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "template_id",
+      "type": "uuid",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "template_name",
+      "type": "text",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "not_null": true,
+      "column_default": "now()"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_communications",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "not_null": true,
+      "column_default": "now()"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "id",
+      "type": "uuid",
+      "not_null": true,
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "shop_id",
+      "type": "uuid",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "customer_id",
+      "type": "uuid",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "vehicle_id",
+      "type": "uuid",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "reminder_type",
+      "type": "text",
+      "not_null": true,
+      "column_default": "'follow_up'::text"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "title",
+      "type": "text",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "notes",
+      "type": "text",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "due_date",
+      "type": "date",
+      "not_null": true,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "status",
+      "type": "text",
+      "not_null": true,
+      "column_default": "'pending'::text"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "assigned_to",
+      "type": "uuid",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "completed_at",
+      "type": "timestamp with time zone",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "created_by",
+      "type": "uuid",
+      "not_null": false,
+      "column_default": null
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "not_null": true,
+      "column_default": "now()"
+    },
+    {
+      "observed_at_utc": "2026-10-14 21:16:31.453424",
+      "relname": "customer_reminders",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "not_null": true,
+      "column_default": "now()"
+    }
+  ]
+}

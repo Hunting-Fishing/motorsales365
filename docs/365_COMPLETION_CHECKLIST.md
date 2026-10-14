@@ -42,8 +42,8 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest fully CI-verified application slice: PR #26, documentation head `9b1fa59`, all six
-CI gates passed (run `38636725539`), 522 application tests. These are review
+Latest fully CI-verified application slice: PR #27, documentation head `de3ac1e`, all six
+CI gates passed (run `38638332580`), 576 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
@@ -56,7 +56,7 @@ Native prerequisite PR #21 latest docs head `e5a76ba` passed all six CI gates
 candidate is implemented/tested but unapplied; its linked-private-vehicle and
 ownership-tenure limitations remain explicit release gates, not completed consent.
 
-Latest independent native proof: draft PR #24, code `7f9bfb5`, stacked on verified
+Earlier independent native proof: draft PR #24, code `7f9bfb5`, stacked on verified
 UI PR #23; latest documentation head `985a659` passed all six CI gates
 (run `38632585607`). Next is the actual
 profile/module/receipt-helper composition and security-attachment closure, not an
@@ -140,11 +140,12 @@ and release gates remain unchanged.
 Verification: 36 handler +23 UI focused tests; full application suite 576/576
 across 43 files/report checker exit 0; final stable-snapshot full typecheck passes.
 Focused ESLint/format/diff and independent source review pass. Tooling unchanged
-at 156/156. Latest remote CI pending. See
+at 156/156. Latest docs head `de3ac1e` passed all six CI gates
+(run `38638332580`), verified on this resume. See
 `evidence/CUSTOMER_COMMERCIAL_REQUEST_BOUND_READS.md` for narrow metadata pins,
 compatibility, separate-snapshot and mocked-test limits.
 
-Exact next action: verify PR #27 checks, then implement request-bound bounded
+Exact next action: implement request-bound bounded
 communications reads with independent freshness/cap handling. Logging mutation
 repair remains separate from reading: observed CHECK/NOT NULL vocabulary/staff
 requirements conflict with the current form. Rehearse reminders' actual scoped
@@ -152,7 +153,41 @@ policy/integrity behavior offline before bounded reminder reads and trusted entr
 contracts. Continue native writer/security/provisioning/offboarding closure and
 baseline/upgrade/recovery; no authority or production acceptance is inferred.
 
-## Recovery evidence (original scope, retained below)
+## Latest communications history checkpoint (2026-10-15)
+
+Draft PR #28, code `f30cb90`, branch
+`completion/customer-communications-request-bound`, stacked on verified PR #27
+docs `de3ac1e`. Communications reads now use the authenticated request's caller
+client, visible-customer gate, strict complete native enum/field/customer-scope
+validation and date/ID-ordered 201-fetch/200-display snapshots. Mount/refetch/error/
+unavailable states hide stale rows, counts and caps; account/customer remounts
+cancel old signals. Recorded staff labels/statuses do not claim verified identity
+or message delivery. The known-incompatible logging form is replaced in this
+review candidate by an explicit disabled entry gate, not an invented attribution
+or a repaired writer. No customer communication or business write occurred.
+
+Verification: 47 handler +19 UI focused tests; full application suite 642/642
+across 45 files, report checker exit 0/no quarantine, final full TypeScript and
+focused ESLint/format/diff pass; independent source review clean. Tooling remains
+the prior 156/156. Latest remote CI pending. Migration impact: none. Deployment:
+none; sparse artifact and unapplied activity consumers remain release-blocked.
+Source correspondence stays 404/422,18 unclassified; inventory flags not promoted.
+Fresh metadata-only policy/constraint/helper/column/index observations are pinned
+in `evidence/CUSTOMER_COMMUNICATIONS_REQUEST_BOUND_READS.md`. The performance skill
+identified no communications customer/date supporting index; response caps are
+not bounded scan/sort work, byte limits or load acceptance. Plan/index rehearsal
+and safe existing-state/index recovery remain separate release prerequisites.
+
+Exact next action: verify PR #28 CI while finishing the separate actual-source
+reminder integrity/policy rehearsal, then bounded request-bound reminder reads.
+Keep entry/logging repair separate until trusted staff/shop attribution,
+customer/vehicle consistency and affected-row confirmation are tested against
+the real database authority model. Continue native writer/security/provisioning/
+offboarding closure and baseline/upgrade/recovery, consent/tenure/retention,
+OCR owner/mobile pilot and hosting gates. Do not re-ask/apply pending helper
+restrictions or deploy this sparse checkout.
+
+## Recovery evidence (original scope, retained)
 
 - [x] Confirm receipt/history release PR #10 is merged on current main.
 - [x] Confirm five existing open PRs: #2, #5, #7, #8, #9.

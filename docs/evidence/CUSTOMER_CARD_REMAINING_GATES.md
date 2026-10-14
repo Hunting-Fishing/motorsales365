@@ -7,6 +7,11 @@ This reconnaissance records the PR #26 source snapshot. The subsequent commercia
 read-only implementation is tracked in `CUSTOMER_COMMERCIAL_REQUEST_BOUND_READS.md`;
 it does not resolve the communications/reminder or database-authority gates below.
 
+Communications read/freshness hardening is subsequently tracked in
+`CUSTOMER_COMMUNICATIONS_REQUEST_BOUND_READS.md`; its candidate disables the
+known-incompatible entry form without implementing logging. Reminder integrity,
+trusted entry and database-authority/performance gates remain unfinished.
+
 ## Current narrow metadata
 
 Project `wjxaajgvddtrxxtocxen`, read-only catalog SELECTs only:
