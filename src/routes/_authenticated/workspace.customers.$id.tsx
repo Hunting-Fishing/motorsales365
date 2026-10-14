@@ -16,6 +16,8 @@ import {
 import { smSupabase } from "@/lib/shop-manager/db";
 import { CustomerCommunicationsLog } from "@/components/shop-manager/customer-communications-log";
 import { CustomerRemindersCard } from "@/components/shop-manager/customer-reminders-card";
+import { CustomerCommercialHistory } from "@/components/shop-manager/customer-commercial-history";
+import { useAuth } from "@/hooks/use-auth";
 
 type Customer = {
   id: string;
@@ -132,7 +134,7 @@ export const Route = createFileRoute("/_authenticated/workspace/customers/$id")(
 
 function fmtCurrency(n: number | null | undefined) {
   if (n == null) return "—";
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  return new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(n);
 }
 
 function fmtDate(s: string | null | undefined) {
@@ -146,17 +148,19 @@ function fmtDate(s: string | null | undefined) {
 
 function CustomerDetail() {
   const { id } = Route.useParams();
+  const { user } = useAuth();
   const customerQ = useQuery({
-    queryKey: ["shop-manager", "customer", id],
+    queryKey: ["shop-manager", user?.id, "customer", id],
     queryFn: () => fetchCustomer(id),
+    enabled: !!user,
   });
   const vehiclesQ = useQuery({
-    queryKey: ["shop-manager", "customer", id, "vehicles"],
+    queryKey: ["shop-manager", user?.id, "customer", id, "vehicles"],
     queryFn: () => fetchVehicles(id),
     enabled: !!customerQ.data,
   });
   const workOrdersQ = useQuery({
-    queryKey: ["shop-manager", "customer", id, "work-orders"],
+    queryKey: ["shop-manager", user?.id, "customer", id, "work-orders"],
     queryFn: () => fetchWorkOrders(id),
     enabled: !!customerQ.data,
   });
@@ -171,6 +175,18 @@ function CustomerDetail() {
     );
   }
 
+  if (customerQ.isError) {
+    return (
+      <SiteLayout>
+        <div className="mx-auto max-w-4xl px-4 py-10" role="alert">
+          <p>Could not load this customer.</p>
+          <Button className="mt-3" onClick={() => void customerQ.refetch()}>
+            Retry customer
+          </Button>
+        </div>
+      </SiteLayout>
+    );
+  }
   const c = customerQ.data;
   if (!c) {
     return (
@@ -188,7 +204,9 @@ function CustomerDetail() {
   }
 
   const fullName = [c.first_name, c.last_name].filter(Boolean).join(" ") || "Unnamed customer";
-  const addressLine = [c.address, c.city, c.state, c.postal_code, c.country].filter(Boolean).join(", ");
+  const addressLine = [c.address, c.city, c.state, c.postal_code, c.country]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <SiteLayout>
@@ -200,10 +218,7 @@ function CustomerDetail() {
             </Link>
           </Button>
           <Button asChild size="sm">
-            <Link
-              to="/workspace/work-orders/new"
-              search={{ customerId: c.id } as any}
-            >
+            <Link to="/workspace/work-orders/new" search={{ customerId: c.id } as any}>
               <Wrench className="h-4 w-4 mr-1" /> New work order
             </Link>
           </Button>
@@ -239,9 +254,7 @@ function CustomerDetail() {
                 <span>{addressLine || "—"}</span>
               </div>
               {c.communication_preference ? (
-                <div className="text-muted-foreground">
-                  Prefers: {c.communication_preference}
-                </div>
+                <div className="text-muted-foreground">Prefers: {c.communication_preference}</div>
               ) : null}
             </CardContent>
           </Card>
@@ -285,6 +298,7 @@ function CustomerDetail() {
 
         <CustomerRemindersCard customerId={c.id} />
         <CustomerCommunicationsLog customerId={c.id} />
+        <CustomerCommercialHistory customerId={c.id} />
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
@@ -293,7 +307,14 @@ function CustomerDetail() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {vehiclesQ.isLoading ? (
+            {vehiclesQ.isError ? (
+              <div role="alert">
+                <p>Could not load vehicles.</p>
+                <Button variant="outline" size="sm" onClick={() => void vehiclesQ.refetch()}>
+                  Retry vehicles
+                </Button>
+              </div>
+            ) : vehiclesQ.isLoading ? (
               <div className="text-muted-foreground text-sm flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading vehicles…
               </div>
@@ -342,7 +363,14 @@ function CustomerDetail() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {workOrdersQ.isLoading ? (
+            {workOrdersQ.isError ? (
+              <div role="alert">
+                <p>Could not load work order history.</p>
+                <Button variant="outline" size="sm" onClick={() => void workOrdersQ.refetch()}>
+                  Retry work orders
+                </Button>
+              </div>
+            ) : workOrdersQ.isLoading ? (
               <div className="text-muted-foreground text-sm flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading history…
               </div>
@@ -375,9 +403,7 @@ function CustomerDetail() {
                       <TableCell>
                         <Badge variant="outline">{w.status || "—"}</Badge>
                       </TableCell>
-                      <TableCell className="max-w-md truncate">
-                        {w.description || "—"}
-                      </TableCell>
+                      <TableCell className="max-w-md truncate">{w.description || "—"}</TableCell>
                       <TableCell className="text-right">{fmtCurrency(w.total_cost)}</TableCell>
                     </TableRow>
                   ))}

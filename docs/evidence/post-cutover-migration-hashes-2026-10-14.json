@@ -1,0 +1,253 @@
+{
+  "project": "wjxaajgvddtrxxtocxen",
+  "observedOn": "2026-10-14",
+  "normalization": "SHA256 of the sole stored SQL statement after CRLF to LF conversion; no whitespace or comment removal.",
+  "scope": "Read-only migration execution-source evidence, not proof of current schema parity or authorization to repair history.",
+  "historySqlHashes": [
+    {
+      "version": "20260831102821",
+      "name": "sync_email_send_log_20260826_delta",
+      "sql_sha256_lf": "a105ca650e332306bbd1ccedf46403a12c21eff21ca0a918cb3f24b6e8fe5ae8"
+    },
+    {
+      "version": "20260831103210",
+      "name": "sync_email_send_log_20260827_delta",
+      "sql_sha256_lf": "75367fd08ca13fcc88a48c09630908f6c47e22dd94269767c7a3c18f5ae51e19"
+    },
+    {
+      "version": "20260831103903",
+      "name": "associate_parts_catalogue_operations",
+      "sql_sha256_lf": "837be415b06829396f80cf53ba8245fa02ad1dabdd93bcb58235467fe30ed10e"
+    },
+    {
+      "version": "20260831104112",
+      "name": "associate_parts_order_lifecycle_schema",
+      "sql_sha256_lf": "83a59fde02f1a956125290bde0d997cd1dd01529b3c546fc5e96d32334f3317c"
+    },
+    {
+      "version": "20260831104125",
+      "name": "associate_parts_order_lifecycle_order_functions",
+      "sql_sha256_lf": "c3fd17770cb49a30402c1be20dc3a674bfb006d25b59bb48e791c33a20822d08"
+    },
+    {
+      "version": "20260831104159",
+      "name": "associate_parts_returns_create",
+      "sql_sha256_lf": "195a137ef1b8f03a8b2dad4241a994f5c0c9f787ab3f890c8031cfbd9d093d91"
+    },
+    {
+      "version": "20260831104213",
+      "name": "associate_parts_warranty_create",
+      "sql_sha256_lf": "e09129325b38b5f84b90eb145b3b3787dd5b64b0b49ef883ea6c4fb5cecc7d34"
+    },
+    {
+      "version": "20260831104214",
+      "name": "associate_parts_returns_transition",
+      "sql_sha256_lf": "a4362ef47642403a38a654331643ef63e765955d2c3b9f6bd8b50de7c4b58359"
+    },
+    {
+      "version": "20260831104216",
+      "name": "associate_parts_warranty_transition",
+      "sql_sha256_lf": "ea7c8bf41491d4f194ceba41ce75c7e3750d1a2b13a5834bdd2176543990971e"
+    },
+    {
+      "version": "20260831104315",
+      "name": "associate_parts_installations_function",
+      "sql_sha256_lf": "ba284152e4e0ee344e81ca2372998bd890adb2a0456e271368b0d04e5ba515d6"
+    },
+    {
+      "version": "20260831104335",
+      "name": "associate_parts_installations_grants",
+      "sql_sha256_lf": "b8f35a7ad9d9e7d973f52949754b70c86132d2f602e04427f4f1582e7934c9ee"
+    },
+    {
+      "version": "20260831105957",
+      "name": "business_associate_enrollment",
+      "sql_sha256_lf": "07a7fac085f43dbc48b75ba5e92e300faf5246768d05e049c11809afa68773ec"
+    },
+    {
+      "version": "20260831110729",
+      "name": "harden_business_associate_rpc",
+      "sql_sha256_lf": "074d94ea3a07be12739651b0d81829d0760dfdf4cf59419b85c6b4a0f2f925a3"
+    },
+    {
+      "version": "20260831112411",
+      "name": "grant_associate_public_projection",
+      "sql_sha256_lf": "cb264c77c4b1330780701849fbbdd7d4807b09b774600b0eb00c1aed8e7072fa"
+    },
+    {
+      "version": "20260831112456",
+      "name": "associate_enrollment_acceptance_test_v4",
+      "sql_sha256_lf": "a28383976e423c5c6c34245637f6be12ea2f169879c7524b4d8d360e6ec51112"
+    },
+    {
+      "version": "20260831114923",
+      "name": "associate_privacy_customer_vehicle_ledger",
+      "sql_sha256_lf": "1bdecb8442d965fef857af165b75d59ce8cec7aad8491b99678b679f85d8ee50"
+    },
+    {
+      "version": "20260831130337",
+      "name": "employee_operations_ledger",
+      "sql_sha256_lf": "2386ee30a1b12cd124445adf3da3568c35e567e96aa9f7b83e6cd4211ccae6b2"
+    },
+    {
+      "version": "20260831130719",
+      "name": "employee_module_access",
+      "sql_sha256_lf": "ea61c34eaa83374751602bed15a87d0e70fadcbb5225aa98c22495ad74985d51"
+    },
+    {
+      "version": "20260831164310",
+      "name": "temporary_email_log_delta_ingest",
+      "sql_sha256_lf": "752cdae4c3c4991d7f289aaf8c9ec5e6c3ed925273528a865c40ecaf4a2fc89b"
+    },
+    {
+      "version": "20260831164411",
+      "name": "remove_temporary_email_log_delta_ingest",
+      "sql_sha256_lf": "494cc7037571dc372f4056e2d0a2c446f1ddd259189d369f349a4c395d66f443"
+    },
+    {
+      "version": "20260831164510",
+      "name": "temporary_public_table_count_parity",
+      "sql_sha256_lf": "11f0ca525daf3c2cd1f2697b1dd0211964595d629f842dee5a0fe9f676a6ced5"
+    },
+    {
+      "version": "20260831164725",
+      "name": "temporary_missing_uuid_parity",
+      "sql_sha256_lf": "e36037c10803af6ff930a9437d4b919f91002d43efc25a1d115f4840e7df20d1"
+    },
+    {
+      "version": "20260831164850",
+      "name": "sync_training_partner_clicks_post_snapshot",
+      "sql_sha256_lf": "3c16dbeff156238e67bb2f2541a5e90d5782760c6c3e7684a4ab7ee12caa397d"
+    },
+    {
+      "version": "20260831164922",
+      "name": "sync_business_discovery_queue_post_snapshot",
+      "sql_sha256_lf": "f76adb5f9cb528332cd458937012f15b253ff1c00024efa84eb5b403d933f40c"
+    },
+    {
+      "version": "20260831164951",
+      "name": "remove_temporary_public_parity_rpcs",
+      "sql_sha256_lf": "88f2c3b615be3cd853362b522f91ab456f9eaf3b96a8c127be846d334bec500c"
+    },
+    {
+      "version": "20260831170314",
+      "name": "stage_standalone_cron_jobs_inactive_v3",
+      "sql_sha256_lf": "e3acecc85278876acd85424b0efd4dba70d28e870af89052a97fd48723604a99"
+    },
+    {
+      "version": "20260831194001",
+      "name": "counter_sales_registers_pricebook",
+      "sql_sha256_lf": "0d7c9894ce7c2d4a0ff73b524cf07725a3e9a92a4f15ab61c3596103278c5e57"
+    },
+    {
+      "version": "20260831194538",
+      "name": "counter_sale_commission_accrual",
+      "sql_sha256_lf": "6b6275fbecff7f8295e6d4775da1abd33f985f80c5fabf524c93e779d48646f0"
+    },
+    {
+      "version": "20260831194858",
+      "name": "allow_write_only_migration_ingest_anon_v1",
+      "sql_sha256_lf": "e7d0758eb4ac8ab154290e356826eef9697b3046f18799fb5a3b8514a5e2bf85"
+    },
+    {
+      "version": "20260831195038",
+      "name": "allow_postgrest_write_only_migration_ingest_v1",
+      "sql_sha256_lf": "afba7e42e737a44180afe376f815e7ce71325fdbdd3385705c6cb1d0580aee79"
+    },
+    {
+      "version": "20260901023005",
+      "name": "migration_ingest_count_metadata_visibility",
+      "sql_sha256_lf": "d79c6c64af355e75ed4d2700869545d7c4ef31531ce3edb4b78ae2c19381ae98"
+    },
+    {
+      "version": "20260901023451",
+      "name": "fix_counter_sale_inventory_cost",
+      "sql_sha256_lf": "15e741d94f1fe43cd29ffcff6bb9afff8e1a9ba8be560ab7f4537c2b43483d06"
+    },
+    {
+      "version": "20260901025616",
+      "name": "business_staff_shop_manager_bridge",
+      "sql_sha256_lf": "0e768b1b9c392b7f002f59d9177632a5930bca64ecdabc2fa3373b116d046684"
+    },
+    {
+      "version": "20260901025711",
+      "name": "add_driver_module_access",
+      "sql_sha256_lf": "ee6d043f23fe25f7f849fdd2d2cc104983a0ae3594d2f269e22d748ad498cff8"
+    },
+    {
+      "version": "20260901025852",
+      "name": "enforce_counter_operator_roles",
+      "sql_sha256_lf": "787ea0c006653a37c515482fc8748cc792f4a8e140dba5dc8d1bb15b94400608"
+    },
+    {
+      "version": "20260901033129",
+      "name": "test_tow_company_demo_workspace",
+      "sql_sha256_lf": "cee2458aa9175efd5a91650bbdf498c1fb500bb869a16a9bb39e858aca690061"
+    },
+    {
+      "version": "20260901090729",
+      "name": "correct_business_role_and_associate_boundaries",
+      "sql_sha256_lf": "bd5de1d18b1e22e361e161a249e22d36759cc24ba9b9636de5dd762b90a7ccd4"
+    },
+    {
+      "version": "20260901160809",
+      "name": "fix_invoice_work_order_uuid_cast",
+      "sql_sha256_lf": "87d53c6edd93394b32f365e592a5c6f21128efb9cae0d26cdf14a8c666456607"
+    },
+    {
+      "version": "20260901160849",
+      "name": "fix_invoice_accounting_source_uuid",
+      "sql_sha256_lf": "f26ad2422cf93d9b979c114563f428d743a990e07c0b946d1e227cc813afbe80"
+    },
+    {
+      "version": "20260901160923",
+      "name": "fix_payment_work_order_uuid_cast",
+      "sql_sha256_lf": "c3de83e19405198de784c582fdb2d9edf9876ab69a4adf8d6f51bd74444ad394"
+    },
+    {
+      "version": "20260902124106",
+      "name": "business_part_cross_references",
+      "sql_sha256_lf": "c422ebb5a0fd50f7e81504d1d3a0c6a08b7cb0bc18604869265aa6162beee2e9"
+    },
+    {
+      "version": "20260902124411",
+      "name": "harden_business_part_cross_reference_privileges",
+      "sql_sha256_lf": "24b4df0c04d87dc058e4be4236a6b4f7d4f4b4d1802bd99587fd3a17ac7a2cbb"
+    },
+    {
+      "version": "20260902171146",
+      "name": "assistant_manager_temporary_canonical_permission",
+      "sql_sha256_lf": "1ac1aaed2fb7fe17bd10a73a1f62f9eab4764248bf257518b84b14db23752522"
+    },
+    {
+      "version": "20260910170508",
+      "name": "parts_receiving_exceptions",
+      "sql_sha256_lf": "7f3c1f1ac5e406fa1dd6434de52d136f5d43e680b25053db1edff8d0f5409fe9"
+    },
+    {
+      "version": "20260910170605",
+      "name": "harden_parts_receiving_exception_privileges",
+      "sql_sha256_lf": "70b2989b94a5a9e1ef09ddc6ba3bd184364daff9d681a8de61b96a78d3731dfe"
+    },
+    {
+      "version": "20260910170925",
+      "name": "enforce_receiving_exception_quarantine",
+      "sql_sha256_lf": "aee5a7fce98c9d4d6d6bcfa596092031f94e8e99ce8bd7f5fe95aa414a7e3cd5"
+    },
+    {
+      "version": "20260911143840",
+      "name": "close_standalone_migration_ingress",
+      "sql_sha256_lf": "81321e1ace678f8400c849041484a10189d456c41efff2e9621dfca815267a12"
+    },
+    {
+      "version": "20261014043336",
+      "name": "vehicle_receipts_shared_history",
+      "sql_sha256_lf": "73de34ce2f20b6fb0b2bb9b343fd48cbed7e09091e0000f931fc7aa51637d21d"
+    },
+    {
+      "version": "20261014064816",
+      "name": "receipt_internal_deny_policies",
+      "sql_sha256_lf": "2ba0a8002f98cec062341207b5cc2d2fb8875eb600fd442f4dc9e73bda6c1200"
+    }
+  ]
+}
