@@ -1,554 +1,7 @@
--- 365 standalone migration package | chunk_002.sql | 68 source migrations
--- Byte-for-byte concatenation of supabase/migrations. No SQL modified.
 
--- ===== BEGIN SOURCE MIGRATION: 20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql =====
-
--- 1. Remove the weekly free-listing cap
-DROP TRIGGER IF EXISTS trg_enforce_free_listing_quota ON public.listings;
-
--- 2. Add export availability to listings
-ALTER TABLE public.listings ADD COLUMN IF NOT EXISTS export_available boolean NOT NULL DEFAULT false;
-CREATE INDEX IF NOT EXISTS idx_listings_export_available ON public.listings(export_available) WHERE export_available = true;
-
--- 3. Business Trial plan
-INSERT INTO public.subscription_plans (name, price_php, listings_per_month, max_photos_per_listing, active, sort_order)
-SELECT 'Business Trial', 0, NULL, 30, true, 5
-WHERE NOT EXISTS (SELECT 1 FROM public.subscription_plans WHERE name = 'Business Trial');
-
--- 4. Auto-grant trial
-CREATE OR REPLACE FUNCTION public.grant_business_trial()
-RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$
-DECLARE
-  trial_plan_id uuid;
-  business_kinds text[] := ARRAY['dealer','repair_shop','insurance'];
-BEGIN
-  IF NEW.business_kind IS NULL OR NEW.business_kind::text <> ANY(business_kinds) THEN RETURN NEW; END IF;
-  IF EXISTS (SELECT 1 FROM public.subscriptions WHERE user_id = NEW.id AND status = 'active') THEN RETURN NEW; END IF;
-  SELECT id INTO trial_plan_id FROM public.subscription_plans WHERE name = 'Business Trial' LIMIT 1;
-  IF trial_plan_id IS NOT NULL THEN
-    INSERT INTO public.subscriptions (user_id, plan_id, status, complimentary, current_period_end, notes)
-    VALUES (NEW.id, trial_plan_id, 'active', true, now() + interval '6 months', 'Auto-granted 6-month business trial')
-    ON CONFLICT DO NOTHING;
-  END IF;
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS trg_grant_business_trial ON public.profiles;
-CREATE TRIGGER trg_grant_business_trial
-AFTER INSERT OR UPDATE OF business_kind, verification_status ON public.profiles
-FOR EACH ROW EXECUTE FUNCTION public.grant_business_trial();
-
--- 5. Types (idempotent)
-DO $$ BEGIN
-  CREATE TYPE ad_placement AS ENUM ('home_carousel','browse_top','rides_top','listing_sidebar','export_top');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-
-DO $$ BEGIN
-  CREATE TYPE ad_status AS ENUM ('draft','scheduled','active','paused','ended');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-
-DO $$ BEGIN
-  CREATE TYPE export_inquiry_status AS ENUM ('new','qualified','quoted','won','lost');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-
--- 6. Advertisements
-CREATE TABLE IF NOT EXISTS public.advertisements (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  title text NOT NULL,
-  advertiser_name text,
-  advertiser_email text,
-  image_url text NOT NULL,
-  target_url text NOT NULL,
-  placement ad_placement NOT NULL,
-  caption text,
-  starts_at timestamptz,
-  ends_at timestamptz,
-  priority int NOT NULL DEFAULT 0,
-  status ad_status NOT NULL DEFAULT 'draft',
-  impressions_count int NOT NULL DEFAULT 0,
-  clicks_count int NOT NULL DEFAULT 0,
-  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_advertisements_active_placement ON public.advertisements(placement, priority DESC) WHERE status = 'active';
-
-ALTER TABLE public.advertisements ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Anyone can view active ads" ON public.advertisements;
-CREATE POLICY "Anyone can view active ads" ON public.advertisements FOR SELECT
-  USING (status = 'active' AND (starts_at IS NULL OR starts_at <= now()) AND (ends_at IS NULL OR ends_at >= now()));
-DROP POLICY IF EXISTS "Ad managers can view all" ON public.advertisements;
-CREATE POLICY "Ad managers can view all" ON public.advertisements FOR SELECT TO authenticated
-  USING (public.can_manage_ads(auth.uid()));
-DROP POLICY IF EXISTS "Ad managers can insert" ON public.advertisements;
-CREATE POLICY "Ad managers can insert" ON public.advertisements FOR INSERT TO authenticated
-  WITH CHECK (public.can_manage_ads(auth.uid()));
-DROP POLICY IF EXISTS "Ad managers can update" ON public.advertisements;
-CREATE POLICY "Ad managers can update" ON public.advertisements FOR UPDATE TO authenticated
-  USING (public.can_manage_ads(auth.uid()));
-DROP POLICY IF EXISTS "Ad managers can delete" ON public.advertisements;
-CREATE POLICY "Ad managers can delete" ON public.advertisements FOR DELETE TO authenticated
-  USING (public.can_manage_ads(auth.uid()));
-
-DROP TRIGGER IF EXISTS trg_advertisements_updated_at ON public.advertisements;
-CREATE TRIGGER trg_advertisements_updated_at BEFORE UPDATE ON public.advertisements
-FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
-
--- 7. Ad events
-CREATE TABLE IF NOT EXISTS public.ad_events (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  ad_id uuid NOT NULL REFERENCES public.advertisements(id) ON DELETE CASCADE,
-  event_type text NOT NULL CHECK (event_type IN ('impression','click')),
-  visitor_id uuid,
-  user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_ad_events_ad_id_created_at ON public.ad_events(ad_id, created_at DESC);
-
-ALTER TABLE public.ad_events ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Anyone can record ad events" ON public.ad_events;
-CREATE POLICY "Anyone can record ad events" ON public.ad_events FOR INSERT WITH CHECK (true);
-DROP POLICY IF EXISTS "Ad managers view events" ON public.ad_events;
-CREATE POLICY "Ad managers view events" ON public.ad_events FOR SELECT TO authenticated
-  USING (public.can_manage_ads(auth.uid()));
-
-CREATE OR REPLACE FUNCTION public.ad_events_increment()
-RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$
-BEGIN
-  IF NEW.event_type = 'impression' THEN
-    UPDATE public.advertisements SET impressions_count = impressions_count + 1 WHERE id = NEW.ad_id;
-  ELSIF NEW.event_type = 'click' THEN
-    UPDATE public.advertisements SET clicks_count = clicks_count + 1 WHERE id = NEW.ad_id;
-  END IF;
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS trg_ad_events_increment ON public.ad_events;
-CREATE TRIGGER trg_ad_events_increment AFTER INSERT ON public.ad_events
-FOR EACH ROW EXECUTE FUNCTION public.ad_events_increment();
-
--- 8. Export inquiries
-CREATE TABLE IF NOT EXISTS public.export_inquiries (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  buyer_name text NOT NULL,
-  buyer_email text NOT NULL,
-  buyer_phone text,
-  country text NOT NULL,
-  destination_port text,
-  listing_id uuid REFERENCES public.listings(id) ON DELETE SET NULL,
-  vehicle_interest text,
-  budget_usd numeric,
-  message text NOT NULL,
-  status export_inquiry_status NOT NULL DEFAULT 'new',
-  assigned_to uuid REFERENCES auth.users(id) ON DELETE SET NULL,
-  internal_notes text,
-  submitter_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_export_inquiries_status ON public.export_inquiries(status, created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_export_inquiries_listing ON public.export_inquiries(listing_id);
-
-ALTER TABLE public.export_inquiries ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Anyone can submit export inquiry" ON public.export_inquiries;
-CREATE POLICY "Anyone can submit export inquiry" ON public.export_inquiries FOR INSERT WITH CHECK (true);
-DROP POLICY IF EXISTS "Staff can view export inquiries" ON public.export_inquiries;
-CREATE POLICY "Staff can view export inquiries" ON public.export_inquiries FOR SELECT TO authenticated
-  USING (public.can_support(auth.uid()));
-DROP POLICY IF EXISTS "Staff can update export inquiries" ON public.export_inquiries;
-CREATE POLICY "Staff can update export inquiries" ON public.export_inquiries FOR UPDATE TO authenticated
-  USING (public.can_support(auth.uid()));
-DROP POLICY IF EXISTS "Admins can delete export inquiries" ON public.export_inquiries;
-CREATE POLICY "Admins can delete export inquiries" ON public.export_inquiries FOR DELETE TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'::app_role));
-
-DROP TRIGGER IF EXISTS trg_export_inquiries_updated_at ON public.export_inquiries;
-CREATE TRIGGER trg_export_inquiries_updated_at BEFORE UPDATE ON public.export_inquiries
-FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
-
--- 9. Storage bucket
-INSERT INTO storage.buckets (id, name, public) VALUES ('ad-media','ad-media', true)
-ON CONFLICT (id) DO NOTHING;
-
-DROP POLICY IF EXISTS "Ad media public read" ON storage.objects;
-CREATE POLICY "Ad media public read" ON storage.objects FOR SELECT USING (bucket_id = 'ad-media');
-DROP POLICY IF EXISTS "Ad managers can upload ad media" ON storage.objects;
-CREATE POLICY "Ad managers can upload ad media" ON storage.objects FOR INSERT TO authenticated
-  WITH CHECK (bucket_id = 'ad-media' AND public.can_manage_ads(auth.uid()));
-DROP POLICY IF EXISTS "Ad managers can update ad media" ON storage.objects;
-CREATE POLICY "Ad managers can update ad media" ON storage.objects FOR UPDATE TO authenticated
-  USING (bucket_id = 'ad-media' AND public.can_manage_ads(auth.uid()));
-DROP POLICY IF EXISTS "Ad managers can delete ad media" ON storage.objects;
-CREATE POLICY "Ad managers can delete ad media" ON storage.objects FOR DELETE TO authenticated
-  USING (bucket_id = 'ad-media' AND public.can_manage_ads(auth.uid()));
-
--- ===== END SOURCE MIGRATION: 20260522104711_7af12507-0ffa-4809-b770-7c0d2419c318.sql =====
-
--- ===== BEGIN SOURCE MIGRATION: 20260522104828_c3809a3b-82da-4574-a337-d01968648c9b.sql =====
-
-ALTER TYPE ad_placement ADD VALUE IF NOT EXISTS 'home_carousel';
-ALTER TYPE ad_placement ADD VALUE IF NOT EXISTS 'browse_top';
-ALTER TYPE ad_placement ADD VALUE IF NOT EXISTS 'rides_top';
-ALTER TYPE ad_placement ADD VALUE IF NOT EXISTS 'export_top';
-
--- ===== END SOURCE MIGRATION: 20260522104828_c3809a3b-82da-4574-a337-d01968648c9b.sql =====
-
--- ===== BEGIN SOURCE MIGRATION: 20260522111105_2c76877e-25cd-41b5-aed4-03377ce2bb42.sql =====
-
--- Extend ad_placement enum
-ALTER TYPE public.ad_placement ADD VALUE IF NOT EXISTS 'shop_top';
-ALTER TYPE public.ad_placement ADD VALUE IF NOT EXISTS 'shop_sidebar';
-
--- can_manage_shop helper
-CREATE OR REPLACE FUNCTION public.can_manage_shop(_user_id uuid)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM public.user_roles
-    WHERE user_id = _user_id AND role::text IN ('admin','advertising','sales')
-  )
-$$;
-
--- Affiliate networks
-CREATE TABLE public.affiliate_networks (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  slug text NOT NULL UNIQUE,
-  name text NOT NULL,
-  tag_param text,
-  tag_value text,
-  deeplink_template text,
-  active boolean NOT NULL DEFAULT true,
-  sort_order int NOT NULL DEFAULT 0,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
-ALTER TABLE public.affiliate_networks ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Active networks public read" ON public.affiliate_networks FOR SELECT USING (active = true OR public.can_manage_shop(auth.uid()));
-CREATE POLICY "Shop managers manage networks" ON public.affiliate_networks FOR ALL USING (public.can_manage_shop(auth.uid())) WITH CHECK (public.can_manage_shop(auth.uid()));
-
--- Shop categories
-CREATE TABLE public.shop_categories (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  slug text NOT NULL UNIQUE,
-  name text NOT NULL,
-  description text,
-  icon text,
-  sort_order int NOT NULL DEFAULT 0,
-  active boolean NOT NULL DEFAULT true,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-ALTER TABLE public.shop_categories ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Active categories public read" ON public.shop_categories FOR SELECT USING (active = true OR public.can_manage_shop(auth.uid()));
-CREATE POLICY "Shop managers manage categories" ON public.shop_categories FOR ALL USING (public.can_manage_shop(auth.uid())) WITH CHECK (public.can_manage_shop(auth.uid()));
-
--- Shop products
-CREATE TABLE public.shop_products (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  slug text NOT NULL UNIQUE,
-  title text NOT NULL,
-  description text,
-  brand text,
-  image_url text,
-  gallery jsonb NOT NULL DEFAULT '[]'::jsonb,
-  category_id uuid REFERENCES public.shop_categories(id) ON DELETE SET NULL,
-  price_php numeric,
-  currency text NOT NULL DEFAULT 'PHP',
-  tags text[] NOT NULL DEFAULT '{}',
-  featured boolean NOT NULL DEFAULT false,
-  active boolean NOT NULL DEFAULT true,
-  click_count int NOT NULL DEFAULT 0,
-  view_count int NOT NULL DEFAULT 0,
-  created_by uuid,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX idx_shop_products_category ON public.shop_products(category_id);
-CREATE INDEX idx_shop_products_active ON public.shop_products(active) WHERE active = true;
-CREATE INDEX idx_shop_products_featured ON public.shop_products(featured) WHERE featured = true;
-ALTER TABLE public.shop_products ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Active products public read" ON public.shop_products FOR SELECT USING (active = true OR public.can_manage_shop(auth.uid()));
-CREATE POLICY "Shop managers manage products" ON public.shop_products FOR ALL USING (public.can_manage_shop(auth.uid())) WITH CHECK (public.can_manage_shop(auth.uid()));
-
-CREATE TRIGGER shop_products_updated_at BEFORE UPDATE ON public.shop_products FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at();
-CREATE TRIGGER affiliate_networks_updated_at BEFORE UPDATE ON public.affiliate_networks FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at();
-
--- Shop product links (per network)
-CREATE TABLE public.shop_product_links (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id uuid NOT NULL REFERENCES public.shop_products(id) ON DELETE CASCADE,
-  network_id uuid NOT NULL REFERENCES public.affiliate_networks(id) ON DELETE CASCADE,
-  url text NOT NULL,
-  sku text,
-  last_checked_at timestamptz,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (product_id, network_id)
-);
-CREATE INDEX idx_shop_product_links_product ON public.shop_product_links(product_id);
-ALTER TABLE public.shop_product_links ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Product links public read" ON public.shop_product_links FOR SELECT USING (
-  EXISTS (SELECT 1 FROM public.shop_products p WHERE p.id = product_id AND (p.active = true OR public.can_manage_shop(auth.uid())))
-);
-CREATE POLICY "Shop managers manage links" ON public.shop_product_links FOR ALL USING (public.can_manage_shop(auth.uid())) WITH CHECK (public.can_manage_shop(auth.uid()));
-
--- Shop clicks
-CREATE TABLE public.shop_clicks (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id uuid NOT NULL REFERENCES public.shop_products(id) ON DELETE CASCADE,
-  network_id uuid REFERENCES public.affiliate_networks(id) ON DELETE SET NULL,
-  visitor_id uuid,
-  user_id uuid,
-  referrer text,
-  user_agent text,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX idx_shop_clicks_product_date ON public.shop_clicks(product_id, created_at DESC);
-ALTER TABLE public.shop_clicks ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anyone can record shop clicks" ON public.shop_clicks FOR INSERT WITH CHECK (true);
-CREATE POLICY "Shop managers view clicks" ON public.shop_clicks FOR SELECT USING (public.can_manage_shop(auth.uid()));
-
--- Increment click_count trigger
-CREATE OR REPLACE FUNCTION public.tg_shop_click_increment()
-RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
-BEGIN
-  UPDATE public.shop_products SET click_count = click_count + 1 WHERE id = NEW.product_id;
-  RETURN NEW;
-END $$;
-CREATE TRIGGER shop_clicks_increment AFTER INSERT ON public.shop_clicks FOR EACH ROW EXECUTE FUNCTION public.tg_shop_click_increment();
-
--- Seed networks
-INSERT INTO public.affiliate_networks (slug, name, tag_param, tag_value, sort_order) VALUES
-  ('shopee', 'Shopee PH', 'af_siteid', '', 1),
-  ('lazada', 'Lazada PH', 'sub_aff_id', '', 2),
-  ('aliexpress', 'AliExpress', 'aff_fcid', '', 3),
-  ('tiktok_shop', 'TikTok Shop PH', null, null, 4),
-  ('amazon', 'Amazon', 'tag', '', 5),
-  ('generic', 'Direct / Other', null, null, 99)
-ON CONFLICT (slug) DO NOTHING;
-
--- Seed categories
-INSERT INTO public.shop_categories (slug, name, icon, sort_order) VALUES
-  ('detailing', 'Car Detailing', 'sparkles', 1),
-  ('tools', 'Mechanic Tools', 'wrench', 2),
-  ('parts', 'Parts & Spares', 'cog', 3),
-  ('electronics', 'Electronics', 'cpu', 4),
-  ('accessories', 'Accessories', 'sticker', 5),
-  ('tires-wheels', 'Tires & Wheels', 'circle-dot', 6),
-  ('lubricants', 'Lubricants & Fluids', 'droplet', 7),
-  ('safety', 'Safety & Recovery', 'shield', 8)
-ON CONFLICT (slug) DO NOTHING;
-
--- ===== END SOURCE MIGRATION: 20260522111105_2c76877e-25cd-41b5-aed4-03377ce2bb42.sql =====
-
--- ===== BEGIN SOURCE MIGRATION: 20260522114743_f950325b-850b-45ed-a26c-13ea8a733ae4.sql =====
-
--- Add universal_fit flag to products
-ALTER TABLE public.shop_products
-  ADD COLUMN IF NOT EXISTS universal_fit boolean NOT NULL DEFAULT false;
-
--- Fitment table: a product fits a (make, model, year-range) combo.
--- Nulls mean "any" at that level (e.g. make=Toyota, model=null => fits any Toyota).
-CREATE TABLE IF NOT EXISTS public.shop_product_fitment (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id uuid NOT NULL REFERENCES public.shop_products(id) ON DELETE CASCADE,
-  category text NOT NULL DEFAULT 'car' CHECK (category IN ('car','motorcycle')),
-  make text,
-  model text,
-  year_start int,
-  year_end int,
-  notes text,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_fitment_product ON public.shop_product_fitment(product_id);
-CREATE INDEX IF NOT EXISTS idx_fitment_make_model ON public.shop_product_fitment(make, model);
-
-ALTER TABLE public.shop_product_fitment ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Fitment is publicly readable"
-  ON public.shop_product_fitment FOR SELECT
-  USING (true);
-
-CREATE POLICY "Shop managers can insert fitment"
-  ON public.shop_product_fitment FOR INSERT
-  WITH CHECK (public.can_manage_shop(auth.uid()));
-
-CREATE POLICY "Shop managers can update fitment"
-  ON public.shop_product_fitment FOR UPDATE
-  USING (public.can_manage_shop(auth.uid()));
-
-CREATE POLICY "Shop managers can delete fitment"
-  ON public.shop_product_fitment FOR DELETE
-  USING (public.can_manage_shop(auth.uid()));
-
--- ===== END SOURCE MIGRATION: 20260522114743_f950325b-850b-45ed-a26c-13ea8a733ae4.sql =====
-
--- ===== BEGIN SOURCE MIGRATION: 20260522154030_bd6a15a5-99ea-4f5e-a39f-93c3e1980ef9.sql =====
-
-CREATE TABLE public.ride_service_log_photos (
-  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  log_id uuid NOT NULL REFERENCES public.ride_service_log(id) ON DELETE CASCADE,
-  url text NOT NULL,
-  storage_path text,
-  sort_order integer NOT NULL DEFAULT 0,
-  created_at timestamp with time zone NOT NULL DEFAULT now()
-);
-
-CREATE INDEX idx_ride_service_log_photos_log_id ON public.ride_service_log_photos(log_id, sort_order);
-
-ALTER TABLE public.ride_service_log_photos ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Service log photos public read"
-ON public.ride_service_log_photos FOR SELECT
-USING (EXISTS (
-  SELECT 1 FROM public.ride_service_log s
-  JOIN public.rides r ON r.id = s.ride_id
-  WHERE s.id = ride_service_log_photos.log_id
-    AND (r.status = 'published'::ride_status OR r.user_id = auth.uid() OR has_role(auth.uid(), 'admin'::app_role))
-));
-
-CREATE POLICY "Owners manage service log photos"
-ON public.ride_service_log_photos FOR ALL
-USING (EXISTS (
-  SELECT 1 FROM public.ride_service_log s
-  JOIN public.rides r ON r.id = s.ride_id
-  WHERE s.id = ride_service_log_photos.log_id AND r.user_id = auth.uid()
-))
-WITH CHECK (EXISTS (
-  SELECT 1 FROM public.ride_service_log s
-  JOIN public.rides r ON r.id = s.ride_id
-  WHERE s.id = ride_service_log_photos.log_id AND r.user_id = auth.uid()
-));
-
-CREATE POLICY "Admins manage service log photos"
-ON public.ride_service_log_photos FOR ALL
-USING (has_role(auth.uid(), 'admin'::app_role));
-
-CREATE OR REPLACE FUNCTION public.enforce_service_log_photo_limit()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-SET search_path = public
-AS $$
-BEGIN
-  IF (SELECT count(*) FROM public.ride_service_log_photos WHERE log_id = NEW.log_id) >= 100 THEN
-    RAISE EXCEPTION 'A service log entry can have at most 100 photos';
-  END IF;
-  RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER trg_service_log_photo_limit
-BEFORE INSERT ON public.ride_service_log_photos
-FOR EACH ROW EXECUTE FUNCTION public.enforce_service_log_photo_limit();
-
--- ===== END SOURCE MIGRATION: 20260522154030_bd6a15a5-99ea-4f5e-a39f-93c3e1980ef9.sql =====
-
--- ===== BEGIN SOURCE MIGRATION: 20260522154420_43b47bf7-cd96-4923-9329-2ae7dadfbef3.sql =====
-
-CREATE OR REPLACE FUNCTION public.enforce_service_log_photo_limit()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-SET search_path = public
-AS $$
-BEGIN
-  IF (SELECT count(*) FROM public.ride_service_log_photos WHERE log_id = NEW.log_id) >= 20 THEN
-    RAISE EXCEPTION 'A service log entry can have at most 20 photos';
-  END IF;
-  RETURN NEW;
-END;
-$$;
-
--- ===== END SOURCE MIGRATION: 20260522154420_43b47bf7-cd96-4923-9329-2ae7dadfbef3.sql =====
-
--- ===== BEGIN SOURCE MIGRATION: 20260523101642_b10e46d3-8424-4a6c-b124-908ca9b23ea6.sql =====
-
-ALTER TABLE public.businesses
-  ADD COLUMN IF NOT EXISTS price_label text,
-  ADD COLUMN IF NOT EXISTS price_updated_at timestamptz,
-  ADD COLUMN IF NOT EXISTS source text NOT NULL DEFAULT 'manual',
-  ADD COLUMN IF NOT EXISTS source_external_id text;
-
-CREATE UNIQUE INDEX IF NOT EXISTS businesses_source_external_id_unique
-  ON public.businesses (source, source_external_id)
-  WHERE source_external_id IS NOT NULL;
-
-CREATE INDEX IF NOT EXISTS businesses_lat_lng_idx
-  ON public.businesses (lat, lng)
-  WHERE lat IS NOT NULL AND lng IS NOT NULL;
-
--- ===== END SOURCE MIGRATION: 20260523101642_b10e46d3-8424-4a6c-b124-908ca9b23ea6.sql =====
-
--- ===== BEGIN SOURCE MIGRATION: 20260524133901_0b73cc17-e47e-4d09-a47b-be80c742536d.sql =====
-CREATE TABLE public.shop_favorites (
-  user_id UUID NOT NULL,
-  product_id UUID NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  PRIMARY KEY (user_id, product_id)
-);
-
-CREATE INDEX idx_shop_favorites_user ON public.shop_favorites(user_id, created_at DESC);
-
-ALTER TABLE public.shop_favorites ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users manage own shop favorites"
-ON public.shop_favorites
-FOR ALL
-USING (auth.uid() = user_id)
-WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Admins read shop favorites"
-ON public.shop_favorites
-FOR SELECT
-USING (has_role(auth.uid(), 'admin'::app_role));
--- ===== END SOURCE MIGRATION: 20260524133901_0b73cc17-e47e-4d09-a47b-be80c742536d.sql =====
-
--- ===== BEGIN SOURCE MIGRATION: 20260525021220_1704181b-8d1c-446c-9098-3b6bf1b4497b.sql =====
-
--- 1. Drop the over-broad public SELECT policy on profiles
-DROP POLICY IF EXISTS "Profiles are viewable by everyone" ON public.profiles;
-
--- 2. Add an own-row SELECT policy so users can still read their own full profile
-CREATE POLICY "Users can view own profile"
-ON public.profiles
-FOR SELECT
-USING (auth.uid() = id);
-
--- 3. Create a SECURITY DEFINER public view exposing only non-sensitive fields.
---    Postgres views run as the view owner by default, which lets anon/auth
---    clients read these safe columns without exposing phone numbers or
---    Facebook verification codes through the underlying table.
-DROP VIEW IF EXISTS public.public_profiles;
-CREATE VIEW public.public_profiles
-WITH (security_invoker = false) AS
-SELECT
-  id,
-  full_name,
-  avatar_url,
-  seller_type,
-  business_name,
-  business_logo_url,
-  business_address,
-  business_region,
-  business_province,
-  business_city,
-  business_barangay,
-  business_lat,
-  business_lng,
-  business_hours,
-  business_kind,
-  verification_status,
-  verified_at,
-  fb_profile_url,
-  fb_profile_id,
-  fb_verified_at,
-  is_founding_member,
-  founding_member_number,
-  created_at
-FROM public.profiles;
-
-GRANT SELECT ON public.public_profiles TO anon, authenticated;
-
--- ===== END SOURCE MIGRATION: 20260525021220_1704181b-8d1c-446c-9098-3b6bf1b4497b.sql =====
-
--- ===== BEGIN SOURCE MIGRATION: 20260525110546_bcdd53df-2d19-4f55-bc0e-4b364fa2db0a.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260525110546_bcdd53df-2d19-4f55-bc0e-4b364fa2db0a.sql
+-- ============================================================================
 
 -- 1. Rename subscription plans
 UPDATE public.subscription_plans SET name = 'Private Seller', price_php = 0, listings_per_month = 5, max_photos_per_listing = 20, sort_order = 0 WHERE name = 'Free';
@@ -713,16 +166,18 @@ CREATE POLICY "Support update inquiries" ON public.service_inquiries
 CREATE POLICY "Admins delete inquiries" ON public.service_inquiries
   FOR DELETE USING (has_role(auth.uid(), 'admin'::app_role));
 
--- ===== END SOURCE MIGRATION: 20260525110546_bcdd53df-2d19-4f55-bc0e-4b364fa2db0a.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260525122358_a9ae8cc8-acf8-4ce2-b2fd-52154331f6c3.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260525122358_a9ae8cc8-acf8-4ce2-b2fd-52154331f6c3.sql
+-- ============================================================================
 -- Add missing business kinds used by the directory ladder
 ALTER TYPE public.business_kind ADD VALUE IF NOT EXISTS 'financing';
 ALTER TYPE public.business_kind ADD VALUE IF NOT EXISTS 'trucking';
 
--- ===== END SOURCE MIGRATION: 20260525122358_a9ae8cc8-acf8-4ce2-b2fd-52154331f6c3.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260525122506_288550cc-cdd5-4c54-8926-9990a6df896a.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260525122506_288550cc-cdd5-4c54-8926-9990a6df896a.sql
+-- ============================================================================
 -- 1. Directory tier enum + columns on businesses
 DO $$ BEGIN
   CREATE TYPE public.business_tier AS ENUM ('free', 'listed', 'featured', 'premium');
@@ -882,9 +337,10 @@ INSERT INTO public.business_plans (slug, business_kind, tier, interval, price_ph
   ('financing_premium_yearly',   'financing', 'premium',  'year',  29990,'biz_financing_premium_yearly',   'Premium Financing — 2 mo. free', 31)
 ON CONFLICT (slug) DO NOTHING;
 
--- ===== END SOURCE MIGRATION: 20260525122506_288550cc-cdd5-4c54-8926-9990a6df896a.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260525125312_004fb4cf-07b7-4034-ab89-43e5c7e6becf.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260525125312_004fb4cf-07b7-4034-ab89-43e5c7e6becf.sql
+-- ============================================================================
 ALTER TABLE public.business_plans
   ADD COLUMN IF NOT EXISTS type_slug text;
 
@@ -898,9 +354,10 @@ UPDATE public.business_plans SET type_slug = 'insurance'         WHERE business_
 
 CREATE INDEX IF NOT EXISTS idx_business_plans_type_slug ON public.business_plans (type_slug, tier, interval);
 
--- ===== END SOURCE MIGRATION: 20260525125312_004fb4cf-07b7-4034-ab89-43e5c7e6becf.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260525131427_be1ff2ed-4252-4891-8033-514954cadfc8.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260525131427_be1ff2ed-4252-4891-8033-514954cadfc8.sql
+-- ============================================================================
 
 -- 1. Add organization_id to businesses
 ALTER TABLE public.businesses
@@ -1167,9 +624,10 @@ CREATE TRIGGER trg_tow_request_lead AFTER INSERT ON public.tow_requests
 ALTER PUBLICATION supabase_realtime ADD TABLE public.leads;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.lead_activities;
 
--- ===== END SOURCE MIGRATION: 20260525131427_be1ff2ed-4252-4891-8033-514954cadfc8.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260525154337_8148e969-e07c-4e8c-b8bc-2f4a19c2e1d3.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260525154337_8148e969-e07c-4e8c-b8bc-2f4a19c2e1d3.sql
+-- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.preview_org_invite(_token text)
 RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
@@ -1251,9 +709,10 @@ DROP TRIGGER IF EXISTS leads_notify_org ON public.leads;
 CREATE TRIGGER leads_notify_org AFTER INSERT ON public.leads
 FOR EACH ROW EXECUTE FUNCTION public.tg_lead_notify_org();
 
--- ===== END SOURCE MIGRATION: 20260525154337_8148e969-e07c-4e8c-b8bc-2f4a19c2e1d3.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260525155935_31efaded-ef49-43e7-945b-f213f41edda7.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260525155935_31efaded-ef49-43e7-945b-f213f41edda7.sql
+-- ============================================================================
 
 CREATE TABLE public.vehicles (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1397,9 +856,10 @@ VALUES
   ('Maintenance-free car battery 12V 60Ah', 'battery', NULL, 'https://example.com/battery-60ah', 5990, 4, true, 'Sealed, 18-month warranty.'),
   ('HD dash cam 1440p with parking mode', 'electronics', NULL, 'https://example.com/dashcam-hd', 4490, 5, true, 'Loop recording + G-sensor.');
 
--- ===== END SOURCE MIGRATION: 20260525155935_31efaded-ef49-43e7-945b-f213f41edda7.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260525162719_50c7215e-4c67-42cb-8aec-b68ec5ca7ef6.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260525162719_50c7215e-4c67-42cb-8aec-b68ec5ca7ef6.sql
+-- ============================================================================
 -- Track price changes for listings so we can show price drops in a live feed.
 CREATE TABLE IF NOT EXISTS public.listing_price_history (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1464,9 +924,11 @@ EXECUTE FUNCTION public.tg_listing_price_history();
 
 -- Enable realtime for the activity feed
 ALTER PUBLICATION supabase_realtime ADD TABLE public.listing_price_history;
--- ===== END SOURCE MIGRATION: 20260525162719_50c7215e-4c67-42cb-8aec-b68ec5ca7ef6.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260526073719_11c435e8-6844-44c8-941a-e0d57931962c.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260526073719_11c435e8-6844-44c8-941a-e0d57931962c.sql
+-- ============================================================================
 
 -- 1) Security Definer View → security_invoker
 ALTER VIEW public.public_profiles SET (security_invoker = on);
@@ -1572,9 +1034,10 @@ USING (
   AND name IS NOT NULL
 );
 
--- ===== END SOURCE MIGRATION: 20260526073719_11c435e8-6844-44c8-941a-e0d57931962c.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260526123921_c0881eba-e524-4c6d-a54b-2a3052863d99.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260526123921_c0881eba-e524-4c6d-a54b-2a3052863d99.sql
+-- ============================================================================
 
 -- 1) listing_boosts: drop public read, add a thin public view
 DROP POLICY IF EXISTS "Boosts public read" ON public.listing_boosts;
@@ -1638,9 +1101,10 @@ GRANT SELECT ON public.active_ads_public TO anon, authenticated;
 -- 3) listing_views: lock down direct inserts (writes only via SECURITY DEFINER fn)
 REVOKE INSERT ON public.listing_views FROM anon, authenticated, PUBLIC;
 
--- ===== END SOURCE MIGRATION: 20260526123921_c0881eba-e524-4c6d-a54b-2a3052863d99.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260526123959_95b81751-3a57-42d8-9821-6efa63d98c4f.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260526123959_95b81751-3a57-42d8-9821-6efa63d98c4f.sql
+-- ============================================================================
 
 DROP POLICY IF EXISTS "Ad media public read" ON storage.objects;
 DROP POLICY IF EXISTS "Ride media public read" ON storage.objects;
@@ -1653,9 +1117,10 @@ CREATE POLICY "Ride media public read by name"
   ON storage.objects FOR SELECT
   USING (bucket_id = 'ride-media' AND name IS NOT NULL);
 
--- ===== END SOURCE MIGRATION: 20260526123959_95b81751-3a57-42d8-9821-6efa63d98c4f.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260526124041_f83db816-5a47-437d-9f74-32008ea6a86f.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260526124041_f83db816-5a47-437d-9f74-32008ea6a86f.sql
+-- ============================================================================
 
 -- Triggers only — no RPC callers
 REVOKE EXECUTE ON FUNCTION public.grant_business_trial() FROM PUBLIC, anon, authenticated;
@@ -1670,9 +1135,10 @@ REVOKE EXECUTE ON FUNCTION public.accept_org_invite(text) FROM PUBLIC, anon;
 REVOKE EXECUTE ON FUNCTION public.self_serve_change_plan(uuid) FROM PUBLIC, anon;
 REVOKE EXECUTE ON FUNCTION public.preview_org_invite(text) FROM PUBLIC, anon;
 
--- ===== END SOURCE MIGRATION: 20260526124041_f83db816-5a47-437d-9f74-32008ea6a86f.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260526135703_84f307b7-e94c-43dc-aeb6-bc64b7791a18.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260526135703_84f307b7-e94c-43dc-aeb6-bc64b7791a18.sql
+-- ============================================================================
 -- 1) subscriptions: tighten self-insert
 DROP POLICY IF EXISTS "Users insert own subscription" ON public.subscriptions;
 CREATE POLICY "Users insert own subscription"
@@ -1731,9 +1197,11 @@ CREATE POLICY "Sales view tow rates"
   FOR SELECT
   TO authenticated
   USING (public.has_role(auth.uid(), 'sales'::app_role));
--- ===== END SOURCE MIGRATION: 20260526135703_84f307b7-e94c-43dc-aeb6-bc64b7791a18.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260526140147_f6f966b7-0fc5-46c2-b4d8-118c389b2900.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260526140147_f6f966b7-0fc5-46c2-b4d8-118c389b2900.sql
+-- ============================================================================
 -- 1) qr_scans: drop email branch
 DROP POLICY IF EXISTS "Staff read own qr_scans" ON public.qr_scans;
 CREATE POLICY "Staff read own qr_scans"
@@ -1814,9 +1282,11 @@ BEGIN
     EXECUTE 'CREATE POLICY "Default deny realtime channel" ON realtime.messages FOR ALL TO authenticated, anon USING (false) WITH CHECK (false)';
   END IF;
 END $$;
--- ===== END SOURCE MIGRATION: 20260526140147_f6f966b7-0fc5-46c2-b4d8-118c389b2900.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260526140452_0eba8686-52b8-4d7e-9f8f-8dd9c386dc54.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260526140452_0eba8686-52b8-4d7e-9f8f-8dd9c386dc54.sql
+-- ============================================================================
 -- 1) Promotions: restrict read to staff
 DROP POLICY IF EXISTS "Promotions public read" ON public.promotions;
 CREATE POLICY "Staff read promotions"
@@ -1894,14 +1364,18 @@ CREATE POLICY "Users insert own payments"
       )
     )
   );
--- ===== END SOURCE MIGRATION: 20260526140452_0eba8686-52b8-4d7e-9f8f-8dd9c386dc54.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260527060550_8c0bf854-44a1-4ab0-9de9-e3653c175773.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260527060550_8c0bf854-44a1-4ab0-9de9-e3653c175773.sql
+-- ============================================================================
 ALTER TABLE public.shop_product_fitment ADD COLUMN IF NOT EXISTS engine TEXT;
 CREATE INDEX IF NOT EXISTS idx_fitment_engine ON public.shop_product_fitment(engine);
--- ===== END SOURCE MIGRATION: 20260527060550_8c0bf854-44a1-4ab0-9de9-e3653c175773.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260527070514_22098064-ab1d-4a26-ba5b-52e8ed15dc7f.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260527070514_22098064-ab1d-4a26-ba5b-52e8ed15dc7f.sql
+-- ============================================================================
 
 -- Categories: SEO landing fields
 ALTER TABLE public.shop_categories
@@ -1950,9 +1424,10 @@ CREATE POLICY "Shop managers can read clicks"
   TO authenticated
   USING (can_manage_shop(auth.uid()));
 
--- ===== END SOURCE MIGRATION: 20260527070514_22098064-ab1d-4a26-ba5b-52e8ed15dc7f.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260527072653_b3f8801f-5bc6-40e2-8261-1a600dde648f.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260527072653_b3f8801f-5bc6-40e2-8261-1a600dde648f.sql
+-- ============================================================================
 
 -- 1. Departments table
 CREATE TABLE public.shop_departments (
@@ -2034,9 +1509,10 @@ UPDATE public.shop_categories SET cross_department_slugs = ARRAY['maintenance-fl
 UPDATE public.shop_categories SET cross_department_slugs = ARRAY['performance-parts']      WHERE slug IN ('window-tint','decals');
 UPDATE public.shop_categories SET cross_department_slugs = ARRAY['performance-parts']      WHERE slug = 'perf-exhaust';
 
--- ===== END SOURCE MIGRATION: 20260527072653_b3f8801f-5bc6-40e2-8261-1a600dde648f.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260527074406_6c863d0d-b51d-40f8-8049-5ece6a07a207.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260527074406_6c863d0d-b51d-40f8-8049-5ece6a07a207.sql
+-- ============================================================================
 
 UPDATE public.shop_departments SET hero_image_url = '/departments/performance-parts.jpg' WHERE slug = 'performance-parts';
 UPDATE public.shop_departments SET hero_image_url = '/departments/maintenance-fluids.jpg' WHERE slug = 'maintenance-fluids';
@@ -2047,9 +1523,10 @@ UPDATE public.shop_departments SET hero_image_url = '/departments/tools-garage.j
 UPDATE public.shop_departments SET hero_image_url = '/departments/electronics-lighting.jpg' WHERE slug = 'electronics-lighting';
 UPDATE public.shop_departments SET hero_image_url = '/departments/specialty.jpg' WHERE slug = 'specialty';
 
--- ===== END SOURCE MIGRATION: 20260527074406_6c863d0d-b51d-40f8-8049-5ece6a07a207.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260527101926_98d7c403-0beb-4d30-b432-0fce0c2c409a.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260527101926_98d7c403-0beb-4d30-b432-0fce0c2c409a.sql
+-- ============================================================================
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM cron.job WHERE jobname='refresh-lazada-prices') THEN
     PERFORM cron.unschedule('refresh-lazada-prices');
@@ -2065,9 +1542,11 @@ SELECT cron.schedule(
     body:='{"limit":50}'::jsonb
   ) AS request_id;$cron$
 );
--- ===== END SOURCE MIGRATION: 20260527101926_98d7c403-0beb-4d30-b432-0fce0c2c409a.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260527114114_35fc4d77-e5e1-45f9-b94b-b96a0abe025d.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260527114114_35fc4d77-e5e1-45f9-b94b-b96a0abe025d.sql
+-- ============================================================================
 
 ALTER TABLE public.shop_product_links
   ADD COLUMN IF NOT EXISTS price_php numeric,
@@ -2107,9 +1586,10 @@ CREATE POLICY "Shop managers manage price history"
   USING (public.can_manage_shop(auth.uid()))
   WITH CHECK (public.can_manage_shop(auth.uid()));
 
--- ===== END SOURCE MIGRATION: 20260527114114_35fc4d77-e5e1-45f9-b94b-b96a0abe025d.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260528054733_ad81c4de-65fb-49d4-8b17-b0273d9d9216.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260528054733_ad81c4de-65fb-49d4-8b17-b0273d9d9216.sql
+-- ============================================================================
 
 -- =========================================================
 -- 1) Extend businesses
@@ -2358,9 +1838,10 @@ CREATE POLICY "business-media authed delete"
     AND auth.uid()::text = (storage.foldername(name))[1]
   );
 
--- ===== END SOURCE MIGRATION: 20260528054733_ad81c4de-65fb-49d4-8b17-b0273d9d9216.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260529001000_96012e17-51ea-4a35-8f29-fff7b08d7b61.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260529001000_96012e17-51ea-4a35-8f29-fff7b08d7b61.sql
+-- ============================================================================
 CREATE TABLE public.support_tickets (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NULL,
@@ -2418,9 +1899,11 @@ EXECUTE FUNCTION public.tg_set_updated_at();
 
 CREATE INDEX idx_support_tickets_status ON public.support_tickets(status, created_at DESC);
 CREATE INDEX idx_support_tickets_user ON public.support_tickets(user_id) WHERE user_id IS NOT NULL;
--- ===== END SOURCE MIGRATION: 20260529001000_96012e17-51ea-4a35-8f29-fff7b08d7b61.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260529091647_234cb316-296e-4d77-9bda-5af7a3528cf1.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260529091647_234cb316-296e-4d77-9bda-5af7a3528cf1.sql
+-- ============================================================================
 INSERT INTO public.business_tags (slug, label, type_slug, category, sort_order, is_popular) VALUES
   ('fuel-gas-91', 'Gasoline 91', 'fuel_station', 'fuel_grade', 10, true),
   ('fuel-gas-95', 'Gasoline 95', 'fuel_station', 'fuel_grade', 20, true),
@@ -2457,9 +1940,11 @@ INSERT INTO public.business_tags (slug, label, type_slug, category, sort_order, 
   ('station-loyalty-card', 'Loyalty card accepted', 'fuel_station', 'station_services', 390, false),
   ('station-fleet-card', 'Fleet card accepted', 'fuel_station', 'station_services', 400, false)
 ON CONFLICT (slug) DO NOTHING;
--- ===== END SOURCE MIGRATION: 20260529091647_234cb316-296e-4d77-9bda-5af7a3528cf1.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260529103420_2638953d-9d10-4fb6-a50b-b469e593a1ec.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260529103420_2638953d-9d10-4fb6-a50b-b469e593a1ec.sql
+-- ============================================================================
 
 -- Fix race/duplicate by using MAX+1 instead of COUNT+1
 CREATE OR REPLACE FUNCTION public.assign_founding_member()
@@ -2572,9 +2057,10 @@ BEGIN
 END
 $$;
 
--- ===== END SOURCE MIGRATION: 20260529103420_2638953d-9d10-4fb6-a50b-b469e593a1ec.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260529110857_5046e165-5e9b-4dd8-b643-3deffd0a340e.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260529110857_5046e165-5e9b-4dd8-b643-3deffd0a340e.sql
+-- ============================================================================
 
 -- Function: delete auth users whose email is not confirmed after 24h
 -- Cascades via existing FKs (profiles.id -> auth.users.id on delete cascade, etc.)
@@ -2622,17 +2108,19 @@ SELECT cron.schedule(
   $$SELECT public.cleanup_unverified_users();$$
 );
 
--- ===== END SOURCE MIGRATION: 20260529110857_5046e165-5e9b-4dd8-b643-3deffd0a340e.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260529110941_ec4ca8a5-b78c-4254-b9f4-315a9b19ef9b.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260529110941_ec4ca8a5-b78c-4254-b9f4-315a9b19ef9b.sql
+-- ============================================================================
 
 -- Remove the unconfirmed goldcity4u@icloud.com signup that has been showing in admin
 UPDATE public.businesses SET owner_id = NULL WHERE owner_id = 'e3b80d24-34d7-4a36-85cb-a89826e2c8da';
 DELETE FROM auth.users WHERE id = 'e3b80d24-34d7-4a36-85cb-a89826e2c8da' AND email_confirmed_at IS NULL;
 
--- ===== END SOURCE MIGRATION: 20260529110941_ec4ca8a5-b78c-4254-b9f4-315a9b19ef9b.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260529114303_62e11c44-56f1-4552-828e-cc9e2d3c3fe5.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260529114303_62e11c44-56f1-4552-828e-cc9e2d3c3fe5.sql
+-- ============================================================================
 
 -- Seed expanded fuel-station tags
 INSERT INTO public.business_tags (slug, label, type_slug, category, sort_order, is_popular) VALUES
@@ -2768,17 +2256,20 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.suggest_business_tag(text, text, text) TO authenticated;
 
--- ===== END SOURCE MIGRATION: 20260529114303_62e11c44-56f1-4552-828e-cc9e2d3c3fe5.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260529115629_f7974081-5d14-4967-8e7b-e8303c363ad0.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260529115629_f7974081-5d14-4967-8e7b-e8303c363ad0.sql
+-- ============================================================================
 DROP POLICY IF EXISTS "Owners update own businesses" ON public.businesses;
 CREATE POLICY "Owners update own businesses" ON public.businesses
 FOR UPDATE TO authenticated
 USING (auth.uid() = owner_id)
 WITH CHECK (auth.uid() = owner_id);
--- ===== END SOURCE MIGRATION: 20260529115629_f7974081-5d14-4967-8e7b-e8303c363ad0.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260529120807_a6d7b5c5-c7ca-4a03-b7a7-025a7aca5ec9.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260529120807_a6d7b5c5-c7ca-4a03-b7a7-025a7aca5ec9.sql
+-- ============================================================================
 ALTER TABLE public.business_services
   ADD COLUMN IF NOT EXISTS category text,
   ADD COLUMN IF NOT EXISTS unit text,
@@ -2788,9 +2279,11 @@ ALTER TABLE public.business_services
 
 CREATE INDEX IF NOT EXISTS idx_business_services_catalog_key ON public.business_services (catalog_key) WHERE catalog_key IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_business_services_category ON public.business_services (category) WHERE category IS NOT NULL;
--- ===== END SOURCE MIGRATION: 20260529120807_a6d7b5c5-c7ca-4a03-b7a7-025a7aca5ec9.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260530131847_36e4ac3c-8ab5-4310-ae44-f419fb7b3997.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260530131847_36e4ac3c-8ab5-4310-ae44-f419fb7b3997.sql
+-- ============================================================================
 
 -- Phase 2 (Gallery) + Phase 4 (Contact channels) + featured video
 
@@ -3006,9 +2499,10 @@ ALTER TABLE public.businesses
   ADD COLUMN IF NOT EXISTS featured_video_url TEXT,
   ADD COLUMN IF NOT EXISTS featured_video_provider TEXT CHECK (featured_video_provider IS NULL OR featured_video_provider IN ('youtube','vimeo','facebook'));
 
--- ===== END SOURCE MIGRATION: 20260530131847_36e4ac3c-8ab5-4310-ae44-f419fb7b3997.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260530160305_f8c16c63-0b0a-4b7c-bdd8-4f305066be96.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260530160305_f8c16c63-0b0a-4b7c-bdd8-4f305066be96.sql
+-- ============================================================================
 
 CREATE TABLE public.business_bookable_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -3113,9 +2607,10 @@ FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at();
 CREATE TRIGGER tg_bookings_updated_at BEFORE UPDATE ON public.business_bookings
 FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at();
 
--- ===== END SOURCE MIGRATION: 20260530160305_f8c16c63-0b0a-4b7c-bdd8-4f305066be96.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260531024844_848819ff-499d-4421-8227-559670575ed9.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260531024844_848819ff-499d-4421-8227-559670575ed9.sql
+-- ============================================================================
 
 -- 1. vanity_slug column (short URL like /b/ucatchfuels)
 ALTER TABLE public.businesses
@@ -3194,9 +2689,10 @@ INSERT INTO public.business_reserved_slugs (slug) VALUES
   ('b'),('r'),('go'),('my-qr'),('sitemap'),('robots')
 ON CONFLICT (slug) DO NOTHING;
 
--- ===== END SOURCE MIGRATION: 20260531024844_848819ff-499d-4421-8227-559670575ed9.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260531025940_5e4297d0-69c9-40fc-992f-defbd62f6a7d.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260531025940_5e4297d0-69c9-40fc-992f-defbd62f6a7d.sql
+-- ============================================================================
 
 CREATE TABLE public.business_page_events (
   id BIGSERIAL PRIMARY KEY,
@@ -3239,29 +2735,36 @@ USING (
 );
 -- All writes happen via service_role inside server functions (no public insert policy needed).
 
--- ===== END SOURCE MIGRATION: 20260531025940_5e4297d0-69c9-40fc-992f-defbd62f6a7d.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260531054706_8415f0eb-7d1f-4b18-878e-8f26c2e98742.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260531054706_8415f0eb-7d1f-4b18-878e-8f26c2e98742.sql
+-- ============================================================================
 CREATE POLICY "Admins read all business events" ON public.business_page_events FOR SELECT TO authenticated USING (has_role(auth.uid(), 'admin'::app_role));
--- ===== END SOURCE MIGRATION: 20260531054706_8415f0eb-7d1f-4b18-878e-8f26c2e98742.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260531115419_12ba05a3-8683-4da9-914e-4513d964a6d4.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260531115419_12ba05a3-8683-4da9-914e-4513d964a6d4.sql
+-- ============================================================================
 GRANT SELECT ON public.businesses TO anon, authenticated;
 GRANT SELECT ON public.business_types TO anon, authenticated;
 GRANT ALL ON public.businesses TO service_role;
 GRANT ALL ON public.business_types TO service_role;
--- ===== END SOURCE MIGRATION: 20260531115419_12ba05a3-8683-4da9-914e-4513d964a6d4.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260601010328_9e8aa9b0-30e0-4c30-9e57-d519a3c9d517.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260601010328_9e8aa9b0-30e0-4c30-9e57-d519a3c9d517.sql
+-- ============================================================================
 GRANT SELECT ON public.businesses TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.businesses TO authenticated;
 GRANT ALL ON public.businesses TO service_role;
 GRANT SELECT ON public.business_types TO anon;
 GRANT SELECT ON public.business_types TO authenticated;
 GRANT ALL ON public.business_types TO service_role;
--- ===== END SOURCE MIGRATION: 20260601010328_9e8aa9b0-30e0-4c30-9e57-d519a3c9d517.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260601030519_cee54f80-90c5-4ee0-a966-2dcf08cf9a98.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260601030519_cee54f80-90c5-4ee0-a966-2dcf08cf9a98.sql
+-- ============================================================================
 DROP POLICY IF EXISTS "Active businesses public read" ON public.businesses;
 
 CREATE POLICY "Active businesses public read"
@@ -3273,9 +2776,11 @@ USING (
   OR (auth.uid() IS NOT NULL AND auth.uid() = owner_id)
   OR (auth.uid() IS NOT NULL AND public.can_moderate(auth.uid()))
 );
--- ===== END SOURCE MIGRATION: 20260601030519_cee54f80-90c5-4ee0-a966-2dcf08cf9a98.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260601030613_bd3b8478-7045-464b-af81-bd540bcc5c00.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260601030613_bd3b8478-7045-464b-af81-bd540bcc5c00.sql
+-- ============================================================================
 DROP POLICY IF EXISTS "Active businesses public read" ON public.businesses;
 DROP POLICY IF EXISTS "Moderators manage businesses" ON public.businesses;
 DROP POLICY IF EXISTS "Admins manage business types" ON public.business_types;
@@ -3305,9 +2810,11 @@ FOR ALL
 TO authenticated
 USING (public.has_role(auth.uid(), 'admin'::app_role))
 WITH CHECK (public.has_role(auth.uid(), 'admin'::app_role));
--- ===== END SOURCE MIGRATION: 20260601030613_bd3b8478-7045-464b-af81-bd540bcc5c00.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260601042141_25c0cbaf-9664-41b6-ac02-f08aa7f340ed.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260601042141_25c0cbaf-9664-41b6-ac02-f08aa7f340ed.sql
+-- ============================================================================
 
 -- ============ ENUMS ============
 DO $$ BEGIN
@@ -3607,13 +3114,16 @@ CREATE POLICY "Moderators update course media" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Moderators delete course media" ON storage.objects FOR DELETE TO authenticated
   USING (bucket_id = 'course-media' AND public.can_moderate(auth.uid()));
 
--- ===== END SOURCE MIGRATION: 20260601042141_25c0cbaf-9664-41b6-ac02-f08aa7f340ed.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260601042456_b507cce1-738b-432c-bb65-8d1eedd30c91.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260601042456_b507cce1-738b-432c-bb65-8d1eedd30c91.sql
+-- ============================================================================
 ALTER TYPE public.payment_kind ADD VALUE IF NOT EXISTS 'course';
--- ===== END SOURCE MIGRATION: 20260601042456_b507cce1-738b-432c-bb65-8d1eedd30c91.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260601134129_39db4dbf-b53a-4491-8006-95ec1e6087a6.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260601134129_39db4dbf-b53a-4491-8006-95ec1e6087a6.sql
+-- ============================================================================
 CREATE OR REPLACE FUNCTION public.tg_notify_business_archive_change()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -3658,9 +3168,11 @@ CREATE TRIGGER trg_notify_business_archive_change
 AFTER UPDATE OF status ON public.businesses
 FOR EACH ROW
 EXECUTE FUNCTION public.tg_notify_business_archive_change();
--- ===== END SOURCE MIGRATION: 20260601134129_39db4dbf-b53a-4491-8006-95ec1e6087a6.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260601152700_e4784cd3-37e1-425b-af96-515e4d088cfb.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260601152700_e4784cd3-37e1-425b-af96-515e4d088cfb.sql
+-- ============================================================================
 
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('vehicle-media', 'vehicle-media', true)
@@ -3691,9 +3203,10 @@ USING (
   AND (storage.foldername(name))[1] = auth.uid()::text
 );
 
--- ===== END SOURCE MIGRATION: 20260601152700_e4784cd3-37e1-425b-af96-515e4d088cfb.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260601154424_f33c698f-120c-4b7c-b2c8-e49c5626bad7.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260601154424_f33c698f-120c-4b7c-b2c8-e49c5626bad7.sql
+-- ============================================================================
 -- Phase 1 P0: business lifecycle notification triggers + enum extension
 
 -- 1) Extend business_kind enum with all signup options that were missing
@@ -3707,9 +3220,10 @@ ALTER TYPE public.business_kind ADD VALUE IF NOT EXISTS 'driving_school';
 ALTER TYPE public.business_kind ADD VALUE IF NOT EXISTS 'lto_services';
 ALTER TYPE public.business_kind ADD VALUE IF NOT EXISTS 'transport';
 
--- ===== END SOURCE MIGRATION: 20260601154424_f33c698f-120c-4b7c-b2c8-e49c5626bad7.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql
+-- ============================================================================
 -- Phase 1 P0: lifecycle email triggers (business submitted/approved, verification submitted/approved/rejected, booking status changed)
 
 -- ============ 1) Business submitted (on INSERT) ============
@@ -3905,9 +3419,10 @@ CREATE TRIGGER trg_notify_booking_status_changed
 AFTER UPDATE OF status ON public.business_bookings
 FOR EACH ROW EXECUTE FUNCTION public.tg_notify_booking_status_changed();
 
--- ===== END SOURCE MIGRATION: 20260601154523_81cd3c4e-befb-4b8d-ae67-da43ecbdeff1.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260602035332_500bb99c-9c9e-4880-8d95-a54a4a786147.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260602035332_500bb99c-9c9e-4880-8d95-a54a4a786147.sql
+-- ============================================================================
 
 -- Pass A: Security hardening for RLS gaps confirmed against live schema.
 
@@ -3983,9 +3498,10 @@ CREATE POLICY "Tag links visible for active businesses"
     OR can_moderate(auth.uid())
   );
 
--- ===== END SOURCE MIGRATION: 20260602035332_500bb99c-9c9e-4880-8d95-a54a4a786147.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260602050028_48904d57-846f-45e4-9641-3bd1272160bf.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260602050028_48904d57-846f-45e4-9641-3bd1272160bf.sql
+-- ============================================================================
 
 -- Allow user to update their own request when pending, more_info, OR rejected (for resubmit).
 DROP POLICY IF EXISTS "Users update own pending requests" ON public.verification_requests;
@@ -4031,9 +3547,10 @@ BEFORE UPDATE ON public.verification_requests
 FOR EACH ROW
 EXECUTE FUNCTION public.tg_verification_user_resubmit();
 
--- ===== END SOURCE MIGRATION: 20260602050028_48904d57-846f-45e4-9641-3bd1272160bf.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260602081428_560fbe2c-f709-4b2f-860c-7883ddc68194.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260602081428_560fbe2c-f709-4b2f-860c-7883ddc68194.sql
+-- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.enforce_listing_media_caps()
 RETURNS trigger
@@ -4087,9 +3604,10 @@ CREATE TRIGGER trg_enforce_listing_media_caps
 BEFORE INSERT ON public.listing_media
 FOR EACH ROW EXECUTE FUNCTION public.enforce_listing_media_caps();
 
--- ===== END SOURCE MIGRATION: 20260602081428_560fbe2c-f709-4b2f-860c-7883ddc68194.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260602131032_2aef236c-1e7d-43f9-b847-d8faa42b4b42.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260602131032_2aef236c-1e7d-43f9-b847-d8faa42b4b42.sql
+-- ============================================================================
 CREATE TABLE public.site_settings (
   key text PRIMARY KEY,
   value text NOT NULL DEFAULT '',
@@ -4106,9 +3624,11 @@ VALUES
   ('support_whatsapp', '', 'Support WhatsApp number', 'WhatsApp number for the support contact button (e.g. +63 917 123 4567). Leave empty to hide the button.'),
   ('support_messenger', '', 'Support Messenger URL', 'Facebook Messenger m.me URL for support (e.g. https://m.me/365motorsales). Leave empty to hide the button.')
 ON CONFLICT (key) DO NOTHING;
--- ===== END SOURCE MIGRATION: 20260602131032_2aef236c-1e7d-43f9-b847-d8faa42b4b42.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260602131107_f405877d-01e1-4a35-8a61-a9ff4352b883.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260602131107_f405877d-01e1-4a35-8a61-a9ff4352b883.sql
+-- ============================================================================
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Allow public read on site_settings"
@@ -4116,9 +3636,11 @@ ON public.site_settings
 FOR SELECT
 TO anon, authenticated
 USING (true);
--- ===== END SOURCE MIGRATION: 20260602131107_f405877d-01e1-4a35-8a61-a9ff4352b883.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260603042141_20b66b5e-9cf2-4bc9-b181-6396c1cfc2e7.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260603042141_20b66b5e-9cf2-4bc9-b181-6396c1cfc2e7.sql
+-- ============================================================================
 CREATE TABLE public.user_garage_vehicles (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id uuid NOT NULL UNIQUE,
@@ -4156,9 +3678,11 @@ CREATE POLICY "Users can delete their own garage vehicle"
 CREATE TRIGGER trg_user_garage_vehicles_updated_at
   BEFORE UPDATE ON public.user_garage_vehicles
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
--- ===== END SOURCE MIGRATION: 20260603042141_20b66b5e-9cf2-4bc9-b181-6396c1cfc2e7.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260603053625_1ad931ed-7ec3-443d-befd-0d8cc0451f89.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260603053625_1ad931ed-7ec3-443d-befd-0d8cc0451f89.sql
+-- ============================================================================
 CREATE TABLE public.ops_alerts (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   event TEXT NOT NULL,
@@ -4188,9 +3712,11 @@ CREATE POLICY "Admins can acknowledge alerts"
   ON public.ops_alerts FOR UPDATE
   USING (public.has_role(auth.uid(), 'admin'::public.app_role))
   WITH CHECK (public.has_role(auth.uid(), 'admin'::public.app_role));
--- ===== END SOURCE MIGRATION: 20260603053625_1ad931ed-7ec3-443d-befd-0d8cc0451f89.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260603063551_f1347a42-fcfe-415f-a41f-13f0f567b2be.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260603063551_f1347a42-fcfe-415f-a41f-13f0f567b2be.sql
+-- ============================================================================
 -- Internal webhook signing keys (HMAC). Service-role only; no anon/auth grants.
 CREATE TABLE IF NOT EXISTS public.internal_webhook_keys (
   name TEXT PRIMARY KEY,
@@ -4268,9 +3794,11 @@ REVOKE ALL ON FUNCTION public.rotate_internal_webhook_key(TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.rotate_internal_cron_token(TEXT) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.rotate_internal_webhook_key(TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.rotate_internal_cron_token(TEXT) TO authenticated;
--- ===== END SOURCE MIGRATION: 20260603063551_f1347a42-fcfe-415f-a41f-13f0f567b2be.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql
+-- ============================================================================
 -- Unschedule old jobs, then re-create them reading URL+token from DB.
 DO $$
 BEGIN
@@ -4327,9 +3855,11 @@ SELECT cron.schedule(
   );
   $cron$
 );
--- ===== END SOURCE MIGRATION: 20260603063905_a1f01f8e-1b53-4ea1-8e67-d48ee3811914.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260603071817_c2bff13a-babb-4098-9869-e84fad6c19f6.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260603071817_c2bff13a-babb-4098-9869-e84fad6c19f6.sql
+-- ============================================================================
 CREATE TABLE public.route_audit_log (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   actor_id uuid NOT NULL,
@@ -4363,9 +3893,10 @@ CREATE POLICY "Support read route audit"
   ON public.route_audit_log FOR SELECT
   USING (can_support(auth.uid()));
 
--- ===== END SOURCE MIGRATION: 20260603071817_c2bff13a-babb-4098-9869-e84fad6c19f6.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260603080421_6b8a7673-45ea-4d4b-85d2-d834969ba292.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260603080421_6b8a7673-45ea-4d4b-85d2-d834969ba292.sql
+-- ============================================================================
 CREATE TABLE public.feature_flags (
   key text PRIMARY KEY,
   enabled boolean NOT NULL DEFAULT false,
@@ -4412,13 +3943,17 @@ INSERT INTO public.feature_flags (key, enabled, description) VALUES
   ('boost.escrow',        false, 'Escrowed boost listings'),
   ('subscriptions.annual',true,  'Annual subscription discount plans')
 ON CONFLICT (key) DO NOTHING;
--- ===== END SOURCE MIGRATION: 20260603080421_6b8a7673-45ea-4d4b-85d2-d834969ba292.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260603080924_baf447bb-08b3-4e28-8ff7-fce134194605.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260603080924_baf447bb-08b3-4e28-8ff7-fce134194605.sql
+-- ============================================================================
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS display_currency text;
--- ===== END SOURCE MIGRATION: 20260603080924_baf447bb-08b3-4e28-8ff7-fce134194605.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260604122237_2389a56f-bfe5-45e0-8114-a798b2889648.sql =====
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260604122237_2389a56f-bfe5-45e0-8114-a798b2889648.sql
+-- ============================================================================
 CREATE TABLE public.share_kit_layouts (
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   template_id text NOT NULL,
@@ -4441,9 +3976,10 @@ TO authenticated
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
--- ===== END SOURCE MIGRATION: 20260604122237_2389a56f-bfe5-45e0-8114-a798b2889648.sql =====
 
--- ===== BEGIN SOURCE MIGRATION: 20260604164158_05bc3b50-bcb2-4dca-b5f3-b10d454f38c5.sql =====
+-- ============================================================================
+-- SOURCE MIGRATION: 20260604164158_05bc3b50-bcb2-4dca-b5f3-b10d454f38c5.sql
+-- ============================================================================
 
 CREATE TABLE public.email_routes (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -4506,5 +4042,1204 @@ INSERT INTO public.email_routes (address, destination, source, category, owner, 
   ('info@365motorsales.com',                  'jordilwbailey@gmail.com', 'cloudflare', 'general',  'Jordi', 'General contact inbox',         true)
 ON CONFLICT (address) DO NOTHING;
 
--- ===== END SOURCE MIGRATION: 20260604164158_05bc3b50-bcb2-4dca-b5f3-b10d454f38c5.sql =====
 
+-- ============================================================================
+-- SOURCE MIGRATION: 20260605033802_58c5391b-eb0e-40fd-babd-8203a211081e.sql
+-- ============================================================================
+-- 1. Extend app_role enum
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'sales_junior';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'sales_senior';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'sales_manager';
+
+-- Commit enum changes before they can be referenced
+COMMIT;
+BEGIN;
+
+-- 2. Sales tier helper: manager > senior > junior. Legacy 'sales' role = senior.
+CREATE OR REPLACE FUNCTION public.has_sales_tier(_user_id uuid, _min_tier text)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  WITH r AS (
+    SELECT role::text AS role FROM public.user_roles WHERE user_id = _user_id
+  ),
+  level AS (
+    SELECT GREATEST(
+      CASE WHEN EXISTS (SELECT 1 FROM r WHERE role = 'admin') THEN 3 ELSE 0 END,
+      CASE WHEN EXISTS (SELECT 1 FROM r WHERE role = 'sales_manager') THEN 3 ELSE 0 END,
+      CASE WHEN EXISTS (SELECT 1 FROM r WHERE role IN ('sales_senior','sales')) THEN 2 ELSE 0 END,
+      CASE WHEN EXISTS (SELECT 1 FROM r WHERE role = 'sales_junior') THEN 1 ELSE 0 END
+    ) AS lvl
+  )
+  SELECT (SELECT lvl FROM level) >= CASE _min_tier
+    WHEN 'junior' THEN 1
+    WHEN 'senior' THEN 2
+    WHEN 'manager' THEN 3
+    ELSE 99
+  END;
+$$;
+
+-- 3. customer_discounts table
+CREATE TABLE IF NOT EXISTS public.customer_discounts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  target_user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  target_business_id uuid,
+  kind text NOT NULL CHECK (kind IN ('percent','flat')),
+  percent_off numeric,
+  flat_amount_php numeric,
+  applies_to text NOT NULL DEFAULT 'any',
+  reason text,
+  expires_at timestamptz,
+  issued_by uuid NOT NULL REFERENCES auth.users(id),
+  active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CHECK (target_user_id IS NOT NULL OR target_business_id IS NOT NULL),
+  CHECK (
+    (kind = 'percent' AND percent_off IS NOT NULL AND percent_off > 0 AND percent_off <= 100) OR
+    (kind = 'flat' AND flat_amount_php IS NOT NULL AND flat_amount_php > 0)
+  )
+);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.customer_discounts TO authenticated;
+GRANT ALL ON public.customer_discounts TO service_role;
+
+ALTER TABLE public.customer_discounts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Managers and admins manage customer discounts"
+  ON public.customer_discounts FOR ALL
+  TO authenticated
+  USING (public.has_role(auth.uid(), 'admin') OR public.has_sales_tier(auth.uid(), 'manager'))
+  WITH CHECK (public.has_role(auth.uid(), 'admin') OR public.has_sales_tier(auth.uid(), 'manager'));
+
+CREATE POLICY "Users can view their own discounts"
+  ON public.customer_discounts FOR SELECT
+  TO authenticated
+  USING (target_user_id = auth.uid());
+
+CREATE OR REPLACE FUNCTION public.touch_updated_at()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN NEW.updated_at = now(); RETURN NEW; END $$;
+
+DROP TRIGGER IF EXISTS trg_customer_discounts_updated_at ON public.customer_discounts;
+CREATE TRIGGER trg_customer_discounts_updated_at
+  BEFORE UPDATE ON public.customer_discounts
+  FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
+
+-- 4. Grant Joan sales_manager role
+INSERT INTO public.user_roles (user_id, role)
+SELECT id, 'sales_manager'::public.app_role
+FROM auth.users
+WHERE lower(email) = 'jordilwbailey@gmail.com'
+ON CONFLICT (user_id, role) DO NOTHING;
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260605033831_236da73f-d912-4947-a953-a016ec283c83.sql
+-- ============================================================================
+CREATE OR REPLACE FUNCTION public.touch_updated_at()
+RETURNS TRIGGER LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN NEW.updated_at = now(); RETURN NEW; END $$;
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260605043935_47d06dfd-d146-4628-b75e-d0c94e3b40f0.sql
+-- ============================================================================
+ALTER TYPE public.seller_type ADD VALUE IF NOT EXISTS 'staff';
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260605044520_a8fe8551-55be-4c4f-87b2-3c223bbf1dd2.sql
+-- ============================================================================
+DROP POLICY IF EXISTS "Public read avatars" ON storage.objects;
+CREATE POLICY "Public read avatars" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260605050625_ab3ca880-2df9-4ae9-865f-cd1ca5c84255.sql
+-- ============================================================================
+
+-- ========== sales_rep_profiles ==========
+CREATE TABLE public.sales_rep_profiles (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  active boolean NOT NULL DEFAULT true,
+  accepting_new_clients boolean NOT NULL DEFAULT true,
+  title text,
+  bio text,
+  public_email text,
+  public_phone text,
+  photo_url text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.sales_rep_profiles TO authenticated;
+GRANT ALL ON public.sales_rep_profiles TO service_role;
+ALTER TABLE public.sales_rep_profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Rep can view own profile" ON public.sales_rep_profiles FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Rep can upsert own profile" ON public.sales_rep_profiles FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Rep can update own profile" ON public.sales_rep_profiles FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Admins manage all rep profiles" ON public.sales_rep_profiles FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin'::app_role)) WITH CHECK (public.has_role(auth.uid(),'admin'::app_role));
+CREATE TRIGGER trg_sales_rep_profiles_updated BEFORE UPDATE ON public.sales_rep_profiles FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at();
+
+-- ========== sales_rep_territories ==========
+CREATE TABLE public.sales_rep_territories (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  rep_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  region text NOT NULL,
+  province text,
+  city text,
+  is_primary boolean NOT NULL DEFAULT false,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_sales_rep_territories_rep ON public.sales_rep_territories(rep_user_id);
+CREATE INDEX idx_sales_rep_territories_geo ON public.sales_rep_territories(region, province, city);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.sales_rep_territories TO authenticated;
+GRANT ALL ON public.sales_rep_territories TO service_role;
+ALTER TABLE public.sales_rep_territories ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Rep manages own territories" ON public.sales_rep_territories FOR ALL TO authenticated USING (auth.uid() = rep_user_id) WITH CHECK (auth.uid() = rep_user_id);
+CREATE POLICY "Admins manage all territories" ON public.sales_rep_territories FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin'::app_role)) WITH CHECK (public.has_role(auth.uid(),'admin'::app_role));
+
+-- ========== enums ==========
+CREATE TYPE public.sales_rep_subject AS ENUM ('user','business');
+CREATE TYPE public.sales_rep_source AS ENUM ('referral','manual','territory','customer_choice');
+
+-- ========== sales_rep_assignments ==========
+CREATE TABLE public.sales_rep_assignments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  rep_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  subject_type public.sales_rep_subject NOT NULL,
+  subject_id uuid NOT NULL,
+  source public.sales_rep_source NOT NULL DEFAULT 'manual',
+  active boolean NOT NULL DEFAULT true,
+  notes text,
+  assigned_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  assigned_at timestamptz NOT NULL DEFAULT now(),
+  ended_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX uniq_active_assignment ON public.sales_rep_assignments(subject_type, subject_id) WHERE active;
+CREATE INDEX idx_sales_rep_assignments_rep ON public.sales_rep_assignments(rep_user_id) WHERE active;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.sales_rep_assignments TO authenticated;
+GRANT ALL ON public.sales_rep_assignments TO service_role;
+ALTER TABLE public.sales_rep_assignments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Rep views own assignments" ON public.sales_rep_assignments FOR SELECT TO authenticated USING (auth.uid() = rep_user_id);
+CREATE POLICY "Admins manage all assignments" ON public.sales_rep_assignments FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin'::app_role)) WITH CHECK (public.has_role(auth.uid(),'admin'::app_role));
+CREATE TRIGGER trg_sales_rep_assignments_updated BEFORE UPDATE ON public.sales_rep_assignments FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at();
+
+-- ========== sales_rep_followups ==========
+CREATE TYPE public.followup_kind AS ENUM ('note','call','email','sms','meeting','request');
+CREATE TYPE public.followup_status AS ENUM ('open','done','snoozed');
+
+CREATE TABLE public.sales_rep_followups (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  rep_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  subject_type public.sales_rep_subject NOT NULL,
+  subject_id uuid NOT NULL,
+  kind public.followup_kind NOT NULL DEFAULT 'note',
+  status public.followup_status NOT NULL DEFAULT 'open',
+  title text NOT NULL,
+  body text,
+  due_at timestamptz,
+  completed_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_followups_rep_status ON public.sales_rep_followups(rep_user_id, status);
+CREATE INDEX idx_followups_subject ON public.sales_rep_followups(subject_type, subject_id);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.sales_rep_followups TO authenticated;
+GRANT ALL ON public.sales_rep_followups TO service_role;
+ALTER TABLE public.sales_rep_followups ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Rep manages own followups" ON public.sales_rep_followups FOR ALL TO authenticated USING (auth.uid() = rep_user_id) WITH CHECK (auth.uid() = rep_user_id);
+CREATE POLICY "Admins manage all followups" ON public.sales_rep_followups FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin'::app_role)) WITH CHECK (public.has_role(auth.uid(),'admin'::app_role));
+CREATE TRIGGER trg_sales_rep_followups_updated BEFORE UPDATE ON public.sales_rep_followups FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at();
+
+-- ========== Helper: safe customer-facing rep lookup ==========
+CREATE OR REPLACE FUNCTION public.get_assigned_rep_card(_subject_type text, _subject_id uuid)
+RETURNS TABLE (
+  rep_user_id uuid, full_name text, title text, bio text, photo_url text,
+  public_email text, public_phone text, accepting_new_clients boolean
+)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT
+    a.rep_user_id,
+    COALESCE(NULLIF(p.full_name,''), p.first_name, au.email) AS full_name,
+    sp.title, sp.bio,
+    COALESCE(sp.photo_url, p.avatar_url) AS photo_url,
+    COALESCE(sp.public_email, au.email) AS public_email,
+    COALESCE(sp.public_phone, p.phone_e164, p.phone) AS public_phone,
+    COALESCE(sp.accepting_new_clients, true) AS accepting_new_clients
+  FROM public.sales_rep_assignments a
+  LEFT JOIN public.sales_rep_profiles sp ON sp.user_id = a.rep_user_id
+  LEFT JOIN public.profiles p ON p.id = a.rep_user_id
+  LEFT JOIN auth.users au ON au.id = a.rep_user_id
+  WHERE a.active = true
+    AND a.subject_type::text = _subject_type
+    AND a.subject_id = _subject_id
+    AND (
+      (_subject_type = 'user' AND a.subject_id = auth.uid())
+      OR a.rep_user_id = auth.uid()
+      OR public.has_role(auth.uid(),'admin'::app_role)
+      OR (_subject_type = 'business' AND EXISTS (
+        SELECT 1 FROM public.businesses b WHERE b.id = a.subject_id AND b.owner_id = auth.uid()
+      ))
+    )
+  LIMIT 1;
+$$;
+GRANT EXECUTE ON FUNCTION public.get_assigned_rep_card(text, uuid) TO authenticated;
+
+-- ========== Auto-assign on staff referral signup ==========
+CREATE OR REPLACE FUNCTION public.tg_auto_assign_sales_rep()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE v_staff_user uuid;
+BEGIN
+  IF NEW.referred_by_staff_id IS NULL THEN RETURN NEW; END IF;
+  SELECT staff_user_id INTO v_staff_user FROM public.staff_referrals WHERE id = NEW.referred_by_staff_id;
+  IF v_staff_user IS NULL THEN RETURN NEW; END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = v_staff_user AND role::text = 'sales') THEN
+    RETURN NEW;
+  END IF;
+  INSERT INTO public.sales_rep_assignments(rep_user_id, subject_type, subject_id, source, assigned_by)
+  VALUES (v_staff_user, 'user', NEW.user_id, 'referral', v_staff_user)
+  ON CONFLICT DO NOTHING;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER trg_user_referrals_auto_assign_rep AFTER INSERT ON public.user_referrals FOR EACH ROW EXECUTE FUNCTION public.tg_auto_assign_sales_rep();
+
+-- ========== Auto-create sales_rep_profiles for sales staff ==========
+INSERT INTO public.sales_rep_profiles(user_id)
+SELECT ur.user_id FROM public.user_roles ur WHERE ur.role::text = 'sales'
+ON CONFLICT DO NOTHING;
+
+CREATE OR REPLACE FUNCTION public.tg_create_sales_rep_profile()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF NEW.role::text = 'sales' THEN
+    INSERT INTO public.sales_rep_profiles(user_id) VALUES (NEW.user_id) ON CONFLICT DO NOTHING;
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER trg_user_roles_create_sales_rep AFTER INSERT ON public.user_roles FOR EACH ROW EXECUTE FUNCTION public.tg_create_sales_rep_profile();
+
+-- ========== Backfill: assign existing referrals to sales reps ==========
+INSERT INTO public.sales_rep_assignments(rep_user_id, subject_type, subject_id, source, assigned_at)
+SELECT sr.staff_user_id, 'user', ur.user_id, 'referral', COALESCE(ur.signup_date, now())
+FROM public.user_referrals ur
+JOIN public.staff_referrals sr ON sr.id = ur.referred_by_staff_id
+JOIN public.user_roles uro ON uro.user_id = sr.staff_user_id AND uro.role::text = 'sales'
+WHERE sr.staff_user_id IS NOT NULL
+ON CONFLICT DO NOTHING;
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260605051559_26b81f60-d973-4718-9e61-9d209dd5c39d.sql
+-- ============================================================================
+
+CREATE TABLE public.sales_rep_audit_log (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  actor_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  action text NOT NULL,
+  rep_user_id uuid,
+  prev_rep_user_id uuid,
+  subject_type text,
+  subject_id uuid,
+  territory_id uuid,
+  details jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_sales_rep_audit_created ON public.sales_rep_audit_log (created_at DESC);
+CREATE INDEX idx_sales_rep_audit_rep ON public.sales_rep_audit_log (rep_user_id);
+CREATE INDEX idx_sales_rep_audit_subject ON public.sales_rep_audit_log (subject_type, subject_id);
+
+GRANT SELECT, INSERT ON public.sales_rep_audit_log TO authenticated;
+GRANT ALL ON public.sales_rep_audit_log TO service_role;
+
+ALTER TABLE public.sales_rep_audit_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins can view sales rep audit log"
+  ON public.sales_rep_audit_log FOR SELECT TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'::app_role));
+
+CREATE POLICY "Admins can insert sales rep audit log"
+  ON public.sales_rep_audit_log FOR INSERT TO authenticated
+  WITH CHECK (public.has_role(auth.uid(), 'admin'::app_role) AND actor_id = auth.uid());
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260605100219_3669f1b4-7fa9-4814-a86d-374afa871185.sql
+-- ============================================================================
+ALTER TABLE public.advertisements ADD COLUMN IF NOT EXISTS category_slug TEXT;
+CREATE INDEX IF NOT EXISTS idx_advertisements_category_sponsor ON public.advertisements (category_slug, priority DESC) WHERE status = 'active'::ad_status AND placement = 'category_banner'::ad_placement;
+DROP VIEW IF EXISTS public.active_ads_public;
+CREATE VIEW public.active_ads_public AS
+SELECT id, title, caption, image_url, target_url, placement, category_slug, priority, starts_at, ends_at, created_at
+FROM public.advertisements
+WHERE status = 'active'::ad_status
+  AND (starts_at IS NULL OR starts_at <= now())
+  AND (ends_at IS NULL OR ends_at >= now());
+GRANT SELECT ON public.active_ads_public TO anon, authenticated;
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260605102058_3f93ff4c-c7ee-417e-90a8-e2acc69ce921.sql
+-- ============================================================================
+
+-- 1) Unlock ledger first (so the lead_offers SELECT policy can reference it)
+CREATE TABLE public.lead_offer_unlocks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  offer_id UUID NOT NULL,
+  buyer_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  buyer_business_id UUID REFERENCES public.businesses(id) ON DELETE SET NULL,
+  payment_id UUID REFERENCES public.payments(id) ON DELETE SET NULL,
+  price_php NUMERIC(14,2) NOT NULL DEFAULT 0,
+  unlocked_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (offer_id, buyer_user_id)
+);
+CREATE INDEX idx_lead_offer_unlocks_buyer ON public.lead_offer_unlocks(buyer_user_id, unlocked_at DESC);
+CREATE INDEX idx_lead_offer_unlocks_offer ON public.lead_offer_unlocks(offer_id);
+
+GRANT SELECT, INSERT ON public.lead_offer_unlocks TO authenticated;
+GRANT ALL ON public.lead_offer_unlocks TO service_role;
+
+ALTER TABLE public.lead_offer_unlocks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins manage unlocks"
+  ON public.lead_offer_unlocks
+  USING (has_role(auth.uid(), 'admin'::app_role))
+  WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
+
+CREATE POLICY "Buyers read their own unlocks"
+  ON public.lead_offer_unlocks FOR SELECT
+  TO authenticated
+  USING (auth.uid() = buyer_user_id);
+
+CREATE POLICY "Buyers insert their own unlocks"
+  ON public.lead_offer_unlocks FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = buyer_user_id);
+
+-- 2) Lead offers table
+CREATE TABLE public.lead_offers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  category_slug TEXT NOT NULL,
+  region TEXT,
+  province TEXT,
+  city TEXT,
+  vehicle_make TEXT,
+  vehicle_model TEXT,
+  vehicle_year INTEGER,
+  budget_min_php NUMERIC(14,2),
+  budget_max_php NUMERIC(14,2),
+  urgency TEXT NOT NULL DEFAULT 'standard' CHECK (urgency IN ('low','standard','urgent')),
+  preview TEXT NOT NULL,
+  contact_name TEXT,
+  contact_email TEXT,
+  contact_phone TEXT,
+  contact_notes TEXT,
+  source_kind TEXT,
+  source_id UUID,
+  price_php NUMERIC(14,2) NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','sold','expired','withdrawn')),
+  max_unlocks INTEGER NOT NULL DEFAULT 1,
+  unlocks_count INTEGER NOT NULL DEFAULT 0,
+  posted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ,
+  created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_lead_offers_open ON public.lead_offers(status, posted_at DESC) WHERE status = 'open';
+CREATE INDEX idx_lead_offers_category ON public.lead_offers(category_slug) WHERE status = 'open';
+CREATE INDEX idx_lead_offers_region ON public.lead_offers(region) WHERE status = 'open';
+
+-- FK from unlocks → offers, added now that both exist
+ALTER TABLE public.lead_offer_unlocks
+  ADD CONSTRAINT lead_offer_unlocks_offer_id_fkey
+  FOREIGN KEY (offer_id) REFERENCES public.lead_offers(id) ON DELETE CASCADE;
+
+GRANT SELECT ON public.lead_offers TO authenticated;
+GRANT ALL ON public.lead_offers TO service_role;
+
+ALTER TABLE public.lead_offers ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins manage lead offers"
+  ON public.lead_offers
+  USING (has_role(auth.uid(), 'admin'::app_role))
+  WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
+
+CREATE POLICY "Buyers read their unlocked offers"
+  ON public.lead_offers FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.lead_offer_unlocks u
+      WHERE u.offer_id = lead_offers.id
+        AND u.buyer_user_id = auth.uid()
+    )
+  );
+
+-- 3) Public redacted view (no PII)
+CREATE OR REPLACE VIEW public.lead_offers_public AS
+SELECT
+  id,
+  category_slug,
+  region,
+  province,
+  city,
+  vehicle_make,
+  vehicle_model,
+  vehicle_year,
+  budget_min_php,
+  budget_max_php,
+  urgency,
+  preview,
+  price_php,
+  max_unlocks,
+  unlocks_count,
+  posted_at,
+  expires_at,
+  status
+FROM public.lead_offers
+WHERE status = 'open'
+  AND (expires_at IS NULL OR expires_at > now());
+
+GRANT SELECT ON public.lead_offers_public TO anon;
+GRANT SELECT ON public.lead_offers_public TO authenticated;
+
+CREATE TRIGGER trg_lead_offers_updated_at
+  BEFORE UPDATE ON public.lead_offers
+  FOR EACH ROW EXECUTE FUNCTION tg_set_updated_at();
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260605102153_39018714-7821-475b-a287-ea88edc82215.sql
+-- ============================================================================
+
+DROP VIEW IF EXISTS public.lead_offers_public;
+
+CREATE OR REPLACE FUNCTION public.list_open_lead_offers(
+  _category_slug TEXT DEFAULT NULL,
+  _region TEXT DEFAULT NULL,
+  _limit INTEGER DEFAULT 60
+)
+RETURNS TABLE (
+  id UUID,
+  category_slug TEXT,
+  region TEXT,
+  province TEXT,
+  city TEXT,
+  vehicle_make TEXT,
+  vehicle_model TEXT,
+  vehicle_year INTEGER,
+  budget_min_php NUMERIC,
+  budget_max_php NUMERIC,
+  urgency TEXT,
+  preview TEXT,
+  price_php NUMERIC,
+  max_unlocks INTEGER,
+  unlocks_count INTEGER,
+  posted_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ
+)
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT
+    o.id,
+    o.category_slug,
+    o.region,
+    o.province,
+    o.city,
+    o.vehicle_make,
+    o.vehicle_model,
+    o.vehicle_year,
+    o.budget_min_php,
+    o.budget_max_php,
+    o.urgency,
+    o.preview,
+    o.price_php,
+    o.max_unlocks,
+    o.unlocks_count,
+    o.posted_at,
+    o.expires_at
+  FROM public.lead_offers o
+  WHERE o.status = 'open'
+    AND (o.expires_at IS NULL OR o.expires_at > now())
+    AND (_category_slug IS NULL OR o.category_slug = _category_slug)
+    AND (_region IS NULL OR o.region = _region)
+  ORDER BY
+    CASE o.urgency WHEN 'urgent' THEN 0 WHEN 'standard' THEN 1 ELSE 2 END,
+    o.posted_at DESC
+  LIMIT GREATEST(1, LEAST(COALESCE(_limit, 60), 200));
+$$;
+
+REVOKE ALL ON FUNCTION public.list_open_lead_offers(TEXT, TEXT, INTEGER) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.list_open_lead_offers(TEXT, TEXT, INTEGER) TO anon;
+GRANT EXECUTE ON FUNCTION public.list_open_lead_offers(TEXT, TEXT, INTEGER) TO authenticated;
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260605103051_33840174-a52e-4fa2-b3c2-434d46ecbdfa.sql
+-- ============================================================================
+
+-- 1) Premium saved-search alerts
+ALTER TABLE public.saved_searches
+  ADD COLUMN IF NOT EXISTS alert_frequency text NOT NULL DEFAULT 'off'
+    CHECK (alert_frequency IN ('off','daily','instant')),
+  ADD COLUMN IF NOT EXISTS last_alerted_at timestamptz,
+  ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now();
+
+-- 2) Listing bundles (dealer packages)
+CREATE TABLE IF NOT EXISTS public.listing_bundles (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  description text,
+  listing_credits integer NOT NULL DEFAULT 0,
+  boost_credits integer NOT NULL DEFAULT 0,
+  duration_days integer NOT NULL DEFAULT 30,
+  price_php numeric(14,2) NOT NULL,
+  is_active boolean NOT NULL DEFAULT true,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT ON public.listing_bundles TO anon, authenticated;
+GRANT ALL ON public.listing_bundles TO service_role;
+ALTER TABLE public.listing_bundles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Bundles are public-readable when active"
+  ON public.listing_bundles FOR SELECT
+  USING (is_active = true);
+CREATE POLICY "Admins manage bundles"
+  ON public.listing_bundles FOR ALL
+  USING (has_role(auth.uid(), 'admin'))
+  WITH CHECK (has_role(auth.uid(), 'admin'));
+
+CREATE TABLE IF NOT EXISTS public.bundle_purchases (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  business_id uuid REFERENCES public.businesses(id) ON DELETE SET NULL,
+  bundle_id uuid NOT NULL REFERENCES public.listing_bundles(id) ON DELETE RESTRICT,
+  listing_credits_remaining integer NOT NULL DEFAULT 0,
+  boost_credits_remaining integer NOT NULL DEFAULT 0,
+  expires_at timestamptz NOT NULL,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','expired','cancelled')),
+  price_paid_php numeric(14,2) NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT, UPDATE ON public.bundle_purchases TO authenticated;
+GRANT ALL ON public.bundle_purchases TO service_role;
+ALTER TABLE public.bundle_purchases ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users see own bundle purchases"
+  ON public.bundle_purchases FOR SELECT TO authenticated
+  USING (auth.uid() = user_id OR has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins manage bundle purchases"
+  ON public.bundle_purchases FOR ALL
+  USING (has_role(auth.uid(), 'admin'))
+  WITH CHECK (has_role(auth.uid(), 'admin'));
+
+CREATE TRIGGER trg_listing_bundles_updated_at
+  BEFORE UPDATE ON public.listing_bundles
+  FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at();
+CREATE TRIGGER trg_bundle_purchases_updated_at
+  BEFORE UPDATE ON public.bundle_purchases
+  FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at();
+CREATE TRIGGER trg_saved_searches_updated_at
+  BEFORE UPDATE ON public.saved_searches
+  FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at();
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260606041358_7821951b-4327-458a-ac97-d13073d706e7.sql
+-- ============================================================================
+-- 1) Fix the broken self-referential subqueries in the owner UPDATE policy on listings.
+DROP POLICY IF EXISTS "Owners update listings" ON public.listings;
+CREATE POLICY "Owners update listings"
+ON public.listings
+FOR UPDATE
+USING (auth.uid() = user_id)
+WITH CHECK (
+  auth.uid() = user_id
+  AND NOT (status IS DISTINCT FROM (
+    SELECT l.status FROM public.listings l WHERE l.id = listings.id
+  ))
+  AND NOT (plan IS DISTINCT FROM (
+    SELECT l.plan FROM public.listings l WHERE l.id = listings.id
+  ))
+  AND NOT (boost_until IS DISTINCT FROM (
+    SELECT l.boost_until FROM public.listings l WHERE l.id = listings.id
+  ))
+  AND NOT (expires_at IS DISTINCT FROM (
+    SELECT l.expires_at FROM public.listings l WHERE l.id = listings.id
+  ))
+);
+
+-- 2) Tighten the business-gallery upload policy to require ownership of the target business.
+DROP POLICY IF EXISTS "Authenticated upload to business gallery" ON storage.objects;
+CREATE POLICY "Authenticated upload to business gallery"
+ON storage.objects
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'business-gallery'
+  AND EXISTS (
+    SELECT 1 FROM public.businesses b
+    WHERE b.id::text = (storage.foldername(name))[1]
+      AND (
+        b.owner_id = auth.uid()
+        OR (b.organization_id IS NOT NULL AND public.can_manage_org(auth.uid(), b.organization_id))
+      )
+  )
+);
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260606123543_fb94412b-0d85-4071-bee5-42acbaf4cf90.sql
+-- ============================================================================
+
+-- 1) Extend businesses with seeding + claim metadata
+ALTER TABLE public.businesses
+  ADD COLUMN IF NOT EXISTS claim_state text NOT NULL DEFAULT 'owned'
+    CHECK (claim_state IN ('owned','unclaimed','claim_pending')),
+  ADD COLUMN IF NOT EXISTS import_metadata jsonb,
+  ADD COLUMN IF NOT EXISTS attribution text,
+  ADD COLUMN IF NOT EXISTS removal_requested_at timestamptz;
+
+CREATE INDEX IF NOT EXISTS idx_businesses_claim_state
+  ON public.businesses(claim_state) WHERE claim_state <> 'owned';
+
+-- 2) Claim requests table
+CREATE TABLE IF NOT EXISTS public.business_claim_requests (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id uuid NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
+  claimant_user_id uuid NOT NULL,
+  contact_method text NOT NULL CHECK (contact_method IN ('email','phone','document','social')),
+  contact_value text,
+  evidence_url text,
+  notes text,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected','auto_approved')),
+  reviewer_user_id uuid,
+  reviewer_notes text,
+  decided_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+GRANT SELECT, INSERT ON public.business_claim_requests TO authenticated;
+GRANT ALL ON public.business_claim_requests TO service_role;
+
+ALTER TABLE public.business_claim_requests ENABLE ROW LEVEL SECURITY;
+
+-- Claimant: insert only for self, only for unclaimed businesses
+CREATE POLICY "Users submit own claim"
+  ON public.business_claim_requests
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    claimant_user_id = auth.uid()
+    AND EXISTS (
+      SELECT 1 FROM public.businesses b
+      WHERE b.id = business_id
+        AND b.claim_state IN ('unclaimed','claim_pending')
+        AND b.owner_id IS NULL
+    )
+  );
+
+-- Claimant + staff can read
+CREATE POLICY "Users read own claims"
+  ON public.business_claim_requests
+  FOR SELECT TO authenticated
+  USING (claimant_user_id = auth.uid() OR public.can_moderate(auth.uid()));
+
+-- Staff updates (decision)
+CREATE POLICY "Staff update claims"
+  ON public.business_claim_requests
+  FOR UPDATE TO authenticated
+  USING (public.can_moderate(auth.uid()))
+  WITH CHECK (public.can_moderate(auth.uid()));
+
+CREATE INDEX IF NOT EXISTS idx_bcr_business ON public.business_claim_requests(business_id);
+CREATE INDEX IF NOT EXISTS idx_bcr_claimant ON public.business_claim_requests(claimant_user_id);
+CREATE INDEX IF NOT EXISTS idx_bcr_status ON public.business_claim_requests(status);
+
+CREATE OR REPLACE FUNCTION public.touch_updated_at()
+RETURNS TRIGGER LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN NEW.updated_at = now(); RETURN NEW; END $$;
+
+DROP TRIGGER IF EXISTS trg_bcr_touch ON public.business_claim_requests;
+CREATE TRIGGER trg_bcr_touch
+  BEFORE UPDATE ON public.business_claim_requests
+  FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
+
+-- 3) Tighten owner update policy: protect claim_state / owner_id / source fields
+-- The existing field-freeze policy on listings (status/plan/boost_until/expires_at)
+-- has its own protection. For businesses, owners can update most fields but NOT
+-- ownership / sourcing / claim machinery. Add a check trigger to enforce this.
+
+CREATE OR REPLACE FUNCTION public.guard_business_owner_update()
+RETURNS TRIGGER LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN
+  -- Service role / staff bypass
+  IF (auth.uid() IS NULL) OR public.can_moderate(auth.uid()) THEN
+    RETURN NEW;
+  END IF;
+  IF NEW.owner_id IS DISTINCT FROM OLD.owner_id
+     OR NEW.claim_state IS DISTINCT FROM OLD.claim_state
+     OR NEW.source IS DISTINCT FROM OLD.source
+     OR NEW.source_external_id IS DISTINCT FROM OLD.source_external_id
+     OR NEW.subscription_tier IS DISTINCT FROM OLD.subscription_tier
+     OR NEW.featured IS DISTINCT FROM OLD.featured
+     OR NEW.featured_until IS DISTINCT FROM OLD.featured_until
+     OR NEW.status IS DISTINCT FROM OLD.status
+  THEN
+    RAISE EXCEPTION 'Cannot modify protected business fields';
+  END IF;
+  RETURN NEW;
+END $$;
+
+DROP TRIGGER IF EXISTS trg_guard_business_owner_update ON public.businesses;
+CREATE TRIGGER trg_guard_business_owner_update
+  BEFORE UPDATE ON public.businesses
+  FOR EACH ROW EXECUTE FUNCTION public.guard_business_owner_update();
+
+-- 4) Helper: approve a claim (server-side, SECURITY DEFINER, used by server fns)
+CREATE OR REPLACE FUNCTION public.approve_business_claim(_claim_id uuid, _auto boolean)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE v_bid uuid; v_uid uuid;
+BEGIN
+  SELECT business_id, claimant_user_id INTO v_bid, v_uid
+    FROM public.business_claim_requests WHERE id = _claim_id;
+  IF v_bid IS NULL THEN RAISE EXCEPTION 'Claim not found'; END IF;
+
+  UPDATE public.businesses
+     SET owner_id = v_uid,
+         claim_state = 'owned',
+         updated_at = now()
+   WHERE id = v_bid AND owner_id IS NULL;
+
+  UPDATE public.business_claim_requests
+     SET status = CASE WHEN _auto THEN 'auto_approved' ELSE 'approved' END,
+         decided_at = now()
+   WHERE id = _claim_id;
+
+  -- Reject sibling pending claims for the same business
+  UPDATE public.business_claim_requests
+     SET status = 'rejected',
+         reviewer_notes = COALESCE(reviewer_notes,'') || E'\nAuto-rejected: another claim approved.',
+         decided_at = now()
+   WHERE business_id = v_bid AND id <> _claim_id AND status = 'pending';
+END $$;
+
+REVOKE ALL ON FUNCTION public.approve_business_claim(uuid, boolean) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.approve_business_claim(uuid, boolean) TO service_role;
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260606130250_6d6b8df8-037d-43a6-88d4-a9541634eb7e.sql
+-- ============================================================================
+
+CREATE TABLE public.business_claim_evidence (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  claim_id UUID NOT NULL REFERENCES public.business_claim_requests(id) ON DELETE CASCADE,
+  uploader_user_id UUID NOT NULL,
+  evidence_type TEXT NOT NULL CHECK (evidence_type IN ('facebook_ownership','google_business','business_license','utility_bill','id_document','website_proof','other')),
+  file_name TEXT NOT NULL,
+  file_size BIGINT NOT NULL,
+  mime_type TEXT NOT NULL,
+  storage_path TEXT NOT NULL,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_bce_claim ON public.business_claim_evidence(claim_id);
+CREATE INDEX idx_bce_uploader ON public.business_claim_evidence(uploader_user_id);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.business_claim_evidence TO authenticated;
+GRANT ALL ON public.business_claim_evidence TO service_role;
+
+ALTER TABLE public.business_claim_evidence ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users read own claim evidence"
+  ON public.business_claim_evidence FOR SELECT TO authenticated
+  USING (uploader_user_id = auth.uid() OR public.can_moderate(auth.uid()));
+
+CREATE POLICY "Users insert own claim evidence"
+  ON public.business_claim_evidence FOR INSERT TO authenticated
+  WITH CHECK (
+    uploader_user_id = auth.uid()
+    AND EXISTS (
+      SELECT 1 FROM public.business_claim_requests c
+      WHERE c.id = claim_id AND c.claimant_user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users delete own claim evidence"
+  ON public.business_claim_evidence FOR DELETE TO authenticated
+  USING (uploader_user_id = auth.uid() OR public.can_moderate(auth.uid()));
+
+-- Storage RLS for the claim-evidence bucket. Path convention: {user_id}/{claim_id}/{filename}
+CREATE POLICY "Claim evidence upload own"
+  ON storage.objects FOR INSERT TO authenticated
+  WITH CHECK (
+    bucket_id = 'claim-evidence'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+CREATE POLICY "Claim evidence read own or mod"
+  ON storage.objects FOR SELECT TO authenticated
+  USING (
+    bucket_id = 'claim-evidence'
+    AND ((storage.foldername(name))[1] = auth.uid()::text OR public.can_moderate(auth.uid()))
+  );
+
+CREATE POLICY "Claim evidence delete own or mod"
+  ON storage.objects FOR DELETE TO authenticated
+  USING (
+    bucket_id = 'claim-evidence'
+    AND ((storage.foldername(name))[1] = auth.uid()::text OR public.can_moderate(auth.uid()))
+  );
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260606130908_794768e3-771f-42ed-b904-e5f51aa1f509.sql
+-- ============================================================================
+
+CREATE TABLE public.business_claim_audit (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  claim_id UUID NOT NULL REFERENCES public.business_claim_requests(id) ON DELETE CASCADE,
+  actor_user_id UUID,
+  action TEXT NOT NULL CHECK (action IN (
+    'submitted','resubmitted','approved','auto_approved','rejected',
+    'evidence_added','evidence_removed','reviewer_note'
+  )),
+  notes TEXT,
+  details JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_bca_claim ON public.business_claim_audit(claim_id, created_at DESC);
+
+GRANT SELECT, INSERT ON public.business_claim_audit TO authenticated;
+GRANT ALL ON public.business_claim_audit TO service_role;
+
+ALTER TABLE public.business_claim_audit ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Read own claim audit or mod"
+  ON public.business_claim_audit FOR SELECT TO authenticated
+  USING (
+    public.can_moderate(auth.uid())
+    OR EXISTS (
+      SELECT 1 FROM public.business_claim_requests c
+      WHERE c.id = claim_id AND c.claimant_user_id = auth.uid()
+    )
+  );
+
+-- Inserts happen via SECURITY DEFINER triggers; deny direct user inserts
+CREATE POLICY "Block direct inserts"
+  ON public.business_claim_audit FOR INSERT TO authenticated
+  WITH CHECK (false);
+
+-- ---------- Triggers ----------
+
+CREATE OR REPLACE FUNCTION public.tg_claim_audit_status()
+RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'
+AS $$
+DECLARE v_action text;
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    INSERT INTO public.business_claim_audit(claim_id, actor_user_id, action, details)
+    VALUES (NEW.id, NEW.claimant_user_id, 'submitted',
+      jsonb_build_object('contact_method', NEW.contact_method));
+    RETURN NEW;
+  END IF;
+
+  IF NEW.status IS DISTINCT FROM OLD.status THEN
+    IF NEW.status = 'approved' THEN v_action := 'approved';
+    ELSIF NEW.status = 'auto_approved' THEN v_action := 'auto_approved';
+    ELSIF NEW.status = 'rejected' THEN v_action := 'rejected';
+    ELSIF NEW.status = 'pending' AND OLD.status = 'rejected' THEN v_action := 'resubmitted';
+    ELSE v_action := NULL;
+    END IF;
+
+    IF v_action IS NOT NULL THEN
+      INSERT INTO public.business_claim_audit(claim_id, actor_user_id, action, notes, details)
+      VALUES (NEW.id, COALESCE(NEW.reviewer_user_id, auth.uid()), v_action,
+        NEW.reviewer_notes,
+        jsonb_build_object('from', OLD.status, 'to', NEW.status));
+    END IF;
+  ELSIF COALESCE(NEW.reviewer_notes,'') IS DISTINCT FROM COALESCE(OLD.reviewer_notes,'')
+        AND NEW.reviewer_notes IS NOT NULL THEN
+    INSERT INTO public.business_claim_audit(claim_id, actor_user_id, action, notes)
+    VALUES (NEW.id, COALESCE(NEW.reviewer_user_id, auth.uid()), 'reviewer_note', NEW.reviewer_notes);
+  END IF;
+
+  RETURN NEW;
+END $$;
+
+CREATE TRIGGER trg_claim_audit_status
+AFTER INSERT OR UPDATE ON public.business_claim_requests
+FOR EACH ROW EXECUTE FUNCTION public.tg_claim_audit_status();
+
+CREATE OR REPLACE FUNCTION public.tg_claim_audit_evidence()
+RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'
+AS $$
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    INSERT INTO public.business_claim_audit(claim_id, actor_user_id, action, details)
+    VALUES (NEW.claim_id, NEW.uploader_user_id, 'evidence_added',
+      jsonb_build_object(
+        'evidence_id', NEW.id,
+        'evidence_type', NEW.evidence_type,
+        'file_name', NEW.file_name,
+        'file_size', NEW.file_size,
+        'mime_type', NEW.mime_type
+      ));
+    RETURN NEW;
+  ELSIF TG_OP = 'DELETE' THEN
+    INSERT INTO public.business_claim_audit(claim_id, actor_user_id, action, details)
+    VALUES (OLD.claim_id, COALESCE(auth.uid(), OLD.uploader_user_id), 'evidence_removed',
+      jsonb_build_object(
+        'evidence_id', OLD.id,
+        'evidence_type', OLD.evidence_type,
+        'file_name', OLD.file_name,
+        'file_size', OLD.file_size,
+        'mime_type', OLD.mime_type
+      ));
+    RETURN OLD;
+  END IF;
+  RETURN NULL;
+END $$;
+
+CREATE TRIGGER trg_claim_audit_evidence_ins
+AFTER INSERT ON public.business_claim_evidence
+FOR EACH ROW EXECUTE FUNCTION public.tg_claim_audit_evidence();
+
+CREATE TRIGGER trg_claim_audit_evidence_del
+AFTER DELETE ON public.business_claim_evidence
+FOR EACH ROW EXECUTE FUNCTION public.tg_claim_audit_evidence();
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260606134147_a7df571a-fced-4d56-a407-5721eb5580ed.sql
+-- ============================================================================
+
+CREATE TABLE public.business_discovery_searches (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  query text NOT NULL,
+  city text,
+  region text,
+  place_type text NOT NULL,
+  active boolean NOT NULL DEFAULT true,
+  last_run_at timestamptz,
+  last_status text,
+  last_error text,
+  last_found_count integer NOT NULL DEFAULT 0,
+  last_new_count integer NOT NULL DEFAULT 0,
+  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.business_discovery_searches TO authenticated;
+GRANT ALL ON public.business_discovery_searches TO service_role;
+
+ALTER TABLE public.business_discovery_searches ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Staff can view discovery searches"
+  ON public.business_discovery_searches FOR SELECT
+  TO authenticated
+  USING (public.can_moderate(auth.uid()));
+
+CREATE POLICY "Staff can manage discovery searches"
+  ON public.business_discovery_searches FOR ALL
+  TO authenticated
+  USING (public.can_moderate(auth.uid()))
+  WITH CHECK (public.can_moderate(auth.uid()));
+
+CREATE TRIGGER trg_business_discovery_searches_updated_at
+  BEFORE UPDATE ON public.business_discovery_searches
+  FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
+
+CREATE TABLE public.business_discovery_queue (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  source text NOT NULL DEFAULT 'google_places',
+  external_id text NOT NULL,
+  name text NOT NULL,
+  address text,
+  lat double precision,
+  lng double precision,
+  phone text,
+  website text,
+  rating numeric,
+  rating_count integer,
+  types text[] NOT NULL DEFAULT '{}',
+  our_type text,
+  photo_name text,
+  region text,
+  city text,
+  search_id uuid REFERENCES public.business_discovery_searches(id) ON DELETE SET NULL,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','imported','dismissed')),
+  existing_business_id uuid REFERENCES public.businesses(id) ON DELETE SET NULL,
+  diff jsonb,
+  first_seen_at timestamptz NOT NULL DEFAULT now(),
+  last_seen_at timestamptz NOT NULL DEFAULT now(),
+  reviewed_at timestamptz,
+  reviewed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (source, external_id)
+);
+
+CREATE INDEX idx_business_discovery_queue_status ON public.business_discovery_queue (status, last_seen_at DESC);
+CREATE INDEX idx_business_discovery_queue_search ON public.business_discovery_queue (search_id);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.business_discovery_queue TO authenticated;
+GRANT ALL ON public.business_discovery_queue TO service_role;
+
+ALTER TABLE public.business_discovery_queue ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Staff can view discovery queue"
+  ON public.business_discovery_queue FOR SELECT
+  TO authenticated
+  USING (public.can_moderate(auth.uid()));
+
+CREATE POLICY "Staff can manage discovery queue"
+  ON public.business_discovery_queue FOR ALL
+  TO authenticated
+  USING (public.can_moderate(auth.uid()))
+  WITH CHECK (public.can_moderate(auth.uid()));
+
+CREATE TRIGGER trg_business_discovery_queue_updated_at
+  BEFORE UPDATE ON public.business_discovery_queue
+  FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260606143803_4431c898-03ff-47a4-a84b-ffa2efba7721.sql
+-- ============================================================================
+-- Clean up any existing duplicates before adding the constraint
+DELETE FROM public.businesses a
+USING public.businesses b
+WHERE a.ctid < b.ctid
+  AND a.source IS NOT NULL
+  AND a.source_external_id IS NOT NULL
+  AND a.source = b.source
+  AND a.source_external_id = b.source_external_id;
+
+CREATE UNIQUE INDEX IF NOT EXISTS businesses_source_external_id_key
+  ON public.businesses (source, source_external_id)
+  WHERE source IS NOT NULL AND source_external_id IS NOT NULL;
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260606143827_5cbab52d-1b9d-4e45-b109-418dc8815f1c.sql
+-- ============================================================================
+DROP INDEX IF EXISTS public.businesses_source_external_id_key;
+
+CREATE UNIQUE INDEX businesses_source_external_id_key
+  ON public.businesses (source, source_external_id)
+  NULLS NOT DISTINCT;
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260606151712_d29167db-53b3-42d2-8cb5-edf9e0cfe07d.sql
+-- ============================================================================
+
+-- 1) Migrate existing business_plans rows off enum values we're collapsing
+UPDATE public.business_plans SET business_kind = 'transport' WHERE business_kind = 'trucking';
+
+-- 2) Rename enum values (1:1) to canonical slugs
+ALTER TYPE public.business_kind RENAME VALUE 'dealer' TO 'dealership';
+ALTER TYPE public.business_kind RENAME VALUE 'parts_shop' TO 'parts_accessories';
+ALTER TYPE public.business_kind RENAME VALUE 'body_shop' TO 'body_paint';
+
+-- 3) Add missing canonical values
+ALTER TYPE public.business_kind ADD VALUE IF NOT EXISTS 'motorcycle_shop';
+
+-- 4) Expand business_types to cover every 365 field; relabel parts_accessories
+UPDATE public.business_types SET label = 'Parts supplier / shop' WHERE slug = 'parts_accessories';
+
+INSERT INTO public.business_types (slug, label, icon, sort_order) VALUES
+  ('rental',         'Vehicle rental',              'Car',         11),
+  ('battery_shop',   'Battery shop',                NULL,          33),
+  ('accessories',    'Accessories / customization', NULL,          55),
+  ('audio_tint',     'Audio & window tint',         NULL,          56),
+  ('inspection',     'Inspection / emissions',      NULL,          60),
+  ('driving_school', 'Driving school',              NULL,          65),
+  ('lto_services',   'LTO / registration services', NULL,          70),
+  ('financing',      'Financing / loans',           NULL,          75),
+  ('transport',      'Transport / logistics',       'Truck',       80),
+  ('corporate',      'Corporate / fleet',           NULL,          85),
+  ('other',          'Other',                       NULL,          99)
+ON CONFLICT (slug) DO NOTHING;
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260606153104_ec1a9e78-3646-41da-a10b-8e55504ae07d.sql
+-- ============================================================================
+ALTER TYPE public.business_kind ADD VALUE IF NOT EXISTS 'used_dealership';
+
+
+-- ============================================================================
+-- SOURCE MIGRATION: 20260606155429_15fa1afb-0a0c-4938-8921-a8e2a28e7510.sql
+-- ============================================================================
+
+INSERT INTO public.business_tags (type_slug, category, slug, label) VALUES
+  ('tire_shop', 'tires', 'tire-vulcanizing', 'Vulcanizing'),
+  ('tire_shop', 'tires', 'tire-repair-patch', 'Tire repair / patch'),
+  ('tire_shop', 'tires', 'tire-mount-balance-ts', 'Mount & balance'),
+  ('tire_shop', 'tires', 'tire-rotation', 'Tire rotation'),
+  ('tire_shop', 'tires', 'tire-pressure-check', 'Pressure check / inflation'),
+  ('tire_shop', 'tires', 'tire-nitrogen', 'Nitrogen fill'),
+  ('tire_shop', 'tires', 'tire-tubeless-conversion', 'Tubeless conversion'),
+  ('tire_shop', 'tires', 'tire-flat-roadside', 'Flat tire roadside'),
+  ('tire_shop', 'tires', 'tire-recap-retread', 'Recap / retread'),
+  ('tire_shop', 'wheels', 'ts-alignment', 'Wheel alignment'),
+  ('tire_shop', 'wheels', 'ts-wheel-balancing', 'Wheel balancing'),
+  ('tire_shop', 'wheels', 'ts-tpms', 'TPMS service'),
+  ('tire_shop', 'wheels', 'mag-wheel-repair', 'Mag / rim repair'),
+  ('tire_shop', 'wheels', 'hubcap-replacement', 'Hubcap replacement'),
+  ('tire_shop', 'inventory_type', 'inv-tire-new', 'New tires'),
+  ('tire_shop', 'inventory_type', 'inv-tire-used', 'Used tires'),
+  ('tire_shop', 'inventory_type', 'inv-tire-mags', 'Mag wheels / rims'),
+  ('tire_shop', 'inventory_type', 'inv-tire-tubes', 'Inner tubes'),
+  ('tire_shop', 'inventory_type', 'inv-tire-batteries', 'Batteries'),
+  ('tire_shop', 'brand', 'tirebrand-bridgestone', 'Bridgestone'),
+  ('tire_shop', 'brand', 'tirebrand-michelin', 'Michelin'),
+  ('tire_shop', 'brand', 'tirebrand-yokohama', 'Yokohama'),
+  ('tire_shop', 'brand', 'tirebrand-dunlop', 'Dunlop'),
+  ('tire_shop', 'brand', 'tirebrand-bf-goodrich', 'BFGoodrich'),
+  ('tire_shop', 'brand', 'tirebrand-goodyear', 'Goodyear'),
+  ('tire_shop', 'brand', 'tirebrand-toyo', 'Toyo'),
+  ('tire_shop', 'brand', 'tirebrand-maxxis', 'Maxxis'),
+  ('tire_shop', 'brand', 'tirebrand-gt-radial', 'GT Radial'),
+  ('tire_shop', 'brand', 'tirebrand-westlake', 'Westlake'),
+  ('tire_shop', 'vehicle_scope', 'tire-scope-cars', 'Cars'),
+  ('tire_shop', 'vehicle_scope', 'tire-scope-suvs', 'SUVs'),
+  ('tire_shop', 'vehicle_scope', 'tire-scope-trucks', 'Trucks'),
+  ('tire_shop', 'vehicle_scope', 'tire-scope-vans', 'Vans'),
+  ('tire_shop', 'vehicle_scope', 'tire-scope-motorcycles', 'Motorcycles'),
+  ('tire_shop', 'vehicle_scope', 'tire-scope-heavy-duty', 'Heavy duty / commercial'),
+  ('tire_shop', 'mobile', 'tire-mobile-service', 'Mobile tire service'),
+  ('tire_shop', 'mobile', 'tire-24-7', '24/7 vulcanizing'),
+  ('repair_shop', 'tires', 'rs-tire-vulcanizing', 'Vulcanizing'),
+  ('repair_shop', 'tires', 'rs-tire-repair-patch', 'Tire repair / patch'),
+  ('repair_shop', 'tires', 'rs-tire-rotation', 'Tire rotation')
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO public.business_tags (type_slug, category, slug, label)
+SELECT 'used_dealership', category, 'used-' || slug, label
+FROM public.business_tags
+WHERE type_slug = 'dealership' AND category IS NOT NULL
+ON CONFLICT (slug) DO NOTHING;
