@@ -1,4 +1,5 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -68,7 +69,17 @@ describe("Parts network adversarial RLS suite (P2 / G2)", () => {
 
   it("ships an executable runner that refuses to run without a connection", () => {
     const runner = "scripts/test-parts-rls-adversarial.sh";
-    expect(statSync(resolve(root, runner)).mode & 0o111).not.toBe(0);
+    // Windows filesystems do not expose POSIX executable permission bits.
+    // Git's recorded mode is what the Linux CI checkout will receive.
+    expect(
+      execFileSync("git", ["ls-files", "--stage", "--", runner], {
+        cwd: root,
+        encoding: "utf8",
+      }),
+    ).toMatch(/^100755 /);
+    if (process.platform !== "win32") {
+      expect(statSync(resolve(root, runner)).mode & 0o111).not.toBe(0);
+    }
     const body = read(runner);
     expect(body).toContain(SUITE_PATH);
     expect(body).toContain("ON_ERROR_STOP=1");

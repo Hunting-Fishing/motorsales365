@@ -11,6 +11,7 @@ the platform, Parts, Repair Knowledge, or Vehicle History program decisions.
 Canonical repository: `Hunting-Fishing/motorsales365`.
 Starting main: `70ab892a8b7c05eac288ea4a6cce7a002d316f00`.
 Implementation branch: `completion/365-foundation`.
+Security reconciliation branch: `completion/365-security`.
 
 ## Recovery evidence
 
@@ -76,5 +77,28 @@ standalone bootstrap/replay batches and split migrations with different version
 numbers. Do not mark every missing filename applied or push the entire history.
 Receipt migrations 20261014043336 and 20261014064816 are present remotely.
 
-Next: validate CI on GitHub, reconcile security branches #5/#7 and migration
-provenance, then deliver the native CRM/receipt scanner slices.
+GitHub Actions verified the complete-checkout foundation build, typecheck, unit
+tests and lint on PR #8. The separate Cloudflare Workers Builds check failed;
+its GitHub check contains a dashboard link but no error log. Investigate that
+hosting check before production release; no successful Cloudflare publication
+is claimed.
+
+Security branches #5 and #7 are merged together locally with the foundation,
+preserving both histories. A Windows-only executable-mode test now verifies the
+Git index mode as well as POSIX mode on Unix. Actual SQL adversarial execution
+still needs the disposable PostgreSQL CI job; Docker Desktop is not running.
+
+Migration provenance: all 388 legacy SQL files exactly match the deployed
+archive hashes after line-ending normalization. Two receipt versions match the
+remote migration history. On the security branch, 27 files remain unclassified:
+25 post-cutover/split/demo migrations plus the two pending security migrations.
+The read-only evidence and comparison script are committed; no history repair
+or production SQL was executed. Run:
+
+`node scripts/ci/migration-provenance.mjs docs/evidence/migration-provenance-2026-10-14.json --summary`
+
+The script intentionally exits 1 while unclassified files remain.
+
+Next: validate the combined security release in PostgreSQL CI and map the
+remaining 25 existing migrations to deployed definitions. Then deliver the
+native CRM and receipt scanner slices.
