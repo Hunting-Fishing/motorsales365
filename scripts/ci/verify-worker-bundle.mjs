@@ -4,6 +4,7 @@
 // bundle bound to the production Supabase project.
 import fs from "node:fs";
 import path from "node:path";
+import { verifyOcrAssets } from "../vehicle-receipts/verify-ocr-assets.mjs";
 
 const expectedName = process.env.WORKER_NAME ?? "motorsales365";
 const expectedRef = process.env.SUPABASE_REF ?? "wjxaajgvddtrxxtocxen";
@@ -34,3 +35,4 @@ if (!hit) {
   process.exit(1);
 }
 console.log(`Worker bundle OK: name=${config.name}, main=${config.main}, Supabase=${expectedRef}`);
+console.log(`Same-origin OCR assets OK: ${verifyOcrAssets(path.dirname(assetsDir))} files`);

@@ -39,6 +39,7 @@ database-backups/
 supabase-backups/
 
 # Supabase local development files
+/public/receipt-ocr/
 supabase/.temp/
 **/supabase/.temp/
 
