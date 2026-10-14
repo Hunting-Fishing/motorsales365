@@ -220,10 +220,19 @@ snapshot; no live release/record/permission change or new helper approval.
 The native identity diagnostic design now has two fixed offline-tested review
 queries (17 core counts;10 optional shop/business counts),15 new memory-only
 regressions and a dedicated CI gate in draft PR #33 (code `8de974e`), with206/206
-full sequential tooling tests and independent review passing. Remote CI pending
-verification. No production count/plan or installed RPC,
+full sequential tooling tests and independent review passing. Docs `1b0696f`
+passed all six CI gates (run `38648993208`), verified on the staff-trigger follow-up.
+No production count/plan or installed RPC,
 guard or repair is supplied. See `evidence/NATIVE_IDENTITY_COUNT_DIAGNOSTIC.md`.
 Next is the unchanged-source staff/chat/native transaction rehearsal with actual
 status CHECKs and all observed staff triggers, before a companion guard; see
 `evidence/NATIVE_STAFF_TRIGGER_REHEARSAL_PLAN.md`. Narrow catalog metadata is not
 complete native authority/offboarding, applied parity or production acceptance.
+
+Draft PR #34 (code `ce4127e`;9 focused/215 full tooling tests) now implements that rehearsal:
+both real status-CHECK failures roll back relevant state, while no-op/identity-
+retarget/owner-delete/multi-roster behaviors expose remaining contract gaps.
+No source constraint or production workflow changed. Selected dated metadata
+correspondence is not global permission/writer or hosted API acceptance. See
+`evidence/NATIVE_STAFF_TRIGGER_COMPOSITION_PROOF.md` for exact evidence/limits and
+the next conservative inventory/companion-contract slice before any guard release.

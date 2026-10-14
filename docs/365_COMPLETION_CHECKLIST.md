@@ -21,8 +21,10 @@ Security reconciliation branch: `completion/365-security`.
    authority for those helpers or the remaining quote-conversion path.
 2. Continue native migration/authority work in parallel: the operator-private
    identity count review queries are implemented/tested offline, not executed
-   against production. Next rehearse unchanged staff/chat/native offboarding
-   transactions with actual CHECKs and all three observed staff triggers; resolve the initial
+   against production. Unchanged staff/chat/native offboarding transactions are
+   now rehearsed offline with actual CHECKs and all three observed staff triggers.
+   Next extend the bounded inventory conservatively and define/test the companion
+   authority contract; resolve the initial
    dependency inventory's identity, role/module helper and trigger/security
    attachment closure; rehearse the companion roster/native guard with actual
    constraints and all trigger effects. Keep unknown bindings and offboarding
@@ -394,7 +396,8 @@ Full sequential tooling passes206/206 (119.16s), focused lint/format/diff and
 independent review pass. CI adds a dedicated offline gate. Application source remains the723-test verified
 parent; this is not hosted authentication, full native authority or load proof.
 Exact hashes and publication verification: `evidence/NATIVE_IDENTITY_COUNT_DIAGNOSTIC.md`.
-Remote CI is pending verification on the published documentation head.
+Docs head `1b0696f` passed all six CI gates (run `38648993208`), verified on the
+staff-trigger follow-up. Hosting remains separately blocked; no upload/release.
 
 Narrow read-only catalog snapshots at22:28 UTC confirm three enabled noninternal
 staff triggers, actual validated chat/shift status CHECKs and selected five
@@ -408,7 +411,7 @@ unchanged. Explicit source composition remains404/423,19 unclassified; no
 inventory/baseline/replay/parity/release flag is promoted. Deployment: none;
 hosting remains separately blocked and sparse artifacts must not be deployed.
 
-Exact next action: implement/review the six-case unchanged-source staff/chat/
+Original next action (implemented in the checkpoint below): implement/review the six-case unchanged-source staff/chat/
 native transaction rehearsal in `evidence/NATIVE_STAFF_TRIGGER_REHEARSAL_PLAN.md`.
 Retain the real status CHECKs; test complete rollback, identity-only/no-op updates,
 owner deletion and multi-roster cleanup before defining a companion guard.
@@ -417,6 +420,50 @@ self-shift/audit contracts, baseline/forward/recovery and actual API/role tests.
 Private consent/tenure/retention, scanner recovery/owner/mobile pilot, trusted
 entry/billing/retail/recruitment and hosting acceptance remain open. Existing
 bootstrap/totals approval request stays pending without another prompt.
+
+## Latest staff/chat/native trigger checkpoint (2026-10-15)
+
+Draft PR #34 (`https://github.com/Hunting-Fishing/motorsales365/pull/34`), code
+`ce4127e`, branch `security/native-staff-trigger-composition`, stacked on verified PR #33
+docs `1b0696f` (all six CI gates, run `38648993208`). Nine new sequential
+always-closed memory-only tests pin14 whole retained sources,23 selected sections
+and eight function definitions, retaining actual critical constraints and all
+three staff triggers. No historical replay, status-CHECK relaxation, migration,
+production row/count/RPC or permission/data/history/platform change.
+
+The rehearsal reproduces chat inactive and shift clocked_out CHECK failures
+with explicit full relevant-state rollback, including earlier register cleanup
+in the isolated no-member/open-shift case. Shift/no-op updates reactivate chat
+without native remapping; identity-only retarget retains old chat/native state;
+actual-owner deletion removes chat membership while preserving native owner;
+valid but deliberately stale multi-roster fixtures demonstrate user-wide session/
+role cleanup versus shop-filtered legacy profile detachment. These are synthetic
+source behaviors, not live incident, mitigation or offboarding acceptance.
+
+Focused tests9/9 (6.365s), own-file lint/format and independent read-only review
+pass. Full sequential tooling215/215 (125.53s); remote CI pending verification.
+Exact publication verification is recorded in
+`evidence/NATIVE_STAFF_TRIGGER_COMPOSITION_PROOF.md`. Five selected function
+fingerprints/config/owners/effective ACLs, three staff attachments and four
+selected constraint/RLS sets match dated narrow metadata; table/column/default
+ACL parity, current chat policies, complete writer/role/security closure,
+concurrent transactions and HTTP/JWT acceptance are not established.
+
+Migration impact: none. Deployment: none; application source remains723-test
+verified parent. Explicit correspondence404/423,19 unclassified and all false
+baseline/replay/parity/release flags remain unchanged. Hosting separately fails;
+sparse artifacts must not deploy. Pending helper approval unchanged.
+
+Exact next action: implement the narrowly tested evidence projectRef identity
+adapter, then extend the bounded native inventory with concrete chat/timestamp/
+default-location/incoming-business attachments and narrowly dated metadata,
+retaining unknown facets/cycles/false flags. The exact scope and source pins are
+in the proof document. Then develop the offline companion contract for immutable
+identity values/upsert compatibility, self-shift/downstream effects, actual-owner
+protection, delegation/deletion/invitation provenance, valid atomic offboarding,
+multi-roster scope and audit/concurrency. No production guard/repair is authorized
+by these tests. Continue separate baseline/forward/recovery/API/role/load,
+consent/tenure/retention, OCR recovery/owner/mobile pilot and hosting gates.
 
 ## Recovery evidence (original scope, retained below)
 

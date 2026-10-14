@@ -1,7 +1,9 @@
 # Native staff, chat and offboarding trigger rehearsal plan
 
-2026-10-15 Asia/Manila. Status: **planned offline proof, not implemented or
-mitigated by this document**. This is the next bounded dependency before a
+2026-10-15 Asia/Manila. Status: **original offline plan, not mitigation**.
+The subsequent nine-test proof is implemented separately; see
+`NATIVE_STAFF_TRIGGER_COMPOSITION_PROOF.md` for actual results, publication
+evidence and limits. This preserves the original proposed cases as a dependency before a
 companion native-authority guard. It does not authorize production changes,
 profile repair, a migration replay, new permissions or customer communications.
 
@@ -311,6 +313,6 @@ recovery readiness are not proved by session-setting memory fixtures.
    cleanup and audit-attribution contract. Any forward SQL, ACL change, data
    repair or production action remains a separately reviewed release decision.
 
-This plan changes documentation only. No rehearsal was run for this slice, no
+This original plan changed documentation only. No rehearsal ran in its PR #33 slice; the separate subsequent proof is linked above. No
 migration was created/applied, no business data or counts were inspected, and no
 production permissions, history, configuration or records were changed.
