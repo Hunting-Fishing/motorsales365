@@ -4,7 +4,7 @@ Updated 2026-10-15 Asia/Manila. This is an initial hand-reviewed registry and
 read-only validator, **not a baseline migration or release approval**.
 
 `baseline-native-scope-v1.json` pins selected original SQL and dated evidence
-files. Current registry source snapshot is `985a65997baa72ec5cfb9ec3cd24fc4b6ce00344`;
+files. Current registry source snapshot is `4100bbfd4513ddeefe21c7d138c88955ff96fadf`;
 the initial PR #20 snapshot/counts below are retained as historical evidence. Its roots cover
 native identity/staff, customers/work orders and receipt/history entry points.
 Unknown objects, security attachments, data assertions, external platform
@@ -51,8 +51,9 @@ retained full-source hashes. Catalog body observations and Markdown split/source
 audits do not automatically become whole-file execution proof. Pending-forward
 sources cannot be promoted by a matching hash. `appliedLineageInferred=false`
 means no live execution conclusion is drawn, not that known deployed files are
-unapplied. The broader composed migration evidence remains 404/421 files with
-17 unclassified; this selected dependency registry does not replace that ledger.
+unapplied. At the initial PR #20 checkpoint, broader composed migration evidence
+was404/421 with17 unclassified. Current composed evidence is404/423 with19
+unclassified; this selected dependency registry does not replace that ledger.
 
 The CLI allows only named migration/evidence inputs within this repository,
 rejects traversal/absolute paths and symlink/junction escapes, caps the manifest
@@ -97,22 +98,50 @@ That dated manifest LF SHA-256 was
 `c775403f37ebfe9cefcdaca671f997e6a5537e8e30ddc1063ff7ef2022593156`.
 All release/parity/replay flags remain false; dated earlier evidence is unchanged.
 
-The subsequent composition increment is recorded in
-`NATIVE_ACCESS_COMPOSITION_PROOF.md`. Current scope: 35 pinned sources, seven
+The PR #25 composition increment is recorded in
+`NATIVE_ACCESS_COMPOSITION_PROOF.md`. That scope: 35 pinned sources, seven
 evidence files, 73 objects, 61 reachable, four cycles and 481 explicit unknown
 findings. Selected source classes are 24 source-correspondence, six unclassified
-and five pending-forward; the global composed ledger is still 404/422 with 18
+and five pending-forward; its dated global composed ledger was404/422 with18
 unclassified. Four recovered privilege/FK/sweep sources and a corrected stale
 module-source classification are supported by retained hashes, not inferred
 applied lineage. The override table, its native profile/shop dependencies and
 module-reader edge are now declared; mandatory security, writer and delegation
-closure remains unreviewed. Current manifest LF SHA-256:
+closure remained unreviewed. That manifest LF SHA-256:
 `b2f8d5937c3df9d1128b92d08a959ea13849f0e7fa3c8335f1b406b1d8663dd7`.
 Inventory tests pass 21/21; complete local tooling passes 156/156. CLI exit 1
 remains intentional and all baseline/replay/parity/attachment/release flags false.
 
-Rehearse a companion guard with actual CHECKs/all enabled triggers and
-legacy/self-shift/manager/multi-roster cases before authorized atomic invoicing.
+## Current staff/chat inventory increment
+
+The subsequent actual-constraint/all-staff-trigger rehearsal is implemented in
+PR #34 (all six CI gates at docs `4100bbf`), not a guard or live offboarding acceptance.
+The current bounded inventory in draft PR #35 (code `8e52323`)
+adds two hash-supported sources, one unchanged dated catalog and13 manual nodes,
+with an explicit offboarding/audit unknown. Current scope:37 sources,8 evidence
+files (45 verified pins),86 objects,74 reachable,201 edges,18 reported DFS
+back-edge cycles and566 unresolved findings. Classes:26 source-correspondence,
+6 unclassified,5 pending-forward. Added cycles/findings are review obligations,
+not defect totals or completion percentages. All mandatory table facets remain
+unreviewed; no full owner/ACL/writer/policy/attachment closure is promoted.
+
+Current manifest LF SHA-256:
+`c208edd504a456c4926c69b88d35a68057313be8d9e844ec843cb22ef11902bb`.
+Metadata tests pass26/26, full sequential tooling220/220, focused lint/format/diff
+and independent review pass. Remote CI pending verification. Tests include strict project/projectRef evidence identity,
+no whole-source/applied promotion and the conservative real-inventory state.
+Manifest identity stays project-only; every present evidence alias must exactly
+match it. Existing evidence bytes are unchanged. See
+`NATIVE_STAFF_DEPENDENCY_INVENTORY.md` for pins, publication/test results and
+precise limits. Mixed dated observations are not one atomic database snapshot.
+CLI exit1 is still intentional and every baseline/replay/parity/release flag
+remains false. No SQL generation, database/network execution or deployment.
+
+Next recover selected current chat policy/helper composition and incoming
+shop/business/shift/register/work-location metadata without business data or
+writer calls; compose corresponding source on disposable fixtures. Then develop
+the offline companion identity/self-shift/owner/delegation/offboarding/audit
+contract and real concurrency tests before authorized atomic invoicing.
 Then construct a separately reviewed baseline with explicit platform/reference
 configuration and data assertions, replay twice into disposable empty targets,
 test the existing-state upgrade and recovery, and verify adversarial role/API

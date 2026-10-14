@@ -236,3 +236,12 @@ No source constraint or production workflow changed. Selected dated metadata
 correspondence is not global permission/writer or hosted API acceptance. See
 `evidence/NATIVE_STAFF_TRIGGER_COMPOSITION_PROOF.md` for exact evidence/limits and
 the next conservative inventory/companion-contract slice before any guard release.
+
+That conservative inventory increment now declares concrete chat/timestamp/
+work-location/incoming writer paths in draft PR #35 (code `8e52323`), a strict evidence projectRef identity adapter
+and an explicit offboarding/audit unknown.26 metadata tests pass; all mandatory
+table facets and release/parity/baseline flags remain unreviewed/false. No source
+SQL, live query, API or permissions change. See
+`evidence/NATIVE_STAFF_DEPENDENCY_INVENTORY.md`. Next is selected current chat
+policy/helper/incoming-attachment metadata and corresponding disposable policy
+composition, then the offline companion contract; no production guard is released.

@@ -14,8 +14,8 @@ historical SQL, migrations, permissions, business data, history or deployment.
 
 Draft PR #34: `https://github.com/Hunting-Fishing/motorsales365/pull/34`, code
 `ce4127e`. Full sequential local tooling passes215/215 (125.53s), focused
-lint/format/diff and independent review pass. Remote CI pending verification on
-the published documentation head.
+lint/format/diff and independent review pass. Docs head `4100bbf` passed all six
+CI gates (run `38650592549`), verified on the inventory follow-up.
 
 ## Selected source and catalog boundary
 
@@ -119,7 +119,11 @@ No source CHECK, historical SQL or production state was altered to pass.
   reactivation: source SELECT/is_thread_member and actual current grants/policies
   also matter. No production policy or operator bypass is approved here.
 
-## Exact next bounded inventory slice
+## Original next bounded inventory slice: now implemented offline
+
+Draft PR #35 (code `8e52323`) implements this increment; see
+`NATIVE_STAFF_DEPENDENCY_INVENTORY.md` for exact scope, tests, publication and
+remaining unknowns. The following retains its original bounded requirements.
 
 After this proof is verified, extend `baseline-native-scope-v1.json`
 conservatively; no release/parity/baseline flag promotion:
