@@ -5,6 +5,8 @@ not production authorization, a trusted native membership fix, or UI acceptance.
 Parent: native prerequisite PR #21, latest head `e5a76ba`, all six CI gates passed
 (run `38626559572`). The separate Cloudflare hosting check still fails; the preview
 wrapper skipped upload. Nothing in this slice deploys the sparse checkout.
+Draft PR #22: `https://github.com/Hunting-Fishing/motorsales365/pull/22`,
+code `343557b`, stacked on #21; publication CI is pending.
 
 ## Exact candidate and recovery
 

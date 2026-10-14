@@ -656,7 +656,8 @@ or unapproved live execution is authorized by this checkpoint.
 ## Customer vehicle activity reader candidate: 2026-10-15
 
 Branch `feature/crm-vehicle-activity-readers`, stacked on native prerequisite PR
-#21. Three new invoker-only SQL/STABLE readers derive customer/native vehicle/shop/
+#21. Draft PR #22: `https://github.com/Hunting-Fishing/motorsales365/pull/22`,
+code `343557b`; full-checkout CI is pending. Three new invoker-only SQL/STABLE readers derive customer/native vehicle/shop/
 active link/current visible owner in one snapshot, retain existing RLS, return
 fixed receipt/installation/work-order summaries, and cap each at 26 rows with
 deterministic ordering. Exact new EXECUTE ACLs, collision/default/inheritance
@@ -665,10 +666,10 @@ helper/grant/policy/data changes. Candidate is **unapplied and release-blocked**
 Global source correspondence is 404/422 with 18 unclassified, not applied parity.
 
 Focused reader tests pass 13/13; separate retained receipt/ownership tests pass
-4/4. CI now runs these memory-only regressions sequentially. See
+4/4. CI now runs these memory-only regressions sequentially.
 Complete local tooling passes 134/134; focused lint, format and diff checks pass.
 Full-checkout CI remains pending publication; application changes are a separate
-next slice, not part of this reader-only commit.
+next slice, not part of this reader-only commit. See
 `evidence/CUSTOMER_VEHICLE_ACTIVITY_READ_CONTRACT.md` for hashes and exact proof
 limits; `evidence/VEHICLE_OWNERSHIP_CONSENT_GATES.md` records the privacy boundary.
 The current-owner-based existing receipt policy can expose prior-creator private
