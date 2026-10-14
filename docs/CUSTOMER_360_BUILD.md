@@ -44,3 +44,46 @@ retail and recruitment pipelines, consent-aware communications, reporting,
 organization-level acceptance testing and receipt OCR recovery remain separate
 delivery slices. Existing query scoping supplements database authorization;
 it does not replace RLS or establish a new organization identity contract.
+
+## Drill-down isolation follow-up (2026-10-15)
+
+The vehicle/work-order screens linked from Customer 360 now scope their detail,
+service, installation, job-line and part caches to the authenticated account.
+Signed-out renders mount no private UI. Vehicle histories are explicitly bounded
+to 100 displayed records; PHP is used consistently for operational amounts.
+Independent source failures offer generic retries rather than claiming an empty
+history or guessing a workspace-link problem.
+
+Work-order editors remount across account/target changes; pending old-context
+callbacks cannot reset a new draft, toast, navigate or invalidate its caches.
+Dependent reads wait for a visible primary record, and write entry points wait
+for complete job/part reads. Existing list invalidation is preserved while the
+current account's customer/vehicle commercial/service caches are refreshed.
+
+Time-entry, technician-picker and inspection caches are also account scoped.
+Child-card drafts reset on context changes. Sequential inspection work checks
+previously ignored checklist errors and stops subsequent dispatch after context
+loss. Partial creation failures refresh the scoped list and warn the operator
+to inspect existing records before retrying; they do not claim rollback.
+
+Focused verification: 45 new route/child-card regressions pass. Full-suite,
+type/build and review commit evidence is recorded in the completion checklist.
+This does not certify all Shop Manager list/editor caches or organization-level
+role transitions; other routes still need a bounded audit.
+
+### New release dependency: invoice integrity and privileged helpers
+
+Do not promote UI test success to invoicing readiness. Read-only inspection found
+elevated legacy invoice/totals RPCs executable by anon/authenticated database
+roles without caller/shop checks. The current browser invoice insert omits the
+required due date and has incorrect labor/part mappings, non-atomic requests and
+no idempotent work-order link. The legacy RPC is not a safe substitute because
+it has authorization, concurrency, tax/status and inventory-posting differences.
+See `evidence/SHOP_MANAGER_INVOICE_RELEASE_GATES.md` for exact observations.
+
+Before expanding commercial activity: obtain a scoped containment decision,
+prepare/test an authorized atomic converter with stable retry behavior and draft
+billing policy, then complete baseline/recovery and release gates before live
+application. No production permissions, customer records or schema were changed.
+The bounded activity card can follow, using only explicit active vehicle links;
+never reuse the owner-only sharing/history screen inside shop CRM.

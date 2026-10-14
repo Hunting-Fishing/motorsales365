@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ClipboardCheck, Loader2, Plus } from "lucide-react";
@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { smSupabase } from "@/lib/shop-manager/db";
+import { useAuth } from "@/hooks/use-auth";
 
 type Row = {
   id: string;
@@ -17,18 +18,54 @@ type Row = {
 };
 
 export function WorkOrderInspectionsCard({ workOrderId }: { workOrderId: string }) {
+  const { user } = useAuth();
+  if (!user) return null;
+  return (
+    <AuthenticatedInspectionsCard
+      key={`${user.id}:${workOrderId}`}
+      accountId={user.id}
+      workOrderId={workOrderId}
+    />
+  );
+}
+
+function AuthenticatedInspectionsCard({
+  accountId,
+  workOrderId,
+}: {
+  accountId: string;
+  workOrderId: string;
+}) {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [starting, setStarting] = useState(false);
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
+  const assertActive = () => {
+    if (!active.current) throw new Error("Work-order context changed");
+  };
+  const queryKey = ["shop-manager", accountId, "wo-inspections", workOrderId];
 
-  const { data = [], isLoading } = useQuery({
-    queryKey: ["shop-manager", "wo-inspections", workOrderId],
+  const {
+    data = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey,
     queryFn: async () => {
+      assertActive();
       const { data, error } = await (smSupabase as any)
         .from("vehicle_inspections")
         .select("id,title,status,overall_result,inspection_date")
         .eq("work_order_id", workOrderId)
         .order("inspection_date", { ascending: false });
+      assertActive();
       if (error) throw error;
       return (data ?? []) as Row[];
     },
@@ -36,9 +73,11 @@ export function WorkOrderInspectionsCard({ workOrderId }: { workOrderId: string 
 
   const start = useMutation({
     mutationFn: async () => {
+      assertActive();
       const { data: shopIdRes, error: shopErr } = await (smSupabase as any).rpc(
         "get_current_user_shop_id",
       );
+      assertActive();
       if (shopErr) throw shopErr;
       const shop_id = shopIdRes as string | null;
       if (!shop_id) throw new Error("No shop provisioned.");
@@ -50,15 +89,19 @@ export function WorkOrderInspectionsCard({ workOrderId }: { workOrderId: string 
         .order("is_default", { ascending: false })
         .limit(1)
         .maybeSingle();
+      assertActive();
       if (tplErr) throw tplErr;
       if (!tpl) throw new Error("No template found.");
 
-      const { data: items } = await (smSupabase as any)
+      const { data: items, error: itemsError } = await (smSupabase as any)
         .from("inspection_template_items")
         .select("category,label,sort_order")
         .eq("template_id", tpl.id)
         .order("sort_order");
+      assertActive();
+      if (itemsError) throw itemsError;
 
+      // Header/checklist creation is not atomic yet. Do not delete a header on failure.
       const { data: insp, error } = await (smSupabase as any)
         .from("vehicle_inspections")
         .insert({
@@ -70,7 +113,9 @@ export function WorkOrderInspectionsCard({ workOrderId }: { workOrderId: string 
         })
         .select("id")
         .single();
+      assertActive();
       if (error) throw error;
+      if (!insp?.id) throw new Error("Inspection was not created");
 
       if (items?.length) {
         const rows = items.map((it: any) => ({
@@ -79,16 +124,29 @@ export function WorkOrderInspectionsCard({ workOrderId }: { workOrderId: string 
           label: it.label,
           sort_order: it.sort_order,
         }));
-        await (smSupabase as any).from("inspection_items").insert(rows);
+        const { error: insertItemsError } = await (smSupabase as any)
+          .from("inspection_items")
+          .insert(rows);
+        assertActive();
+        if (insertItemsError) throw insertItemsError;
       }
       return insp.id as string;
     },
     onSuccess: (id) => {
-      qc.invalidateQueries({ queryKey: ["shop-manager", "wo-inspections", workOrderId] });
+      if (!active.current) return;
+      qc.invalidateQueries({ queryKey });
       navigate({ to: "/workspace/inspections/$id", params: { id } });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed to start"),
-    onSettled: () => setStarting(false),
+    onError: () => {
+      if (!active.current) return;
+      qc.invalidateQueries({ queryKey });
+      toast.error(
+        "Could not finish creating this inspection. Check existing inspections before trying again.",
+      );
+    },
+    onSettled: () => {
+      if (active.current) setStarting(false);
+    },
   });
 
   return (
@@ -104,14 +162,25 @@ export function WorkOrderInspectionsCard({ workOrderId }: { workOrderId: string 
             setStarting(true);
             start.mutate();
           }}
-          disabled={starting}
+          disabled={starting || isLoading || isError}
         >
-          {starting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+          {starting ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Plus className="h-3.5 w-3.5" />
+          )}
           Start inspection
         </Button>
       </CardHeader>
       <CardContent className="text-sm">
-        {isLoading ? (
+        {isError ? (
+          <div role="alert" className="space-y-2">
+            <p>Could not load this work order's inspections.</p>
+            <Button size="sm" variant="outline" onClick={() => void refetch()}>
+              Retry inspections
+            </Button>
+          </div>
+        ) : isLoading ? (
           <p className="text-muted-foreground">Loading…</p>
         ) : data.length === 0 ? (
           <p className="text-muted-foreground">No inspections yet.</p>

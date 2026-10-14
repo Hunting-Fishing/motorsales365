@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Clock, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -7,9 +7,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { smSupabase } from "@/lib/shop-manager/db";
+import { useAuth } from "@/hooks/use-auth";
 
 type TimeEntry = {
   id: string;
@@ -36,15 +50,48 @@ function hoursBetween(a: string | null, b: string | null): number {
 }
 
 export function WorkOrderTimeEntries({ workOrderId }: { workOrderId: string }) {
+  const { user } = useAuth();
+  if (!user) return null;
+  return (
+    <AuthenticatedTimeEntries
+      key={`${user.id}:${workOrderId}`}
+      accountId={user.id}
+      workOrderId={workOrderId}
+    />
+  );
+}
+
+function AuthenticatedTimeEntries({
+  accountId,
+  workOrderId,
+}: {
+  accountId: string;
+  workOrderId: string;
+}) {
   const qc = useQueryClient();
-  const { data: entries = [], isLoading } = useQuery({
-    queryKey: ["shop-manager", "wo-time", workOrderId],
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
+  const queryKey = ["shop-manager", accountId, "wo-time", workOrderId];
+  const {
+    data: entries = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey,
     queryFn: async () => {
+      if (!active.current) throw new Error("Work-order context changed");
       const { data, error } = await (smSupabase as any)
         .from("work_order_time_entries")
         .select("id,employee_id,employee_name,start_time,end_time,duration,notes,billable")
         .eq("work_order_id", workOrderId)
         .order("start_time", { ascending: false });
+      if (!active.current) throw new Error("Work-order context changed");
       if (error) throw error;
       return (data ?? []) as TimeEntry[];
     },
@@ -52,33 +99,53 @@ export function WorkOrderTimeEntries({ workOrderId }: { workOrderId: string }) {
 
   const del = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (smSupabase as any).from("work_order_time_entries").delete().eq("id", id);
+      if (!active.current) throw new Error("Work-order context changed");
+      const { error } = await (smSupabase as any)
+        .from("work_order_time_entries")
+        .delete()
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
+      if (!active.current) return;
       toast.success("Entry removed");
-      qc.invalidateQueries({ queryKey: ["shop-manager", "wo-time", workOrderId] });
+      qc.invalidateQueries({ queryKey });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+    onError: () => {
+      if (active.current) toast.error("Could not remove this time entry. Please try again.");
+    },
   });
 
   const totalHours = entries.reduce((s, e) => s + Number(e.duration ?? 0), 0);
-  const billableHours = entries.filter((e) => e.billable).reduce((s, e) => s + Number(e.duration ?? 0), 0);
+  const billableHours = entries
+    .filter((e) => e.billable)
+    .reduce((s, e) => s + Number(e.duration ?? 0), 0);
 
   return (
     <Card className="md:col-span-2">
       <CardHeader className="flex-row items-center justify-between">
         <CardTitle className="text-base flex items-center gap-2">
           <Clock className="h-4 w-4" /> Time entries ({entries.length})
-          <span className="ml-3 text-xs font-normal text-muted-foreground">
-            {totalHours.toFixed(2)}h total · {billableHours.toFixed(2)}h billable
-          </span>
+          {!isError && (
+            <span className="ml-3 text-xs font-normal text-muted-foreground">
+              {totalHours.toFixed(2)}h total · {billableHours.toFixed(2)}h billable
+            </span>
+          )}
         </CardTitle>
-        <AddTimeEntryDialog workOrderId={workOrderId} />
+        <AddTimeEntryDialog accountId={accountId} workOrderId={workOrderId} />
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>
+        {isError ? (
+          <div role="alert" className="space-y-2">
+            <p>Could not load this work order's time entries.</p>
+            <Button size="sm" variant="outline" onClick={() => void refetch()}>
+              Retry time entries
+            </Button>
+          </div>
+        ) : isLoading ? (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+          </div>
         ) : entries.length === 0 ? (
           <div className="text-sm text-muted-foreground py-4 text-center">No time entries yet.</div>
         ) : (
@@ -86,11 +153,29 @@ export function WorkOrderTimeEntries({ workOrderId }: { workOrderId: string }) {
             {entries.map((e) => (
               <div key={e.id} className="flex items-center justify-between py-2 text-sm">
                 <div className="flex-1">
-                  <div className="font-medium">{e.employee_name ?? "—"} <span className="text-xs text-muted-foreground ml-2">{Number(e.duration ?? 0).toFixed(2)}h {e.billable ? "· billable" : "· non-billable"}</span></div>
-                  <div className="text-xs text-muted-foreground">{fmt(e.start_time)} → {fmt(e.end_time)}</div>
-                  {e.notes ? <div className="text-xs text-muted-foreground mt-1">{e.notes}</div> : null}
+                  <div className="font-medium">
+                    {e.employee_name ?? "—"}{" "}
+                    <span className="text-xs text-muted-foreground ml-2">
+                      {Number(e.duration ?? 0).toFixed(2)}h{" "}
+                      {e.billable ? "· billable" : "· non-billable"}
+                    </span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {fmt(e.start_time)} → {fmt(e.end_time)}
+                  </div>
+                  {e.notes ? (
+                    <div className="text-xs text-muted-foreground mt-1">{e.notes}</div>
+                  ) : null}
                 </div>
-                <Button size="icon" variant="ghost" onClick={() => { if (confirm("Delete entry?")) del.mutate(e.id); }}>
+                <Button
+                  aria-label={`Delete time entry for ${e.employee_name ?? "unassigned technician"}`}
+                  size="icon"
+                  variant="ghost"
+                  disabled={del.isPending}
+                  onClick={() => {
+                    if (confirm("Delete entry?")) del.mutate(e.id);
+                  }}
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
@@ -102,26 +187,53 @@ export function WorkOrderTimeEntries({ workOrderId }: { workOrderId: string }) {
   );
 }
 
-function AddTimeEntryDialog({ workOrderId }: { workOrderId: string }) {
+function AddTimeEntryDialog({
+  accountId,
+  workOrderId,
+}: {
+  accountId: string;
+  workOrderId: string;
+}) {
   const qc = useQueryClient();
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
   const [open, setOpen] = useState(false);
   const [employeeId, setEmployeeId] = useState("");
-  const [startTime, setStartTime] = useState(() => new Date(Date.now() - 60 * 60_000).toISOString().slice(0, 16));
+  const [startTime, setStartTime] = useState(() =>
+    new Date(Date.now() - 60 * 60_000).toISOString().slice(0, 16),
+  );
   const [endTime, setEndTime] = useState(() => new Date().toISOString().slice(0, 16));
   const [notes, setNotes] = useState("");
   const [billable, setBillable] = useState(true);
 
-  const { data: technicians = [] } = useQuery({
-    queryKey: ["shop-manager", "technicians", "picker"],
+  const {
+    data: technicians = [],
+    isLoading: techniciansLoading,
+    isError: techniciansError,
+    refetch: retryTechnicians,
+  } = useQuery({
+    queryKey: ["shop-manager", accountId, "technicians", "picker", workOrderId],
     enabled: open,
     queryFn: async () => {
-      const { data: shopId } = await (smSupabase as any).rpc("get_current_user_shop_id");
+      if (!active.current) throw new Error("Work-order context changed");
+      const { data: shopId, error: shopError } = await (smSupabase as any).rpc(
+        "get_current_user_shop_id",
+      );
+      if (!active.current) throw new Error("Work-order context changed");
+      if (shopError) throw shopError;
+      if (!shopId) throw new Error("No shop provisioned");
       const { data, error } = await (smSupabase as any)
         .from("profiles")
         .select("id,full_name,first_name,last_name,job_title")
         .eq("shop_id", shopId)
         .order("full_name", { ascending: true })
         .limit(500);
+      if (!active.current) throw new Error("Work-order context changed");
       if (error) throw error;
       return data ?? [];
     },
@@ -129,9 +241,13 @@ function AddTimeEntryDialog({ workOrderId }: { workOrderId: string }) {
 
   const create = useMutation({
     mutationFn: async () => {
+      if (!active.current) throw new Error("Work-order context changed");
+      if (techniciansLoading || techniciansError) throw new Error("Technicians unavailable");
       if (!startTime || !endTime) throw new Error("Set start and end time");
       const emp = technicians.find((t: any) => t.id === employeeId);
-      const empName = emp ? (emp.full_name || `${emp.first_name ?? ""} ${emp.last_name ?? ""}`.trim() || "—") : null;
+      const empName = emp
+        ? emp.full_name || `${emp.first_name ?? ""} ${emp.last_name ?? ""}`.trim() || "—"
+        : null;
       const startISO = new Date(startTime).toISOString();
       const endISO = new Date(endTime).toISOString();
       const duration = hoursBetween(startISO, endISO);
@@ -148,28 +264,54 @@ function AddTimeEntryDialog({ workOrderId }: { workOrderId: string }) {
       if (error) throw error;
     },
     onSuccess: () => {
+      if (!active.current) return;
       toast.success("Time entry added");
-      qc.invalidateQueries({ queryKey: ["shop-manager", "wo-time", workOrderId] });
+      qc.invalidateQueries({ queryKey: ["shop-manager", accountId, "wo-time", workOrderId] });
       setOpen(false);
-      setNotes(""); setEmployeeId(""); setBillable(true);
+      setNotes("");
+      setEmployeeId("");
+      setBillable(true);
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+    onError: () => {
+      if (active.current)
+        toast.error("Could not add this time entry. Check the fields and try again.");
+    },
   });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button size="sm" variant="outline"><Plus className="mr-1 h-4 w-4" /> Log time</Button></DialogTrigger>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <Plus className="mr-1 h-4 w-4" /> Log time
+        </Button>
+      </DialogTrigger>
       <DialogContent>
-        <DialogHeader><DialogTitle>Log time entry</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Log time entry</DialogTitle>
+        </DialogHeader>
         <div className="space-y-3">
           <div>
             <Label>Technician</Label>
+            {techniciansError ? (
+              <div role="alert" className="space-y-2">
+                <p>Could not load technicians.</p>
+                <Button size="sm" variant="outline" onClick={() => void retryTechnicians()}>
+                  Retry technicians
+                </Button>
+              </div>
+            ) : techniciansLoading ? (
+              <p role="status">Loading technicians…</p>
+            ) : null}
             <Select value={employeeId} onValueChange={setEmployeeId}>
-              <SelectTrigger><SelectValue placeholder="Pick a technician…" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Pick a technician…" />
+              </SelectTrigger>
               <SelectContent>
                 {technicians.map((t: any) => (
                   <SelectItem key={t.id} value={t.id}>
-                    {(t.full_name || `${t.first_name ?? ""} ${t.last_name ?? ""}`.trim()) || t.id.slice(0, 8)}
+                    {t.full_name ||
+                      `${t.first_name ?? ""} ${t.last_name ?? ""}`.trim() ||
+                      t.id.slice(0, 8)}
                     {t.job_title ? ` · ${t.job_title}` : ""}
                   </SelectItem>
                 ))}
@@ -177,18 +319,48 @@ function AddTimeEntryDialog({ workOrderId }: { workOrderId: string }) {
             </Select>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <div><Label>Start</Label><Input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} /></div>
-            <div><Label>End</Label><Input type="datetime-local" value={endTime} onChange={(e) => setEndTime(e.target.value)} /></div>
+            <div>
+              <Label htmlFor="time-entry-start">Start</Label>
+              <Input
+                id="time-entry-start"
+                type="datetime-local"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="time-entry-end">End</Label>
+              <Input
+                id="time-entry-end"
+                type="datetime-local"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+              />
+            </div>
           </div>
           <div className="text-sm text-muted-foreground">
-            Duration: <span className="font-mono">{hoursBetween(new Date(startTime).toISOString(), new Date(endTime).toISOString()).toFixed(2)}h</span>
+            Duration:{" "}
+            <span className="font-mono">{hoursBetween(startTime, endTime).toFixed(2)}h</span>
           </div>
-          <div><Label>Notes</Label><Input value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
-          <div className="flex items-center gap-2"><Switch checked={billable} onCheckedChange={setBillable} /><Label className="mb-0">Billable</Label></div>
+          <div>
+            <Label htmlFor="time-entry-notes">Notes</Label>
+            <Input id="time-entry-notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch checked={billable} onCheckedChange={setBillable} />
+            <Label className="mb-0">Billable</Label>
+          </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={() => create.mutate()} disabled={create.isPending}>{create.isPending ? "Saving…" : "Save"}</Button>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => create.mutate()}
+            disabled={create.isPending || techniciansLoading || techniciansError}
+          >
+            {create.isPending ? "Saving…" : "Save"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
