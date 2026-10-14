@@ -6,7 +6,6 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { colorForType } from "./map-utils";
 
-
 export type GMapBusiness = {
   id: string;
   slug: string;
@@ -21,6 +20,7 @@ export type GMapBusiness = {
   featured: boolean;
   price_label?: string | null;
   highlighted?: boolean;
+  is_associate?: boolean;
 };
 
 const PH_CENTER: [number, number] = [12.8797, 121.774];
@@ -34,6 +34,7 @@ function pinDivIcon(
   featured: boolean,
   highlighted = false,
   typeSlug?: string,
+  associate = false,
 ): L.DivIcon {
   const touchBoost = isTouchDevice() ? 1.2 : 1;
   const scale = (highlighted ? 1.6 : featured ? 1.4 : 1.1) * touchBoost;
@@ -41,8 +42,8 @@ function pinDivIcon(
   // Fuel-station: render a fuel-pump badge instead of the generic teardrop.
   if (typeSlug === "fuel_station") {
     const size = 34 * scale;
-    const stroke = highlighted ? "#0ea5e9" : "#ffffff";
-    const strokeW = highlighted ? 3 : 2;
+    const stroke = associate ? "#f59e0b" : highlighted ? "#0ea5e9" : "#ffffff";
+    const strokeW = associate ? 5 : highlighted ? 3 : 2;
     // Inlined Lucide "fuel" path, white on colored circle.
     const html = `
       <div style="position:relative;width:${size}px;height:${size}px;display:flex;align-items:center;justify-content:center;border-radius:9999px;background:${color};border:${strokeW}px solid ${stroke};box-shadow:0 2px 4px rgba(0,0,0,0.35)">
@@ -64,8 +65,8 @@ function pinDivIcon(
 
   const w = 24 * scale;
   const h = 34 * scale;
-  const stroke = highlighted ? "#0ea5e9" : "#ffffff";
-  const strokeW = highlighted ? 4 : featured ? 3 : 2;
+  const stroke = associate ? "#f59e0b" : highlighted ? "#0ea5e9" : "#ffffff";
+  const strokeW = associate ? 5 : highlighted ? 4 : featured ? 3 : 2;
   const html = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 24 34" style="display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
       <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 22 12 22s12-13 12-22C24 5.4 18.6 0 12 0z"
@@ -175,7 +176,6 @@ export function BusinessesMapInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
   // Render markers + adjust bounds whenever data changes
   useEffect(() => {
     const map = mapRef.current;
@@ -196,9 +196,10 @@ export function BusinessesMapInner({
     const newMarkers: L.Marker[] = [];
     valid.forEach((b) => {
       const color = colorForType(b.type_slug);
-      const isHighlighted = b.highlighted || (highlightedSlug != null && b.slug === highlightedSlug);
+      const isHighlighted =
+        b.highlighted || (highlightedSlug != null && b.slug === highlightedSlug);
       const marker = L.marker([Number(b.lat), Number(b.lng)], {
-        icon: pinDivIcon(color, b.featured, isHighlighted, b.type_slug),
+        icon: pinDivIcon(color, b.featured, isHighlighted, b.type_slug, b.is_associate === true),
         title: b.name,
         zIndexOffset: isHighlighted ? 1000 : b.featured ? 500 : 0,
       });
@@ -210,11 +211,15 @@ export function BusinessesMapInner({
       const price = b.price_label
         ? `<div style="margin-top:4px;display:inline-block;padding:2px 8px;border-radius:999px;background:#fef3c7;color:#92400e;font-weight:600;font-size:12px">${escapeHtml(b.price_label)}</div>`
         : "";
+      const associate = b.is_associate
+        ? `<div style="margin-top:4px;display:inline-block;padding:2px 8px;border:1px solid #f59e0b;border-radius:999px;background:#fffbeb;color:#92400e;font-weight:700;font-size:11px">365 Associate</div>`
+        : "";
       const html = `<div style="font-family:inherit;min-width:180px;max-width:240px">
         <div style="font-weight:600;font-size:14px;margin-bottom:2px">${escapeHtml(b.name)}</div>
         <div style="font-size:12px;color:#64748b">${escapeHtml(b.type_label)}${b.city ? " · " + escapeHtml(b.city) : ""}</div>
         ${rating ? `<div style="font-size:12px;margin-top:2px">${rating}</div>` : ""}
         ${price}
+        ${associate}
         <div style="margin-top:6px"><a style="font-size:12px;font-weight:600;color:#0ea5e9;text-decoration:underline;cursor:pointer" href="/businesses/${encodeURIComponent(b.slug)}">View business →</a></div>
       </div>`;
       marker.bindPopup(html, { closeButton: true, maxWidth: 260 });
@@ -223,7 +228,6 @@ export function BusinessesMapInner({
     });
     cluster.addLayers(newMarkers);
     markersRef.current = newMarkers;
-
 
     // Centre / fit logic — only when the requested center/radius changes,
     // so user pan/zoom is preserved across re-renders and on remount with

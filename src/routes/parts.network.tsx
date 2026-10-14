@@ -3,7 +3,18 @@ import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-quer
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Search, MapPin, Radio, Package, X, SlidersHorizontal } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  Radio,
+  Package,
+  X,
+  SlidersHorizontal,
+  ScanLine,
+  Navigation,
+  ShoppingCart,
+  ShieldCheck,
+} from "lucide-react";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { SiteLayout } from "@/components/site-layout";
@@ -26,6 +37,12 @@ import {
   type NetworkStockRow,
 } from "@/lib/network-stock.functions";
 import { NetworkPartInquiryDialog } from "@/components/parts/network-part-inquiry-dialog";
+import { NetworkPartOrderDialog } from "@/components/parts/network-part-order-dialog";
+import { decodeVin, type DecodeResult } from "@/lib/vin-decode.functions";
+import {
+  getCanonicalCatalogMatches,
+  type CatalogMatch,
+} from "@/lib/parts-network-operations.functions";
 
 const TITLE = "Network parts stock — Live availability across 365 shops";
 const DESCRIPTION =
@@ -42,6 +59,8 @@ const searchSchema = z.object({
   model: fallback(z.string(), "").default(""),
   year: fallback(z.number().int(), 0).default(0),
   province: fallback(z.string(), "").default(""),
+  vin: fallback(z.string(), "").default(""),
+  workOrderId: fallback(z.string(), "").default(""),
 });
 
 export const Route = createFileRoute("/parts/network")({
@@ -66,12 +85,22 @@ function NetworkStockPage() {
   const navigate = useNavigate({ from: "/parts/network" });
   const searchFn = useServerFn(searchNetworkStock);
   const facetsFn = useServerFn(getNetworkStockFacets);
+  const decodeVinFn = useServerFn(decodeVin);
+  const catalogFn = useServerFn(getCanonicalCatalogMatches);
   const qc = useQueryClient();
   const [query, setQuery] = useState(search.q);
   const [inquiry, setInquiry] = useState<NetworkStockRow | null>(null);
+  const [order, setOrder] = useState<NetworkStockRow | null>(null);
+  const [vinInput, setVinInput] = useState(search.vin);
+  const [vinResult, setVinResult] = useState<DecodeResult | null>(null);
+  const [vinBusy, setVinBusy] = useState(false);
+  const [nearby, setNearby] = useState<{ lat: number; lng: number } | null>(null);
+  const [radiusKm, setRadiusKm] = useState(50);
+  const [locationBusy, setLocationBusy] = useState(false);
 
   // Keep the search input synced with URL state (e.g. back/forward or reset).
   useEffect(() => setQuery(search.q), [search.q]);
+  useEffect(() => setVinInput(search.vin), [search.vin]);
 
   const filters = useMemo(
     () => ({
@@ -82,18 +111,15 @@ function NetworkStockPage() {
       model: search.model || undefined,
       year: search.year && search.year > 0 ? search.year : undefined,
       province: search.province || undefined,
+      originLat: nearby?.lat,
+      originLng: nearby?.lng,
+      radiusKm: nearby ? radiusKm : undefined,
     }),
-    [search],
+    [search, nearby, radiusKm],
   );
 
   const PAGE_SIZE = 20;
-  const {
-    data,
-    isFetching,
-    isFetchingNextPage,
-    fetchNextPage,
-    hasNextPage,
-  } = useInfiniteQuery({
+  const { data, isFetching, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ["network-stock", filters],
     queryFn: ({ pageParam }) =>
       searchFn({ data: { ...filters, limit: PAGE_SIZE, offset: pageParam as number } }),
@@ -101,15 +127,45 @@ function NetworkStockPage() {
     getNextPageParam: (last) => last.nextOffset ?? undefined,
     staleTime: 15_000,
   });
-  const rows = useMemo(
-    () => (data?.pages ?? []).flatMap((p) => p.rows),
-    [data],
-  );
+  const rows = useMemo(() => (data?.pages ?? []).flatMap((p) => p.rows), [data]);
   const total = data?.pages?.[0]?.total ?? null;
 
   const { data: facets } = useQuery({
     queryKey: ["network-stock-facets"],
     queryFn: () => facetsFn(),
+    staleTime: 60_000,
+  });
+
+  const vehicleHasCriteria = !!(
+    search.q ||
+    search.make ||
+    search.model ||
+    search.year ||
+    search.vin
+  );
+  const { data: catalogMatches = [], isFetching: catalogFetching } = useQuery({
+    queryKey: [
+      "canonical-parts-catalog",
+      search.q,
+      search.make,
+      search.model,
+      search.year,
+      search.vin,
+      vinResult,
+    ],
+    queryFn: () =>
+      catalogFn({
+        data: {
+          query: search.q || undefined,
+          make: search.make || undefined,
+          model: search.model || undefined,
+          year: search.year || undefined,
+          engine: vinResult?.ok ? vinResult.engine : undefined,
+          chassisCode: search.vin && search.vin.length < 17 ? search.vin : undefined,
+          limit: 8,
+        },
+      }),
+    enabled: vehicleHasCriteria,
     staleTime: 60_000,
   });
 
@@ -132,12 +188,74 @@ function NetworkStockPage() {
   };
   const resetAll = () =>
     navigate({
-      search: { q: "", category: "", brand: "", make: "", model: "", year: 0, province: "" },
+      search: {
+        q: "",
+        category: "",
+        brand: "",
+        make: "",
+        model: "",
+        year: 0,
+        province: "",
+        vin: "",
+        workOrderId: search.workOrderId,
+      },
     });
 
-  const activeCount = [
-    search.category, search.brand, search.make, search.model, search.province,
-  ].filter(Boolean).length + (search.year > 0 ? 1 : 0);
+  const activeCount =
+    [search.category, search.brand, search.make, search.model, search.province, search.vin].filter(
+      Boolean,
+    ).length + (search.year > 0 ? 1 : 0);
+
+  async function matchVinOrChassis(event: React.FormEvent) {
+    event.preventDefault();
+    const value = vinInput.trim().toUpperCase();
+    if (!value) return;
+    setVinBusy(true);
+    try {
+      const result = await decodeVinFn({ data: { value } });
+      setVinResult(result);
+      if (!result.ok) {
+        setParam({ vin: value });
+        toast.error(result.reason);
+        return;
+      }
+      setParam({
+        vin: value,
+        make: result.make ?? "",
+        model: result.model ?? "",
+        year: Number(result.year) || 0,
+      });
+      toast.success("Vehicle matched", {
+        description: [result.year, result.make, result.model, result.engine]
+          .filter(Boolean)
+          .join(" "),
+      });
+    } catch (error: any) {
+      toast.error(error?.message ?? "Could not match that VIN or chassis number");
+    } finally {
+      setVinBusy(false);
+    }
+  }
+
+  function useMyLocation() {
+    if (!navigator.geolocation) {
+      toast.error("Location is not available in this browser");
+      return;
+    }
+    setLocationBusy(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setNearby({ lat: position.coords.latitude, lng: position.coords.longitude });
+        setLocationBusy(false);
+        toast.success("Showing nearest Associate locations first");
+      },
+      (error) => {
+        setLocationBusy(false);
+        toast.error(error.message || "Could not get your location");
+      },
+      { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 },
+    );
+  }
 
   return (
     <SiteLayout>
@@ -150,8 +268,8 @@ function NetworkStockPage() {
             Find parts in stock across the 365 network
           </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Search live inventory from 365 Franchise and Partner shops that opted in.
-            Filter by category, brand, or your vehicle to find matching parts faster.
+            Search live inventory from 365 Franchise and Partner shops that opted in. Filter by
+            category, brand, or your vehicle to find matching parts faster.
           </p>
 
           <form
@@ -171,10 +289,57 @@ function NetworkStockPage() {
                 aria-label="Search network stock"
               />
             </div>
-            <Button type="submit" size="lg">Search stock</Button>
+            <Button type="submit" size="lg">
+              Search stock
+            </Button>
             <Button asChild type="button" size="lg" variant="outline">
               <Link to="/parts/my-requests">My requests</Link>
             </Button>
+          </form>
+
+          <form
+            onSubmit={matchVinOrChassis}
+            className="mt-3 grid gap-2 rounded-xl border border-primary/20 bg-card/80 p-3 sm:grid-cols-[1fr,auto]"
+          >
+            <div>
+              <Label
+                htmlFor="network-vin"
+                className="flex items-center gap-1.5 text-xs font-semibold"
+              >
+                <ScanLine className="h-3.5 w-3.5" /> VIN or Philippine/JDM chassis number
+              </Label>
+              <Input
+                id="network-vin"
+                value={vinInput}
+                onChange={(event) =>
+                  setVinInput(event.target.value.toUpperCase().replace(/\s+/g, ""))
+                }
+                placeholder="17-character VIN or chassis code, e.g. JZX100"
+                className="mt-1 font-mono"
+                maxLength={20}
+              />
+            </div>
+            <Button
+              type="submit"
+              variant="secondary"
+              className="self-end"
+              disabled={vinBusy || vinInput.trim().length < 3}
+            >
+              {vinBusy ? "Matching…" : "Match vehicle"}
+            </Button>
+            {vinResult?.ok ? (
+              <div className="sm:col-span-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">
+                  {vinResult.primarySource === "jdm_table" ? "Chassis table match" : "VIN decoded"}
+                </Badge>
+                <span>
+                  {[vinResult.year, vinResult.make, vinResult.model, vinResult.engine]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+                <span>Fitment still requires a confirmed catalogue record.</span>
+              </div>
+            ) : null}
           </form>
         </div>
       </section>
@@ -187,10 +352,7 @@ function NetworkStockPage() {
                 <SlidersHorizontal className="h-4 w-4" /> Filters
               </p>
               {activeCount > 0 && (
-                <button
-                  onClick={resetAll}
-                  className="text-xs text-primary hover:underline"
-                >
+                <button onClick={resetAll} className="text-xs text-primary hover:underline">
                   Clear all
                 </button>
               )}
@@ -214,6 +376,47 @@ function NetworkStockPage() {
               options={facets?.provinces ?? []}
               onChange={(v) => setParam({ province: v })}
             />
+
+            <div className="border-t pt-3 space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                Nearby stock
+              </p>
+              <Button
+                type="button"
+                variant={nearby ? "secondary" : "outline"}
+                size="sm"
+                className="w-full"
+                onClick={nearby ? () => setNearby(null) : useMyLocation}
+                disabled={locationBusy}
+              >
+                <Navigation className="mr-1.5 h-3.5 w-3.5" />
+                {locationBusy
+                  ? "Locating…"
+                  : nearby
+                    ? "Clear current location"
+                    : "Use my current location"}
+              </Button>
+              {nearby ? (
+                <div>
+                  <Label className="text-xs">Within</Label>
+                  <Select
+                    value={String(radiusKm)}
+                    onValueChange={(value) => setRadiusKm(Number(value))}
+                  >
+                    <SelectTrigger className="h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[10, 25, 50, 100, 250, 500].map((km) => (
+                        <SelectItem key={km} value={String(km)}>
+                          {km} km
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : null}
+            </div>
 
             <div className="border-t pt-3 space-y-2">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
@@ -251,17 +454,48 @@ function NetworkStockPage() {
 
           {activeCount > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {search.category && <Chip label={`Category: ${search.category}`} onRemove={() => setParam({ category: "" })} />}
-              {search.brand && <Chip label={`Brand: ${search.brand}`} onRemove={() => setParam({ brand: "" })} />}
-              {search.make && <Chip label={`Make: ${search.make}`} onRemove={() => setParam({ make: "" })} />}
-              {search.model && <Chip label={`Model: ${search.model}`} onRemove={() => setParam({ model: "" })} />}
-              {search.year > 0 && <Chip label={`Year: ${search.year}`} onRemove={() => setParam({ year: 0 })} />}
-              {search.province && <Chip label={`Province: ${search.province}`} onRemove={() => setParam({ province: "" })} />}
+              {search.category && (
+                <Chip
+                  label={`Category: ${search.category}`}
+                  onRemove={() => setParam({ category: "" })}
+                />
+              )}
+              {search.brand && (
+                <Chip label={`Brand: ${search.brand}`} onRemove={() => setParam({ brand: "" })} />
+              )}
+              {search.make && (
+                <Chip label={`Make: ${search.make}`} onRemove={() => setParam({ make: "" })} />
+              )}
+              {search.model && (
+                <Chip label={`Model: ${search.model}`} onRemove={() => setParam({ model: "" })} />
+              )}
+              {search.year > 0 && (
+                <Chip label={`Year: ${search.year}`} onRemove={() => setParam({ year: 0 })} />
+              )}
+              {search.province && (
+                <Chip
+                  label={`Province: ${search.province}`}
+                  onRemove={() => setParam({ province: "" })}
+                />
+              )}
+              {search.vin && (
+                <Chip
+                  label={`VIN/chassis: ${search.vin}`}
+                  onRemove={() => {
+                    setVinResult(null);
+                    setParam({ vin: "" });
+                  }}
+                />
+              )}
             </div>
           )}
         </aside>
 
         <div>
+          {vehicleHasCriteria ? (
+            <CanonicalCatalogPanel matches={catalogMatches} loading={catalogFetching} />
+          ) : null}
+
           {isFetching && rows.length === 0 ? (
             <Card className="p-6 text-sm text-muted-foreground">Loading network stock…</Card>
           ) : rows.length === 0 ? (
@@ -277,7 +511,9 @@ function NetworkStockPage() {
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-3">
                 {activeCount > 0 && (
-                  <Button variant="outline" onClick={resetAll}>Clear filters</Button>
+                  <Button variant="outline" onClick={resetAll}>
+                    Clear filters
+                  </Button>
                 )}
                 <Button asChild variant="ghost">
                   <Link to="/parts">Browse parts catalog</Link>
@@ -297,6 +533,7 @@ function NetworkStockPage() {
                   key={r.id}
                   row={r}
                   onInquire={setInquiry}
+                  onOrder={setOrder}
                   filterMake={search.make}
                   filterModel={search.model}
                   filterYear={search.year}
@@ -323,12 +560,21 @@ function NetworkStockPage() {
         onClose={() => setInquiry(null)}
         onSubmitted={() => toast.success("Request sent to shop")}
       />
+      <NetworkPartOrderDialog
+        row={order}
+        workOrderId={search.workOrderId || null}
+        onClose={() => setOrder(null)}
+        onCreated={() => qc.invalidateQueries({ queryKey: ["network-stock"] })}
+      />
     </SiteLayout>
   );
 }
 
 function FilterSelect({
-  label, value, options, onChange,
+  label,
+  value,
+  options,
+  onChange,
 }: {
   label: string;
   value: string;
@@ -338,21 +584,91 @@ function FilterSelect({
   return (
     <div>
       <Label className="text-xs">{label}</Label>
-      <Select
-        value={value || ALL}
-        onValueChange={(v) => onChange(v === ALL ? "" : v)}
-      >
+      <Select value={value || ALL} onValueChange={(v) => onChange(v === ALL ? "" : v)}>
         <SelectTrigger className="h-8">
           <SelectValue placeholder={`All ${label.toLowerCase()}`} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>All {label.toLowerCase()}</SelectItem>
           {options.map((o) => (
-            <SelectItem key={o} value={o}>{o}</SelectItem>
+            <SelectItem key={o} value={o}>
+              {o}
+            </SelectItem>
           ))}
         </SelectContent>
       </Select>
     </div>
+  );
+}
+
+function CanonicalCatalogPanel({
+  matches,
+  loading,
+}: {
+  matches: CatalogMatch[];
+  loading: boolean;
+}) {
+  return (
+    <Card className="mb-5 overflow-hidden border-primary/20">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-primary/5 px-4 py-3">
+        <div>
+          <p className="flex items-center gap-2 font-semibold">
+            <ShieldCheck className="h-4 w-4 text-primary" /> Canonical catalogue matches
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Verified fitment evidence is ranked above broad legacy compatibility.
+          </p>
+        </div>
+        <Badge variant="outline">{loading ? "Matching…" : `${matches.length} found`}</Badge>
+      </div>
+      {loading ? (
+        <div className="p-4 text-sm text-muted-foreground">
+          Checking canonical numbers and vehicle profiles…
+        </div>
+      ) : matches.length === 0 ? (
+        <div className="p-4 text-sm text-muted-foreground">
+          No confirmed catalogue record yet. Live supplier stock below may still be requested, but
+          fitment must be confirmed by the shop.
+        </div>
+      ) : (
+        <div className="grid gap-px bg-border sm:grid-cols-2">
+          {matches.slice(0, 6).map((match) => (
+            <div key={match.id} className="bg-card p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate font-medium">{match.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {[match.manufacturer, match.manufacturer_part_number]
+                      .filter(Boolean)
+                      .join(" · ") || match.category}
+                  </p>
+                </div>
+                <Badge
+                  variant="outline"
+                  className={
+                    match.fitment_confirmed
+                      ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+                      : ""
+                  }
+                >
+                  {match.fitment_confirmed ? "Confirmed fit" : "Catalogue"}
+                </Badge>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">{match.match_reason}</p>
+              {match.alternate_numbers.length > 0 ? (
+                <p className="mt-1 truncate font-mono text-[11px] text-muted-foreground">
+                  Also:{" "}
+                  {match.alternate_numbers
+                    .slice(0, 3)
+                    .map((number) => number.number)
+                    .join(", ")}
+                </p>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
   );
 }
 
@@ -368,17 +684,27 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
 }
 
 function StockRow({
-  row, onInquire, filterMake, filterModel, filterYear,
+  row,
+  onInquire,
+  onOrder,
+  filterMake,
+  filterModel,
+  filterYear,
 }: {
   row: NetworkStockRow;
   onInquire: (r: NetworkStockRow) => void;
+  onOrder: (r: NetworkStockRow) => void;
   filterMake: string;
   filterModel: string;
   filterYear: number;
 }) {
   const price = row.price != null ? `₱${Number(row.price).toLocaleString()}` : null;
-  const hasFitmentData =
-    !!(row.compatible_makes?.length || row.compatible_models?.length || row.year_min || row.year_max);
+  const hasFitmentData = !!(
+    row.compatible_makes?.length ||
+    row.compatible_models?.length ||
+    row.year_min ||
+    row.year_max
+  );
 
   const norm = (s: string) => s.trim().toLowerCase();
   const makes = row.compatible_makes ?? [];
@@ -465,8 +791,15 @@ function StockRow({
               SKU {row.sku}
             </span>
           )}
+          {(row.catalog_part_number || row.manufacturer_part_number || row.oem_part_number) && (
+            <span className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+              PN {row.catalog_part_number || row.manufacturer_part_number || row.oem_part_number}
+            </span>
+          )}
           {row.brand && (
-            <Badge variant="outline" className="text-[10px]">{row.brand}</Badge>
+            <Badge variant="outline" className="text-[10px]">
+              {row.brand}
+            </Badge>
           )}
           {tier && (
             <span
@@ -477,11 +810,7 @@ function StockRow({
           )}
         </div>
         <p className="mt-0.5 text-sm text-muted-foreground">
-          <Link
-            to="/b/$slug"
-            params={{ slug: row.business_slug }}
-            className="hover:underline"
-          >
+          <Link to="/b/$slug" params={{ slug: row.business_slug }} className="hover:underline">
             {row.business_name}
           </Link>
           {(row.city || row.province) && (
@@ -490,14 +819,20 @@ function StockRow({
               {[row.city, row.province].filter(Boolean).join(", ")}
             </span>
           )}
+          {row.stock_location_name && row.stock_location_name !== row.business_name ? (
+            <span className="ml-2">· {row.stock_location_name}</span>
+          ) : null}
+          {row.distance_km != null ? (
+            <span className="ml-2 font-medium text-primary">
+              · {row.distance_km.toLocaleString()} km away
+            </span>
+          ) : null}
           {row.category && <span className="ml-2">· {row.category}</span>}
         </p>
         {hasFitmentData ? (
           <p className="mt-1 text-xs text-muted-foreground">
             <span className="font-medium text-foreground">Fits: </span>
-            {makes.length > 0 && (
-              <>{renderTokens(makes, wantMake, !!makeMatch)}</>
-            )}
+            {makes.length > 0 && <>{renderTokens(makes, wantMake, !!makeMatch)}</>}
             {models.length > 0 && (
               <>
                 {makes.length > 0 && " · "}
@@ -522,9 +857,7 @@ function StockRow({
               </>
             )}
             {yearRangeOnly && (
-              <span className="ml-1 italic">
-                — no make/model listed, confirm with shop
-              </span>
+              <span className="ml-1 italic">— no make/model listed, confirm with shop</span>
             )}
           </p>
         ) : hasVehicleFilter ? (
@@ -539,13 +872,9 @@ function StockRow({
           <p className="text-lg font-bold text-primary">
             {Number(row.available_qty ?? row.qty_on_hand)}
           </p>
-          <p className="text-[10px] uppercase text-muted-foreground">
-            {row.unit} available
-          </p>
+          <p className="text-[10px] uppercase text-muted-foreground">{row.unit} available</p>
           {row.reserved_qty && Number(row.reserved_qty) > 0 ? (
-            <p className="text-[10px] text-amber-600">
-              {Number(row.reserved_qty)} on hold
-            </p>
+            <p className="text-[10px] text-amber-600">{Number(row.reserved_qty)} on hold</p>
           ) : null}
         </div>
         {price && (
@@ -554,7 +883,14 @@ function StockRow({
             <p className="text-[10px] uppercase text-muted-foreground">per {row.unit}</p>
           </div>
         )}
-        <Button size="sm" onClick={() => onInquire(row)}>Request</Button>
+        <div className="flex flex-col gap-1.5">
+          <Button size="sm" onClick={() => onOrder(row)} disabled={row.price == null}>
+            <ShoppingCart className="mr-1 h-3.5 w-3.5" /> Order
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => onInquire(row)}>
+            Request quote
+          </Button>
+        </div>
       </div>
     </Card>
   );

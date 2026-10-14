@@ -1,7 +1,2675 @@
+-- 365 standalone migration package | chunk_006.sql | 27 source migrations
+-- Byte-for-byte concatenation of supabase/migrations. No SQL modified.
 
--- ============================================================================
--- SOURCE MIGRATION: 20260713063318_90b3f5d4-5173-4f8a-b355-7634671276fe.sql
--- ============================================================================
+-- ===== BEGIN SOURCE MIGRATION: 20260711010354_064bbdf4-d81e-4437-98d9-b75c0c57afcb.sql =====
+
+DROP FUNCTION IF EXISTS public.apply_report_action(uuid,text,text,boolean,boolean,boolean,uuid);
+
+CREATE OR REPLACE FUNCTION public.apply_report_action(
+  _report_id uuid,
+  _action text,
+  _note text DEFAULT NULL,
+  _hide_listing boolean DEFAULT false,
+  _delete_listing boolean DEFAULT false,
+  _notify_poster boolean DEFAULT false,
+  _reverses_action_id uuid DEFAULT NULL,
+  _severity text DEFAULT 'standard'
+)
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  _actor uuid := auth.uid();
+  _report public.reports%ROWTYPE;
+  _listing public.listings%ROWTYPE;
+  _delta int := 0;
+  _accept_base int := -25;
+  _listing_effect text := 'none';
+  _new_status text;
+  _new_resolution text;
+  _action_id uuid;
+  _reason_code text;
+  _reason_label text;
+BEGIN
+  IF NOT (public.has_role(_actor,'admin') OR public.has_role(_actor,'moderator')) THEN
+    RAISE EXCEPTION 'Forbidden';
+  END IF;
+
+  SELECT * INTO _report FROM public.reports WHERE id = _report_id FOR UPDATE;
+  IF _report.id IS NULL THEN RAISE EXCEPTION 'Report not found'; END IF;
+
+  IF _report.listing_id IS NOT NULL THEN
+    SELECT * INTO _listing FROM public.listings WHERE id = _report.listing_id;
+  END IF;
+
+  IF _action = 'reverse' AND NOT public.has_role(_actor,'admin') THEN
+    RAISE EXCEPTION 'Only admins can reverse decisions';
+  END IF;
+
+  _accept_base := CASE lower(COALESCE(_severity,'standard'))
+    WHEN 'none' THEN 0
+    WHEN 'minor' THEN -5
+    WHEN 'moderate' THEN -15
+    WHEN 'severe' THEN -50
+    ELSE -25
+  END;
+
+  IF _action = 'accept' THEN
+    _new_status := 'resolved'; _new_resolution := 'accepted';
+    _delta := _accept_base;
+    _reason_code := CASE WHEN _accept_base = 0 THEN 'report_accepted_no_penalty' ELSE 'report_accepted' END;
+    _reason_label := CASE WHEN _accept_base = 0
+      THEN 'Report accepted — no penalty (honest mistake)'
+      ELSE 'Report accepted against you' END;
+  ELSIF _action = 'dismiss' THEN
+    _new_status := 'resolved'; _new_resolution := 'dismissed';
+    _delta := 0; _reason_code := 'report_dismissed'; _reason_label := 'Report dismissed';
+  ELSIF _action = 'reverse' THEN
+    _new_status := 'open'; _new_resolution := NULL;
+    IF _reverses_action_id IS NOT NULL THEN
+      SELECT -score_delta INTO _delta FROM public.report_actions WHERE id = _reverses_action_id;
+      _delta := COALESCE(_delta,0);
+    END IF;
+    _reason_code := 'decision_reversed'; _reason_label := 'Prior moderation decision reversed';
+  ELSE
+    _new_status := _report.status; _new_resolution := _report.resolution;
+  END IF;
+
+  IF _hide_listing AND _listing.id IS NOT NULL THEN
+    UPDATE public.listings SET status = 'hidden' WHERE id = _listing.id;
+    _listing_effect := 'hidden';
+    _delta := _delta - 10;
+  END IF;
+  IF _delete_listing AND _listing.id IS NOT NULL THEN
+    DELETE FROM public.listings WHERE id = _listing.id;
+    _listing_effect := 'deleted';
+    _delta := _delta - 30;
+  END IF;
+  IF _action = 'restore_listing' AND _listing.id IS NOT NULL THEN
+    UPDATE public.listings SET status = 'active' WHERE id = _listing.id;
+    _listing_effect := 'restored';
+    _delta := _delta + 10;
+  END IF;
+
+  IF _action IN ('accept','dismiss','reverse') THEN
+    UPDATE public.reports SET
+      status = _new_status,
+      resolution = _new_resolution,
+      resolved_by = CASE WHEN _new_status='resolved' THEN _actor ELSE NULL END,
+      resolved_at = CASE WHEN _new_status='resolved' THEN now() ELSE NULL END
+    WHERE id = _report_id;
+  END IF;
+
+  INSERT INTO public.report_actions(
+    report_id, actor_id, action, prev_status, new_status, prev_resolution, new_resolution,
+    score_delta, listing_effect, notified_poster, note, reversed_by_action_id
+  ) VALUES (
+    _report_id, _actor, _action, _report.status, _new_status, _report.resolution, _new_resolution,
+    _delta, _listing_effect, _notify_poster, _note, _reverses_action_id
+  ) RETURNING id INTO _action_id;
+
+  IF _action = 'reverse' AND _reverses_action_id IS NOT NULL THEN
+    UPDATE public.report_actions SET reversed_by_action_id = _action_id WHERE id = _reverses_action_id;
+  END IF;
+
+  IF _listing.user_id IS NOT NULL AND _delta <> 0 THEN
+    INSERT INTO public.trust_score_events(
+      user_id, delta, reason_code, reason_label, source_type, source_id, actor_id
+    ) VALUES (
+      _listing.user_id, _delta, _reason_code, _reason_label, 'report', _report_id, _actor
+    );
+  END IF;
+
+  RETURN _action_id;
+END $$;
+
+REVOKE ALL ON FUNCTION public.apply_report_action(uuid,text,text,boolean,boolean,boolean,uuid,text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.apply_report_action(uuid,text,text,boolean,boolean,boolean,uuid,text) TO authenticated;
+
+-- ===== END SOURCE MIGRATION: 20260711010354_064bbdf4-d81e-4437-98d9-b75c0c57afcb.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260711011141_9f8294d9-bbfa-4fdb-a058-d364cdfed91f.sql =====
+
+-- 1. Remove overbroad sales UPDATE on profiles and replace with a status-only RPC.
+DROP POLICY IF EXISTS "Sales update account status" ON public.profiles;
+
+CREATE OR REPLACE FUNCTION public.sales_update_account_status(
+  _profile_id uuid,
+  _new_status text
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT public.has_role(auth.uid(), 'sales'::app_role) THEN
+    RAISE EXCEPTION 'Forbidden';
+  END IF;
+
+  IF NOT public.is_sales_assigned_user(auth.uid(), _profile_id) THEN
+    RAISE EXCEPTION 'Not assigned to this customer';
+  END IF;
+
+  IF _new_status IS NULL OR length(_new_status) = 0 OR length(_new_status) > 64 THEN
+    RAISE EXCEPTION 'Invalid account status';
+  END IF;
+
+  UPDATE public.profiles
+     SET account_status = _new_status
+   WHERE id = _profile_id;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.sales_update_account_status(uuid, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.sales_update_account_status(uuid, text) TO authenticated;
+
+-- 2. Let DM recipients read attachments sent to them.
+CREATE POLICY "Staff DM recipients can read attachments"
+ON storage.objects
+FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'staff-dm-attachments'
+  AND EXISTS (
+    SELECT 1
+      FROM public.staff_dms d
+     WHERE d.attachment_path = storage.objects.name
+       AND (d.sender_id = auth.uid() OR d.recipient_id = auth.uid())
+  )
+);
+
+-- ===== END SOURCE MIGRATION: 20260711011141_9f8294d9-bbfa-4fdb-a058-d364cdfed91f.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260711044610_4ba7cad7-f972-4860-893d-7bb76399edd4.sql =====
+GRANT INSERT ON public.reports TO anon;
+GRANT SELECT, INSERT, UPDATE ON public.reports TO authenticated;
+GRANT ALL ON public.reports TO service_role;
+-- ===== END SOURCE MIGRATION: 20260711044610_4ba7cad7-f972-4860-893d-7bb76399edd4.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260711065141_5acf3fda-e424-43a9-ad55-be9982fe0117.sql =====
+
+-- Checklists library
+CREATE TABLE public.buyer_checklists (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug text UNIQUE NOT NULL,
+  title text NOT NULL,
+  category_slug text,
+  pdf_url text,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT ON public.buyer_checklists TO anon, authenticated;
+GRANT ALL ON public.buyer_checklists TO service_role;
+ALTER TABLE public.buyer_checklists ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can view active checklists"
+  ON public.buyer_checklists FOR SELECT
+  USING (is_active = true);
+CREATE POLICY "Admins manage checklists"
+  ON public.buyer_checklists FOR ALL
+  TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+-- Items
+CREATE TABLE public.buyer_checklist_items (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  checklist_id uuid NOT NULL REFERENCES public.buyer_checklists(id) ON DELETE CASCADE,
+  position int NOT NULL DEFAULT 0,
+  label text NOT NULL,
+  hint text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX buyer_checklist_items_checklist_idx ON public.buyer_checklist_items(checklist_id, position);
+GRANT SELECT ON public.buyer_checklist_items TO anon, authenticated;
+GRANT ALL ON public.buyer_checklist_items TO service_role;
+ALTER TABLE public.buyer_checklist_items ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can view items of active checklists"
+  ON public.buyer_checklist_items FOR SELECT
+  USING (EXISTS (SELECT 1 FROM public.buyer_checklists c WHERE c.id = checklist_id AND c.is_active = true));
+CREATE POLICY "Admins manage checklist items"
+  ON public.buyer_checklist_items FOR ALL
+  TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+-- Per-user, per-listing progress
+CREATE TABLE public.buyer_checklist_progress (
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  listing_id uuid NOT NULL REFERENCES public.listings(id) ON DELETE CASCADE,
+  item_id uuid NOT NULL REFERENCES public.buyer_checklist_items(id) ON DELETE CASCADE,
+  checked_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, listing_id, item_id)
+);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.buyer_checklist_progress TO authenticated;
+GRANT ALL ON public.buyer_checklist_progress TO service_role;
+ALTER TABLE public.buyer_checklist_progress ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users read own checklist progress"
+  ON public.buyer_checklist_progress FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+CREATE POLICY "Users insert own checklist progress"
+  ON public.buyer_checklist_progress FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users delete own checklist progress"
+  ON public.buyer_checklist_progress FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- updated_at trigger
+CREATE TRIGGER buyer_checklists_updated_at
+  BEFORE UPDATE ON public.buyer_checklists
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Seed: PH used-car checklist
+WITH c AS (
+  INSERT INTO public.buyer_checklists (slug, title, category_slug)
+  VALUES ('ph-used-car', 'PH buyer document checklist — Used car', 'cars')
+  RETURNING id
+)
+INSERT INTO public.buyer_checklist_items (checklist_id, position, label, hint)
+SELECT c.id, v.position, v.label, v.hint FROM c, (VALUES
+  (1, 'Original OR and CR are present', 'Ask for the latest LTO Official Receipt and Certificate of Registration.'),
+  (2, 'Registered owner matches the seller''s valid ID', 'If not, ask for the open Deed of Sale chain and previous owner''s ID.'),
+  (3, 'Deed of Sale is ready (notarised)', NULL),
+  (4, 'Seller can show 2 valid government IDs', NULL),
+  (5, 'Chassis number matches the CR and the unit', NULL),
+  (6, 'Engine number matches the CR and the unit', NULL),
+  (7, 'Plate / conduction sticker matches the CR', NULL),
+  (8, 'No encumbrance / chattel mortgage on the CR', 'If marked ''Encumbered,'' ask for the bank''s release of mortgage.'),
+  (9, 'Flood, accident, and rebuild history disclosed in writing', NULL),
+  (10, 'HPG / PNP clearance done (recommended for high-value units)', 'Highway Patrol Group macro-etching confirms the unit is not stolen.')
+) AS v(position, label, hint);
+
+-- Seed: PH used-motorcycle checklist (stub, admin can extend)
+WITH c AS (
+  INSERT INTO public.buyer_checklists (slug, title, category_slug)
+  VALUES ('ph-used-motorcycle', 'PH buyer document checklist — Motorcycle', 'motorcycles')
+  RETURNING id
+)
+INSERT INTO public.buyer_checklist_items (checklist_id, position, label, hint)
+SELECT c.id, v.position, v.label, v.hint FROM c, (VALUES
+  (1, 'Original OR and CR are present', NULL),
+  (2, 'Registered owner matches the seller''s valid ID', NULL),
+  (3, 'Deed of Sale is ready (notarised)', NULL),
+  (4, 'Chassis and engine numbers match the CR', NULL),
+  (5, 'No encumbrance on the CR', NULL),
+  (6, 'HPG clearance done (recommended)', NULL)
+) AS v(position, label, hint);
+
+-- ===== END SOURCE MIGRATION: 20260711065141_5acf3fda-e424-43a9-ad55-be9982fe0117.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260711065326_ef5ce8a6-5dd5-40f6-be75-52253b43e0d7.sql =====
+
+CREATE POLICY "Anyone can read buyer guides"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'buyer-guides');
+
+CREATE POLICY "Admins upload buyer guides"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (bucket_id = 'buyer-guides' AND public.has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins update buyer guides"
+  ON storage.objects FOR UPDATE
+  TO authenticated
+  USING (bucket_id = 'buyer-guides' AND public.has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins delete buyer guides"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (bucket_id = 'buyer-guides' AND public.has_role(auth.uid(), 'admin'));
+
+-- ===== END SOURCE MIGRATION: 20260711065326_ef5ce8a6-5dd5-40f6-be75-52253b43e0d7.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260711070812_b5fc269f-649d-4705-b255-89d823663b24.sql =====
+-- Notify listing owner when a new message arrives, like Messenger.
+CREATE OR REPLACE FUNCTION public.tg_notify_message_recipient()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_title TEXT;
+  v_body  TEXT;
+  v_sender_name TEXT;
+  v_listing_title TEXT;
+BEGIN
+  SELECT COALESCE(business_name, full_name, 'Someone')
+    INTO v_sender_name
+    FROM public.profiles WHERE id = NEW.sender_id;
+
+  SELECT title INTO v_listing_title
+    FROM public.listings WHERE id = NEW.listing_id;
+
+  v_title := COALESCE(v_sender_name, 'New message') || ' sent you a message';
+  v_body  := CASE
+    WHEN v_listing_title IS NOT NULL THEN 'Re: ' || v_listing_title || E'\n' || LEFT(NEW.body, 140)
+    ELSE LEFT(NEW.body, 200)
+  END;
+
+  INSERT INTO public.user_notifications
+    (user_id, title, body, link_url, entity_type, entity_id)
+  VALUES
+    (NEW.recipient_id, v_title, v_body,
+     '/dashboard/messages',
+     'message', NEW.id);
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_notify_message_recipient ON public.messages;
+CREATE TRIGGER trg_notify_message_recipient
+  AFTER INSERT ON public.messages
+  FOR EACH ROW EXECUTE FUNCTION public.tg_notify_message_recipient();
+
+-- ===== END SOURCE MIGRATION: 20260711070812_b5fc269f-649d-4705-b255-89d823663b24.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260711072533_71165e8b-c1de-4475-94a1-9c91ae3c46e5.sql =====
+-- Extend messages with attachments
+ALTER TABLE public.messages
+  ADD COLUMN IF NOT EXISTS attachment_url text,
+  ADD COLUMN IF NOT EXISTS attachment_type text,
+  ADD COLUMN IF NOT EXISTS attachment_thumb_url text,
+  ADD COLUMN IF NOT EXISTS attachment_meta jsonb,
+  ADD COLUMN IF NOT EXISTS attachment_path text;
+
+-- Allow empty body when attachment present: relax NOT NULL if it was set
+ALTER TABLE public.messages ALTER COLUMN body DROP NOT NULL;
+
+-- Mark a conversation unread (most recent inbound message)
+CREATE OR REPLACE FUNCTION public.mark_conversation_unread(
+  p_listing_id uuid,
+  p_other_user_id uuid
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_uid uuid := auth.uid();
+  v_id uuid;
+BEGIN
+  IF v_uid IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+  SELECT id INTO v_id
+  FROM public.messages
+  WHERE listing_id = p_listing_id
+    AND recipient_id = v_uid
+    AND sender_id = p_other_user_id
+  ORDER BY created_at DESC
+  LIMIT 1;
+  IF v_id IS NOT NULL THEN
+    UPDATE public.messages SET read_at = NULL WHERE id = v_id;
+  END IF;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.mark_conversation_unread(uuid, uuid) TO authenticated;
+
+-- Update notify trigger to describe attachment when body is empty
+CREATE OR REPLACE FUNCTION public.tg_notify_message_recipient()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_title TEXT;
+  v_body  TEXT;
+  v_preview TEXT;
+  v_sender_name TEXT;
+  v_listing_title TEXT;
+BEGIN
+  SELECT COALESCE(business_name, full_name, 'Someone')
+    INTO v_sender_name
+    FROM public.profiles WHERE id = NEW.sender_id;
+
+  SELECT title INTO v_listing_title
+    FROM public.listings WHERE id = NEW.listing_id;
+
+  v_preview := CASE
+    WHEN COALESCE(NEW.body, '') <> '' THEN LEFT(NEW.body, 140)
+    WHEN NEW.attachment_type = 'image' THEN '📷 Sent a photo'
+    WHEN NEW.attachment_type = 'video' THEN '🎬 Sent a video'
+    WHEN NEW.attachment_type = 'gif'   THEN 'Sent a GIF'
+    ELSE 'Sent an attachment'
+  END;
+
+  v_title := COALESCE(v_sender_name, 'New message') || ' sent you a message';
+  v_body  := CASE
+    WHEN v_listing_title IS NOT NULL THEN 'Re: ' || v_listing_title || E'\n' || v_preview
+    ELSE v_preview
+  END;
+
+  INSERT INTO public.user_notifications
+    (user_id, title, body, link_url, entity_type, entity_id)
+  VALUES
+    (NEW.recipient_id, v_title, v_body,
+     '/dashboard/messages',
+     'message', NEW.id);
+
+  RETURN NEW;
+END;
+$$;
+
+-- Storage RLS for message-media (private bucket)
+-- Path convention: {auth.uid()}/{uuid}.{ext}
+CREATE POLICY "message-media: upload own"
+  ON storage.objects FOR INSERT TO authenticated
+  WITH CHECK (
+    bucket_id = 'message-media'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+CREATE POLICY "message-media: read own uploads"
+  ON storage.objects FOR SELECT TO authenticated
+  USING (
+    bucket_id = 'message-media'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+CREATE POLICY "message-media: read as recipient"
+  ON storage.objects FOR SELECT TO authenticated
+  USING (
+    bucket_id = 'message-media'
+    AND EXISTS (
+      SELECT 1 FROM public.messages m
+      WHERE m.attachment_path = storage.objects.name
+        AND m.recipient_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "message-media: delete own uploads"
+  ON storage.objects FOR DELETE TO authenticated
+  USING (
+    bucket_id = 'message-media'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+-- ===== END SOURCE MIGRATION: 20260711072533_71165e8b-c1de-4475-94a1-9c91ae3c46e5.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql =====
+
+-- 1. Tables
+CREATE TABLE public.chat_threads (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  created_by uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.chat_threads TO authenticated;
+GRANT ALL ON public.chat_threads TO service_role;
+ALTER TABLE public.chat_threads ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE public.chat_thread_members (
+  thread_id uuid NOT NULL REFERENCES public.chat_threads(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  invited_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('invited','active','left')),
+  last_read_at timestamptz,
+  joined_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (thread_id, user_id)
+);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.chat_thread_members TO authenticated;
+GRANT ALL ON public.chat_thread_members TO service_role;
+ALTER TABLE public.chat_thread_members ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE public.chat_thread_messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  thread_id uuid NOT NULL REFERENCES public.chat_threads(id) ON DELETE CASCADE,
+  sender_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  body text,
+  attachment_url text,
+  attachment_type text CHECK (attachment_type IN ('image','video','gif')),
+  attachment_thumb_url text,
+  attachment_path text,
+  attachment_meta jsonb,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.chat_thread_messages TO authenticated;
+GRANT ALL ON public.chat_thread_messages TO service_role;
+ALTER TABLE public.chat_thread_messages ENABLE ROW LEVEL SECURITY;
+
+CREATE INDEX idx_chat_thread_messages_thread ON public.chat_thread_messages(thread_id, created_at);
+CREATE INDEX idx_chat_thread_members_user ON public.chat_thread_members(user_id, status);
+
+-- 2. Helper (SECURITY DEFINER to avoid recursive RLS)
+CREATE OR REPLACE FUNCTION public.is_thread_member(_thread uuid, _user uuid)
+RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.chat_thread_members
+    WHERE thread_id = _thread AND user_id = _user AND status IN ('active','invited')
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_active_thread_member(_thread uuid, _user uuid)
+RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.chat_thread_members
+    WHERE thread_id = _thread AND user_id = _user AND status = 'active'
+  );
+$$;
+
+-- 3. Policies
+CREATE POLICY "Members view threads" ON public.chat_threads
+  FOR SELECT TO authenticated
+  USING (public.is_thread_member(id, auth.uid()));
+
+CREATE POLICY "Anyone can create threads" ON public.chat_threads
+  FOR INSERT TO authenticated
+  WITH CHECK (created_by = auth.uid());
+
+CREATE POLICY "Creator can update thread" ON public.chat_threads
+  FOR UPDATE TO authenticated
+  USING (created_by = auth.uid())
+  WITH CHECK (created_by = auth.uid());
+
+CREATE POLICY "Members see member rows" ON public.chat_thread_members
+  FOR SELECT TO authenticated
+  USING (public.is_thread_member(thread_id, auth.uid()));
+
+CREATE POLICY "Active members can invite" ON public.chat_thread_members
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    public.is_active_thread_member(thread_id, auth.uid())
+    OR EXISTS (SELECT 1 FROM public.chat_threads t WHERE t.id = thread_id AND t.created_by = auth.uid())
+  );
+
+CREATE POLICY "User can update own membership" ON public.chat_thread_members
+  FOR UPDATE TO authenticated
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "Members view thread messages" ON public.chat_thread_messages
+  FOR SELECT TO authenticated
+  USING (public.is_thread_member(thread_id, auth.uid()));
+
+CREATE POLICY "Active members can send" ON public.chat_thread_messages
+  FOR INSERT TO authenticated
+  WITH CHECK (sender_id = auth.uid() AND public.is_active_thread_member(thread_id, auth.uid()));
+
+-- 4. updated_at trigger
+CREATE OR REPLACE FUNCTION public.tg_touch_chat_thread()
+RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN
+  UPDATE public.chat_threads SET updated_at = now() WHERE id = NEW.thread_id;
+  RETURN NEW;
+END;
+$$;
+CREATE TRIGGER trg_touch_chat_thread_on_message
+AFTER INSERT ON public.chat_thread_messages
+FOR EACH ROW EXECUTE FUNCTION public.tg_touch_chat_thread();
+
+-- 5. Notification trigger for group messages
+CREATE OR REPLACE FUNCTION public.tg_notify_chat_thread_message()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  v_title text;
+  v_preview text;
+  v_sender_name text;
+BEGIN
+  SELECT title INTO v_title FROM public.chat_threads WHERE id = NEW.thread_id;
+  SELECT COALESCE(business_name, full_name, 'Someone') INTO v_sender_name
+  FROM public.public_profiles WHERE id = NEW.sender_id;
+
+  IF NEW.body IS NOT NULL AND length(NEW.body) > 0 THEN
+    v_preview := left(NEW.body, 140);
+  ELSIF NEW.attachment_type = 'image' THEN v_preview := 'sent a photo';
+  ELSIF NEW.attachment_type = 'video' THEN v_preview := 'sent a video';
+  ELSIF NEW.attachment_type = 'gif' THEN v_preview := 'sent a GIF';
+  ELSE v_preview := 'sent a message';
+  END IF;
+
+  INSERT INTO public.user_notifications (user_id, type, title, body, url, metadata)
+  SELECT
+    m.user_id,
+    'chat_message',
+    COALESCE(v_title, 'Group chat'),
+    v_sender_name || ': ' || v_preview,
+    '/dashboard/messages?thread=' || NEW.thread_id::text,
+    jsonb_build_object('thread_id', NEW.thread_id, 'sender_id', NEW.sender_id)
+  FROM public.chat_thread_members m
+  WHERE m.thread_id = NEW.thread_id
+    AND m.user_id <> NEW.sender_id
+    AND m.status = 'active';
+
+  RETURN NEW;
+END;
+$$;
+CREATE TRIGGER trg_notify_chat_thread_message
+AFTER INSERT ON public.chat_thread_messages
+FOR EACH ROW EXECUTE FUNCTION public.tg_notify_chat_thread_message();
+
+-- 6. RPCs
+CREATE OR REPLACE FUNCTION public.create_group_chat(p_title text, p_member_ids uuid[])
+RETURNS uuid
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  v_uid uuid := auth.uid();
+  v_thread_id uuid;
+  v_member uuid;
+  v_clean text;
+BEGIN
+  IF v_uid IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  v_clean := btrim(coalesce(p_title, ''));
+  IF v_clean = '' THEN RAISE EXCEPTION 'Title is required'; END IF;
+
+  INSERT INTO public.chat_threads (title, created_by) VALUES (v_clean, v_uid)
+  RETURNING id INTO v_thread_id;
+
+  INSERT INTO public.chat_thread_members (thread_id, user_id, invited_by, status)
+  VALUES (v_thread_id, v_uid, v_uid, 'active');
+
+  IF p_member_ids IS NOT NULL THEN
+    FOREACH v_member IN ARRAY p_member_ids LOOP
+      IF v_member IS NOT NULL AND v_member <> v_uid THEN
+        INSERT INTO public.chat_thread_members (thread_id, user_id, invited_by, status)
+        VALUES (v_thread_id, v_member, v_uid, 'invited')
+        ON CONFLICT DO NOTHING;
+
+        INSERT INTO public.user_notifications (user_id, type, title, body, url, metadata)
+        VALUES (
+          v_member,
+          'chat_invite',
+          'You were invited to a group chat',
+          v_clean,
+          '/dashboard/messages?thread=' || v_thread_id::text,
+          jsonb_build_object('thread_id', v_thread_id, 'invited_by', v_uid)
+        );
+      END IF;
+    END LOOP;
+  END IF;
+
+  RETURN v_thread_id;
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.create_group_chat(text, uuid[]) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.invite_to_thread(p_thread_id uuid, p_user_ids uuid[])
+RETURNS int
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  v_uid uuid := auth.uid();
+  v_title text;
+  v_member uuid;
+  v_added int := 0;
+BEGIN
+  IF v_uid IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  IF NOT public.is_active_thread_member(p_thread_id, v_uid) THEN
+    RAISE EXCEPTION 'Not a member of this thread';
+  END IF;
+  SELECT title INTO v_title FROM public.chat_threads WHERE id = p_thread_id;
+  IF p_user_ids IS NULL THEN RETURN 0; END IF;
+
+  FOREACH v_member IN ARRAY p_user_ids LOOP
+    IF v_member IS NOT NULL AND v_member <> v_uid THEN
+      INSERT INTO public.chat_thread_members (thread_id, user_id, invited_by, status)
+      VALUES (p_thread_id, v_member, v_uid, 'invited')
+      ON CONFLICT (thread_id, user_id) DO NOTHING;
+      IF FOUND THEN
+        v_added := v_added + 1;
+        INSERT INTO public.user_notifications (user_id, type, title, body, url, metadata)
+        VALUES (
+          v_member,
+          'chat_invite',
+          'You were invited to a group chat',
+          v_title,
+          '/dashboard/messages?thread=' || p_thread_id::text,
+          jsonb_build_object('thread_id', p_thread_id, 'invited_by', v_uid)
+        );
+      END IF;
+    END IF;
+  END LOOP;
+  RETURN v_added;
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.invite_to_thread(uuid, uuid[]) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.respond_to_thread_invite(p_thread_id uuid, p_accept boolean)
+RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE v_uid uuid := auth.uid();
+BEGIN
+  IF v_uid IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  IF p_accept THEN
+    UPDATE public.chat_thread_members
+      SET status = 'active', joined_at = now()
+      WHERE thread_id = p_thread_id AND user_id = v_uid AND status = 'invited';
+  ELSE
+    UPDATE public.chat_thread_members
+      SET status = 'left'
+      WHERE thread_id = p_thread_id AND user_id = v_uid;
+  END IF;
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.respond_to_thread_invite(uuid, boolean) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.leave_thread(p_thread_id uuid)
+RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  UPDATE public.chat_thread_members
+    SET status = 'left'
+    WHERE thread_id = p_thread_id AND user_id = auth.uid();
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.leave_thread(uuid) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.mark_thread_read(p_thread_id uuid)
+RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  UPDATE public.chat_thread_members
+    SET last_read_at = now()
+    WHERE thread_id = p_thread_id AND user_id = auth.uid();
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.mark_thread_read(uuid) TO authenticated;
+
+-- ===== END SOURCE MIGRATION: 20260711073331_3314948d-c196-44ff-b656-7be383f5d16b.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260711073454_cea6ce68-1eda-4711-8431-5d3468395289.sql =====
+
+CREATE OR REPLACE FUNCTION public.tg_notify_chat_thread_message()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  v_title text;
+  v_preview text;
+  v_sender_name text;
+BEGIN
+  SELECT title INTO v_title FROM public.chat_threads WHERE id = NEW.thread_id;
+  SELECT COALESCE(business_name, full_name, 'Someone') INTO v_sender_name
+  FROM public.public_profiles WHERE id = NEW.sender_id;
+
+  IF NEW.body IS NOT NULL AND length(NEW.body) > 0 THEN
+    v_preview := left(NEW.body, 140);
+  ELSIF NEW.attachment_type = 'image' THEN v_preview := 'sent a photo';
+  ELSIF NEW.attachment_type = 'video' THEN v_preview := 'sent a video';
+  ELSIF NEW.attachment_type = 'gif' THEN v_preview := 'sent a GIF';
+  ELSE v_preview := 'sent a message';
+  END IF;
+
+  INSERT INTO public.user_notifications (user_id, category, title, body, link_url, entity_type, entity_id, metadata)
+  SELECT
+    m.user_id,
+    'chat_message',
+    COALESCE(v_title, 'Group chat'),
+    v_sender_name || ': ' || v_preview,
+    '/dashboard/messages?thread=' || NEW.thread_id::text,
+    'chat_thread',
+    NEW.thread_id,
+    jsonb_build_object('thread_id', NEW.thread_id, 'sender_id', NEW.sender_id)
+  FROM public.chat_thread_members m
+  WHERE m.thread_id = NEW.thread_id
+    AND m.user_id <> NEW.sender_id
+    AND m.status = 'active';
+  RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.create_group_chat(p_title text, p_member_ids uuid[])
+RETURNS uuid
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  v_uid uuid := auth.uid();
+  v_thread_id uuid;
+  v_member uuid;
+  v_clean text;
+BEGIN
+  IF v_uid IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  v_clean := btrim(coalesce(p_title, ''));
+  IF v_clean = '' THEN RAISE EXCEPTION 'Title is required'; END IF;
+
+  INSERT INTO public.chat_threads (title, created_by) VALUES (v_clean, v_uid)
+  RETURNING id INTO v_thread_id;
+
+  INSERT INTO public.chat_thread_members (thread_id, user_id, invited_by, status)
+  VALUES (v_thread_id, v_uid, v_uid, 'active');
+
+  IF p_member_ids IS NOT NULL THEN
+    FOREACH v_member IN ARRAY p_member_ids LOOP
+      IF v_member IS NOT NULL AND v_member <> v_uid THEN
+        INSERT INTO public.chat_thread_members (thread_id, user_id, invited_by, status)
+        VALUES (v_thread_id, v_member, v_uid, 'invited')
+        ON CONFLICT DO NOTHING;
+
+        INSERT INTO public.user_notifications (user_id, category, title, body, link_url, entity_type, entity_id, metadata)
+        VALUES (
+          v_member, 'chat_invite',
+          'You were invited to a group chat', v_clean,
+          '/dashboard/messages?thread=' || v_thread_id::text,
+          'chat_thread', v_thread_id,
+          jsonb_build_object('thread_id', v_thread_id, 'invited_by', v_uid)
+        );
+      END IF;
+    END LOOP;
+  END IF;
+  RETURN v_thread_id;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.invite_to_thread(p_thread_id uuid, p_user_ids uuid[])
+RETURNS int
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  v_uid uuid := auth.uid();
+  v_title text;
+  v_member uuid;
+  v_added int := 0;
+BEGIN
+  IF v_uid IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  IF NOT public.is_active_thread_member(p_thread_id, v_uid) THEN
+    RAISE EXCEPTION 'Not a member of this thread';
+  END IF;
+  SELECT title INTO v_title FROM public.chat_threads WHERE id = p_thread_id;
+  IF p_user_ids IS NULL THEN RETURN 0; END IF;
+
+  FOREACH v_member IN ARRAY p_user_ids LOOP
+    IF v_member IS NOT NULL AND v_member <> v_uid THEN
+      INSERT INTO public.chat_thread_members (thread_id, user_id, invited_by, status)
+      VALUES (p_thread_id, v_member, v_uid, 'invited')
+      ON CONFLICT (thread_id, user_id) DO NOTHING;
+      IF FOUND THEN
+        v_added := v_added + 1;
+        INSERT INTO public.user_notifications (user_id, category, title, body, link_url, entity_type, entity_id, metadata)
+        VALUES (
+          v_member, 'chat_invite',
+          'You were invited to a group chat', v_title,
+          '/dashboard/messages?thread=' || p_thread_id::text,
+          'chat_thread', p_thread_id,
+          jsonb_build_object('thread_id', p_thread_id, 'invited_by', v_uid)
+        );
+      END IF;
+    END IF;
+  END LOOP;
+  RETURN v_added;
+END;
+$$;
+
+-- ===== END SOURCE MIGRATION: 20260711073454_cea6ce68-1eda-4711-8431-5d3468395289.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260711074001_e72c5982-744f-4023-9045-99a02778d52b.sql =====
+CREATE OR REPLACE FUNCTION public.mark_thread_unread(p_thread_id uuid)
+RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  v_prev timestamptz;
+BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+  SELECT max(created_at) INTO v_prev
+    FROM public.chat_thread_messages
+    WHERE thread_id = p_thread_id
+      AND sender_id <> auth.uid();
+  UPDATE public.chat_thread_members
+    SET last_read_at = CASE
+      WHEN v_prev IS NULL THEN NULL
+      ELSE v_prev - interval '1 millisecond'
+    END
+    WHERE thread_id = p_thread_id AND user_id = auth.uid();
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.mark_thread_unread(uuid) TO authenticated;
+-- ===== END SOURCE MIGRATION: 20260711074001_e72c5982-744f-4023-9045-99a02778d52b.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260712010743_2fbad4dc-269c-4aed-b5b5-c8a714d5828f.sql =====
+CREATE OR REPLACE FUNCTION public.tg_notify_message_recipient()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_title TEXT;
+  v_body  TEXT;
+  v_sender_name TEXT;
+  v_listing_title TEXT;
+BEGIN
+  IF NEW.recipient_id IS NULL OR NEW.recipient_id = NEW.sender_id THEN
+    RETURN NEW;
+  END IF;
+
+  SELECT COALESCE(business_name, full_name, 'Someone')
+    INTO v_sender_name
+    FROM public.profiles WHERE id = NEW.sender_id;
+
+  SELECT title INTO v_listing_title
+    FROM public.listings WHERE id = NEW.listing_id;
+
+  v_title := COALESCE(v_sender_name, 'New message') || ' sent you a message';
+  v_body  := CASE
+    WHEN v_listing_title IS NOT NULL THEN 'Re: ' || v_listing_title || E'\n' || LEFT(COALESCE(NEW.body, ''), 140)
+    ELSE LEFT(COALESCE(NEW.body, ''), 200)
+  END;
+
+  INSERT INTO public.user_notifications
+    (user_id, category, title, body, link_url, entity_type, entity_id)
+  VALUES
+    (NEW.recipient_id, 'messages', v_title, v_body,
+     '/dashboard/messages',
+     'message', NEW.id);
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_notify_message_recipient ON public.messages;
+CREATE TRIGGER trg_notify_message_recipient
+  AFTER INSERT ON public.messages
+  FOR EACH ROW EXECUTE FUNCTION public.tg_notify_message_recipient();
+-- ===== END SOURCE MIGRATION: 20260712010743_2fbad4dc-269c-4aed-b5b5-c8a714d5828f.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260712012245_5a4e31fb-2e2d-4a6e-9504-fdf3fa8af497.sql =====
+
+-- 1) listing_verifications: remove anon public access
+DROP POLICY IF EXISTS "Public reads verification status for active listings" ON public.listing_verifications;
+REVOKE SELECT ON public.listing_verifications FROM anon;
+
+-- Safe minimal public view exposing only status (name avoids existing enum type)
+CREATE OR REPLACE VIEW public.public_listing_verification_status AS
+SELECT
+  v.listing_id,
+  v.status,
+  v.created_at,
+  v.updated_at
+FROM public.listing_verifications v
+JOIN public.listings l ON l.id = v.listing_id
+WHERE l.status = 'active';
+
+GRANT SELECT ON public.public_listing_verification_status TO anon, authenticated;
+
+-- 2) qr_lead_captures: scope advertising role to own referral codes
+DROP POLICY IF EXISTS "Advertising read all QR leads" ON public.qr_lead_captures;
+CREATE POLICY "Advertising read own QR leads"
+  ON public.qr_lead_captures FOR SELECT
+  TO authenticated
+  USING (
+    has_role(auth.uid(), 'advertising'::app_role)
+    AND EXISTS (
+      SELECT 1 FROM public.staff_referrals s
+      WHERE s.referral_code = qr_lead_captures.referral_code
+        AND s.staff_user_id = auth.uid()
+    )
+  );
+
+-- 3) qr_scans: scope sales + advertising roles to own referral codes
+DROP POLICY IF EXISTS "Sales read qr_scans" ON public.qr_scans;
+CREATE POLICY "Sales read own qr_scans"
+  ON public.qr_scans FOR SELECT
+  TO authenticated
+  USING (
+    has_role(auth.uid(), 'sales'::app_role)
+    AND EXISTS (
+      SELECT 1 FROM public.staff_referrals s
+      WHERE s.referral_code = qr_scans.referral_code
+        AND s.staff_user_id = auth.uid()
+    )
+  );
+
+DROP POLICY IF EXISTS "Advertising read qr_scans" ON public.qr_scans;
+CREATE POLICY "Advertising read own qr_scans"
+  ON public.qr_scans FOR SELECT
+  TO authenticated
+  USING (
+    has_role(auth.uid(), 'advertising'::app_role)
+    AND EXISTS (
+      SELECT 1 FROM public.staff_referrals s
+      WHERE s.referral_code = qr_scans.referral_code
+        AND s.staff_user_id = auth.uid()
+    )
+  );
+
+-- ===== END SOURCE MIGRATION: 20260712012245_5a4e31fb-2e2d-4a6e-9504-fdf3fa8af497.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260712022741_5d584347-8ea1-4cf5-97a4-c209993eeb90.sql =====
+UPDATE public.businesses SET status = 'active', updated_at = now() WHERE id = '9edc71f5-940b-457d-916b-aaaf34e864de' AND status = 'archived';
+-- ===== END SOURCE MIGRATION: 20260712022741_5d584347-8ea1-4cf5-97a4-c209993eeb90.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260712053445_e5ece42f-5c6d-4e45-a47e-05759dd82540.sql =====
+CREATE OR REPLACE FUNCTION public.tg_notify_message_recipient()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_title TEXT;
+  v_body TEXT;
+  v_preview TEXT;
+  v_sender_name TEXT;
+  v_listing_title TEXT;
+BEGIN
+  IF NEW.recipient_id IS NULL OR NEW.recipient_id = NEW.sender_id THEN
+    RETURN NEW;
+  END IF;
+
+  SELECT COALESCE(business_name, full_name, 'Someone')
+    INTO v_sender_name
+    FROM public.profiles
+   WHERE id = NEW.sender_id;
+
+  SELECT title
+    INTO v_listing_title
+    FROM public.listings
+   WHERE id = NEW.listing_id;
+
+  v_preview := CASE
+    WHEN COALESCE(NEW.body, '') <> '' THEN LEFT(NEW.body, 140)
+    WHEN NEW.attachment_type = 'image' THEN '📷 Sent a photo'
+    WHEN NEW.attachment_type = 'video' THEN '🎬 Sent a video'
+    WHEN NEW.attachment_type = 'gif' THEN 'Sent a GIF'
+    WHEN NEW.attachment_type IS NOT NULL THEN 'Sent an attachment'
+    ELSE 'Sent a message'
+  END;
+
+  v_title := COALESCE(v_sender_name, 'New message') || ' sent you a message';
+  v_body := CASE
+    WHEN v_listing_title IS NOT NULL THEN 'Re: ' || v_listing_title || E'\n' || v_preview
+    ELSE v_preview
+  END;
+
+  INSERT INTO public.user_notifications
+    (user_id, category, title, body, link_url, entity_type, entity_id)
+  VALUES
+    (NEW.recipient_id, 'messages', v_title, v_body, '/dashboard/messages', 'message', NEW.id);
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_notify_message_recipient ON public.messages;
+CREATE TRIGGER trg_notify_message_recipient
+  AFTER INSERT ON public.messages
+  FOR EACH ROW EXECUTE FUNCTION public.tg_notify_message_recipient();
+-- ===== END SOURCE MIGRATION: 20260712053445_e5ece42f-5c6d-4e45-a47e-05759dd82540.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260712053952_4bb09603-be11-47ed-aaaf-4114494cbd93.sql =====
+CREATE OR REPLACE FUNCTION public.mark_message_notifications_read(p_message_ids uuid[])
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  UPDATE public.user_notifications
+     SET read_at = COALESCE(read_at, now())
+   WHERE user_id = auth.uid()
+     AND category = 'messages'
+     AND entity_type = 'message'
+     AND entity_id = ANY(p_message_ids);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.mark_message_notifications_read(uuid[]) TO authenticated;
+-- ===== END SOURCE MIGRATION: 20260712053952_4bb09603-be11-47ed-aaaf-4114494cbd93.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260712054230_0cadcc14-52ad-4ffb-9294-fa2c1d058c2f.sql =====
+CREATE OR REPLACE FUNCTION public.mark_message_notifications_unread(p_message_ids uuid[])
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  UPDATE public.user_notifications
+     SET read_at = NULL
+   WHERE user_id = auth.uid()
+     AND category = 'messages'
+     AND entity_type = 'message'
+     AND entity_id = ANY(p_message_ids);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.mark_message_notifications_unread(uuid[]) TO authenticated;
+-- ===== END SOURCE MIGRATION: 20260712054230_0cadcc14-52ad-4ffb-9294-fa2c1d058c2f.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260712062336_120321ae-5824-4df8-9d53-0e8b448e5160.sql =====
+
+-- 1. messages: additive columns
+ALTER TABLE public.messages
+  ADD COLUMN IF NOT EXISTS starred_by uuid[] NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS is_offer boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS offer_amount numeric(12,2),
+  ADD COLUMN IF NOT EXISTS offer_currency text DEFAULT 'PHP',
+  ADD COLUMN IF NOT EXISTS offer_status text,
+  ADD COLUMN IF NOT EXISTS system_kind text;
+
+-- Full-text search index on message bodies
+CREATE INDEX IF NOT EXISTS idx_messages_body_fts
+  ON public.messages USING gin (to_tsvector('simple', coalesce(body, '')));
+
+-- 2. message_thread_state
+CREATE TABLE IF NOT EXISTS public.message_thread_state (
+  user_id      uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  scope        text NOT NULL CHECK (scope IN ('dm','group')),
+  key          text NOT NULL,
+  starred      boolean NOT NULL DEFAULT false,
+  archived     boolean NOT NULL DEFAULT false,
+  muted        boolean NOT NULL DEFAULT false,
+  spam         boolean NOT NULL DEFAULT false,
+  color_label  text,
+  last_read_at timestamptz,
+  updated_at   timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, scope, key)
+);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.message_thread_state TO authenticated;
+GRANT ALL ON public.message_thread_state TO service_role;
+
+ALTER TABLE public.message_thread_state ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "own thread state select" ON public.message_thread_state
+  FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "own thread state insert" ON public.message_thread_state
+  FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "own thread state update" ON public.message_thread_state
+  FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "own thread state delete" ON public.message_thread_state
+  FOR DELETE TO authenticated USING (auth.uid() = user_id);
+
+CREATE INDEX IF NOT EXISTS idx_mts_user_flags
+  ON public.message_thread_state (user_id, archived, spam, starred);
+
+-- 3. quick_replies
+CREATE TABLE IF NOT EXISTS public.quick_replies (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title      text NOT NULL,
+  body       text NOT NULL,
+  sort_order int NOT NULL DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.quick_replies TO authenticated;
+GRANT ALL ON public.quick_replies TO service_role;
+
+ALTER TABLE public.quick_replies ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "own quick replies select" ON public.quick_replies
+  FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "own quick replies insert" ON public.quick_replies
+  FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "own quick replies update" ON public.quick_replies
+  FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "own quick replies delete" ON public.quick_replies
+  FOR DELETE TO authenticated USING (auth.uid() = user_id);
+
+CREATE INDEX IF NOT EXISTS idx_quick_replies_user ON public.quick_replies(user_id, sort_order);
+
+CREATE OR REPLACE FUNCTION public.tg_quick_replies_touch()
+RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN NEW.updated_at = now(); RETURN NEW; END; $$;
+DROP TRIGGER IF EXISTS quick_replies_touch ON public.quick_replies;
+CREATE TRIGGER quick_replies_touch BEFORE UPDATE ON public.quick_replies
+  FOR EACH ROW EXECUTE FUNCTION public.tg_quick_replies_touch();
+
+-- 4. Sold / relisted auto system-message trigger
+CREATE OR REPLACE FUNCTION public.tg_listing_status_system_message()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_kind text;
+  v_body text;
+  v_buyer uuid;
+BEGIN
+  IF NEW.status = 'sold' AND (OLD.status IS DISTINCT FROM 'sold') THEN
+    v_kind := 'listing_sold';
+    v_body := 'This listing was marked SOLD. Thanks!';
+  ELSIF NEW.status = 'active' AND OLD.status = 'sold' THEN
+    v_kind := 'listing_relisted';
+    v_body := 'This listing has been relisted and is available again.';
+  ELSE
+    RETURN NEW;
+  END IF;
+
+  FOR v_buyer IN
+    SELECT DISTINCT CASE WHEN sender_id = NEW.user_id THEN recipient_id ELSE sender_id END
+    FROM public.messages
+    WHERE listing_id = NEW.id
+      AND (sender_id = NEW.user_id OR recipient_id = NEW.user_id)
+  LOOP
+    IF v_buyer IS NULL OR v_buyer = NEW.user_id THEN CONTINUE; END IF;
+
+    INSERT INTO public.messages (sender_id, recipient_id, listing_id, body, system_kind)
+    VALUES (NEW.user_id, v_buyer, NEW.id, v_body, v_kind);
+
+    INSERT INTO public.user_notifications (user_id, category, title, body, link_url, entity_type, entity_id)
+    VALUES (
+      v_buyer,
+      'messages',
+      CASE WHEN v_kind = 'listing_sold' THEN 'Listing marked sold' ELSE 'Listing relisted' END,
+      v_body,
+      '/listing/' || NEW.id::text,
+      'listing',
+      NEW.id
+    );
+  END LOOP;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS listing_status_system_message ON public.listings;
+CREATE TRIGGER listing_status_system_message
+  AFTER UPDATE OF status ON public.listings
+  FOR EACH ROW EXECUTE FUNCTION public.tg_listing_status_system_message();
+
+-- ===== END SOURCE MIGRATION: 20260712062336_120321ae-5824-4df8-9d53-0e8b448e5160.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260713012516_8b3939aa-63d7-4e0d-8c85-0246b3bb8a21.sql =====
+DROP POLICY IF EXISTS "Applicants and admins post messages" ON public.franchise_application_messages;
+
+CREATE POLICY "Applicants and admins post messages"
+  ON public.franchise_application_messages FOR INSERT
+  WITH CHECK (
+    sender_id = auth.uid() AND (
+      public.has_role(auth.uid(), 'admin')
+      OR (
+        NOT is_internal
+        AND EXISTS (
+          SELECT 1 FROM public.franchise_applications a
+          WHERE a.id = application_id
+            AND (
+              a.user_id = auth.uid()
+              OR public.current_user_owns_email(a.contact_email)
+            )
+        )
+      )
+    )
+  );
+-- ===== END SOURCE MIGRATION: 20260713012516_8b3939aa-63d7-4e0d-8c85-0246b3bb8a21.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260713022238_540630d7-d0d4-436b-b5a0-58f9dc07811f.sql =====
+
+-- =========================================================
+-- Document Check: schema
+-- =========================================================
+
+CREATE TABLE public.doc_check_countries (
+  code TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  flag_emoji TEXT NOT NULL,
+  region TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  summary TEXT,
+  currency TEXT,
+  drives_on TEXT,
+  sort_order INT NOT NULL DEFAULT 100,
+  is_published BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+GRANT SELECT ON public.doc_check_countries TO anon, authenticated;
+GRANT ALL ON public.doc_check_countries TO service_role;
+ALTER TABLE public.doc_check_countries ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public read published countries" ON public.doc_check_countries
+  FOR SELECT USING (is_published = true OR public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "admin manage countries" ON public.doc_check_countries
+  FOR ALL TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+CREATE TABLE public.doc_check_sections (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  country_code TEXT NOT NULL REFERENCES public.doc_check_countries(code) ON DELETE CASCADE,
+  kind TEXT NOT NULL CHECK (kind IN ('quick_guide','buying','selling','import','export','insurance','documents')),
+  title TEXT NOT NULL,
+  body_md TEXT NOT NULL DEFAULT '',
+  sort_order INT NOT NULL DEFAULT 100,
+  is_published BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX doc_check_sections_country_kind_idx ON public.doc_check_sections(country_code, kind, sort_order);
+GRANT SELECT ON public.doc_check_sections TO anon, authenticated;
+GRANT ALL ON public.doc_check_sections TO service_role;
+ALTER TABLE public.doc_check_sections ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public read published sections" ON public.doc_check_sections
+  FOR SELECT USING (is_published = true OR public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "admin manage sections" ON public.doc_check_sections
+  FOR ALL TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+CREATE TABLE public.doc_check_documents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  country_code TEXT NOT NULL REFERENCES public.doc_check_countries(code) ON DELETE CASCADE,
+  code TEXT NOT NULL,
+  name TEXT NOT NULL,
+  description_md TEXT NOT NULL DEFAULT '',
+  who_issues TEXT,
+  typical_cost TEXT,
+  validity TEXT,
+  sort_order INT NOT NULL DEFAULT 100,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(country_code, code)
+);
+GRANT SELECT ON public.doc_check_documents TO anon, authenticated;
+GRANT ALL ON public.doc_check_documents TO service_role;
+ALTER TABLE public.doc_check_documents ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public read documents" ON public.doc_check_documents
+  FOR SELECT USING (true);
+CREATE POLICY "admin manage documents" ON public.doc_check_documents
+  FOR ALL TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+CREATE TABLE public.doc_check_agency_links (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  country_code TEXT NOT NULL REFERENCES public.doc_check_countries(code) ON DELETE CASCADE,
+  section_kind TEXT,
+  label TEXT NOT NULL,
+  url TEXT NOT NULL,
+  sort_order INT NOT NULL DEFAULT 100,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+GRANT SELECT ON public.doc_check_agency_links TO anon, authenticated;
+GRANT ALL ON public.doc_check_agency_links TO service_role;
+ALTER TABLE public.doc_check_agency_links ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public read agency links" ON public.doc_check_agency_links
+  FOR SELECT USING (true);
+CREATE POLICY "admin manage agency links" ON public.doc_check_agency_links
+  FOR ALL TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+CREATE TABLE public.doc_check_audit_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  actor_id UUID,
+  country_code TEXT,
+  entity TEXT NOT NULL,
+  entity_id TEXT,
+  action TEXT NOT NULL,
+  details JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT ON public.doc_check_audit_log TO authenticated;
+GRANT ALL ON public.doc_check_audit_log TO service_role;
+ALTER TABLE public.doc_check_audit_log ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "admin read audit" ON public.doc_check_audit_log
+  FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "admin insert audit" ON public.doc_check_audit_log
+  FOR INSERT TO authenticated WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+-- updated_at triggers
+CREATE TRIGGER trg_doc_check_countries_updated BEFORE UPDATE ON public.doc_check_countries
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE TRIGGER trg_doc_check_sections_updated BEFORE UPDATE ON public.doc_check_sections
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE TRIGGER trg_doc_check_documents_updated BEFORE UPDATE ON public.doc_check_documents
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- =========================================================
+-- Seed: countries
+-- =========================================================
+
+INSERT INTO public.doc_check_countries (code, name, flag_emoji, region, slug, summary, currency, drives_on, sort_order, is_published) VALUES
+  ('ph','Philippines','🇵🇭','Southeast Asia','ph','Vehicle transfer and registration is administered by the Land Transportation Office (LTO). Comprehensive third-party liability (CTPL) insurance is mandatory.','PHP','right', 1, true),
+  ('sg','Singapore','🇸🇬','Southeast Asia','sg','Vehicles are administered by LTA. Ownership transfer, COE, and PARF rules apply.','SGD','left', 10, true),
+  ('my','Malaysia','🇲🇾','Southeast Asia','my','JPJ manages registration and title transfer. Puspakom inspection is required for used-vehicle transfers.','MYR','left', 11, true),
+  ('th','Thailand','🇹🇭','Southeast Asia','th','Department of Land Transport (DLT) handles vehicle transfer, CTPL (Por Ror Bor), and green book updates.','THB','left', 12, true),
+  ('vn','Vietnam','🇻🇳','Southeast Asia','vn','Traffic Police handle registration transfer. Import restrictions on used vehicles are strict.','VND','right', 13, true),
+  ('id','Indonesia','🇮🇩','Southeast Asia','id','SAMSAT / Korlantas Polri handle STNK/BPKB transfers and annual tax.','IDR','left', 14, true),
+  ('us','United States','🇺🇸','North America','us','Vehicle title and registration are handled state-by-state via the DMV. Emissions and safety standards set by NHTSA/EPA.','USD','right', 20, true),
+  ('ca','Canada','🇨🇦','North America','ca','Registration is provincial (ICBC, SAAQ, ServiceOntario, etc.). Transport Canada sets federal standards.','CAD','right', 21, true),
+  ('uk','United Kingdom','🇬🇧','Europe','uk','DVLA manages V5C logbooks, MOT, and vehicle tax. Import from EU has post-Brexit VAT/duty rules.','GBP','left', 30, true),
+  ('de','Germany','🇩🇪','Europe','de','Kfz-Zulassungsstelle handles registration. TÜV/DEKRA inspection required. EU-wide type approval applies.','EUR','right', 31, true),
+  ('fr','France','🇫🇷','Europe','fr','ANTS online system for carte grise. Contrôle technique (CT) required every 2 years for used cars.','EUR','right', 32, true),
+  ('nl','Netherlands','🇳🇱','Europe','nl','RDW manages kenteken registration. APK inspection mandatory. BPM tax on imports.','EUR','right', 33, true),
+  ('es','Spain','🇪🇸','Europe','es','DGT handles transfer of ownership. ITV inspection required. Registration tax on imports.','EUR','right', 34, true),
+  ('it','Italy','🇮🇹','Europe','it','Motorizzazione Civile and PRA manage title transfer. Revisione inspection every 2 years.','EUR','right', 35, true),
+  ('jp','Japan','🇯🇵','East Asia','jp','Land Transport Bureau handles Shaken inspection and registration. Export deregistration for JDM exports.','JPY','left', 40, true),
+  ('kr','South Korea','🇰🇷','East Asia','kr','KOROAD / MOLIT regulate vehicle transfer. Emissions and export certificates required for used exports.','KRW','right', 41, true),
+  ('au','Australia','🇦🇺','Oceania','au','State-based rego (VicRoads, TfNSW, Qld TMR, etc.). Strict import rules under RAWS/SEVS.','AUD','left', 50, true),
+  ('nz','New Zealand','🇳🇿','Oceania','nz','Waka Kotahi NZTA handles registration and WoF. Compliance inspection required on import.','NZD','left', 51, true);
+
+-- =========================================================
+-- Seed: Philippines full content
+-- =========================================================
+
+INSERT INTO public.doc_check_sections (country_code, kind, title, body_md, sort_order, is_published) VALUES
+  ('ph','quick_guide','Quick Guide — Buying a used vehicle in the Philippines',
+$MD$
+This is the fast checklist buyers should complete before handing over any payment. Full details live in the sections below.
+
+1. **Verify OR and CR match** — both documents must show the seller's name, and the plate, chassis (VIN), and engine numbers must match the vehicle in person.
+2. **Confirm chassis and engine numbers** — check under the hood and on the frame. Numbers must be crisp, not restamped or ground.
+3. **Ask for PNP-HPG Motor Vehicle Clearance** — required before transfer at LTO. Confirms the unit is not stolen or encumbered.
+4. **Check for encumbrance** — the CR must be marked "No Encumbrance" (or the bank release must be attached if it was financed).
+5. **Notarized Deed of Sale** — both parties sign in front of a notary public. Bring 2 valid government IDs each.
+6. **Valid CTPL insurance** — Compulsory Third-Party Liability must be active. Buyer typically renews upon transfer.
+7. **Recent Emission Test** — required to renew registration.
+8. **Transfer at LTO within 30 days** — the buyer files the change of ownership at the LTO district office that has jurisdiction.
+9. **Use traceable payment** — bank transfer, GCash, Maya, or manager's check. Avoid large cash.
+10. **Meet in a safe, public place** — daylight, well-lit, ideally with a companion or mechanic.
+$MD$, 1, true),
+
+  ('ph','buying','Buying & transferring ownership',
+$MD$
+The Philippines transfers vehicle ownership through the Land Transportation Office (LTO). The buyer is responsible for filing the transfer within 30 days of the Deed of Sale.
+
+**Required documents (buyer files these at LTO):**
+- Original OR (Official Receipt) and CR (Certificate of Registration)
+- Notarized Deed of Absolute Sale
+- PNP-HPG Motor Vehicle Clearance (macro-etching + records check)
+- Latest Emission Test Result
+- CTPL insurance (Compulsory Third-Party Liability)
+- Buyer and seller valid IDs (2 each)
+- TIN of both parties
+- Duty-paid stamp / release papers if imported
+
+**Typical LTO transfer fees (2026):**
+- Transfer fee: ₱150
+- Change of ownership: ~₱50
+- IT service fee, computer fee, and legal fees: ~₱169
+- Total including PNP clearance and notarization: **₱1,500 – ₱3,500** depending on region
+
+**Timeline:** 1–2 hours at LTO if papers are complete. Same-day plate release for renewals.
+$MD$, 10, true),
+
+  ('ph','selling','Selling & releasing liability',
+$MD$
+Once the buyer takes possession, the seller should protect themselves from future liability (traffic tickets, accidents, or unpaid registration) filed under the old owner's name.
+
+**Seller checklist:**
+- Prepare a **Notarized Deed of Sale** — keep a signed original for your records.
+- Photocopy the buyer's IDs and take a photo of buyer + vehicle + plate together.
+- Surrender **only photocopies** of OR/CR at signing; hand over originals only when payment clears.
+- File a **"Sold" report** at your LTO district office (Report of Sale) so the vehicle is flagged as transferred if the buyer delays registration.
+- Cancel your CTPL insurance or transfer it to the buyer.
+- Save the transaction record for at least 3 years.
+$MD$, 20, true),
+
+  ('ph','import','Import laws',
+$MD$
+Philippine used-vehicle imports are heavily restricted. Only specific channels are permitted.
+
+**Restrictions:**
+- Executive Order 156 prohibits importation of used motor vehicles into the customs territory (with narrow exceptions).
+- **Allowed:** returning residents (balikbayan) who owned the vehicle abroad for at least 12 months, diplomats, and vehicles imported through the Subic Bay Freeport Zone (SBFZ) or Cagayan Special Economic Zone.
+- Left-hand-drive only. Right-hand-drive conversion is prohibited on public roads.
+- Age caps vary by channel; SBFZ historically allowed vehicles up to ~5 years old.
+
+**Duties & taxes (BOC):**
+- Import duty: 30% (used) or 30% (new, ASEAN preferential rates may apply under ATIGA)
+- VAT: 12%
+- Excise tax: 4% – 50% based on net manufacturer's price
+- Ad valorem tax on luxury vehicles
+
+**Homologation:** DTI-BPS / DENR emissions compliance required for road use.
+$MD$, 30, true),
+
+  ('ph','export','Export laws',
+$MD$
+Vehicles registered in the Philippines can be exported after LTO deregistration.
+
+**Steps:**
+1. Settle any outstanding registration or Alarm Report at LTO.
+2. Obtain a **PNP-HPG Motor Vehicle Clearance** confirming the unit is clear.
+3. Apply for LTO **Certificate of Deregistration** for export.
+4. File a **BOC Export Declaration** with commercial invoice and packing list.
+5. Book with a licensed customs broker for RoRo or container shipment.
+6. Buyer's country requirements (age caps, LHD/RHD, homologation) must be met before shipment.
+
+**ATA Carnet** — for temporary export (rallies, shows, motorsport), the Philippine Chamber of Commerce and Industry (PCCI) issues carnets.
+$MD$, 40, true),
+
+  ('ph','insurance','Insurance',
+$MD$
+**Mandatory: CTPL** (Compulsory Third-Party Liability) — covers bodily injury or death to third parties, up to ₱100,000 per victim. Required for every vehicle registration renewal. Typical cost: ₱600–₱1,200 per year for private cars.
+
+**Optional: Comprehensive** — covers own damage, theft, acts of nature, third-party property damage, and personal accident. Typical cost: 1.5%–3% of the vehicle's fair market value per year.
+
+**Common local providers:** Malayan, Standard Insurance, Prudential Guarantee, FPG, Charter Ping An, MAPFRE Insular, Stronghold, PGA Sompo.
+
+**Insurance Commission (IC)** regulates all motor insurance in the Philippines. Complaints can be filed at insurance.gov.ph.
+$MD$, 50, true),
+
+  ('ph','documents','Document reference',
+$MD$
+Below is a quick summary of the documents Filipino buyers and sellers encounter. Full descriptions are in the Document Reference table on this page.
+$MD$, 60, true);
+
+-- PH documents
+INSERT INTO public.doc_check_documents (country_code, code, name, description_md, who_issues, typical_cost, validity, sort_order) VALUES
+  ('ph','or','Official Receipt (OR)','Proof that the current year''s registration fees, CTPL, and emissions were paid. Renewed annually.','LTO','₱2,500 – ₱8,000 per year','1 year',10),
+  ('ph','cr','Certificate of Registration (CR)','The vehicle''s title equivalent — shows the registered owner, plate, chassis, and engine numbers, and encumbrance status.','LTO','Included with registration','Lifetime (updated on transfer)',20),
+  ('ph','deed_of_sale','Notarized Deed of Absolute Sale','Legal document transferring ownership from seller to buyer. Must be signed in front of a notary public with 2 valid IDs each.','Notary Public','₱200 – ₱500 notarial fee','N/A',30),
+  ('ph','pnp_hpg','PNP-HPG Motor Vehicle Clearance','Confirms the unit is not stolen, carnapped, or wanted. Includes macro-etching of chassis and engine numbers.','PNP Highway Patrol Group','₱300 – ₱600','2 months',40),
+  ('ph','emission','Emission Test Certificate','Confirms the vehicle meets Philippine Clean Air Act emission standards.','LTO-accredited PETCs','₱450 – ₱600','60 days',50),
+  ('ph','ctpl','CTPL Insurance Certificate','Compulsory Third-Party Liability. Mandatory for every registration.','Insurance provider (IC-regulated)','₱600 – ₱1,200','1 year',60),
+  ('ph','valid_id','Two valid government IDs','Any two of: PhilID, Passport, Driver''s License, UMID, PRC, Postal ID. Required by both notary and LTO.','Government agencies','Free – ₱500','Varies',70),
+  ('ph','tin','TIN (Tax Identification Number)','Required on the Deed of Sale and LTO transfer form.','BIR','Free','Lifetime',80);
+
+-- PH agency links
+INSERT INTO public.doc_check_agency_links (country_code, section_kind, label, url, sort_order) VALUES
+  ('ph', NULL, 'Land Transportation Office (LTO)', 'https://lto.gov.ph', 10),
+  ('ph', NULL, 'Bureau of Customs (BOC)', 'https://customs.gov.ph', 20),
+  ('ph', NULL, 'Insurance Commission', 'https://insurance.gov.ph', 30),
+  ('ph', NULL, 'DTI Fair Trade Enforcement Bureau', 'https://dti.gov.ph/fair-trade/', 40),
+  ('ph', NULL, 'PNP Highway Patrol Group', 'https://hpg.pnp.gov.ph', 50),
+  ('ph', 'import', 'BOC Import Assessment', 'https://customs.gov.ph/import-assessment/', 60),
+  ('ph', 'export', 'BOC Export Guidelines', 'https://customs.gov.ph/export/', 70);
+
+-- Stub sections for each other country: a Quick Guide placeholder and empty other sections
+INSERT INTO public.doc_check_sections (country_code, kind, title, body_md, sort_order, is_published)
+SELECT c.code, 'quick_guide', 'Quick Guide — ' || c.name,
+       'Content for ' || c.name || ' is being compiled. If you have local expertise in vehicle transfer, insurance, or import/export laws for ' || c.name || ', please contact us and we will credit your contribution.',
+       1, true
+FROM public.doc_check_countries c
+WHERE c.code <> 'ph';
+
+-- ===== END SOURCE MIGRATION: 20260713022238_540630d7-d0d4-436b-b5a0-58f9dc07811f.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260713044701_64bcbe3c-76cf-4ed0-ba80-4e9c57766705.sql =====
+-- Shop Manager isolated schema import (chunk 01/10: schema + enums + sequences)
+CREATE SCHEMA IF NOT EXISTS shop_manager;
+GRANT USAGE ON SCHEMA shop_manager TO authenticated, service_role, anon;
+ALTER DEFAULT PRIVILEGES IN SCHEMA shop_manager GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA shop_manager GRANT ALL ON TABLES TO service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA shop_manager GRANT USAGE, SELECT ON SEQUENCES TO authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA shop_manager GRANT EXECUTE ON FUNCTIONS TO authenticated, service_role;
+
+CREATE TYPE shop_manager.app_role AS ENUM ('owner', 'admin', 'manager', 'parts_manager', 'service_advisor', 'technician', 'reception', 'other_staff', 'customer', 'marketing', 'deckhand', 'boson', 'mate', 'captain', 'chief_engineer', 'marine_engineer', 'fishing_master', 'crane_operator', 'rigger', 'diver', 'dispatch', 'truck_driver', 'office_admin', 'operations_manager', 'yard', 'yard_manager', 'welder', 'mechanic_manager', 'yard_manager_assistant', 'mechanic_manager_assistant', 'developer');
+CREATE TYPE shop_manager.approval_status AS ENUM ('pending', 'approved', 'rejected');
+CREATE TYPE shop_manager.equipment_status AS ENUM ('operational', 'maintenance', 'down', 'retired');
+CREATE TYPE shop_manager.equipment_type AS ENUM ('marine', 'forklift', 'semi', 'small_engine', 'other', 'fleet_vehicle', 'courtesy_car', 'rental_vehicle', 'service_vehicle', 'heavy_truck', 'excavator', 'loader', 'dozer', 'crane', 'vessel', 'outboard', 'diagnostic', 'lifting', 'air_tools', 'hand_tools', 'electrical', 'generator', 'fire_extinguisher', 'life_raft', 'life_ring', 'epirb', 'survival_suit', 'flare', 'first_aid_kit', 'safety_harness', 'life_jacket', 'immersion_suit', 'fuel_truck');
+CREATE TYPE shop_manager.forklift_item_status AS ENUM ('good', 'attention', 'bad', 'na');
+CREATE TYPE shop_manager.form_field_type AS ENUM ('text', 'textarea', 'number', 'select', 'checkbox', 'radio', 'date', 'email', 'phone', 'file', 'signature');
+CREATE TYPE shop_manager.gunsmith_role_type AS ENUM ('shop_owner', 'master_gunsmith', 'gunsmith', 'apprentice', 'counter_staff', 'parts_manager', 'manager', 'sales', 'reception', 'shipping');
+CREATE TYPE shop_manager.job_line_status AS ENUM ('pending', 'signed-onto-task', 'in-progress', 'waiting-for-parts', 'paused', 'awaiting-approval', 'quality-check', 'completed', 'on-hold', 'ready-for-delivery', 'needs-road-test', 'tech-support', 'warranty', 'sublet', 'customer-auth-required', 'parts-ordered', 'parts-arrived', 'rework-required');
+CREATE TYPE shop_manager.maintenance_request_status AS ENUM ('pending', 'approved', 'in_progress', 'completed', 'rejected');
+CREATE TYPE shop_manager.permission_type AS ENUM ('create', 'read', 'update', 'delete');
+CREATE TYPE shop_manager.product_type AS ENUM ('affiliate', 'suggested');
+CREATE TYPE shop_manager.report_type AS ENUM ('daily', 'weekly', 'monthly');
+CREATE TYPE shop_manager.resource_type AS ENUM ('users', 'roles', 'settings', 'billing', 'work_orders', 'inventory', 'appointments', 'reports', 'customers');
+CREATE TYPE shop_manager.role_action_type AS ENUM ('added', 'removed', 'modified');
+CREATE TYPE shop_manager.tool_condition AS ENUM ('new', 'excellent', 'good', 'fair', 'poor', 'unusable');
+CREATE TYPE shop_manager.tool_status AS ENUM ('available', 'in_use', 'maintenance', 'broken', 'lost', 'retired');
+CREATE TYPE shop_manager.welding_ap_status AS ENUM ('pending', 'partial', 'paid');
+CREATE TYPE shop_manager.welding_customer_interaction_type AS ENUM ('email', 'phone_call', 'site_visit', 'quote_request', 'deposit', 'payment', 'follow_up', 'conversation', 'other');
+CREATE TYPE shop_manager.welding_invoice_status AS ENUM ('draft', 'sent', 'unpaid', 'partial', 'paid', 'overdue');
+CREATE TYPE shop_manager.welding_po_status AS ENUM ('draft', 'ordered', 'shipped', 'received', 'cancelled');
+CREATE TYPE shop_manager.welding_quote_status AS ENUM ('new', 'reviewed', 'quoted', 'accepted', 'declined', 'draft', 'sent', 'approved', 'rejected');
+CREATE TYPE shop_manager.welding_schedule_entry_type AS ENUM ('day_off', 'vacation', 'install_day', 'on_site', 'shop_day', 'booking', 'measurement');
+
+CREATE SEQUENCE IF NOT EXISTS shop_manager.feature_request_number_seq AS bigint START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 NO CYCLE;
+-- ===== END SOURCE MIGRATION: 20260713044701_64bcbe3c-76cf-4ed0-ba80-4e9c57766705.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260713062739_e0144043-a7a4-43b7-8fc6-050ea0304634.sql =====
+CREATE TABLE shop_manager.appointments (
+  id uuid DEFAULT uuid_generate_v4() NOT NULL,
+  customer_id uuid,
+  vehicle_id uuid,
+  advisor_id uuid,
+  date timestamp with time zone NOT NULL,
+  duration integer NOT NULL,
+  status text NOT NULL,
+  notes text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT appointments_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.ar_invoice_lines (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  invoice_id uuid NOT NULL,
+  description text NOT NULL,
+  quantity numeric(10,2) DEFAULT 1 NOT NULL,
+  unit_price numeric(12,2) DEFAULT 0 NOT NULL,
+  total_price numeric(12,2) DEFAULT 0 NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT ar_invoice_lines_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.ar_invoices (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid NOT NULL,
+  customer_id uuid,
+  invoice_number text NOT NULL,
+  status text NOT NULL,
+  issue_date date NOT NULL,
+  due_date date,
+  subtotal numeric(12,2) DEFAULT 0 NOT NULL,
+  tax numeric(12,2) DEFAULT 0 NOT NULL,
+  total numeric(12,2) DEFAULT 0 NOT NULL,
+  balance_due numeric(12,2) DEFAULT 0 NOT NULL,
+  created_by uuid,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  tax_rate numeric(5,2) DEFAULT 0 NOT NULL,
+  CONSTRAINT ar_invoices_status_check CHECK (status = ANY (ARRAY['draft'::text, 'sent'::text, 'partial'::text, 'paid'::text, 'overdue'::text, 'void'::text])),
+  CONSTRAINT ar_invoices_pkey PRIMARY KEY (id),
+  CONSTRAINT ar_invoices_shop_id_invoice_number_key UNIQUE (shop_id, invoice_number)
+);
+
+CREATE TABLE shop_manager.ar_payments (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid NOT NULL,
+  invoice_id uuid,
+  payment_date date NOT NULL,
+  amount numeric(12,2) DEFAULT 0 NOT NULL,
+  payment_method text,
+  reference text,
+  created_by uuid,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT ar_payments_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.company_settings (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid NOT NULL,
+  settings_key text NOT NULL,
+  settings_value jsonb DEFAULT '{}'::jsonb NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT company_settings_pkey PRIMARY KEY (id),
+  CONSTRAINT company_settings_shop_id_settings_key_key UNIQUE (shop_id, settings_key)
+);
+
+CREATE TABLE shop_manager.customer_activities (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  customer_id uuid NOT NULL,
+  action text NOT NULL,
+  user_id text NOT NULL,
+  user_name text NOT NULL,
+  timestamp timestamp with time zone DEFAULT now() NOT NULL,
+  flagged boolean DEFAULT false,
+  flag_reason text,
+  CONSTRAINT customer_activities_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_addresses (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  user_id uuid NOT NULL,
+  address_type text NOT NULL,
+  is_default boolean DEFAULT false NOT NULL,
+  full_name text NOT NULL,
+  address_line1 text NOT NULL,
+  address_line2 text,
+  city text NOT NULL,
+  state text NOT NULL,
+  postal_code text NOT NULL,
+  country text DEFAULT 'US'::text NOT NULL,
+  phone text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_addresses_address_type_check CHECK (address_type = ANY (ARRAY['shipping'::text, 'billing'::text, 'both'::text])),
+  CONSTRAINT customer_addresses_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_automation_preferences (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  customer_id uuid NOT NULL,
+  email_notifications boolean DEFAULT true,
+  sms_notifications boolean DEFAULT false,
+  service_reminders boolean DEFAULT true,
+  marketing_emails boolean DEFAULT true,
+  preferred_contact_time text DEFAULT 'business_hours'::text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT customer_automation_preferences_pkey PRIMARY KEY (id),
+  CONSTRAINT customer_automation_preferences_customer_id_key UNIQUE (customer_id)
+);
+
+CREATE TABLE shop_manager.customer_communications (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  customer_id uuid NOT NULL,
+  date timestamp with time zone DEFAULT now() NOT NULL,
+  type text NOT NULL,
+  direction text NOT NULL,
+  subject text,
+  content text NOT NULL,
+  staff_member_id text NOT NULL,
+  staff_member_name text NOT NULL,
+  status text NOT NULL,
+  template_id uuid,
+  template_name text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_communications_direction_check CHECK (direction = ANY (ARRAY['incoming'::text, 'outgoing'::text])),
+  CONSTRAINT customer_communications_status_check CHECK (status = ANY (ARRAY['completed'::text, 'pending'::text, 'failed'::text])),
+  CONSTRAINT customer_communications_type_check CHECK (type = ANY (ARRAY['email'::text, 'phone'::text, 'text'::text, 'in-person'::text])),
+  CONSTRAINT customer_communications_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_documents (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  customer_id uuid NOT NULL,
+  file_name text NOT NULL,
+  file_path text NOT NULL,
+  file_type text NOT NULL,
+  file_size integer NOT NULL,
+  original_name text NOT NULL,
+  title text NOT NULL,
+  description text,
+  version integer DEFAULT 1 NOT NULL,
+  version_notes text,
+  tags text[] DEFAULT '{}'::text[],
+  category uuid,
+  is_shared boolean DEFAULT false NOT NULL,
+  uploaded_by text NOT NULL,
+  uploaded_by_name text NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_documents_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_form_comments (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  form_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  comment text NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_form_comments_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_interactions (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  customer_id uuid NOT NULL,
+  customer_name text NOT NULL,
+  date timestamp with time zone DEFAULT now() NOT NULL,
+  type text NOT NULL,
+  description text NOT NULL,
+  staff_member_id text NOT NULL,
+  staff_member_name text NOT NULL,
+  status text NOT NULL,
+  notes text,
+  related_work_order_id uuid,
+  follow_up_date timestamp with time zone,
+  follow_up_completed boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_interactions_status_check CHECK (status = ANY (ARRAY['pending'::text, 'in_progress'::text, 'completed'::text, 'cancelled'::text])),
+  CONSTRAINT customer_interactions_type_check CHECK (type = ANY (ARRAY['work_order'::text, 'communication'::text, 'parts'::text, 'service'::text, 'follow_up'::text])),
+  CONSTRAINT customer_interactions_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_loyalty (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  customer_id uuid,
+  current_points integer DEFAULT 0,
+  lifetime_points integer DEFAULT 0,
+  lifetime_value numeric DEFAULT 0.0,
+  tier character varying(50) DEFAULT 'Standard'::character varying,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_loyalty_pkey PRIMARY KEY (id),
+  CONSTRAINT customer_loyalty_customer_id_key UNIQUE (customer_id)
+);
+
+CREATE TABLE shop_manager.customer_notes (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  customer_id uuid NOT NULL,
+  content text NOT NULL,
+  category text DEFAULT 'general'::text NOT NULL,
+  created_by text NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_notes_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_payment_methods (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  user_id uuid,
+  payment_type text NOT NULL,
+  provider text NOT NULL,
+  last_four text,
+  expiry_month integer,
+  expiry_year integer,
+  is_default boolean DEFAULT false,
+  stripe_payment_method_id text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_payment_methods_payment_type_check CHECK (payment_type = ANY (ARRAY['card'::text, 'paypal'::text, 'bank'::text])),
+  CONSTRAINT customer_payment_methods_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_profiles (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  user_id uuid,
+  first_name text,
+  last_name text,
+  phone text,
+  date_of_birth date,
+  preferences jsonb DEFAULT '{}'::jsonb,
+  marketing_consent boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_profiles_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_property_areas (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid NOT NULL,
+  customer_id uuid NOT NULL,
+  area_type text NOT NULL,
+  label text,
+  square_footage integer NOT NULL,
+  length_ft numeric(10,2),
+  width_ft numeric(10,2),
+  height_ft numeric(10,2),
+  notes text,
+  last_serviced_at timestamp with time zone,
+  service_count integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_property_areas_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_provided_forms (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  title text NOT NULL,
+  description text,
+  customer_id uuid NOT NULL,
+  file_path text NOT NULL,
+  file_name text NOT NULL,
+  file_type text NOT NULL,
+  file_size integer NOT NULL,
+  upload_date timestamp with time zone DEFAULT now() NOT NULL,
+  status text DEFAULT 'pending'::text NOT NULL,
+  reviewed_by uuid,
+  reviewed_at timestamp with time zone,
+  review_notes text,
+  tags text[] DEFAULT '{}'::text[],
+  metadata jsonb DEFAULT '{}'::jsonb,
+  CONSTRAINT customer_provided_forms_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_referrals (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  referrer_id uuid NOT NULL,
+  referred_id uuid NOT NULL,
+  referral_date timestamp with time zone DEFAULT now() NOT NULL,
+  status text DEFAULT 'pending'::text NOT NULL,
+  converted_at timestamp with time zone,
+  notes text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_referrals_pkey PRIMARY KEY (id),
+  CONSTRAINT customer_referrals_referrer_id_referred_id_key UNIQUE (referrer_id, referred_id)
+);
+
+CREATE TABLE shop_manager.customer_segment_assignments (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  customer_id uuid,
+  segment_id uuid,
+  is_automatic boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_segment_assignments_pkey PRIMARY KEY (id),
+  CONSTRAINT customer_segment_assignments_customer_id_segment_id_key UNIQUE (customer_id, segment_id)
+);
+
+CREATE TABLE shop_manager.customer_segments (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  name text NOT NULL,
+  description text,
+  color text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_segments_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_shop_relationships (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  customer_id uuid NOT NULL,
+  shop_id uuid NOT NULL,
+  status text DEFAULT 'active'::text NOT NULL,
+  joined_at timestamp with time zone DEFAULT now() NOT NULL,
+  booking_enabled boolean DEFAULT true NOT NULL,
+  CONSTRAINT customer_shop_relationships_pkey PRIMARY KEY (id),
+  CONSTRAINT customer_shop_relationships_customer_id_shop_id_key UNIQUE (customer_id, shop_id)
+);
+
+CREATE TABLE shop_manager.customer_touchpoints (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  customer_id uuid NOT NULL,
+  touchpoint_type text NOT NULL,
+  channel text NOT NULL,
+  campaign_id uuid,
+  action text NOT NULL,
+  metadata jsonb,
+  occurred_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_touchpoints_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customer_uploaded_forms (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid,
+  customer_id uuid,
+  title text NOT NULL,
+  description text,
+  file_path text NOT NULL,
+  file_name text NOT NULL,
+  file_type text NOT NULL,
+  file_size integer NOT NULL,
+  status text DEFAULT 'pending'::text NOT NULL,
+  reviewed_by uuid,
+  reviewed_at timestamp with time zone,
+  review_notes text,
+  tags text[] DEFAULT '{}'::text[],
+  category_id uuid,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT customer_uploaded_forms_status_check CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'digitized'::text])),
+  CONSTRAINT customer_uploaded_forms_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.customers (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid NOT NULL,
+  first_name text NOT NULL,
+  last_name text NOT NULL,
+  email text,
+  phone text,
+  address text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  household_id uuid,
+  segments jsonb,
+  referral_person_id uuid,
+  city text,
+  state text,
+  postal_code text,
+  country text,
+  company text,
+  notes text,
+  tags jsonb,
+  preferred_technician_id text,
+  communication_preference text,
+  referral_source text,
+  other_referral_details text,
+  is_fleet boolean DEFAULT false,
+  fleet_company text,
+  auto_billing boolean DEFAULT false,
+  credit_terms text,
+  terms_agreed boolean DEFAULT false,
+  business_type text,
+  business_industry text,
+  other_business_industry text,
+  tax_id text,
+  business_email text,
+  business_phone text,
+  fleet_manager text,
+  fleet_contact text,
+  preferred_payment_method text,
+  preferred_service_type text,
+  auth_user_id uuid,
+  labor_tax_exempt boolean DEFAULT false,
+  parts_tax_exempt boolean DEFAULT false,
+  tax_exempt_certificate_number text,
+  tax_exempt_notes text,
+  user_id uuid,
+  latitude double precision,
+  longitude double precision,
+  CONSTRAINT customers_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.discount_audit_log (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  discount_id uuid NOT NULL,
+  discount_table text NOT NULL,
+  action_type text NOT NULL,
+  old_values jsonb,
+  new_values jsonb,
+  performed_by text NOT NULL,
+  performed_at timestamp with time zone DEFAULT now() NOT NULL,
+  reason text,
+  CONSTRAINT discount_audit_log_action_type_check CHECK (action_type = ANY (ARRAY['created'::text, 'modified'::text, 'deleted'::text, 'approved'::text, 'rejected'::text])),
+  CONSTRAINT discount_audit_log_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.discount_code_usage (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  discount_code_id uuid,
+  order_id uuid,
+  user_id uuid,
+  discount_amount numeric(10,2) NOT NULL,
+  used_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT discount_code_usage_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.discount_codes (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  code text NOT NULL,
+  description text,
+  discount_type text NOT NULL,
+  discount_value numeric(10,2) NOT NULL,
+  minimum_order_amount numeric(10,2) DEFAULT 0,
+  maximum_discount_amount numeric(10,2),
+  usage_limit integer,
+  usage_count integer DEFAULT 0,
+  valid_from timestamp with time zone DEFAULT now() NOT NULL,
+  valid_until timestamp with time zone,
+  is_active boolean DEFAULT true,
+  created_by uuid,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT discount_codes_discount_type_check CHECK (discount_type = ANY (ARRAY['percentage'::text, 'fixed_amount'::text, 'free_shipping'::text])),
+  CONSTRAINT discount_codes_pkey PRIMARY KEY (id),
+  CONSTRAINT discount_codes_code_key UNIQUE (code)
+);
+
+CREATE TABLE shop_manager.discount_types (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  name text NOT NULL,
+  description text,
+  discount_type text NOT NULL,
+  default_value numeric DEFAULT 0 NOT NULL,
+  applies_to text NOT NULL,
+  is_active boolean DEFAULT true NOT NULL,
+  requires_approval boolean DEFAULT false NOT NULL,
+  max_discount_amount numeric,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_by text NOT NULL,
+  CONSTRAINT discount_types_applies_to_check CHECK (applies_to = ANY (ARRAY['labor'::text, 'parts'::text, 'work_order'::text, 'any'::text])),
+  CONSTRAINT discount_types_discount_type_check CHECK (discount_type = ANY (ARRAY['percentage'::text, 'fixed_amount'::text])),
+  CONSTRAINT discount_types_pkey PRIMARY KEY (id),
+  CONSTRAINT discount_types_name_key UNIQUE (name)
+);
+
+CREATE TABLE shop_manager.employee_accommodations (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid,
+  employee_id uuid,
+  accommodation_type text NOT NULL,
+  description text NOT NULL,
+  start_date date,
+  end_date date,
+  is_permanent boolean DEFAULT false,
+  approved_by uuid,
+  approved_at timestamp with time zone,
+  status text DEFAULT 'active'::text,
+  notes text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT employee_accommodations_accommodation_type_check CHECK (accommodation_type = ANY (ARRAY['medical'::text, 'religious'::text, 'personal'::text, 'disability'::text, 'other'::text])),
+  CONSTRAINT employee_accommodations_status_check CHECK (status = ANY (ARRAY['active'::text, 'inactive'::text, 'expired'::text])),
+  CONSTRAINT employee_accommodations_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.employee_availability (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid NOT NULL,
+  employee_id uuid NOT NULL,
+  day_of_week integer NOT NULL,
+  available_start time without time zone NOT NULL,
+  available_end time without time zone NOT NULL,
+  is_available boolean DEFAULT true,
+  recurring boolean DEFAULT true,
+  effective_from date DEFAULT CURRENT_DATE NOT NULL,
+  effective_until date,
+  notes text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT employee_availability_day_of_week_check CHECK (day_of_week >= 0 AND day_of_week <= 6),
+  CONSTRAINT valid_time_range CHECK (available_end > available_start),
+  CONSTRAINT employee_availability_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.employee_leave_balances (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid NOT NULL,
+  employee_id uuid NOT NULL,
+  leave_type_id uuid NOT NULL,
+  balance_hours numeric(10,2) DEFAULT 0,
+  used_hours numeric(10,2) DEFAULT 0,
+  pending_hours numeric(10,2) DEFAULT 0,
+  accrued_ytd numeric(10,2) DEFAULT 0,
+  carry_over_hours numeric(10,2) DEFAULT 0,
+  year integer DEFAULT EXTRACT(year FROM CURRENT_DATE) NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT employee_leave_balances_pkey PRIMARY KEY (id),
+  CONSTRAINT employee_leave_balances_employee_id_leave_type_id_year_key UNIQUE (employee_id, leave_type_id, year)
+);
+
+CREATE TABLE shop_manager.household_members (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  household_id uuid,
+  customer_id uuid,
+  relationship_type text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT household_members_pkey PRIMARY KEY (id),
+  CONSTRAINT household_members_household_id_customer_id_key UNIQUE (household_id, customer_id)
+);
+
+CREATE TABLE shop_manager.households (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  name text NOT NULL,
+  address text,
+  notes text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT households_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  name text NOT NULL,
+  sku text NOT NULL,
+  description text,
+  part_number text,
+  barcode text,
+  category text,
+  subcategory text,
+  manufacturer text,
+  vehicle_compatibility text,
+  location text,
+  status text DEFAULT 'active'::text,
+  supplier text,
+  quantity integer DEFAULT 0,
+  measurement_unit text,
+  on_hold integer DEFAULT 0,
+  on_order integer DEFAULT 0,
+  reorder_point integer DEFAULT 0,
+  min_stock_level integer DEFAULT 0,
+  max_stock_level integer DEFAULT 0,
+  unit_price numeric DEFAULT 0,
+  sell_price_per_unit numeric DEFAULT 0,
+  cost_per_unit numeric DEFAULT 0,
+  margin_markup numeric DEFAULT 0,
+  tax_rate numeric DEFAULT 0,
+  tax_exempt boolean DEFAULT false,
+  environmental_fee numeric DEFAULT 0,
+  core_charge numeric DEFAULT 0,
+  hazmat_fee numeric DEFAULT 0,
+  weight numeric DEFAULT 0,
+  dimensions text,
+  color text,
+  material text,
+  model_year text,
+  oem_part_number text,
+  universal_part boolean DEFAULT false,
+  warranty_period text,
+  date_bought text,
+  date_last text,
+  notes text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT inventory_pkey PRIMARY KEY (id),
+  CONSTRAINT inventory_sku_key UNIQUE (sku)
+);
+
+CREATE TABLE shop_manager.inventory_adjustments (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  work_order_id uuid,
+  inventory_item_id uuid,
+  quantity integer NOT NULL,
+  adjustment_type text NOT NULL,
+  adjusted_by uuid,
+  notes text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT inventory_adjustments_adjustment_type_check CHECK (adjustment_type = ANY (ARRAY['reserve'::text, 'consume'::text, 'return'::text])),
+  CONSTRAINT inventory_adjustments_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_alerts (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  product_id uuid,
+  variant_id uuid,
+  alert_type text NOT NULL,
+  threshold_value integer NOT NULL,
+  current_value integer NOT NULL,
+  status text DEFAULT 'active'::text NOT NULL,
+  message text,
+  acknowledged_by uuid,
+  acknowledged_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  resolved_at timestamp with time zone,
+  notification_sent boolean DEFAULT false,
+  CONSTRAINT inventory_alerts_check CHECK (product_id IS NOT NULL AND variant_id IS NULL OR product_id IS NULL AND variant_id IS NOT NULL),
+  CONSTRAINT inventory_alerts_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_auto_reorder (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  item_id uuid,
+  enabled boolean DEFAULT false NOT NULL,
+  threshold integer DEFAULT 5 NOT NULL,
+  quantity integer DEFAULT 10 NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT inventory_auto_reorder_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_categories (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  name text NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  description text,
+  is_active boolean DEFAULT true,
+  display_order integer DEFAULT 0,
+  CONSTRAINT inventory_categories_pkey PRIMARY KEY (id),
+  CONSTRAINT inventory_categories_name_key UNIQUE (name)
+);
+
+CREATE TABLE shop_manager.inventory_consumption_history (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  inventory_item_id uuid NOT NULL,
+  quantity_consumed numeric(10,2) NOT NULL,
+  usage_metric text NOT NULL,
+  usage_value numeric(10,2) NOT NULL,
+  service_package_id uuid,
+  work_order_id uuid,
+  consumed_at timestamp with time zone DEFAULT now() NOT NULL,
+  notes text,
+  CONSTRAINT inventory_consumption_history_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_consumption_rates (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  inventory_item_id uuid NOT NULL,
+  usage_metric text NOT NULL,
+  consumption_per_unit numeric(10,4) NOT NULL,
+  average_consumption numeric(10,4),
+  variance_percentage numeric(5,2),
+  last_calculated_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT inventory_consumption_rates_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_forecasts (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  inventory_item_id uuid NOT NULL,
+  forecast_type text NOT NULL,
+  predicted_runout_date date,
+  predicted_runout_usage numeric(10,2),
+  current_stock numeric(10,2) NOT NULL,
+  average_consumption_rate numeric(10,4) NOT NULL,
+  confidence_level numeric(5,2),
+  recommended_reorder_date date,
+  recommended_reorder_quantity numeric(10,2),
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT inventory_forecasts_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_items (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  name text NOT NULL,
+  sku text NOT NULL,
+  category text NOT NULL,
+  supplier text NOT NULL,
+  quantity integer DEFAULT 0 NOT NULL,
+  reorder_point integer DEFAULT 10 NOT NULL,
+  unit_price numeric(10,2) NOT NULL,
+  location text,
+  status text DEFAULT 'In Stock'::text NOT NULL,
+  description text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  shop_id uuid,
+  quantity_in_stock integer,
+  part_number text,
+  barcode text,
+  subcategory text,
+  manufacturer text,
+  vehicle_compatibility text,
+  on_hold integer DEFAULT 0,
+  on_order integer DEFAULT 0,
+  margin_markup numeric(10,2) DEFAULT 0,
+  sell_price_per_unit numeric(10,2) DEFAULT 0,
+  cost_per_unit numeric(10,2) DEFAULT 0,
+  weight numeric(10,2) DEFAULT 0,
+  dimensions text,
+  warranty_period text,
+  date_bought date,
+  date_last date,
+  notes text,
+  web_links jsonb DEFAULT '[]'::jsonb,
+  CONSTRAINT inventory_items_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_locations (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  name text NOT NULL,
+  type text,
+  parent_id uuid,
+  description text,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT inventory_locations_type_check CHECK (type = ANY (ARRAY['warehouse'::text, 'section'::text, 'shelf'::text, 'bin'::text])),
+  CONSTRAINT inventory_locations_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_orders (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  item_id uuid,
+  order_date timestamp with time zone DEFAULT now() NOT NULL,
+  expected_arrival date NOT NULL,
+  quantity_ordered integer NOT NULL,
+  quantity_received integer DEFAULT 0 NOT NULL,
+  supplier text NOT NULL,
+  status text DEFAULT 'ordered'::text NOT NULL,
+  notes text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT inventory_orders_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_purchase_order_items (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  purchase_order_id uuid NOT NULL,
+  inventory_item_id uuid NOT NULL,
+  quantity integer NOT NULL,
+  quantity_received integer DEFAULT 0,
+  unit_price numeric NOT NULL,
+  total_price numeric NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT inventory_purchase_order_items_quantity_check CHECK (quantity > 0),
+  CONSTRAINT inventory_purchase_order_items_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_purchase_orders (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  vendor_id uuid,
+  status text DEFAULT 'draft'::text NOT NULL,
+  order_date timestamp with time zone DEFAULT now() NOT NULL,
+  expected_delivery_date timestamp with time zone,
+  received_date timestamp with time zone,
+  total_amount numeric,
+  created_by uuid,
+  notes text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  received_by uuid,
+  po_number text DEFAULT ('PO-'::text || nextval('shop_manager.feature_request_number_seq'::regclass)),
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT inventory_purchase_orders_status_check CHECK (status = ANY (ARRAY['draft'::text, 'submitted'::text, 'partially_received'::text, 'received'::text, 'cancelled'::text])),
+  CONSTRAINT inventory_purchase_orders_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_seasonal_factors (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  inventory_item_id uuid,
+  category text,
+  month integer NOT NULL,
+  adjustment_factor numeric(5,2) DEFAULT 1.0 NOT NULL,
+  notes text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT inventory_seasonal_factors_month_check CHECK (month >= 1 AND month <= 12),
+  CONSTRAINT inventory_seasonal_factors_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_settings (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid NOT NULL,
+  low_stock_threshold integer DEFAULT 5,
+  auto_reorder_enabled boolean DEFAULT false,
+  default_supplier_id uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT inventory_settings_pkey PRIMARY KEY (id),
+  CONSTRAINT inventory_settings_shop_id_key UNIQUE (shop_id)
+);
+
+CREATE TABLE shop_manager.inventory_suppliers (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  name text NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  contact_name text,
+  email text,
+  phone text,
+  address text,
+  website text,
+  payment_terms text,
+  lead_time_days integer,
+  is_active boolean DEFAULT true NOT NULL,
+  notes text,
+  type text,
+  region text,
+  CONSTRAINT inventory_suppliers_pkey PRIMARY KEY (id),
+  CONSTRAINT inventory_suppliers_name_key UNIQUE (name)
+);
+
+CREATE TABLE shop_manager.inventory_transactions (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  inventory_item_id uuid NOT NULL,
+  transaction_type text NOT NULL,
+  quantity integer NOT NULL,
+  transaction_date timestamp with time zone DEFAULT now() NOT NULL,
+  reference_type text,
+  reference_id uuid,
+  performed_by uuid,
+  notes text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT inventory_transactions_transaction_type_check CHECK (transaction_type = ANY (ARRAY['purchase'::text, 'sale'::text, 'adjustment'::text, 'transfer'::text, 'return'::text, 'write-off'::text])),
+  CONSTRAINT inventory_transactions_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.inventory_vendors (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  name text NOT NULL,
+  contact_name text,
+  email text,
+  phone text,
+  address text,
+  website text,
+  payment_terms text,
+  lead_time_days integer,
+  is_active boolean DEFAULT true,
+  notes text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT inventory_vendors_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.invoice_items (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  invoice_id text NOT NULL,
+  name text NOT NULL,
+  description text,
+  quantity numeric NOT NULL,
+  price numeric NOT NULL,
+  total numeric NOT NULL,
+  hours boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT invoice_items_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.invoice_staff (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  invoice_id text NOT NULL,
+  staff_name text NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT invoice_staff_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.invoice_template_items (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  template_id uuid,
+  name text NOT NULL,
+  description text,
+  quantity numeric DEFAULT 1,
+  price numeric NOT NULL,
+  total numeric,
+  hours boolean DEFAULT false,
+  sku text,
+  category text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT invoice_template_items_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.invoice_templates (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  name text NOT NULL,
+  description text,
+  default_tax_rate numeric DEFAULT 0.08,
+  default_due_date_days integer DEFAULT 30,
+  default_notes text,
+  created_at timestamp with time zone DEFAULT now(),
+  last_used timestamp with time zone,
+  usage_count integer DEFAULT 0,
+  CONSTRAINT invoice_templates_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.invoices (
+  id text NOT NULL,
+  customer text NOT NULL,
+  customer_address text,
+  customer_email text,
+  description text,
+  notes text,
+  date text NOT NULL,
+  due_date text NOT NULL,
+  status text NOT NULL,
+  work_order_id text,
+  created_by text,
+  subtotal numeric,
+  tax numeric,
+  total numeric,
+  payment_method text,
+  created_at timestamp with time zone DEFAULT now(),
+  last_updated_by text,
+  last_updated_at timestamp with time zone,
+  customer_id uuid,
+  CONSTRAINT invoices_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.job_line_discounts (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  job_line_id uuid NOT NULL,
+  discount_type_id uuid,
+  discount_name text NOT NULL,
+  discount_type text NOT NULL,
+  discount_value numeric NOT NULL,
+  discount_amount numeric NOT NULL,
+  reason text,
+  approved_by text,
+  approved_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_by text NOT NULL,
+  CONSTRAINT job_line_discounts_discount_type_check CHECK (discount_type = ANY (ARRAY['percentage'::text, 'fixed_amount'::text])),
+  CONSTRAINT job_line_discounts_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.labor_rates (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid NOT NULL,
+  standard_rate numeric DEFAULT 125.00 NOT NULL,
+  diagnostic_rate numeric DEFAULT 145.00 NOT NULL,
+  emergency_rate numeric DEFAULT 175.00 NOT NULL,
+  warranty_rate numeric DEFAULT 95.00 NOT NULL,
+  internal_rate numeric DEFAULT 85.00 NOT NULL,
+  diy_rate numeric DEFAULT 65.00 NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT labor_rates_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.part_discounts (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  part_id uuid NOT NULL,
+  discount_type_id uuid,
+  discount_name text NOT NULL,
+  discount_type text NOT NULL,
+  discount_value numeric NOT NULL,
+  discount_amount numeric NOT NULL,
+  reason text,
+  approved_by text,
+  approved_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_by text NOT NULL,
+  CONSTRAINT part_discounts_discount_type_check CHECK (discount_type = ANY (ARRAY['percentage'::text, 'fixed_amount'::text])),
+  CONSTRAINT part_discounts_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.part_warranties (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  shop_id uuid NOT NULL,
+  inventory_item_id uuid,
+  work_order_id uuid,
+  equipment_id uuid,
+  vehicle_id uuid,
+  part_name character varying(200) NOT NULL,
+  part_number character varying(100),
+  serial_number character varying(100),
+  manufacturer character varying(200),
+  installed_date date NOT NULL,
+  warranty_months integer,
+  warranty_miles integer,
+  warranty_hours integer,
+  expiry_date date NOT NULL,
+  purchase_price numeric(10,2),
+  warranty_value numeric(10,2),
+  coverage_description text,
+  document_url text,
+  notes text,
+  status character varying(20) DEFAULT 'active'::character varying,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_by uuid,
+  CONSTRAINT part_warranties_status_check CHECK (status::text = ANY (ARRAY['active'::character varying::text, 'expired'::character varying::text, 'claimed'::character varying::text, 'voided'::character varying::text])),
+  CONSTRAINT part_warranties_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE shop_manager.parts_categories (
+  id uuid DEFAULT gen_random_uuid() NOT NULL,
+  name text NOT NULL,
+  description text,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT parts_categories_pkey PRIMARY KEY (id),
+  CONSTRAINT parts_categories_name_key UNIQUE (name)
+);
+
+CREATE TABLE shop_manager.parts_inventory (
+  id uuid DEFAULT uuid_generate_v4() NOT NULL,
+  part_number text NOT NULL,
+  name text NOT NULL,
+  description text,
+  category text,
+  quantity integer DEFAULT 0 NOT NULL,
+  min_quantity integer DEFAULT 0,
+  cost_price numeric,
+  retail_price numeric,
+  location text,
+  security_invoker boolean DEFAULT true,
+  security_barrier boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT parts_inventory_pkey PRIMARY KEY (id)
+);
+-- ===== END SOURCE MIGRATION: 20260713062739_e0144043-a7a4-43b7-8fc6-050ea0304634.sql =====
+
+-- ===== BEGIN SOURCE MIGRATION: 20260713063318_90b3f5d4-5173-4f8a-b355-7634671276fe.sql =====
 CREATE TABLE shop_manager.payment_methods (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
   customer_id uuid NOT NULL,
@@ -1020,11 +3688,9 @@ CREATE TABLE shop_manager.work_order_job_lines (
   updated_at timestamp with time zone DEFAULT now() NOT NULL,
   CONSTRAINT work_order_job_lines_pkey PRIMARY KEY (id)
 );
+-- ===== END SOURCE MIGRATION: 20260713063318_90b3f5d4-5173-4f8a-b355-7634671276fe.sql =====
 
-
--- ============================================================================
--- SOURCE MIGRATION: 20260713063430_0a07d0d9-729b-4662-ac1e-d561b0a2ce85.sql
--- ============================================================================
+-- ===== BEGIN SOURCE MIGRATION: 20260713063430_0a07d0d9-729b-4662-ac1e-d561b0a2ce85.sql =====
 CREATE TABLE shop_manager.work_order_notifications (
   id uuid DEFAULT gen_random_uuid() NOT NULL,
   work_order_id uuid NOT NULL,
@@ -1220,11 +3886,9 @@ CREATE TABLE shop_manager.work_orders (
   CONSTRAINT work_orders_must_have_reference CHECK (customer_id IS NOT NULL OR vehicle_id IS NOT NULL),
   CONSTRAINT work_orders_pkey PRIMARY KEY (id)
 );
+-- ===== END SOURCE MIGRATION: 20260713063430_0a07d0d9-729b-4662-ac1e-d561b0a2ce85.sql =====
 
-
--- ============================================================================
--- SOURCE MIGRATION: 20260713070220_28789e9e-20ef-4e63-a727-e686ff8c5c7c.sql
--- ============================================================================
+-- ===== BEGIN SOURCE MIGRATION: 20260713070220_28789e9e-20ef-4e63-a727-e686ff8c5c7c.sql =====
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.appointments ADD CONSTRAINT appointments_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES shop_manager.customers(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.appointments ADD CONSTRAINT appointments_vehicle_id_fkey FOREIGN KEY (vehicle_id) REFERENCES shop_manager.vehicles(id) ON DELETE SET NULL'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.appointments ADD CONSTRAINT fk_appointments_advisor FOREIGN KEY (advisor_id) REFERENCES shop_manager.profiles(id) ON DELETE SET NULL'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
@@ -1277,11 +3941,9 @@ DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.inventory_consumption_history ADD 
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.inventory_consumption_history ADD CONSTRAINT inventory_consumption_history_service_package_id_fkey3 FOREIGN KEY (service_package_id) REFERENCES shop_manager.service_packages(id) ON DELETE SET NULL'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.inventory_consumption_history ADD CONSTRAINT inventory_consumption_history_service_package_id_fkey4 FOREIGN KEY (service_package_id) REFERENCES shop_manager.service_packages(id) ON DELETE SET NULL'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.inventory_consumption_history ADD CONSTRAINT inventory_consumption_history_service_package_id_fkey5 FOREIGN KEY (service_package_id) REFERENCES shop_manager.service_packages(id) ON DELETE SET NULL'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
+-- ===== END SOURCE MIGRATION: 20260713070220_28789e9e-20ef-4e63-a727-e686ff8c5c7c.sql =====
 
-
--- ============================================================================
--- SOURCE MIGRATION: 20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql
--- ============================================================================
+-- ===== BEGIN SOURCE MIGRATION: 20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql =====
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.shift_swap_requests ADD CONSTRAINT shift_swap_requests_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES shop_manager.shops(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.shift_templates ADD CONSTRAINT shift_templates_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES shop_manager.shops(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.shop_enabled_modules ADD CONSTRAINT shop_enabled_modules_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES shop_manager.shops(id) ON DELETE CASCADE'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
@@ -1383,11 +4045,9 @@ DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.work_order_job_line_history ADD CO
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.work_order_part_history ADD CONSTRAINT work_order_part_history_changed_by_fkey FOREIGN KEY (changed_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.work_orders ADD CONSTRAINT work_orders_advisor_id_fkey FOREIGN KEY (advisor_id) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
 DO $$ BEGIN EXECUTE 'ALTER TABLE shop_manager.work_orders ADD CONSTRAINT work_orders_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id)'; EXCEPTION WHEN others THEN RAISE NOTICE 'skip: %', SQLERRM; END $$;
+-- ===== END SOURCE MIGRATION: 20260713070436_a4f482f9-5657-4142-88e7-047bd0e90a42.sql =====
 
-
--- ============================================================================
--- SOURCE MIGRATION: 20260713070515_c57f9258-c8b3-4973-9eff-2d03ccade037.sql
--- ============================================================================
+-- ===== BEGIN SOURCE MIGRATION: 20260713070515_c57f9258-c8b3-4973-9eff-2d03ccade037.sql =====
 DO $$
 DECLARE r record;
 BEGIN
@@ -1400,11 +4060,9 @@ BEGIN
 END $$;
 
 GRANT USAGE ON SCHEMA shop_manager TO authenticated, service_role;
+-- ===== END SOURCE MIGRATION: 20260713070515_c57f9258-c8b3-4973-9eff-2d03ccade037.sql =====
 
-
--- ============================================================================
--- SOURCE MIGRATION: 20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql
--- ============================================================================
+-- ===== BEGIN SOURCE MIGRATION: 20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql =====
 
 -- 1. Extend chat_threads with business scope
 ALTER TABLE public.chat_threads
@@ -1628,2795 +4286,5 @@ BEGIN
   BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE public.tow_requests;         EXCEPTION WHEN duplicate_object THEN NULL; END;
 END $$;
 
+-- ===== END SOURCE MIGRATION: 20260713071921_8c790938-2bb4-420b-b1df-3261d4bed855.sql =====
 
--- ============================================================================
--- SOURCE MIGRATION: 20260713081429_d9cdd366-04dd-4e51-939f-541106ff205e.sql
--- ============================================================================
-
--- Helper: current user's shop_id from shop_manager.profiles
-CREATE OR REPLACE FUNCTION shop_manager.get_current_user_shop_id()
-RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT shop_id FROM shop_manager.profiles WHERE id = auth.uid() LIMIT 1
-$$;
-
-CREATE OR REPLACE FUNCTION shop_manager.get_user_shop_id(_user_id uuid)
-RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT shop_id FROM shop_manager.profiles WHERE id = _user_id LIMIT 1
-$$;
-
--- roles catalog referenced by user_roles.role_id
-CREATE TABLE IF NOT EXISTS shop_manager.roles (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name shop_manager.app_role NOT NULL UNIQUE,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-GRANT SELECT ON shop_manager.roles TO authenticated;
-GRANT ALL ON shop_manager.roles TO service_role;
-ALTER TABLE shop_manager.roles ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "roles_select_all" ON shop_manager.roles;
-CREATE POLICY "roles_select_all" ON shop_manager.roles FOR SELECT TO authenticated USING (true);
-
-INSERT INTO shop_manager.roles (name)
-SELECT unnest(enum_range(NULL::shop_manager.app_role))
-ON CONFLICT (name) DO NOTHING;
-
--- has_role by enum value (matches policy signatures)
-CREATE OR REPLACE FUNCTION shop_manager.has_role(_user_id uuid, _role shop_manager.app_role)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT EXISTS (
-    SELECT 1
-    FROM shop_manager.user_roles ur
-    JOIN shop_manager.roles r ON r.id = ur.role_id
-    WHERE ur.user_id = _user_id AND r.name = _role
-  )
-$$;
-
--- Generic permission stub — allow owner/admin; extend later when a
--- permissions table lands. Kept conservative on purpose.
-CREATE OR REPLACE FUNCTION shop_manager.user_has_permission(_user_id uuid, _permission text)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT EXISTS (
-    SELECT 1
-    FROM shop_manager.user_roles ur
-    JOIN shop_manager.roles r ON r.id = ur.role_id
-    WHERE ur.user_id = _user_id
-      AND r.name IN ('owner'::shop_manager.app_role, 'admin'::shop_manager.app_role)
-  )
-$$;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260713081559_69ad9a73-edab-4719-b16e-38541b8ba91a.sql
--- ============================================================================
-
--- Text overload of has_role (some policies pass 'admin'::text instead of the enum)
-CREATE OR REPLACE FUNCTION shop_manager.has_role(_user_id uuid, _role text)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM shop_manager.user_roles ur
-    JOIN shop_manager.roles r ON r.id = ur.role_id
-    WHERE ur.user_id = _user_id AND r.name::text = _role
-  )
-$$;
-
-CREATE OR REPLACE FUNCTION shop_manager.is_staff_member()
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT EXISTS (SELECT 1 FROM shop_manager.profiles WHERE id = auth.uid())
-$$;
-
-CREATE OR REPLACE FUNCTION shop_manager.is_owner_or_admin(_user_id uuid)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM shop_manager.user_roles ur
-    JOIN shop_manager.roles r ON r.id = ur.role_id
-    WHERE ur.user_id = _user_id
-      AND r.name IN ('owner'::shop_manager.app_role, 'admin'::shop_manager.app_role)
-  )
-$$;
-
-CREATE OR REPLACE FUNCTION shop_manager.get_user_shop_id_secure(_user_id uuid)
-RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT shop_id FROM shop_manager.profiles WHERE id = _user_id LIMIT 1
-$$;
-
--- 3-arg overload: resource + action; conservative — owner/admin only.
-CREATE OR REPLACE FUNCTION shop_manager.user_has_permission(_user_id uuid, _resource text, _action text)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT shop_manager.is_owner_or_admin(_user_id)
-$$;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260713081649_7763bb16-35c5-4c76-a8f9-36c3f58090ce.sql
--- ============================================================================
-
-CREATE OR REPLACE FUNCTION shop_manager.is_admin_or_owner_secure(_user_id uuid)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT shop_manager.is_owner_or_admin(_user_id)
-$$;
-
-CREATE OR REPLACE FUNCTION shop_manager.check_user_is_admin_or_owner(_user_id uuid)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT shop_manager.is_owner_or_admin(_user_id)
-$$;
-
-CREATE OR REPLACE FUNCTION shop_manager.is_admin_user(_user_id uuid)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT shop_manager.has_role(_user_id, 'admin'::shop_manager.app_role)
-$$;
-
-CREATE OR REPLACE FUNCTION shop_manager.is_same_shop(_profile_id uuid)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM shop_manager.profiles p
-    WHERE p.id = _profile_id
-      AND p.shop_id = (SELECT shop_id FROM shop_manager.profiles WHERE id = auth.uid())
-  )
-$$;
-
-CREATE OR REPLACE FUNCTION shop_manager.user_belongs_to_shop(_user_id uuid, _shop_id uuid)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, shop_manager AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM shop_manager.profiles WHERE id = _user_id AND shop_id = _shop_id
-  )
-$$;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260713081838_b99aba93-f19b-4aec-b7a1-3bdb86faadc6.sql
--- ============================================================================
-
--- ============================================================
--- Profiles: user can see/update own; admins can read shop profiles
--- ============================================================
-DROP POLICY IF EXISTS "sm_profiles_select_self" ON shop_manager.profiles;
-DROP POLICY IF EXISTS "sm_profiles_select_shop" ON shop_manager.profiles;
-DROP POLICY IF EXISTS "sm_profiles_update_self" ON shop_manager.profiles;
-DROP POLICY IF EXISTS "sm_profiles_insert_self" ON shop_manager.profiles;
-
-CREATE POLICY "sm_profiles_select_self" ON shop_manager.profiles
-  FOR SELECT TO authenticated
-  USING (id = auth.uid() OR user_id = auth.uid());
-
-CREATE POLICY "sm_profiles_select_shop" ON shop_manager.profiles
-  FOR SELECT TO authenticated
-  USING (shop_id = shop_manager.get_current_user_shop_id() AND shop_id IS NOT NULL);
-
-CREATE POLICY "sm_profiles_update_self" ON shop_manager.profiles
-  FOR UPDATE TO authenticated
-  USING (id = auth.uid() OR user_id = auth.uid())
-  WITH CHECK (id = auth.uid() OR user_id = auth.uid());
-
-CREATE POLICY "sm_profiles_insert_self" ON shop_manager.profiles
-  FOR INSERT TO authenticated
-  WITH CHECK (id = auth.uid() OR user_id = auth.uid());
-
--- ============================================================
--- Shops: members read; owner/admin update
--- ============================================================
-DROP POLICY IF EXISTS "sm_shops_select_members" ON shop_manager.shops;
-DROP POLICY IF EXISTS "sm_shops_update_admins" ON shop_manager.shops;
-
-CREATE POLICY "sm_shops_select_members" ON shop_manager.shops
-  FOR SELECT TO authenticated
-  USING (id = shop_manager.get_current_user_shop_id());
-
-CREATE POLICY "sm_shops_update_admins" ON shop_manager.shops
-  FOR UPDATE TO authenticated
-  USING (id = shop_manager.get_current_user_shop_id() AND shop_manager.is_owner_or_admin(auth.uid()))
-  WITH CHECK (id = shop_manager.get_current_user_shop_id() AND shop_manager.is_owner_or_admin(auth.uid()));
-
--- ============================================================
--- User roles: user reads own; owner/admin manages in same shop
--- ============================================================
-DROP POLICY IF EXISTS "sm_user_roles_select_self" ON shop_manager.user_roles;
-DROP POLICY IF EXISTS "sm_user_roles_admin_manage" ON shop_manager.user_roles;
-
-CREATE POLICY "sm_user_roles_select_self" ON shop_manager.user_roles
-  FOR SELECT TO authenticated
-  USING (user_id = auth.uid());
-
-CREATE POLICY "sm_user_roles_admin_manage" ON shop_manager.user_roles
-  FOR ALL TO authenticated
-  USING (shop_manager.is_owner_or_admin(auth.uid())
-         AND shop_manager.user_belongs_to_shop(user_id, shop_manager.get_current_user_shop_id()))
-  WITH CHECK (shop_manager.is_owner_or_admin(auth.uid())
-              AND shop_manager.user_belongs_to_shop(user_id, shop_manager.get_current_user_shop_id()));
-
--- ============================================================
--- Shop-scoped tables (direct shop_id column)
--- ============================================================
-DO $$
-DECLARE t text;
-BEGIN
-  FOR t IN SELECT unnest(ARRAY['customers','inventory_items','work_orders']) LOOP
-    EXECUTE format('DROP POLICY IF EXISTS "sm_%1$s_shop_all" ON shop_manager.%1$I', t);
-    EXECUTE format(
-      'CREATE POLICY "sm_%1$s_shop_all" ON shop_manager.%1$I FOR ALL TO authenticated
-         USING (shop_id = shop_manager.get_current_user_shop_id() AND shop_id IS NOT NULL)
-         WITH CHECK (shop_id = shop_manager.get_current_user_shop_id() AND shop_id IS NOT NULL)', t);
-  END LOOP;
-END$$;
-
--- Customer can view/update their own record too
-DROP POLICY IF EXISTS "sm_customers_self_select" ON shop_manager.customers;
-CREATE POLICY "sm_customers_self_select" ON shop_manager.customers
-  FOR SELECT TO authenticated USING (user_id = auth.uid());
-
--- ============================================================
--- Customer-linked tables (join through shop_manager.customers)
--- ============================================================
-DO $$
-DECLARE t text;
-BEGIN
-  FOR t IN SELECT unnest(ARRAY['vehicles','appointments','invoices','quotes']) LOOP
-    EXECUTE format('DROP POLICY IF EXISTS "sm_%1$s_shop_all" ON shop_manager.%1$I', t);
-    EXECUTE format(
-      'CREATE POLICY "sm_%1$s_shop_all" ON shop_manager.%1$I FOR ALL TO authenticated
-         USING (customer_id IN (
-           SELECT id FROM shop_manager.customers
-           WHERE shop_id = shop_manager.get_current_user_shop_id()))
-         WITH CHECK (customer_id IN (
-           SELECT id FROM shop_manager.customers
-           WHERE shop_id = shop_manager.get_current_user_shop_id()))', t);
-  END LOOP;
-END$$;
-
--- ============================================================
--- Line items: join through parent invoice / quote
--- ============================================================
-DROP POLICY IF EXISTS "sm_invoice_items_shop_all" ON shop_manager.invoice_items;
-CREATE POLICY "sm_invoice_items_shop_all" ON shop_manager.invoice_items
-  FOR ALL TO authenticated
-  USING (invoice_id IN (
-    SELECT i.id FROM shop_manager.invoices i
-    JOIN shop_manager.customers c ON c.id = i.customer_id
-    WHERE c.shop_id = shop_manager.get_current_user_shop_id()))
-  WITH CHECK (invoice_id IN (
-    SELECT i.id FROM shop_manager.invoices i
-    JOIN shop_manager.customers c ON c.id = i.customer_id
-    WHERE c.shop_id = shop_manager.get_current_user_shop_id()));
-
-DROP POLICY IF EXISTS "sm_quote_items_shop_all" ON shop_manager.quote_items;
-CREATE POLICY "sm_quote_items_shop_all" ON shop_manager.quote_items
-  FOR ALL TO authenticated
-  USING (quote_id IN (
-    SELECT q.id FROM shop_manager.quotes q
-    JOIN shop_manager.customers c ON c.id = q.customer_id
-    WHERE c.shop_id = shop_manager.get_current_user_shop_id()))
-  WITH CHECK (quote_id IN (
-    SELECT q.id FROM shop_manager.quotes q
-    JOIN shop_manager.customers c ON c.id = q.customer_id
-    WHERE c.shop_id = shop_manager.get_current_user_shop_id()));
-
--- ============================================================
--- Roles catalog: already granted SELECT; policy in previous migration
--- ============================================================
-
--- ============================================================
--- Auto-provision shop_manager.profiles on first authenticated visit
---
--- Bridge: when a signed-in user hits any shop_manager server-fn / RLS check
--- and there is no matching row in shop_manager.profiles yet, create a stub
--- pointing at their existing public.businesses row (if any) so the
--- get_current_user_shop_id() helper resolves cleanly.
--- ============================================================
-CREATE OR REPLACE FUNCTION shop_manager.ensure_profile_for(_user_id uuid)
-RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, shop_manager AS $$
-DECLARE
-  _existing_shop uuid;
-  _biz_id uuid;
-  _email text;
-  _first text;
-  _last text;
-BEGIN
-  SELECT shop_id INTO _existing_shop FROM shop_manager.profiles WHERE id = _user_id;
-  IF _existing_shop IS NOT NULL THEN
-    RETURN _existing_shop;
-  END IF;
-
-  -- Best-effort: pull the first business the user owns as their "shop".
-  BEGIN
-    SELECT id INTO _biz_id FROM public.businesses WHERE owner_id = _user_id ORDER BY created_at LIMIT 1;
-  EXCEPTION WHEN undefined_table OR undefined_column THEN
-    _biz_id := NULL;
-  END;
-
-  SELECT email, raw_user_meta_data->>'first_name', raw_user_meta_data->>'last_name'
-    INTO _email, _first, _last
-    FROM auth.users WHERE id = _user_id;
-
-  INSERT INTO shop_manager.profiles (id, user_id, email, first_name, last_name, shop_id)
-  VALUES (_user_id, _user_id, _email, COALESCE(_first, ''), COALESCE(_last, ''), _biz_id)
-  ON CONFLICT (id) DO NOTHING;
-
-  RETURN _biz_id;
-END$$;
-
-GRANT EXECUTE ON FUNCTION shop_manager.ensure_profile_for(uuid) TO authenticated;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260713092951_9b14970f-d116-4ec7-ac76-927ba14d5bcb.sql
--- ============================================================================
-
-ALTER TABLE shop_manager.inventory_transactions ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "shop members access inventory_transactions" ON shop_manager.inventory_transactions;
-CREATE POLICY "shop members access inventory_transactions"
-ON shop_manager.inventory_transactions FOR ALL TO authenticated
-USING (EXISTS (SELECT 1 FROM shop_manager.inventory_items i WHERE i.id = inventory_transactions.inventory_item_id AND i.shop_id = shop_manager.get_current_user_shop_id()))
-WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.inventory_items i WHERE i.id = inventory_transactions.inventory_item_id AND i.shop_id = shop_manager.get_current_user_shop_id()));
-
-ALTER TABLE shop_manager.work_order_parts ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "shop members access work_order_parts" ON shop_manager.work_order_parts;
-CREATE POLICY "shop members access work_order_parts"
-ON shop_manager.work_order_parts FOR ALL TO authenticated
-USING (EXISTS (SELECT 1 FROM shop_manager.work_orders w WHERE w.id = work_order_parts.work_order_id AND w.shop_id = shop_manager.get_current_user_shop_id()))
-WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.work_orders w WHERE w.id = work_order_parts.work_order_id AND w.shop_id = shop_manager.get_current_user_shop_id()));
-
-ALTER TABLE shop_manager.work_order_job_lines ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "shop members access work_order_job_lines" ON shop_manager.work_order_job_lines;
-CREATE POLICY "shop members access work_order_job_lines"
-ON shop_manager.work_order_job_lines FOR ALL TO authenticated
-USING (EXISTS (SELECT 1 FROM shop_manager.work_orders w WHERE w.id = work_order_job_lines.work_order_id AND w.shop_id = shop_manager.get_current_user_shop_id()))
-WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.work_orders w WHERE w.id = work_order_job_lines.work_order_id AND w.shop_id = shop_manager.get_current_user_shop_id()));
-
--- invoices: id is text; work_order_id is text; customer_id is uuid
-ALTER TABLE shop_manager.invoices ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "shop members access invoices" ON shop_manager.invoices;
-CREATE POLICY "shop members access invoices"
-ON shop_manager.invoices FOR ALL TO authenticated
-USING (
-  (invoices.work_order_id IS NOT NULL AND EXISTS (SELECT 1 FROM shop_manager.work_orders w WHERE w.id::text = invoices.work_order_id AND w.shop_id = shop_manager.get_current_user_shop_id()))
-  OR EXISTS (SELECT 1 FROM shop_manager.customers c WHERE c.id = invoices.customer_id AND c.shop_id = shop_manager.get_current_user_shop_id())
-)
-WITH CHECK (
-  (invoices.work_order_id IS NOT NULL AND EXISTS (SELECT 1 FROM shop_manager.work_orders w WHERE w.id::text = invoices.work_order_id AND w.shop_id = shop_manager.get_current_user_shop_id()))
-  OR EXISTS (SELECT 1 FROM shop_manager.customers c WHERE c.id = invoices.customer_id AND c.shop_id = shop_manager.get_current_user_shop_id())
-);
-
-ALTER TABLE shop_manager.invoice_items ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "shop members access invoice_items" ON shop_manager.invoice_items;
-CREATE POLICY "shop members access invoice_items"
-ON shop_manager.invoice_items FOR ALL TO authenticated
-USING (EXISTS (
-  SELECT 1 FROM shop_manager.invoices i
-  LEFT JOIN shop_manager.work_orders w ON w.id::text = i.work_order_id
-  LEFT JOIN shop_manager.customers c ON c.id = i.customer_id
-  WHERE i.id = invoice_items.invoice_id
-    AND (w.shop_id = shop_manager.get_current_user_shop_id() OR c.shop_id = shop_manager.get_current_user_shop_id())
-))
-WITH CHECK (EXISTS (
-  SELECT 1 FROM shop_manager.invoices i
-  LEFT JOIN shop_manager.work_orders w ON w.id::text = i.work_order_id
-  LEFT JOIN shop_manager.customers c ON c.id = i.customer_id
-  WHERE i.id = invoice_items.invoice_id
-    AND (w.shop_id = shop_manager.get_current_user_shop_id() OR c.shop_id = shop_manager.get_current_user_shop_id())
-));
-
-ALTER TABLE shop_manager.payments ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "shop members access payments" ON shop_manager.payments;
-CREATE POLICY "shop members access payments"
-ON shop_manager.payments FOR ALL TO authenticated
-USING (EXISTS (SELECT 1 FROM shop_manager.customers c WHERE c.id = payments.customer_id AND c.shop_id = shop_manager.get_current_user_shop_id()))
-WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.customers c WHERE c.id = payments.customer_id AND c.shop_id = shop_manager.get_current_user_shop_id()));
-
-ALTER TABLE shop_manager.purchase_orders ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "shop members access purchase_orders" ON shop_manager.purchase_orders;
-CREATE POLICY "shop members access purchase_orders"
-ON shop_manager.purchase_orders FOR ALL TO authenticated
-USING (created_by = auth.uid() OR public.has_role(auth.uid(), 'admin'))
-WITH CHECK (created_by = auth.uid() OR public.has_role(auth.uid(), 'admin'));
-
-ALTER TABLE shop_manager.purchase_order_items ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "shop members access purchase_order_items" ON shop_manager.purchase_order_items;
-CREATE POLICY "shop members access purchase_order_items"
-ON shop_manager.purchase_order_items FOR ALL TO authenticated
-USING (EXISTS (SELECT 1 FROM shop_manager.purchase_orders po WHERE po.id = purchase_order_items.purchase_order_id AND (po.created_by = auth.uid() OR public.has_role(auth.uid(), 'admin'))))
-WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.purchase_orders po WHERE po.id = purchase_order_items.purchase_order_id AND (po.created_by = auth.uid() OR public.has_role(auth.uid(), 'admin'))));
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714030752_6f5ee6b1-4f4f-4c51-8e76-02388780860e.sql
--- ============================================================================
-
--- Suppliers: no shop_id column; scope by whether user belongs to any shop
-CREATE POLICY sm_suppliers_all ON shop_manager.suppliers
-  FOR ALL TO authenticated
-  USING (shop_manager.get_current_user_shop_id() IS NOT NULL)
-  WITH CHECK (shop_manager.get_current_user_shop_id() IS NOT NULL);
-
-CREATE POLICY sm_vendor_bills_all ON shop_manager.vendor_bills
-  FOR ALL TO authenticated
-  USING (shop_id = shop_manager.get_current_user_shop_id())
-  WITH CHECK (shop_id = shop_manager.get_current_user_shop_id());
-
-CREATE POLICY sm_vendor_bill_lines_all ON shop_manager.vendor_bill_lines
-  FOR ALL TO authenticated
-  USING (EXISTS (SELECT 1 FROM shop_manager.vendor_bills b WHERE b.id = vendor_bill_lines.bill_id AND b.shop_id = shop_manager.get_current_user_shop_id()))
-  WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.vendor_bills b WHERE b.id = vendor_bill_lines.bill_id AND b.shop_id = shop_manager.get_current_user_shop_id()));
-
-CREATE POLICY sm_vendor_payments_all ON shop_manager.vendor_payments
-  FOR ALL TO authenticated
-  USING (shop_id = shop_manager.get_current_user_shop_id())
-  WITH CHECK (shop_id = shop_manager.get_current_user_shop_id());
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714031847_09f013bc-9de9-4686-8cbb-b2b4ccbd1633.sql
--- ============================================================================
-DO $$ BEGIN
-  EXECUTE 'ALTER TABLE shop_manager.labor_rates ENABLE ROW LEVEL SECURITY';
-  EXECUTE 'DROP POLICY IF EXISTS sm_labor_rates_all ON shop_manager.labor_rates';
-  EXECUTE 'CREATE POLICY sm_labor_rates_all ON shop_manager.labor_rates FOR ALL TO authenticated USING (shop_id = shop_manager.get_current_user_shop_id()) WITH CHECK (shop_id = shop_manager.get_current_user_shop_id())';
-
-  EXECUTE 'ALTER TABLE shop_manager.work_order_time_entries ENABLE ROW LEVEL SECURITY';
-  EXECUTE 'DROP POLICY IF EXISTS sm_wo_time_all ON shop_manager.work_order_time_entries';
-  EXECUTE 'CREATE POLICY sm_wo_time_all ON shop_manager.work_order_time_entries FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM shop_manager.work_orders wo WHERE wo.id = work_order_time_entries.work_order_id AND wo.shop_id = shop_manager.get_current_user_shop_id())) WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.work_orders wo WHERE wo.id = work_order_time_entries.work_order_id AND wo.shop_id = shop_manager.get_current_user_shop_id()))';
-
-  EXECUTE 'ALTER TABLE shop_manager.work_order_assignments ENABLE ROW LEVEL SECURITY';
-  EXECUTE 'DROP POLICY IF EXISTS sm_wo_assign_all ON shop_manager.work_order_assignments';
-  EXECUTE 'CREATE POLICY sm_wo_assign_all ON shop_manager.work_order_assignments FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM shop_manager.work_orders wo WHERE wo.id = work_order_assignments.work_order_id AND wo.shop_id = shop_manager.get_current_user_shop_id())) WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.work_orders wo WHERE wo.id = work_order_assignments.work_order_id AND wo.shop_id = shop_manager.get_current_user_shop_id()))';
-
-  EXECUTE 'ALTER TABLE shop_manager.technician_schedules ENABLE ROW LEVEL SECURITY';
-  EXECUTE 'DROP POLICY IF EXISTS sm_tech_sched_all ON shop_manager.technician_schedules';
-  EXECUTE 'CREATE POLICY sm_tech_sched_all ON shop_manager.technician_schedules FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM shop_manager.profiles p WHERE p.id = technician_schedules.technician_id AND p.shop_id = shop_manager.get_current_user_shop_id())) WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.profiles p WHERE p.id = technician_schedules.technician_id AND p.shop_id = shop_manager.get_current_user_shop_id()))';
-
-  EXECUTE 'ALTER TABLE shop_manager.technician_breaks ENABLE ROW LEVEL SECURITY';
-  EXECUTE 'DROP POLICY IF EXISTS sm_tech_breaks_all ON shop_manager.technician_breaks';
-  EXECUTE 'CREATE POLICY sm_tech_breaks_all ON shop_manager.technician_breaks FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM shop_manager.technician_schedules s JOIN shop_manager.profiles p ON p.id = s.technician_id WHERE s.id = technician_breaks.schedule_id AND p.shop_id = shop_manager.get_current_user_shop_id())) WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.technician_schedules s JOIN shop_manager.profiles p ON p.id = s.technician_id WHERE s.id = technician_breaks.schedule_id AND p.shop_id = shop_manager.get_current_user_shop_id()))';
-
-  EXECUTE 'ALTER TABLE shop_manager.technician_status_changes ENABLE ROW LEVEL SECURITY';
-  EXECUTE 'DROP POLICY IF EXISTS sm_tech_status_all ON shop_manager.technician_status_changes';
-  EXECUTE 'CREATE POLICY sm_tech_status_all ON shop_manager.technician_status_changes FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM shop_manager.profiles p WHERE p.id::text = technician_status_changes.technician_id AND p.shop_id = shop_manager.get_current_user_shop_id())) WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.profiles p WHERE p.id::text = technician_status_changes.technician_id AND p.shop_id = shop_manager.get_current_user_shop_id()))';
-END $$;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714032507_f944b167-9bbe-4f1b-a49b-48dec9a68a68.sql
--- ============================================================================
-
--- Enable RLS + shop-scoped policies on settings tables
-ALTER TABLE shop_manager.shop_settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shop_manager.shop_hours ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shop_manager.shop_special_days ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shop_manager.company_settings ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS sm_shop_settings_all ON shop_manager.shop_settings;
-CREATE POLICY sm_shop_settings_all ON shop_manager.shop_settings FOR ALL TO authenticated
-  USING (shop_id = shop_manager.get_current_user_shop_id())
-  WITH CHECK (shop_id = shop_manager.get_current_user_shop_id());
-
-DROP POLICY IF EXISTS sm_shop_hours_all ON shop_manager.shop_hours;
-CREATE POLICY sm_shop_hours_all ON shop_manager.shop_hours FOR ALL TO authenticated
-  USING (shop_id = shop_manager.get_current_user_shop_id())
-  WITH CHECK (shop_id = shop_manager.get_current_user_shop_id());
-
-DROP POLICY IF EXISTS sm_shop_special_days_all ON shop_manager.shop_special_days;
-CREATE POLICY sm_shop_special_days_all ON shop_manager.shop_special_days FOR ALL TO authenticated
-  USING (shop_id = shop_manager.get_current_user_shop_id())
-  WITH CHECK (shop_id = shop_manager.get_current_user_shop_id());
-
-DROP POLICY IF EXISTS sm_company_settings_all ON shop_manager.company_settings;
-CREATE POLICY sm_company_settings_all ON shop_manager.company_settings FOR ALL TO authenticated
-  USING (shop_id = shop_manager.get_current_user_shop_id())
-  WITH CHECK (shop_id = shop_manager.get_current_user_shop_id());
-
--- Expense tracking
-CREATE TABLE IF NOT EXISTS shop_manager.expense_categories (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_id UUID NOT NULL,
-  name TEXT NOT NULL,
-  description TEXT,
-  is_active BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS shop_manager.expenses (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_id UUID NOT NULL,
-  category_id UUID REFERENCES shop_manager.expense_categories(id) ON DELETE SET NULL,
-  vendor_id UUID,
-  amount NUMERIC(14,2) NOT NULL DEFAULT 0,
-  tax_amount NUMERIC(14,2) NOT NULL DEFAULT 0,
-  expense_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  payment_method TEXT,
-  reference_number TEXT,
-  description TEXT,
-  notes TEXT,
-  status TEXT NOT NULL DEFAULT 'recorded',
-  created_by UUID,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_expenses_shop_date ON shop_manager.expenses(shop_id, expense_date DESC);
-CREATE INDEX IF NOT EXISTS idx_expenses_category ON shop_manager.expenses(category_id);
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.expense_categories TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.expenses TO authenticated;
-GRANT ALL ON shop_manager.expense_categories TO service_role;
-GRANT ALL ON shop_manager.expenses TO service_role;
-
-ALTER TABLE shop_manager.expense_categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shop_manager.expenses ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY sm_expense_categories_all ON shop_manager.expense_categories FOR ALL TO authenticated
-  USING (shop_id = shop_manager.get_current_user_shop_id())
-  WITH CHECK (shop_id = shop_manager.get_current_user_shop_id());
-
-CREATE POLICY sm_expenses_all ON shop_manager.expenses FOR ALL TO authenticated
-  USING (shop_id = shop_manager.get_current_user_shop_id())
-  WITH CHECK (shop_id = shop_manager.get_current_user_shop_id());
-
--- updated_at trigger for expenses
-CREATE OR REPLACE FUNCTION shop_manager.touch_updated_at() RETURNS TRIGGER
-LANGUAGE plpgsql SET search_path = shop_manager AS $$
-BEGIN NEW.updated_at = now(); RETURN NEW; END $$;
-
-DROP TRIGGER IF EXISTS trg_expenses_updated ON shop_manager.expenses;
-CREATE TRIGGER trg_expenses_updated BEFORE UPDATE ON shop_manager.expenses
-  FOR EACH ROW EXECUTE FUNCTION shop_manager.touch_updated_at();
-
-DROP TRIGGER IF EXISTS trg_expense_categories_updated ON shop_manager.expense_categories;
-CREATE TRIGGER trg_expense_categories_updated BEFORE UPDATE ON shop_manager.expense_categories
-  FOR EACH ROW EXECUTE FUNCTION shop_manager.touch_updated_at();
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714033406_52a679a7-d96b-447e-a534-cb540b995c98.sql
--- ============================================================================
-
--- Communications & notes: shop-scoped via customer join
-CREATE POLICY sm_customer_comms_all ON shop_manager.customer_communications
-  FOR ALL TO authenticated
-  USING (EXISTS (SELECT 1 FROM shop_manager.customers c WHERE c.id = customer_communications.customer_id AND c.shop_id = shop_manager.get_current_user_shop_id()))
-  WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.customers c WHERE c.id = customer_communications.customer_id AND c.shop_id = shop_manager.get_current_user_shop_id()));
-
-CREATE POLICY sm_customer_notes_all ON shop_manager.customer_notes
-  FOR ALL TO authenticated
-  USING (EXISTS (SELECT 1 FROM shop_manager.customers c WHERE c.id = customer_notes.customer_id AND c.shop_id = shop_manager.get_current_user_shop_id()))
-  WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.customers c WHERE c.id = customer_notes.customer_id AND c.shop_id = shop_manager.get_current_user_shop_id()));
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714034131_1bed039d-569f-4b91-8f56-bf19451a7786.sql
--- ============================================================================
-
-ALTER TABLE shop_manager.expenses ADD COLUMN IF NOT EXISTS receipt_url TEXT;
-
-DROP POLICY IF EXISTS "shop-receipts read authenticated" ON storage.objects;
-DROP POLICY IF EXISTS "shop-receipts write authenticated" ON storage.objects;
-DROP POLICY IF EXISTS "shop-receipts update authenticated" ON storage.objects;
-DROP POLICY IF EXISTS "shop-receipts delete authenticated" ON storage.objects;
-
-CREATE POLICY "shop-receipts read authenticated" ON storage.objects FOR SELECT TO authenticated
-USING (bucket_id = 'shop-receipts');
-CREATE POLICY "shop-receipts write authenticated" ON storage.objects FOR INSERT TO authenticated
-WITH CHECK (bucket_id = 'shop-receipts');
-CREATE POLICY "shop-receipts update authenticated" ON storage.objects FOR UPDATE TO authenticated
-USING (bucket_id = 'shop-receipts');
-CREATE POLICY "shop-receipts delete authenticated" ON storage.objects FOR DELETE TO authenticated
-USING (bucket_id = 'shop-receipts');
-
-CREATE TABLE IF NOT EXISTS shop_manager.customer_reminders (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_id UUID,
-  customer_id UUID NOT NULL,
-  vehicle_id UUID,
-  reminder_type TEXT NOT NULL DEFAULT 'follow_up',
-  title TEXT NOT NULL,
-  notes TEXT,
-  due_date DATE NOT NULL,
-  status TEXT NOT NULL DEFAULT 'pending',
-  assigned_to UUID,
-  completed_at TIMESTAMPTZ,
-  created_by UUID,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.customer_reminders TO authenticated;
-GRANT ALL ON shop_manager.customer_reminders TO service_role;
-
-ALTER TABLE shop_manager.customer_reminders ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "reminders_all_authenticated" ON shop_manager.customer_reminders;
-CREATE POLICY "reminders_all_authenticated" ON shop_manager.customer_reminders
-FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-CREATE INDEX IF NOT EXISTS customer_reminders_customer_idx ON shop_manager.customer_reminders(customer_id);
-CREATE INDEX IF NOT EXISTS customer_reminders_due_idx ON shop_manager.customer_reminders(due_date) WHERE status = 'pending';
-
-CREATE OR REPLACE FUNCTION shop_manager.touch_updated_at()
-RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$
-LANGUAGE plpgsql SET search_path = public;
-
-DROP TRIGGER IF EXISTS customer_reminders_touch ON shop_manager.customer_reminders;
-CREATE TRIGGER customer_reminders_touch BEFORE UPDATE ON shop_manager.customer_reminders
-FOR EACH ROW EXECUTE FUNCTION shop_manager.touch_updated_at();
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714035008_71146e6f-405a-436d-a0d3-9c1c87779acd.sql
--- ============================================================================
-
--- Grants + RLS for CRM segments, service reminders, loyalty
-DO $$
-DECLARE t text;
-BEGIN
-  FOREACH t IN ARRAY ARRAY['customer_segments','customer_segment_assignments','service_reminders','service_reminder_tags','customer_loyalty','customer_activities','customer_touchpoints']
-  LOOP
-    EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.%I TO authenticated', t);
-    EXECUTE format('GRANT ALL ON shop_manager.%I TO service_role', t);
-    EXECUTE format('DROP POLICY IF EXISTS "auth_all_%s" ON shop_manager.%I', t, t);
-    EXECUTE format('CREATE POLICY "auth_all_%s" ON shop_manager.%I FOR ALL TO authenticated USING (true) WITH CHECK (true)', t, t);
-  END LOOP;
-END $$;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714035559_c43891b0-62af-40d5-9dd9-757d5ea6bf16.sql
--- ============================================================================
-
-DO $$
-DECLARE t text;
-BEGIN
-  FOREACH t IN ARRAY ARRAY['shift_templates','shift_swap_requests','employee_availability','discount_codes','discount_code_usage','discount_types','stock_alerts','service_automation_rules']
-  LOOP
-    EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.%I TO authenticated', t);
-    EXECUTE format('GRANT ALL ON shop_manager.%I TO service_role', t);
-    EXECUTE format('DROP POLICY IF EXISTS "auth_all_%s" ON shop_manager.%I', t, t);
-    EXECUTE format('CREATE POLICY "auth_all_%s" ON shop_manager.%I FOR ALL TO authenticated USING (true) WITH CHECK (true)', t, t);
-  END LOOP;
-END $$;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714040242_e2995194-583b-4ca7-9f5e-a8456e9af42f.sql
--- ============================================================================
-
--- 1. Grants + policies for existing HR/automation tables
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.staff_certificates TO authenticated;
-GRANT ALL ON shop_manager.staff_certificates TO service_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.staff_certificate_types TO authenticated;
-GRANT ALL ON shop_manager.staff_certificate_types TO service_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.employee_leave_balances TO authenticated;
-GRANT ALL ON shop_manager.employee_leave_balances TO service_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.customer_automation_preferences TO authenticated;
-GRANT ALL ON shop_manager.customer_automation_preferences TO service_role;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='shop_manager' AND tablename='staff_certificates') THEN
-    EXECUTE 'CREATE POLICY auth_all_staff_certificates ON shop_manager.staff_certificates FOR ALL TO authenticated USING (true) WITH CHECK (true)';
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='shop_manager' AND tablename='staff_certificate_types') THEN
-    EXECUTE 'CREATE POLICY auth_all_staff_certificate_types ON shop_manager.staff_certificate_types FOR ALL TO authenticated USING (true) WITH CHECK (true)';
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='shop_manager' AND tablename='employee_leave_balances') THEN
-    EXECUTE 'CREATE POLICY auth_all_employee_leave_balances ON shop_manager.employee_leave_balances FOR ALL TO authenticated USING (true) WITH CHECK (true)';
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='shop_manager' AND tablename='customer_automation_preferences') THEN
-    EXECUTE 'CREATE POLICY auth_all_customer_automation_preferences ON shop_manager.customer_automation_preferences FOR ALL TO authenticated USING (true) WITH CHECK (true)';
-  END IF;
-END $$;
-
--- 2. Leave types lookup
-CREATE TABLE IF NOT EXISTS shop_manager.leave_types (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_id UUID,
-  name TEXT NOT NULL,
-  is_paid BOOLEAN NOT NULL DEFAULT true,
-  default_hours_per_year NUMERIC NOT NULL DEFAULT 0,
-  color TEXT,
-  is_active BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.leave_types TO authenticated;
-GRANT ALL ON shop_manager.leave_types TO service_role;
-ALTER TABLE shop_manager.leave_types ENABLE ROW LEVEL SECURITY;
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='shop_manager' AND tablename='leave_types') THEN
-    EXECUTE 'CREATE POLICY auth_all_leave_types ON shop_manager.leave_types FOR ALL TO authenticated USING (true) WITH CHECK (true)';
-  END IF;
-END $$;
-
--- 3. Chart of accounts + double-entry journal
-CREATE TABLE IF NOT EXISTS shop_manager.chart_of_accounts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_id UUID,
-  code TEXT NOT NULL,
-  name TEXT NOT NULL,
-  account_type TEXT NOT NULL CHECK (account_type IN ('asset','liability','equity','revenue','expense')),
-  is_active BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.chart_of_accounts TO authenticated;
-GRANT ALL ON shop_manager.chart_of_accounts TO service_role;
-ALTER TABLE shop_manager.chart_of_accounts ENABLE ROW LEVEL SECURITY;
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='shop_manager' AND tablename='chart_of_accounts') THEN
-    EXECUTE 'CREATE POLICY auth_all_chart_of_accounts ON shop_manager.chart_of_accounts FOR ALL TO authenticated USING (true) WITH CHECK (true)';
-  END IF;
-END $$;
-
-CREATE TABLE IF NOT EXISTS shop_manager.journal_entries (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_id UUID,
-  entry_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  reference TEXT,
-  memo TEXT,
-  status TEXT NOT NULL DEFAULT 'posted' CHECK (status IN ('draft','posted','void')),
-  created_by UUID,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.journal_entries TO authenticated;
-GRANT ALL ON shop_manager.journal_entries TO service_role;
-ALTER TABLE shop_manager.journal_entries ENABLE ROW LEVEL SECURITY;
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='shop_manager' AND tablename='journal_entries') THEN
-    EXECUTE 'CREATE POLICY auth_all_journal_entries ON shop_manager.journal_entries FOR ALL TO authenticated USING (true) WITH CHECK (true)';
-  END IF;
-END $$;
-
-CREATE TABLE IF NOT EXISTS shop_manager.journal_entry_lines (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  journal_entry_id UUID NOT NULL REFERENCES shop_manager.journal_entries(id) ON DELETE CASCADE,
-  account_id UUID REFERENCES shop_manager.chart_of_accounts(id),
-  account_code TEXT,
-  description TEXT,
-  debit NUMERIC NOT NULL DEFAULT 0,
-  credit NUMERIC NOT NULL DEFAULT 0,
-  line_order INT NOT NULL DEFAULT 0,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.journal_entry_lines TO authenticated;
-GRANT ALL ON shop_manager.journal_entry_lines TO service_role;
-ALTER TABLE shop_manager.journal_entry_lines ENABLE ROW LEVEL SECURITY;
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='shop_manager' AND tablename='journal_entry_lines') THEN
-    EXECUTE 'CREATE POLICY auth_all_journal_entry_lines ON shop_manager.journal_entry_lines FOR ALL TO authenticated USING (true) WITH CHECK (true)';
-  END IF;
-END $$;
-
-CREATE INDEX IF NOT EXISTS idx_je_lines_entry ON shop_manager.journal_entry_lines(journal_entry_id);
-CREATE INDEX IF NOT EXISTS idx_je_date ON shop_manager.journal_entries(entry_date DESC);
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714041231_2a64059b-ef9b-4388-b34d-dcae0ab40cd2.sql
--- ============================================================================
-
-CREATE TABLE IF NOT EXISTS shop_manager.leave_requests (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_id uuid,
-  employee_id uuid NOT NULL,
-  leave_type_id uuid REFERENCES shop_manager.leave_types(id) ON DELETE SET NULL,
-  start_date date NOT NULL,
-  end_date date NOT NULL,
-  hours numeric NOT NULL DEFAULT 0,
-  reason text,
-  status text NOT NULL DEFAULT 'pending',
-  reviewed_by uuid,
-  reviewed_at timestamptz,
-  review_notes text,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.leave_requests TO authenticated;
-GRANT ALL ON shop_manager.leave_requests TO service_role;
-
-ALTER TABLE shop_manager.leave_requests ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "auth_all_leave_requests" ON shop_manager.leave_requests
-  FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-CREATE OR REPLACE FUNCTION shop_manager.update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN NEW.updated_at = now(); RETURN NEW; END;
-$$ LANGUAGE plpgsql SET search_path = shop_manager, public;
-
-DROP TRIGGER IF EXISTS update_leave_requests_updated_at ON shop_manager.leave_requests;
-CREATE TRIGGER update_leave_requests_updated_at
-BEFORE UPDATE ON shop_manager.leave_requests
-FOR EACH ROW EXECUTE FUNCTION shop_manager.update_updated_at_column();
-
-CREATE INDEX IF NOT EXISTS idx_leave_requests_employee ON shop_manager.leave_requests(employee_id);
-CREATE INDEX IF NOT EXISTS idx_leave_requests_status ON shop_manager.leave_requests(status);
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714155326_c1b1b538-961e-401b-a3e7-0eba5e655d65.sql
--- ============================================================================
-
-CREATE TABLE IF NOT EXISTS public.feature_screenshots (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  feature_id TEXT NOT NULL,
-  route TEXT NOT NULL,
-  url TEXT NOT NULL,
-  viewport TEXT NOT NULL DEFAULT 'desktop',
-  captured_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  captured_by TEXT,
-  notes TEXT,
-  is_pinned BOOLEAN NOT NULL DEFAULT FALSE,
-  sha256 TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS feature_screenshots_feature_captured_idx
-  ON public.feature_screenshots (feature_id, captured_at DESC);
-
-GRANT SELECT ON public.feature_screenshots TO anon, authenticated;
-GRANT INSERT, UPDATE, DELETE ON public.feature_screenshots TO authenticated;
-GRANT ALL ON public.feature_screenshots TO service_role;
-
-ALTER TABLE public.feature_screenshots ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "feature_screenshots public read"
-  ON public.feature_screenshots FOR SELECT
-  USING (true);
-
-CREATE POLICY "feature_screenshots admin insert"
-  ON public.feature_screenshots FOR INSERT
-  TO authenticated
-  WITH CHECK (public.has_role(auth.uid(), 'admin'));
-
-CREATE POLICY "feature_screenshots admin update"
-  ON public.feature_screenshots FOR UPDATE
-  TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'))
-  WITH CHECK (public.has_role(auth.uid(), 'admin'));
-
-CREATE POLICY "feature_screenshots admin delete"
-  ON public.feature_screenshots FOR DELETE
-  TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'));
-
--- Storage policies for feature-screenshots bucket
-CREATE POLICY "feature-screenshots public read"
-  ON storage.objects FOR SELECT
-  USING (bucket_id = 'feature-screenshots');
-
-CREATE POLICY "feature-screenshots admin write"
-  ON storage.objects FOR INSERT
-  TO authenticated
-  WITH CHECK (bucket_id = 'feature-screenshots' AND public.has_role(auth.uid(), 'admin'));
-
-CREATE POLICY "feature-screenshots admin update"
-  ON storage.objects FOR UPDATE
-  TO authenticated
-  USING (bucket_id = 'feature-screenshots' AND public.has_role(auth.uid(), 'admin'));
-
-CREATE POLICY "feature-screenshots admin delete"
-  ON storage.objects FOR DELETE
-  TO authenticated
-  USING (bucket_id = 'feature-screenshots' AND public.has_role(auth.uid(), 'admin'));
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714155507_6f25272b-4786-48dd-a9c7-31e3d5e2cf43.sql
--- ============================================================================
-
-ALTER TABLE public.feature_screenshots
-  ADD COLUMN IF NOT EXISTS storage_path TEXT;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714170250_e9540d54-e006-48bd-918c-8e5033f08dab.sql
--- ============================================================================
--- Add optional labor economics fields to shop_manager.profiles so
--- per-technician P&L (revenue = billable hours × rate, cost = hours × cost_rate)
--- has stable columns to read from.
-ALTER TABLE shop_manager.profiles
-  ADD COLUMN IF NOT EXISTS hourly_rate numeric(10,2),
-  ADD COLUMN IF NOT EXISTS cost_rate numeric(10,2);
-
--- Track which rule produced a reminder so audit + admin surfaces can attribute
--- automation output.
-ALTER TABLE shop_manager.service_reminders
-  ADD COLUMN IF NOT EXISTS source text,
-  ADD COLUMN IF NOT EXISTS source_rule_id uuid;
-
--- Register the cron-driven automation runner token. Value is a random 32-byte
--- hex string; pg_cron sends it in the `x-cron-token` header.
-INSERT INTO public.internal_cron_tokens (job_name, token)
-VALUES ('shop_automation_run', encode(gen_random_bytes(32), 'hex'))
-ON CONFLICT (job_name) DO NOTHING;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714172542_fe842540-f4a5-410d-a22b-db7d2530ac2c.sql
--- ============================================================================
-
--- Automation run logs (shop_manager schema)
-CREATE TABLE IF NOT EXISTS shop_manager.automation_run_logs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_id uuid NULL,
-  rule_id uuid NULL,
-  ran_at timestamptz NOT NULL DEFAULT now(),
-  customers_scanned integer NOT NULL DEFAULT 0,
-  vehicles_scanned integer NOT NULL DEFAULT 0,
-  reminders_created integer NOT NULL DEFAULT 0,
-  skipped_duplicate integer NOT NULL DEFAULT 0,
-  error text NULL,
-  triggered_by text NOT NULL DEFAULT 'cron'
-);
-
-CREATE INDEX IF NOT EXISTS automation_run_logs_shop_ran_at_idx
-  ON shop_manager.automation_run_logs (shop_id, ran_at DESC);
-
-GRANT SELECT ON shop_manager.automation_run_logs TO authenticated;
-GRANT ALL ON shop_manager.automation_run_logs TO service_role;
-
-ALTER TABLE shop_manager.automation_run_logs ENABLE ROW LEVEL SECURITY;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname = 'shop_manager'
-      AND tablename = 'automation_run_logs'
-      AND policyname = 'Shop members can read own automation logs'
-  ) THEN
-    CREATE POLICY "Shop members can read own automation logs"
-      ON shop_manager.automation_run_logs
-      FOR SELECT
-      TO authenticated
-      USING (
-        shop_id IS NOT NULL
-        AND shop_id = shop_manager.get_current_user_shop_id()
-      );
-  END IF;
-END $$;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260714182226_86c87564-8376-4497-be04-81f0d6ff5210.sql
--- ============================================================================
-
--- Digital Inspections MVP for Shop Manager
--- Extend vehicle_inspections and add templates/items/photos
-
-ALTER TABLE shop_manager.vehicle_inspections
-  ADD COLUMN IF NOT EXISTS shop_id uuid,
-  ADD COLUMN IF NOT EXISTS work_order_id uuid,
-  ADD COLUMN IF NOT EXISTS customer_id uuid,
-  ADD COLUMN IF NOT EXISTS template_id uuid,
-  ADD COLUMN IF NOT EXISTS title text,
-  ADD COLUMN IF NOT EXISTS summary text,
-  ADD COLUMN IF NOT EXISTS overall_result text,
-  ADD COLUMN IF NOT EXISTS completed_at timestamptz,
-  ADD COLUMN IF NOT EXISTS signed_off_by uuid,
-  ADD COLUMN IF NOT EXISTS customer_shared_at timestamptz;
-
-ALTER TABLE shop_manager.vehicle_inspections
-  ALTER COLUMN vehicle_body_style DROP NOT NULL;
-
--- Templates
-CREATE TABLE IF NOT EXISTS shop_manager.inspection_templates (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_id uuid,
-  name text NOT NULL,
-  description text,
-  is_default boolean NOT NULL DEFAULT false,
-  is_system boolean NOT NULL DEFAULT false,
-  active boolean NOT NULL DEFAULT true,
-  created_by uuid,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS shop_manager.inspection_template_items (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  template_id uuid NOT NULL REFERENCES shop_manager.inspection_templates(id) ON DELETE CASCADE,
-  category text NOT NULL,
-  label text NOT NULL,
-  sort_order int NOT NULL DEFAULT 0,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-
--- Item results (one row per checked point)
-CREATE TABLE IF NOT EXISTS shop_manager.inspection_items (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  inspection_id uuid NOT NULL REFERENCES shop_manager.vehicle_inspections(id) ON DELETE CASCADE,
-  category text NOT NULL,
-  label text NOT NULL,
-  sort_order int NOT NULL DEFAULT 0,
-  -- pass | attention | fail | na
-  result text,
-  notes text,
-  measurement text,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_inspection_items_inspection ON shop_manager.inspection_items(inspection_id);
-
--- Photos attached to inspection or specific item
-CREATE TABLE IF NOT EXISTS shop_manager.inspection_photos (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  inspection_id uuid NOT NULL REFERENCES shop_manager.vehicle_inspections(id) ON DELETE CASCADE,
-  item_id uuid REFERENCES shop_manager.inspection_items(id) ON DELETE CASCADE,
-  storage_path text NOT NULL,
-  caption text,
-  uploaded_by uuid,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_inspection_photos_inspection ON shop_manager.inspection_photos(inspection_id);
-CREATE INDEX IF NOT EXISTS idx_vi_shop ON shop_manager.vehicle_inspections(shop_id);
-CREATE INDEX IF NOT EXISTS idx_vi_wo ON shop_manager.vehicle_inspections(work_order_id);
-
-GRANT USAGE ON SCHEMA shop_manager TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.inspection_templates TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.inspection_template_items TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.inspection_items TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON shop_manager.inspection_photos TO authenticated;
-GRANT ALL ON shop_manager.inspection_templates TO service_role;
-GRANT ALL ON shop_manager.inspection_template_items TO service_role;
-GRANT ALL ON shop_manager.inspection_items TO service_role;
-GRANT ALL ON shop_manager.inspection_photos TO service_role;
-
-ALTER TABLE shop_manager.inspection_templates ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shop_manager.inspection_template_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shop_manager.inspection_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shop_manager.inspection_photos ENABLE ROW LEVEL SECURITY;
-
--- Templates: shop members can see own shop's templates + system templates
-DROP POLICY IF EXISTS "templates_select" ON shop_manager.inspection_templates;
-CREATE POLICY "templates_select" ON shop_manager.inspection_templates FOR SELECT TO authenticated
-USING (is_system = true OR shop_id = shop_manager.get_current_user_shop_id());
-
-DROP POLICY IF EXISTS "templates_write" ON shop_manager.inspection_templates;
-CREATE POLICY "templates_write" ON shop_manager.inspection_templates FOR ALL TO authenticated
-USING (shop_id = shop_manager.get_current_user_shop_id())
-WITH CHECK (shop_id = shop_manager.get_current_user_shop_id());
-
-DROP POLICY IF EXISTS "template_items_select" ON shop_manager.inspection_template_items;
-CREATE POLICY "template_items_select" ON shop_manager.inspection_template_items FOR SELECT TO authenticated
-USING (EXISTS (SELECT 1 FROM shop_manager.inspection_templates t WHERE t.id = template_id
-  AND (t.is_system = true OR t.shop_id = shop_manager.get_current_user_shop_id())));
-
-DROP POLICY IF EXISTS "template_items_write" ON shop_manager.inspection_template_items;
-CREATE POLICY "template_items_write" ON shop_manager.inspection_template_items FOR ALL TO authenticated
-USING (EXISTS (SELECT 1 FROM shop_manager.inspection_templates t WHERE t.id = template_id AND t.shop_id = shop_manager.get_current_user_shop_id()))
-WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.inspection_templates t WHERE t.id = template_id AND t.shop_id = shop_manager.get_current_user_shop_id()));
-
--- Vehicle inspections RLS (scoped by shop)
-ALTER TABLE shop_manager.vehicle_inspections ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "vi_all" ON shop_manager.vehicle_inspections;
-CREATE POLICY "vi_all" ON shop_manager.vehicle_inspections FOR ALL TO authenticated
-USING (shop_id = shop_manager.get_current_user_shop_id())
-WITH CHECK (shop_id = shop_manager.get_current_user_shop_id());
-
-DROP POLICY IF EXISTS "insp_items_all" ON shop_manager.inspection_items;
-CREATE POLICY "insp_items_all" ON shop_manager.inspection_items FOR ALL TO authenticated
-USING (EXISTS (SELECT 1 FROM shop_manager.vehicle_inspections v WHERE v.id = inspection_id AND v.shop_id = shop_manager.get_current_user_shop_id()))
-WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.vehicle_inspections v WHERE v.id = inspection_id AND v.shop_id = shop_manager.get_current_user_shop_id()));
-
-DROP POLICY IF EXISTS "insp_photos_all" ON shop_manager.inspection_photos;
-CREATE POLICY "insp_photos_all" ON shop_manager.inspection_photos FOR ALL TO authenticated
-USING (EXISTS (SELECT 1 FROM shop_manager.vehicle_inspections v WHERE v.id = inspection_id AND v.shop_id = shop_manager.get_current_user_shop_id()))
-WITH CHECK (EXISTS (SELECT 1 FROM shop_manager.vehicle_inspections v WHERE v.id = inspection_id AND v.shop_id = shop_manager.get_current_user_shop_id()));
-
--- Updated_at trigger
-CREATE OR REPLACE FUNCTION shop_manager.set_updated_at()
-RETURNS trigger LANGUAGE plpgsql AS $$
-BEGIN NEW.updated_at = now(); RETURN NEW; END; $$;
-
-DROP TRIGGER IF EXISTS trg_vi_upd ON shop_manager.vehicle_inspections;
-CREATE TRIGGER trg_vi_upd BEFORE UPDATE ON shop_manager.vehicle_inspections
-  FOR EACH ROW EXECUTE FUNCTION shop_manager.set_updated_at();
-DROP TRIGGER IF EXISTS trg_ii_upd ON shop_manager.inspection_items;
-CREATE TRIGGER trg_ii_upd BEFORE UPDATE ON shop_manager.inspection_items
-  FOR EACH ROW EXECUTE FUNCTION shop_manager.set_updated_at();
-DROP TRIGGER IF EXISTS trg_it_upd ON shop_manager.inspection_templates;
-CREATE TRIGGER trg_it_upd BEFORE UPDATE ON shop_manager.inspection_templates
-  FOR EACH ROW EXECUTE FUNCTION shop_manager.set_updated_at();
-
--- Seed a system default 50-point inspection template
-DO $$
-DECLARE tid uuid;
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM shop_manager.inspection_templates WHERE is_system = true AND name = 'Standard Digital Inspection') THEN
-    INSERT INTO shop_manager.inspection_templates(name, description, is_default, is_system, active)
-    VALUES ('Standard Digital Inspection', 'Default multi-point inspection covering exterior, interior, under-hood, under-vehicle, brakes, tires, and fluids.', true, true, true)
-    RETURNING id INTO tid;
-
-    INSERT INTO shop_manager.inspection_template_items(template_id, category, label, sort_order) VALUES
-    (tid, 'Exterior', 'Body condition / panels', 10),
-    (tid, 'Exterior', 'Headlights & signals', 20),
-    (tid, 'Exterior', 'Windshield & wipers', 30),
-    (tid, 'Exterior', 'Mirrors', 40),
-    (tid, 'Interior', 'Horn operation', 50),
-    (tid, 'Interior', 'Seat belts & airbags', 60),
-    (tid, 'Interior', 'HVAC / A/C performance', 70),
-    (tid, 'Interior', 'Dashboard warning lights', 80),
-    (tid, 'Under Hood', 'Engine oil level & condition', 90),
-    (tid, 'Under Hood', 'Coolant level & condition', 100),
-    (tid, 'Under Hood', 'Brake fluid', 110),
-    (tid, 'Under Hood', 'Power steering fluid', 120),
-    (tid, 'Under Hood', 'Battery & terminals', 130),
-    (tid, 'Under Hood', 'Belts & hoses', 140),
-    (tid, 'Under Hood', 'Air filter', 150),
-    (tid, 'Under Vehicle', 'Exhaust system', 160),
-    (tid, 'Under Vehicle', 'CV boots / drive shafts', 170),
-    (tid, 'Under Vehicle', 'Suspension components', 180),
-    (tid, 'Under Vehicle', 'Steering linkage', 190),
-    (tid, 'Under Vehicle', 'Fluid leaks', 200),
-    (tid, 'Brakes', 'Front pad thickness', 210),
-    (tid, 'Brakes', 'Rear pad / shoe thickness', 220),
-    (tid, 'Brakes', 'Rotors / drums condition', 230),
-    (tid, 'Brakes', 'Brake lines & hoses', 240),
-    (tid, 'Tires', 'LF tread depth', 250),
-    (tid, 'Tires', 'RF tread depth', 260),
-    (tid, 'Tires', 'LR tread depth', 270),
-    (tid, 'Tires', 'RR tread depth', 280),
-    (tid, 'Tires', 'Tire pressure (all)', 290),
-    (tid, 'Tires', 'Wear pattern', 300);
-  END IF;
-END $$;
-
--- Storage RLS for shop-inspections bucket
-DROP POLICY IF EXISTS "shop_inspections_read" ON storage.objects;
-CREATE POLICY "shop_inspections_read" ON storage.objects FOR SELECT TO authenticated
-USING (bucket_id = 'shop-inspections' AND auth.uid() IS NOT NULL);
-
-DROP POLICY IF EXISTS "shop_inspections_write" ON storage.objects;
-CREATE POLICY "shop_inspections_write" ON storage.objects FOR INSERT TO authenticated
-WITH CHECK (bucket_id = 'shop-inspections' AND auth.uid() IS NOT NULL);
-
-DROP POLICY IF EXISTS "shop_inspections_delete" ON storage.objects;
-CREATE POLICY "shop_inspections_delete" ON storage.objects FOR DELETE TO authenticated
-USING (bucket_id = 'shop-inspections' AND auth.uid() IS NOT NULL);
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260715012303_a5daad1f-ca4a-4606-b07d-3f38ec8c7ee9.sql
--- ============================================================================
-
--- ============================================================
--- Shop Manager: helper functions
--- ============================================================
-
--- Sequences for auto-generated numbers (per-shop scoping done via prefix)
-CREATE SEQUENCE IF NOT EXISTS shop_manager.quote_number_seq START 1000;
-CREATE SEQUENCE IF NOT EXISTS shop_manager.work_order_number_seq START 1000;
-CREATE SEQUENCE IF NOT EXISTS shop_manager.receipt_number_seq START 1000;
-GRANT USAGE ON SEQUENCE shop_manager.quote_number_seq TO authenticated;
-GRANT USAGE ON SEQUENCE shop_manager.work_order_number_seq TO authenticated;
-GRANT USAGE ON SEQUENCE shop_manager.receipt_number_seq TO authenticated;
-
--- Generate quote number
-CREATE OR REPLACE FUNCTION shop_manager.generate_quote_number()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-BEGIN
-  IF NEW.quote_number IS NULL OR NEW.quote_number = '' THEN
-    NEW.quote_number := 'Q-' || to_char(now(), 'YYMM') || '-' ||
-      lpad(nextval('shop_manager.quote_number_seq')::text, 5, '0');
-  END IF;
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS trg_generate_quote_number ON shop_manager.quotes;
-CREATE TRIGGER trg_generate_quote_number
-  BEFORE INSERT ON shop_manager.quotes
-  FOR EACH ROW EXECUTE FUNCTION shop_manager.generate_quote_number();
-
--- Generate work-order number
-CREATE OR REPLACE FUNCTION shop_manager.generate_work_order_number()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-BEGIN
-  IF NEW.work_order_number IS NULL OR NEW.work_order_number = '' THEN
-    NEW.work_order_number := 'WO-' || to_char(now(), 'YYMM') || '-' ||
-      lpad(nextval('shop_manager.work_order_number_seq')::text, 5, '0');
-  END IF;
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS trg_generate_work_order_number ON shop_manager.work_orders;
-CREATE TRIGGER trg_generate_work_order_number
-  BEFORE INSERT ON shop_manager.work_orders
-  FOR EACH ROW EXECUTE FUNCTION shop_manager.generate_work_order_number();
-
--- Generate payment receipt number (uses transaction_id as receipt slot)
-CREATE OR REPLACE FUNCTION shop_manager.generate_receipt_number()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-BEGIN
-  IF NEW.transaction_id IS NULL OR NEW.transaction_id = '' THEN
-    NEW.transaction_id := 'RC-' || to_char(now(), 'YYMM') || '-' ||
-      lpad(nextval('shop_manager.receipt_number_seq')::text, 6, '0');
-  END IF;
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS trg_generate_receipt_number ON shop_manager.payments;
-CREATE TRIGGER trg_generate_receipt_number
-  BEFORE INSERT ON shop_manager.payments
-  FOR EACH ROW EXECUTE FUNCTION shop_manager.generate_receipt_number();
-
--- Recalculate work-order totals from job lines + parts
-CREATE OR REPLACE FUNCTION shop_manager.calculate_work_order_totals(_work_order_id uuid)
-RETURNS numeric
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-DECLARE
-  labor_total numeric := 0;
-  parts_total numeric := 0;
-  grand numeric := 0;
-BEGIN
-  SELECT COALESCE(SUM(total_amount), 0) INTO labor_total
-    FROM shop_manager.work_order_job_lines WHERE work_order_id = _work_order_id;
-  SELECT COALESCE(SUM(customer_price * quantity), 0) INTO parts_total
-    FROM shop_manager.work_order_parts WHERE work_order_id = _work_order_id;
-  grand := labor_total + parts_total;
-  UPDATE shop_manager.work_orders SET total_cost = grand, updated_at = now()
-    WHERE id = _work_order_id;
-  RETURN grand;
-END $$;
-
-GRANT EXECUTE ON FUNCTION shop_manager.calculate_work_order_totals(uuid) TO authenticated;
-
--- Detect scheduling conflicts for a technician in a time window
-CREATE OR REPLACE FUNCTION shop_manager.detect_schedule_conflicts(
-  _technician_id uuid,
-  _start timestamptz,
-  _end timestamptz,
-  _exclude_work_order uuid DEFAULT NULL
-)
-RETURNS TABLE(work_order_id uuid, start_time timestamptz, end_time timestamptz)
-LANGUAGE sql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-  SELECT id, start_time, end_time
-  FROM shop_manager.work_orders
-  WHERE technician_id = _technician_id
-    AND start_time IS NOT NULL
-    AND end_time IS NOT NULL
-    AND (_exclude_work_order IS NULL OR id <> _exclude_work_order)
-    AND tstzrange(start_time, end_time, '[)') && tstzrange(_start, _end, '[)');
-$$;
-
-GRANT EXECUTE ON FUNCTION shop_manager.detect_schedule_conflicts(uuid, timestamptz, timestamptz, uuid) TO authenticated;
-
--- Convert a quote to a work order (copies quote_items → work_order_job_lines / parts)
-CREATE OR REPLACE FUNCTION shop_manager.convert_quote_to_work_order(_quote_id uuid)
-RETURNS uuid
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-DECLARE
-  q shop_manager.quotes%ROWTYPE;
-  new_wo_id uuid;
-BEGIN
-  SELECT * INTO q FROM shop_manager.quotes WHERE id = _quote_id;
-  IF NOT FOUND THEN RAISE EXCEPTION 'Quote % not found', _quote_id; END IF;
-  IF q.status = 'converted' AND q.converted_to_work_order_id IS NOT NULL THEN
-    RETURN q.converted_to_work_order_id;
-  END IF;
-
-  INSERT INTO shop_manager.work_orders (customer_id, vehicle_id, status, description, created_by)
-  VALUES (q.customer_id, q.vehicle_id, 'pending', q.notes, auth.uid())
-  RETURNING id INTO new_wo_id;
-
-  -- Services / labor lines
-  INSERT INTO shop_manager.work_order_job_lines
-    (work_order_id, name, description, category, estimated_hours, labor_rate, total_amount, display_order)
-  SELECT new_wo_id, name, description, category, quantity, unit_price, total_price, display_order
-  FROM shop_manager.quote_items WHERE quote_id = _quote_id AND item_type IN ('service','labor');
-
-  -- Parts lines
-  INSERT INTO shop_manager.work_order_parts
-    (work_order_id, part_name, quantity, customer_price, retail_price, part_type, category)
-  SELECT new_wo_id, name, quantity::int, unit_price, unit_price, 'aftermarket', category
-  FROM shop_manager.quote_items WHERE quote_id = _quote_id AND item_type = 'part';
-
-  UPDATE shop_manager.quotes
-    SET status = 'converted', converted_at = now(), converted_to_work_order_id = new_wo_id, updated_at = now()
-    WHERE id = _quote_id;
-
-  PERFORM shop_manager.calculate_work_order_totals(new_wo_id);
-  RETURN new_wo_id;
-END $$;
-
-GRANT EXECUTE ON FUNCTION shop_manager.convert_quote_to_work_order(uuid) TO authenticated;
-
--- Convert a work order to an invoice
-CREATE OR REPLACE FUNCTION shop_manager.convert_work_order_to_invoice(_work_order_id uuid)
-RETURNS text
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-DECLARE
-  wo shop_manager.work_orders%ROWTYPE;
-  cust shop_manager.customers%ROWTYPE;
-  new_invoice_id text;
-  subtotal_v numeric := 0;
-  tax_rate_v numeric := 0.12;
-  tax_v numeric := 0;
-BEGIN
-  SELECT * INTO wo FROM shop_manager.work_orders WHERE id = _work_order_id;
-  IF NOT FOUND THEN RAISE EXCEPTION 'Work order % not found', _work_order_id; END IF;
-  IF wo.invoice_id IS NOT NULL THEN RETURN wo.invoice_id; END IF;
-
-  SELECT * INTO cust FROM shop_manager.customers WHERE id = wo.customer_id;
-
-  PERFORM shop_manager.calculate_work_order_totals(_work_order_id);
-  SELECT total_cost INTO subtotal_v FROM shop_manager.work_orders WHERE id = _work_order_id;
-  subtotal_v := COALESCE(subtotal_v, 0);
-  tax_v := round(subtotal_v * tax_rate_v, 2);
-
-  new_invoice_id := 'INV-' || to_char(now(), 'YYMM') || '-' ||
-    lpad(nextval('shop_manager.work_order_number_seq')::text, 5, '0');
-
-  INSERT INTO shop_manager.invoices
-    (id, customer, customer_email, description, date, due_date, status,
-     work_order_id, subtotal, tax, total, created_by, customer_id, created_at)
-  VALUES
-    (new_invoice_id,
-     TRIM(CONCAT(cust.first_name, ' ', cust.last_name)),
-     cust.email,
-     wo.description,
-     to_char(now(), 'YYYY-MM-DD'),
-     to_char(now() + interval '30 days', 'YYYY-MM-DD'),
-     'unpaid',
-     _work_order_id::text,
-     subtotal_v,
-     tax_v,
-     subtotal_v + tax_v,
-     auth.uid()::text,
-     wo.customer_id,
-     now());
-
-  -- Copy job lines as invoice items
-  INSERT INTO shop_manager.invoice_items (invoice_id, name, description, quantity, price, total, hours)
-  SELECT new_invoice_id, name, description, estimated_hours, labor_rate, total_amount, true
-  FROM shop_manager.work_order_job_lines WHERE work_order_id = _work_order_id;
-
-  -- Copy parts as invoice items
-  INSERT INTO shop_manager.invoice_items (invoice_id, name, description, quantity, price, total, hours)
-  SELECT new_invoice_id, part_name, part_number, quantity, customer_price, customer_price * quantity, false
-  FROM shop_manager.work_order_parts WHERE work_order_id = _work_order_id;
-
-  UPDATE shop_manager.work_orders
-    SET invoice_id = new_invoice_id, invoiced_at = now(), updated_at = now()
-    WHERE id = _work_order_id;
-
-  RETURN new_invoice_id;
-END $$;
-
-GRANT EXECUTE ON FUNCTION shop_manager.convert_work_order_to_invoice(uuid) TO authenticated;
-
--- ============================================================
--- Helper views (security_invoker=on so RLS binds to the caller)
--- ============================================================
-
--- Technicians view: shop staff resolved from profiles
-CREATE OR REPLACE VIEW shop_manager.technicians
-WITH (security_invoker=on) AS
-SELECT
-  p.id,
-  p.first_name,
-  p.last_name,
-  p.full_name,
-  p.email,
-  p.phone,
-  p.shop_id,
-  p.job_title,
-  p.hourly_rate,
-  p.cost_rate
-FROM shop_manager.profiles p
-WHERE p.shop_id IS NOT NULL;
-
-GRANT SELECT ON shop_manager.technicians TO authenticated;
-
--- Customer overview: spend & visits
-CREATE OR REPLACE VIEW shop_manager.customer_overview
-WITH (security_invoker=on) AS
-SELECT
-  c.id AS customer_id,
-  c.shop_id,
-  c.first_name,
-  c.last_name,
-  c.email,
-  c.phone,
-  COUNT(DISTINCT w.id) AS work_order_count,
-  COALESCE(SUM(w.total_cost), 0) AS lifetime_spend,
-  MAX(w.created_at) AS last_visit_at,
-  MIN(w.created_at) AS first_visit_at
-FROM shop_manager.customers c
-LEFT JOIN shop_manager.work_orders w ON w.customer_id = c.id
-GROUP BY c.id, c.shop_id, c.first_name, c.last_name, c.email, c.phone;
-
-GRANT SELECT ON shop_manager.customer_overview TO authenticated;
-
--- Inventory stock view
-CREATE OR REPLACE VIEW shop_manager.inventory_stock_view
-WITH (security_invoker=on) AS
-SELECT
-  i.id,
-  i.shop_id,
-  i.name,
-  i.sku,
-  i.part_number,
-  i.category,
-  i.supplier,
-  i.manufacturer,
-  i.quantity AS on_hand,
-  COALESCE(i.on_hold, 0) AS on_hold,
-  COALESCE(i.on_order, 0) AS on_order,
-  GREATEST(i.quantity - COALESCE(i.on_hold, 0), 0) AS available,
-  i.reorder_point,
-  i.cost_per_unit,
-  i.sell_price_per_unit,
-  i.unit_price,
-  (i.quantity * COALESCE(i.cost_per_unit, 0)) AS stock_value_cost,
-  (i.quantity * COALESCE(i.sell_price_per_unit, i.unit_price)) AS stock_value_retail,
-  i.status,
-  i.updated_at
-FROM shop_manager.inventory_items i;
-
-GRANT SELECT ON shop_manager.inventory_stock_view TO authenticated;
-
--- Financial summary: month-to-date rollup per shop
-CREATE OR REPLACE VIEW shop_manager.financial_summary_view
-WITH (security_invoker=on) AS
-WITH inv AS (
-  SELECT
-    c.shop_id,
-    date_trunc('month', now()) AS period_start,
-    COUNT(*) FILTER (WHERE i.status <> 'draft') AS invoice_count,
-    COALESCE(SUM(i.total) FILTER (WHERE i.status <> 'draft'), 0) AS invoiced_total,
-    COALESCE(SUM(i.total) FILTER (WHERE i.status = 'unpaid'), 0) AS unpaid_total
-  FROM shop_manager.invoices i
-  LEFT JOIN shop_manager.customers c ON c.id = i.customer_id
-  WHERE i.created_at >= date_trunc('month', now())
-  GROUP BY c.shop_id
-),
-pay AS (
-  SELECT
-    c.shop_id,
-    COALESCE(SUM(p.amount), 0) AS payments_total
-  FROM shop_manager.payments p
-  JOIN shop_manager.customers c ON c.id = p.customer_id
-  WHERE p.created_at >= date_trunc('month', now())
-    AND p.status IN ('completed','captured','paid','succeeded')
-  GROUP BY c.shop_id
-),
-exp AS (
-  SELECT
-    e.shop_id,
-    COALESCE(SUM(e.amount), 0) AS expense_total
-  FROM shop_manager.expenses e
-  WHERE e.created_at >= date_trunc('month', now())
-  GROUP BY e.shop_id
-)
-SELECT
-  s.id AS shop_id,
-  date_trunc('month', now()) AS period_start,
-  COALESCE(inv.invoice_count, 0) AS invoice_count,
-  COALESCE(inv.invoiced_total, 0) AS invoiced_total,
-  COALESCE(inv.unpaid_total, 0) AS unpaid_total,
-  COALESCE(pay.payments_total, 0) AS payments_total,
-  COALESCE(exp.expense_total, 0) AS expense_total,
-  COALESCE(pay.payments_total, 0) - COALESCE(exp.expense_total, 0) AS net_cash
-FROM shop_manager.shops s
-LEFT JOIN inv ON inv.shop_id = s.id
-LEFT JOIN pay ON pay.shop_id = s.id
-LEFT JOIN exp ON exp.shop_id = s.id;
-
-GRANT SELECT ON shop_manager.financial_summary_view TO authenticated;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260715015208_d62496ef-e67e-4f61-a395-604bfd5749dc.sql
--- ============================================================================
-
--- 1. Source tracking on journal entries -------------------------------------
-ALTER TABLE shop_manager.journal_entries
-  ADD COLUMN IF NOT EXISTS source_type text,
-  ADD COLUMN IF NOT EXISTS source_id   uuid;
-
-CREATE UNIQUE INDEX IF NOT EXISTS journal_entries_source_uniq
-  ON shop_manager.journal_entries (source_type, source_id)
-  WHERE source_type IS NOT NULL AND source_id IS NOT NULL;
-
--- 2. Chart-of-accounts helper -----------------------------------------------
-CREATE OR REPLACE FUNCTION shop_manager.sm_get_or_create_account(
-  p_shop uuid, p_code text, p_name text, p_type text
-) RETURNS uuid
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-DECLARE v_id uuid;
-BEGIN
-  SELECT id INTO v_id FROM shop_manager.chart_of_accounts
-   WHERE shop_id = p_shop AND code = p_code LIMIT 1;
-  IF v_id IS NULL THEN
-    INSERT INTO shop_manager.chart_of_accounts (shop_id, code, name, account_type, is_active)
-    VALUES (p_shop, p_code, p_name, p_type, true)
-    RETURNING id INTO v_id;
-  END IF;
-  RETURN v_id;
-END $$;
-
-CREATE OR REPLACE FUNCTION shop_manager.sm_seed_chart_of_accounts(p_shop uuid)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-BEGIN
-  PERFORM shop_manager.sm_get_or_create_account(p_shop, '1000', 'Cash',                 'asset');
-  PERFORM shop_manager.sm_get_or_create_account(p_shop, '1100', 'Accounts Receivable',  'asset');
-  PERFORM shop_manager.sm_get_or_create_account(p_shop, '1200', 'Inventory',            'asset');
-  PERFORM shop_manager.sm_get_or_create_account(p_shop, '2000', 'Accounts Payable',     'liability');
-  PERFORM shop_manager.sm_get_or_create_account(p_shop, '2100', 'Sales Tax Payable',    'liability');
-  PERFORM shop_manager.sm_get_or_create_account(p_shop, '4000', 'Sales Revenue',        'revenue');
-  PERFORM shop_manager.sm_get_or_create_account(p_shop, '4100', 'Service Revenue',      'revenue');
-  PERFORM shop_manager.sm_get_or_create_account(p_shop, '5000', 'Cost of Goods Sold',   'expense');
-  PERFORM shop_manager.sm_get_or_create_account(p_shop, '6000', 'Operating Expenses',   'expense');
-END $$;
-
--- 3. Core posting helper ----------------------------------------------------
--- Posts a balanced journal entry from a jsonb array of lines:
---   [ { "code": "1100", "name": "Accounts Receivable", "type": "asset",
---       "debit": 1000, "credit": 0, "description": "..." }, ... ]
-CREATE OR REPLACE FUNCTION shop_manager.sm_post_journal(
-  p_shop        uuid,
-  p_date        date,
-  p_reference   text,
-  p_memo        text,
-  p_source_type text,
-  p_source_id   uuid,
-  p_lines       jsonb
-) RETURNS uuid
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-DECLARE
-  v_entry_id uuid;
-  v_line     jsonb;
-  v_idx      int := 0;
-  v_acct     uuid;
-  v_debit    numeric := 0;
-  v_credit   numeric := 0;
-BEGIN
-  IF p_shop IS NULL THEN RETURN NULL; END IF;
-  IF p_source_id IS NOT NULL THEN
-    SELECT id INTO v_entry_id FROM shop_manager.journal_entries
-     WHERE source_type = p_source_type AND source_id = p_source_id LIMIT 1;
-    IF v_entry_id IS NOT NULL THEN RETURN v_entry_id; END IF;
-  END IF;
-
-  -- Balance guard
-  FOR v_line IN SELECT * FROM jsonb_array_elements(p_lines) LOOP
-    v_debit  := v_debit  + COALESCE((v_line->>'debit')::numeric, 0);
-    v_credit := v_credit + COALESCE((v_line->>'credit')::numeric, 0);
-  END LOOP;
-  IF ROUND(v_debit, 2) <> ROUND(v_credit, 2) THEN
-    RAISE EXCEPTION 'Unbalanced journal entry (debit=% credit=%)', v_debit, v_credit;
-  END IF;
-  IF v_debit = 0 THEN RETURN NULL; END IF;
-
-  INSERT INTO shop_manager.journal_entries (shop_id, entry_date, reference, memo, status, source_type, source_id)
-  VALUES (p_shop, p_date, p_reference, p_memo, 'posted', p_source_type, p_source_id)
-  RETURNING id INTO v_entry_id;
-
-  FOR v_line IN SELECT * FROM jsonb_array_elements(p_lines) LOOP
-    v_acct := shop_manager.sm_get_or_create_account(
-      p_shop,
-      v_line->>'code',
-      COALESCE(v_line->>'name', v_line->>'code'),
-      COALESCE(v_line->>'type', 'asset')
-    );
-    INSERT INTO shop_manager.journal_entry_lines
-      (journal_entry_id, account_id, account_code, description, debit, credit, line_order)
-    VALUES (
-      v_entry_id, v_acct, v_line->>'code', v_line->>'description',
-      COALESCE((v_line->>'debit')::numeric, 0),
-      COALESCE((v_line->>'credit')::numeric, 0),
-      v_idx
-    );
-    v_idx := v_idx + 1;
-  END LOOP;
-
-  RETURN v_entry_id;
-END $$;
-
-CREATE OR REPLACE FUNCTION shop_manager.sm_void_journal_by_source(
-  p_source_type text, p_source_id uuid, p_reason text DEFAULT NULL
-) RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-BEGIN
-  UPDATE shop_manager.journal_entries
-     SET status = 'void',
-         memo   = COALESCE(memo,'') || CASE WHEN p_reason IS NULL THEN '' ELSE ' | voided: ' || p_reason END,
-         updated_at = now()
-   WHERE source_type = p_source_type AND source_id = p_source_id AND status <> 'void';
-END $$;
-
--- 4. Invoice → Journal ------------------------------------------------------
-CREATE OR REPLACE FUNCTION shop_manager.sm_trg_invoice_post()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-DECLARE
-  v_shop uuid;
-  v_lines jsonb;
-BEGIN
-  -- Only post when the invoice becomes real to the customer (not draft/void)
-  IF COALESCE(NEW.status,'') IN ('draft','void','cancelled') THEN
-    IF TG_OP = 'UPDATE' AND COALESCE(OLD.status,'') NOT IN ('draft','void','cancelled') THEN
-      PERFORM shop_manager.sm_void_journal_by_source('invoice', NEW.id, 'status=' || NEW.status);
-    END IF;
-    RETURN NEW;
-  END IF;
-
-  SELECT wo.shop_id INTO v_shop FROM shop_manager.work_orders wo WHERE wo.id = NEW.work_order_id;
-  IF v_shop IS NULL THEN
-    v_shop := shop_manager.get_current_user_shop_id();
-  END IF;
-  IF v_shop IS NULL THEN RETURN NEW; END IF;
-
-  v_lines := jsonb_build_array(
-    jsonb_build_object('code','1100','name','Accounts Receivable','type','asset',
-                       'debit', COALESCE(NEW.total,0), 'credit', 0,
-                       'description', 'Invoice ' || NEW.id),
-    jsonb_build_object('code','4000','name','Sales Revenue','type','revenue',
-                       'debit', 0, 'credit', COALESCE(NEW.subtotal,0),
-                       'description','Sales'),
-    jsonb_build_object('code','2100','name','Sales Tax Payable','type','liability',
-                       'debit', 0, 'credit', COALESCE(NEW.tax,0),
-                       'description','Sales tax')
-  );
-
-  PERFORM shop_manager.sm_post_journal(
-    v_shop, COALESCE(NEW.date::date, CURRENT_DATE),
-    'INV-' || substr(NEW.id::text,1,8),
-    'Invoice posted', 'invoice', NEW.id, v_lines
-  );
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS sm_trg_invoice_post_ins ON shop_manager.invoices;
-DROP TRIGGER IF EXISTS sm_trg_invoice_post_upd ON shop_manager.invoices;
-CREATE TRIGGER sm_trg_invoice_post_ins AFTER INSERT ON shop_manager.invoices
-FOR EACH ROW EXECUTE FUNCTION shop_manager.sm_trg_invoice_post();
-CREATE TRIGGER sm_trg_invoice_post_upd AFTER UPDATE OF status ON shop_manager.invoices
-FOR EACH ROW EXECUTE FUNCTION shop_manager.sm_trg_invoice_post();
-
--- 5. Payment → Journal (DR Cash, CR AR) + refund reversal -------------------
-CREATE OR REPLACE FUNCTION shop_manager.sm_trg_payment_post()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-DECLARE v_shop uuid;
-BEGIN
-  IF TG_OP = 'UPDATE'
-     AND COALESCE(NEW.status,'') = 'refunded'
-     AND COALESCE(OLD.status,'') <> 'refunded' THEN
-    SELECT wo.shop_id INTO v_shop
-      FROM shop_manager.invoices i JOIN shop_manager.work_orders wo ON wo.id=i.work_order_id
-     WHERE i.id = NEW.invoice_id;
-    IF v_shop IS NULL THEN v_shop := shop_manager.get_current_user_shop_id(); END IF;
-    IF v_shop IS NOT NULL THEN
-      PERFORM shop_manager.sm_post_journal(
-        v_shop, COALESCE(NEW.transaction_date::date, CURRENT_DATE),
-        'REFUND-' || substr(NEW.id::text,1,8),
-        'Payment refunded',
-        'payment_refund', NEW.id,
-        jsonb_build_array(
-          jsonb_build_object('code','1100','name','Accounts Receivable','type','asset',
-                             'debit', COALESCE(NEW.amount,0), 'credit', 0,
-                             'description','Refund reversal — restore AR'),
-          jsonb_build_object('code','1000','name','Cash','type','asset',
-                             'debit', 0, 'credit', COALESCE(NEW.amount,0),
-                             'description','Cash out for refund')
-        )
-      );
-    END IF;
-    RETURN NEW;
-  END IF;
-
-  IF COALESCE(NEW.status,'completed') NOT IN ('completed','succeeded','paid') THEN
-    RETURN NEW;
-  END IF;
-
-  SELECT wo.shop_id INTO v_shop
-    FROM shop_manager.invoices i JOIN shop_manager.work_orders wo ON wo.id=i.work_order_id
-   WHERE i.id = NEW.invoice_id;
-  IF v_shop IS NULL THEN v_shop := shop_manager.get_current_user_shop_id(); END IF;
-  IF v_shop IS NULL THEN RETURN NEW; END IF;
-
-  PERFORM shop_manager.sm_post_journal(
-    v_shop, COALESCE(NEW.transaction_date::date, CURRENT_DATE),
-    'PMT-' || substr(NEW.id::text,1,8),
-    'Customer payment', 'payment', NEW.id,
-    jsonb_build_array(
-      jsonb_build_object('code','1000','name','Cash','type','asset',
-                         'debit', COALESCE(NEW.amount,0), 'credit', 0,
-                         'description','Cash received'),
-      jsonb_build_object('code','1100','name','Accounts Receivable','type','asset',
-                         'debit', 0, 'credit', COALESCE(NEW.amount,0),
-                         'description','Applied to AR')
-    )
-  );
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS sm_trg_payment_post_ins ON shop_manager.payments;
-DROP TRIGGER IF EXISTS sm_trg_payment_post_upd ON shop_manager.payments;
-CREATE TRIGGER sm_trg_payment_post_ins AFTER INSERT ON shop_manager.payments
-FOR EACH ROW EXECUTE FUNCTION shop_manager.sm_trg_payment_post();
-CREATE TRIGGER sm_trg_payment_post_upd AFTER UPDATE OF status ON shop_manager.payments
-FOR EACH ROW EXECUTE FUNCTION shop_manager.sm_trg_payment_post();
-
--- 6. Expense → Journal (DR Expense, CR Cash or AP) --------------------------
-CREATE OR REPLACE FUNCTION shop_manager.sm_trg_expense_post()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-DECLARE
-  v_shop uuid := NEW.shop_id;
-  v_credit_code text := '1000';
-  v_credit_name text := 'Cash';
-  v_credit_type text := 'asset';
-BEGIN
-  IF v_shop IS NULL THEN v_shop := shop_manager.get_current_user_shop_id(); END IF;
-  IF v_shop IS NULL THEN RETURN NEW; END IF;
-  IF COALESCE(NEW.status,'paid') = 'unpaid' THEN
-    v_credit_code := '2000'; v_credit_name := 'Accounts Payable'; v_credit_type := 'liability';
-  END IF;
-
-  PERFORM shop_manager.sm_post_journal(
-    v_shop, COALESCE(NEW.expense_date, CURRENT_DATE),
-    'EXP-' || substr(NEW.id::text,1,8),
-    COALESCE(NEW.description,'Expense'),
-    'expense', NEW.id,
-    jsonb_build_array(
-      jsonb_build_object('code','6000','name','Operating Expenses','type','expense',
-                         'debit', COALESCE(NEW.amount,0) + COALESCE(NEW.tax_amount,0), 'credit', 0,
-                         'description', COALESCE(NEW.description,'Expense')),
-      jsonb_build_object('code', v_credit_code, 'name', v_credit_name, 'type', v_credit_type,
-                         'debit', 0, 'credit', COALESCE(NEW.amount,0) + COALESCE(NEW.tax_amount,0),
-                         'description', COALESCE(NEW.payment_method,'Cash out'))
-    )
-  );
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS sm_trg_expense_post_ins ON shop_manager.expenses;
-CREATE TRIGGER sm_trg_expense_post_ins AFTER INSERT ON shop_manager.expenses
-FOR EACH ROW EXECUTE FUNCTION shop_manager.sm_trg_expense_post();
-
--- 7. Vendor payment → Journal (DR AP, CR Cash) ------------------------------
-CREATE OR REPLACE FUNCTION shop_manager.sm_trg_vendor_payment_post()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = shop_manager, public
-AS $$
-DECLARE v_shop uuid := NEW.shop_id;
-BEGIN
-  IF v_shop IS NULL THEN v_shop := shop_manager.get_current_user_shop_id(); END IF;
-  IF v_shop IS NULL THEN RETURN NEW; END IF;
-
-  PERFORM shop_manager.sm_post_journal(
-    v_shop, COALESCE(NEW.payment_date, CURRENT_DATE),
-    'VP-' || substr(NEW.id::text,1,8),
-    'Vendor payment', 'vendor_payment', NEW.id,
-    jsonb_build_array(
-      jsonb_build_object('code','2000','name','Accounts Payable','type','liability',
-                         'debit', COALESCE(NEW.amount,0), 'credit', 0,
-                         'description','Payable settled'),
-      jsonb_build_object('code','1000','name','Cash','type','asset',
-                         'debit', 0, 'credit', COALESCE(NEW.amount,0),
-                         'description', COALESCE(NEW.payment_method,'Cash out'))
-    )
-  );
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS sm_trg_vendor_payment_post_ins ON shop_manager.vendor_payments;
-CREATE TRIGGER sm_trg_vendor_payment_post_ins AFTER INSERT ON shop_manager.vendor_payments
-FOR EACH ROW EXECUTE FUNCTION shop_manager.sm_trg_vendor_payment_post();
-
--- 8. Backfill: seed chart of accounts for every existing shop --------------
-DO $$
-DECLARE r RECORD;
-BEGIN
-  FOR r IN SELECT DISTINCT shop_id FROM shop_manager.chart_of_accounts WHERE shop_id IS NOT NULL LOOP
-    PERFORM shop_manager.sm_seed_chart_of_accounts(r.shop_id);
-  END LOOP;
-END $$;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260715020120_bc5cc45c-4d3d-4e90-a555-cf44d6e11086.sql
--- ============================================================================
--- Invoice-from-inventory: link invoice lines to inventory items, deduct stock, and auto-post COGS/Inventory journals
-
--- 1) Extend invoice_items with inventory linkage and unit_cost
-ALTER TABLE shop_manager.invoice_items
-  ADD COLUMN IF NOT EXISTS inventory_item_id uuid REFERENCES shop_manager.inventory_items(id) ON DELETE SET NULL,
-  ADD COLUMN IF NOT EXISTS unit_cost numeric(12,2) DEFAULT 0;
-
-CREATE INDEX IF NOT EXISTS idx_invoice_items_inventory
-  ON shop_manager.invoice_items(inventory_item_id) WHERE inventory_item_id IS NOT NULL;
-
--- 2) Helper: consume ('out') or return ('in') stock for one invoice_items row
--- and post the matching COGS <-> Inventory journal entry line-by-line.
-CREATE OR REPLACE FUNCTION shop_manager.sm_apply_invoice_line_stock(
-  p_invoice_id text,
-  p_item_id uuid,
-  p_direction text  -- 'out' = ship (decrement stock, post COGS/Inventory)
-                    -- 'in'  = reverse (restore stock, void COGS/Inventory)
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path TO 'shop_manager', 'public'
-AS $$
-DECLARE
-  v_line record;
-  v_shop uuid;
-  v_inv record;
-  v_qty numeric;
-  v_cost numeric;
-  v_total_cost numeric;
-  v_lines jsonb;
-  v_src text;
-BEGIN
-  SELECT ii.*, i.date, i.status
-    INTO v_line
-    FROM shop_manager.invoice_items ii
-    JOIN shop_manager.invoices i ON i.id = ii.invoice_id
-   WHERE ii.id = p_item_id AND ii.invoice_id = p_invoice_id;
-  IF NOT FOUND OR v_line.inventory_item_id IS NULL THEN RETURN; END IF;
-
-  v_qty := COALESCE(v_line.quantity, 0);
-  IF v_qty <= 0 THEN RETURN; END IF;
-
-  SELECT * INTO v_inv FROM shop_manager.inventory_items WHERE id = v_line.inventory_item_id;
-  IF NOT FOUND THEN RETURN; END IF;
-  v_shop := v_inv.shop_id;
-  IF v_shop IS NULL THEN RETURN; END IF;
-
-  -- unit_cost: prefer the value snapshotted on the invoice_item, else the inventory master cost
-  v_cost := COALESCE(NULLIF(v_line.unit_cost, 0), v_inv.cost_per_unit, 0);
-  v_total_cost := v_cost * v_qty;
-
-  IF p_direction = 'out' THEN
-    UPDATE shop_manager.inventory_items
-       SET quantity = GREATEST(0, COALESCE(quantity,0) - v_qty::int),
-           quantity_in_stock = GREATEST(0, COALESCE(quantity_in_stock, quantity, 0) - v_qty::int),
-           date_last = CURRENT_DATE,
-           updated_at = now()
-     WHERE id = v_inv.id;
-
-    IF v_total_cost > 0 THEN
-      PERFORM shop_manager.sm_seed_chart_of_accounts(v_shop);
-      v_lines := jsonb_build_array(
-        jsonb_build_object('code','5000','name','Cost of Goods Sold','type','expense',
-                           'debit', v_total_cost, 'credit', 0,
-                           'description', 'COGS ' || COALESCE(v_line.name,'inventory item') || ' x' || v_qty::text),
-        jsonb_build_object('code','1200','name','Inventory','type','asset',
-                           'debit', 0, 'credit', v_total_cost,
-                           'description', 'Inventory shipped')
-      );
-      v_src := 'invoice_item:' || p_item_id::text;
-      PERFORM shop_manager.sm_post_journal(
-        v_shop,
-        COALESCE(v_line.date::date, CURRENT_DATE),
-        'COGS-' || substr(p_invoice_id::text,1,8),
-        'Inventory sold on invoice ' || p_invoice_id,
-        v_src, p_item_id, v_lines
-      );
-    END IF;
-
-  ELSIF p_direction = 'in' THEN
-    UPDATE shop_manager.inventory_items
-       SET quantity = COALESCE(quantity,0) + v_qty::int,
-           quantity_in_stock = COALESCE(quantity_in_stock, quantity, 0) + v_qty::int,
-           updated_at = now()
-     WHERE id = v_inv.id;
-
-    PERFORM shop_manager.sm_void_journal_by_source('invoice_item:' || p_item_id::text, p_item_id, 'reversal');
-  END IF;
-END $$;
-
-GRANT EXECUTE ON FUNCTION shop_manager.sm_apply_invoice_line_stock(text, uuid, text) TO authenticated, service_role;
-
--- 3) Helper: apply/reverse ALL inventory-linked lines for an invoice
-CREATE OR REPLACE FUNCTION shop_manager.sm_apply_invoice_stock(p_invoice_id text, p_direction text)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path TO 'shop_manager','public'
-AS $$
-DECLARE r record;
-BEGIN
-  FOR r IN
-    SELECT id FROM shop_manager.invoice_items
-     WHERE invoice_id = p_invoice_id AND inventory_item_id IS NOT NULL
-  LOOP
-    PERFORM shop_manager.sm_apply_invoice_line_stock(p_invoice_id, r.id, p_direction);
-  END LOOP;
-END $$;
-
-GRANT EXECUTE ON FUNCTION shop_manager.sm_apply_invoice_stock(text, text) TO authenticated, service_role;
-
--- 4) Trigger on invoices: on status transition into "posted" (non-draft/void),
---    consume all inventory-linked lines; on transition out, restore them.
-CREATE OR REPLACE FUNCTION shop_manager.sm_trg_invoice_stock()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path TO 'shop_manager','public'
-AS $$
-DECLARE
-  was_posted boolean;
-  is_posted boolean;
-BEGIN
-  is_posted := COALESCE(NEW.status,'') NOT IN ('draft','void','cancelled');
-  IF TG_OP = 'INSERT' THEN
-    IF is_posted THEN PERFORM shop_manager.sm_apply_invoice_stock(NEW.id, 'out'); END IF;
-    RETURN NEW;
-  END IF;
-
-  was_posted := COALESCE(OLD.status,'') NOT IN ('draft','void','cancelled');
-  IF was_posted AND NOT is_posted THEN
-    PERFORM shop_manager.sm_apply_invoice_stock(NEW.id, 'in');
-  ELSIF is_posted AND NOT was_posted THEN
-    PERFORM shop_manager.sm_apply_invoice_stock(NEW.id, 'out');
-  END IF;
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS sm_trg_invoice_stock_ins ON shop_manager.invoices;
-DROP TRIGGER IF EXISTS sm_trg_invoice_stock_upd ON shop_manager.invoices;
-CREATE TRIGGER sm_trg_invoice_stock_ins
-  AFTER INSERT ON shop_manager.invoices
-  FOR EACH ROW EXECUTE FUNCTION shop_manager.sm_trg_invoice_stock();
-CREATE TRIGGER sm_trg_invoice_stock_upd
-  AFTER UPDATE OF status ON shop_manager.invoices
-  FOR EACH ROW EXECUTE FUNCTION shop_manager.sm_trg_invoice_stock();
-
--- 5) Trigger on invoice_items: apply stock immediately when a line is added
---    to an already-posted invoice, and reverse on delete/qty change.
-CREATE OR REPLACE FUNCTION shop_manager.sm_trg_invoice_item_stock()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path TO 'shop_manager','public'
-AS $$
-DECLARE
-  v_status text;
-  v_posted boolean;
-BEGIN
-  IF TG_OP = 'DELETE' THEN
-    SELECT status INTO v_status FROM shop_manager.invoices WHERE id = OLD.invoice_id;
-    v_posted := COALESCE(v_status,'') NOT IN ('draft','void','cancelled');
-    IF v_posted AND OLD.inventory_item_id IS NOT NULL THEN
-      PERFORM shop_manager.sm_apply_invoice_line_stock(OLD.invoice_id, OLD.id, 'in');
-    END IF;
-    RETURN OLD;
-  END IF;
-
-  SELECT status INTO v_status FROM shop_manager.invoices WHERE id = NEW.invoice_id;
-  v_posted := COALESCE(v_status,'') NOT IN ('draft','void','cancelled');
-  IF NOT v_posted THEN RETURN NEW; END IF;
-
-  IF TG_OP = 'INSERT' THEN
-    IF NEW.inventory_item_id IS NOT NULL THEN
-      PERFORM shop_manager.sm_apply_invoice_line_stock(NEW.invoice_id, NEW.id, 'out');
-    END IF;
-  ELSIF TG_OP = 'UPDATE' THEN
-    -- Reverse old, apply new, whenever inventory link or quantity changed
-    IF OLD.inventory_item_id IS DISTINCT FROM NEW.inventory_item_id
-       OR COALESCE(OLD.quantity,0) IS DISTINCT FROM COALESCE(NEW.quantity,0) THEN
-      IF OLD.inventory_item_id IS NOT NULL THEN
-        PERFORM shop_manager.sm_apply_invoice_line_stock(OLD.invoice_id, OLD.id, 'in');
-      END IF;
-      IF NEW.inventory_item_id IS NOT NULL THEN
-        PERFORM shop_manager.sm_apply_invoice_line_stock(NEW.invoice_id, NEW.id, 'out');
-      END IF;
-    END IF;
-  END IF;
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS sm_trg_invoice_item_stock ON shop_manager.invoice_items;
-CREATE TRIGGER sm_trg_invoice_item_stock
-  AFTER INSERT OR UPDATE OR DELETE ON shop_manager.invoice_items
-  FOR EACH ROW EXECUTE FUNCTION shop_manager.sm_trg_invoice_item_stock();
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260715020533_cd0eef21-5341-4af3-abc2-71fc7c080432.sql
--- ============================================================================
-ALTER TABLE public.businesses
-  ADD COLUMN IF NOT EXISTS custom_domain text,
-  ADD COLUMN IF NOT EXISTS custom_domain_status text NOT NULL DEFAULT 'none',
-  ADD COLUMN IF NOT EXISTS custom_domain_verify_token text,
-  ADD COLUMN IF NOT EXISTS custom_domain_verified_at timestamptz;
-
-CREATE OR REPLACE FUNCTION public.normalize_business_domain(v text)
-RETURNS text
-LANGUAGE sql
-IMMUTABLE
-SET search_path = public
-AS $$
-  SELECT NULLIF(
-    regexp_replace(
-      regexp_replace(lower(trim(coalesce(v,''))), '^https?://', ''),
-      '^www\.', ''
-    ),
-    ''
-  );
-$$;
-
-CREATE OR REPLACE FUNCTION public.enforce_business_custom_domain()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE norm text;
-BEGIN
-  norm := public.normalize_business_domain(NEW.custom_domain);
-  IF norm IS NOT NULL AND norm !~ '^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$' THEN
-    RAISE EXCEPTION 'Invalid custom domain: %', NEW.custom_domain;
-  END IF;
-  NEW.custom_domain := norm;
-  IF norm IS NULL THEN
-    NEW.custom_domain_status := 'none';
-    NEW.custom_domain_verify_token := NULL;
-    NEW.custom_domain_verified_at := NULL;
-  END IF;
-  RETURN NEW;
-END $$;
-
-DROP TRIGGER IF EXISTS trg_enforce_business_custom_domain ON public.businesses;
-CREATE TRIGGER trg_enforce_business_custom_domain
-  BEFORE INSERT OR UPDATE OF custom_domain, custom_domain_status ON public.businesses
-  FOR EACH ROW EXECUTE FUNCTION public.enforce_business_custom_domain();
-
-CREATE UNIQUE INDEX IF NOT EXISTS uniq_business_custom_domain
-  ON public.businesses (custom_domain)
-  WHERE custom_domain IS NOT NULL;
-
-DROP POLICY IF EXISTS "Public can resolve verified custom domains" ON public.businesses;
-CREATE POLICY "Public can resolve verified custom domains"
-  ON public.businesses
-  FOR SELECT
-  TO anon, authenticated
-  USING (
-    custom_domain IS NOT NULL
-    AND custom_domain_status = 'verified'
-  );
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260716020110_bcb99519-8cc0-40be-b8af-c0d69fe82236.sql
--- ============================================================================
-
--- 1. shop-inspections storage policies: scope to owning shop
-DROP POLICY IF EXISTS shop_inspections_read ON storage.objects;
-DROP POLICY IF EXISTS shop_inspections_write ON storage.objects;
-DROP POLICY IF EXISTS shop_inspections_delete ON storage.objects;
-
-CREATE POLICY shop_inspections_read ON storage.objects
-FOR SELECT TO authenticated
-USING (
-  bucket_id = 'shop-inspections'
-  AND EXISTS (
-    SELECT 1 FROM shop_manager.vehicle_inspections v
-    WHERE v.id::text = (storage.foldername(name))[1]
-      AND v.shop_id = shop_manager.get_current_user_shop_id()
-  )
-);
-
-CREATE POLICY shop_inspections_write ON storage.objects
-FOR INSERT TO authenticated
-WITH CHECK (
-  bucket_id = 'shop-inspections'
-  AND EXISTS (
-    SELECT 1 FROM shop_manager.vehicle_inspections v
-    WHERE v.id::text = (storage.foldername(name))[1]
-      AND v.shop_id = shop_manager.get_current_user_shop_id()
-  )
-);
-
-CREATE POLICY shop_inspections_delete ON storage.objects
-FOR DELETE TO authenticated
-USING (
-  bucket_id = 'shop-inspections'
-  AND EXISTS (
-    SELECT 1 FROM shop_manager.vehicle_inspections v
-    WHERE v.id::text = (storage.foldername(name))[1]
-      AND v.shop_id = shop_manager.get_current_user_shop_id()
-  )
-);
-
--- 2. shop-receipts storage policies: scope to uploader's own folder
-DROP POLICY IF EXISTS "shop-receipts read authenticated" ON storage.objects;
-DROP POLICY IF EXISTS "shop-receipts write authenticated" ON storage.objects;
-DROP POLICY IF EXISTS "shop-receipts update authenticated" ON storage.objects;
-DROP POLICY IF EXISTS "shop-receipts delete authenticated" ON storage.objects;
-
-CREATE POLICY "shop-receipts read authenticated" ON storage.objects
-FOR SELECT TO authenticated
-USING (
-  bucket_id = 'shop-receipts'
-  AND (storage.foldername(name))[1] = auth.uid()::text
-);
-
-CREATE POLICY "shop-receipts write authenticated" ON storage.objects
-FOR INSERT TO authenticated
-WITH CHECK (
-  bucket_id = 'shop-receipts'
-  AND (storage.foldername(name))[1] = auth.uid()::text
-);
-
-CREATE POLICY "shop-receipts update authenticated" ON storage.objects
-FOR UPDATE TO authenticated
-USING (
-  bucket_id = 'shop-receipts'
-  AND (storage.foldername(name))[1] = auth.uid()::text
-)
-WITH CHECK (
-  bucket_id = 'shop-receipts'
-  AND (storage.foldername(name))[1] = auth.uid()::text
-);
-
-CREATE POLICY "shop-receipts delete authenticated" ON storage.objects
-FOR DELETE TO authenticated
-USING (
-  bucket_id = 'shop-receipts'
-  AND (storage.foldername(name))[1] = auth.uid()::text
-);
-
--- 3. staff_academy_articles: drop the email-domain shortcut
-DROP POLICY IF EXISTS "Staff read published articles" ON public.staff_academy_articles;
-
-CREATE POLICY "Staff read published articles" ON public.staff_academy_articles
-FOR SELECT
-USING (
-  status <> 'draft'
-  AND is_staff(auth.uid())
-);
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260716145553_ac1cd5fe-07aa-4ad1-b6ad-caf47c0e2886.sql
--- ============================================================================
-
--- =========================================
--- business_invoices
--- =========================================
-CREATE TABLE public.business_invoices (
-  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
-  created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  invoice_number TEXT NOT NULL,
-  customer_name TEXT,
-  customer_email TEXT,
-  customer_phone TEXT,
-  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','sent','paid','void')),
-  issue_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  due_date DATE,
-  currency TEXT NOT NULL DEFAULT 'PHP',
-  notes TEXT,
-  subtotal NUMERIC(12,2) NOT NULL DEFAULT 0,
-  tax_rate NUMERIC(5,2) NOT NULL DEFAULT 0,
-  tax_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
-  total NUMERIC(12,2) NOT NULL DEFAULT 0,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE (business_id, invoice_number)
-);
-CREATE INDEX business_invoices_business_idx ON public.business_invoices(business_id, created_at DESC);
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.business_invoices TO authenticated;
-GRANT ALL ON public.business_invoices TO service_role;
-
-ALTER TABLE public.business_invoices ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Members can view business invoices"
-  ON public.business_invoices FOR SELECT TO authenticated
-  USING (public.is_business_member(auth.uid(), business_id));
-
-CREATE POLICY "Managers can insert business invoices"
-  ON public.business_invoices FOR INSERT TO authenticated
-  WITH CHECK (public.has_business_role(auth.uid(), business_id, 'manager'));
-
-CREATE POLICY "Managers can update business invoices"
-  ON public.business_invoices FOR UPDATE TO authenticated
-  USING (public.has_business_role(auth.uid(), business_id, 'manager'))
-  WITH CHECK (public.has_business_role(auth.uid(), business_id, 'manager'));
-
-CREATE POLICY "Managers can delete business invoices"
-  ON public.business_invoices FOR DELETE TO authenticated
-  USING (public.has_business_role(auth.uid(), business_id, 'manager'));
-
--- =========================================
--- business_invoice_items
--- =========================================
-CREATE TABLE public.business_invoice_items (
-  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  invoice_id UUID NOT NULL REFERENCES public.business_invoices(id) ON DELETE CASCADE,
-  business_id UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
-  inventory_item_id UUID REFERENCES public.business_inventory_items(id) ON DELETE SET NULL,
-  description TEXT NOT NULL,
-  quantity NUMERIC(12,2) NOT NULL DEFAULT 1 CHECK (quantity > 0),
-  unit_price NUMERIC(12,2) NOT NULL DEFAULT 0,
-  line_total NUMERIC(12,2) NOT NULL DEFAULT 0,
-  deducted_qty NUMERIC(12,2) NOT NULL DEFAULT 0,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-CREATE INDEX business_invoice_items_invoice_idx ON public.business_invoice_items(invoice_id);
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.business_invoice_items TO authenticated;
-GRANT ALL ON public.business_invoice_items TO service_role;
-
-ALTER TABLE public.business_invoice_items ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Members can view invoice items"
-  ON public.business_invoice_items FOR SELECT TO authenticated
-  USING (public.is_business_member(auth.uid(), business_id));
-
-CREATE POLICY "Managers can insert invoice items"
-  ON public.business_invoice_items FOR INSERT TO authenticated
-  WITH CHECK (public.has_business_role(auth.uid(), business_id, 'manager'));
-
-CREATE POLICY "Managers can update invoice items"
-  ON public.business_invoice_items FOR UPDATE TO authenticated
-  USING (public.has_business_role(auth.uid(), business_id, 'manager'))
-  WITH CHECK (public.has_business_role(auth.uid(), business_id, 'manager'));
-
-CREATE POLICY "Managers can delete invoice items"
-  ON public.business_invoice_items FOR DELETE TO authenticated
-  USING (public.has_business_role(auth.uid(), business_id, 'manager'));
-
--- =========================================
--- Trigger: line_total + updated_at + inventory sync
--- =========================================
-CREATE OR REPLACE FUNCTION public.set_business_invoice_item_totals()
-RETURNS TRIGGER LANGUAGE plpgsql SET search_path = public AS $$
-BEGIN
-  NEW.line_total := ROUND(COALESCE(NEW.quantity,0) * COALESCE(NEW.unit_price,0), 2);
-  NEW.updated_at := now();
-  RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER trg_biz_invoice_item_totals
-BEFORE INSERT OR UPDATE ON public.business_invoice_items
-FOR EACH ROW EXECUTE FUNCTION public.set_business_invoice_item_totals();
-
--- Inventory sync: keep business_inventory_items.qty_on_hand in sync
--- with deducted_qty and log a movement for the diff.
-CREATE OR REPLACE FUNCTION public.sync_invoice_item_inventory()
-RETURNS TRIGGER LANGUAGE plpgsql SET search_path = public AS $$
-DECLARE
-  v_delta NUMERIC;
-  v_target NUMERIC;
-BEGIN
-  IF TG_OP = 'INSERT' THEN
-    IF NEW.inventory_item_id IS NOT NULL AND NEW.quantity > 0 THEN
-      v_delta := -NEW.quantity;
-      UPDATE public.business_inventory_items
-        SET qty_on_hand = COALESCE(qty_on_hand,0) + v_delta
-        WHERE id = NEW.inventory_item_id;
-      INSERT INTO public.business_inventory_movements(item_id, business_id, delta, reason, actor_id)
-        VALUES (NEW.inventory_item_id, NEW.business_id, v_delta, 'invoice:' || NEW.invoice_id, auth.uid());
-      NEW.deducted_qty := NEW.quantity;
-      UPDATE public.business_invoice_items SET deducted_qty = NEW.quantity WHERE id = NEW.id;
-    END IF;
-    RETURN NEW;
-  ELSIF TG_OP = 'UPDATE' THEN
-    -- Restore prior deduction if item link removed or changed
-    IF OLD.inventory_item_id IS NOT NULL AND OLD.deducted_qty <> 0
-       AND (NEW.inventory_item_id IS DISTINCT FROM OLD.inventory_item_id) THEN
-      UPDATE public.business_inventory_items
-        SET qty_on_hand = COALESCE(qty_on_hand,0) + OLD.deducted_qty
-        WHERE id = OLD.inventory_item_id;
-      INSERT INTO public.business_inventory_movements(item_id, business_id, delta, reason, actor_id)
-        VALUES (OLD.inventory_item_id, OLD.business_id, OLD.deducted_qty, 'invoice-unlink:' || OLD.invoice_id, auth.uid());
-      NEW.deducted_qty := 0;
-    END IF;
-    -- Sync current linked item to NEW.quantity
-    IF NEW.inventory_item_id IS NOT NULL THEN
-      v_target := NEW.quantity;
-      v_delta := -(v_target - NEW.deducted_qty);
-      IF v_delta <> 0 THEN
-        UPDATE public.business_inventory_items
-          SET qty_on_hand = COALESCE(qty_on_hand,0) + v_delta
-          WHERE id = NEW.inventory_item_id;
-        INSERT INTO public.business_inventory_movements(item_id, business_id, delta, reason, actor_id)
-          VALUES (NEW.inventory_item_id, NEW.business_id, v_delta, 'invoice-adjust:' || NEW.invoice_id, auth.uid());
-        NEW.deducted_qty := v_target;
-      END IF;
-    END IF;
-    RETURN NEW;
-  ELSIF TG_OP = 'DELETE' THEN
-    IF OLD.inventory_item_id IS NOT NULL AND OLD.deducted_qty <> 0 THEN
-      UPDATE public.business_inventory_items
-        SET qty_on_hand = COALESCE(qty_on_hand,0) + OLD.deducted_qty
-        WHERE id = OLD.inventory_item_id;
-      INSERT INTO public.business_inventory_movements(item_id, business_id, delta, reason, actor_id)
-        VALUES (OLD.inventory_item_id, OLD.business_id, OLD.deducted_qty, 'invoice-delete:' || OLD.invoice_id, auth.uid());
-    END IF;
-    RETURN OLD;
-  END IF;
-  RETURN NULL;
-END;
-$$;
-
-CREATE TRIGGER trg_biz_invoice_item_inventory_ins
-AFTER INSERT ON public.business_invoice_items
-FOR EACH ROW EXECUTE FUNCTION public.sync_invoice_item_inventory();
-
-CREATE TRIGGER trg_biz_invoice_item_inventory_upd
-BEFORE UPDATE ON public.business_invoice_items
-FOR EACH ROW EXECUTE FUNCTION public.sync_invoice_item_inventory();
-
-CREATE TRIGGER trg_biz_invoice_item_inventory_del
-AFTER DELETE ON public.business_invoice_items
-FOR EACH ROW EXECUTE FUNCTION public.sync_invoice_item_inventory();
-
--- Recompute invoice totals on line change
-CREATE OR REPLACE FUNCTION public.recompute_business_invoice_totals()
-RETURNS TRIGGER LANGUAGE plpgsql SET search_path = public AS $$
-DECLARE
-  v_invoice UUID;
-  v_sub NUMERIC;
-  v_rate NUMERIC;
-  v_tax NUMERIC;
-BEGIN
-  v_invoice := COALESCE(NEW.invoice_id, OLD.invoice_id);
-  SELECT COALESCE(SUM(line_total),0) INTO v_sub
-    FROM public.business_invoice_items WHERE invoice_id = v_invoice;
-  SELECT tax_rate INTO v_rate FROM public.business_invoices WHERE id = v_invoice;
-  v_tax := ROUND(v_sub * COALESCE(v_rate,0) / 100.0, 2);
-  UPDATE public.business_invoices
-    SET subtotal = v_sub,
-        tax_amount = v_tax,
-        total = v_sub + v_tax,
-        updated_at = now()
-    WHERE id = v_invoice;
-  RETURN NULL;
-END;
-$$;
-
-CREATE TRIGGER trg_biz_invoice_totals
-AFTER INSERT OR UPDATE OR DELETE ON public.business_invoice_items
-FOR EACH ROW EXECUTE FUNCTION public.recompute_business_invoice_totals();
-
--- updated_at on invoice
-CREATE OR REPLACE FUNCTION public.touch_business_invoice_updated_at()
-RETURNS TRIGGER LANGUAGE plpgsql SET search_path = public AS $$
-BEGIN
-  NEW.updated_at := now();
-  RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER trg_biz_invoice_touch
-BEFORE UPDATE ON public.business_invoices
-FOR EACH ROW EXECUTE FUNCTION public.touch_business_invoice_updated_at();
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260717033312_67f3b139-4a4e-418a-95bf-fab1035a98c5.sql
--- ============================================================================
-
-ALTER TABLE public.business_inventory_items
-  ADD COLUMN IF NOT EXISTS barcode text,
-  ADD COLUMN IF NOT EXISTS manufacturer_part_number text,
-  ADD COLUMN IF NOT EXISTS main_category text,
-  ADD COLUMN IF NOT EXISTS status text NOT NULL DEFAULT 'active',
-  ADD COLUMN IF NOT EXISTS manufacturer text,
-  ADD COLUMN IF NOT EXISTS supplier text,
-  ADD COLUMN IF NOT EXISTS description text,
-  ADD COLUMN IF NOT EXISTS markup_percentage numeric,
-  ADD COLUMN IF NOT EXISTS date_purchased date,
-  ADD COLUMN IF NOT EXISTS last_price_update date,
-  ADD COLUMN IF NOT EXISTS qty_on_hold numeric NOT NULL DEFAULT 0,
-  ADD COLUMN IF NOT EXISTS qty_on_order numeric NOT NULL DEFAULT 0,
-  ADD COLUMN IF NOT EXISTS min_stock_level numeric,
-  ADD COLUMN IF NOT EXISTS max_stock_level numeric,
-  ADD COLUMN IF NOT EXISTS weight_lbs numeric,
-  ADD COLUMN IF NOT EXISTS dimensions text,
-  ADD COLUMN IF NOT EXISTS color text,
-  ADD COLUMN IF NOT EXISTS material text,
-  ADD COLUMN IF NOT EXISTS model_year integer,
-  ADD COLUMN IF NOT EXISTS oem_part_number text,
-  ADD COLUMN IF NOT EXISTS warranty_period text,
-  ADD COLUMN IF NOT EXISTS universal_part boolean NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS tax_rate numeric,
-  ADD COLUMN IF NOT EXISTS environmental_fee numeric,
-  ADD COLUMN IF NOT EXISTS core_charge numeric,
-  ADD COLUMN IF NOT EXISTS hazmat_fee numeric,
-  ADD COLUMN IF NOT EXISTS tax_exempt boolean NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS date_last_ordered date,
-  ADD COLUMN IF NOT EXISTS date_last_used date,
-  ADD COLUMN IF NOT EXISTS web_links jsonb NOT NULL DEFAULT '[]'::jsonb;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260718125837_e056555a-51c9-4074-9ab4-f0d8297324d4.sql
--- ============================================================================
-
-ALTER TABLE public.business_invoices
-  ADD COLUMN IF NOT EXISTS customer_address TEXT,
-  ADD COLUMN IF NOT EXISTS description TEXT,
-  ADD COLUMN IF NOT EXISTS payment_method TEXT,
-  ADD COLUMN IF NOT EXISTS po_number TEXT,
-  ADD COLUMN IF NOT EXISTS terms TEXT;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260720052948_61b323c1-58ce-4316-996c-4cac73e5da99.sql
--- ============================================================================
-
--- 1) Shop Manager plans (per business kind × tier)
-CREATE TABLE public.shop_manager_plans (
-  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_kind text NOT NULL,
-  tier text NOT NULL CHECK (tier IN ('free','starter','pro','enterprise')),
-  name text NOT NULL,
-  blurb text,
-  base_price_php numeric(10,2) NOT NULL DEFAULT 0,
-  yearly_discount_pct numeric(5,2) NOT NULL DEFAULT 16.67, -- ~2 months free
-  features jsonb NOT NULL DEFAULT '{}'::jsonb,
-  limits jsonb NOT NULL DEFAULT '{}'::jsonb,
-  ai_ceiling integer NOT NULL DEFAULT 0,
-  sort_order integer NOT NULL DEFAULT 0,
-  active boolean NOT NULL DEFAULT true,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (business_kind, tier)
-);
-
-GRANT SELECT ON public.shop_manager_plans TO anon, authenticated;
-GRANT ALL ON public.shop_manager_plans TO service_role;
-ALTER TABLE public.shop_manager_plans ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anyone can view active plans"
-  ON public.shop_manager_plans FOR SELECT
-  USING (active = true);
-
--- 2) Regional PPP pricing table
-CREATE TABLE public.shop_manager_regional_pricing (
-  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  country_code text NOT NULL UNIQUE,
-  country_name text NOT NULL,
-  ppp_multiplier numeric(6,3) NOT NULL DEFAULT 1.0,
-  currency text NOT NULL DEFAULT 'PHP',
-  currency_symbol text NOT NULL DEFAULT '₱',
-  fx_to_php numeric(12,6) NOT NULL DEFAULT 1.0, -- 1 unit of local currency = X PHP
-  price_ends_in text NOT NULL DEFAULT '9', -- snap suffix
-  active boolean NOT NULL DEFAULT true,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
-
-GRANT SELECT ON public.shop_manager_regional_pricing TO anon, authenticated;
-GRANT ALL ON public.shop_manager_regional_pricing TO service_role;
-ALTER TABLE public.shop_manager_regional_pricing ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anyone can view active regional pricing"
-  ON public.shop_manager_regional_pricing FOR SELECT
-  USING (active = true);
-
--- 3) Shop Manager subscriptions (per business)
-CREATE TABLE public.shop_manager_subscriptions (
-  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id uuid NOT NULL,
-  business_id uuid NOT NULL,
-  plan_id uuid REFERENCES public.shop_manager_plans(id),
-  tier text NOT NULL DEFAULT 'free' CHECK (tier IN ('free','starter','pro','enterprise')),
-  status text NOT NULL DEFAULT 'active',
-  interval text NOT NULL DEFAULT 'month' CHECK (interval IN ('month','year')),
-  country_code text,
-  effective_price_local numeric(12,2),
-  effective_currency text,
-  stripe_customer_id text,
-  stripe_subscription_id text,
-  current_period_end timestamptz,
-  cancel_at_period_end boolean NOT NULL DEFAULT false,
-  auto_upgrade boolean NOT NULL DEFAULT false,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (business_id)
-);
-
-GRANT SELECT ON public.shop_manager_subscriptions TO authenticated;
-GRANT ALL ON public.shop_manager_subscriptions TO service_role;
-ALTER TABLE public.shop_manager_subscriptions ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Owner or member can view sub"
-  ON public.shop_manager_subscriptions FOR SELECT
-  TO authenticated
-  USING (
-    user_id = auth.uid()
-    OR EXISTS (
-      SELECT 1 FROM public.businesses b
-      WHERE b.id = shop_manager_subscriptions.business_id AND b.owner_id = auth.uid()
-    )
-  );
-
--- 4) Fair-use AI usage counter (monthly)
-CREATE TABLE public.shop_manager_ai_usage (
-  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id uuid NOT NULL,
-  month_key text NOT NULL, -- 'YYYY-MM'
-  calls_used integer NOT NULL DEFAULT 0,
-  last_call_at timestamptz,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (business_id, month_key)
-);
-
-GRANT SELECT ON public.shop_manager_ai_usage TO authenticated;
-GRANT ALL ON public.shop_manager_ai_usage TO service_role;
-ALTER TABLE public.shop_manager_ai_usage ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Owner can view own AI usage"
-  ON public.shop_manager_ai_usage FOR SELECT
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.businesses b
-      WHERE b.id = shop_manager_ai_usage.business_id AND b.owner_id = auth.uid()
-    )
-  );
-
--- Shared updated_at trigger
-CREATE OR REPLACE FUNCTION public.shop_manager_touch_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = now();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SET search_path = public;
-
-CREATE TRIGGER sm_plans_touch BEFORE UPDATE ON public.shop_manager_plans
-  FOR EACH ROW EXECUTE FUNCTION public.shop_manager_touch_updated_at();
-CREATE TRIGGER sm_regional_touch BEFORE UPDATE ON public.shop_manager_regional_pricing
-  FOR EACH ROW EXECUTE FUNCTION public.shop_manager_touch_updated_at();
-CREATE TRIGGER sm_subs_touch BEFORE UPDATE ON public.shop_manager_subscriptions
-  FOR EACH ROW EXECUTE FUNCTION public.shop_manager_touch_updated_at();
-CREATE TRIGGER sm_ai_usage_touch BEFORE UPDATE ON public.shop_manager_ai_usage
-  FOR EACH ROW EXECUTE FUNCTION public.shop_manager_touch_updated_at();
-
--- 5) Seed default 4-tier ladder for a set of business kinds.
--- Callers override per-kind via admin console; this is the sensible default.
-INSERT INTO public.shop_manager_plans (business_kind, tier, name, blurb, base_price_php, features, limits, ai_ceiling, sort_order)
-SELECT bk.kind, t.tier, t.name, t.blurb, t.price, t.features::jsonb, t.limits::jsonb, t.ai_ceiling, t.sort_order
-FROM (VALUES
-  ('repair_shop'), ('fuel_station'), ('dealership'), ('parts_retailer'),
-  ('tow_service'), ('service_shop'), ('detailer'), ('rental'),
-  ('inspection_center'), ('accessories'), ('default')
-) AS bk(kind)
-CROSS JOIN (VALUES
-  ('free', 'Free', 'For solo shops getting started', 0,
-    '{"custom_domain":false,"ai_translate":false,"ai_doc_check":false,"ai_dvi":false,"ai_smart_search":false,"white_label":false,"priority_support":false,"custom_reports":false,"gl_drilldown":false,"multi_location":false}',
-    '{"inventory_skus":100,"invoices_per_month":25,"team_seats":1,"locations":1,"listings":5,"network_sharing":"none"}',
-    0, 1),
-  ('starter', 'Starter', 'For growing single-shop businesses', 499,
-    '{"custom_domain":false,"ai_translate":true,"ai_doc_check":true,"ai_dvi":false,"ai_smart_search":true,"white_label":false,"priority_support":false,"custom_reports":false,"gl_drilldown":false,"multi_location":false}',
-    '{"inventory_skus":1000,"invoices_per_month":250,"team_seats":3,"locations":1,"listings":25,"network_sharing":"read"}',
-    500, 2),
-  ('pro', 'Pro', 'For established shops that need everything', 1499,
-    '{"custom_domain":true,"ai_translate":true,"ai_doc_check":true,"ai_dvi":true,"ai_smart_search":true,"white_label":false,"priority_support":true,"custom_reports":false,"gl_drilldown":true,"multi_location":true}',
-    '{"inventory_skus":10000,"invoices_per_month":2500,"team_seats":10,"locations":3,"listings":100,"network_sharing":"read_write"}',
-    5000, 3),
-  ('enterprise', 'Enterprise', 'Multi-branch and franchise operations', 4999,
-    '{"custom_domain":true,"ai_translate":true,"ai_doc_check":true,"ai_dvi":true,"ai_smart_search":true,"white_label":true,"priority_support":true,"custom_reports":true,"gl_drilldown":true,"multi_location":true}',
-    '{"inventory_skus":null,"invoices_per_month":null,"team_seats":null,"locations":null,"listings":null,"network_sharing":"priority"}',
-    50000, 4)
-) AS t(tier, name, blurb, price, features, limits, ai_ceiling, sort_order);
-
--- 6) Seed regional pricing (PPP multipliers). PH = base.
-INSERT INTO public.shop_manager_regional_pricing (country_code, country_name, ppp_multiplier, currency, currency_symbol, fx_to_php) VALUES
-  ('PH', 'Philippines', 1.000, 'PHP', '₱', 1.0),
-  ('ID', 'Indonesia',   0.900, 'IDR', 'Rp', 0.0036),
-  ('VN', 'Vietnam',     0.950, 'VND', '₫', 0.0023),
-  ('TH', 'Thailand',    1.100, 'THB', '฿', 1.60),
-  ('MY', 'Malaysia',    1.200, 'MYR', 'RM', 12.5),
-  ('SG', 'Singapore',   2.000, 'SGD', 'S$', 42.0),
-  ('JP', 'Japan',       2.200, 'JPY', '¥', 0.37),
-  ('KR', 'South Korea', 1.800, 'KRW', '₩', 0.042),
-  ('AU', 'Australia',   2.600, 'AUD', 'A$', 37.0),
-  ('NZ', 'New Zealand', 2.400, 'NZD', 'NZ$', 34.0),
-  ('US', 'United States', 3.000, 'USD', '$', 57.0),
-  ('CA', 'Canada',      2.800, 'CAD', 'C$', 42.0),
-  ('GB', 'United Kingdom', 2.700, 'GBP', '£', 72.0),
-  ('EU', 'Eurozone',    2.500, 'EUR', '€', 62.0),
-  ('MX', 'Mexico',      1.200, 'MXN', '$', 3.1),
-  ('BR', 'Brazil',      1.300, 'BRL', 'R$', 11.0),
-  ('AR', 'Argentina',   1.500, 'ARS', '$', 0.06),
-  ('IN', 'India',       0.700, 'INR', '₹', 0.68),
-  ('CN', 'China',       1.400, 'CNY', '¥', 7.9),
-  ('AE', 'UAE',         2.500, 'AED', 'AED', 15.5),
-  ('ZA', 'South Africa', 1.100, 'ZAR', 'R', 3.2),
-  ('NG', 'Nigeria',     0.800, 'NGN', '₦', 0.037);
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260726172206_6d55b8f9-1c75-4b3e-825a-33a66205de65.sql
--- ============================================================================
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.leads TO authenticated;
-GRANT ALL ON public.leads TO service_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.lead_activities TO authenticated;
-GRANT ALL ON public.lead_activities TO service_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.organization_members TO authenticated;
-GRANT ALL ON public.organization_members TO service_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.organizations TO authenticated;
-GRANT SELECT ON public.organizations TO anon;
-GRANT ALL ON public.organizations TO service_role;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260727022952_6eba5acb-4c7c-43c0-8d0b-b4064c1cd289.sql
--- ============================================================================
-DROP POLICY IF EXISTS "sm_profiles_update_self" ON public.profiles;
-DROP POLICY IF EXISTS "sm_profiles_insert_self" ON public.profiles;
-
-
--- ============================================================================
--- SOURCE MIGRATION: 20260728125715_52a60fda-14fe-4758-bf19-22284e3e7468.sql
--- ============================================================================
-
--- 1. Application fields
-ALTER TABLE public.partner_program_applications
-  ADD COLUMN IF NOT EXISTS first_name text,
-  ADD COLUMN IF NOT EXISTS last_name text,
-  ADD COLUMN IF NOT EXISTS occupation text,
-  ADD COLUMN IF NOT EXISTS school_or_company text,
-  ADD COLUMN IF NOT EXISTS address_line text,
-  ADD COLUMN IF NOT EXISTS postal_code text,
-  ADD COLUMN IF NOT EXISTS birth_date date,
-  ADD COLUMN IF NOT EXISTS payout_method text,
-  ADD COLUMN IF NOT EXISTS payout_account_name text,
-  ADD COLUMN IF NOT EXISTS payout_account_number text,
-  ADD COLUMN IF NOT EXISTS payout_details jsonb NOT NULL DEFAULT '{}'::jsonb,
-  ADD COLUMN IF NOT EXISTS wants_shop_manager boolean NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS agreed_early_release boolean NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS agreed_early_release_at timestamptz;
-
--- 2. Partner settings
-ALTER TABLE public.partner_program_partners
-  ADD COLUMN IF NOT EXISTS shop_manager_access boolean NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS payout_account_name text,
-  ADD COLUMN IF NOT EXISTS payout_account_number text,
-  ADD COLUMN IF NOT EXISTS signup_bounty_php numeric NOT NULL DEFAULT 2,
-  ADD COLUMN IF NOT EXISTS business_bounty_php numeric NOT NULL DEFAULT 10;
-
--- 3. Allow bounty event types
-ALTER TABLE public.partner_program_commission_events
-  DROP CONSTRAINT IF EXISTS partner_program_commission_events_event_type_check;
-ALTER TABLE public.partner_program_commission_events
-  ADD CONSTRAINT partner_program_commission_events_event_type_check
-  CHECK (event_type = ANY (ARRAY['seller_sub','boost','verified_business','advertiser_purchase','shop_purchase','user_signup','business_signup','other']));
-
--- Idempotency for automated bounties
-CREATE UNIQUE INDEX IF NOT EXISTS pp_commission_events_source_uniq
-  ON public.partner_program_commission_events (partner_id, event_type, source_ref)
-  WHERE source_ref IS NOT NULL;
-
--- 4. Bounty award helper
-CREATE OR REPLACE FUNCTION public.pp_award_bounty(_code text, _event_type text, _source_ref text)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-  p record;
-  amt numeric;
-BEGIN
-  IF _code IS NULL OR btrim(_code) = '' THEN RETURN; END IF;
-  SELECT id, signup_bounty_php, business_bounty_php INTO p
-  FROM public.partner_program_partners
-  WHERE lower(referral_code) = lower(btrim(_code)) AND active = true
-  LIMIT 1;
-  IF NOT FOUND THEN RETURN; END IF;
-  amt := CASE WHEN _event_type = 'business_signup' THEN p.business_bounty_php ELSE p.signup_bounty_php END;
-  IF amt IS NULL OR amt <= 0 THEN RETURN; END IF;
-  INSERT INTO public.partner_program_commission_events
-    (partner_id, event_type, amount_php, commission_php, status, source_ref, notes)
-  VALUES (p.id, _event_type, 0, amt, 'pending', _source_ref,
-          CASE WHEN _event_type = 'business_signup' THEN 'Business sign-up bounty' ELSE 'User sign-up bounty' END)
-  ON CONFLICT DO NOTHING;
-END;
-$$;
-
--- 5. Trigger: user signup bounty
-CREATE OR REPLACE FUNCTION public.pp_user_signup_bounty()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-BEGIN
-  IF NEW.credited_referral_code IS NOT NULL THEN
-    PERFORM public.pp_award_bounty(NEW.credited_referral_code, 'user_signup', 'signup:' || NEW.user_id::text);
-  END IF;
-  RETURN NEW;
-END;
-$$;
-
-DROP TRIGGER IF EXISTS trg_pp_user_signup_bounty ON public.user_referrals;
-CREATE TRIGGER trg_pp_user_signup_bounty
-AFTER INSERT OR UPDATE OF credited_referral_code ON public.user_referrals
-FOR EACH ROW EXECUTE FUNCTION public.pp_user_signup_bounty();
-
--- 6. Trigger: business signup bounty
-CREATE OR REPLACE FUNCTION public.pp_business_signup_bounty()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-  code text;
-BEGIN
-  IF NEW.owner_id IS NULL THEN RETURN NEW; END IF;
-  SELECT credited_referral_code INTO code FROM public.user_referrals WHERE user_id = NEW.owner_id LIMIT 1;
-  IF code IS NOT NULL THEN
-    PERFORM public.pp_award_bounty(code, 'business_signup', 'business:' || NEW.id::text);
-  END IF;
-  RETURN NEW;
-END;
-$$;
-
-DROP TRIGGER IF EXISTS trg_pp_business_signup_bounty ON public.businesses;
-CREATE TRIGGER trg_pp_business_signup_bounty
-AFTER INSERT ON public.businesses
-FOR EACH ROW EXECUTE FUNCTION public.pp_business_signup_bounty();
-
--- 7. Applicants can read their own application
-DROP POLICY IF EXISTS "Applicants read own partner application" ON public.partner_program_applications;
-CREATE POLICY "Applicants read own partner application"
-ON public.partner_program_applications
-FOR SELECT TO authenticated
-USING (user_id = auth.uid());

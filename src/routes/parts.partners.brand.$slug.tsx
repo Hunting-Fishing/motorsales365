@@ -129,7 +129,8 @@ function BrandPage() {
         )}
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
-          Disclosure: 365 MotorSales earns a commission on qualifying purchases. See our{" "}
+          Disclosure: 365 MotorSales earns a commission on qualifying purchases. As an Amazon
+          Associate I earn from qualifying purchases. See our{" "}
           <Link to="/affiliate-disclosure" className="underline">
             affiliate disclosure
           </Link>

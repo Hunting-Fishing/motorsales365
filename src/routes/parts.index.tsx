@@ -253,8 +253,8 @@ function PartsHub() {
             </Link>
           </Button>
           <Button asChild variant="default" size="sm" className="ml-auto">
-            <Link to="/partners/parts">
-              <Handshake className="mr-1 h-4 w-4" /> Sell on 365 (partners)
+            <Link to="/partners">
+              <Handshake className="mr-1 h-4 w-4" /> Join the Associate Network
             </Link>
           </Button>
         </div>
@@ -294,11 +294,11 @@ function PartsHub() {
 
         {/* 9. How-it-works footer note */}
         <p className="rounded-xl border border-border bg-card/60 p-4 text-xs text-muted-foreground">
-          <span className="font-semibold text-foreground">How it works:</span> Set your vehicle
-          once above and every list is filtered to exact-fit parts. Results rank by fitment
-          quality (exact YMM first) with OEM cross-references and typical retail prices. Nothing
-          matches? Post a wanted ad — salvage yards reach out. Part names follow the Car-Part.com
-          industry standard.
+          <span className="font-semibold text-foreground">How it works:</span> Set your vehicle once
+          above and every list is filtered to exact-fit parts. Results rank by fitment quality
+          (exact YMM first) with OEM cross-references and typical retail prices. Nothing matches?
+          Post a wanted ad — salvage yards reach out. Part names follow the Car-Part.com industry
+          standard.
         </p>
       </div>
     </SiteLayout>

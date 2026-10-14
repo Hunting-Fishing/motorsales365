@@ -3,14 +3,28 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Package, Trash2, Pencil, Minus, Plus as PlusIcon, AlertTriangle, Radio } from "lucide-react";
+import {
+  Plus,
+  Package,
+  Trash2,
+  Pencil,
+  Minus,
+  Plus as PlusIcon,
+  AlertTriangle,
+  Radio,
+  Search,
+  Link2,
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   listBusinessInventory,
   upsertBusinessInventoryItem,
   adjustBusinessInventory,
   deleteBusinessInventoryItem,
+  getCanonicalLinkCapability,
+  linkBusinessInventoryCanonicalPart,
 } from "@/lib/business-inventory.functions";
+import { getCanonicalCatalogMatches } from "@/lib/parts-network-operations.functions";
 import {
   listShopInquiries,
   updateNetworkInquiryStatus,
@@ -50,11 +64,19 @@ function InventoryPage() {
   const adjustFn = useServerFn(adjustBusinessInventory);
   const delFn = useServerFn(deleteBusinessInventoryItem);
   const inquiriesFn = useServerFn(listShopInquiries);
+  const capabilityFn = useServerFn(getCanonicalLinkCapability);
+  const linkCanonicalFn = useServerFn(linkBusinessInventoryCanonicalPart);
+  const catalogFn = useServerFn(getCanonicalCatalogMatches);
 
   const q = useQuery({
     queryKey: ["business-inventory", businessId],
     enabled: !!user?.id,
     queryFn: () => loadFn({ data: { businessId } }),
+  });
+  const capability = useQuery({
+    queryKey: ["business-canonical-link-capability", businessId, user?.id],
+    enabled: !!user?.id,
+    queryFn: () => capabilityFn({ data: { businessId } }),
   });
 
   const businessMeta = useQuery({
@@ -70,7 +92,6 @@ function InventoryPage() {
       return (data?.type_slug as string | null) ?? null;
     },
   });
-
 
   const inquiries = useQuery({
     queryKey: ["business-network-inquiries", businessId],
@@ -115,6 +136,18 @@ function InventoryPage() {
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
+  const [inventorySearch, setInventorySearch] = useState("");
+  const [linkingItem, setLinkingItem] = useState<any | null>(null);
+  const [catalogSearch, setCatalogSearch] = useState("");
+  const [selectedCatalogPartId, setSelectedCatalogPartId] = useState<string | null>(null);
+  const [linking, setLinking] = useState(false);
+
+  const catalogMatches = useQuery({
+    queryKey: ["canonical-link-search", catalogSearch],
+    enabled: !!linkingItem && catalogSearch.trim().length >= 3,
+    queryFn: () => catalogFn({ data: { query: catalogSearch.trim(), limit: 20 } }),
+    staleTime: 60_000,
+  });
 
   function openNew() {
     setEditing(null);
@@ -126,6 +159,32 @@ function InventoryPage() {
     setOpen(true);
   }
 
+  function openCanonicalLink(row: any) {
+    setLinkingItem(row);
+    setCatalogSearch(row.manufacturer_part_number || row.sku || row.name || "");
+    setSelectedCatalogPartId(row.catalog_part_id ?? null);
+  }
+
+  async function saveCanonicalLink() {
+    if (!linkingItem) return;
+    setLinking(true);
+    try {
+      await linkCanonicalFn({
+        data: {
+          businessId,
+          itemId: linkingItem.id,
+          catalogPartId: selectedCatalogPartId,
+        },
+      });
+      toast.success(selectedCatalogPartId ? "Canonical product linked" : "Canonical link removed");
+      setLinkingItem(null);
+      qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
+    } catch (e: any) {
+      toast.error(e?.message || "Could not update canonical link");
+    } finally {
+      setLinking(false);
+    }
+  }
 
   async function adjust(itemId: string, delta: number) {
     try {
@@ -150,6 +209,34 @@ function InventoryPage() {
   }
 
   const rows = q.data ?? [];
+  const normalizedSearch = inventorySearch
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  const visibleRows = normalizedSearch
+    ? rows.filter((item: any) => {
+        const values = [
+          item.name,
+          item.sku,
+          item.category,
+          item.brand,
+          item.manufacturer_part_number,
+          item.oem_part_number,
+          item.barcode,
+          item.supplier,
+          ...(item.business_part_cross_references ?? []).flatMap((xref: any) => [
+            xref.part_number,
+            xref.supplier_name,
+          ]),
+        ];
+        return values.some((value) =>
+          String(value ?? "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "")
+            .includes(normalizedSearch),
+        );
+      })
+    : rows;
 
   return (
     <div className="space-y-4">
@@ -162,13 +249,25 @@ function InventoryPage() {
             Track straps, dollies, fuel, spare parts, and any other consumables.
           </p>
         </div>
-        <Button onClick={openNew}>
-          <Plus className="h-4 w-4 mr-1" /> Add item
-        </Button>
+        {capability.data?.canManage && (
+          <Button onClick={openNew}>
+            <Plus className="h-4 w-4 mr-1" /> Add item
+          </Button>
+        )}
       </div>
 
       <NetworkExposureCard businessId={businessId} />
 
+      <div className="relative max-w-xl">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={inventorySearch}
+          onChange={(event) => setInventorySearch(event.target.value)}
+          className="pl-9"
+          placeholder="Search item, SKU, OEM, barcode, supplier, or cross-reference"
+          aria-label="Search business inventory and private part cross-references"
+        />
+      </div>
 
       {inquiries.data && inquiries.data.length > 0 && (
         <Card className="divide-y">
@@ -184,7 +283,6 @@ function InventoryPage() {
         </Card>
       )}
 
-
       <Card className="divide-y">
         {q.isLoading && <div className="p-4 text-sm text-muted-foreground">Loading…</div>}
         {!q.isLoading && rows.length === 0 && (
@@ -192,9 +290,13 @@ function InventoryPage() {
             No inventory yet. Add items you want to track so you never run out.
           </div>
         )}
-        {rows.map((it: any) => {
-          const low =
-            it.reorder_at != null && Number(it.qty_on_hand) <= Number(it.reorder_at);
+        {!q.isLoading && rows.length > 0 && visibleRows.length === 0 && (
+          <div className="p-6 text-center text-sm text-muted-foreground">
+            No inventory matches “{inventorySearch}”.
+          </div>
+        )}
+        {visibleRows.map((it: any) => {
+          const low = it.reorder_at != null && Number(it.qty_on_hand) <= Number(it.reorder_at);
           return (
             <div key={it.id} className="p-4 flex items-center justify-between gap-3">
               <div className="min-w-0">
@@ -209,7 +311,39 @@ function InventoryPage() {
                 <div className="text-xs text-muted-foreground">
                   {it.sku && <span>SKU {it.sku} · </span>}
                   {it.category && <span>{it.category} · </span>}
-                  {it.location && <span>@ {it.location}</span>}
+                  {(it.business_inventory_locations?.name || it.location) && (
+                    <span>
+                      @ {it.business_inventory_locations?.name ?? it.location}
+                      {it.location && it.business_inventory_locations?.name
+                        ? ` / ${it.location}`
+                        : ""}
+                    </span>
+                  )}
+                </div>
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  {it.catalog_part_id && (
+                    <Badge variant="outline" className="max-w-full text-[10px]">
+                      <Link2 className="mr-1 h-3 w-3 shrink-0" />
+                      <span className="truncate">
+                        365:{" "}
+                        {it.parts_catalog?.manufacturer_part_number ||
+                          it.parts_catalog?.title ||
+                          "catalogue linked"}
+                      </span>
+                    </Badge>
+                  )}
+                  {(it.business_part_cross_references ?? [])
+                    .filter((xref: any) => xref.active)
+                    .slice(0, 3)
+                    .map((xref: any) => (
+                      <Badge
+                        key={`${xref.number_type}-${xref.part_number}`}
+                        variant="secondary"
+                        className="text-[10px]"
+                      >
+                        {String(xref.number_type).replaceAll("_", " ")}: {xref.part_number}
+                      </Badge>
+                    ))}
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -222,9 +356,7 @@ function InventoryPage() {
                   >
                     <Minus className="h-3 w-3" />
                   </Button>
-                  <div className="w-14 text-center font-semibold">
-                    {Number(it.qty_on_hand)}
-                  </div>
+                  <div className="w-14 text-center font-semibold">{Number(it.qty_on_hand)}</div>
                   <Button
                     variant="outline"
                     size="icon"
@@ -235,12 +367,26 @@ function InventoryPage() {
                   </Button>
                   <span className="text-xs text-muted-foreground ml-1">{it.unit}</span>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => openEdit(it)}>
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleDelete(it.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                {capability.data?.allowed && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openCanonicalLink(it)}
+                    aria-label={`Link ${it.name} to canonical catalogue`}
+                  >
+                    <Link2 className="mr-1 h-3.5 w-3.5" /> Catalogue
+                  </Button>
+                )}
+                {capability.data?.canManage && (
+                  <>
+                    <Button variant="ghost" size="icon" onClick={() => openEdit(it)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(it.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           );
@@ -255,11 +401,81 @@ function InventoryPage() {
         editing={editing}
         onSaved={() => qc.invalidateQueries({ queryKey: ["business-inventory", businessId] })}
       />
+
+      <Dialog open={!!linkingItem} onOpenChange={(next) => !next && setLinkingItem(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Link approved canonical product</DialogTitle>
+            <DialogDescription>
+              Match {linkingItem?.name} to one active 365 catalogue record. This action changes only
+              the catalogue link and is recorded in inventory history.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Search by part number, brand, or product name</Label>
+              <Input
+                value={catalogSearch}
+                onChange={(event) => setCatalogSearch(event.target.value)}
+                placeholder="Enter at least 3 characters"
+              />
+            </div>
+            <div className="max-h-72 space-y-2 overflow-y-auto rounded-md border p-2">
+              {catalogMatches.isFetching && (
+                <p className="p-3 text-sm text-muted-foreground">Searching approved catalogue…</p>
+              )}
+              {!catalogMatches.isFetching && catalogSearch.trim().length < 3 && (
+                <p className="p-3 text-sm text-muted-foreground">Enter at least 3 characters.</p>
+              )}
+              {!catalogMatches.isFetching &&
+                catalogSearch.trim().length >= 3 &&
+                (catalogMatches.data ?? []).length === 0 && (
+                  <p className="p-3 text-sm text-muted-foreground">No approved products found.</p>
+                )}
+              {(catalogMatches.data ?? []).map((match) => (
+                <button
+                  type="button"
+                  key={match.id}
+                  onClick={() => setSelectedCatalogPartId(match.id)}
+                  className={`w-full rounded-md border p-3 text-left transition-colors ${
+                    selectedCatalogPartId === match.id
+                      ? "border-primary bg-primary/5"
+                      : "hover:bg-muted/60"
+                  }`}
+                >
+                  <div className="font-medium">{match.title}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {[match.manufacturer, match.manufacturer_part_number, match.match_reason]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-between">
+            <Button variant="ghost" onClick={() => setSelectedCatalogPartId(null)}>
+              Remove link
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setLinkingItem(null)}>
+                Cancel
+              </Button>
+              <Button onClick={saveCanonicalLink} disabled={linking}>
+                {linking ? "Saving…" : "Save catalogue link"}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-const STATUS_VARIANT: Record<NetworkInquiryStatus, "default" | "secondary" | "destructive" | "outline"> = {
+const STATUS_VARIANT: Record<
+  NetworkInquiryStatus,
+  "default" | "secondary" | "destructive" | "outline"
+> = {
   pending: "default",
   accepted: "secondary",
   rejected: "destructive",
@@ -283,12 +499,8 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
   const [fulfill, setFulfill] = useState({
     price: row.fulfilled_price != null ? String(row.fulfilled_price) : "",
     quantity:
-      row.fulfilled_quantity != null
-        ? String(row.fulfilled_quantity)
-        : String(row.quantity ?? 1),
-    eta: row.fulfilled_eta
-      ? new Date(row.fulfilled_eta).toISOString().slice(0, 16)
-      : "",
+      row.fulfilled_quantity != null ? String(row.fulfilled_quantity) : String(row.quantity ?? 1),
+    eta: row.fulfilled_eta ? new Date(row.fulfilled_eta).toISOString().slice(0, 16) : "",
     message: row.fulfilled_message ?? "",
   });
 
@@ -374,7 +586,6 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
     }
   }
 
-
   async function submitFulfill() {
     if (!fulfillFor) return;
     const priceNum = fulfill.price.trim() === "" ? null : Number(fulfill.price);
@@ -431,12 +642,8 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
             {row.fulfilled_price != null && (
               <span>Price ₱{Number(row.fulfilled_price).toLocaleString()}</span>
             )}
-            {row.fulfilled_quantity != null && (
-              <span>Qty {Number(row.fulfilled_quantity)}</span>
-            )}
-            {row.fulfilled_eta && (
-              <span>ETA {new Date(row.fulfilled_eta).toLocaleString()}</span>
-            )}
+            {row.fulfilled_quantity != null && <span>Qty {Number(row.fulfilled_quantity)}</span>}
+            {row.fulfilled_eta && <span>ETA {new Date(row.fulfilled_eta).toLocaleString()}</span>}
           </div>
           {row.fulfilled_message && (
             <p className="mt-1 text-muted-foreground">{row.fulfilled_message}</p>
@@ -474,13 +681,7 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
             <Button
               key={s}
               size="sm"
-              variant={
-                s === "rejected"
-                  ? "destructive"
-                  : s === "accepted"
-                    ? "default"
-                    : "outline"
-              }
+              variant={s === "rejected" ? "destructive" : s === "accepted" ? "default" : "outline"}
               disabled={busy !== null}
               onClick={() => handleClick(s)}
               className="capitalize"
@@ -499,12 +700,10 @@ function InquiryRow({ row, businessId }: { row: any; businessId: string }) {
       <Dialog open={!!fulfillFor} onOpenChange={(o) => !o && setFulfillFor(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              Mark as {fulfillFor === "closed" ? "Closed" : "Fulfilled"}
-            </DialogTitle>
+            <DialogTitle>Mark as {fulfillFor === "closed" ? "Closed" : "Fulfilled"}</DialogTitle>
             <DialogDescription>
-              Attach the final price, quantity, ETA, and a message. The customer sees
-              this on their request status.
+              Attach the final price, quantity, ETA, and a message. The customer sees this on their
+              request status.
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-3">
