@@ -32,6 +32,12 @@ The migration is unapplied and the adapter still uses two queries. Next verify
 PR #31 and implement the strict one-RPC adapter, retaining all native authority,
 compatible migration/recovery/API/role/load and trusted-entry release gates.
 
+PR #32 implements the one-RPC adapter offline (59 handler/22 UI focused,
+723 application tests; `CUSTOMER_REMINDERS_RPC_ADAPTER.md`). It does not install
+the API or restore trusted writes. Next verify its checks and resume native
+authority/writer/attachment and baseline/recovery closure; source observations
+below remain historical, not a claim that the current adapter uses browser reads.
+
 ## Current narrow metadata
 
 Project `wjxaajgvddtrxxtocxen`, read-only catalog SELECTs only:

@@ -7,7 +7,8 @@ release-blocked until a compatible reviewed adapter/database release. This slice
 does not switch the application adapter or change any source policy/grant/data.
 Draft PR #31: `https://github.com/Hunting-Fishing/motorsales365/pull/31`, code
 `797876c`, branch `completion/customer-reminders-invoker-read`, stacked on
-CI-verified PR #30 docs `f4c86c1`. Remote CI pending verification at publication.
+CI-verified PR #30 docs `f4c86c1`. Latest docs head `e51125c` passed all six CI
+gates (run `38644991112`), verified on the adapter follow-up. No deployment.
 
 ## Exact contract
 
