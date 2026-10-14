@@ -6,7 +6,7 @@ import * as api from "@/lib/vehicle-receipts.functions";
 import type { VehicleReceipt } from "@/lib/vehicle-receipts";
 const auth = vi.hoisted(() => ({ userId: "owner-a" as string | null }));
 const localOcr = vi.hoisted(() => ({ scan: vi.fn(), upload: vi.fn() }));
-vi.mock("@/lib/receipt-ocr.client", () => ({ scanReceiptImage: localOcr.scan }));
+vi.mock("@/lib/receipt-document.client", () => ({ scanReceiptDocument: localOcr.scan }));
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({ user: auth.userId ? { id: auth.userId } : null }),
 }));
@@ -108,7 +108,7 @@ describe("vehicle receipt workflow", () => {
     expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
     expect(localOcr.upload).not.toHaveBeenCalled();
   });
-  it("keeps PDF local scanning disabled and retains manual entry", async () => {
+  it("scans a selected PDF locally without uploading or using the AI provider", async () => {
     show();
     await waitFor(() => expect(screen.getByRole("button", { name: "Add receipt" })).toBeEnabled());
     fireEvent.click(screen.getByRole("button", { name: "Add receipt" }));
@@ -116,9 +116,16 @@ describe("vehicle receipt workflow", () => {
     fireEvent.change(dialog.getByLabelText("Receipt image or PDF (optional for manual entry)"), {
       target: { files: [new File(["pdf"], "receipt.pdf", { type: "application/pdf" })] },
     });
-    expect(dialog.getByRole("button", { name: "Scan on this device" })).toBeDisabled();
+    expect(dialog.getByRole("button", { name: "Scan on this device" })).toBeEnabled();
+    fireEvent.click(dialog.getByRole("button", { name: "Scan on this device" }));
+    await waitFor(() =>
+      expect(dialog.getByLabelText("Supplier / shop")).toHaveValue("Local supplier"),
+    );
     expect(dialog.getByLabelText("Item description")).toBeEnabled();
-    expect(localOcr.scan).not.toHaveBeenCalled();
+    expect(localOcr.scan).toHaveBeenCalled();
+    expect(localOcr.upload).not.toHaveBeenCalled();
+    expect(api.startVehicleReceipt).not.toHaveBeenCalled();
+    expect(api.extractVehicleReceipt).not.toHaveBeenCalled();
   });
   it("cancels local extraction without replacing manual values or uploading", async () => {
     localOcr.scan.mockImplementationOnce(

@@ -40,6 +40,8 @@ supabase-backups/
 
 # Supabase local development files
 /public/receipt-ocr/
+/public/receipt-pdf/
+/tmp/pdfs/
 supabase/.temp/
 **/supabase/.temp/
 

@@ -14,8 +14,9 @@ infer fitment, or certify service history.
 4. Save a draft or confirm reviewed purchases. Saving uploads the selected
    attachment to the existing private receipt storage, as clearly labelled.
 
-The separate consent-gated provider option remains available. Local PDF scanning
-is not included yet: use manual entry or that separate provider option. This is
+The separate consent-gated provider option remains available. This first image
+checkpoint did not include PDFs; the subsequent bounded PDF implementation is
+documented in `RECEIPT_PDF_DELIVERY.md`. This is
 not a claim that first-use scanning works offline; scanner assets must be served
 by the app. No API key or paid OCR provider is needed for the on-device path.
 
@@ -92,6 +93,6 @@ Primary references: [Tesseract.js local installation](https://github.com/naptha/
 
 ## Next slice
 
-Implement bounded same-origin PDF page rendering with explicit page limits and
-reviewed merging. A wider photo
-corpus, mobile resource tests and business/owner acceptance remain pilot gates.
+Bounded same-origin PDF page rendering and reviewed merging are implemented in
+the follow-up `RECEIPT_PDF_DELIVERY.md` slice. A wider receipt corpus, mobile
+resource tests and business/owner acceptance remain pilot gates.

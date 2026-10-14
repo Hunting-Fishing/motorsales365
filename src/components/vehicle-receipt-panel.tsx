@@ -20,6 +20,7 @@ import {
 import { PART_CATEGORIES, localReceiptDate, validateReceiptFile } from "@/lib/vehicle-receipts";
 import type { ReceiptLine, ReceiptTarget, VehicleReceipt } from "@/lib/vehicle-receipts";
 import type { ReceiptOcrProgress } from "@/lib/receipt-ocr.client";
+import { withReceiptAbort } from "@/lib/receipt-abort";
 
 // The import itself must be client-only, not just the exported scanner body.
 // Start's SSR import protection rejects any server-visible .client module edge.
@@ -31,9 +32,12 @@ const scanReceiptOnDevice = createClientOnlyFn(
       onProgress: (progress: ReceiptOcrProgress) => void;
     },
   ) => {
-    const { scanReceiptImage } = await import("@/lib/receipt-ocr.client");
+    const { scanReceiptDocument } = await withReceiptAbort(
+      import("@/lib/receipt-document.client"),
+      options.signal,
+    );
     if (options.signal.aborted) throw new DOMException("Local scan cancelled", "AbortError");
-    return scanReceiptImage(file, options);
+    return scanReceiptDocument(file, options);
   },
 );
 import {
@@ -540,12 +544,7 @@ function ReceiptEditor({
             </div>
           )}
           <div className="rounded-lg border p-3 space-y-2">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={busy || !file || file.type === "application/pdf"}
-              onClick={extractLocal}
-            >
+            <Button type="button" variant="outline" disabled={busy || !file} onClick={extractLocal}>
               <ScanLine className="mr-1 h-4 w-4" /> Scan on this device
             </Button>
             {localProgress && (
@@ -559,10 +558,11 @@ function ReceiptEditor({
               </div>
             )}
             <p className="text-xs text-muted-foreground">
-              JPG, PNG and WebP photos are read on this device in English. Scanning replaces the
-              current suggestions but does not upload the photo. Saving uploads the attachment to
-              private storage. Check supplier, date, currency and every item. PDFs currently use
-              manual entry or the separate AI option below.
+              JPG, PNG, WebP and receipt PDFs of up to 3 pages are read on this device in English.
+              Scanning replaces known suggestions but does not upload the file. Saving uploads the
+              attachment to private storage. Compare every page against the original and check
+              supplier, date, currency and every item. Password-protected, interactive, unreadable
+              or longer PDFs require manual entry or the separate AI option below.
             </p>
           </div>
           <div className="rounded-lg border p-3 space-y-2">

@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
+import { preparePdfAssets } from "./prepare-pdf-assets.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const output = path.join(root, "public/receipt-ocr/7.0.0");
@@ -65,3 +66,4 @@ fs.writeFileSync(
 console.log(
   `Prepared ${manifest.length} same-origin OCR assets (${Math.round(manifest.reduce((n, f) => n + f.bytes, 0) / 1024 / 1024)} MB).`,
 );
+preparePdfAssets();
