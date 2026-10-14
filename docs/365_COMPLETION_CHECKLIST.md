@@ -120,6 +120,72 @@ states. Customer activity caches now include the authenticated account.
 Application suite: 236/236; TypeScript passes; changed-line lint has zero errors.
 See `CUSTOMER_360_BUILD.md`. Full CRM delivery remains incomplete.
 
-Next: finish CRM build verification, publish the stacked review branch, and map
-the remaining 25 existing migrations to deployed definitions. Recover or rebuild
-the receipt scanner before claiming receipt scan-to-entry completion.
+CRM build verification and publication are complete: stacked draft PR #11
+(`feature/customer-360-native`) passes the complete-checkout GitHub build,
+typecheck, unit, lint and PostgreSQL security checks. The separate Cloudflare
+Workers Builds check still fails. Local Wrangler authentication reports an
+invalid token/not logged in, so hosting build-log access remains unavailable.
+The preview job is configured to skip upload: its green wrapper is not proof
+of a published preview. No production publication is claimed.
+
+## Recurring continuation
+
+An active same-chat heartbeat named **Continue 365 MotorSales to completion**
+was created at the owner's request, every 30 minutes. Automation id:
+`continue-365-motorsales-to-completion`. It resumes the next unfinished dependency,
+records evidence here, avoids duplicate work and reports only meaningful changes
+or required input. It stops when the agreed acceptance criteria are verified.
+This is a schedule, not an instant phase-end trigger. Local work requires the
+computer and desktop app to remain available. Do not duplicate the automation.
+
+## Migration evidence follow-up
+
+Read-only stored-SQL SHA256 evidence is now in
+`evidence/post-cutover-migration-hashes-2026-10-14.json`. Thirteen previously
+unclassified repository files exactly match deployed SQL under other timestamps.
+Both directly recorded receipt files also have exact source matches. Together
+with 388 legacy archive matches, 403 of 418 source files have execution-source
+evidence. This does **not** prove current schema parity or approve history repair.
+
+Run the comparison with both evidence files:
+
+```powershell
+node scripts/ci/migration-provenance.mjs docs/evidence/migration-provenance-2026-10-14.json docs/evidence/post-cutover-migration-hashes-2026-10-14.json --summary
+```
+
+Expected exit: 1. Fifteen files remain unclassified: twelve existing/split/seed
+files plus the two pending security migrations and pending receipt-trigger fix.
+Seven regression tests ensure names/timestamps alone cannot approve a source,
+modified SQL blocks, line-ending normalization is safe, and another project's
+evidence cannot be used. These tests run in CI.
+
+Additional live read-only checks: all 50 curated chassis source rows have
+matching PH profiles under the seed's identity predicate. This does not verify
+every profile attribute or prove the seed file was applied. Both old migration
+archive tables have RLS enabled and forced, no anon/authenticated table rights,
+and no former anonymous ingress policies. The deployed counter-sale function
+uses `i.cost_per_unit` and not the obsolete inventory-cost expression.
+
+Replay hazard: the repository's earlier counter-register migration already
+contains the corrected cost field, while the later cost-fix migration raises
+unless it finds the obsolete text. Therefore exact individual source evidence
+does not establish that replaying the entire historical chain will succeed.
+Do not edit previously applied SQL or bulk-repair timestamps to hide this.
+Compare final objects, then establish a tested baseline/release strategy.
+
+Receipt source inspection confirms manual/reviewed entry and provider-based
+image/PDF extraction, but no local Tesseract/PDF.js scanner in the repository.
+Receipt and shop-link caches are now scoped to the authenticated account;
+signed-out users mount no private receipt UI, and account/target switches reset
+open editors and connection codes. Five added regressions cover cached account
+switches, signed-out cached data, open-editor resets and scoped invalidation.
+The application suite passes 241/241 tests; tooling regressions pass 13/13.
+Local image OCR should run before upload,
+keep every suggestion unreviewed, bundle assets on the same origin and retain
+manual/provider fallbacks. PDF rendering is a separate bounded slice.
+
+Next: complete TypeScript/build verification for this follow-up, then compare
+the twelve unmatched existing migration sources to their split/deployed final
+objects. Recover or rebuild the scanner before claiming receipt scan-to-entry
+completion. Keep resource-heavy checks sequential on this 16 GB computer;
+concurrent TypeScript and Vite left less than 1 GB free during this run.

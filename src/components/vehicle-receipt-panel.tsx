@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Receipt, Plus, ScanLine, Loader2, Lock, Wrench, Trash2, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,6 +47,26 @@ const blankLine = (): ReceiptLine => ({
 const num = (s: string) => (s === "" ? null : Number(s));
 
 export function VehicleReceiptPanel({ vehicleId, shopVehicleId }: ReceiptTarget) {
+  const { user } = useAuth();
+  if (!user) return null;
+
+  // Remount account-local editors and connection codes as well as changing the
+  // query keys. A receipt opened by the previous account must not remain visible.
+  return (
+    <AuthenticatedVehicleReceiptPanel
+      key={`${user.id}:${vehicleId ?? ""}:${shopVehicleId ?? ""}`}
+      userId={user.id}
+      vehicleId={vehicleId}
+      shopVehicleId={shopVehicleId}
+    />
+  );
+}
+
+function AuthenticatedVehicleReceiptPanel({
+  userId,
+  vehicleId,
+  shopVehicleId,
+}: ReceiptTarget & { userId: string }) {
   const target = vehicleId ? { vehicleId } : { shopVehicleId: shopVehicleId! };
   const qc = useQueryClient();
   const fetchFn = useServerFn(getVehicleReceipts);
@@ -54,7 +75,8 @@ export function VehicleReceiptPanel({ vehicleId, shopVehicleId }: ReceiptTarget)
   const discardFn = useServerFn(discardReceiptDraft);
   const expenseFn = useServerFn(recordVehicleReceiptExpense);
   const { data, error, isLoading } = useQuery({
-    queryKey: ["vehicle-receipts", vehicleId, shopVehicleId],
+    queryKey: ["vehicle-receipts", userId, vehicleId, shopVehicleId],
+    enabled: Boolean(userId),
     queryFn: () => fetchFn({ data: target }),
   });
   const [edit, setEdit] = useState<VehicleReceipt | "new" | null>(null);
@@ -62,7 +84,7 @@ export function VehicleReceiptPanel({ vehicleId, shopVehicleId }: ReceiptTarget)
   const [busy, setBusy] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState("");
   const refresh = () => {
-    void qc.invalidateQueries({ queryKey: ["vehicle-receipts"] });
+    void qc.invalidateQueries({ queryKey: ["vehicle-receipts", userId] });
     void qc.invalidateQueries({ queryKey: ["vehicle-history"] });
   };
   async function action(id: string, fn: () => Promise<unknown>) {
@@ -101,7 +123,7 @@ export function VehicleReceiptPanel({ vehicleId, shopVehicleId }: ReceiptTarget)
           <Plus className="mr-1 h-4 w-4" /> Add receipt
         </Button>
       </div>
-      <VehicleShopConnections {...target} onChanged={refresh} />
+      <VehicleShopConnections {...target} userId={userId} onChanged={refresh} />
       {isLoading && <p className="text-sm">Loading receipts…</p>}
       {error && <p className="text-sm text-destructive">{error.message}</p>}
       {data && !data.receipts.length && (
@@ -715,10 +737,11 @@ function InstallReceiptDialog({
   );
 }
 function VehicleShopConnections({
+  userId,
   vehicleId,
   shopVehicleId,
   onChanged,
-}: ReceiptTarget & { onChanged: () => void }) {
+}: ReceiptTarget & { userId: string; onChanged: () => void }) {
   const request = useServerFn(requestShopVehicleLink),
     approve = useServerFn(approveShopVehicleLink),
     list = useServerFn(listVehicleShopLinks),
@@ -728,8 +751,8 @@ function VehicleShopConnections({
     [error, setError] = useState("");
   const qc = useQueryClient();
   const links = useQuery({
-    queryKey: ["vehicle-shop-links", vehicleId],
-    enabled: Boolean(vehicleId),
+    queryKey: ["vehicle-shop-links", userId, vehicleId],
+    enabled: Boolean(userId && vehicleId),
     queryFn: () => list({ data: { vehicleId: vehicleId! } }),
   });
   async function run(fn: () => Promise<unknown>) {
@@ -737,7 +760,7 @@ function VehicleShopConnections({
     setError("");
     try {
       await fn();
-      void qc.invalidateQueries({ queryKey: ["vehicle-shop-links"] });
+      void qc.invalidateQueries({ queryKey: ["vehicle-shop-links", userId] });
       onChanged();
     } catch (e: any) {
       setError(e.message);
