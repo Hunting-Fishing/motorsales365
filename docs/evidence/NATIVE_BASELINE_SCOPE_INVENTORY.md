@@ -81,7 +81,16 @@ No application artifact is uploaded; the sparse checkout must not be deployed.
 Next, resolve the native identity/roster and receipt access-helper declaration,
 supersession, security-attachment and writer closure against pinned source and
 fresh narrowly scoped metadata. Do not promote a source-observed facet to full
-coverage. Rehearse a companion guard with actual CHECKs/all enabled triggers and
+coverage. The next concrete declaration sources already located (not yet mapped
+into this initial manifest) are
+`20260713081559_69ad9a73-edab-4719-b16e-38541b8ba91a.sql` for the text overload of
+`has_role(uuid,text)` and
+`20260713081649_7763bb16-35c5-4c76-a8f9-36c3f58090ce.sql` for
+`user_belongs_to_shop(uuid,uuid)`. The operating-manager caller explicitly casts
+role literals to text. Do not substitute the enum overload or infer legacy
+`id=user_id` equivalence from these declarations. Source recovery alone does not
+establish current catalog/permission parity or trusted membership.
+Rehearse a companion guard with actual CHECKs/all enabled triggers and
 legacy/self-shift/manager/multi-roster cases before authorized atomic invoicing.
 Then construct a separately reviewed baseline with explicit platform/reference
 configuration and data assertions, replay twice into disposable empty targets,

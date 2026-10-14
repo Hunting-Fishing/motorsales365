@@ -571,7 +571,13 @@ remain unapplied pending a separately scoped owner decision and release gates.
 
 ## Offline native dependency inventory: 2026-10-15
 
-Branch `review/native-baseline-scope-inventory`, stacked on PR #19. The new
+Draft PR #20: `https://github.com/Hunting-Fishing/motorsales365/pull/20`, code
+commit `52e74ab`, branch `review/native-baseline-scope-inventory`, stacked on PR #19.
+All six code-head CI gates passed (run `38623172324`): 109 tooling/417 application
+tests, both receipt database suites, 247 disposable SQL assertions, lint, typecheck,
+real-browser image/PDF OCR and full build/package dry-run. This follow-up changes
+documentation only; verify its latest checks on the next resume without rebuilding
+completed proof/application work. The new
 read-only validator and initial manifest pin 29 SQL sources plus five evidence
 files, with 71 declared objects/158 edges and 60 reachable objects. It reports
 four cycles and 467 explicit unknown-coverage findings (including repeated
@@ -581,7 +587,7 @@ coverage upgrades. All replay/baseline/applied-lineage/parity/release flags rema
 false. The CLI deliberately returns 1 for this valid but incomplete inventory.
 
 Twenty focused tests pass; full local tooling passes 109/109. Focused lint,
-formatting and diff checks pass. Full-checkout CI publication is the next gate.
+formatting and diff checks pass. Full-checkout code-head CI passes as recorded above.
 See `evidence/NATIVE_BASELINE_SCOPE_INVENTORY.md` for the exact manifest hash,
 scope and limits. Source evidence remains 404/421 globally, with 17 unclassified;
 the selected inventory's seven unclassified source pins are a different count.
@@ -590,7 +596,10 @@ application deployment or platform configuration changed in this slice.
 
 Next: publish and verify this exact review slice, then close the native identity/
 roster and receipt helper declaration/supersession/writer/security attachment
-closure, starting with the helpers already identified in the manifest. Build
+closure, starting with `has_role(uuid,text)` and `user_belongs_to_shop(uuid,uuid)`.
+Their original declaration files have been located and read, but are not yet
+mapped/verified in the seed inventory; exact next paths are in the evidence doc.
+Build
 the companion guard against real shift constraints, all native/chat triggers,
 legacy identity and delegated-manager/multi-roster behavior. Continue the planned
 read-only CRM activity slice independently; production acceptance needs a reviewed
