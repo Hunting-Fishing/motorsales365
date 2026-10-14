@@ -17,6 +17,7 @@ import { smSupabase } from "@/lib/shop-manager/db";
 import { CustomerCommunicationsLog } from "@/components/shop-manager/customer-communications-log";
 import { CustomerRemindersCard } from "@/components/shop-manager/customer-reminders-card";
 import { CustomerCommercialHistory } from "@/components/shop-manager/customer-commercial-history";
+import { CustomerVehicleActivity } from "@/components/shop-manager/customer-vehicle-activity";
 import { useAuth } from "@/hooks/use-auth";
 
 type Customer = {
@@ -44,6 +45,7 @@ type Customer = {
 
 type Vehicle = {
   id: string;
+  customer_id: string | null;
   make: string | null;
   model: string | null;
   year: number | null;
@@ -78,7 +80,7 @@ async function fetchCustomer(id: string): Promise<Customer | null> {
 async function fetchVehicles(customerId: string): Promise<Vehicle[]> {
   const { data, error } = await (smSupabase as any)
     .from("vehicles")
-    .select("id, make, model, year, vin, license_plate, color, last_service_date")
+    .select("id, customer_id, make, model, year, vin, license_plate, color, last_service_date")
     .eq("customer_id", customerId)
     .order("created_at", { ascending: false });
   if (error) throw error;
@@ -105,13 +107,13 @@ export const Route = createFileRoute("/_authenticated/workspace/customers/$id")(
     ],
   }),
   component: CustomerDetail,
-  errorComponent: ({ error, reset }) => {
+  errorComponent: function CustomerError({ reset }) {
     const router = useRouter();
     return (
       <SiteLayout>
         <div className="mx-auto max-w-4xl px-4 py-10">
           <h1 className="text-2xl font-bold">Customer</h1>
-          <p className="mt-2 text-destructive">{String((error as any)?.message ?? error)}</p>
+          <p className="mt-2 text-destructive">Could not load this customer.</p>
           <Button
             className="mt-4"
             onClick={() => {
@@ -149,18 +151,22 @@ function fmtDate(s: string | null | undefined) {
 function CustomerDetail() {
   const { id } = Route.useParams();
   const { user } = useAuth();
+  if (!user) return null;
+  return <PrivateCustomerDetail key={`${user.id}:${id}`} id={id} accountId={user.id} />;
+}
+
+function PrivateCustomerDetail({ id, accountId }: { id: string; accountId: string }) {
   const customerQ = useQuery({
-    queryKey: ["shop-manager", user?.id, "customer", id],
+    queryKey: ["shop-manager", accountId, "customer", id],
     queryFn: () => fetchCustomer(id),
-    enabled: !!user,
   });
   const vehiclesQ = useQuery({
-    queryKey: ["shop-manager", user?.id, "customer", id, "vehicles"],
+    queryKey: ["shop-manager", accountId, "customer", id, "vehicles"],
     queryFn: () => fetchVehicles(id),
     enabled: !!customerQ.data,
   });
   const workOrdersQ = useQuery({
-    queryKey: ["shop-manager", user?.id, "customer", id, "work-orders"],
+    queryKey: ["shop-manager", accountId, "customer", id, "work-orders"],
     queryFn: () => fetchWorkOrders(id),
     enabled: !!customerQ.data,
   });
@@ -299,6 +305,12 @@ function CustomerDetail() {
         <CustomerRemindersCard customerId={c.id} />
         <CustomerCommunicationsLog customerId={c.id} />
         <CustomerCommercialHistory customerId={c.id} />
+        <CustomerVehicleActivity
+          customerId={c.id}
+          vehicles={vehiclesQ.data ?? []}
+          vehiclesLoading={vehiclesQ.isPending}
+          vehiclesError={vehiclesQ.isError}
+        />
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
