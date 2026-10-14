@@ -3,9 +3,22 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import {
+  bearerToken,
+  buildNetworkInquiryRow,
+  networkInquiryErrorMessage,
+} from "@/lib/network-inquiry";
+import { attachExposureReviewNotes } from "@/lib/security/restricted-columns";
 
 function publicClient() {
   return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
+}
+
+function userClient(token: string) {
+  return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
 }
@@ -284,41 +297,37 @@ export const submitNetworkPartInquiry = createServerFn({ method: "POST" })
         .parse(d),
   )
   .handler(async ({ data }) => {
-    const supabase = publicClient();
-
-    // If the caller is signed in, tag the row with their user id so they can
-    // track it in "My requests".
-    let requester_user_id: string | null = null;
+    // Signed-in callers insert with their own session so RLS can bind
+    // requester_user_id to auth.uid() and they can track the request in
+    // "My requests". Guests insert anonymously with no requester attached.
+    let supabase = publicClient();
+    let requesterUserId: string | null = null;
     try {
       const { getRequestHeader } = await import("@tanstack/react-start/server");
-      const auth = getRequestHeader("authorization") ?? getRequestHeader("Authorization");
-      const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+      const token = bearerToken(
+        getRequestHeader("authorization") ?? getRequestHeader("Authorization"),
+      );
       if (token) {
         const { data: u } = await supabase.auth.getUser(token);
-        requester_user_id = u.user?.id ?? null;
+        if (u.user?.id) {
+          requesterUserId = u.user.id;
+          supabase = userClient(token);
+        }
       }
     } catch {
-      requester_user_id = null;
+      requesterUserId = null;
+      supabase = publicClient();
     }
 
-    const { data: row, error } = await supabase
+    // Generate the id here and do not ask for the row back: guests have no SELECT policy on
+    // inquiries, so returning the inserted row would be rejected by RLS.
+    const id = crypto.randomUUID();
+    const { error } = await supabase
       .from("network_part_inquiries")
-      .insert({
-        business_id: data.business_id,
-        item_id: data.item_id ?? null,
-        sku: data.sku ?? null,
-        part_name: data.part_name,
-        quantity: data.quantity ?? 1,
-        contact_name: data.contact_name,
-        contact_email: data.contact_email,
-        contact_phone: data.contact_phone ?? null,
-        message: data.message ?? null,
-        requester_user_id,
-      })
-      .select("id")
-      .single();
-    if (error) throw error;
-    return { ok: true, id: row.id };
+      .insert(buildNetworkInquiryRow(data, { id, requesterUserId }));
+    // The database throttles inquiries (SQLSTATE PT429); surface its message.
+    if (error) throw new Error(networkInquiryErrorMessage(error));
+    return { ok: true, id };
   });
 
 export const NETWORK_INQUIRY_STATUSES = [
@@ -469,17 +478,24 @@ export const getBusinessNetworkExposure = createServerFn({ method: "POST" })
     const { data: row, error } = await supabase
       .from("businesses")
       .select(
-        "expose_inventory_to_network, network_exposure_status, network_exposure_requested_at, network_exposure_reviewed_at, network_exposure_review_note",
+        "expose_inventory_to_network, network_exposure_status, network_exposure_requested_at, network_exposure_reviewed_at",
       )
       .eq("id", data.businessId)
       .maybeSingle();
     if (error) throw error;
+    // Review notes are not selectable by API roles; members read them via RPC.
+    const { data: reviews, error: reviewError } = await (supabase as any).rpc(
+      "get_business_network_exposure_reviews",
+      { _business_ids: [data.businessId] },
+    );
+    if (reviewError) throw reviewError;
+    const review = attachExposureReviewNotes([{ id: data.businessId }], reviews)[0];
     return {
       expose: !!(row as any)?.expose_inventory_to_network,
       status: ((row as any)?.network_exposure_status as NetworkExposureStatus) ?? "none",
       requested_at: (row as any)?.network_exposure_requested_at ?? null,
       reviewed_at: (row as any)?.network_exposure_reviewed_at ?? null,
-      review_note: (row as any)?.network_exposure_review_note ?? null,
+      review_note: review.network_exposure_review_note,
     };
   });
 
@@ -551,7 +567,7 @@ export const adminListNetworkExposure = createServerFn({ method: "POST" })
     let q = context.supabase
       .from("businesses")
       .select(
-        "id, name, slug, city, province, expose_inventory_to_network, network_exposure_status, network_exposure_requested_at, network_exposure_reviewed_at, network_exposure_review_note",
+        "id, name, slug, city, province, expose_inventory_to_network, network_exposure_status, network_exposure_requested_at, network_exposure_reviewed_at",
       )
       .order("network_exposure_requested_at", { ascending: false, nullsFirst: false })
       .limit(300);
@@ -565,7 +581,16 @@ export const adminListNetworkExposure = createServerFn({ method: "POST" })
     }
     const { data: rows, error } = await q;
     if (error) throw error;
-    return ((rows as any[]) ?? []) as AdminNetworkExposureRow[];
+    const list = ((rows as any[]) ?? []) as Array<
+      Omit<AdminNetworkExposureRow, "network_exposure_review_note">
+    >;
+    if (list.length === 0) return [];
+    const { data: reviews, error: reviewError } = await (context.supabase as any).rpc(
+      "get_business_network_exposure_reviews",
+      { _business_ids: list.map((r) => r.id) },
+    );
+    if (reviewError) throw reviewError;
+    return attachExposureReviewNotes(list, reviews) as AdminNetworkExposureRow[];
   });
 
 export const adminReviewNetworkExposure = createServerFn({ method: "POST" })

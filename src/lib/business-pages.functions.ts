@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { BUSINESS_EDITOR_SELECT } from "@/lib/security/restricted-columns";
 
 // Lenient URL: accept bare domain, normalize to https://, allow null/empty.
 const lenientUrl = (max = 500) =>
@@ -341,7 +342,13 @@ export const getMyBusinessPage = createServerFn({ method: "GET" })
       { data: exceptions },
       { data: bookings },
     ] = await Promise.all([
-      supabase.from("businesses").select("*").eq("id", data.businessId).maybeSingle(),
+      // Not "*": private columns (verification token, review notes) are not
+      // selectable by API roles. See src/lib/security/restricted-columns.ts.
+      (supabase as any)
+        .from("businesses")
+        .select(BUSINESS_EDITOR_SELECT)
+        .eq("id", data.businessId)
+        .maybeSingle(),
       supabase
         .from("business_services")
         .select("*")

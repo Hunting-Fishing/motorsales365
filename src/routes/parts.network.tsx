@@ -126,6 +126,10 @@ function NetworkStockPage() {
     initialPageParam: 0,
     getNextPageParam: (last) => last.nextOffset ?? undefined,
     staleTime: 15_000,
+    // Other partners' stock rows are only visible to the anonymous network
+    // projection, so a signed-in session's Realtime channel below receives
+    // changes for its own organization only. Poll as the cross-partner fallback.
+    refetchInterval: 60_000,
   });
   const rows = useMemo(() => (data?.pages ?? []).flatMap((p) => p.rows), [data]);
   const total = data?.pages?.[0]?.total ?? null;

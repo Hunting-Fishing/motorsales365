@@ -1,0 +1,108 @@
+name: Supabase types
+
+# Regenerates src/integrations/supabase/types.ts from the production Supabase
+# project and opens (or updates) a pull request when it changed.
+# Runs daily, on demand, and after production migrations (migrations.yml calls it).
+# Read-only against Supabase: it only introspects the schema.
+on:
+  schedule:
+    - cron: "17 3 * * *" # daily 03:17 UTC
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: supabase-types
+  cancel-in-progress: false
+
+env:
+  PROJECT_REF: ${{ vars.PRODUCTION_PROJECT_REF || 'wjxaajgvddtrxxtocxen' }}
+  TYPES_FILE: src/integrations/supabase/types.ts
+  BRANCH: automation/supabase-types
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check configuration
+        id: cfg
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if [ -z "${SUPABASE_ACCESS_TOKEN}" ]; then
+            echo "::notice title=Supabase types skipped::Repository secret SUPABASE_ACCESS_TOKEN is not set. See docs/CI_CD.md."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.ready == 'true'
+        with:
+          ref: main
+
+      - uses: supabase/setup-cli@v1
+        if: steps.cfg.outputs.ready == 'true'
+        with:
+          version: 2.118.0
+
+      - name: Generate types from production schema
+        if: steps.cfg.outputs.ready == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          supabase gen types typescript --project-id "${PROJECT_REF}" --schema public > /tmp/types.ts
+          # Guard against committing an error page or truncated output.
+          grep -q "export type Database" /tmp/types.ts || { echo "::error::Generator output does not look like Supabase types"; head -n 20 /tmp/types.ts; exit 1; }
+          test "$(wc -l < /tmp/types.ts)" -gt 1000 || { echo "::error::Generator output suspiciously short"; exit 1; }
+          mv /tmp/types.ts "${TYPES_FILE}"
+          if git diff --quiet -- "${TYPES_FILE}"; then
+            echo "types.ts is already up to date." | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            git diff --stat -- "${TYPES_FILE}" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.ready == 'true'
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Typecheck with regenerated types (informational)
+        id: tsc
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          npm ci --legacy-peer-deps --no-audit --no-fund
+          if npx tsc --noEmit -p tsconfig.json > /tmp/tsc.log 2>&1; then
+            echo "result=passes" >> "$GITHUB_OUTPUT"
+          else
+            echo "result=FAILS ($(grep -c 'error TS' /tmp/tsc.log) errors — the app code needs updating for the real schema)" >> "$GITHUB_OUTPUT"
+            head -n 40 /tmp/tsc.log
+          fi
+
+      # Uses TYPES_PR_TOKEN (fine-grained PAT) if provided so the PR triggers CI;
+      # PRs opened with the default GITHUB_TOKEN do not start other workflows.
+      - name: Open or update pull request
+        if: steps.cfg.outputs.ready == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.TYPES_PR_TOKEN || github.token }}
+          branch: ${{ env.BRANCH }}
+          base: main
+          add-paths: ${{ env.TYPES_FILE }}
+          commit-message: "chore(supabase): regenerate database types from production"
+          title: "chore(supabase): regenerate database types"
+          delete-branch: true
+          body: |
+            Automated regeneration of `${{ env.TYPES_FILE }}` from Supabase project `${{ env.PROJECT_REF }}`
+            (`supabase gen types typescript --schema public`).
+
+            - `tsc --noEmit` with these types: **${{ steps.tsc.outputs.result }}**
+            - Trigger: `${{ github.event_name }}` — run ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Review the diff for unexpected drops (objects removed in production) before merging.
