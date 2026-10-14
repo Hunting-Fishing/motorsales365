@@ -3,6 +3,9 @@
 2026-10-15 Asia/Manila. Branch `feature/crm-vehicle-activity-card`, stacked on
 reader candidate PR #22. This is repository implementation, **not a live feature
 release**. No database, storage, historical SQL or platform configuration changes.
+Draft PR #23: `https://github.com/Hunting-Fishing/motorsales365/pull/23`,
+code `9f3f7b8`; full-checkout CI is pending. Reader parent `ec4671e` passed
+all six gates (run `38629630823`), not a database or hosting release.
 
 ## Delivered contract
 

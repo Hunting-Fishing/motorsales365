@@ -693,7 +693,9 @@ live DDL/data/history repair or broader production permission is implied.
 ## Customer vehicle activity UI and adapter: 2026-10-15
 
 Branch `feature/crm-vehicle-activity-card`, stacked on verified reader PR #22
-(`ec4671e`). The customer detail route now mounts the read-only three-source card
+(`ec4671e`). Draft PR #23:
+`https://github.com/Hunting-Fishing/motorsales365/pull/23`, code `9f3f7b8`;
+publication CI is pending. The customer detail route now mounts the read-only three-source card
 for an explicitly selected matching native vehicle. Signed-out mounting, account/
 customer remounts, account/customer/vehicle/source query keys, AbortSignal forwarding
 and refresh/error stale-row masking protect context isolation. The authenticated
