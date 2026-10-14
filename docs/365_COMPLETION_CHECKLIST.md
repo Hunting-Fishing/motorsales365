@@ -47,15 +47,17 @@ CI gates passed (run `38642371142`), 706 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
-Latest application candidate: draft PR #30, code `a2eff76`, 706 application
-tests across 47 files and full TypeScript pass. CI is verified above. It
-gates reminder mutations and scopes reads, but must not ship before a reviewed
-same-statement invoker reminder read and native authority/recovery prerequisites.
+Latest application candidate: draft PR #32, code `dff0aa8`,723 application tests
+across47 files and full TypeScript pass; CI pending verification. It switches
+reminder reads to the caller-only single-RPC API and keeps writes gated. The API
+is unapplied: do not ship the consumer before compatible database, native
+authority and recovery release prerequisites.
 
 Latest database read candidate: draft PR #31, code `797876c`,22 new focused tests
 and 191/191 full sequential tooling pass. The CLI-generated reminder invoker API
-is unapplied, with guarded recovery; app adapter still uses two statements.
-Verify PR #31 CI, then implement its strict one-RPC adapter. Current explicit
+is unapplied, with guarded recovery. PR #31 docs `e51125c` passed all six CI gates
+(run `38644991112`); PR #32 implements its strict one-RPC adapter offline.
+Current explicit
 source composition is404/423 matched,19 unclassified; release flags remain false.
 
 Inventory PR #20 latest docs head `ff24159` also passed all six CI gates (run
@@ -295,8 +297,9 @@ resolution, checks exact shape/body/ACL/effective access, refuses dependencies
 and preserves unrelated overloads/source state. No production change is implied.
 
 Verification: 22/22 focused memory tests (26.03s), full local sequential tooling
-191/191 (104.22s), focused ESLint/format/diff and independent review pass. CI
-pending verification. Actual selected reminder/helper/native policies run on
+191/191 (104.22s), focused ESLint/format/diff and independent review pass. Latest
+docs head `e51125c` passed all six CI gates (run `38644991112`), verified on this
+resume. Actual selected reminder/helper/native policies run on
 explicit synthetic supports; same-actor visible B-parent/stale A-child proves
 the shop join independently of RLS. No live business rows/RPCs were read or
 changed. Application source remains PR #30's verified 706 tests/full TypeScript.
@@ -312,7 +315,8 @@ intentional exit1 and all approval/parity/replay/baseline flags false. Original
 four cycles/481 findings; this new candidate is not silently adopted into it.
 Historical SQL, immutable observations and source provenance are unchanged.
 
-Exact next action: verify PR #31 latest checks, then replace the reminder
+Original next action (now being implemented offline): verify PR #31 latest checks,
+then replace the reminder
 two-query adapter with this one caller-bound RPC. Strictly validate available
 context/customer/shop and every row including sentinel, reject contradictory/
 malformed payloads, preserve honest unavailability and actor/cancellation/
@@ -323,6 +327,49 @@ trusted reminder entry/affected rows and index/load/queue pagination. Private
 consent/tenure/retention, scanner source recovery/owner/mobile pilot and hosting
 remain open. Pending helper-containment owner decision is unchanged; do not
 re-ask/apply or infer authority for it.
+
+## Latest single-RPC reminder adapter checkpoint (2026-10-15)
+
+Draft PR #32, code `dff0aa8`, branch `completion/customer-reminders-rpc-adapter`,
+stacked on verified PR #31 docs `e51125c`. Two direct-table statements become
+one authenticated caller RPC to crm_customer_reminders, with no separate parent
+lookup, direct schema/table path, privileged/browser fallback or write. Exact
+discriminated envelope validates unavailable(null/null/empty) versus visible
+UUID context; every one of at most101 rows, including sentinel, must match both
+context IDs and complete native fields before100 + hasMore is returned. Arbitrary
+native text, calendar dates and nullable notes/completion timestamps remain
+unaltered. Actor/abort checks surround binding/builders/lazy-await/results;
+request AbortSignal is forwarded and SDK retry(false) is explicit.
+
+Verification:59 handler +22 existing UI focused tests; final stable application
+723/723 across47 files, report checker exit0/no quarantine, final full TypeScript,
+focused ESLint/format/diff and independent review pass. UI/result shape and
+disabled mutation controls unchanged. Tooling unchanged from191/191 verified
+parent. Remote CI pending verification. Migration impact: none in this adapter;
+parent API remains unapplied. Deployment: none. No live business row/RPC/write,
+permission/history/platform mutation or helper reapplication.
+
+A narrow catalog SELECT at `2026-10-14 22:11:43.274436` UTC observed no public
+crm_customer_reminders routine and confirms approved invoice converter anon/auth
+EXECUTE denial, postgres/service execution retained and unchanged body fingerprint.
+This is not other-helper/native/source/API/role closure or future release proof.
+Exact artifact/hash/contracts/limits: `evidence/CUSTOMER_REMINDERS_RPC_ADAPTER.md`.
+Explicit provenance stays404/423 with19 unclassified; inventory/parity/baseline/
+replay/release flags stay false. No sparse local build or artifact deployment.
+
+Exact next action: verify PR #32 latest checks. Continue the unfinished native
+authority dependency: implement/test the fixed operator-private count-only query
+from `evidence/NATIVE_IDENTITY_DIAGNOSTIC_DESIGN.md` on disposable fixtures first,
+and finish actual profile/module/roster/provisioning/delegation/offboarding writer
+and security-attachment closure before a companion guard/baseline. Do not query
+or publish production identity counts until diagnostic scope, privacy/storage,
+authorized read-only visibility, non-executing plan/timeouts are resolved; do not
+infer any binding repair authority from counts. Continue separate baseline/
+forward-upgrade/recovery and real API/JWT/role/load gates, then trusted entry/
+reference/affected-row contracts and queue/index pagination. Keep private
+consent/tenure/retention, scanner source recovery/owner/mobile pilot and hosting
+release prerequisites open. Pending helper-containment decision unchanged;
+no repeat prompt or live application is authorized by these CI results.
 
 ## Recovery evidence (original scope, retained below)
 

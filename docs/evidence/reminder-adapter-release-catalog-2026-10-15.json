@@ -1,0 +1,19 @@
+{
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "mode": "read-only-catalog",
+  "observed_at_utc": "2026-10-14 22:11:43.274436",
+  "scope": "Exact approved converter catalog/EXECUTE checks and all public crm_customer_reminders signatures only; no business row, RPC, DDL, grant, history or platform write.",
+  "approved_converter": {
+    "signature": "shop_manager.convert_work_order_to_invoice(uuid)",
+    "owner": "postgres",
+    "security_definer": true,
+    "acl": "{postgres=X/postgres,service_role=X/postgres}",
+    "body_md5_lf": "c3ef84a1dfa61850a0135fdc66eb9f40",
+    "anon_execute": false,
+    "authenticated_execute": false,
+    "service_execute": true,
+    "owner_execute": true
+  },
+  "reminder_api_catalog": null,
+  "limits": "No public routine of this name was observed at this snapshot. This is not a schema/API/role closure or later release guarantee. Other helpers and owner decisions remain outside this observation."
+}

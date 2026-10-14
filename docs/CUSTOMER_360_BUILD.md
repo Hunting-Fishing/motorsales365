@@ -205,3 +205,13 @@ compatible approved release. See
 `evidence/CUSTOMER_REMINDERS_INVOKER_READ_CONTRACT.md`. This does not resolve
 mutable native identity, baseline/recovery, actual API/role/load acceptance or
 trusted entry. No application deployment or live database/permission change.
+
+Draft PR #32 (code `dff0aa8`) now switches the reminder adapter to that single
+caller RPC, validating the full strict context/envelope and101 rows before100 +
+hasMore. Request cancellation is forwarded and SDK retries explicitly disabled;
+there is no direct-table or privileged fallback if the unapplied API is absent.
+UI/result shape and disabled writes stay unchanged.59 handler +22 UI focused
+tests,723 full application tests and full TypeScript pass; CI pending verification.
+See `evidence/CUSTOMER_REMINDERS_RPC_ADAPTER.md`. Catalog-only refresh confirms
+the API remains absent and approved invoice restriction retained at its dated
+snapshot; no live release/record/permission change or new helper approval.
