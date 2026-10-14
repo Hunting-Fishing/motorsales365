@@ -3,6 +3,7 @@ import { File as NodeFile } from "node:buffer";
 import * as pdfjs from "pdfjs-dist";
 import { processReceiptPdf, RECEIPT_PDF_ASSETS } from "./receipt-pdf.client";
 import type { ReceiptExtraction } from "./vehicle-receipts";
+import type { ReceiptPdfOptions } from "./receipt-pdf.client";
 
 const mocks = vi.hoisted(() => ({
   getDocument: vi.fn(),
@@ -83,7 +84,7 @@ let loading: {
   destroy: ReturnType<typeof vi.fn>;
   onPassword?: () => void;
 };
-let onPage: ReturnType<typeof vi.fn>;
+let onPage: ReturnType<typeof vi.fn<ReceiptPdfOptions["onPage"]>>;
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -114,7 +115,7 @@ beforeEach(() => {
   loading = { promise: Promise.resolve(doc), destroy: vi.fn().mockResolvedValue(undefined) };
   mocks.getDocument.mockImplementation(() => loading);
   mocks.workerCreate.mockReturnValue({ destroy: mocks.workerDestroy });
-  onPage = vi.fn().mockResolvedValue(suggestion());
+  onPage = vi.fn<ReceiptPdfOptions["onPage"]>().mockResolvedValue(suggestion());
 });
 afterEach(() => {
   vi.useRealTimers();
