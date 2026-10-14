@@ -5,8 +5,9 @@ stacked on verified PR #27 docs head `de3ac1e` (all six CI gates, run
 `38638332580`). Application-only review candidate; not a live workflow release,
 tenant-authority repair or a working logging-entry contract.
 
-Published as draft PR #28, code `f30cb90`. Latest remote CI is pending at
-publication; local proof is not a hosting upload or production acceptance.
+Published as draft PR #28, code `f30cb90`. Latest docs head `b6478f7` passed all
+six CI gates (run `38639864235`), verified on the next slice's resume. This is
+not a hosting upload or production acceptance.
 
 ## Read and visibility contract
 

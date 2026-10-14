@@ -42,8 +42,8 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest fully CI-verified application slice: PR #27, documentation head `de3ac1e`, all six
-CI gates passed (run `38638332580`), 576 application tests. These are review
+Latest fully CI-verified application slice: PR #28, documentation head `b6478f7`, all six
+CI gates passed (run `38639864235`), 642 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
@@ -169,7 +169,8 @@ or a repaired writer. No customer communication or business write occurred.
 Verification: 47 handler +19 UI focused tests; full application suite 642/642
 across 45 files, report checker exit 0/no quarantine, final full TypeScript and
 focused ESLint/format/diff pass; independent source review clean. Tooling remains
-the prior 156/156. Latest remote CI pending. Migration impact: none. Deployment:
+the prior 156/156. Latest docs head `b6478f7` passed all six CI gates
+(run `38639864235`), verified on this resume. Migration impact: none. Deployment:
 none; sparse artifact and unapplied activity consumers remain release-blocked.
 Source correspondence stays 404/422,18 unclassified; inventory flags not promoted.
 Fresh metadata-only policy/constraint/helper/column/index observations are pinned
@@ -178,7 +179,7 @@ identified no communications customer/date supporting index; response caps are
 not bounded scan/sort work, byte limits or load acceptance. Plan/index rehearsal
 and safe existing-state/index recovery remain separate release prerequisites.
 
-Exact next action: verify PR #28 CI while finishing the separate actual-source
+Exact next action: finish the separate actual-source
 reminder integrity/policy rehearsal, then bounded request-bound reminder reads.
 Keep entry/logging repair separate until trusted staff/shop attribution,
 customer/vehicle consistency and affected-row confirmation are tested against
@@ -187,7 +188,41 @@ offboarding closure and baseline/upgrade/recovery, consent/tenure/retention,
 OCR owner/mobile pilot and hosting gates. Do not re-ask/apply pending helper
 restrictions or deploy this sparse checkout.
 
-## Recovery evidence (original scope, retained)
+## Latest reminder integrity checkpoint (2026-10-15)
+
+Draft PR #29, code `78f9460`, branch `security/customer-reminder-integrity-proof`,
+stacked on verified PR #28 docs `b6478f7`. Thirteen new memory-only tests execute
+only actual pinned reminder suffix/current-shop helper/policy-rewrite block 4.
+Exact selected table/helper metadata and all reminder columns/defaults/constraints/
+trigger/indexes compare to immutable observations; only PG18 NOT NULL catalog
+representation differs, after exact column nullability checks. Supporting native
+tables/policies/session claims are explicitly synthetic, with real non-bypass
+actor roles. No live business function, row, mutation, DDL/history or permission
+change. Historical source and all baseline/replay/parity/release flags unchanged.
+
+The current policy is shop-scoped, not the original broad authenticated policy.
+Fixture app-style omission of shop_id fails42501; own-shop rows can carry foreign/
+nonexistent reference and spoofed attribution UUIDs under present constraints.
+Wrong-shop id-only mutations return zero rows, not success; explicit customer
+target matching matters within a shop. Timestamp maintenance is not human audit
+attribution. These are source/fixture behaviors, not asserted live incidents.
+
+Verification: 13/13 focused, full local tooling169/169 sequentially, ESLint/format/
+diff and independent review pass. Dedicated CI step added; remote CI pending.
+Application remains the verified642-test parent. Migration impact: none.
+Deployment: none. See `evidence/CUSTOMER_REMINDER_INTEGRITY_PROOF.md` for exact pins,
+execution boundaries and limits. Inventory/global provenance counts unchanged.
+
+Exact next action: verify PR #29 checks, then implement bounded actor-bound
+reminder reads with explicit visible-customer/shop and returned-row consistency,
+freshness/cap/error/unavailable semantics. Keep known-invalid/unconfirmed writes
+gated until separate trusted attribution, database authority and affected-row
+contracts pass. Continue native writer/provisioning/security/offboarding closure,
+baseline/upgrade/recovery, private consent/tenure/retention, index/load, pilot and
+hosting gates. Count-only native identity audit is still design-only, not live
+data evidence or permission to publish business counts/repair bindings.
+
+## Recovery evidence (original scope, retained below)
 
 - [x] Confirm receipt/history release PR #10 is merged on current main.
 - [x] Confirm five existing open PRs: #2, #5, #7, #8, #9.
