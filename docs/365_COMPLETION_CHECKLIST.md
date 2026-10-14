@@ -19,11 +19,11 @@ Security reconciliation branch: `completion/365-security`.
 - [x] Confirm five existing open PRs: #2, #5, #7, #8, #9.
 - [x] Confirm authenticated GitHub CLI access for implementation.
 - [ ] Recover the in-house receipt scanner from chat/workspace
-  `01a13964-74e2-727b-a213-e5115412a098`. Remote history timed out during
-  this implementation pass. No source recovery or publication is claimed.
+      `01a13964-74e2-727b-a213-e5115412a098`. Remote history timed out during
+      this implementation pass. No source recovery or publication is claimed.
 - [ ] Recover the interrupted CRM workspace
-  `/workspace/scratch/8b1286a419da/motorsales365`. Earlier execution created
-  `feature/parts-crm-integration` and a migration but no verified push/PR.
+      `/workspace/scratch/8b1286a419da/motorsales365`. Earlier execution created
+      `feature/parts-crm-integration` and a migration but no verified push/PR.
 
 ## Delivery sequence
 
@@ -31,23 +31,24 @@ Security reconciliation branch: `completion/365-security`.
 2. [x] Reconcile CI PR #8 locally with current main; preserve its existing work.
 3. [x] Resolve ten known test failures: 179/179 application tests now pass.
 4. [ ] Audit tracked environment variables by purpose; distinguish intentionally
-   public browser configuration from credentials requiring restriction/rotation.
+       public browser configuration from credentials requiring restriction/rotation.
 5. [ ] Reconcile security PR #5 and dependent #7 together; test migrations on
-   isolated/staging data before shipping application consumers.
+       isolated/staging data before shipping application consumers.
 6. [ ] Reconcile migration history against deployed schema before automated push.
 7. [ ] Reconcile PR #9 and validate provider configuration and authentication.
 8. [ ] Approve a single organization/shop/customer/vehicle identity contract and
-   verify multiple-organization access boundaries, including cache separation.
-9. [ ] Recover or rebuild local receipt OCR; bundle workers, PDF rendering and
-   language assets; preserve manual review and private file handling.
+       verify multiple-organization access boundaries, including cache separation.
+9. [x] Rebuild English on-device image/PDF receipt OCR; bundle workers, PDF
+       rendering and language assets; preserve manual review and private file handling.
+       Wider corpus/mobile/owner acceptance remains a separate pilot gate.
 10. [ ] Deliver CRM Customer 360 and activity/task follow-ups using existing
-    customer, vehicle, receipt, invoice and work-order records.
+        customer, vehicle, receipt, invoice and work-order records.
 11. [ ] Deliver separate retail and business-recruitment pipelines, consent-aware
-    communications, assignments and reporting.
+        communications, assignments and reporting.
 12. [ ] Verify the Parts catalog-to-receiving-to-installation loop, stock/financial
-    reconciliation, returns and warranty recovery.
+        reconciliation, returns and warranty recovery.
 13. [ ] Complete history corrections, ownership transfer, report snapshots,
-    source labels and sharing expiry.
+        source labels and sharing expiry.
 14. [ ] Complete responsive role-based UI and business/owner acceptance checks.
 15. [ ] Verify billing, entitlements, support operations and recovery procedure.
 16. [ ] Run a bounded Philippine pilot before approving broader availability.
@@ -250,6 +251,9 @@ caught untyped test callback mocks; they were corrected against the public
 scanner contract, and complete-checkout TypeScript then passed. No safeguards
 were relaxed. This final PDF checkpoint update is docs-only.
 
+The docs-only PDF head `adc5fd2` also passed all six GitHub CI gates
+(run `38605658988`). The separate Cloudflare hosting check remains failed.
+
 Migration replay safety: 13 new offline/PGlite regressions reproduce the unchanged
 historical cost-fix patch on original and already-corrected disposable fixtures.
 The offline preflight intentionally reports blocked (exit 1) for the current
@@ -265,3 +269,69 @@ and child-card caches, then deliver bounded native customer/vehicle activity and
 the disposable baseline/recovery prerequisites. External CRM candidate selection
 remains unresolved pending recovery of the actual repositories/licenses. Keep
 resource-heavy local checks sequential on this 16 GB computer.
+
+## CRM drill-down continuation: 2026-10-15
+
+Branch: `feature/crm-drilldown-isolation`, draft PR #14 stacked on the verified
+PDF slice. Verified application commit: `5945c33`; verified follow-up/test commit:
+`117412b`.
+Vehicle/work-order detail and time/technician/inspection child-card caches now
+include account identity. Signed-out UI is hidden, drafts reset on account/target
+changes, late old-context callbacks are ignored, dependent reads require a visible
+primary record and work-order writes require complete job/part reads. Generic
+independent errors/retries replace misleading empty states. PHP amounts and
+explicit vehicle-history list caps are preserved. No database grants/RLS were
+relaxed. See `CUSTOMER_360_BUILD.md`.
+
+All 370 application tests pass, including 45 new focused regressions and partial
+invoice failure warnings/invalidation. Explicit lint has zero errors and 33
+existing schema-typing warnings. Local TypeScript passes. All six GitHub CI gates
+passed at `5945c33` (run `38607348255`), including full build/package dry-run,
+TypeScript, application/tooling/receipt DB suites, lint, real-browser image/PDF
+OCR and 247 disposable PostgreSQL assertions. No schema migration or deployment
+is included. The separate Cloudflare hosting check still fails.
+
+New priority release blocker: read-only live catalog inspection confirmed
+`convert_work_order_to_invoice(uuid)` and `calculate_work_order_totals(uuid)` are
+postgres-owned SECURITY DEFINER functions, executable by anon/authenticated roles
+and lacking caller/shop checks in their inspected bodies. Neither was invoked;
+external API reachability was not tested. The native browser conversion also
+omits live NOT NULL `due_date`, has wrong line mappings and lacks atomic/idempotent
+creation. Do not wire the legacy RPC as a shortcut. Exact evidence and ordered
+acceptance gates: `evidence/SHOP_MANAGER_INVOICE_RELEASE_GATES.md`.
+
+Owner action requested once: approve or decline tested temporary production
+restriction of the legacy invoice converter. No response/approval is inferred;
+related helper restrictions need explicitly scoped authority too. Continue safe
+offline preparation while authority is pending. Existing applied migrations and
+live privileges remain untouched.
+
+Five focused memory-only PGlite ACL tests now prove historical definer bypass
+despite real synthetic RLS denial, and verify proposed fixture-only revocations.
+They are added to CI; total tooling regressions are now 41. No containment SQL
+is applied. Live ACLs differ from retained direct authenticated grants, which is
+documented explicitly rather than inferred from old source.
+All six GitHub gates also pass at `117412b` (run `38608648139`); job logs confirm
+370/370 application tests, 41/41 tooling regressions and both isolated receipt
+database suites. This final handoff update changes documentation only.
+
+Identity follow-up found a prerequisite to converter hardening: native shop,
+business and public organization IDs are distinct, and current profile shop
+binding is self-writable under observed grants/policies. Catalog inspection found
+no non-internal profile triggers; no profile mutation or API exploit was attempted.
+See `evidence/SHOP_MANAGER_IDENTITY_CONTRACT_AUDIT.md`. Do not trust a writable
+profile shop ID as sufficient tenant authority or infer linkage from names/emails.
+
+Tracked environment-name/format inspection covered `.env`, `.env.development`
+and `.env.production` without printing values: Supabase publishable formats and
+public identifiers, Maps browser configuration and public-format payment client
+tokens. This does not verify provider key restrictions, runtime secrets or Git
+history; the environment/security audit remains incomplete.
+
+Next: verify any new docs-head checks without repeating the completed OCR/UI
+slices, then prepare disposable trusted shop/role binding and membership-tampering
+tests before invoice authorization,
+atomicity and concurrency implementation. Continue the
+baseline/recovery path. Native bounded receipt/installation activity follows;
+retail/recruitment pipelines, wider account/role UI audits and owner/pilot
+acceptance remain unfinished. Do not deploy the sparse local artifact.

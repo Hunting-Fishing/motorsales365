@@ -15,6 +15,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { smSupabase, supabase } from "@/lib/shop-manager/db";
+import { useAuth } from "@/hooks/use-auth";
+
+const HISTORY_LIMIT = 100;
 
 type Vehicle = {
   id: string;
@@ -88,7 +91,7 @@ async function fetchWorkOrders(vehicleId: string): Promise<WorkOrder[]> {
     .select("id, work_order_number, status, description, total_cost, created_at")
     .eq("vehicle_id", vehicleId)
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(HISTORY_LIMIT + 1);
   if (error) throw error;
   return (data ?? []) as WorkOrder[];
 }
@@ -100,7 +103,8 @@ async function fetchInstalledComponents(vehicleId: string): Promise<InstalledCom
       "id,name_snapshot,part_number_snapshot,serial_number,position,installed_quantity,installed_at,installed_odometer_km,warranty_ends_at,work_order_id",
     )
     .eq("shop_manager_vehicle_id", vehicleId)
-    .order("installed_at", { ascending: false });
+    .order("installed_at", { ascending: false })
+    .limit(HISTORY_LIMIT + 1);
   if (error) throw error;
   return (data ?? []) as InstalledComponent[];
 }
@@ -114,13 +118,15 @@ export const Route = createFileRoute("/_authenticated/workspace/vehicles/$id")({
     ],
   }),
   component: VehicleDetail,
-  errorComponent: ({ error, reset }) => {
+  errorComponent: function VehicleLoadError({ reset }) {
     const router = useRouter();
     return (
       <SiteLayout>
         <div className="mx-auto max-w-4xl px-4 py-10">
           <h1 className="text-2xl font-bold">Vehicle</h1>
-          <p className="mt-2 text-destructive">{String((error as any)?.message ?? error)}</p>
+          <p role="alert" className="mt-2 text-destructive">
+            Could not load this vehicle.
+          </p>
           <Button
             className="mt-4"
             onClick={() => {
@@ -141,9 +147,11 @@ export const Route = createFileRoute("/_authenticated/workspace/vehicles/$id")({
   ),
 });
 
+// Shop Manager work-order amounts are PHP, independent of visitor display FX.
+const money = new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" });
 function fmtCurrency(n: number | null | undefined) {
   if (n == null) return "—";
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  return money.format(n);
 }
 
 function fmtDate(s: string | null | undefined) {
@@ -167,26 +175,52 @@ function Spec({ label, value }: { label: string; value: string | number | null |
 
 function VehicleDetail() {
   const { id } = Route.useParams();
+  const { user } = useAuth();
   const vehicleQ = useQuery({
-    queryKey: ["shop-manager", "vehicle", id],
+    queryKey: ["shop-manager", user?.id, "vehicle", id],
     queryFn: () => fetchVehicle(id),
+    enabled: !!user,
   });
   const workOrdersQ = useQuery({
-    queryKey: ["shop-manager", "vehicle", id, "work-orders"],
+    queryKey: ["shop-manager", user?.id, "vehicle", id, "work-orders"],
     queryFn: () => fetchWorkOrders(id),
-    enabled: !!vehicleQ.data,
+    enabled: !!user && vehicleQ.isSuccess && !!vehicleQ.data,
   });
   const installedQ = useQuery({
-    queryKey: ["shop-manager", "vehicle", id, "installed-components"],
+    queryKey: ["shop-manager", user?.id, "vehicle", id, "installed-components"],
     queryFn: () => fetchInstalledComponents(id),
-    enabled: !!vehicleQ.data,
+    enabled: !!user && vehicleQ.isSuccess && !!vehicleQ.data,
   });
+
+  if (!user) return null;
 
   if (vehicleQ.isLoading) {
     return (
       <SiteLayout>
-        <div className="mx-auto max-w-5xl px-4 py-10 flex items-center gap-2 text-muted-foreground">
+        <div
+          role="status"
+          className="mx-auto max-w-5xl px-4 py-10 flex items-center gap-2 text-muted-foreground"
+        >
           <Loader2 className="h-4 w-4 animate-spin" /> Loading vehicle…
+        </div>
+      </SiteLayout>
+    );
+  }
+
+  if (vehicleQ.isError) {
+    return (
+      <SiteLayout>
+        <div className="mx-auto max-w-4xl px-4 py-10 space-y-4">
+          <p role="alert" className="text-sm text-destructive">
+            Could not load this vehicle.
+          </p>
+          <Button
+            variant="outline"
+            disabled={vehicleQ.isFetching}
+            onClick={() => void vehicleQ.refetch()}
+          >
+            Retry vehicle
+          </Button>
         </div>
       </SiteLayout>
     );
@@ -308,54 +342,72 @@ function VehicleDetail() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Wrench className="h-4 w-4" /> Installed components ({installedQ.data?.length ?? 0})
+              <Wrench className="h-4 w-4" /> Installed components
             </CardTitle>
           </CardHeader>
           <CardContent>
             {installedQ.isLoading ? (
-              <p className="text-sm text-muted-foreground">Loading installed parts…</p>
-            ) : installedQ.isError ? (
-              <p className="text-sm text-muted-foreground">
-                Installed components are available after this Shop Manager workspace is linked to
-                its 365 Associate business.
+              <p role="status" className="text-sm text-muted-foreground">
+                Loading installed parts…
               </p>
+            ) : installedQ.isError ? (
+              <div className="space-y-2">
+                <p role="alert" className="text-sm text-destructive">
+                  Could not load installed components.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={installedQ.isFetching}
+                  onClick={() => void installedQ.refetch()}
+                >
+                  Retry installed components
+                </Button>
+              </div>
             ) : installedQ.data?.length ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Part</TableHead>
-                    <TableHead>Installed</TableHead>
-                    <TableHead>Position</TableHead>
-                    <TableHead>Warranty</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {installedQ.data.map((component) => (
-                    <TableRow key={component.id}>
-                      <TableCell>
-                        <p className="font-medium">{component.name_snapshot}</p>
-                        <p className="font-mono text-xs text-muted-foreground">
-                          {component.part_number_snapshot || component.serial_number || "—"}
-                        </p>
-                      </TableCell>
-                      <TableCell>
-                        {fmtDate(component.installed_at)}
-                        {component.installed_odometer_km != null ? (
-                          <p className="text-xs text-muted-foreground">
-                            {component.installed_odometer_km.toLocaleString()} km
-                          </p>
-                        ) : null}
-                      </TableCell>
-                      <TableCell>{component.position || "—"}</TableCell>
-                      <TableCell>
-                        {component.warranty_ends_at
-                          ? `Until ${fmtDate(component.warranty_ends_at)}`
-                          : "Not recorded"}
-                      </TableCell>
+              <>
+                {installedQ.data.length > HISTORY_LIMIT && (
+                  <p className="mb-2 text-xs text-muted-foreground">
+                    Showing the 100 most recent installed components.
+                  </p>
+                )}
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Part</TableHead>
+                      <TableHead>Installed</TableHead>
+                      <TableHead>Position</TableHead>
+                      <TableHead>Warranty</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {installedQ.data.slice(0, HISTORY_LIMIT).map((component) => (
+                      <TableRow key={component.id}>
+                        <TableCell>
+                          <p className="font-medium">{component.name_snapshot}</p>
+                          <p className="font-mono text-xs text-muted-foreground">
+                            {component.part_number_snapshot || component.serial_number || "—"}
+                          </p>
+                        </TableCell>
+                        <TableCell>
+                          {fmtDate(component.installed_at)}
+                          {component.installed_odometer_km != null ? (
+                            <p className="text-xs text-muted-foreground">
+                              {component.installed_odometer_km.toLocaleString()} km
+                            </p>
+                          ) : null}
+                        </TableCell>
+                        <TableCell>{component.position || "—"}</TableCell>
+                        <TableCell>
+                          {component.warranty_ends_at
+                            ? `Until ${fmtDate(component.warranty_ends_at)}`
+                            : "Not recorded"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </>
             ) : (
               <p className="text-sm text-muted-foreground">
                 No network parts have been recorded as installed on this vehicle.
@@ -367,49 +419,70 @@ function VehicleDetail() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
-              <Wrench className="h-4 w-4" /> Service history ({workOrdersQ.data?.length ?? 0})
+              <Wrench className="h-4 w-4" /> Service history
             </CardTitle>
           </CardHeader>
           <CardContent>
             {workOrdersQ.isLoading ? (
-              <div className="text-muted-foreground text-sm flex items-center gap-2">
+              <div role="status" className="text-muted-foreground text-sm flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading history…
+              </div>
+            ) : workOrdersQ.isError ? (
+              <div className="space-y-2">
+                <p role="alert" className="text-sm text-destructive">
+                  Could not load service history.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={workOrdersQ.isFetching}
+                  onClick={() => void workOrdersQ.refetch()}
+                >
+                  Retry service history
+                </Button>
               </div>
             ) : (workOrdersQ.data?.length ?? 0) === 0 ? (
               <p className="text-sm text-muted-foreground">No work orders yet for this vehicle.</p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>#</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {workOrdersQ.data!.map((w) => (
-                    <TableRow key={w.id}>
-                      <TableCell>
-                        <Link
-                          to="/workspace/work-orders/$id"
-                          params={{ id: w.id }}
-                          className="text-primary hover:underline font-medium"
-                        >
-                          {w.work_order_number || w.id.slice(0, 8)}
-                        </Link>
-                      </TableCell>
-                      <TableCell>{fmtDate(w.created_at)}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{w.status || "—"}</Badge>
-                      </TableCell>
-                      <TableCell className="max-w-md truncate">{w.description || "—"}</TableCell>
-                      <TableCell className="text-right">{fmtCurrency(w.total_cost)}</TableCell>
+              <>
+                {workOrdersQ.data!.length > HISTORY_LIMIT && (
+                  <p className="mb-2 text-xs text-muted-foreground">
+                    Showing the 100 most recent work orders.
+                  </p>
+                )}
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>#</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead className="text-right">Total</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {workOrdersQ.data!.slice(0, HISTORY_LIMIT).map((w) => (
+                      <TableRow key={w.id}>
+                        <TableCell>
+                          <Link
+                            to="/workspace/work-orders/$id"
+                            params={{ id: w.id }}
+                            className="text-primary hover:underline font-medium"
+                          >
+                            {w.work_order_number || w.id.slice(0, 8)}
+                          </Link>
+                        </TableCell>
+                        <TableCell>{fmtDate(w.created_at)}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{w.status || "—"}</Badge>
+                        </TableCell>
+                        <TableCell className="max-w-md truncate">{w.description || "—"}</TableCell>
+                        <TableCell className="text-right">{fmtCurrency(w.total_cost)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </>
             )}
           </CardContent>
         </Card>

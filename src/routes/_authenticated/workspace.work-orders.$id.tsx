@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   Loader2,
@@ -46,6 +46,7 @@ import { toast } from "sonner";
 import { smSupabase } from "@/lib/shop-manager/db";
 import { WorkOrderTimeEntries } from "@/components/shop-manager/work-order-time-entries";
 import { WorkOrderInspectionsCard } from "@/components/shop-manager/work-order-inspections-card";
+import { useAuth } from "@/hooks/use-auth";
 
 type WorkOrderDetail = {
   id: string;
@@ -148,13 +149,13 @@ export const Route = createFileRoute("/_authenticated/workspace/work-orders/$id"
     ],
   }),
   component: WorkOrderDetailPage,
-  errorComponent: ({ error, reset }) => {
+  errorComponent: function WorkOrderRouteError({ reset }) {
     const router = useRouter();
     return (
       <SiteLayout>
         <div className="mx-auto max-w-4xl px-4 py-10">
           <h1 className="text-2xl font-bold">Work Order</h1>
-          <p className="mt-2 text-destructive">{String((error as any)?.message ?? error)}</p>
+          <p className="mt-2 text-destructive">Could not load this work order.</p>
           <Button
             className="mt-4"
             onClick={() => {
@@ -203,20 +204,86 @@ const WO_STATUSES = [
 
 function WorkOrderDetailPage() {
   const { id } = Route.useParams();
+  const { user } = useAuth();
+  if (!user) return null;
+  // Remount local editors and mutation observers across account/target changes.
+  return <AuthenticatedWorkOrderDetail key={`${user.id}:${id}`} userId={user.id} id={id} />;
+}
+
+function useActiveScope() {
+  const active = useRef(false);
+  useLayoutEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
+  return useCallback(() => active.current, []);
+}
+
+const php = new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" });
+const money = (value: number) => php.format(value);
+
+function AuthenticatedWorkOrderDetail({ userId, id }: { userId: string; id: string }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const { data, isLoading } = useQuery({
-    queryKey: ["shop-manager", "work-orders", "detail", id],
+  const isCurrent = useActiveScope();
+  const detailQ = useQuery({
+    queryKey: ["shop-manager", userId, "work-orders", "detail", id],
     queryFn: () => fetchWorkOrder(id),
   });
-  const { data: jobLines = [] } = useQuery({
-    queryKey: ["shop-manager", "work-orders", "job-lines", id],
+  const { data, isLoading } = detailQ;
+  const jobLinesQ = useQuery({
+    queryKey: ["shop-manager", userId, "work-orders", "job-lines", id],
     queryFn: () => fetchJobLines(id),
+    enabled: detailQ.isSuccess && !!data,
   });
-  const { data: parts = [] } = useQuery({
-    queryKey: ["shop-manager", "work-orders", "parts", id],
+  const partsQ = useQuery({
+    queryKey: ["shop-manager", userId, "work-orders", "parts", id],
     queryFn: () => fetchWorkOrderParts(id),
+    enabled: detailQ.isSuccess && !!data,
   });
+  const jobLines = jobLinesQ.data ?? [];
+  const parts = partsQ.data ?? [];
+  const writesReady =
+    detailQ.isSuccess &&
+    !!data &&
+    jobLinesQ.isSuccess &&
+    partsQ.isSuccess &&
+    !detailQ.isFetching &&
+    !jobLinesQ.isFetching &&
+    !partsQ.isFetching;
+  const ready = useRef(false);
+  useLayoutEffect(() => {
+    ready.current = writesReady;
+  }, [writesReady]);
+  const assertCanWrite = () => {
+    if (!isCurrent() || !ready.current) throw new Error("Work order data is not ready");
+  };
+  const refreshWorkOrder = () => {
+    if (!isCurrent()) return;
+    void qc.invalidateQueries({
+      queryKey: ["shop-manager", userId, "work-orders", "detail", id],
+      exact: true,
+    });
+    // Keep the existing list producer compatible until that route is scoped.
+    void qc.invalidateQueries({
+      queryKey: ["shop-manager", "work-orders", "list"],
+      exact: true,
+    });
+    if (data?.customer_id) {
+      void qc.invalidateQueries({
+        queryKey: ["shop-manager", userId, "customer", data.customer_id, "work-orders"],
+        exact: true,
+      });
+    }
+    if (data?.vehicle_id) {
+      void qc.invalidateQueries({
+        queryKey: ["shop-manager", userId, "vehicle", data.vehicle_id, "work-orders"],
+        exact: true,
+      });
+    }
+  };
   const partsTotal = parts.reduce(
     (s, p) => s + Number(p.customer_price ?? 0) * Number(p.quantity ?? 0),
     0,
@@ -225,6 +292,7 @@ function WorkOrderDetailPage() {
 
   const generateInvoice = useMutation({
     mutationFn: async () => {
+      assertCanWrite();
       if (!data) throw new Error("Work order not loaded");
       if (!data.customer_id) throw new Error("Work order has no customer");
       if (jobLines.length === 0 && parts.length === 0) {
@@ -250,6 +318,9 @@ function WorkOrderDetailPage() {
         total: subtotal,
       });
       if (invErr) throw invErr;
+      // An already-dispatched insert cannot be undone here. Never dispatch its
+      // follow-up using a different account's current session after a remount.
+      assertCanWrite();
 
       const items = [
         ...jobLines.map((j: any) => ({
@@ -278,15 +349,36 @@ function WorkOrderDetailPage() {
       return invoiceId;
     },
     onSuccess: (invoiceId) => {
+      if (!isCurrent()) return;
       toast.success("Invoice created");
-      qc.invalidateQueries({ queryKey: ["shop-manager", "invoices"] });
+      qc.invalidateQueries({ queryKey: ["shop-manager", userId, "invoices"] });
+      qc.invalidateQueries({
+        queryKey: ["shop-manager", "invoices", "list"],
+        exact: true,
+      });
+      qc.invalidateQueries({
+        queryKey: ["shop-manager", userId, "customer", data?.customer_id, "invoices"],
+      });
       navigate({ to: "/workspace/invoices/$id", params: { id: invoiceId } });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed to generate invoice"),
+    onError: () => {
+      if (!isCurrent()) return;
+      // Header/item writes are not atomic yet; refresh to reveal any partial
+      // header, and never encourage an uninspected duplicate retry.
+      void qc.invalidateQueries({ queryKey: ["shop-manager", "invoices", "list"], exact: true });
+      void qc.invalidateQueries({ queryKey: ["shop-manager", userId, "invoices"] });
+      void qc.invalidateQueries({
+        queryKey: ["shop-manager", userId, "customer", data?.customer_id, "invoices"],
+      });
+      toast.error(
+        "Could not finish creating this invoice. Check existing invoices before trying again.",
+      );
+    },
   });
 
   const updateStatus = useMutation({
     mutationFn: async (status: string) => {
+      assertCanWrite();
       const { error } = await (smSupabase as any)
         .from("work_orders")
         .update({ status })
@@ -294,40 +386,55 @@ function WorkOrderDetailPage() {
       if (error) throw error;
     },
     onSuccess: () => {
+      if (!isCurrent()) return;
       toast.success("Status updated");
-      qc.invalidateQueries({ queryKey: ["shop-manager", "work-orders"] });
+      refreshWorkOrder();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed to update"),
+    onError: () => {
+      if (isCurrent()) toast.error("Could not update this work order. Please retry.");
+    },
   });
 
   const deleteJobLine = useMutation({
     mutationFn: async (jobId: string) => {
+      assertCanWrite();
       const { error } = await (smSupabase as any)
         .from("work_order_job_lines")
         .delete()
-        .eq("id", jobId);
+        .eq("id", jobId)
+        .eq("work_order_id", id);
       if (error) throw error;
     },
     onSuccess: () => {
+      if (!isCurrent()) return;
       toast.success("Job line removed");
-      qc.invalidateQueries({ queryKey: ["shop-manager", "work-orders", "job-lines", id] });
+      qc.invalidateQueries({ queryKey: ["shop-manager", userId, "work-orders", "job-lines", id] });
+      refreshWorkOrder();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+    onError: () => {
+      if (isCurrent()) toast.error("Could not remove this job line. Please retry.");
+    },
   });
 
   const deletePart = useMutation({
     mutationFn: async (partId: string) => {
+      assertCanWrite();
       const { error } = await (smSupabase as any)
         .from("work_order_parts")
         .delete()
-        .eq("id", partId);
+        .eq("id", partId)
+        .eq("work_order_id", id);
       if (error) throw error;
     },
     onSuccess: () => {
+      if (!isCurrent()) return;
       toast.success("Part removed");
-      qc.invalidateQueries({ queryKey: ["shop-manager", "work-orders", "parts", id] });
+      qc.invalidateQueries({ queryKey: ["shop-manager", userId, "work-orders", "parts", id] });
+      refreshWorkOrder();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+    onError: () => {
+      if (isCurrent()) toast.error("Could not remove this part. Please retry.");
+    },
   });
 
   return (
@@ -339,7 +446,14 @@ function WorkOrderDetailPage() {
           </Link>
         </Button>
 
-        {isLoading ? (
+        {detailQ.isError ? (
+          <div role="alert" className="space-y-3">
+            <p>Could not load this work order.</p>
+            <Button variant="outline" onClick={() => void detailQ.refetch()}>
+              Retry work order
+            </Button>
+          </div>
+        ) : isLoading ? (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading…
           </div>
@@ -371,6 +485,7 @@ function WorkOrderDetailPage() {
                 <Badge variant={statusVariant(data.status)}>{data.status ?? "unknown"}</Badge>
                 <Select
                   value={data.status ?? undefined}
+                  disabled={!writesReady || updateStatus.isPending}
                   onValueChange={(v) => updateStatus.mutate(v)}
                 >
                   <SelectTrigger className="h-8 w-[170px]">
@@ -389,7 +504,9 @@ function WorkOrderDetailPage() {
                   size="sm"
                   variant="default"
                   disabled={
-                    generateInvoice.isPending || (jobLines.length === 0 && parts.length === 0)
+                    !writesReady ||
+                    generateInvoice.isPending ||
+                    (jobLines.length === 0 && parts.length === 0)
                   }
                   onClick={() => generateInvoice.mutate()}
                 >
@@ -523,36 +640,58 @@ function WorkOrderDetailPage() {
                 <CardContent className="space-y-2 text-sm">
                   <Field
                     label="Labor"
-                    value={laborTotal ? `₱${laborTotal.toLocaleString()}` : null}
+                    value={jobLinesQ.isSuccess ? money(laborTotal) : "Unavailable"}
                   />
                   <Field
                     label="Parts"
-                    value={partsTotal ? `₱${partsTotal.toLocaleString()}` : null}
+                    value={partsQ.isSuccess ? money(partsTotal) : "Unavailable"}
                   />
                   <Field
                     label="Total cost"
                     value={
                       data.total_cost != null
-                        ? `₱${Number(data.total_cost).toLocaleString()}`
-                        : `₱${(laborTotal + partsTotal).toLocaleString()}`
+                        ? money(Number(data.total_cost))
+                        : jobLinesQ.isSuccess && partsQ.isSuccess
+                          ? money(laborTotal + partsTotal)
+                          : "Unavailable"
                     }
                   />
                 </CardContent>
               </Card>
 
               <div className="md:col-span-2">
-                <WorkOrderInspectionsCard workOrderId={id} />
+                <WorkOrderInspectionsCard key={`${userId}:${id}`} workOrderId={id} />
               </div>
 
               <Card className="md:col-span-2">
                 <CardHeader className="flex-row items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <ListChecks className="h-4 w-4" /> Job lines ({jobLines.length})
+                    <ListChecks className="h-4 w-4" /> Job lines
+                    {jobLinesQ.isSuccess ? ` (${jobLines.length})` : ""}
                   </CardTitle>
-                  <AddJobLineDialog workOrderId={id} nextOrder={jobLines.length} />
+                  <AddJobLineDialog
+                    userId={userId}
+                    workOrderId={id}
+                    nextOrder={jobLines.length}
+                    canWrite={writesReady}
+                    isScopeCurrent={isCurrent}
+                    assertCanWrite={assertCanWrite}
+                    onWritten={refreshWorkOrder}
+                  />
                 </CardHeader>
                 <CardContent className="p-0">
-                  {jobLines.length === 0 ? (
+                  {jobLinesQ.isError ? (
+                    <div role="alert" className="space-y-2 px-6 pb-6 text-sm">
+                      <p>Could not load job lines.</p>
+                      <Button variant="outline" size="sm" onClick={() => void jobLinesQ.refetch()}>
+                        Retry job lines
+                      </Button>
+                    </div>
+                  ) : jobLinesQ.isPending ? (
+                    <p role="status" className="px-6 pb-6 text-sm">
+                      Loading job lines…
+                    </p>
+                  ) : jobLines.length === 0 ? (
                     <div className="px-6 pb-6 text-sm text-muted-foreground">No job lines yet.</div>
                   ) : (
                     <Table>
@@ -574,12 +713,10 @@ function WorkOrderDetailPage() {
                             <TableCell>{j.category ?? "—"}</TableCell>
                             <TableCell className="text-right">{j.estimated_hours ?? "—"}</TableCell>
                             <TableCell className="text-right">
-                              {j.labor_rate != null ? Number(j.labor_rate).toLocaleString() : "—"}
+                              {j.labor_rate != null ? money(Number(j.labor_rate)) : "—"}
                             </TableCell>
                             <TableCell className="text-right">
-                              {j.total_amount != null
-                                ? Number(j.total_amount).toLocaleString()
-                                : "—"}
+                              {j.total_amount != null ? money(Number(j.total_amount)) : "—"}
                             </TableCell>
                             <TableCell>
                               <Badge variant="outline">{j.status ?? "—"}</Badge>
@@ -588,6 +725,8 @@ function WorkOrderDetailPage() {
                               <Button
                                 variant="ghost"
                                 size="icon"
+                                aria-label={`Remove ${j.name ?? "job line"}`}
+                                disabled={!writesReady || deleteJobLine.isPending}
                                 onClick={() => {
                                   if (confirm("Remove this job line?")) deleteJobLine.mutate(j.id);
                                 }}
@@ -606,12 +745,31 @@ function WorkOrderDetailPage() {
               <Card className="md:col-span-2">
                 <CardHeader className="flex-row items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <Package className="h-4 w-4" /> Parts ({parts.length})
+                    <Package className="h-4 w-4" /> Parts
+                    {partsQ.isSuccess ? ` (${parts.length})` : ""}
                   </CardTitle>
-                  <AddPartDialog workOrderId={id} />
+                  <AddPartDialog
+                    userId={userId}
+                    workOrderId={id}
+                    canWrite={writesReady}
+                    isScopeCurrent={isCurrent}
+                    assertCanWrite={assertCanWrite}
+                    onWritten={refreshWorkOrder}
+                  />
                 </CardHeader>
                 <CardContent className="p-0">
-                  {parts.length === 0 ? (
+                  {partsQ.isError ? (
+                    <div role="alert" className="space-y-2 px-6 pb-6 text-sm">
+                      <p>Could not load parts.</p>
+                      <Button variant="outline" size="sm" onClick={() => void partsQ.refetch()}>
+                        Retry parts
+                      </Button>
+                    </div>
+                  ) : partsQ.isPending ? (
+                    <p role="status" className="px-6 pb-6 text-sm">
+                      Loading parts…
+                    </p>
+                  ) : parts.length === 0 ? (
                     <div className="px-6 pb-6 text-sm text-muted-foreground">
                       No parts attached.
                     </div>
@@ -641,10 +799,8 @@ function WorkOrderDetailPage() {
                               </TableCell>
                               <TableCell>{p.supplier_name ?? "—"}</TableCell>
                               <TableCell className="text-right">{qty}</TableCell>
-                              <TableCell className="text-right">{price.toLocaleString()}</TableCell>
-                              <TableCell className="text-right">
-                                {(qty * price).toLocaleString()}
-                              </TableCell>
+                              <TableCell className="text-right">{money(price)}</TableCell>
+                              <TableCell className="text-right">{money(qty * price)}</TableCell>
                               <TableCell>
                                 <Badge variant="outline">{p.status ?? "—"}</Badge>
                               </TableCell>
@@ -652,6 +808,8 @@ function WorkOrderDetailPage() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
+                                  aria-label={`Remove ${p.part_name ?? "part"}`}
+                                  disabled={!writesReady || deletePart.isPending}
                                   onClick={() => {
                                     if (confirm("Remove this part?")) deletePart.mutate(p.id);
                                   }}
@@ -668,7 +826,7 @@ function WorkOrderDetailPage() {
                 </CardContent>
               </Card>
 
-              <WorkOrderTimeEntries workOrderId={id} />
+              <WorkOrderTimeEntries key={`${userId}:${id}`} workOrderId={id} />
             </div>
           </>
         )}
@@ -688,8 +846,27 @@ function Field({ label, value }: { label: string; value: string | null }) {
   );
 }
 
-function AddJobLineDialog({ workOrderId, nextOrder }: { workOrderId: string; nextOrder: number }) {
+type EditorScope = {
+  userId: string;
+  workOrderId: string;
+  canWrite: boolean;
+  isScopeCurrent: () => boolean;
+  assertCanWrite: () => void;
+  onWritten: () => void;
+};
+
+function AddJobLineDialog({
+  userId,
+  workOrderId,
+  nextOrder,
+  canWrite,
+  isScopeCurrent,
+  assertCanWrite,
+  onWritten,
+}: EditorScope & { nextOrder: number }) {
   const qc = useQueryClient();
+  const isMounted = useActiveScope();
+  const isCurrent = () => isMounted() && isScopeCurrent();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
@@ -701,6 +878,8 @@ function AddJobLineDialog({ workOrderId, nextOrder }: { workOrderId: string; nex
 
   const create = useMutation({
     mutationFn: async () => {
+      if (!isCurrent()) throw new Error("Editor is no longer active");
+      assertCanWrite();
       const payload = {
         work_order_id: workOrderId,
         name: name.trim(),
@@ -716,8 +895,12 @@ function AddJobLineDialog({ workOrderId, nextOrder }: { workOrderId: string; nex
       if (error) throw error;
     },
     onSuccess: () => {
+      if (!isCurrent()) return;
       toast.success("Job line added");
-      qc.invalidateQueries({ queryKey: ["shop-manager", "work-orders", "job-lines", workOrderId] });
+      qc.invalidateQueries({
+        queryKey: ["shop-manager", userId, "work-orders", "job-lines", workOrderId],
+      });
+      onWritten();
       setOpen(false);
       setName("");
       setCategory("");
@@ -725,13 +908,15 @@ function AddJobLineDialog({ workOrderId, nextOrder }: { workOrderId: string; nex
       setHours("");
       setRate("");
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed to add job line"),
+    onError: () => {
+      if (isCurrent()) toast.error("Could not add this job line. Please retry.");
+    },
   });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
+        <Button size="sm" variant="outline" disabled={!canWrite}>
           <Plus className="mr-1 h-4 w-4" /> Add job line
         </Button>
       </DialogTrigger>
@@ -787,7 +972,10 @@ function AddJobLineDialog({ workOrderId, nextOrder }: { workOrderId: string; nex
           <Button variant="ghost" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button disabled={!name.trim() || create.isPending} onClick={() => create.mutate()}>
+          <Button
+            disabled={!canWrite || !name.trim() || create.isPending}
+            onClick={() => create.mutate()}
+          >
             {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
           </Button>
         </DialogFooter>
@@ -796,8 +984,17 @@ function AddJobLineDialog({ workOrderId, nextOrder }: { workOrderId: string; nex
   );
 }
 
-function AddPartDialog({ workOrderId }: { workOrderId: string }) {
+function AddPartDialog({
+  userId,
+  workOrderId,
+  canWrite,
+  isScopeCurrent,
+  assertCanWrite,
+  onWritten,
+}: EditorScope) {
   const qc = useQueryClient();
+  const isMounted = useActiveScope();
+  const isCurrent = () => isMounted() && isScopeCurrent();
   const [open, setOpen] = useState(false);
   const [partName, setPartName] = useState("");
   const [partNumber, setPartNumber] = useState("");
@@ -808,6 +1005,8 @@ function AddPartDialog({ workOrderId }: { workOrderId: string }) {
 
   const create = useMutation({
     mutationFn: async () => {
+      if (!isCurrent()) throw new Error("Editor is no longer active");
+      assertCanWrite();
       const payload = {
         work_order_id: workOrderId,
         part_name: partName.trim(),
@@ -822,8 +1021,12 @@ function AddPartDialog({ workOrderId }: { workOrderId: string }) {
       if (error) throw error;
     },
     onSuccess: () => {
+      if (!isCurrent()) return;
       toast.success("Part added");
-      qc.invalidateQueries({ queryKey: ["shop-manager", "work-orders", "parts", workOrderId] });
+      qc.invalidateQueries({
+        queryKey: ["shop-manager", userId, "work-orders", "parts", workOrderId],
+      });
+      onWritten();
       setOpen(false);
       setPartName("");
       setPartNumber("");
@@ -832,13 +1035,15 @@ function AddPartDialog({ workOrderId }: { workOrderId: string }) {
       setPrice("");
       setPartType("new");
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed to add part"),
+    onError: () => {
+      if (isCurrent()) toast.error("Could not add this part. Please retry.");
+    },
   });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
+        <Button size="sm" variant="outline" disabled={!canWrite}>
           <Plus className="mr-1 h-4 w-4" /> Add part
         </Button>
       </DialogTrigger>
@@ -897,7 +1102,7 @@ function AddPartDialog({ workOrderId }: { workOrderId: string }) {
             Cancel
           </Button>
           <Button
-            disabled={!partName.trim() || !price || create.isPending}
+            disabled={!canWrite || !partName.trim() || !price || create.isPending}
             onClick={() => create.mutate()}
           >
             {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
