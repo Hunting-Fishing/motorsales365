@@ -15,6 +15,9 @@
 --   * Intended for a local or disposable staging database. Run it with
 --     scripts/test-parts-rls-adversarial.sh; do not paste it into production.
 --
+-- Section 5b covers the security follow-ups of migration
+-- 20260927120000_parts_network_security_followups.sql (report §6 → §8).
+--
 -- Result: prints a PASS/FAIL table and raises an exception (non-zero psql exit)
 -- if any assertion fails.
 -- =============================================================================
@@ -56,7 +59,7 @@ LANGUAGE plpgsql AS $$
 BEGIN
   PERFORM set_config('rls_adversarial.persona', _persona, true);
   IF _persona = 'postgres' THEN
-    PERFORM set_config('request.jwt.claims', '', true);
+    PERFORM set_config('request.jwt.claims', '{}', true);
     EXECUTE 'RESET ROLE';
   ELSIF _persona = 'anon' THEN
     PERFORM set_config('request.jwt.claims', json_build_object('role', 'anon')::text, true);
@@ -132,6 +135,22 @@ BEGIN
   END;
 END $$;
 
+-- Statement must fail with a specific SQLSTATE (rolled back either way).
+CREATE FUNCTION rls_adversarial.expect_sqlstate(_label text, _sql text, _state text)
+RETURNS void LANGUAGE plpgsql AS $$
+BEGIN
+  BEGIN
+    EXECUTE _sql;
+    RAISE EXCEPTION USING ERRCODE = 'RLS01', MESSAGE = 'no error';
+  EXCEPTION
+    WHEN SQLSTATE 'RLS01' THEN
+      PERFORM rls_adversarial.record(_label, false, format('expected SQLSTATE %s, statement succeeded', _state));
+    WHEN OTHERS THEN
+      PERFORM rls_adversarial.record(_label, SQLSTATE = _state,
+        format('SQLSTATE %s: %s', SQLSTATE, left(SQLERRM, 120)));
+  END;
+END $$;
+
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA rls_adversarial TO anon, authenticated;
 
 -- -----------------------------------------------------------------------------
@@ -151,7 +170,7 @@ DECLARE
   k text;
   v_cat uuid;
 BEGIN
-  FOREACH k IN ARRAY ARRAY['a_owner','a_mechanic','b_owner','d_owner','e_owner','outsider','customer','sm_b','admin'] LOOP
+  FOREACH k IN ARRAY ARRAY['a_owner','a_mechanic','a_asst','b_owner','d_owner','e_owner','outsider','customer','sm_b','admin'] LOOP
     INSERT INTO rls_adversarial.fx VALUES (k, gen_random_uuid());
     INSERT INTO auth.users (id, email, aud, role, created_at, updated_at)
     VALUES (rls_adversarial.id(k), k || '.' || left(rls_adversarial.id(k)::text, 8) || '@rls-adversarial.test',
@@ -170,7 +189,8 @@ BEGIN
   INSERT INTO public.user_roles (user_id, role) VALUES (rls_adversarial.id('admin'), 'admin');
 
   INSERT INTO public.business_staff (business_id, user_id, role, active)
-  VALUES (rls_adversarial.id('biz_a'), rls_adversarial.id('a_mechanic'), 'mechanic', true);
+  VALUES (rls_adversarial.id('biz_a'), rls_adversarial.id('a_mechanic'), 'mechanic', true),
+         (rls_adversarial.id('biz_a'), rls_adversarial.id('a_asst'), 'assistant_manager', true);
 
   -- Associate records (the sync trigger derives exposure from the status).
   INSERT INTO public.business_associate_applications (business_id, applicant_user_id, track, status, approved_at)
@@ -183,8 +203,17 @@ BEGIN
   UPDATE public.businesses SET expose_inventory_to_network = true, network_exposure_status = 'approved'
   WHERE id IN (rls_adversarial.id('biz_a'), rls_adversarial.id('biz_d'));
   UPDATE public.businesses SET expose_inventory_to_network = false, network_exposure_status = 'revoked',
-    network_exposure_review_note = 'RLS-ADV-PRIVATE-REVIEW-NOTE'
+    network_exposure_review_note = 'RLS-ADV-PRIVATE-REVIEW-NOTE', network_exposure_reviewed_by = rls_adversarial.id('admin')
   WHERE id = rls_adversarial.id('biz_e');
+
+  -- Custom domains: A verified (publicly resolvable row), B pending. Tokens are sentinels.
+  UPDATE public.businesses SET custom_domain = 'rls-adv-a-' || left(rls_adversarial.id('biz_a')::text, 8) || '.example',
+    custom_domain_status = 'verified', custom_domain_verified_at = now(),
+    custom_domain_verify_token = 'RLS-ADV-DOMAIN-TOKEN-A'
+  WHERE id = rls_adversarial.id('biz_a');
+  UPDATE public.businesses SET custom_domain = 'rls-adv-b-' || left(rls_adversarial.id('biz_b')::text, 8) || '.example',
+    custom_domain_status = 'pending', custom_domain_verify_token = 'RLS-ADV-DOMAIN-TOKEN-B'
+  WHERE id = rls_adversarial.id('biz_b');
 
   -- Canonical product (public by design).
   INSERT INTO public.parts_catalog (slug, title, category, manufacturer, manufacturer_part_number, active)
@@ -305,8 +334,11 @@ $fixtures$;
 -- 1. Positive controls — prove the suite is not vacuous
 -- =============================================================================
 SELECT rls_adversarial.as_persona('a_owner');
-SELECT rls_adversarial.expect_rows('A owner reads own private item with cost',
-  $$SELECT 1 FROM public.business_inventory_items WHERE id = rls_adversarial.id('item_a_private') AND cost = 222.22$$, 1);
+SELECT rls_adversarial.expect_rows('A owner reads own private item',
+  $$SELECT 1 FROM public.business_inventory_items WHERE id = rls_adversarial.id('item_a_private')$$, 1);
+SELECT rls_adversarial.expect_rows('A owner reads own item cost through get_business_inventory_costs',
+  $$SELECT 1 FROM public.get_business_inventory_costs(rls_adversarial.id('biz_a'))
+    WHERE item_id = rls_adversarial.id('item_a_private') AND cost = 222.22 AND supplier = 'RLS-ADV-SUPPLIER'$$, 1);
 SELECT rls_adversarial.expect_rows('A owner reads inquiry PII addressed to A',
   $$SELECT 1 FROM public.network_part_inquiries WHERE id = rls_adversarial.id('inquiry_a') AND contact_phone IS NOT NULL$$, 1);
 SELECT rls_adversarial.expect_rows('A owner (supplier) reads order E<-A',
@@ -316,8 +348,9 @@ SELECT rls_adversarial.as_persona('b_owner');
 SELECT rls_adversarial.expect_rows('B owner reads own order B<-A and its line',
   $$SELECT 1 FROM public.parts_orders o JOIN public.parts_order_lines l ON l.order_id = o.id
     WHERE o.id = rls_adversarial.id('order_ab')$$, 1);
-SELECT rls_adversarial.expect_rows('B owner reads own inventory cost',
-  $$SELECT 1 FROM public.business_inventory_items WHERE id = rls_adversarial.id('item_b_own') AND cost IS NOT NULL$$, 1);
+SELECT rls_adversarial.expect_rows('B owner reads own inventory cost (RPC)',
+  $$SELECT 1 FROM public.get_business_inventory_costs(rls_adversarial.id('biz_b'))
+    WHERE item_id = rls_adversarial.id('item_b_own') AND cost IS NOT NULL$$, 1);
 
 SELECT rls_adversarial.as_persona('outsider');
 SELECT rls_adversarial.expect_rows('Outsider reads own inquiry',
@@ -522,6 +555,241 @@ SELECT rls_adversarial.expect_allowed('Signed-in buyer may send an inquiry as th
 SELECT rls_adversarial.expect_blocked('Signed-in buyer cannot attribute an inquiry to someone else',
   $$INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email, requester_user_id)
     VALUES (rls_adversarial.id('biz_a'), 'pad', 'Forged', 'f@rls-adversarial.test', rls_adversarial.id('b_owner'))$$);
+
+-- =============================================================================
+-- 5b. Security follow-ups (report §8, migration 20260927120000)
+-- =============================================================================
+
+-- S1: private business columns are not selectable by API roles; the public
+-- row itself stays readable through the remaining columns.
+DO $$
+DECLARE p text;
+BEGIN
+  FOREACH p IN ARRAY ARRAY['anon','outsider','b_owner','a_mechanic','e_owner'] LOOP
+    PERFORM rls_adversarial.as_persona(p);
+    PERFORM rls_adversarial.expect_hidden('S1 exposure review note not selectable',
+      $q$SELECT network_exposure_review_note FROM public.businesses WHERE id = rls_adversarial.id('biz_e')$q$);
+    PERFORM rls_adversarial.expect_hidden('S1 exposure reviewer not selectable',
+      $q$SELECT network_exposure_reviewed_by FROM public.businesses WHERE id = rls_adversarial.id('biz_e')$q$);
+    PERFORM rls_adversarial.expect_hidden('S1 domain verify token not selectable',
+      $q$SELECT custom_domain_verify_token FROM public.businesses WHERE id = rls_adversarial.id('biz_a')$q$);
+    PERFORM rls_adversarial.expect_hidden('S1 select * cannot pull private columns',
+      $q$SELECT * FROM public.businesses WHERE id = rls_adversarial.id('biz_a')$q$);
+    PERFORM rls_adversarial.expect_rows('S1 public business row still readable (safe columns)',
+      $q$SELECT id, name, slug, custom_domain, custom_domain_status, network_exposure_status
+         FROM public.businesses WHERE id = rls_adversarial.id('biz_a')$q$, 1);
+  END LOOP;
+END $$;
+
+SELECT rls_adversarial.as_persona('anon');
+SELECT rls_adversarial.expect_blocked('S1 anon cannot call review-note RPC',
+  $$SELECT * FROM public.get_business_network_exposure_reviews(ARRAY[rls_adversarial.id('biz_e')])$$);
+SELECT rls_adversarial.expect_blocked('S1 anon cannot call domain-token RPC',
+  $$SELECT public.get_business_custom_domain_token(rls_adversarial.id('biz_a'))$$);
+
+SELECT rls_adversarial.as_persona('e_owner');
+SELECT rls_adversarial.expect_rows('S1 owner reads own review note via RPC',
+  $$SELECT 1 FROM public.get_business_network_exposure_reviews(ARRAY[rls_adversarial.id('biz_e')])
+    WHERE network_exposure_review_note = 'RLS-ADV-PRIVATE-REVIEW-NOTE'$$, 1);
+SELECT rls_adversarial.expect_rows('S1 review-note RPC omits other businesses',
+  $$SELECT 1 FROM public.get_business_network_exposure_reviews(
+      ARRAY[rls_adversarial.id('biz_a'), rls_adversarial.id('biz_b')])$$, 0);
+
+SELECT rls_adversarial.as_persona('b_owner');
+SELECT rls_adversarial.expect_rows('S1 competitor gets no review note via RPC',
+  $$SELECT 1 FROM public.get_business_network_exposure_reviews(ARRAY[rls_adversarial.id('biz_e')])$$, 0);
+SELECT rls_adversarial.expect_sqlstate('S1 competitor cannot read domain token via RPC',
+  $$SELECT public.get_business_custom_domain_token(rls_adversarial.id('biz_a'))$$, '42501');
+
+SELECT rls_adversarial.as_persona('admin');
+SELECT rls_adversarial.expect_rows('S1 admin reads review note via RPC',
+  $$SELECT 1 FROM public.get_business_network_exposure_reviews(ARRAY[rls_adversarial.id('biz_e')])$$, 1);
+
+SELECT rls_adversarial.as_persona('a_owner');
+SELECT rls_adversarial.expect_rows('S1 owner reads own domain token via RPC',
+  $$SELECT 1 WHERE public.get_business_custom_domain_token(rls_adversarial.id('biz_a')) = 'RLS-ADV-DOMAIN-TOKEN-A'$$, 1);
+SELECT rls_adversarial.as_persona('a_asst');
+SELECT rls_adversarial.expect_rows('S1 assistant manager reads domain token via RPC',
+  $$SELECT 1 WHERE public.get_business_custom_domain_token(rls_adversarial.id('biz_a')) = 'RLS-ADV-DOMAIN-TOKEN-A'$$, 1);
+SELECT rls_adversarial.as_persona('a_mechanic');
+SELECT rls_adversarial.expect_sqlstate('S1 mechanic cannot read domain token via RPC',
+  $$SELECT public.get_business_custom_domain_token(rls_adversarial.id('biz_a'))$$, '42501');
+
+-- S1: domain verification can only be granted by the platform.
+SELECT rls_adversarial.as_persona('b_owner');
+SELECT rls_adversarial.expect_sqlstate('S1 owner cannot self-verify a custom domain',
+  $$UPDATE public.businesses SET custom_domain_status = 'verified' WHERE id = rls_adversarial.id('biz_b')$$, '42501');
+SELECT rls_adversarial.expect_sqlstate('S1 owner cannot forge custom_domain_verified_at',
+  $$UPDATE public.businesses SET custom_domain_verified_at = now() WHERE id = rls_adversarial.id('biz_b')$$, '42501');
+SELECT rls_adversarial.expect_allowed('S1 owner may still (re)connect a domain (pending)',
+  $$UPDATE public.businesses SET custom_domain = 'rls-adv-b2.example', custom_domain_status = 'pending'
+    WHERE id = rls_adversarial.id('biz_b')$$);
+
+SELECT rls_adversarial.as_persona('a_owner');
+DO $$
+DECLARE v_status text; v_verified timestamptz;
+BEGIN
+  BEGIN
+    UPDATE public.businesses SET custom_domain = 'rls-adv-moved.example'
+    WHERE id = rls_adversarial.id('biz_a')
+    RETURNING custom_domain_status, custom_domain_verified_at INTO v_status, v_verified;
+    RAISE EXCEPTION USING ERRCODE = 'RLS02';
+  EXCEPTION WHEN SQLSTATE 'RLS02' THEN NULL;
+  END;
+  PERFORM rls_adversarial.record('S1 moving a verified business to a new domain resets verification',
+    v_status = 'pending' AND v_verified IS NULL, format('status=%s verified_at=%s', v_status, v_verified));
+END $$;
+
+SELECT rls_adversarial.as_persona('admin');
+SELECT rls_adversarial.expect_allowed('S1 moderator/admin may mark a domain verified',
+  $$UPDATE public.businesses SET custom_domain_status = 'verified', custom_domain_verified_at = now()
+    WHERE id = rls_adversarial.id('biz_b')$$);
+
+-- S2: cost data is limited to owner / manager / assistant manager.
+SELECT rls_adversarial.as_persona('a_mechanic');
+SELECT rls_adversarial.expect_rows('S2 mechanic still reads own stock (non-cost columns)',
+  $$SELECT id, name, sku, qty_on_hand, price, notes FROM public.business_inventory_items
+    WHERE business_id = rls_adversarial.id('biz_a')$$, 2);
+SELECT rls_adversarial.expect_hidden('S2 mechanic cannot select cost',
+  $$SELECT cost FROM public.business_inventory_items WHERE business_id = rls_adversarial.id('biz_a')$$);
+SELECT rls_adversarial.expect_hidden('S2 mechanic cannot select supplier',
+  $$SELECT supplier FROM public.business_inventory_items WHERE business_id = rls_adversarial.id('biz_a')$$);
+SELECT rls_adversarial.expect_hidden('S2 mechanic cannot select markup',
+  $$SELECT markup_percentage FROM public.business_inventory_items WHERE business_id = rls_adversarial.id('biz_a')$$);
+SELECT rls_adversarial.expect_hidden('S2 mechanic cannot filter on cost (side channel)',
+  $$SELECT id FROM public.business_inventory_items WHERE business_id = rls_adversarial.id('biz_a') AND cost > 200$$);
+SELECT rls_adversarial.expect_sqlstate('S2 mechanic cannot read costs via RPC',
+  $$SELECT * FROM public.get_business_inventory_costs(rls_adversarial.id('biz_a'))$$, '42501');
+SELECT rls_adversarial.expect_rows('S2 cost gate says no for mechanic',
+  $$SELECT 1 WHERE NOT public.can_view_business_inventory_costs(rls_adversarial.id('a_mechanic'), rls_adversarial.id('biz_a'))$$, 1);
+
+SELECT rls_adversarial.as_persona('a_asst');
+SELECT rls_adversarial.expect_rows('S2 assistant manager reads costs via RPC',
+  $$SELECT 1 FROM public.get_business_inventory_costs(rls_adversarial.id('biz_a'), ARRAY[rls_adversarial.id('item_a_public')])
+    WHERE cost = 111.11 AND markup_percentage = 35$$, 1);
+
+SELECT rls_adversarial.as_persona('a_owner');
+SELECT rls_adversarial.expect_allowed('S2 owner can still write cost (plain UPDATE)',
+  $$UPDATE public.business_inventory_items SET cost = 120, supplier = 'New supplier'
+    WHERE id = rls_adversarial.id('item_a_public')$$);
+SELECT rls_adversarial.expect_allowed('S2 owner can insert stock with cost (INSERT ... RETURNING safe columns)',
+  $$INSERT INTO public.business_inventory_items (business_id, name, cost, supplier, markup_percentage)
+    VALUES (rls_adversarial.id('biz_a'), 'RLS new item', 10, 'RLS supplier', 20) RETURNING id, name$$);
+
+SELECT rls_adversarial.as_persona('b_owner');
+SELECT rls_adversarial.expect_sqlstate('S2 competitor cannot read A costs via RPC',
+  $$SELECT * FROM public.get_business_inventory_costs(rls_adversarial.id('biz_a'))$$, '42501');
+SELECT rls_adversarial.as_persona('anon');
+SELECT rls_adversarial.expect_blocked('S2 anon cannot call cost RPC',
+  $$SELECT * FROM public.get_business_inventory_costs(rls_adversarial.id('biz_a'))$$);
+
+-- S3: accredit_staff_partner is not anonymous and checks the caller.
+SELECT rls_adversarial.as_persona('anon');
+SELECT rls_adversarial.expect_blocked('S3 anon cannot call accredit_staff_partner',
+  $$SELECT public.accredit_staff_partner(rls_adversarial.id('outsider'))$$);
+SELECT rls_adversarial.as_persona('outsider');
+SELECT rls_adversarial.expect_sqlstate('S3 user cannot accredit someone else',
+  $$SELECT public.accredit_staff_partner(rls_adversarial.id('b_owner'))$$, '42501');
+SELECT rls_adversarial.expect_allowed('S3 user may run self-accreditation (function re-checks staff e-mail)',
+  $$SELECT public.accredit_staff_partner(rls_adversarial.id('outsider'))$$);
+SELECT rls_adversarial.as_persona('admin');
+SELECT rls_adversarial.expect_allowed('S3 admin may accredit a staff user',
+  $$SELECT public.accredit_staff_partner(rls_adversarial.id('outsider'))$$);
+SELECT rls_adversarial.as_persona('postgres');
+SELECT rls_adversarial.expect_rows('S3 PUBLIC/anon hold no EXECUTE on accredit_staff_partner',
+  $$SELECT 1 WHERE NOT has_function_privilege('anon', 'public.accredit_staff_partner(uuid)', 'EXECUTE')$$, 1);
+SELECT rls_adversarial.expect_allowed('S3 trusted (non-API) context may still accredit',
+  $$SELECT public.accredit_staff_partner(rls_adversarial.id('outsider'))$$);
+
+-- S4: inquiry throttle (SQLSTATE PT429 -> HTTP 429). Flood rows are seeded as
+-- postgres (not throttled) and removed at the end of this block.
+SELECT rls_adversarial.as_persona('postgres');
+INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email)
+SELECT rls_adversarial.id('biz_b'), 'flood', 'Flood', 'rls-flood@rls-adversarial.test' FROM generate_series(1, 5);
+INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email, requester_user_id)
+SELECT rls_adversarial.id('biz_b'), 'flood', 'Flood', 'rls-user-flood-' || g || '@rls-adversarial.test',
+       rls_adversarial.id('customer')
+FROM generate_series(1, 10) g;
+
+SELECT rls_adversarial.as_persona('anon');
+SELECT rls_adversarial.expect_sqlstate('S4 guest over the per-email hourly limit is throttled',
+  $$INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email)
+    VALUES (rls_adversarial.id('biz_a'), 'pad', 'Flood', 'rls-flood@rls-adversarial.test')$$, 'PT429');
+SELECT rls_adversarial.expect_sqlstate('S4 per-email limit is case-insensitive',
+  $$INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email)
+    VALUES (rls_adversarial.id('biz_a'), 'pad', 'Flood', '  RLS-Flood@RLS-Adversarial.test ')$$, 'PT429');
+SELECT rls_adversarial.expect_allowed('S4 other guests are not affected',
+  $$INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email)
+    VALUES (rls_adversarial.id('biz_a'), 'pad', 'Fresh', 'rls-fresh@rls-adversarial.test')$$);
+
+SELECT rls_adversarial.as_persona('customer');
+SELECT rls_adversarial.expect_sqlstate('S4 signed-in requester over the hourly limit is throttled',
+  $$INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email, requester_user_id)
+    VALUES (rls_adversarial.id('biz_a'), 'pad', 'Customer', 'rls-customer-new@rls-adversarial.test', rls_adversarial.id('customer'))$$, 'PT429');
+
+SELECT rls_adversarial.as_persona('outsider');
+DO $$
+DECLARE v_created timestamptz;
+BEGIN
+  BEGIN
+    INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email, requester_user_id, created_at)
+    VALUES (rls_adversarial.id('biz_a'), 'pad', 'Backdate', 'rls-backdate@rls-adversarial.test', rls_adversarial.id('outsider'), '2000-01-01')
+    RETURNING created_at INTO v_created;
+    RAISE EXCEPTION USING ERRCODE = 'RLS02';
+  EXCEPTION WHEN SQLSTATE 'RLS02' THEN NULL;
+  END;
+  PERFORM rls_adversarial.record('S4 callers cannot backdate created_at to dodge the window',
+    v_created > now() - interval '1 minute', format('created_at=%s', v_created));
+END $$;
+
+SELECT rls_adversarial.as_persona('postgres');
+INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email)
+SELECT rls_adversarial.id('biz_a'), 'flood', 'Flood', 'rls-biz-flood-' || g || '@rls-adversarial.test'
+FROM generate_series(1, 30) g;
+SELECT rls_adversarial.as_persona('anon');
+SELECT rls_adversarial.expect_sqlstate('S4 guest flood against one partner is throttled',
+  $$INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email)
+    VALUES (rls_adversarial.id('biz_a'), 'pad', 'Guest', 'rls-guest-31@rls-adversarial.test')$$, 'PT429');
+SELECT rls_adversarial.as_persona('outsider');
+SELECT rls_adversarial.expect_allowed('S4 signed-in buyers can still reach a flooded partner',
+  $$INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email, requester_user_id)
+    VALUES (rls_adversarial.id('biz_a'), 'pad', 'Outsider', 'rls-outsider-2@rls-adversarial.test', rls_adversarial.id('outsider'))$$);
+
+SELECT rls_adversarial.as_persona('postgres');
+SELECT rls_adversarial.expect_allowed('S4 service/internal inserts are not throttled',
+  $$INSERT INTO public.network_part_inquiries (business_id, part_name, contact_name, contact_email)
+    VALUES (rls_adversarial.id('biz_b'), 'pad', 'Internal', 'rls-flood@rls-adversarial.test')$$);
+DELETE FROM public.network_part_inquiries WHERE contact_email LIKE 'rls-%flood%@rls-adversarial.test';
+
+-- S5: column privileges are what Supabase Realtime (walrus) uses to strip
+-- postgres_changes payload columns (has_column_privilege(role, table, col,
+-- 'SELECT')). business_inventory_items is published with REPLICA IDENTITY FULL.
+SELECT rls_adversarial.expect_rows('S5 no private inventory column selectable by anon (Realtime payload)',
+  $$SELECT 1 FROM unnest(ARRAY['cost','supplier','markup_percentage','notes','location','date_purchased',
+      'qty_on_order','reorder_at','min_stock_level','max_stock_level','core_charge']) c
+    WHERE has_column_privilege('anon', 'public.business_inventory_items', c, 'SELECT')$$, 0);
+SELECT rls_adversarial.expect_rows('S5 no cost column selectable by authenticated (Realtime payload)',
+  $$SELECT 1 FROM unnest(ARRAY['cost','supplier','markup_percentage']) c
+    WHERE has_column_privilege('authenticated', 'public.business_inventory_items', c, 'SELECT')$$, 0);
+SELECT rls_adversarial.expect_rows('S5 no private business column selectable by anon/authenticated',
+  $$SELECT 1 FROM unnest(ARRAY['anon','authenticated']) r,
+      unnest(ARRAY['custom_domain_verify_token','network_exposure_review_note','network_exposure_reviewed_by']) c
+    WHERE has_column_privilege(r, 'public.businesses', c, 'SELECT')$$, 0);
+SELECT rls_adversarial.expect_rows('S5 drift guard: every other business column stays readable',
+  $$SELECT 1 FROM pg_attribute a
+    WHERE a.attrelid = 'public.businesses'::regclass AND a.attnum > 0 AND NOT a.attisdropped
+      AND a.attname NOT IN ('custom_domain_verify_token','network_exposure_review_note','network_exposure_reviewed_by')
+      AND NOT (has_column_privilege('anon', 'public.businesses', a.attname, 'SELECT')
+               AND has_column_privilege('authenticated', 'public.businesses', a.attname, 'SELECT'))$$, 0);
+SELECT rls_adversarial.expect_rows('S5 drift guard: every non-cost inventory column readable by members',
+  $$SELECT 1 FROM pg_attribute a
+    WHERE a.attrelid = 'public.business_inventory_items'::regclass AND a.attnum > 0 AND NOT a.attisdropped
+      AND a.attname NOT IN ('cost','supplier','markup_percentage')
+      AND NOT has_column_privilege('authenticated', 'public.business_inventory_items', a.attname, 'SELECT')$$, 0);
+SELECT rls_adversarial.expect_rows('S5 private business tables are not in the Realtime publication',
+  $$SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public'
+      AND tablename IN ('businesses','network_part_inquiries','business_inventory_locations','parts_orders',
+                        'parts_order_lines','business_part_cross_references')$$, 0);
 
 -- =============================================================================
 -- 6. Revocation immediately hides network stock (§5.1, §11 stop condition 3)

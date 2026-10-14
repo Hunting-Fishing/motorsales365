@@ -177,3 +177,101 @@ describe("App code aligned with the hardened policies", () => {
     expect(read("src/routes/parts.network.tsx")).toContain("refetchInterval: 60_000");
   });
 });
+
+describe("Security follow-ups migration (report §8)", () => {
+  const followups = read("supabase/migrations/20260927120000_parts_network_security_followups.sql");
+  const suite = read(SUITE_PATH);
+
+  it("is additive", () => {
+    expect(followups).not.toMatch(/\bDROP\s+(TABLE|COLUMN|SCHEMA|FUNCTION)\b/i);
+    expect(followups).not.toMatch(/\bDELETE\s+FROM\b/i);
+    expect(followups).not.toMatch(/^\s*TRUNCATE\b/im);
+    expect(followups).not.toMatch(/ALTER\s+PUBLICATION/i);
+  });
+
+  it("hides private business columns and exposes them only through gated RPCs", () => {
+    expect(followups).toContain("REVOKE SELECT ON public.businesses FROM anon, authenticated;");
+    expect(followups).toContain(
+      "FUNCTION public.get_business_network_exposure_reviews(_business_ids uuid[])",
+    );
+    expect(followups).toContain(
+      "FUNCTION public.get_business_custom_domain_token(_business_id uuid)",
+    );
+    expect(followups).toContain("CREATE TRIGGER trg_guard_business_custom_domain_verification");
+  });
+
+  it("limits inventory cost data to manager-level roles", () => {
+    expect(followups).toContain(
+      "REVOKE SELECT ON public.business_inventory_items FROM authenticated;",
+    );
+    expect(followups).toMatch(
+      /can_view_business_inventory_costs[\s\S]*has_business_role\(_user, _business, 'manager'/,
+    );
+  });
+
+  it("revokes anonymous accreditation and checks the caller", () => {
+    expect(followups).toContain(
+      "REVOKE ALL ON FUNCTION public.accredit_staff_partner(uuid) FROM PUBLIC, anon;",
+    );
+    expect(followups).toContain("pg_trigger_depth() = 0");
+    expect(followups).toContain("'admin'::public.app_role");
+  });
+
+  it("throttles inquiries in the database", () => {
+    expect(followups).toContain("CREATE TRIGGER trg_npi_throttle");
+    expect(followups).toContain("BEFORE INSERT ON public.network_part_inquiries");
+    expect(followups).toContain("NEW.created_at := now();");
+  });
+
+  it("is covered by the adversarial suite for every fix", () => {
+    for (const label of [
+      "S1 exposure review note not selectable",
+      "S1 domain verify token not selectable",
+      "S1 owner cannot self-verify a custom domain",
+      "S2 mechanic cannot select cost",
+      "S2 mechanic cannot read costs via RPC",
+      "S2 assistant manager reads costs via RPC",
+      "S3 anon cannot call accredit_staff_partner",
+      "S3 user cannot accredit someone else",
+      "S4 guest over the per-email hourly limit is throttled",
+      "S4 guest flood against one partner is throttled",
+      "S5 no cost column selectable by authenticated (Realtime payload)",
+    ]) {
+      expect(suite).toContain(label);
+    }
+  });
+
+  it("ships a Realtime (walrus) replay check wired into the runner", () => {
+    const realtime = read("supabase/tests/parts_network_realtime_columns.sql");
+    expect(realtime).toContain("realtime.apply_rls");
+    expect(realtime).toContain("assertions FAILED");
+    const runner = read("scripts/test-parts-rls-adversarial.sh");
+    expect(runner).toContain("--realtime");
+    expect(runner).toContain("supabase/tests/parts_network_realtime_columns.sql");
+  });
+});
+
+describe("App code aligned with the follow-up column privileges", () => {
+  it("verifies custom domains with the service role after the DNS check", () => {
+    const fn = read("src/lib/business-domain.functions.ts");
+    expect(fn).toContain('rpc("get_business_custom_domain_token"');
+    const verify = fn.slice(fn.indexOf("export const verifyBusinessCustomDomain"));
+    expect(verify).toMatch(
+      /await supabaseAdmin\s+\.from\("businesses"\)\s+\.update\(\{ custom_domain_status: "verified"/,
+    );
+  });
+
+  it("loads inventory cost data only through the gated RPC", () => {
+    const fn = read("src/lib/business-inventory.functions.ts");
+    expect(fn).toContain('"can_view_business_inventory_costs"');
+    expect(fn).toContain('"get_business_inventory_costs"');
+    expect(fn).not.toContain(".upsert(");
+    expect(fn).not.toMatch(/\.select\(\s*"\*/);
+  });
+
+  it("locks cost fields in the item form for restricted rows", () => {
+    const form = read("src/components/business/inventory-item-form.tsx");
+    expect(form).toContain("isInventoryCostRestricted(editing)");
+    expect(form).toContain("cost: costRestricted ? undefined : num(form.cost)");
+  });
+});
