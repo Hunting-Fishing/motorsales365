@@ -664,3 +664,28 @@ heads then resume auth/profile/org/partner/incoming-role/offboarding and origina
 actor closure plus trusted claim/evidence/tenure revisions/common writer locks
 before an atomic kernel. Preserve recovery/consent/native/OCR/mobile/owner/full-
 media gates and the single recurring follow-up; do not deploy sparse artifacts.
+
+Follow-up verification: PR #50 docs `3c153c5` and PR #51 docs `681e36c` now
+passed all six CI gates (`38687811205` and `38688332298`). Hosting remains
+separately failed, and migrations/production deployment were skipped. PR #51 is
+the latest verified connected application-source slice (1,154 tests), not a
+deployed release or end-to-end provisioning acceptance.
+
+Draft PR #52 (code `e4e099d`) adds the separate fingerprint-only staff-partner
+catalog frontier: nine relations/117 columns, with prior PR #50 facets unchanged
+as subsets. It exposes real user-referral bounty/assignment attachments and the
+nonempty intent frontier; no partner behavior or signup authority is proved by
+these observations. Two successful READ ONLY catalog executions, one complete
+retained privacy-reviewed artifact at `06:17:10.912953` UTC; no application data,
+helper calls, raw definitions/expressions or mutation. Six focused tests and full
+serial tooling 446 plus 10 receipt assets pass (456 separate-command total).
+Independent query review/syntax/lint/format/diff pass. Evidence/next construction:
+`evidence/STAFF_PARTNER_DEPENDENCY_FRONTIER.md`.
+
+Code CI `38692637701` is running; hosting failed separately and deployment/
+migration wrappers skip. Verify later docs heads. The subagent account limit was
+recorded without retry loops or credit purchases; primary work continued, without
+claiming another independent final API review. Next construct the actual bounded
+partner wrapper, recover/map auth/org/member source and close nonempty referrals,
+incoming/offboarding/original-actor/revision/lock dependencies. No migration,
+deployment, baseline/parity/replay/release promotion or restriction replay.
