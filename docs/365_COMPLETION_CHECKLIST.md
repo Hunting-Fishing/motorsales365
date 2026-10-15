@@ -15,6 +15,19 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Owner scheduling directive, 2026-10-15: target completion of the existing software
+scope within seven days, by 2026-10-22 21:00 Asia/Manila. Follow
+`365_SEVEN_DAY_COMPLETION_PLAN.md` alongside this checklist. The schedule does not
+change release/approval gates, declare prototypes accepted, select an external CRM
+or silently reduce scope. Immediate priority is the integrated release candidate,
+PR dependency/feature acceptance ledger, staging/full-artifact/hosting/migration/
+recovery blockers and bounded parallel feature work. Continue the named authority
+dependency below as part of that integration path, not an indefinite standalone
+research chain. Preserve all work and existing approved restrictions. Raise
+specific access/capacity/decision blockers on Day1 and reassess deadline feasibility
+by Day2. One existing automation only; no continuous-execution guarantee. Planning
+files are saved locally in this direct user turn, not committed/pushed or deployed.
+
 Newest disposable revision/invalidation model: code `c03fede`, branch
 `security/claim-revision-invalidation-model`, based on PR #66 `02cb49f`.
 Two private witness tables/five invoker-only functions/nine capture/unsupported-
