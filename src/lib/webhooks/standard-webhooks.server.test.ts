@@ -28,7 +28,7 @@ function signature(
   body: string | Uint8Array = sample,
   timestamp = String(nowSeconds),
   id = eventId,
-  signingKey = key,
+  signingKey: Buffer = key,
 ): string {
   return createHmac("sha256", signingKey)
     .update(`${id}.${timestamp}.`, "utf8")
