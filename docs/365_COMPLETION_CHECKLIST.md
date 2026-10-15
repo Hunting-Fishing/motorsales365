@@ -106,17 +106,16 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest fully CI-verified application slice: PR #48, docs head `6389eac`, all six
-CI gates passed (run `38682112982`), 1,068 application tests across 55 files. These are review
+Latest fully CI-verified application slice: PR #51, docs head `681e36c`, all six
+CI gates passed (run `38688332298`), 1,154 application tests across 58 files. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
 Latest application candidate: draft PR #51, code `883c505`, 1,154 application tests
 across 58 files and full TypeScript pass. It hardens account-creation acknowledgments,
 private request lifetimes and known input boundaries without changing the API or
-backend authority; its own latest CI requires verification. PR #48 remains the
-latest fully CI-verified connected application-source parent, with its claim UI
-hardening and six gates recorded above. PR #46 remains the
+backend authority; docs `681e36c` now passed all six CI gates. PR #48 remains the
+earlier verified claim UI parent, with its six gates recorded above. PR #46 remains the
 earlier verified owner-row confirmation parent (1,029 tests). PR #38, code `22c2724`, remains the earlier
 six-chat-caller slice (986 tests), not the latest verified application head.
 The following PR #39 is a separate memory-only,
@@ -137,8 +136,13 @@ Latest platform authority characterization: draft PR #50, code `6136701`,
 32 focused and 450 tooling/assets pass; one fingerprint-only catalog read,
 no production mutation/deployment. The actual nonstaff referral/sales forward
 chain is composed offline; auth bootstrap, staff-domain partner/incoming writers,
-offboarding and original-actor custody remain separate. Verify this PR's latest
-head, not just the parent CI, before any release claim.
+offboarding and original-actor custody remain separate. Docs `3c153c5` now passed
+all six CI gates (`38687811205`), not production authority or release acceptance.
+
+Latest dependency inventory: draft PR #52, code `e4e099d`, six offline catalog
+contracts pass. New fingerprint-only partner/referral inventory exposes bounty/
+assignment and nonempty intent frontiers; no partner behavioral fixture or
+complete signup proof is claimed. Full regressions and own CI are being verified.
 
 Latest database read candidate: draft PR #31, code `797876c`,22 new focused tests
 and 191/191 full sequential tooling pass. The CLI-generated reminder invoker API
@@ -1630,6 +1634,54 @@ backend repair dependency, not solved by truthful caller feedback. Recovery,
 native/consent reconciliation, real HTTP/JWT/session/concurrency, receipt/mobile/
 owner pilot and full-media hosting remain open. Continuation remains active,
 without duplicate automation or claims of continuous between-schedule work.
+
+## Partner dependency frontier checkpoint (2026-10-15)
+
+Draft PR #52, code `e4e099df191e7a6f74fe49dc386dcbfdac9a1ac9`, branch
+`security/signup-partner-provenance`, stacked on PR #51 docs `681e36c`.
+PR #50 docs `3c153c5` and PR #51 docs `681e36c` now passed all six CI gates
+(`38687811205`, `38688332298`). Hosting failed separately; wrappers skipped
+migrations/production deployment. PR #52 code CI `38692637701` is running;
+hosting `b4ba08d8-9a2e-4d5f-b5a2-672c8f42a905` failed separately, wrapper
+`38692637642` skips migration/production deploy. Later docs heads need fresh checks.
+
+The new independently reviewed fingerprint-only query records nine selected
+relations, 117 columns, 28 constraints, 28 indexes, 27 policies, 16 attachments,
+25 functions and three enums. All prior PR #50 metadata facets remain identical
+subsets. Two successful catalog-only READ ONLY executions occurred; first output
+was not retained in full, the second observation at `06:17:10.912953` UTC was
+parsed, privacy-reviewed and saved. No application/auth rows/counts/helper calls,
+raw definitions/defaults/config values/SQL expressions or mutation. Actual bounty
+and auto-assignment user-referral attachments are explicit uncomposed frontiers;
+no completed partner behavioral fixture, auth/bootstrap closure, authority,
+source-history adoption or release acceptance is claimed.
+
+Verification: six focused catalog contracts (1.181s); full serial tooling 446/446
+(347.324s), then separate receipt assets 10/10 (0.396s), 456 total with no failures,
+skips or cancellations. Independent query review, syntax/lint/format/diff pass.
+No application source changes in this metadata slice; the separate API row-
+evidence correction is being validated independently. Scope/pins:
+`evidence/STAFF_PARTNER_DEPENDENCY_FRONTIER.md`.
+
+All three subagents reported an account usage limit after their bounded findings.
+Their work/partial API edit was preserved; the primary agent continued safe work.
+Do not repeatedly retry unchanged failed subagent calls or purchase credits. This
+does not establish that every primary-agent execution is unavailable. No fresh
+independent final API review can be claimed from those failed calls.
+
+Exact next action: verify newest PR heads; construct a NEW wrapper around pinned
+PR #50 with actual July 1/July 28 partner DDL, current policies/critical constraints,
+timestamp functions/attachments, partner intent wrapper and genuine empty
+user-referrals branch. Keep nonempty intent/bounty/assignment fanouts out until
+fully composed. Recover/match actual organization/member/bootstrap source and
+critical metadata; normally reachable org/founding/member-number dependencies
+must not be silently stubbed. Trial/staff-intent source predictions are not
+current behavior or an approved repair. Then close incoming/offboarding/original-
+actor and trusted claim/evidence/tenure/common-lock dependencies before an atomic
+kernel. No migrations/deployment; provenance 404/423, 19 unclassified and all
+baseline/replay/parity/release flags stay false. Preserve applied restrictions,
+native/consent/recovery/API/session/concurrency/receipt/mobile/owner/full-media
+gates and one active continuation automation.
 
 ## Recovery evidence (original scope, retained below)
 
