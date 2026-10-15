@@ -48,6 +48,12 @@ and Prettier pass. Independent read-only review and full sequential tooling
 are verified above. CI adds a dedicated
 never-quarantined memory-only gate.
 
+The hash above identifies the original PR #34 snapshot. The later self-shift
+research candidate mechanically extracts its non-test helpers into
+`scripts/ci/fixtures/native-staff-trigger-fixture.mjs`; all nine original test
+bodies and retained SQL/pins/supports remain unchanged. Current extraction and
+separate candidate limits are recorded in `NATIVE_SELF_SHIFT_CANDIDATE.md`.
+
 | Synthetic operation with both staff AFTER triggers retained            | Verified stored outcome                                                                                                                                                                                                            |
 | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Self on_shift no-op/toggle, previously left chat member                | Chat becomes active and timestamp changes; native binding/roles stay unchanged. Targeting role=role separately invokes native remapping despite unchanged role.                                                                    |

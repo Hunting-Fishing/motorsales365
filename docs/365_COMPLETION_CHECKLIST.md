@@ -31,9 +31,12 @@ Security reconciliation branch: `completion/365-security`.
    rehearsed with their selected current metadata, including dual fanouts,
    invoker timestamp behavior and void no-ops. The separate caller acknowledgement/
    error/late-result contract is now implemented locally without treating void as
-   a confirmed mutation (draft PR #38); verify its remote checks, then implement
-   the separate disposable companion-candidate negative controls from the new
-   proposed authority contract. Resolve the initial
+   a confirmed mutation (draft PR #38); docs `14c18d3` passed all six CI gates.
+   The first self-shift-only disposable companion candidate is now implemented/
+   tested in draft PR #39, with no adopted privileged positive branches. Next
+   verify its remote checks and close the bounded native/bootstrap/role/profile
+   and trusted team writer dependencies before authority/offboarding acceptance.
+   Resolve the initial
    dependency inventory's identity, role/module helper and trigger/security
    attachment closure; rehearse the companion roster/native guard with actual
    constraints and all trigger effects. Keep unknown bindings and offboarding
@@ -56,15 +59,16 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest fully CI-verified application code slice: PR #38, code head `22c2724`, all six
-CI gates passed (run `38659076609`), 986 application tests. These are review
+Latest fully CI-verified application slice: PR #38, docs head `14c18d3`, all six
+CI gates passed (run `38659674559`), 986 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
 Latest application candidate: draft PR #38, code `22c2724`, 986 application tests
 across 53 files and full TypeScript pass. It hardens six chat command callers and
-their UI lifetimes without changing database authority; all six code-head gates
-passed, and the following documentation head requires its own next-run check.
+their UI lifetimes without changing database authority; all six documentation-head
+gates passed as recorded above. The following PR #39 is a separate memory-only,
+non-adopted research candidate, not a compatible staff-management release.
 PR #32's reminder consumer is retained in this stack and its
 API remains unapplied: do not ship before compatible database, native authority
 and recovery release prerequisites. No application candidate is deployed.
@@ -661,8 +665,11 @@ checks and memory-only SQL proofs, not live database acceptance.
 Code head `22c2724` passed all six CI gates (run `38659076609`), verified before
 documentation publication. Deploy wrapper `38659076487` has preview-wrapper
 success, production migration/deploy skipped, separate Workers Builds failure
-`a9ef2dc0-2476-4978-92dc-807fd9b94321` and Supabase Preview skipped. The new
-documentation head's checks require separate verification on the next resume.
+`a9ef2dc0-2476-4978-92dc-807fd9b94321` and Supabase Preview skipped. Documentation
+head `14c18d3` also passed all six CI gates (run `38659674559`), verified on the
+self-shift follow-up. Its wrapper `38659674608` still skips production release,
+preview-wrapper success is not upload, and hosting build
+`b9ae5ebe-2e84-4228-a5c3-fdae88cf8baf` fails separately.
 
 Migration impact: none. Deployment: none. No live business records/counts,
 application RPCs/messages, grants/history repair, paid resources or platform
@@ -673,8 +680,9 @@ and all false release/parity/replay/baseline flags remain unchanged. Sparse loca
 artifacts must not deploy; separate hosting failure/skipped production release
 cannot be replaced by CI or the green preview wrapper.
 
-The next phase's `evidence/NATIVE_COMPANION_AUTHORITY_CONTRACT.md` is now drafted
-and reviewed as **design-only, not adopted/implemented/applied**. It separates
+The next phase's `evidence/NATIVE_COMPANION_AUTHORITY_CONTRACT.md` is drafted
+and reviewed as a **full contract not adopted/implemented/applied**. Its first
+self-shift-only research subset is implemented in the following checkpoint. It separates
 identity-value freeze/unchanged upsert keys/legacy IDs, privileged no-op targets,
 harmless active self-shift, independently evaluated ownership, unresolved
 delegation/invitation provenance, trusted business-team classification and valid
@@ -682,7 +690,8 @@ atomic offboarding/multi-roster/original-actor recovery/concurrency requirements
 Writing `left` alone does not fix raw self reentry/retargeting. No new schema or
 production guard is supplied and no unresolved decision is adopted.
 
-Exact next action: verify PR #38 latest head/checks, then implement one separate
+Original next action (implemented by the following checkpoint): verify PR #38
+latest head/checks, then implement one separate
 disposable companion candidate with pinned actual constraints/all three staff
 attachments. Start identity-value freeze and harmless active-self-shift controls,
 preserving unchanged authorized conflict keys and legacy IDs, plus privileged
@@ -694,6 +703,80 @@ reviewed transaction/real-session concurrency/recovery. Keep baseline/storage,
 consent/tenure, actual role/API/config/load, receipt/mobile pilot, trusted entry/
 invoicing/retail/recruitment and hosting acceptance open. The heartbeat stays
 active; no duplicate automation or repeated unchanged owner prompt is created.
+
+## Latest self-shift-only companion research checkpoint (2026-10-15)
+
+Draft PR #39 (`https://github.com/Hunting-Fishing/motorsales365/pull/39`), code
+`62f4c4b574224bfe55418b2ab30484644a1b8c03`, branch
+`security/native-self-shift-candidate`, stacked on verified PR #38 docs `14c18d3`
+(all six CI gates, run `38659674559`). This is **memory-only research, not adopted
+authority, a production mitigation, a migration or app management compatibility**.
+Privileged positive branches remain denied/gated rather than accepted via a
+mutable-role/NULL/service/operator authority stub.
+
+The shared non-test fixture mechanically reuses all 14 whole-source pins,
+23 selected sections, eight functions and explicitly synthetic supports. Root
+independently verified the moved preamble is identical except node:test import/
+URL depth and all nine old test bodies remain byte-identical. Source constraints,
+ACLs, RLS and all three enabled original staff attachments stay retained. The
+new private candidate adds identity-value/self/binding and privileged-target
+guards plus deny-only INSERT/DELETE. A separate candidate-only chat UPDATE prefix
+returns before ensure/provisioning for harmless self changes; it does not disable
+the attachment, alter native writers or admit invalid offboarding statuses.
+
+18 new cases cover active/invited/left/absent/missing-team chat preservation,
+legacy profiles and real open sessions, unchanged identity targets versus valid
+identity changes, all privileged no-op/mixed/client timestamp targets, NULL/service
+and unrelated/inactive subjects, competing canonical/legacy shadows and binding/
+all-roster gates, actual app conflict/DO NOTHING/INSERT/DELETE negatives, raw and
+dependent-CTE atomic failures, real NOT NULL rollback and narrow guarded lab
+installation/recovery. No canonicalization, implicit provisioning or privileged
+compatibility is claimed. Source chat policies are deliberately not loaded here;
+the existing raw self-membership reentry/retarget path is **not fixed**.
+
+Verification: focused 18/18 (final stable run 25.764s), original 9/9 (6.370s),
+full sequential tooling 277/277 (181.68s), no skipped/cancelled cases. ESLint/
+format/diff and independent bounded module/test/document review pass. Recovery
+volatility/header drift and two stored-value assertions were corrected during
+review. Dedicated never-quarantined memory CI step added. Application source is
+unchanged from the 986-test, full-TypeScript/CI-verified parent; those are not new
+local app/API/production acceptance claims. Code head `62f4c4b` passed all six CI
+gates (run `38661636502`), verified before documentation publication. Wrapper
+`38661636513` still skips migrations/production deployment; preview-wrapper success
+is not an upload. Hosting build `318edcce-af2f-454b-85eb-290aaa7a19e7` fails
+separately and Supabase Preview skips. The subsequent documentation head requires
+its own next-run check. Exact LF pins and limits:
+`evidence/NATIVE_SELF_SHIFT_CANDIDATE.md`.
+
+Migration impact: none. Deployment: none. The candidate SQL runs only in always-
+closed disposable memory fixtures; no live business records/counts/RPCs, grants,
+history repair, customer communications, paid resources or platform mutation.
+Existing approved converter containment is not modified. Pending helper decisions
+are unchanged/not re-requested. Global correspondence 404/423 with19 unclassified,
+selected-inventory unknowns and all baseline/parity/replay/release flags stay
+unchanged/false. Sparse checkout must not deploy; hosting and actual role/API/JWT/
+session/index/load/recovery/consent/tenure/OCR/mobile pilot gates remain open.
+
+Exact next action: verify PR #39 latest head/checks, then close bounded remaining
+native profile/role policy boundary: recover selected current metadata and
+source-pin/rehearse `shop_manager.is_owner_or_admin(uuid)` and
+`shop_manager.user_belongs_to_shop(uuid,uuid)` with actual
+`sm_profiles_update_self`, `sm_profiles_insert_self`, `sm_user_roles_admin_manage`
+policies and legacy/shadow/global-role/direct-DML controls. Reuse the completed
+`ensure_profile_for(uuid)` indirect-writer proof, not its repeated seven cases.
+Exact retained sources and later claim/shift/audit dependencies are in
+`evidence/NATIVE_SELF_SHIFT_CANDIDATE.md`. Current effective policy/ACL and later
+conditional sweeps remain unverified; ordering is not applied lineage. Recover the
+selected original definitions/ACL/security attachments before composing further
+candidate effects; do not repeat completed raw chat characterization or declare
+the self-shift candidate a full guard. Use the already-pinned actual chat policies
+for future team scope/reentry/retarget negatives without trusting mutable kind/
+business/creator fields. Keep owner/delegation/provenance/multi-roster positives
+gated; implement valid atomic offboarding/original-actor audit only after that
+authority boundary, then independently reviewed real-session locking/revalidation
+and recovery. Continue other independent in-scope baseline/storage and receipt/
+Customer 360 release prerequisites when blocked; do not deploy sparse artifacts,
+apply pending helper restrictions or create duplicate heartbeat notifications.
 
 ## Recovery evidence (original scope, retained below)
 
