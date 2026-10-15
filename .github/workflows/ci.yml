@@ -178,6 +178,9 @@ jobs:
       - name: Internal staff acknowledgments and private UI lifetimes (never quarantined)
         run: npx vitest run src/lib/internal-staff.functions.test.ts src/components/internal-staff/InternalStaffView.test.tsx --maxWorkers=1
 
+      - name: Native Google OAuth handoff and route lifetimes (never quarantined)
+        run: npx vitest run src/lib/google-oauth.test.ts src/hooks/use-google-oauth.test.tsx src/__tests__/google-oauth-routes.test.tsx --maxWorkers=1
+
       - name: Approved helper execution envelope and metadata review regressions (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/approved-helper-execution-envelope.test.mjs scripts/ci/approved-helpers-catalog-review.test.mjs scripts/ci/approved-helper-release-evidence.test.mjs
 

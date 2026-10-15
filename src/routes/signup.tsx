@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 
 
-import { lovable } from "@/integrations/lovable/index";
+import { useGoogleOAuth } from "@/hooks/use-google-oauth";
+import { safeAuthInternalPath as safeInternalPath } from "@/lib/google-oauth";
 import { useAuth } from "@/hooks/use-auth";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -57,12 +58,6 @@ type SignupSearch = {
   /** "qr" | "link" — what kind of touch created the referral. */
   src?: string;
 };
-
-function safeInternalPath(value: unknown): string | undefined {
-  if (typeof value !== "string") return undefined;
-  if (!value.startsWith("/") || value.startsWith("//")) return undefined;
-  return value;
-}
 
 function safeEmail(v: unknown): string | undefined {
   if (typeof v !== "string") return undefined;
@@ -223,6 +218,32 @@ function SignupPage() {
   const [refCode, setRefCode] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const authFlight = useRef(false);
+  const google = useGoogleOAuth({
+    redirect: search.redirect,
+    scopeKey: JSON.stringify([
+      intent,
+      search.redirect,
+      search.invite,
+      user?.id,
+      firstName,
+      lastName,
+      email,
+      phoneIso,
+      phoneNational,
+      businessName,
+      businessAddress,
+      businessKind,
+      streetAddress,
+      postalCode,
+      businessPostalCode,
+      location,
+      agreed,
+      refCode,
+    ]),
+    blocked: submitting || loading || !!user || !intent,
+    flight: authFlight,
+  });
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [apiFailure, setApiFailure] = useState<
     | {
@@ -595,7 +616,7 @@ function SignupPage() {
   };
 
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitAttempted(true);
     setApiFailure(null);
@@ -782,39 +803,38 @@ function SignupPage() {
     goAfterSignup(POST_SIGNUP_ROUTE[intent]);
   };
 
-  const handleGoogle = async () => {
-    setSubmitAttempted(true);
-    // Same identity-step validation as email/password signup, minus the
-    // password fields (Google supplies credentials). We still require phone,
-    // personal email, address, and (for business) business_* so the applier
-    // can persist them into `profiles` after the OAuth round-trip.
-    const oauthIssues = issues.filter(
-      (i) => i.field !== "password" && i.field !== "confirm-password",
-    );
-    if (oauthIssues.length > 0) {
-      toast.error(
-        `Please fix ${oauthIssues.length} ${oauthIssues.length === 1 ? "field" : "fields"} before continuing with Google.`,
-      );
-      const first = oauthIssues[0].field;
-      const el = document.getElementById(`field-${first}`) ?? document.getElementById(first);
-      el?.scrollIntoView({ behavior: "smooth", block: "center" });
-      return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (authFlight.current || loading || user) return;
+    authFlight.current = true;
+    try {
+      await handleEmailSubmit(e);
+    } finally {
+      authFlight.current = false;
     }
-    if (!intent) return;
-    stashPendingProfile();
-    const returnTo = search.redirect
-      ? `${siteOrigin()}/login?redirect=${encodeURIComponent(search.redirect)}`
-      : siteOrigin();
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: returnTo,
-    });
-    if (result.error) {
-      toast.error("Could not sign up with Google");
-      return;
-    }
-    if (result.redirected) return;
-    goAfterSignup(POST_SIGNUP_ROUTE[intent]);
   };
+
+  const handleGoogle = () =>
+    google.start(() => {
+      setSubmitAttempted(true);
+      // Preserve identity/terms validation and the existing pending profile
+      // snapshot. Password fields are omitted because Google supplies credentials.
+      const oauthIssues = issues.filter(
+        (i) => i.field !== "password" && i.field !== "confirm-password",
+      );
+      if (oauthIssues.length > 0) {
+        toast.error(
+          `Please fix ${oauthIssues.length} ${oauthIssues.length === 1 ? "field" : "fields"} before continuing with Google.`,
+        );
+        const first = oauthIssues[0].field;
+        const el = document.getElementById(`field-${first}`) ?? document.getElementById(first);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return false;
+      }
+      if (!intent) return false;
+      stashPendingProfile();
+      return true;
+    });
 
 
   const inputCls =
@@ -1486,7 +1506,7 @@ function SignupPage() {
                 >
                   <button
                     type="submit"
-                    disabled={submitting || !intent}
+                    disabled={submitting || google.busy || loading || !!user || !intent}
                     className={cn(
                       "w-full rounded-lg bg-navy-900 min-h-12 sm:min-h-0 py-3 sm:py-2.5 text-sm font-bold text-white shadow-lg shadow-navy-900/20 transition hover:bg-navy-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60",
                     )}
@@ -1515,7 +1535,8 @@ function SignupPage() {
                   <button
                     type="button"
                     onClick={handleGoogle}
-                    disabled={!intent}
+                    disabled={submitting || google.busy || loading || !!user || !intent}
+                    aria-busy={google.busy}
                     className="w-full flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white min-h-12 sm:min-h-0 py-3 sm:py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden>
@@ -1524,7 +1545,7 @@ function SignupPage() {
                       <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
                       <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                     </svg>
-                    Continue with Google
+                    {google.busy ? "Opening Google…" : "Continue with Google"}
                   </button>
                 </div>
 
