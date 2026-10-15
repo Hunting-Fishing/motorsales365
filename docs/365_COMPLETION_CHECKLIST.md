@@ -15,12 +15,26 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
-Newest completed bounded slice: draft PR #54, code `e4348cf`, composes the actual
+Newest completed inventory slice: draft PR #55, code `34cea88`, retains the
+privacy-reviewed auth/bootstrap catalog at `07:22:41.479679` UTC (six tables,
+123 columns, 25 constraints, 15 triggers, 29 functions, exact sequence metadata).
+25 public bodies match 19 retained-source pins; three org function definitions,
+original org/member/org-role DDL and external `member_tiers` remain explicit
+frontiers. Eleven focused and 496 tooling/assets pass (486 plus separate 10).
+Two read-only catalog executions, no row/helper/raw definition/sequence-current
+reads; first unpublished bigint-rounded artifact discarded before exact-text
+capture. No migration, deployment or mutation. Evidence and exact next action:
+`evidence/AUTH_BOOTSTRAP_DEPENDENCY_FRONTIER.md`. Prepare selected privacy-gated
+definition recovery, then compose actual bootstrap dependencies; do not invent
+helpers or strip constraints. New PR #55 CI requires its own verification.
+
+Newest completed bounded behavioral slice: draft PR #54, code `e4348cf`, composes the actual
 staff-domain partner forward chain with an actual empty user-referrals table in
 discarded databases. Immutable PR #50 and PR #52 artifacts are unchanged. 29
 focused and 485 tooling/receipt-asset tests pass (475 plus separate 10). No
-migration, live query/mutation or deployment. Newest PR CI still needs its own
-verification. Exact evidence: `evidence/STAFF_PARTNER_EMPTY_REFERRALS.md`.
+migration, live query/mutation or deployment. Docs `b415d4b` now passed all six
+CI gates (`38696845832`); hosting failed separately and deployment/migrations
+skipped. Exact evidence: `evidence/STAFF_PARTNER_EMPTY_REFERRALS.md`.
 Fresh full application suite also passes: 1,207 tests/59 files (93.25s), plus
 full TypeScript. Lint/syntax/format/diff pass; primary review only, no quota retry.
 Next recover the bounded auth/profile/org/member/settings/subscription/sequence

@@ -193,3 +193,8 @@ PR #54 code CI `38696532588` currently has OCR/lint/Parts passed and build/type/
 unit pending. Separate hosting `6f0e6469-b986-4938-bbaa-418a361b69ab` failed;
 wrapper `38696532720` skipped migrations/production deployment. Later docs HEAD
 requires fresh checks; neither the green preview wrapper nor a build is an upload.
+
+Follow-up: docs HEAD `b415d4b` passed all six CI gates (`38696845832`). Its
+separate hosting check failed and wrapper `38696846028` skipped migrations/
+production. The bounded auth/bootstrap inventory is now documented in
+`AUTH_BOOTSTRAP_DEPENDENCY_FRONTIER.md`; this partner fixture remains unchanged.
