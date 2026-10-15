@@ -1,0 +1,3900 @@
+{
+  "mode": "read-only-catalog-fingerprints",
+  "enums": [
+    {
+      "name": "app_role",
+      "labels": [
+        "admin",
+        "user",
+        "sales",
+        "moderator",
+        "support",
+        "advertising",
+        "sales_junior",
+        "sales_senior",
+        "sales_manager"
+      ],
+      "schema": "public"
+    },
+    {
+      "name": "sales_rep_source",
+      "labels": [
+        "referral",
+        "manual",
+        "territory",
+        "customer_choice"
+      ],
+      "schema": "public"
+    },
+    {
+      "name": "sales_rep_subject",
+      "labels": [
+        "user",
+        "business",
+        "supplier"
+      ],
+      "schema": "public"
+    }
+  ],
+  "scope": "Nine selected platform role/referral/sales/partner relations, selected profile/auth support columns, selected-table/auth.users noninternal attachments and named helper families including unexecuted intent frontier. Fingerprints/structural metadata only; no raw definitions or expressions.",
+  "limits": "No row data, application/auth counts or helper calls, raw bodies/defaults/config values/SQL expressions, mutation, history adoption, trusted original actor, complete dependency closure, hosted behavior, baseline/parity or release acceptance. Auth bootstrap, nonempty referred-user intent, incoming writers and offboarding remain separate composition boundaries. Effective MAINTAIN is not evaluated; raw ACL retains it.",
+  "tables": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "partner_program_applications",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "partner_program_partners",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "sales_rep_assignments",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "sales_rep_profiles",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": false,
+          "insert": false,
+          "select": false,
+          "update": false,
+          "trigger": false,
+          "truncate": false,
+          "references": false
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "sales_rep_territories",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "staff_referral_audit",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "staff_referrals",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "user_referrals",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "user_roles",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    }
+  ],
+  "columns": [
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "users",
+      "schema": "auth",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "email",
+      "type": "character varying(255)",
+      "table": "users",
+      "schema": "auth",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "user_id",
+      "type": "uuid",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "full_name",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "email",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "phone",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "city",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "region",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "channel_type",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "platforms",
+      "type": "text[]",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": "f81a5133416544064d5b9b182f73a6e1"
+    },
+    {
+      "acl": null,
+      "name": "audience_band",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "pitch",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 11,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "status",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 12,
+      "generated": "",
+      "defaultMd5": "3d0c12821e68f0fc31291c72ad568aa9"
+    },
+    {
+      "acl": null,
+      "name": "admin_notes",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 13,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "reviewer_id",
+      "type": "uuid",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 14,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "reviewed_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 15,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "agreed_terms",
+      "type": "boolean",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 16,
+      "generated": "",
+      "defaultMd5": "68934a3e9455fa72420237eb05902327"
+    },
+    {
+      "acl": null,
+      "name": "agreed_terms_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 17,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 18,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 19,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "first_name",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 20,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "last_name",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 21,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "occupation",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 22,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "school_or_company",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 23,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "address_line",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 24,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "postal_code",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 25,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "birth_date",
+      "type": "date",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 26,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "payout_method",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 27,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "payout_account_name",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 28,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "payout_account_number",
+      "type": "text",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 29,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "payout_details",
+      "type": "jsonb",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 30,
+      "generated": "",
+      "defaultMd5": "f3db357cf4f4a03883484fa3281a056c"
+    },
+    {
+      "acl": null,
+      "name": "wants_shop_manager",
+      "type": "boolean",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 31,
+      "generated": "",
+      "defaultMd5": "68934a3e9455fa72420237eb05902327"
+    },
+    {
+      "acl": null,
+      "name": "agreed_early_release",
+      "type": "boolean",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 32,
+      "generated": "",
+      "defaultMd5": "68934a3e9455fa72420237eb05902327"
+    },
+    {
+      "acl": null,
+      "name": "agreed_early_release_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_applications",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 33,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "user_id",
+      "type": "uuid",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "application_id",
+      "type": "uuid",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "referral_code",
+      "type": "text",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "display_name",
+      "type": "text",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "active",
+      "type": "boolean",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "acl": null,
+      "name": "agreed_terms_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "agreed_terms_version",
+      "type": "text",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "payout_method",
+      "type": "text",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "payout_details",
+      "type": "jsonb",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": "f3db357cf4f4a03883484fa3281a056c"
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 11,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 12,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "shop_manager_access",
+      "type": "boolean",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 13,
+      "generated": "",
+      "defaultMd5": "68934a3e9455fa72420237eb05902327"
+    },
+    {
+      "acl": null,
+      "name": "payout_account_name",
+      "type": "text",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 14,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "payout_account_number",
+      "type": "text",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 15,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "signup_bounty_php",
+      "type": "numeric",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 16,
+      "generated": "",
+      "defaultMd5": "c81e728d9d4c2f636f067f89cc14862c"
+    },
+    {
+      "acl": null,
+      "name": "business_bounty_php",
+      "type": "numeric",
+      "table": "partner_program_partners",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 17,
+      "generated": "",
+      "defaultMd5": "d3d9446802a44259755d38e6d163e820"
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "profiles",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "full_name",
+      "type": "text",
+      "table": "profiles",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "business_region",
+      "type": "text",
+      "table": "profiles",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "business_city",
+      "type": "text",
+      "table": "profiles",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "signup_city",
+      "type": "text",
+      "table": "profiles",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 28,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "signup_region",
+      "type": "text",
+      "table": "profiles",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 31,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "rep_user_id",
+      "type": "uuid",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "subject_type",
+      "type": "public.sales_rep_subject",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "subject_id",
+      "type": "uuid",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "source",
+      "type": "public.sales_rep_source",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": "e5b94dc2bf08a816fe64bb7c6cc09b4c"
+    },
+    {
+      "acl": null,
+      "name": "active",
+      "type": "boolean",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "acl": null,
+      "name": "notes",
+      "type": "text",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "assigned_by",
+      "type": "uuid",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "assigned_at",
+      "type": "timestamp with time zone",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "ended_at",
+      "type": "timestamp with time zone",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 11,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "sales_rep_assignments",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 12,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "user_id",
+      "type": "uuid",
+      "table": "sales_rep_profiles",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "active",
+      "type": "boolean",
+      "table": "sales_rep_profiles",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "acl": null,
+      "name": "accepting_new_clients",
+      "type": "boolean",
+      "table": "sales_rep_profiles",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "acl": null,
+      "name": "title",
+      "type": "text",
+      "table": "sales_rep_profiles",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "bio",
+      "type": "text",
+      "table": "sales_rep_profiles",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "public_email",
+      "type": "text",
+      "table": "sales_rep_profiles",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "public_phone",
+      "type": "text",
+      "table": "sales_rep_profiles",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "photo_url",
+      "type": "text",
+      "table": "sales_rep_profiles",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "sales_rep_profiles",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "sales_rep_profiles",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "commission_rate_override",
+      "type": "numeric",
+      "table": "sales_rep_profiles",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 11,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "sales_rep_territories",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "rep_user_id",
+      "type": "uuid",
+      "table": "sales_rep_territories",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "region",
+      "type": "text",
+      "table": "sales_rep_territories",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "province",
+      "type": "text",
+      "table": "sales_rep_territories",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "city",
+      "type": "text",
+      "table": "sales_rep_territories",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "is_primary",
+      "type": "boolean",
+      "table": "sales_rep_territories",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": "68934a3e9455fa72420237eb05902327"
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "sales_rep_territories",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "staff_referral_audit",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "staff_referral_id",
+      "type": "uuid",
+      "table": "staff_referral_audit",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "staff_email",
+      "type": "text",
+      "table": "staff_referral_audit",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "actor_id",
+      "type": "uuid",
+      "table": "staff_referral_audit",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "action",
+      "type": "text",
+      "table": "staff_referral_audit",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "details",
+      "type": "jsonb",
+      "table": "staff_referral_audit",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": "f3db357cf4f4a03883484fa3281a056c"
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "staff_referral_audit",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "staff_referrals",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "staff_user_id",
+      "type": "uuid",
+      "table": "staff_referrals",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "email",
+      "type": "text",
+      "table": "staff_referrals",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "full_name",
+      "type": "text",
+      "table": "staff_referrals",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "phone",
+      "type": "text",
+      "table": "staff_referrals",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "referral_code",
+      "type": "text",
+      "table": "staff_referrals",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "qr_storage_path",
+      "type": "text",
+      "table": "staff_referrals",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "active",
+      "type": "boolean",
+      "table": "staff_referrals",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "acl": null,
+      "name": "notes",
+      "type": "text",
+      "table": "staff_referrals",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "staff_referrals",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "staff_referrals",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 11,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "user_referrals",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "user_id",
+      "type": "uuid",
+      "table": "user_referrals",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "referred_by_staff_id",
+      "type": "uuid",
+      "table": "user_referrals",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "first_referral_code",
+      "type": "text",
+      "table": "user_referrals",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "last_referral_code",
+      "type": "text",
+      "table": "user_referrals",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "credited_referral_code",
+      "type": "text",
+      "table": "user_referrals",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "signup_date",
+      "type": "timestamp with time zone",
+      "table": "user_referrals",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "user_roles",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "user_id",
+      "type": "uuid",
+      "table": "user_roles",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "role",
+      "type": "public.app_role",
+      "table": "user_roles",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "user_roles",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "partner_program_applications_pkey",
+      "ready": true,
+      "table": "partner_program_applications",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "44465e65fa681eafc26e4235fe8a46a8"
+    },
+    {
+      "name": "pp_apps_status_idx",
+      "ready": true,
+      "table": "partner_program_applications",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "34651816037d7c5cb680d16c50cf54eb"
+    },
+    {
+      "name": "partner_program_partners_pkey",
+      "ready": true,
+      "table": "partner_program_partners",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "4c082023be227af86091ea370b056786"
+    },
+    {
+      "name": "partner_program_partners_referral_code_key",
+      "ready": true,
+      "table": "partner_program_partners",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "30a03518268bcce3e7b0cff985634242"
+    },
+    {
+      "name": "pp_partners_user_idx",
+      "ready": true,
+      "table": "partner_program_partners",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "98ef213b7dbb4d10374553976526c65c"
+    },
+    {
+      "name": "idx_sales_rep_assignments_rep",
+      "ready": true,
+      "table": "sales_rep_assignments",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "ebe32115469fafcb741f5dbb1ecc2542"
+    },
+    {
+      "name": "sales_rep_assignments_pkey",
+      "ready": true,
+      "table": "sales_rep_assignments",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "f8bd175d895e33e5d5205357dcbe460c"
+    },
+    {
+      "name": "uniq_active_assignment",
+      "ready": true,
+      "table": "sales_rep_assignments",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "7f64d50cf88ce86b171213f91173d8f8"
+    },
+    {
+      "name": "sales_rep_profiles_pkey",
+      "ready": true,
+      "table": "sales_rep_profiles",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "88b2e6135beca78c07c4b55e1d88b974"
+    },
+    {
+      "name": "idx_sales_rep_territories_geo",
+      "ready": true,
+      "table": "sales_rep_territories",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "59857cc389cee970a5abf234fbd89ca8"
+    },
+    {
+      "name": "idx_sales_rep_territories_rep",
+      "ready": true,
+      "table": "sales_rep_territories",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "53cb7581ec5ed14aac0e632b0afde002"
+    },
+    {
+      "name": "sales_rep_territories_pkey",
+      "ready": true,
+      "table": "sales_rep_territories",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "05033d4047b7e0ec73394a1298622a5d"
+    },
+    {
+      "name": "idx_sr_audit_created",
+      "ready": true,
+      "table": "staff_referral_audit",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "af4193cf12e811548221e59e544e8ea0"
+    },
+    {
+      "name": "idx_sr_audit_staff",
+      "ready": true,
+      "table": "staff_referral_audit",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "27d4e5aa1a2ffa84e1082deeccec9a45"
+    },
+    {
+      "name": "staff_referral_audit_pkey",
+      "ready": true,
+      "table": "staff_referral_audit",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "4a5ebf23e3e44b43434d46af619153bb"
+    },
+    {
+      "name": "idx_staff_referrals_code",
+      "ready": true,
+      "table": "staff_referrals",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "be74d8a92017f9a54b20e5bccd231ade"
+    },
+    {
+      "name": "idx_staff_referrals_user",
+      "ready": true,
+      "table": "staff_referrals",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "cee7f02b3041b24bf3ce7a000a2b2d98"
+    },
+    {
+      "name": "staff_referrals_email_key",
+      "ready": true,
+      "table": "staff_referrals",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "bf6eb9e18c77339b083c96276ea679f2"
+    },
+    {
+      "name": "staff_referrals_pkey",
+      "ready": true,
+      "table": "staff_referrals",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "2070dc6f97a5c1b97a10bfd524360bfc"
+    },
+    {
+      "name": "staff_referrals_referral_code_key",
+      "ready": true,
+      "table": "staff_referrals",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "9f30a384aa0ac5cb3f61d05234677b4c"
+    },
+    {
+      "name": "idx_user_referrals_credit",
+      "ready": true,
+      "table": "user_referrals",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "8b638ec8ee7ac230c7b148da9ec8b364"
+    },
+    {
+      "name": "idx_user_referrals_first_code",
+      "ready": true,
+      "table": "user_referrals",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "57890fb24aa98615a8376ad372fbeffb"
+    },
+    {
+      "name": "idx_user_referrals_signup_date",
+      "ready": true,
+      "table": "user_referrals",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "94db4fcac14fb675b12cc2c14d4b4bf8"
+    },
+    {
+      "name": "idx_user_referrals_staff",
+      "ready": true,
+      "table": "user_referrals",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "a27454015533253c9160e97dabe673dc"
+    },
+    {
+      "name": "user_referrals_pkey",
+      "ready": true,
+      "table": "user_referrals",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "f57d8a4cebe503f51b3eaf4d43aee492"
+    },
+    {
+      "name": "user_referrals_user_id_key",
+      "ready": true,
+      "table": "user_referrals",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "c99f1388963e9f0bb8d28d9987ac998b"
+    },
+    {
+      "name": "user_roles_pkey",
+      "ready": true,
+      "table": "user_roles",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "ccb7e044b04f5818b3ca8e15f5e2da86"
+    },
+    {
+      "name": "user_roles_user_id_role_key",
+      "ready": true,
+      "table": "user_roles",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "8063253ac22be945431bbe7806457b5b"
+    }
+  ],
+  "policies": [
+    {
+      "name": "Applicants read own partner application",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "partner_program_applications",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "3a807491e0a912fbfbee0ffa087b82f6",
+      "permissive": true
+    },
+    {
+      "name": "admin_update_apps",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "partner_program_applications",
+      "command": "w",
+      "checkMd5": "52601dff68335277823fcbfe28ec86d5",
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "anon_insert_apps",
+      "roles": [
+        "anon"
+      ],
+      "table": "partner_program_applications",
+      "command": "a",
+      "checkMd5": "b326b5062b2f0e69046810717534cb09",
+      "usingMd5": null,
+      "permissive": true
+    },
+    {
+      "name": "auth_insert_apps",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "partner_program_applications",
+      "command": "a",
+      "checkMd5": "b326b5062b2f0e69046810717534cb09",
+      "usingMd5": null,
+      "permissive": true
+    },
+    {
+      "name": "self_read_apps",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "partner_program_applications",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "cc3653716d564cc364cf178deb14f086",
+      "permissive": true
+    },
+    {
+      "name": "admin_write_partners",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "partner_program_partners",
+      "command": "*",
+      "checkMd5": "52601dff68335277823fcbfe28ec86d5",
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "self_or_admin_read_partners",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "partner_program_partners",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "cc3653716d564cc364cf178deb14f086",
+      "permissive": true
+    },
+    {
+      "name": "Admins manage all assignments",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "sales_rep_assignments",
+      "command": "*",
+      "checkMd5": "52601dff68335277823fcbfe28ec86d5",
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "Rep views own assignments",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "sales_rep_assignments",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "2dcb1119aa79635f73a311538506066e",
+      "permissive": true
+    },
+    {
+      "name": "Admins manage all rep profiles",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "sales_rep_profiles",
+      "command": "*",
+      "checkMd5": "52601dff68335277823fcbfe28ec86d5",
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "Rep can update own profile",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "sales_rep_profiles",
+      "command": "w",
+      "checkMd5": "19300d155780585259ede73ac370586c",
+      "usingMd5": "19300d155780585259ede73ac370586c",
+      "permissive": true
+    },
+    {
+      "name": "Rep can upsert own profile",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "sales_rep_profiles",
+      "command": "a",
+      "checkMd5": "19300d155780585259ede73ac370586c",
+      "usingMd5": null,
+      "permissive": true
+    },
+    {
+      "name": "Rep can view own profile",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "sales_rep_profiles",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "19300d155780585259ede73ac370586c",
+      "permissive": true
+    },
+    {
+      "name": "Admins manage all territories",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "sales_rep_territories",
+      "command": "*",
+      "checkMd5": "52601dff68335277823fcbfe28ec86d5",
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "Rep manages own territories",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "sales_rep_territories",
+      "command": "*",
+      "checkMd5": "2dcb1119aa79635f73a311538506066e",
+      "usingMd5": "2dcb1119aa79635f73a311538506066e",
+      "permissive": true
+    },
+    {
+      "name": "Admins insert sr audit",
+      "roles": [
+        "public"
+      ],
+      "table": "staff_referral_audit",
+      "command": "a",
+      "checkMd5": "42f97d95c904a075a7bd26312db73461",
+      "usingMd5": null,
+      "permissive": true
+    },
+    {
+      "name": "Admins read sr audit",
+      "roles": [
+        "public"
+      ],
+      "table": "staff_referral_audit",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "Admins manage staff_referrals",
+      "roles": [
+        "public"
+      ],
+      "table": "staff_referrals",
+      "command": "*",
+      "checkMd5": "52601dff68335277823fcbfe28ec86d5",
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "Staff read own referral row",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "staff_referrals",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "085e2a640ad9e7e058d0264baf24583c",
+      "permissive": true
+    },
+    {
+      "name": "Admins manage user_referrals",
+      "roles": [
+        "public"
+      ],
+      "table": "user_referrals",
+      "command": "*",
+      "checkMd5": "52601dff68335277823fcbfe28ec86d5",
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "Advertising read user_referrals",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_referrals",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "2d7175b2b3b185f6efa3c4808fd77bcf",
+      "permissive": true
+    },
+    {
+      "name": "Sales read user_referrals",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_referrals",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "2af7cc1e1e9a1154b41f14f636207efa",
+      "permissive": true
+    },
+    {
+      "name": "Staff read own credited signups",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_referrals",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "9365e5d864cb7a6dc92234607499920b",
+      "permissive": true
+    },
+    {
+      "name": "User reads own referral row",
+      "roles": [
+        "public"
+      ],
+      "table": "user_referrals",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "19300d155780585259ede73ac370586c",
+      "permissive": true
+    },
+    {
+      "name": "Admins manage roles",
+      "roles": [
+        "public"
+      ],
+      "table": "user_roles",
+      "command": "*",
+      "checkMd5": null,
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "Sales view user_roles",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_roles",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "31d468492553825c582b0c69647b5a45",
+      "permissive": true
+    },
+    {
+      "name": "Users can view own roles",
+      "roles": [
+        "public"
+      ],
+      "table": "user_roles",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "446c0428749737e24493d26321c2c66e",
+      "permissive": true
+    }
+  ],
+  "triggers": [
+    {
+      "name": "on_auth_user_confirmed_accredit_staff",
+      "table": "auth.users",
+      "enabled": "O",
+      "function": "public.tg_auth_user_staff_accredit()",
+      "typeBits": 21,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "4001d9cbb9a6926c2d4b9ebc859382d6",
+      "updateColumns": [
+        "email_confirmed_at"
+      ]
+    },
+    {
+      "name": "on_auth_user_created",
+      "table": "auth.users",
+      "enabled": "O",
+      "function": "public.handle_new_user()",
+      "typeBits": 5,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "6ee743739ce4ec4da080d6a04e0b6f0a",
+      "updateColumns": []
+    },
+    {
+      "name": "pp_apps_updated",
+      "table": "public.partner_program_applications",
+      "enabled": "O",
+      "function": "public.update_updated_at_column()",
+      "typeBits": 19,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "c545544e808d54a2055b30477e955589",
+      "updateColumns": []
+    },
+    {
+      "name": "partners_recompute_intent",
+      "table": "public.partner_program_partners",
+      "enabled": "O",
+      "function": "public.trg_partners_recompute_intent()",
+      "typeBits": 29,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "632c598a36a8a583ee24cbc9c57c6aa8",
+      "updateColumns": [
+        "referral_code",
+        "active"
+      ]
+    },
+    {
+      "name": "pp_partners_updated",
+      "table": "public.partner_program_partners",
+      "enabled": "O",
+      "function": "public.update_updated_at_column()",
+      "typeBits": 19,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "c25b63496a8eaa587b8baab39fe0a38c",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_sales_rep_assignments_updated",
+      "table": "public.sales_rep_assignments",
+      "enabled": "O",
+      "function": "public.tg_set_updated_at()",
+      "typeBits": 19,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "4fea7039c29611c2386cd91d32153caa",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_sales_rep_profiles_updated",
+      "table": "public.sales_rep_profiles",
+      "enabled": "O",
+      "function": "public.tg_set_updated_at()",
+      "typeBits": 19,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "d0076e73519dbfdfefd9473eb84fa4fc",
+      "updateColumns": []
+    },
+    {
+      "name": "staff_referral_audit_insert_trg",
+      "table": "public.staff_referrals",
+      "enabled": "O",
+      "function": "public.tg_staff_referral_audit_insert()",
+      "typeBits": 5,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "eaf2b654397077ce9deb688206f01583",
+      "updateColumns": []
+    },
+    {
+      "name": "staff_referral_audit_trg",
+      "table": "public.staff_referrals",
+      "enabled": "O",
+      "function": "public.tg_staff_referral_audit()",
+      "typeBits": 17,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "7a76a9e917a254284d4819e54876cbd2",
+      "updateColumns": []
+    },
+    {
+      "name": "staff_referrals_accredit",
+      "table": "public.staff_referrals",
+      "enabled": "O",
+      "function": "public.tg_staff_referrals_accredit()",
+      "typeBits": 21,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "703fefc132c833dcbb84fd20ff099c35",
+      "updateColumns": [
+        "staff_user_id",
+        "referral_code",
+        "active"
+      ]
+    },
+    {
+      "name": "trg_staff_referrals_updated",
+      "table": "public.staff_referrals",
+      "enabled": "O",
+      "function": "public.tg_set_updated_at()",
+      "typeBits": 19,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "78b09b4f0d230ef8068d852a212f4dc9",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_pp_user_signup_bounty",
+      "table": "public.user_referrals",
+      "enabled": "O",
+      "function": "public.pp_user_signup_bounty()",
+      "typeBits": 21,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "f67ef95698747625d786a3d1dd69850e",
+      "updateColumns": [
+        "credited_referral_code"
+      ]
+    },
+    {
+      "name": "trg_user_referrals_auto_assign_rep",
+      "table": "public.user_referrals",
+      "enabled": "O",
+      "function": "public.tg_auto_assign_sales_rep()",
+      "typeBits": 5,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "72c4213dd1a9fa93180cfd96ffb9b245",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_auto_setup_sales_rep_territory_on_role",
+      "table": "public.user_roles",
+      "enabled": "O",
+      "function": "public.trg_auto_setup_sales_rep_territory()",
+      "typeBits": 5,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "bbee951f7fc4dc3408b0f9502cd41276",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_create_staff_referral",
+      "table": "public.user_roles",
+      "enabled": "O",
+      "function": "public.tg_create_staff_referral()",
+      "typeBits": 5,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "ce0f470c8a1ba9942fcc2d9fe3655611",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_user_roles_create_sales_rep",
+      "table": "public.user_roles",
+      "enabled": "O",
+      "function": "public.tg_create_sales_rep_profile()",
+      "typeBits": 5,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "80469524ba31304331d18c57b38ccdb6",
+      "updateColumns": []
+    }
+  ],
+  "functions": [
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "93f21bd4e7112ea9e8c5257267f9da69",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.accredit_staff_partner(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "void",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "5beda1edf3d5e9ace79800f240af4fa8",
+      "argumentModes": null,
+      "argumentNames": [
+        "_staff_user_id"
+      ],
+      "definitionMd5": "6e70bba42d380c902744f73a6b3d7ce3",
+      "serviceExecute": true,
+      "definitionBytes": 2663,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "7ccfa24b7379127173727b528e29d473",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.auto_setup_sales_rep_territory(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "record",
+      "returnsSet": true,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "354e6bb9bdb5bf02bbfb3195917160fa",
+      "argumentModes": [
+        "i",
+        "t",
+        "t",
+        "t",
+        "t",
+        "t"
+      ],
+      "argumentNames": [
+        "_rep_user_id",
+        "added",
+        "region",
+        "province",
+        "city",
+        "reason"
+      ],
+      "definitionMd5": "14911d074667d63474472a0fb33a34af",
+      "serviceExecute": true,
+      "definitionBytes": 1194,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "995bf3deb59ebb7314cadfb102c0ec7c",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.can_moderate(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "27656335d4ff4b9557951c2f3678e7a2",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id"
+      ],
+      "definitionMd5": "f7e561172cb3ff6dd98ffdb015066c3c",
+      "serviceExecute": true,
+      "definitionBytes": 299,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "318998007586fe3538d6ae3b381212df",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.can_support(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "27656335d4ff4b9557951c2f3678e7a2",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id"
+      ],
+      "definitionMd5": "29bb2f0b57fd8abe4bce8555627afa2a",
+      "serviceExecute": true,
+      "definitionBytes": 314,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{=X/postgres,postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "e41ac334c9e1600deb34d425f7094bda",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.canonical_365_org_id()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "uuid",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "f4160a7e0cb1de3f5e75b86bd188637e",
+      "serviceExecute": true,
+      "definitionBytes": 240,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres,authenticated=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "eee9038a5060ac2f0a74871148972abe",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.derive_signup_intent(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "text",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": false,
+      "argumentsMd5": "27656335d4ff4b9557951c2f3678e7a2",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id"
+      ],
+      "definitionMd5": "037f53638583143d112ecfa99289b2e0",
+      "serviceExecute": true,
+      "definitionBytes": 754,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "db26e6beeb5a0dfe0b4700df5948e634",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.gen_referral_code(text)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "text",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "8672f8f8f8a4279e7172d4e0158b4969",
+      "argumentModes": null,
+      "argumentNames": [
+        "_name"
+      ],
+      "definitionMd5": "ad21a041ab22bf912970c4ddc94823a7",
+      "serviceExecute": true,
+      "definitionBytes": 736,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "9bb9dde968ced3998403b7c78330d836",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.handle_new_user()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "28e1341ee5e279bbc3ed10d57e1fd3a4",
+      "serviceExecute": true,
+      "definitionBytes": 4466,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres,authenticated=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "dae5cfc5a8d92461a428f6702e4e65af",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.has_role(uuid,public.app_role)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "8216964371cd350348af933959ab4fda",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id",
+        "_role"
+      ],
+      "definitionMd5": "0c2c78626ed8a4807e6cc1b7b54d641c",
+      "serviceExecute": true,
+      "definitionBytes": 295,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "ea0befcf7465299834312bed02346c25",
+      "configMd5": "a16fef723685b52b7e1fce1a346453d0",
+      "signature": "public.is_internal_365_email(text)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "i",
+      "anonExecute": true,
+      "argumentsMd5": "83fdf7560607c3da26373e87a46a03b0",
+      "argumentModes": null,
+      "argumentNames": [
+        "_email"
+      ],
+      "definitionMd5": "0a90b91ef0f9bb61c9896778f071c1f2",
+      "serviceExecute": true,
+      "definitionBytes": 265,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "0f339e67db4b0fb50334774376f1fcf4",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.is_sales_assigned_user(uuid,uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "fd79dd1f17566bfa95b60b0bdad8f3ef",
+      "argumentModes": null,
+      "argumentNames": [
+        "_rep",
+        "_target_user"
+      ],
+      "definitionMd5": "0b8fd2230064c2802d61f10474c33af5",
+      "serviceExecute": true,
+      "definitionBytes": 388,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "53c2dbdd0884625f0bffa04689d12cb9",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.pp_user_signup_bounty()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "8b0e3a6ec5bb10c5b7824381288bd375",
+      "serviceExecute": true,
+      "definitionBytes": 360,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 6,
+      "language": "plpgsql",
+      "bodyMd5Lf": "0f539857998f64fb0e3bcc212941ce90",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.recompute_signup_intent(uuid,text,text,text,text,text,text)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "void",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "6f4bd920d2ae876513cd548636dfbeca",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id",
+        "_trigger_source",
+        "_trigger_field",
+        "_trigger_old",
+        "_trigger_new",
+        "_trigger_entity_type",
+        "_trigger_entity_id"
+      ],
+      "definitionMd5": "6a3b02a5f5ff0f859f1e8fc8713aef44",
+      "serviceExecute": true,
+      "definitionBytes": 1822,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "bf98af3fb51d414f568de3fa34e80afa",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.recompute_signup_intent(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "void",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "27656335d4ff4b9557951c2f3678e7a2",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id"
+      ],
+      "definitionMd5": "1b7e8c8e59c2959ca12cd072529d2517",
+      "serviceExecute": true,
+      "definitionBytes": 1039,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "586bba695867afa3cda7e7dcf31e077b",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_auth_user_staff_accredit()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "3606d03d845d418830b34dabd5623e83",
+      "serviceExecute": true,
+      "definitionBytes": 381,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "df58e18372301426b6dcd49a95f27de9",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_auto_assign_sales_rep()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "e21d67956b02e47ba3da821cbfc2f841",
+      "serviceExecute": true,
+      "definitionBytes": 774,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "6d32b8a8d6c88e34bd746dd8b1d34620",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_create_sales_rep_profile()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "459db05a0ea726375b273ae3896a609b",
+      "serviceExecute": true,
+      "definitionBytes": 336,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "8c728c2ab83ef33108d3248393020d08",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_create_staff_referral()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "2155ff63d16ea6e86c488e5f11ac8738",
+      "serviceExecute": true,
+      "definitionBytes": 1056,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "301a884953d37769916294bb60562e05",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_set_updated_at()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "494198e1eb8f9c98c4cf075ed9d79bb9",
+      "serviceExecute": true,
+      "definitionBytes": 194,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "c71d743748b8ffe2d81ff94b77b925dc",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_staff_referral_audit_insert()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "935e3efd2941c0b22724ccd18311690f",
+      "serviceExecute": true,
+      "definitionBytes": 462,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "589f812f6c7ca3ccc77a4a1a073088ce",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_staff_referral_audit()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "d033c85582b2605f5f33130130cbbd3b",
+      "serviceExecute": true,
+      "definitionBytes": 930,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "c63def3940fa98f2dabc7ae5eeb1d61b",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_staff_referrals_accredit()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "c948b8083ddd5616c54e8c4fc8ddd6fd",
+      "serviceExecute": true,
+      "definitionBytes": 330,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "69fa75c9327b83a603599aacfcf52b07",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.trg_auto_setup_sales_rep_territory()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "8a8835836cfdf1afb7365a7fad434fd0",
+      "serviceExecute": true,
+      "definitionBytes": 306,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "5df9fb3bd7a12cba1689f4bb9eb983ab",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.trg_partners_recompute_intent()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "7589b3bb43f54b16d752d680ebd9abd3",
+      "serviceExecute": true,
+      "definitionBytes": 1114,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "5b733ab523bad442e4b10f836de9e4ba",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.update_updated_at_column()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "47b72756852a143198dccf4db5943afc",
+      "serviceExecute": true,
+      "definitionBytes": 197,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": false
+    }
+  ],
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "constraints": [
+    {
+      "name": "partner_program_applications_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "partner_program_applications",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "partner_program_applications_reviewer_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "partner_program_applications",
+      "columns": [
+        "reviewer_id"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "ef8c9772fb78a7a0f5d3684d2302a16d",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "partner_program_applications_status_check",
+      "type": "c",
+      "match": " ",
+      "table": "partner_program_applications",
+      "columns": [
+        "status"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "16a2d47fcc8595a788a8a2a0f5c38939",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "partner_program_applications_user_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "partner_program_applications",
+      "columns": [
+        "user_id"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "c3025b918f5d330db0d4b19482474b87",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "partner_program_partners_application_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "partner_program_partners",
+      "columns": [
+        "application_id"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "08a6d747c12e0129de30a78384bd3439",
+      "referenceTable": "public.partner_program_applications",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "partner_program_partners_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "partner_program_partners",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "partner_program_partners_referral_code_key",
+      "type": "u",
+      "match": " ",
+      "table": "partner_program_partners",
+      "columns": [
+        "referral_code"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "0412736459776e4b9a664ec21b078bd7",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "partner_program_partners_user_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "partner_program_partners",
+      "columns": [
+        "user_id"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "c3025b918f5d330db0d4b19482474b87",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "sales_rep_assignments_assigned_by_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "sales_rep_assignments",
+      "columns": [
+        "assigned_by"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "01e958a1b12c7e866146019169316663",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "sales_rep_assignments_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "sales_rep_assignments",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "sales_rep_assignments_rep_user_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "sales_rep_assignments",
+      "columns": [
+        "rep_user_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "7c5ea88f9c56ba04e7776f1a17acb8b6",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "sales_rep_profiles_commission_rate_override_check",
+      "type": "c",
+      "match": " ",
+      "table": "sales_rep_profiles",
+      "columns": [
+        "commission_rate_override"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "67e81a74f282418ec855031f99ae0aaf",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "sales_rep_profiles_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "sales_rep_profiles",
+      "columns": [
+        "user_id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "0a0db78b5fb70bf8475b3bd434e6842b",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "sales_rep_profiles_user_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "sales_rep_profiles",
+      "columns": [
+        "user_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "85d8b2f5f0c0f6b4dcb854efb61a8cb1",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "sales_rep_territories_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "sales_rep_territories",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "sales_rep_territories_rep_user_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "sales_rep_territories",
+      "columns": [
+        "rep_user_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "7c5ea88f9c56ba04e7776f1a17acb8b6",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "staff_referral_audit_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "staff_referral_audit",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "staff_referrals_email_key",
+      "type": "u",
+      "match": " ",
+      "table": "staff_referrals",
+      "columns": [
+        "email"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "cb128631a72269d9e93b234b2814eb06",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "staff_referrals_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "staff_referrals",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "staff_referrals_referral_code_key",
+      "type": "u",
+      "match": " ",
+      "table": "staff_referrals",
+      "columns": [
+        "referral_code"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "0412736459776e4b9a664ec21b078bd7",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "staff_referrals_staff_user_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "staff_referrals",
+      "columns": [
+        "staff_user_id"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "3866efe406ea423c92b51073cef1550e",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "user_referrals_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "user_referrals",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "user_referrals_referred_by_staff_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "user_referrals",
+      "columns": [
+        "referred_by_staff_id"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "1d4bf0aba5bc2b7333ab11a0f7ea0e94",
+      "referenceTable": "public.staff_referrals",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "user_referrals_user_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "user_referrals",
+      "columns": [
+        "user_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "85d8b2f5f0c0f6b4dcb854efb61a8cb1",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "user_referrals_user_id_key",
+      "type": "u",
+      "match": " ",
+      "table": "user_referrals",
+      "columns": [
+        "user_id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "180ab7ada944bc4434863ec0e09cc727",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "user_roles_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "user_roles",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "user_roles_user_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "user_roles",
+      "columns": [
+        "user_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "85d8b2f5f0c0f6b4dcb854efb61a8cb1",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "user_roles_user_id_role_key",
+      "type": "u",
+      "match": " ",
+      "table": "user_roles",
+      "columns": [
+        "user_id",
+        "role"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "04c067b71c95a20d91c771e33a720d92",
+      "referenceTable": null,
+      "referenceColumns": []
+    }
+  ],
+  "observedAtUtc": "2026-10-15T06:17:10.912953",
+  "serverVersion": "17.6"
+}

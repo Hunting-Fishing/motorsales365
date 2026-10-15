@@ -118,6 +118,9 @@ jobs:
       - name: Platform role selected policy and nonstaff referral forward composition (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/platform-role-catalog-review.test.mjs scripts/ci/platform-role-forward-composition.test.mjs
 
+      - name: Staff partner catalog fingerprints and explicit dependency frontier (offline)
+        run: node --test scripts/ci/staff-partner-catalog-review.test.mjs
+
       - name: Claim review current caller and unwired command contracts (never quarantined)
         run: npx vitest run src/lib/business-claims.functions.test.ts src/lib/claim-review-contract.server.test.ts --maxWorkers=1
 
