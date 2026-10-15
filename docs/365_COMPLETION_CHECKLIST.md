@@ -15,6 +15,38 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest full nonstaff Auth/referral/partner-intent slice: draft PR #62, code
+`8906446`, composes actual Auth INSERT through full profile/org/owner/Bronze/
+intent-audit/referral/bounty/assignment, plus real nonempty partner intent UPDATE/
+DELETE callbacks. Unchanged PR #60 full schema and PR #61 source reused:
+18 actual public tables/322 columns/72 critical constraints/74 indexes/26 full
+public function envelopes/22 attachments. No reduced profile or Auth uid/JWT/
+has_role/intent substitute, live query, migration, mutation or deployment.
+Four-field Auth and tier/plan supports remain synthetic, referrer role/staff/
+accreditation is explicit existing fixture input; omitted writer fanouts are not
+staff provisioning or client/native authority acceptance. Late bounty/assignment
+failures restore all 18 public tables/Auth rows; sequence gaps survive and genuine
+defaults/config recover. Full-profile/Auth/FK/sequence/ACL/attachment/policy/shim
+drift fails before nested rollback can hide it. Twenty focused tests pass
+(36.407 seconds); full serial tooling 602/602 passes (485.089 seconds), then
+10/10 receipt assets (0.325 seconds): 612 aggregate, zero failures/skips/
+cancellations. Syntax/lint/format/diff/primary review pass. No fresh application
+suite claimed; PR #54 remains parent evidence. Real partner rename leaves old-code
+intent stale, DELETE cascades ledger while referral/assignment remain, and target-
+actor/mislabeled active-change/audit swallowing persist. These and all prior
+financial/authority gaps remain characterized blockers, not adopted rules.
+Evidence: `evidence/AUTH_REFERRAL_INTENT_BOOTSTRAP.md`. PR #62 needs latest checks.
+Next actual staff-domain Auth → platform role/staff/partner with genuine canonical
+org/manager prerequisites, full schemas and real writer fanouts. Recover/match
+provider Auth uid only if reached, not the old GUC shim; test genuine failures
+and late rollback. Then original actor/revision/common locks/offboarding/native
+acceptance. Do not repeat completed ordinary full Auth/referral/intent/financial/
+schema/org recovery. Static canonical admin/editable manager, staff seller NULL/
+enum/trial ANY and all prior receipt/mobile/owner/consent/private-history/recovery/
+full-media/hosting gates remain open. Source/baseline/replay/parity/release flags
+unchanged. No sparse deploy, approved restriction replay, paid resource, customer
+message, data deletion, PR merge or duplicate automation; single continuation active.
+
 Newest nonempty referral forward slice: draft PR #61, code `9cbd673`, executes
 actual user_referrals bounty/assignment fanouts plus the separate payout-total
 helper in discarded databases. Two READ ONLY catalog diagnostics at
@@ -36,10 +68,11 @@ Recredit/NULL-source/case-variant credit, inactive assignment, exact-sales-only,
 all-status payout sums/cross-partner/negative values remain characterized release
 gaps, not approved monetary/actor rules. Reached absent partner intent fails
 genuinely, not stubbed. Zero live mutation/migration/deploy. Evidence:
-`evidence/REFERRAL_FINANCIAL_FORWARD.md`. New PR #61 needs latest-head checks.
-Next compose actual nonempty ordinary Auth referral + partner intent using PR
-#60 full structure and this proven source/financial fanout; recover/match actual
-provider Auth uid if reached, never adopt the GUC shim. Then staff-domain Auth/
+`evidence/REFERRAL_FINANCIAL_FORWARD.md`. PR #61 docs `e9de502` now passed all six
+CI gates (`38717396103`); hosting failed separately, migrations/production skipped.
+Ordinary full Auth/referral plus partner intent now compose in PR #62 above,
+without adopting the GUC shim or fixture referrer role/accreditation authority.
+Next staff-domain Auth/
 role/staff/partner/canonical-org/manager and original actor/revision/common locks/
 offboarding/native acceptance. Do not repeat completed financial/ordinary/full-
 schema/current-org recovery or strip constraints. Source/baseline/replay/parity/
