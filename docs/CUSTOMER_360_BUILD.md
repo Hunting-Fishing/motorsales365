@@ -804,3 +804,32 @@ revision/locks/offboarding/native/consent/private-history/recovery/receipt/mobil
 owner/full-media/release acceptance stay open. No deployment, migration, paid
 resource, customer message, data deletion, PR merge, restriction replay or duplicate
 automation; the existing single recurring continuation remains active.
+
+PR #56 docs `7b46012` now passed all six CI gates (`38701375439`); hosting
+failed separately, with production/migrations skipped. Draft PR #57 (`e859bed`)
+recovers current org/member/tier structure: three tables/39 columns/10 critical
+constraints/eight indexes/nine policies/three attachments/nine function envelopes/
+four enums/78 guarded structural pieces. One READ ONLY execution at
+`07:59:37.940729` UTC, privacy-reviewed before saving, no app/auth/config rows or
+counts/helper calls/function bodies/settings/sequence values or mutation. Prior
+org/member facets/functions/types are unchanged; actual tier CREATE/policy source
+is selected/pinned without seeds/backfills. Current-catalog org/member reproduction
+is explicitly not original migration source, accepted baseline or authority.
+
+The empty disposable structure fixture matches columns/defaults/NOT NULL/PK/
+UNIQUE/FKs/delete actions/indexes/enum/ACL/RLS exactly. Policies/functions/trigger
+attachments are deliberately not installed and persistent writes violate the
+fixture invariant. No helper stub or workflow acceptance. Twelve focused and 519
+tooling/assets pass (509 serial plus separate 10), zero failures/skips/cancellations;
+syntax/lint/source+Markdown format/canonical JSON/diff/primary review pass. No fresh
+application run claimed; PR #54 1,207 tests/TypeScript remain parent evidence. New
+PR #57 requires latest-head checks. Evidence: `evidence/ORG_TIER_STRUCTURE_RECOVERY.md`.
+
+Next full profile/settings/plan/subscription structural recovery and actual ordinary
+no-referral bootstrap with business-owner read, intent/admin-audit, tier/common,
+member sequence and genuine critical constraints/defaults. Do not re-recover current
+org/tier or the three org functions, invent success stubs, weaken FKs or adopt catalog
+source as original history. Actor/revision/locks/offboarding/native/consent/private-
+history/recovery/receipt/mobile/owner/full-media/release gates remain open. No live
+migration/mutation/deploy, paid resource, customer communication, data deletion, PR
+merge, restriction replay or duplicate automation; single continuation stays active.

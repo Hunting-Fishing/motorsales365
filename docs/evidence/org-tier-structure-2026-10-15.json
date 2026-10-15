@@ -1,0 +1,2055 @@
+{
+  "mode": "read-only-selected-structure-not-history",
+  "enums": [
+    {
+      "name": "app_role",
+      "labels": [
+        "admin",
+        "user",
+        "sales",
+        "moderator",
+        "support",
+        "advertising",
+        "sales_junior",
+        "sales_senior",
+        "sales_manager"
+      ],
+      "schema": "public"
+    },
+    {
+      "name": "business_kind",
+      "labels": [
+        "repair_shop",
+        "insurance",
+        "dealership",
+        "other",
+        "parts_accessories",
+        "towing",
+        "body_paint",
+        "carwash",
+        "salvage",
+        "rental",
+        "financing",
+        "trucking",
+        "tire_shop",
+        "battery_shop",
+        "fuel_station",
+        "accessories",
+        "audio_tint",
+        "inspection",
+        "driving_school",
+        "lto_services",
+        "transport",
+        "motorcycle_shop",
+        "used_dealership"
+      ],
+      "schema": "public"
+    },
+    {
+      "name": "org_role",
+      "labels": [
+        "owner",
+        "admin",
+        "manager",
+        "member",
+        "viewer"
+      ],
+      "schema": "public"
+    },
+    {
+      "name": "verification_status",
+      "labels": [
+        "unverified",
+        "pending",
+        "verified",
+        "rejected"
+      ],
+      "schema": "public"
+    }
+  ],
+  "scope": "Three public org/member/tier relations, complete structural metadata/attachments, named/direct-expression helper fingerprints and related enums. Default/constraint/index/policy/trigger text only behind expected-hash/privacy gates. No data rows or function bodies.",
+  "limits": "Three selected tables only. No rows/counts/helper calls/function bodies, arbitrary structural definitions, sequence or settings/config values, mutation, original-source/history adoption, approved baseline, complete auth/bootstrap/actor/authority/offboarding or release acceptance. Raw pieces require prior catalog or pinned retained tier-source hashes plus privacy checks. Denials return NULL. Effective MAINTAIN is not evaluated; raw ACL retained.",
+  "pieces": [
+    {
+      "name": "annual_badge_months",
+      "table": "member_tiers",
+      "category": "column",
+      "permitted": true,
+      "definition": "0",
+      "expectedMd5": "cfcd208495d565ef66e7dff9f98764da",
+      "definitionMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "name": "annual_boost_credits",
+      "table": "member_tiers",
+      "category": "column",
+      "permitted": true,
+      "definition": "0",
+      "expectedMd5": "cfcd208495d565ef66e7dff9f98764da",
+      "definitionMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "name": "color",
+      "table": "member_tiers",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "created_at",
+      "table": "member_tiers",
+      "category": "column",
+      "permitted": true,
+      "definition": "now()",
+      "expectedMd5": "75230039beb12ce952f24927f2bfa2f2",
+      "definitionMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "name": "id",
+      "table": "member_tiers",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "min_score",
+      "table": "member_tiers",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "min_tenure_days",
+      "table": "member_tiers",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "name",
+      "table": "member_tiers",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "quarterly_boost_credits",
+      "table": "member_tiers",
+      "category": "column",
+      "permitted": true,
+      "definition": "0",
+      "expectedMd5": "cfcd208495d565ef66e7dff9f98764da",
+      "definitionMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "name": "rank",
+      "table": "member_tiers",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "member_tiers_pkey",
+      "table": "member_tiers",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "PRIMARY KEY (id)",
+      "expectedMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3"
+    },
+    {
+      "name": "member_tiers_rank_key",
+      "table": "member_tiers",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "UNIQUE (rank)",
+      "expectedMd5": "de4b57fdebbb1adeaae27590fb8a912c",
+      "definitionMd5": "de4b57fdebbb1adeaae27590fb8a912c"
+    },
+    {
+      "name": "member_tiers_pkey",
+      "table": "member_tiers",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX member_tiers_pkey ON public.member_tiers USING btree (id)",
+      "expectedMd5": "ea5c3dc47b455f5053757de5cee0c0ae",
+      "definitionMd5": "ea5c3dc47b455f5053757de5cee0c0ae"
+    },
+    {
+      "name": "member_tiers_rank_key",
+      "table": "member_tiers",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX member_tiers_rank_key ON public.member_tiers USING btree (rank)",
+      "expectedMd5": "b15af776f45b9238ea924d3e82639960",
+      "definitionMd5": "b15af776f45b9238ea924d3e82639960"
+    },
+    {
+      "name": "tiers readable",
+      "table": "member_tiers",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "tiers readable",
+      "table": "member_tiers",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "true",
+      "expectedMd5": "b326b5062b2f0e69046810717534cb09",
+      "definitionMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "name": "id",
+      "table": "organization_members",
+      "category": "column",
+      "permitted": true,
+      "definition": "gen_random_uuid()",
+      "expectedMd5": "f3b72bb359a50b640590970a2ab8e514",
+      "definitionMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "name": "invited_by",
+      "table": "organization_members",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "joined_at",
+      "table": "organization_members",
+      "category": "column",
+      "permitted": true,
+      "definition": "now()",
+      "expectedMd5": "75230039beb12ce952f24927f2bfa2f2",
+      "definitionMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "name": "organization_id",
+      "table": "organization_members",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "role",
+      "table": "organization_members",
+      "category": "column",
+      "permitted": true,
+      "definition": "'member'::public.org_role",
+      "expectedMd5": "aaf5e2d423e0ac6be311292ab8cfff7a",
+      "definitionMd5": "aaf5e2d423e0ac6be311292ab8cfff7a"
+    },
+    {
+      "name": "user_id",
+      "table": "organization_members",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "organization_members_invited_by_fkey",
+      "table": "organization_members",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (invited_by) REFERENCES auth.users(id) ON DELETE SET NULL",
+      "expectedMd5": "a69b0a652c9ebb326a06cb48b47c5215",
+      "definitionMd5": "a69b0a652c9ebb326a06cb48b47c5215"
+    },
+    {
+      "name": "organization_members_organization_id_fkey",
+      "table": "organization_members",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE",
+      "expectedMd5": "862d3e65572468c2226ee609d16b40e4",
+      "definitionMd5": "862d3e65572468c2226ee609d16b40e4"
+    },
+    {
+      "name": "organization_members_organization_id_user_id_key",
+      "table": "organization_members",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "UNIQUE (organization_id, user_id)",
+      "expectedMd5": "0522fd08870e800988ad0017c5465df8",
+      "definitionMd5": "0522fd08870e800988ad0017c5465df8"
+    },
+    {
+      "name": "organization_members_pkey",
+      "table": "organization_members",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "PRIMARY KEY (id)",
+      "expectedMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3"
+    },
+    {
+      "name": "organization_members_user_id_fkey",
+      "table": "organization_members",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+      "expectedMd5": "85d8b2f5f0c0f6b4dcb854efb61a8cb1",
+      "definitionMd5": "85d8b2f5f0c0f6b4dcb854efb61a8cb1"
+    },
+    {
+      "name": "idx_organization_members_org_role",
+      "table": "organization_members",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_organization_members_org_role ON public.organization_members USING btree (organization_id, role)",
+      "expectedMd5": "2a4110d6bda0406865fee715cb59ade5",
+      "definitionMd5": "2a4110d6bda0406865fee715cb59ade5"
+    },
+    {
+      "name": "idx_organization_members_user_id",
+      "table": "organization_members",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_organization_members_user_id ON public.organization_members USING btree (user_id)",
+      "expectedMd5": "3e8d0759ea76d3cb328ee90e57ad3512",
+      "definitionMd5": "3e8d0759ea76d3cb328ee90e57ad3512"
+    },
+    {
+      "name": "organization_members_organization_id_user_id_key",
+      "table": "organization_members",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX organization_members_organization_id_user_id_key ON public.organization_members USING btree (organization_id, user_id)",
+      "expectedMd5": "b7abeb76f43c357e789ce83f97079997",
+      "definitionMd5": "b7abeb76f43c357e789ce83f97079997"
+    },
+    {
+      "name": "organization_members_pkey",
+      "table": "organization_members",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX organization_members_pkey ON public.organization_members USING btree (id)",
+      "expectedMd5": "0958b9906b37482cf5ebd4675dd6e0c1",
+      "definitionMd5": "0958b9906b37482cf5ebd4675dd6e0c1"
+    },
+    {
+      "name": "Org managers add memberships",
+      "table": "organization_members",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": "public.can_manage_org(auth.uid(), organization_id)",
+      "expectedMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65",
+      "definitionMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65"
+    },
+    {
+      "name": "Org managers remove memberships",
+      "table": "organization_members",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Org managers update memberships",
+      "table": "organization_members",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": "public.can_manage_org(auth.uid(), organization_id)",
+      "expectedMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65",
+      "definitionMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65"
+    },
+    {
+      "name": "Org members read memberships",
+      "table": "organization_members",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Org managers add memberships",
+      "table": "organization_members",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Org managers remove memberships",
+      "table": "organization_members",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "public.can_manage_org(auth.uid(), organization_id)",
+      "expectedMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65",
+      "definitionMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65"
+    },
+    {
+      "name": "Org managers update memberships",
+      "table": "organization_members",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "public.can_manage_org(auth.uid(), organization_id)",
+      "expectedMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65",
+      "definitionMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65"
+    },
+    {
+      "name": "Org members read memberships",
+      "table": "organization_members",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "public.is_org_member(auth.uid(), organization_id)",
+      "expectedMd5": "e8f73862f87c6808044ed7b1c2ffbcc7",
+      "definitionMd5": "e8f73862f87c6808044ed7b1c2ffbcc7"
+    },
+    {
+      "name": "barangay",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "city",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "created_at",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": "now()",
+      "expectedMd5": "75230039beb12ce952f24927f2bfa2f2",
+      "definitionMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "name": "created_by",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "description",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "email",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "id",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": "gen_random_uuid()",
+      "expectedMd5": "f3b72bb359a50b640590970a2ab8e514",
+      "definitionMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "name": "kind",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": "'dealership'::public.business_kind",
+      "expectedMd5": "d89737d751a4c361676751f4e475b055",
+      "definitionMd5": "d89737d751a4c361676751f4e475b055"
+    },
+    {
+      "name": "lat",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "lng",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "logo_url",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "name",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "phone",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "postal_code",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "province",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "region",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "slug",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "status",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": "'active'::text",
+      "expectedMd5": "cfaf8d9e8ae4be644c6e743d4de4ac24",
+      "definitionMd5": "cfaf8d9e8ae4be644c6e743d4de4ac24"
+    },
+    {
+      "name": "street_address",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "updated_at",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": "now()",
+      "expectedMd5": "75230039beb12ce952f24927f2bfa2f2",
+      "definitionMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "name": "verification_status",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": "'unverified'::public.verification_status",
+      "expectedMd5": "770739f7c7688f9d248312b9251dfe14",
+      "definitionMd5": "770739f7c7688f9d248312b9251dfe14"
+    },
+    {
+      "name": "verified_at",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "website",
+      "table": "organizations",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "organizations_created_by_fkey",
+      "table": "organizations",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE RESTRICT",
+      "expectedMd5": "894265d4102fcf170b5b0f16b5f40a3f",
+      "definitionMd5": "894265d4102fcf170b5b0f16b5f40a3f"
+    },
+    {
+      "name": "organizations_pkey",
+      "table": "organizations",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "PRIMARY KEY (id)",
+      "expectedMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3"
+    },
+    {
+      "name": "organizations_slug_key",
+      "table": "organizations",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "UNIQUE (slug)",
+      "expectedMd5": "687397275d0e852fb2a4b50394adffee",
+      "definitionMd5": "687397275d0e852fb2a4b50394adffee"
+    },
+    {
+      "name": "organizations_pkey",
+      "table": "organizations",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX organizations_pkey ON public.organizations USING btree (id)",
+      "expectedMd5": "f45c1aefdc5c9e573ccc52f6cb1e62d3",
+      "definitionMd5": "f45c1aefdc5c9e573ccc52f6cb1e62d3"
+    },
+    {
+      "name": "organizations_slug_key",
+      "table": "organizations",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX organizations_slug_key ON public.organizations USING btree (slug)",
+      "expectedMd5": "a881bf64441213989542be703220da41",
+      "definitionMd5": "a881bf64441213989542be703220da41"
+    },
+    {
+      "name": "Org managers delete organizations",
+      "table": "organizations",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Org managers update organizations",
+      "table": "organizations",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": "public.can_manage_org(auth.uid(), id)",
+      "expectedMd5": "cbb06892211e532bb2fb0e40415d0d7d",
+      "definitionMd5": "cbb06892211e532bb2fb0e40415d0d7d"
+    },
+    {
+      "name": "Public read organizations",
+      "table": "organizations",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Users create own organizations",
+      "table": "organizations",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": "(created_by = auth.uid())",
+      "expectedMd5": "987767fc803474751ce44a4235a12922",
+      "definitionMd5": "987767fc803474751ce44a4235a12922"
+    },
+    {
+      "name": "Org managers delete organizations",
+      "table": "organizations",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "public.can_manage_org(auth.uid(), id)",
+      "expectedMd5": "cbb06892211e532bb2fb0e40415d0d7d",
+      "definitionMd5": "cbb06892211e532bb2fb0e40415d0d7d"
+    },
+    {
+      "name": "Org managers update organizations",
+      "table": "organizations",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "public.can_manage_org(auth.uid(), id)",
+      "expectedMd5": "cbb06892211e532bb2fb0e40415d0d7d",
+      "definitionMd5": "cbb06892211e532bb2fb0e40415d0d7d"
+    },
+    {
+      "name": "Public read organizations",
+      "table": "organizations",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "true",
+      "expectedMd5": "b326b5062b2f0e69046810717534cb09",
+      "definitionMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "name": "Users create own organizations",
+      "table": "organizations",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "org_add_creator_as_owner",
+      "table": "organizations",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER org_add_creator_as_owner AFTER INSERT ON public.organizations FOR EACH ROW EXECUTE FUNCTION public.tg_org_add_creator_as_owner()",
+      "expectedMd5": "3965da0eed938e77308130f0cbc01a4f",
+      "definitionMd5": "3965da0eed938e77308130f0cbc01a4f"
+    },
+    {
+      "name": "organizations_set_updated_at",
+      "table": "organizations",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER organizations_set_updated_at BEFORE UPDATE ON public.organizations FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at()",
+      "expectedMd5": "4ca0905dcbde8dc8735f888edf4da07f",
+      "definitionMd5": "4ca0905dcbde8dc8735f888edf4da07f"
+    },
+    {
+      "name": "trg_block_internal_staff_org",
+      "table": "organizations",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER trg_block_internal_staff_org BEFORE INSERT ON public.organizations FOR EACH ROW EXECUTE FUNCTION public.block_internal_staff_org()",
+      "expectedMd5": "2d1f40720016dd513188942b21c8a5e7",
+      "definitionMd5": "2d1f40720016dd513188942b21c8a5e7"
+    }
+  ],
+  "tables": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "member_tiers",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "organization_members",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "organizations",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    }
+  ],
+  "columns": [
+    {
+      "acl": null,
+      "name": "id",
+      "type": "text",
+      "table": "member_tiers",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "name",
+      "type": "text",
+      "table": "member_tiers",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "min_score",
+      "type": "integer",
+      "table": "member_tiers",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "min_tenure_days",
+      "type": "integer",
+      "table": "member_tiers",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "color",
+      "type": "text",
+      "table": "member_tiers",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "rank",
+      "type": "integer",
+      "table": "member_tiers",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "quarterly_boost_credits",
+      "type": "integer",
+      "table": "member_tiers",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "acl": null,
+      "name": "annual_boost_credits",
+      "type": "integer",
+      "table": "member_tiers",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "acl": null,
+      "name": "annual_badge_months",
+      "type": "integer",
+      "table": "member_tiers",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "member_tiers",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "organization_members",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "organization_id",
+      "type": "uuid",
+      "table": "organization_members",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "user_id",
+      "type": "uuid",
+      "table": "organization_members",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "role",
+      "type": "public.org_role",
+      "table": "organization_members",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": "aaf5e2d423e0ac6be311292ab8cfff7a"
+    },
+    {
+      "acl": null,
+      "name": "invited_by",
+      "type": "uuid",
+      "table": "organization_members",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "joined_at",
+      "type": "timestamp with time zone",
+      "table": "organization_members",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "name",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "slug",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "kind",
+      "type": "public.business_kind",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": "d89737d751a4c361676751f4e475b055"
+    },
+    {
+      "acl": null,
+      "name": "description",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "logo_url",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "website",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "phone",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "email",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "street_address",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "barangay",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 11,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "city",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 12,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "province",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 13,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "region",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 14,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "postal_code",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 15,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "lat",
+      "type": "numeric",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 16,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "lng",
+      "type": "numeric",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 17,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "status",
+      "type": "text",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 18,
+      "generated": "",
+      "defaultMd5": "cfaf8d9e8ae4be644c6e743d4de4ac24"
+    },
+    {
+      "acl": null,
+      "name": "verification_status",
+      "type": "public.verification_status",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 19,
+      "generated": "",
+      "defaultMd5": "770739f7c7688f9d248312b9251dfe14"
+    },
+    {
+      "acl": null,
+      "name": "verified_at",
+      "type": "timestamp with time zone",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 20,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_by",
+      "type": "uuid",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 21,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 22,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "organizations",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 23,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "member_tiers_pkey",
+      "ready": true,
+      "table": "member_tiers",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "ea5c3dc47b455f5053757de5cee0c0ae"
+    },
+    {
+      "name": "member_tiers_rank_key",
+      "ready": true,
+      "table": "member_tiers",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "b15af776f45b9238ea924d3e82639960"
+    },
+    {
+      "name": "idx_organization_members_org_role",
+      "ready": true,
+      "table": "organization_members",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "2a4110d6bda0406865fee715cb59ade5"
+    },
+    {
+      "name": "idx_organization_members_user_id",
+      "ready": true,
+      "table": "organization_members",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "3e8d0759ea76d3cb328ee90e57ad3512"
+    },
+    {
+      "name": "organization_members_organization_id_user_id_key",
+      "ready": true,
+      "table": "organization_members",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "b7abeb76f43c357e789ce83f97079997"
+    },
+    {
+      "name": "organization_members_pkey",
+      "ready": true,
+      "table": "organization_members",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "0958b9906b37482cf5ebd4675dd6e0c1"
+    },
+    {
+      "name": "organizations_pkey",
+      "ready": true,
+      "table": "organizations",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "f45c1aefdc5c9e573ccc52f6cb1e62d3"
+    },
+    {
+      "name": "organizations_slug_key",
+      "ready": true,
+      "table": "organizations",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "a881bf64441213989542be703220da41"
+    }
+  ],
+  "policies": [
+    {
+      "name": "tiers readable",
+      "roles": [
+        "public"
+      ],
+      "table": "member_tiers",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "b326b5062b2f0e69046810717534cb09",
+      "permissive": true
+    },
+    {
+      "name": "Org managers add memberships",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "organization_members",
+      "command": "a",
+      "checkMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65",
+      "usingMd5": null,
+      "permissive": true
+    },
+    {
+      "name": "Org managers remove memberships",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "organization_members",
+      "command": "d",
+      "checkMd5": null,
+      "usingMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65",
+      "permissive": true
+    },
+    {
+      "name": "Org managers update memberships",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "organization_members",
+      "command": "w",
+      "checkMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65",
+      "usingMd5": "c9c3aeee2b2becf3ae46c67bb3e75f65",
+      "permissive": true
+    },
+    {
+      "name": "Org members read memberships",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "organization_members",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "e8f73862f87c6808044ed7b1c2ffbcc7",
+      "permissive": true
+    },
+    {
+      "name": "Org managers delete organizations",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "organizations",
+      "command": "d",
+      "checkMd5": null,
+      "usingMd5": "cbb06892211e532bb2fb0e40415d0d7d",
+      "permissive": true
+    },
+    {
+      "name": "Org managers update organizations",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "organizations",
+      "command": "w",
+      "checkMd5": "cbb06892211e532bb2fb0e40415d0d7d",
+      "usingMd5": "cbb06892211e532bb2fb0e40415d0d7d",
+      "permissive": true
+    },
+    {
+      "name": "Public read organizations",
+      "roles": [
+        "public"
+      ],
+      "table": "organizations",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "b326b5062b2f0e69046810717534cb09",
+      "permissive": true
+    },
+    {
+      "name": "Users create own organizations",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "organizations",
+      "command": "a",
+      "checkMd5": "987767fc803474751ce44a4235a12922",
+      "usingMd5": null,
+      "permissive": true
+    }
+  ],
+  "triggers": [
+    {
+      "name": "org_add_creator_as_owner",
+      "table": "public.organizations",
+      "enabled": "O",
+      "function": "public.tg_org_add_creator_as_owner()",
+      "typeBits": 5,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "3965da0eed938e77308130f0cbc01a4f",
+      "updateColumns": []
+    },
+    {
+      "name": "organizations_set_updated_at",
+      "table": "public.organizations",
+      "enabled": "O",
+      "function": "public.tg_set_updated_at()",
+      "typeBits": 19,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "4ca0905dcbde8dc8735f888edf4da07f",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_block_internal_staff_org",
+      "table": "public.organizations",
+      "enabled": "O",
+      "function": "public.block_internal_staff_org()",
+      "typeBits": 7,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "2d1f40720016dd513188942b21c8a5e7",
+      "updateColumns": []
+    }
+  ],
+  "functions": [
+    {
+      "acl": "{=X/supabase_auth_admin,supabase_auth_admin=X/supabase_auth_admin,dashboard_user=X/supabase_auth_admin}",
+      "kind": "f",
+      "owner": "supabase_auth_admin",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "cdef18c69c4f4cbbced2eaf81e628b49",
+      "configMd5": null,
+      "signature": "auth.uid()",
+      "configKeys": [],
+      "resultType": "uuid",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "ea3b41bf29e2ad573067939329aa088e",
+      "serviceExecute": true,
+      "definitionBytes": 274,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "56e77821c80023cf2dd2f65447175804",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.block_internal_staff_org()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "8be41fcebf21025ab84ea3bfe6fc3114",
+      "serviceExecute": true,
+      "definitionBytes": 465,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "4b54f3895e3fab6350dea558838bdd05",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.can_manage_org(uuid,uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "471d2ed1bc08ebd663d786d33a990fce",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id",
+        "_org_id"
+      ],
+      "definitionMd5": "935d3e6f96bf9ff0bef97b72bb8d0960",
+      "serviceExecute": true,
+      "definitionBytes": 369,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{=X/postgres,postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "e41ac334c9e1600deb34d425f7094bda",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.canonical_365_org_id()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "uuid",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "f4160a7e0cb1de3f5e75b86bd188637e",
+      "serviceExecute": true,
+      "definitionBytes": 240,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres,authenticated=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "dae5cfc5a8d92461a428f6702e4e65af",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.has_role(uuid,public.app_role)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "8216964371cd350348af933959ab4fda",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id",
+        "_role"
+      ],
+      "definitionMd5": "0c2c78626ed8a4807e6cc1b7b54d641c",
+      "serviceExecute": true,
+      "definitionBytes": 295,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "463f97fcc6926f33e50510d0e9f946c6",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.is_internal_365_staff(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "27656335d4ff4b9557951c2f3678e7a2",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id"
+      ],
+      "definitionMd5": "23c86a7e08ac55093e2d27aa1fb2e860",
+      "serviceExecute": true,
+      "definitionBytes": 359,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "cefe2097db7339afc78a8e4bbb665c4b",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.is_org_member(uuid,uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "471d2ed1bc08ebd663d786d33a990fce",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id",
+        "_org_id"
+      ],
+      "definitionMd5": "d9dc0bcc29c9dc6b890100871fa617e4",
+      "serviceExecute": true,
+      "definitionBytes": 330,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "866cb0936b4e0fb9f8babcbc24482324",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_org_add_creator_as_owner()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "c1ea913652a5e36a8b096f50678c7cb9",
+      "serviceExecute": true,
+      "definitionBytes": 436,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "301a884953d37769916294bb60562e05",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_set_updated_at()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "494198e1eb8f9c98c4cf075ed9d79bb9",
+      "serviceExecute": true,
+      "definitionBytes": 194,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": false
+    }
+  ],
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "constraints": [
+    {
+      "name": "member_tiers_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "member_tiers",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "member_tiers_rank_key",
+      "type": "u",
+      "match": " ",
+      "table": "member_tiers",
+      "columns": [
+        "rank"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "de4b57fdebbb1adeaae27590fb8a912c",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "organization_members_invited_by_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "organization_members",
+      "columns": [
+        "invited_by"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "a69b0a652c9ebb326a06cb48b47c5215",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "organization_members_organization_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "organization_members",
+      "columns": [
+        "organization_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "862d3e65572468c2226ee609d16b40e4",
+      "referenceTable": "public.organizations",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "organization_members_organization_id_user_id_key",
+      "type": "u",
+      "match": " ",
+      "table": "organization_members",
+      "columns": [
+        "organization_id",
+        "user_id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "0522fd08870e800988ad0017c5465df8",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "organization_members_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "organization_members",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "organization_members_user_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "organization_members",
+      "columns": [
+        "user_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "85d8b2f5f0c0f6b4dcb854efb61a8cb1",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "organizations_created_by_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "organizations",
+      "columns": [
+        "created_by"
+      ],
+      "deferred": false,
+      "onDelete": "r",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "894265d4102fcf170b5b0f16b5f40a3f",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "organizations_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "organizations",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "organizations_slug_key",
+      "type": "u",
+      "match": " ",
+      "table": "organizations",
+      "columns": [
+        "slug"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "687397275d0e852fb2a4b50394adffee",
+      "referenceTable": null,
+      "referenceColumns": []
+    }
+  ],
+  "observedAtUtc": "2026-10-15T07:59:37.940729",
+  "serverVersion": "17.6"
+}

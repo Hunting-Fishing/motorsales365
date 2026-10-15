@@ -160,3 +160,8 @@ PR #56 code CI `38701141237` has lint/Parts passed, build/type/OCR/unit pending.
 Hosting `78293363-0ee3-41a4-b593-301dab687f77` failed separately; wrapper
 `38701141313` skipped migrations/production deployment. Later documentation
 HEAD needs fresh checks. No passing build/preview wrapper is a production upload.
+
+Follow-up: docs `7b46012` passed all six CI gates (`38701375439`). Hosting still
+failed separately, production/migrations skipped. Current org/member/tier structure
+and empty structural parity are now recorded in `ORG_TIER_STRUCTURE_RECOVERY.md`;
+these three current function definitions are unchanged and must not be re-recovered.
