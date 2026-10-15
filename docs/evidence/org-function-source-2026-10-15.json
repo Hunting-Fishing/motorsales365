@@ -1,0 +1,33 @@
+{
+  "mode": "read-only-selected-source-recovery-not-history",
+  "limits": "Exactly three selected previously fingerprinted current functions only. No rows, counts, helper execution, settings/config values, arbitrary definitions, schema/data/history/privilege mutation or sequence access. Guard denial returns NULL definition. Further privacy/source review required; not historical provenance, approved baseline, behavioral/authority or release acceptance.",
+  "functions": [
+    {
+      "bodyMd5Lf": "4b54f3895e3fab6350dea558838bdd05",
+      "permitted": true,
+      "signature": "public.can_manage_org(uuid,uuid)",
+      "definition": "CREATE OR REPLACE FUNCTION public.can_manage_org(_user_id uuid, _org_id uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  SELECT EXISTS (\n    SELECT 1\n    FROM public.organization_members m\n    WHERE m.organization_id = _org_id\n      AND m.user_id = _user_id\n      AND m.role IN ('owner','admin')\n  )\n$function$\n",
+      "definitionMd5": "935d3e6f96bf9ff0bef97b72bb8d0960",
+      "definitionBytes": 369
+    },
+    {
+      "bodyMd5Lf": "cefe2097db7339afc78a8e4bbb665c4b",
+      "permitted": true,
+      "signature": "public.is_org_member(uuid,uuid)",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_org_member(_user_id uuid, _org_id uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  SELECT EXISTS (\n    SELECT 1\n    FROM public.organization_members m\n    WHERE m.organization_id = _org_id\n      AND m.user_id = _user_id\n  )\n$function$\n",
+      "definitionMd5": "d9dc0bcc29c9dc6b890100871fa617e4",
+      "definitionBytes": 330
+    },
+    {
+      "bodyMd5Lf": "866cb0936b4e0fb9f8babcbc24482324",
+      "permitted": true,
+      "signature": "public.tg_org_add_creator_as_owner()",
+      "definition": "CREATE OR REPLACE FUNCTION public.tg_org_add_creator_as_owner()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nBEGIN\n  IF NEW.created_by IS NOT NULL THEN\n    INSERT INTO public.organization_members(organization_id, user_id, role)\n    VALUES (NEW.id, NEW.created_by, 'owner')\n    ON CONFLICT (organization_id, user_id) DO UPDATE SET role = 'owner';\n  END IF;\n  RETURN NEW;\nEND $function$\n",
+      "definitionMd5": "c1ea913652a5e36a8b096f50678c7cb9",
+      "definitionBytes": 436
+    }
+  ],
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "observedAtUtc": "2026-10-15T07:38:31.452256",
+  "serverVersion": "17.6"
+}

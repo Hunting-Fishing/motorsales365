@@ -206,3 +206,10 @@ PR #55 code CI `38699596178` has OCR/lint/Parts passed and build/type/unit
 pending. Hosting `b1cb0ff7-3661-4df8-9c52-e8006f6b3cca` failed separately;
 wrapper `38699596161` skipped migrations/production deployment. Verify the later
 documentation HEAD separately; no passing build/preview wrapper is an upload.
+
+Follow-up: docs HEAD `ec8ea7a` passed all six CI gates (`38699776700`); hosting
+failed separately and migration/deployment skipped. PR #56's separate current
+definition recovery is recorded in `ORG_FUNCTION_SOURCE_RECOVERY.md`. The three
+original retained-source definitions are still missing, but their exact current
+catalog-derived reference source is now recovered. This fingerprint capture and
+25-body retained-source map remain unchanged, with no history/baseline adoption.
