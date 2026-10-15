@@ -1108,3 +1108,29 @@ Source404/423, 19 unclassified; baseline/replay/parity/release and financial/con
 privacy/recovery/receipt/mobile/owner/full-media/hosting gates unchanged. Zero
 production write/migration/deploy, paid resource, customer communication, data
 deletion, restriction replay, PR merge or duplicate automation; continuation active.
+
+Revision-aware claim command follow-up: code `dce37b1`, branch
+`security/claim-review-revision-contract`, based on PR #65 docs `a9987a5`.
+Separate unwired v2 codec requires expected attempt UUID and exact canonical
+decimal attempt/evidence-set/ownership-tenure revisions. It retains unchanged v1
+text/scalar validation and generated middleware/legacy callers; source/test pins
+prove v1 unchanged. Frozen key/payload/UTF-8 hash distinguish revision and ABA
+changes but prove no original actor, freshness, locked state, mutation, receipt or
+atomic ledger. Explicit zero is syntax only, not a trusted unknown-state fallback.
+33 new/58 focused pass (28.74 seconds); fresh full app1,240/1,240 across60 files
+passes (114.058 seconds), zero failures/pending/no quarantine needed. TypeScript/
+lint/format/diff/primary review and10 fresh report/release guards (0.753 seconds)
+pass. Parent PR #65's 676 tooling+10 assets are unchanged evidence, not rerun or
+double-counted. Evidence: `evidence/CLAIM_REVIEW_REVISION_CONTRACT.md`.
+
+PR #65 published/attached; CI `38733014822` five passed/unit pending at observation,
+hosting failed separately, migrations/production skipped. Verify new HEAD's checks.
+Next disposable revision/invalidation companion on full PR #65 tables across real
+attempt/evidence/ownership writers, UPDATE/delete/recreate/ABA, unknown/unverified
+initialization deny. Then trusted fresh original actor, atomic pending/current-
+owner/revision/idempotency receipt/common locks, native/team/offboarding/private-
+storage/runtime/independent-session/recovery gates. No v1/live wiring, fabricated
+trusted zero or legacy privileged adoption. Source404/423,19 unclassified; all
+baseline/replay/parity/release and existing acceptance gates stay open. Zero live
+query/mutation/migration/deploy, paid resource, customer communication, deletion,
+restriction replay, PR merge or duplicate automation; continuation active.
