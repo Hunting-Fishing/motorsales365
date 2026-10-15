@@ -636,3 +636,31 @@ own-rep/offboarding and original-actor custody, while defining trusted claim/
 evidence/tenure revisions and a common writer-lock protocol before an atomic
 kernel. Native/consent/recovery/API/session/concurrency/OCR/mobile/owner/full-media
 gates remain open. Preserve applied restrictions and the one recurring follow-up.
+
+Draft PR #51 (code `883c505`) now hardens the separate account-creation dialog:
+both real 207 envelopes are partial/unknown, exact 200 is acknowledgment-only,
+captured one-flight requests and account/config/open/observed ABA/loading/unmount
+fences suppress stale work, same-mounted-account unknown locks persist and no
+credential/raw diagnostic outcome toast or automatic delivery/retry is emitted.
+Known API limits/enums are checked before dispatch; unsupported historical seller
+input is blocked without remapping. API, authority and password generation remain
+unchanged; actual backend enum/NOT NULL/partial-step/row-count/audit repair is open.
+
+41 focused tests pass; final full app 1,154/1,154 across 58 files (92.42s), full
+TypeScript passes. First full run encountered one unchanged security source-scan
+timeout; isolated 10/10 and unchanged final full reruns pass without weakening any
+gate, timeout or quarantine. Same-run tooling 440 plus 10 receipt assets passed
+separately; independent review/format/diff pass and ESLint zero errors/four retained
+warnings. Real form primitives/accessibility and parent independent load races,
+HTTP/JWT/RLS/credential delivery/audit/cancellation/durable idempotence are not
+proved by mocked component tests. Scope/pins:
+`evidence/ACCOUNT_CREATION_ACKNOWLEDGEMENT_SLICE.md`.
+
+PR #50 docs `3c153c5` CI is running; PR #51 code CI `38688116687` queued at
+capture, hosting failed separately and deployment/migration wrappers skip. Later
+docs heads need fresh verification. UI slice adds no live calls/mutations or
+deployment; the single live catalog-only read belongs to PR #50. Next verify latest
+heads then resume auth/profile/org/partner/incoming-role/offboarding and original-
+actor closure plus trusted claim/evidence/tenure revisions/common writer locks
+before an atomic kernel. Preserve recovery/consent/native/OCR/mobile/owner/full-
+media gates and the single recurring follow-up; do not deploy sparse artifacts.

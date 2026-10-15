@@ -111,10 +111,12 @@ CI gates passed (run `38682112982`), 1,068 application tests across 55 files. Th
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
-Latest application candidate: draft PR #48, code `59228c5`, 1,068 application tests
-across 55 files and full TypeScript pass. It hardens claim-review acknowledgement,
-private snapshot caches and request lifetimes without changing backend authority;
-its documentation head passed the six gates recorded above. PR #46 remains the
+Latest application candidate: draft PR #51, code `883c505`, 1,154 application tests
+across 58 files and full TypeScript pass. It hardens account-creation acknowledgments,
+private request lifetimes and known input boundaries without changing the API or
+backend authority; its own latest CI requires verification. PR #48 remains the
+latest fully CI-verified connected application-source parent, with its claim UI
+hardening and six gates recorded above. PR #46 remains the
 earlier verified owner-row confirmation parent (1,029 tests). PR #38, code `22c2724`, remains the earlier
 six-chat-caller slice (986 tests), not the latest verified application head.
 The following PR #39 is a separate memory-only,
@@ -1574,6 +1576,60 @@ revisions and a common competing-writer lock protocol before an atomic claim
 kernel. Native/consent reconciliation, recovery, real HTTP/JWT/session/concurrency,
 receipt/mobile/owner pilot and full-media hosting remain open. Do not deploy the
 sparse checkout or duplicate/disable the active continuation automation.
+
+## Account-creation caller checkpoint (2026-10-15)
+
+Draft PR #51, code `883c505064338d524a7033e761b7d90471abc98a`, branch
+`security/account-creation-ack-contract`, stacked on PR #50 docs `3c153c5`.
+Only AddUserDialog, its 41 new tests and a dedicated never-quarantined CI gate
+change. Existing API/auth middleware/claims handler/database authority and
+password generation remain unchanged. PR #50's latest docs CI `38687811205`
+has lint/Parts passed and four gates running at capture; hosting failed separately,
+wrapper skipped migrations/production deployment. PR #51 code CI `38688116687`
+is queued; hosting `471db0a9-290b-4fa2-afde-ae401530ad75` failed separately and
+wrapper `38688116568` skips migrations/production deployment. Later documentation
+heads require fresh checks; no green wrapper or unit test proves an upload.
+
+Both actual HTTP 207 role/profile partial-creation envelopes now enter generic
+partial/unknown handling, never success. Only exact status 200 and matching
+three-field acknowledgment produces acknowledgment-only feedback, not verified
+roles/profile/audit. No credential/raw diagnostic outcome toasts or automatic
+retry/delivery. Serialized captured inputs, synchronous one-flight, bound-session
+subject and account/configuration/open/observed ABA/loading/unmount fences prevent
+stale dispatch/publication/reset. Unknown issued requests lock that mounted
+account scope across close/reopen/configuration/loading; displayed inputs are
+cleared, not guaranteed in-flight memory erasure or database cancellation.
+Whole remounts/other tabs/reloads remain outside this nondurable bookkeeping.
+Sync/async consumer refresh errors cannot reclassify the acknowledgment, but the
+consumer's independent read/cache races remain out of scope.
+
+Known current API input limits/enums are checked before dispatch. Historical
+`seller_type="business"` UI input is rejected explicitly without guessing a
+dealer/repair-shop/insurance mapping; server model/provisioning reconciliation is
+not repaired. Owned input accessible names improve, while real shared Address/
+Select/portal/focus/keyboard/mobile acceptance remains unverified by mocks.
+
+Verification: 41 focused tests (6.77s); final full app 1,154/1,154 across 58 files
+(92.42s), no skips/quarantine; final TypeScript pass. The first full run had one
+unchanged source-scan timeout (1,153 passes); its isolated 10/10 rerun passed
+(1.09s, scan 86ms), then the complete suite passed unchanged. No timeout increase,
+gate weakening or test exclusion. Same-run serial tooling 440/440 and separate
+receipt assets 10/10 (450 total) passed before this UI-only publication. Independent
+review/format/diff pass; ESLint zero errors, four retained `any` warnings.
+Exact pins, scope and validation: `evidence/ACCOUNT_CREATION_ACKNOWLEDGEMENT_SLICE.md`.
+
+Migration/live application calls/production mutation/deployment for this UI slice:
+none. The heartbeat's only live database work was PR #50's catalog-only read.
+All three approved restrictions remain without replay; provenance remains 404/423
+with 19 unclassified and baseline/replay/parity/release flags false. Exact next
+action: verify latest PR #50/#51 docs heads; resume actual auth/profile/org INSERT,
+staff-domain partner and incoming role/offboarding closure, then trusted original
+actor and revision/common-lock prerequisites for the atomic claim kernel. Keep
+the account API's enum/NOT NULL/partial-step/row-count/audit behavior as a separate
+backend repair dependency, not solved by truthful caller feedback. Recovery,
+native/consent reconciliation, real HTTP/JWT/session/concurrency, receipt/mobile/
+owner pilot and full-media hosting remain open. Continuation remains active,
+without duplicate automation or claims of continuous between-schedule work.
 
 ## Recovery evidence (original scope, retained below)
 
