@@ -164,10 +164,12 @@ and an actual initial 42601 SQL parse error by parenthesizing CASE. The final
 passing run occurs after those fixes; no historical SQL/constraints or live
 permission was altered to pass a test. Full sequential tooling passes 315/315 in
 232.393s, none skipped/cancelled. A dedicated never-quarantined CI step runs the
-new suite. Code CI `38667600224` and hosting build
-`2ca956a1-037d-467d-bb89-0567e521298a` are pending at this checkpoint; wrapper
-`38667600239` skips migrations/production deployment. The documentation head
-requires its own next-run check. App source is unchanged from the CI-verified
+new suite. Code CI `38667600224` was superseded (unit job cancelled). Documentation
+head `5ab35ef1be590d130f150d9385c0b9378399d409` passed all six CI gates in
+`38667796510`, verified during the approved-helper follow-up. Separate hosting
+builds `2ca956a1-037d-467d-bb89-0567e521298a` and
+`8b2bea0a-4be0-43d4-869b-4854281a6b7b` failed. Wrappers `38667600239` and
+`38667796672` skip migrations/production deployment. App source is unchanged from the CI-verified
 986-test parent, not newly verified production behavior. No production readiness,
 approval or application compatibility is inferred from memory tests or passing CI.
 
@@ -203,8 +205,9 @@ offboarding. The full contract's independent-session concurrency and durable
 operator recovery remain open.
 
 Any live restriction needs separate explicit authority and fresh impact/recovery
-readiness. The converter-only approval and pending PR #18 helper decision do not
-cover this table. Baseline/replay/parity/release flags stay false; correspondence
+readiness. The converter approval and the now separately approved PR #18 helper
+restrictions do not cover this table. See `APPROVED_HELPER_EXECUTE_RELEASE.md`
+for the newer scoped decision and release state. Baseline/replay/parity/release flags stay false; correspondence
 remains 404/423 with 19 unclassified. Private-storage/database recovery,
 consent/tenure, receipt OCR/mobile/owner pilot, real API/JWT/session acceptance,
 configuration and full-media hosting remain open. Never deploy the sparse checkout,

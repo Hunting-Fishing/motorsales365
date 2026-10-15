@@ -15,10 +15,14 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
-1. Preserve the approved converter-only live restriction. Helper-candidate PR
-   #18 passed all six CI gates at `88a8977`; a single separate owner decision for
-   bootstrap/totals containment is pending. Do not treat the earlier approval as
-   authority for those helpers or the remaining quote-conversion path.
+1. Preserve the approved converter live restriction. The owner now separately
+   approved both PR #18 bootstrap/totals EXECUTE restrictions; PR #18 `88a8977`
+   passed all six CI gates. Fresh selected metadata/history preflight matched on
+   2026-10-15 02:00:48 UTC. Rehearse/review the trusted-path execution envelope,
+   apply only those two actions and verify exact stored-source/catalog results.
+   See `evidence/APPROVED_HELPER_EXECUTE_RELEASE.md` for current state. This newer
+   decision supersedes historical pending-helper notes below, not their evidence,
+   and does not authorize quote conversion or native table/role changes.
 2. Continue native migration/authority work in parallel: the operator-private
    identity count review queries are implemented/tested offline, not executed
    against production. Unchanged staff/chat/native offboarding transactions are
@@ -36,7 +40,8 @@ Security reconciliation branch: `completion/365-security`.
    tested in draft PR #39, with no adopted privileged positive branches. Next
    build the deny-only direct native profile/user-role write prototype. The narrow
    roles-catalog restriction/recovery candidate is implemented/tested in draft
-   PR #41, memory-only and unapplied; verify its latest checks. PR #40 composes
+   PR #41, memory-only and unapplied; docs `5ab35ef` passed all six CI gates
+   (`38667796510`). PR #40 composes
    selected current policies and confirms profile scope pivots/global catalog-role
    effects offline. Neither is production authority acceptance.
    PR #40 docs `e97baca` passed all six CI gates (run `38664876182`), verified
@@ -884,20 +889,24 @@ separately labelled. Review caught/fixed wrong-kind lock scope, observation boun
 and an actual initial SQL parse defect before the final passing runs. No old SQL
 or constraints were rewritten to make tests pass.
 
-Code CI `38667600224` and separate hosting build
-`2ca956a1-037d-467d-bb89-0567e521298a` are pending at this checkpoint. Wrapper
-`38667600239` skips migrations/production deployment; wrapper success is not an
-upload. The subsequent documentation head requires its own check. Exact pins,
+Code CI `38667600224` was superseded (unit job cancelled). Docs `5ab35ef` passed
+all six CI gates in `38667796510`, verified on the approved-helper follow-up.
+Separate hosting builds `2ca956a1-037d-467d-bb89-0567e521298a` and
+`8b2bea0a-4be0-43d4-869b-4854281a6b7b` failed. Wrappers `38667600239` and
+`38667796672` skip migrations/production deployment; wrapper success is not an
+upload. Exact pins,
 scope and next proposal: `evidence/NATIVE_ROLE_CATALOG_CONTAINMENT_CANDIDATE.md`.
 Application source is unchanged from the 986-test CI-verified parent.
 
 Migration impact: none. Deployment/live mutation: none. Converter-only approved
-restriction is preserved; pending PR #18 decision remains unchanged/not asked
-again. Baseline/parity/replay/release flags stay false, correspondence 404/423
+restriction is preserved. A later owner decision explicitly approves both PR #18
+helper restrictions only; its live release state is tracked separately in
+`evidence/APPROVED_HELPER_EXECUTE_RELEASE.md`. This table remains unapproved.
+Baseline/parity/replay/release flags stay false, correspondence 404/423
 with19 unclassified and selected unknowns unchanged. No data repair, paid resource,
 customer communication or sparse-checkout deployment.
 
-Exact next action: verify PR #41 latest checks, then implement/test an offline
+Exact next native action (PR #41 docs checks now verified): implement/test an offline
 deny-only direct write prototype on `shop_manager.profiles` and `user_roles`,
 removing authenticated I/U/D on both while preserving SELECT/policies/legacy rows.
 No contact or native-admin/owner-role exception: successful phone-update policy
