@@ -5,3 +5,5 @@ dist
 pnpm-lock.yaml
 package-lock.json
 routeTree.gen.ts
+# Pinned original planning bytes; verified by parts-plan-reference.test.mjs.
+docs/reference/parts-pr2/source/
