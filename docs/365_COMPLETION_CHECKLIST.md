@@ -28,7 +28,46 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Newest integrated candidate: `completion/365-seven-day-integration`, source
+Latest release-safety slice: `75b2304fae26f9572041ff88d3cff86aeeaec5a0` on the
+same `completion/365-seven-day-integration` / draft PR #68. The working checkout
+is now complete (`core.sparseCheckout=false`): 214 tracked public files restored,
+56,116,946 bytes, with generated OCR/PDF manifest hashes unchanged. Fresh build
+and byte-exact Git HEAD/source/output media verification pass; this clears the
+local missing-media subgate only. No upload/deploy or complete artifact/owner/
+runtime approval is inferred. Never deploy the earlier sparse output.
+
+New read-only `verify-release-assets.mjs` rejects sparse/missing/altered/copied/
+unsafe/excluded public assets before CI dry-run and both Actions uploads. Preview
+also now runs existing Worker identity/target/OCR/PDF verification. Production
+environment, migration freeze, readiness/fork/secrets/release flags are unchanged.
+Independent Workers Builds/raw Wrangler remain outside this gate. 50 new Node
+regressions plus 15 existing inventory/report/release tests pass 65/65 (7.591s);
+OCR/PDF assets 10/10 (0.201s), lint/format/diff/primary review/full build/Worker
+checks pass. App/SQL unchanged; prior 1,333 app/701 tooling are not fresh reruns.
+Evidence: `evidence/COMPLETE_PUBLIC_ASSET_RELEASE_GUARD.md`.
+
+PR #68 prior exact head `c5e4bf1a` now passed all six CI gates (`38748717058`),
+including real-browser OCR and disposable Parts PG. Hosting build
+`73ef71c2-c97b-4b37-aac8-cadb567bf055` fails separately with no diagnostic text.
+Wrapper `38748717572` preview step passes but upload is configured skipped;
+migration/production skip. The guard publication head needs its own checks.
+
+Owner answered the staging question with production project `wjxaajgvddtrxxtocxen`.
+Do not assign it as isolated staging or run destructive acceptance tests there.
+Fresh organization/project metadata confirms no separate 365 staging target.
+One follow-up asks which staging option to assess: cost lookup for a separate
+project in the owner's 366 Industries AI Platform organization, or another existing
+staging project. Connector requires owner organization selection before cost
+lookup; no cost/creation/charge confirmed or resource created. Earlier pilot-shop/
+test-account question remains open. Do not repeat unchanged prompts. Local safe
+work continues on selective PR #9/#2 and action-level migration/feature inventory,
+then fresh authority/native-team/claim/offboarding/private-custody transactions
+and recovery as the integrated release path. Source 404/423, 19 unclassified and
+all baseline/replay/parity/release flags unchanged. Migration impact/deployment
+none; zero live SQL/business/Auth mutation, restriction replay, history repair,
+customer message, paid resource, PR merge or duplicate automation.
+
+Previous staff integration slice: `completion/365-seven-day-integration`, source
 `ece7e2a0288a9a70be58feeeaefdfe1922fde887`. Initial workflow gates are in
 `365_RELEASE_ACCEPTANCE_LEDGER.md`; action-level inventory is not yet exhaustive.
 Dated 13:44:13 UTC inventory finds 59/61 then-open PR heads already ancestors,

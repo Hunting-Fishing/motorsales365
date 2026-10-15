@@ -1224,3 +1224,24 @@ first evidence head `76c5fa41`; CI `38748496533` running/queued, wrapper
 `38748496539` preview in progress and migrations/production skipped. No upload,
 new-head pass or live behavior is claimed. This publication-record commit
 supersedes the first check head; verify the PR's exact newest head next.
+
+## Complete local media and upload guard (2026-10-15)
+
+Same integration branch/PR #68, source `75b2304fae26f9572041ff88d3cff86aeeaec5a0`.
+The checkout is now non-sparse and all 214 tracked public files are restored.
+Fresh full build, exact Git/source/copied-public checks and existing Worker/
+OCR/PDF verification pass. 65 new/existing Node release/report/inventory tests
+and 10 asset tests pass; app/SQL source is unchanged. The prior PR head `c5e4bf1a`
+passed all six CI gates; new-head checks remain required. The new fail-closed
+guard runs before CI packaging and both Actions uploads. It does not govern
+independent Workers Builds/raw Wrangler or approve a release. Evidence:
+`evidence/COMPLETE_PUBLIC_ASSET_RELEASE_GUARD.md`.
+
+The owner's staging reply names production project `wjxaajgvddtrxxtocxen`, not
+isolated staging. One follow-up asks about a separate-project cost quote in their
+organization versus a different existing staging project. No target was created
+or reassigned; no costs/charges confirmed. Pilot-account question and migration/
+fresh-authority/native-team/claim/offboarding/private-object/recovery/hosting/
+owner acceptance remain open. Local media completeness is cleared; it is not
+production or consent/history/financial acceptance. No live SQL/business/Auth
+mutation, deployment, restriction replay, paid resource or duplicate automation.

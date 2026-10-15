@@ -7,13 +7,14 @@ target, not a verified forecast. Scope and daily gates are in
 ## Candidate and status rules
 
 Integration branch: `completion/365-seven-day-integration`.
-Source slice: `ece7e2a0288a9a70be58feeeaefdfe1922fde887`.
+Latest source slice: `75b2304fae26f9572041ff88d3cff86aeeaec5a0` (public-asset guard);
+staff slice: `ece7e2a0288a9a70be58feeeaefdfe1922fde887`.
 Main remains `70ab892a8b7c05eac288ea4a6cce7a002d316f00`.
 
 Published/attached [draft PR #68](https://github.com/Hunting-Fishing/motorsales365/pull/68),
-stacked on PR #67 at `576fb17d`. First evidence head `76c5fa41` started CI
-`38748496533`; no new-head pass or upload is claimed. This publication record
-supersedes that first check head, so verify the PR's exact newest head next.
+stacked on PR #67 at `576fb17d`. Prior head `c5e4bf1a` passed all six CI gates
+(`38748717058`); independent hosting failed. The new guard publication needs
+its own exact latest-head checks. No upload or new-head pass is claimed.
 
 The dated PR inventory found 59 of the 61 then-open PR heads already ancestors
 of the candidate, including CI PR #8. Do not merge those heads again. PR #9
@@ -44,7 +45,7 @@ route is not evidence that the changed candidate has passed those gates.
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- | ------- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1 / release       | Migration provenance, `scripts/ci/migration-provenance.mjs`                                                                                                        | Existing tooling included; last composed mapping 404/423, 19 unclassified                                   | Blocked | Pending | Not verified | Classify the remaining entries against this candidate; verify actual schema/ACL/trigger provenance and a reviewed forward path. No destructive history repair.                                                                                                                                                            |
 | R2 / release       | Identity, roles, team/offboarding, ownership claims; `src/lib/internal-staff.functions.ts` and `docs/evidence/CLAIM_REVISION_INVALIDATION_MODEL.md`                | Staff returned-response/lifetime fixes integrated; authority and claim models are incomplete/unwired        | Blocked | Pending | Not verified | Original-human and fresh session/role/tenant checks, trusted native-team bindings, atomic manager/claim/offboarding protocols, durable retry/audit, private evidence custody and independent-session races. Preserve approved restrictions; do not treat bans as session revocation.                                      |
-| R3 / release       | Full artifact, hosting, database/private-object recovery                                                                                                           | Local app build succeeds; no full-media release artifact accepted                                           | Blocked | Pending | Not verified | Nominate isolated staging; recover authenticated hosting build logs, full media and provider configuration; rehearse database plus private-object restore and rollback. Sparse local artifact must never deploy.                                                                                                          |
+| R3 / release       | Full artifact, hosting, database/private-object recovery                                                                                                           | Complete local build and 214 tracked public copies verified; broader artifact/release acceptance open       | Blocked | Pending | Not verified | Nominate isolated staging; recover authenticated hosting logs/provider configuration; rehearse database/private-object restore and rollback. New Actions guard is not control of independent Workers Builds/raw Wrangler. Never deploy earlier sparse output.                                                             |
 | C1 / CRM           | Receipt image/PDF/manual review, `src/components/vehicle-receipt-panel.tsx`, `src/lib/receipt-document.client.ts`, `src/lib/vehicle-receipts.functions.ts`         | OCR and reviewed-entry foundations included; broader workflow acceptance open                               | Not run | Pending | Not verified | Phone image/PDF/manual correction to confirmed purchase/expense with correct amounts/currency/date/customer/vehicle/work order; no duplicate on retry, originals private. Recover original interrupted scanner/workspace separately or record its unresolved status; do not call source recovery completed by rebuilding. |
 | C2 / CRM           | Native Customer 360, `src/routes/_authenticated/workspace.customers.$id.tsx`, `src/components/shop-manager/customer-vehicle-activity.tsx`                          | Commercial, communications, reminders and activity readers/UI included; selected SQL candidates not applied | Blocked | Pending | Not verified | Verify same native identities, linked-vehicle consent at read, independent errors/caps, assignments/tasks/reminders and account/shop transitions. Complete release-safe SQL/role boundary before activating consumers.                                                                                                    |
 | C3 / CRM           | Shop Manager operational/financial loop, `src/routes/_authenticated/workspace.work-orders.$id.tsx`, `src/routes/_authenticated/workspace.invoices.$id.tsx`         | Existing screens and read hardening included; invoice converter integrity unresolved                        | Blocked | Pending | Not verified | Quote to work order to invoice/payment/refund must reconcile labor/parts/tax/due dates/status, stock and idempotent linkage in an authorized atomic transaction. Direct legacy helper restriction does not close indirect quote-conversion bypass or supply a replacement.                                                |
@@ -81,6 +82,14 @@ request, database migration, provider account creation or deployment was tested.
 Detailed commands, limitations and metadata discoveries are in
 `evidence/SEVEN_DAY_INTEGRATION_STAFF_ACKNOWLEDGMENT.md`.
 
+Public-media follow-up at `75b2304f`: the checkout is no longer sparse and a fresh
+build passes exact Git/source/output checks for all 214 tracked public files.
+The new fail-closed guard precedes CI packaging and both Actions upload paths;
+50 new regressions plus 15 existing guards pass 65/65, OCR/PDF assets 10/10.
+See `evidence/COMPLETE_PUBLIC_ASSET_RELEASE_GUARD.md` for test commands, the
+independent-hosting boundary and unchanged release prerequisites. This clears
+local missing-media verification, not staging/owner/live acceptance.
+
 ## Next actions and owner dependencies
 
 1. Verify published PR #68's exact latest CI head.
@@ -90,11 +99,12 @@ Detailed commands, limitations and metadata discoveries are in
    `.env` contents or bulk merge the provider cleanup. Reconcile PR #2 plan separately.
 3. Complete the action-level feature inventory and classify the 19 outstanding
    migration entries on this candidate while shared authority work continues.
-4. Owner: nominate an **existing isolated Supabase staging project**, or connect
-   access to one. Connected discovery shows no separate 365 staging target.
-   The default main branch is not isolation; do not repurpose another business's
-   database or provision paid resources without approval. A question is already
-   open in this chat; no passwords or keys requested.
+4. Owner supplied `wjxaajgvddtrxxtocxen`, which is production, not isolated staging.
+   A follow-up asks to select cost lookup for a separate project in `366 Industries
+AI Platform`, or nominate a different existing staging project. No costs or
+   creation are confirmed. Do not repurpose another business's database, designate
+   production as staging or provision paid resources without approval. No passwords
+   or keys requested; do not repeat the pending question.
 5. Owner: nominate the pilot shop and owner/staff test accounts (names/test IDs
    only). This earlier question remains open. Safe local work uses synthetic data.
 6. Close trusted original-actor/fresh authority and native-team/offboarding/claim
