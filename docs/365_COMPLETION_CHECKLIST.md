@@ -15,6 +15,17 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Owner backend clarification, 2026-10-15: 365 MotorSales must use only hosted
+Supabase project `wjxaajgvddtrxxtocxen`, API `https://wjxaajgvddtrxxtocxen.supabase.co`.
+Project `ujkizgblscqcejghxemb` belongs to 366 AI and is out of scope. No backend
+switch or new project has been made. The earlier separate-hosted-staging/cost
+question is superseded; do not repeat it or create/repurpose another hosted target.
+Prepare isolated local synthetic testing and a reviewed production-safe acceptance
+path consistent with this requirement. This does not waive real API/role/storage,
+transaction/recovery or release gates, or authorize risky tests against live data.
+If a required gate cannot be satisfied under this constraint, state the exact gap
+without silently substituting privileged fixtures or assuming release approval.
+
 Owner scheduling directive, 2026-10-15: target completion of the existing software
 scope within seven days, by 2026-10-22 21:00 Asia/Manila. Follow
 `365_SEVEN_DAY_COMPLETION_PLAN.md` alongside this checklist. The schedule does not
@@ -28,7 +39,29 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest release-safety slice: `75b2304fae26f9572041ff88d3cff86aeeaec5a0` on the
+Latest application slice: native Google OAuth handoff, source
+`c3f6bb9cc11c46246c0662f2030a3056b2287854`, with guard follow-up `b3acef0e`,
+on the same integration branch/PR #68.
+Selectively adopts PR #9's native-client intent without merging its broader
+provider/configuration/asset/migration changes. Login/signup use the existing
+canonical 365 Supabase client; returned authorization URLs and internal return
+paths are checked before navigation. Shared form locks prevent duplicate and
+cross-flow dispatch; changed account/return target/signup details or unmount
+suppress late handoffs/errors. Signup identity/terms validation and pending-profile
+snapshot remain; a generated URL never claims signup/provisioning success.
+Verification and remaining provider/real-session gates:
+`evidence/NATIVE_GOOGLE_OAUTH_HANDOFF.md`. No SQL or provider settings changed.
+Fresh full application 1,431/1,431 across 65 files passes (105.08s), including
+all 98 new OAuth tests. Report checker/full TypeScript/changed-line lint pass;
+zero quarantine, no new warnings. One earlier repository-scan failure passed
+alone and in the clean full rerun without test changes; root cause not asserted.
+Fresh complete-checkout build/Worker verification and Git/source/copied-public
+guard pass at formatting follow-up `8e1be6ac`: all 214 tracked public files,
+15 OCR/202 PDF assets and canonical 365 target. Release/report/inventory guards
+65/65 (7.910s), asset regressions10/10 (0.236s), format/diff/primary review pass.
+This is local artifact verification, not upload or broader release acceptance.
+
+Previous release-safety slice: `75b2304fae26f9572041ff88d3cff86aeeaec5a0` on the
 same `completion/365-seven-day-integration` / draft PR #68. The working checkout
 is now complete (`core.sparseCheckout=false`): 214 tracked public files restored,
 56,116,946 bytes, with generated OCR/PDF manifest hashes unchanged. Fresh build
@@ -46,21 +79,22 @@ OCR/PDF assets 10/10 (0.201s), lint/format/diff/primary review/full build/Worker
 checks pass. App/SQL unchanged; prior 1,333 app/701 tooling are not fresh reruns.
 Evidence: `evidence/COMPLETE_PUBLIC_ASSET_RELEASE_GUARD.md`.
 
-PR #68 prior exact head `c5e4bf1a` now passed all six CI gates (`38748717058`),
+PR #68 prior exact head `818651fd` now passed all six CI gates (`38752315795`),
 including real-browser OCR and disposable Parts PG. Hosting build
-`73ef71c2-c97b-4b37-aac8-cadb567bf055` fails separately with no diagnostic text.
-Wrapper `38748717572` preview step passes but upload is configured skipped;
-migration/production skip. The guard publication head needs its own checks.
+`ea623a17-3b0f-4bc0-ba4e-90f939f8a218` fails separately with no diagnostic text.
+Wrapper `38752316318` preview step passes but upload is configured skipped;
+migration/production skip. The new OAuth publication needs its own exact-head
+checks; prior-head green CI is not new-head or live acceptance.
 
 Owner answered the staging question with production project `wjxaajgvddtrxxtocxen`.
 Do not assign it as isolated staging or run destructive acceptance tests there.
-Fresh organization/project metadata confirms no separate 365 staging target.
-One follow-up asks which staging option to assess: cost lookup for a separate
-project in the owner's 366 Industries AI Platform organization, or another existing
-staging project. Connector requires owner organization selection before cost
-lookup; no cost/creation/charge confirmed or resource created. Earlier pilot-shop/
-test-account question remains open. Do not repeat unchanged prompts. Local safe
-work continues on selective PR #9/#2 and action-level migration/feature inventory,
+The later sole-backend clarification above supersedes the separate-project/cost
+follow-up. Do not repeat it or act on a late organization-selection answer as
+creation permission. Earlier pilot-shop/test-account question remains open.
+Docker Desktop status is stopped/unavailable; a read-only snapshot found 1.93 GiB
+free of 15.71 GiB RAM. No daemon, image download or local Supabase stack was started.
+Local synthetic component/SDK tests are not real API/Auth/storage acceptance.
+Safe work continues on the remaining selective PR #9/#2 and action-level inventory,
 then fresh authority/native-team/claim/offboarding/private-custody transactions
 and recovery as the integrated release path. Source 404/423, 19 unclassified and
 all baseline/replay/parity/release flags unchanged. Migration impact/deployment
@@ -93,19 +127,23 @@ hosting build `e4ecbe71-54eb-4776-9b31-3f3508d6fece` fails independently.
 Purpose-built check diagnostics expose no text/annotations/root cause; need
 authenticated hosting logs. Wrapper `38740109751` preview step passes but upload
 is configured skipped, migration/production skipped. New candidate head needs
-its own checks. Local sparse build is not a releasable full-media artifact.
+its own checks. The older sparse output must never be released.
 
 Two fresh Supabase resource/branch metadata reads show canonical project healthy
 on 17.6.1.155, but no separate 365 staging target. The sole default main branch is
 not isolation; its Sep 27 MIGRATIONS_FAILED marker is old metadata, not a new
-failed migration. Existing isolated-staging nomination/access question is open;
-pilot shop/test-account question also remains open. No passwords/keys requested.
+failed migration. The separate-hosted-staging question is now superseded by the
+owner clarification above; the pilot shop/test-account question remains open.
+No passwords/keys requested.
 Local Docker CLI exists but Linux engine is unavailable; psql absent on PATH.
 No daemon/image install or paid resource. Safe local work continues meanwhile.
 
-Exact next action: publish/attach this source-bearing candidate and check its
-latest head; reconcile PR #9 selectively and PR #2 plan; complete action-level
-ledger and 19 outstanding migration classifications. Close original-human/fresh
+Exact next action: verify existing PR #68's exact latest published head; keep all
+further slices on that branch/PR. Complete remaining PR #9 provider/generated-middleware/config/
+asset/legacy-URL reconciliation and PR #2 plan review; complete the action-level
+ledger and 19 outstanding migration classifications. Establish local synthetic
+API/Auth/storage and production-safe acceptance without a new hosted project.
+Close original-human/fresh
 session-role-tenant/native-team/claim/offboarding/private-object transaction and
 recovery boundaries as the staging integration path, not an endless lab chain.
 Source 404/423 and all baseline/replay/parity/release gates unchanged. Migration

@@ -7,6 +7,15 @@ days, by **22 October 2026 at 21:00 Asia/Manila**. Work starts immediately on
 15 October. This is an aggressive delivery target, not a verified forecast or
 permission to bypass release gates.
 
+Owner clarification: the only hosted backend for 365 is Supabase project
+`wjxaajgvddtrxxtocxen` at `https://wjxaajgvddtrxxtocxen.supabase.co`.
+The 366 AI project is unrelated. References to staging below mean an isolated
+test environment, not permission to create another hosted project or use live
+365 data for destructive testing. Develop a local synthetic test environment and
+a reviewed production-safe acceptance path; if a gate remains unsatisfied,
+report it explicitly. The earlier separate-hosted-project/cost question is
+superseded. No backend switch, new resource, charge or release is approved.
+
 The target is one integrated, usable, tested 365 release covering receipts,
 native CRM, Shop Manager, retail and recruitment pipelines, parts, owner vehicles
 and history, existing commercial surfaces, role-based UI and operating readiness.

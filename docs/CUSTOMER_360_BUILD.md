@@ -1245,3 +1245,41 @@ fresh-authority/native-team/claim/offboarding/private-object/recovery/hosting/
 owner acceptance remain open. Local media completeness is cleared; it is not
 production or consent/history/financial acceptance. No live SQL/business/Auth
 mutation, deployment, restriction replay, paid resource or duplicate automation.
+
+## Native Google handoff and sole hosted backend (2026-10-15)
+
+Owner clarification supersedes the historical staging/cost follow-up above:
+365 uses only hosted project `wjxaajgvddtrxxtocxen`, API
+`https://wjxaajgvddtrxxtocxen.supabase.co`. The 366 AI project is separate and
+untouched. Do not create another hosted target or repeat the cost/project question.
+Prepare isolated local synthetic testing and a reviewed production-safe acceptance
+path; actual API/role/private-storage/transaction/recovery gates still apply.
+Docker Desktop is stopped/unavailable and the observed free RAM was 1.93 GiB;
+no daemon, image download or local Supabase stack was started.
+
+Same integration branch/PR #68, OAuth source `c3f6bb9cc11c46246c0662f2030a3056b2287854`.
+URL/lifetime guard follow-up: `b3acef0e`.
+Login/signup now request native Google authorization from the existing canonical
+365 client, checking callback/provider URL before browser handoff. Duplicate and
+cross-flow form dispatch is fenced; old account/return target/signup-input results
+cannot navigate or toast after their context changes. Required signup details and
+terms plus the existing pending-profile snapshot are preserved. No successful
+authentication, role provisioning or customer/organization identity is inferred
+from generating a URL. See `evidence/NATIVE_GOOGLE_OAUTH_HANDOFF.md` for tests and
+the remaining live provider/session acceptance. This is selective PR #9 adoption,
+not its complete provider/configuration/assets/migration cutover.
+Fresh application suite passes 1,431/1,431 across 65 files (105.08s), including
+98 new OAuth tests; report checker, full TypeScript and changed-line lint pass.
+No live provider/session or Customer 360 identity/role acceptance is inferred.
+Fresh complete build/Worker/214-file Git-source-output checks pass at formatting
+follow-up `8e1be6ac`; release/report/inventory tests65/65 and assets10/10 pass
+separately. Local artifact verification does not authorize upload or release.
+
+Prior exact head `818651fd` passed all six CI gates (`38752315795`); independent
+hosting build `ea623a17-3b0f-4bc0-ba4e-90f939f8a218` failed with no diagnostic
+text. Upload/migrations/production remain skipped. Verify the new publication's
+exact head. Source mapping is still 404/423 with 19 unclassified; no live SQL,
+business/Auth write, provider change, restriction replay, paid resource or deploy.
+Continue remaining PR #9/#2 and action-level migration/feature inventory, then
+trusted actor/fresh role/native-team/claim/offboarding/private-custody/recovery
+acceptance. The pilot shop/test-account question remains open, not repeated.
