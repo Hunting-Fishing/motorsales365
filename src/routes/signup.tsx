@@ -836,7 +836,6 @@ function SignupPage() {
       return true;
     });
 
-
   const inputCls =
     "w-full rounded-lg border border-slate-200 bg-white px-3 h-11 sm:h-10 py-2 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-navy-500 focus:ring-2 focus:ring-navy-500/25";
   const invalidInputCls = (field: string) =>
