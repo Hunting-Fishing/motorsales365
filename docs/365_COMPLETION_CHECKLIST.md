@@ -126,10 +126,17 @@ and recovery release prerequisites. No application candidate is deployed.
 Latest unwired preparatory candidate: draft PR #49, code `f6bf32e`, strict future
 claim-review command codec plus actual unchanged caller characterization and
 platform helper source correction. Final full app 1,113/1,113 across 57 files,
-45 focused cases, 418 tooling/assets and TypeScript pass; its own latest CI needs
-verification. It is NOT a new atomic endpoint, ledger, authority/revision model,
+45 focused cases, 418 tooling/assets and TypeScript pass; docs `722f4de` now
+passed all six CI gates (`38684735093`). It is NOT a new atomic endpoint, ledger, authority/revision model,
 confirmed receipt or deployed change. PR #48 remains the verified connected application-source
 parent, not a deployed release. Do not wire the codec before its prerequisites.
+
+Latest platform authority characterization: draft PR #50, code `6136701`,
+32 focused and 450 tooling/assets pass; one fingerprint-only catalog read,
+no production mutation/deployment. The actual nonstaff referral/sales forward
+chain is composed offline; auth bootstrap, staff-domain partner/incoming writers,
+offboarding and original-actor custody remain separate. Verify this PR's latest
+head, not just the parent CI, before any release claim.
 
 Latest database read candidate: draft PR #31, code `797876c`,22 new focused tests
 and 191/191 full sequential tooling pass. The CLI-generated reminder invoker API
@@ -1514,6 +1521,59 @@ consent reconciliation cannot be skipped. Real API/JWT/role/session/concurrency,
 operator DB/private-storage recovery, consent/tenure/private retention, receipt/
 mobile/owner pilot and full-media hosting remain open. Same-chat continuation
 stays active without duplication or claims of continuous between-run work.
+
+## Platform-role forward checkpoint (2026-10-15)
+
+Draft PR #50, code `6136701dc4a6aeb6e00724b4ec21328f3ea273fa`, branch
+`security/platform-role-forward-composition`, stacked on PR #49 docs `722f4de`.
+PR #49 now passed all six CI gates (`38684735093`); its hosting check failed
+separately and wrapper skipped migrations/production deployment. PR #50 code CI
+`38687514056` is running at capture; hosting
+`26ea1452-0928-4058-982f-d7ee9d3654c5` failed separately. Wrapper `38687514137`
+skipped migrations/production deployment; no upload is inferred from preview success.
+Later documentation heads need their own next-resume verification.
+
+One independently reviewed fingerprint-only READ ONLY catalog query observed
+PostgreSQL 17.6 at `2026-10-15T05:15:07.018072` UTC. Six platform role/referral/
+sales relations, selected support columns, 18 helper families and 11 attachments
+are inventoried without application rows/counts, helper calls, raw unreviewed
+bodies/defaults/config values/SQL expressions or mutation. The actual accreditation
+body matches July, not the later retained September rewrite. Bootstrap body/internal
+helpers and two auth attachments are fingerprint-mapped, not executed or closed.
+
+The disposable fixture composes six full selected tables, all 15 current policies,
+16 critical constraints, 17 indexes, 13 unchanged helper bodies and nine forward
+attachments with actual enum/header/config/raw ACL metadata. Genuine nonstaff-
+domain accreditation early return is used; no permissive auth/partner stubs.
+Projected auth/profile prerequisites and seeded existing admin roles are synthetic,
+not trusted JWT/human authority or history replay. Staff-domain missing-partner
+control marks the uncomposed branch, not a production incident. Ordinary command
+denials/zero rows, actual sales assignment filtering, real downstream audit/FK
+rollback, service NULL audit attribution, referral binding gaps and INSERT-only
+role UPDATE/DELETE provisioning gaps are characterized, not repaired or adopted.
+Raw non-row grants remain separate from RLS DML denials; no TRUNCATE experiment.
+
+Verification: 25 focused composition tests (26.173s), seven catalog tests (1.082s),
+full serial CI-tooling 440/440 (349.896s), then 10/10 receipt assets (0.483s),
+450 total in separate consecutive commands, no failures/skips/cancellations.
+Independent code/test/evidence review, syntax/lint/format/diff pass. No application
+source change is included in this SQL-characterization commit; PR #49's app suite
+remains its previously verified 1,113 tests. The separate account dialog fix is
+being validated/published independently. Exact pins/exclusions:
+`evidence/PLATFORM_ROLE_FORWARD_COMPOSITION.md`.
+
+Migration impact: none. Live work: one catalog-only read, no application helper/API
+calls, schema/role/data/history mutation, migration or deployment. Preserve all
+three applied restrictions without replay. Composer remains 404/423, 19 unclassified;
+baseline/replay/parity/release flags remain false. Exact next action: verify latest
+PR heads, then compose the mapped auth/profile/organization INSERT chain and
+staff-domain partner chain with actual critical constraints/attachments; close
+incoming role writers, own-rep-policy/offboarding behavior and original-actor
+custody. In parallel define trusted claim-attempt/evidence/ownership-tenure
+revisions and a common competing-writer lock protocol before an atomic claim
+kernel. Native/consent reconciliation, recovery, real HTTP/JWT/session/concurrency,
+receipt/mobile/owner pilot and full-media hosting remain open. Do not deploy the
+sparse checkout or duplicate/disable the active continuation automation.
 
 ## Recovery evidence (original scope, retained below)
 
