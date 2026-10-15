@@ -35,6 +35,15 @@ export type VerifiedWebhook = Readonly<{
   body: string;
 }>;
 
+const verifiedWebhooks = new WeakSet<VerifiedWebhook>();
+
+/** Same-instance provenance only, not ownership of the configured hook secret. */
+export function isVerifiedStandardWebhook(value: unknown): value is VerifiedWebhook {
+  return (
+    typeof value === "object" && value !== null && verifiedWebhooks.has(value as VerifiedWebhook)
+  );
+}
+
 const BASE64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 const HEADER_NAMES = ["id", "timestamp", "signature"] as const;
 const MAX_SIGNATURE_HEADER_LENGTH = 2_048;
@@ -238,7 +247,9 @@ export async function verifyStandardWebhook(
     } catch {
       return fail("invalid_body");
     }
-    return Object.freeze({ id, timestamp, body: bodyText });
+    const result = Object.freeze({ id, timestamp, body: bodyText });
+    verifiedWebhooks.add(result);
+    return result;
   } catch (error) {
     if (error instanceof WebhookVerificationError) throw error;
     return fail("verification_unavailable");

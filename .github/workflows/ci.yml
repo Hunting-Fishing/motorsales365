@@ -187,6 +187,9 @@ jobs:
       - name: Native webhook authenticity and bounded reads (never quarantined, no delivery)
         run: npx vitest run src/lib/webhooks/standard-webhooks.server.test.ts --maxWorkers=1
 
+      - name: Native Auth email plans and first-address rendering (never quarantined, no delivery)
+        run: npx vitest run src/lib/email/native-auth-email-plan.server.test.ts src/lib/email-templates/email-change.test.tsx --maxWorkers=1
+
       - name: Unsubscribe acknowledgments and public UI lifetimes (never quarantined)
         run: npx vitest run src/routes/email/unsubscribe.test.ts src/routes/unsubscribe.test.tsx --maxWorkers=1
 

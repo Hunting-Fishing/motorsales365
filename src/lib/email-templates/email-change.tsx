@@ -17,7 +17,8 @@ interface EmailChangeEmailProps {
   // oldEmail is the user's current address (HookData.OldEmail). For the
   // NEW-recipient half of a secure email_change fanout, `email` equals the
   // recipient (NEW), so the "from" line must render oldEmail to read
-  // "from OLD to NEW" instead of "from NEW to NEW".
+  // "from OLD to NEW" instead of "from NEW to NEW". The trusted planner
+  // supplies an explicit empty oldEmail when adding the account's first address.
   oldEmail: string;
   email: string;
   newEmail: string;
@@ -29,35 +30,60 @@ export const EmailChangeEmail = ({
   oldEmail,
   newEmail,
   confirmationUrl,
-}: EmailChangeEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
-    <Preview>Confirm your email change for {siteName}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Confirm your email change</Heading>
-        <Text style={text}>
-          You requested to change your email address for {siteName} from{" "}
-          <Link href={`mailto:${oldEmail}`} style={link}>
-            {oldEmail}
-          </Link>{" "}
-          to{" "}
-          <Link href={`mailto:${newEmail}`} style={link}>
-            {newEmail}
-          </Link>
-          .
-        </Text>
-        <Text style={text}>Click the button below to confirm this change:</Text>
-        <Button style={button} href={confirmationUrl}>
-          Confirm Email Change
-        </Button>
-        <Text style={footer}>
-          If you didn't request this change, please secure your account immediately.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-);
+}: EmailChangeEmailProps) => {
+  const firstAddress = oldEmail === "";
+  return (
+    <Html lang="en" dir="ltr">
+      <Head />
+      <Preview>
+        {firstAddress ? "Confirm your email address" : "Confirm your email change"} for {siteName}
+      </Preview>
+      <Body style={main}>
+        <Container style={container}>
+          <Heading style={h1}>
+            {firstAddress ? "Confirm your email address" : "Confirm your email change"}
+          </Heading>
+          <Text style={text}>
+            {firstAddress ? (
+              <>
+                You requested to add the email address{" "}
+                <Link href={`mailto:${newEmail}`} style={link}>
+                  {newEmail}
+                </Link>{" "}
+                for {siteName}.
+              </>
+            ) : (
+              <>
+                You requested to change your email address for {siteName} from{" "}
+                <Link href={`mailto:${oldEmail}`} style={link}>
+                  {oldEmail}
+                </Link>{" "}
+                to{" "}
+                <Link href={`mailto:${newEmail}`} style={link}>
+                  {newEmail}
+                </Link>
+                .
+              </>
+            )}
+          </Text>
+          <Text style={text}>
+            {firstAddress
+              ? "Click the button below to confirm your email address:"
+              : "Click the button below to confirm this change:"}
+          </Text>
+          <Button style={button} href={confirmationUrl}>
+            {firstAddress ? "Confirm Email Address" : "Confirm Email Change"}
+          </Button>
+          <Text style={footer}>
+            {firstAddress
+              ? "If you didn't request to add this email address, please secure your account immediately."
+              : "If you didn't request this change, please secure your account immediately."}
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  );
+};
 
 export default EmailChangeEmail;
 
