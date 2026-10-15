@@ -96,8 +96,9 @@ its original empty-referral/postflight checks then run unchanged.
 ## Verification and release status
 
 Focused **22/22**, **28.614 seconds**, zero failures/skips/cancellations.
-Full tooling/assets results are recorded in the published checkpoint below.
-Syntax/lint/format/canonical JSON/diff checks and primary review are required.
+Full serial tooling **582/582** (435.252 seconds), then separate receipt assets
+**10/10** (0.333 seconds): **592 aggregate**, zero failures/skips/cancellations.
+Syntax/lint/format/canonical JSON/diff checks and primary review pass.
 Dedicated serial never-quarantined CI step added. No fresh application run is
 claimed; PR #54's 1,207 tests/59 files and TypeScript remain parent evidence.
 Independent review was unavailable under the previously recorded agent quota;
@@ -135,6 +136,28 @@ parity/release flags unchanged. Zero migration, production mutation/deploy, paid
 resource, customer communication, PR merge or restriction replay. Quote conversion
 remains outside earlier approvals. No sparse deploy or duplicate automation.
 Single recurring continuation active; **365 is not complete or release-ready**.
+
+## Published checkpoint
+
+Draft [PR #61](https://github.com/Hunting-Fishing/motorsales365/pull/61), code
+`9cbd6738b27acde254191836b52bf896887ea79e`, stacked on PR #60 docs `3f48b40`.
+Twenty-two focused and 592 tooling/assets pass; syntax/lint/format/canonical JSON/
+diff/primary review pass. The two actual referral INSERT fanouts and payout helper
+execute in discarded databases with exact structure/function/attachment guards
+and genuine late-write rollback/recovery, not accepted accounting/identity rules.
+Exactly two live READ ONLY catalog diagnostics; migration impact zero,
+production mutation/deployment none, no paid resource or customer communication.
+
+Initial code CI `38717009890`: lint/Parts/OCR/type passed, build/unit pending.
+Hosting `fe64520d-eafc-4e14-b094-8928d7a2fe74` failed separately; wrapper
+`38717010068` skipped migrations/production. The documentation HEAD requires its
+own latest checks; earlier code/parent green is not release evidence.
+
+Next actual ordinary nonempty Auth referral plus partner intent using full PR #60
+structures and this retained source/fanout, genuine constraints and no synthetic
+helper success; then staff-domain/canonical-org/manager and original actor/
+revision/common locks/offboarding/native acceptance. Source/baseline/replay/
+parity/release flags unchanged; single continuation remains active.
 
 ## Artifact pins
 
