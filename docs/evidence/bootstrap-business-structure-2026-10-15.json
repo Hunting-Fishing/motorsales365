@@ -1,0 +1,3654 @@
+{
+  "mode": "read-only-selected-structure-not-history",
+  "enums": [
+    {
+      "name": "app_role",
+      "labels": [
+        "admin",
+        "user",
+        "sales",
+        "moderator",
+        "support",
+        "advertising",
+        "sales_junior",
+        "sales_senior",
+        "sales_manager"
+      ],
+      "schema": "public"
+    },
+    {
+      "name": "business_status",
+      "labels": [
+        "pending",
+        "active",
+        "rejected",
+        "hidden",
+        "archived"
+      ],
+      "schema": "public"
+    },
+    {
+      "name": "business_tier",
+      "labels": [
+        "free",
+        "listed",
+        "featured",
+        "premium"
+      ],
+      "schema": "public"
+    }
+  ],
+  "scope": "Full businesses, business_types and admin_audit_log structural metadata, selected/direct-expression function fingerprints and related enums. Structural definitions only behind preceding metadata hashes and privacy gates. No data rows, helper calls or function bodies.",
+  "limits": "Three selected tables only. No app/Auth/config rows or counts, helper calls/function bodies, arbitrary structural definitions, sequence or settings/config values, mutation, original-source/history adoption, approved baseline, complete bootstrap/actor/authority/offboarding or release acceptance. Expected hashes come from the preceding reviewed metadata-only capture; privacy independently gates raw pieces. Denials return NULL. Business writes/forward attachments remain a separate behavioral frontier. Effective MAINTAIN is not evaluated; raw ACL retained.",
+  "pieces": [
+    {
+      "name": "action",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "actor_id",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "created_at",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": "now()",
+      "expectedMd5": "75230039beb12ce952f24927f2bfa2f2",
+      "definitionMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "name": "entity_id",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "entity_type",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "field",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "id",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": "gen_random_uuid()",
+      "expectedMd5": "f3b72bb359a50b640590970a2ab8e514",
+      "definitionMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "name": "metadata",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "new_value",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "note",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "old_value",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "target_user_id",
+      "table": "admin_audit_log",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "admin_audit_log_pkey",
+      "table": "admin_audit_log",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "PRIMARY KEY (id)",
+      "expectedMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3"
+    },
+    {
+      "name": "admin_audit_log_pkey",
+      "table": "admin_audit_log",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX admin_audit_log_pkey ON public.admin_audit_log USING btree (id)",
+      "expectedMd5": "29fda601e4c4b3790790c6b6b28f1b8a",
+      "definitionMd5": "29fda601e4c4b3790790c6b6b28f1b8a"
+    },
+    {
+      "name": "idx_admin_audit_action",
+      "table": "admin_audit_log",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_admin_audit_action ON public.admin_audit_log USING btree (action, created_at DESC)",
+      "expectedMd5": "df2a899dbb625567a5a1a61accf1c977",
+      "definitionMd5": "df2a899dbb625567a5a1a61accf1c977"
+    },
+    {
+      "name": "idx_admin_audit_actor",
+      "table": "admin_audit_log",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_admin_audit_actor ON public.admin_audit_log USING btree (actor_id, created_at DESC)",
+      "expectedMd5": "a205989317c5597070e26d7706e4f563",
+      "definitionMd5": "a205989317c5597070e26d7706e4f563"
+    },
+    {
+      "name": "idx_admin_audit_created",
+      "table": "admin_audit_log",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_admin_audit_created ON public.admin_audit_log USING btree (created_at DESC)",
+      "expectedMd5": "6fb8a5147a2ca8e902903038f0b6149c",
+      "definitionMd5": "6fb8a5147a2ca8e902903038f0b6149c"
+    },
+    {
+      "name": "idx_admin_audit_entity",
+      "table": "admin_audit_log",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_admin_audit_entity ON public.admin_audit_log USING btree (entity_type, entity_id, created_at DESC)",
+      "expectedMd5": "ae60a7cd40a577f2e5d832f38724074e",
+      "definitionMd5": "ae60a7cd40a577f2e5d832f38724074e"
+    },
+    {
+      "name": "idx_admin_audit_target",
+      "table": "admin_audit_log",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_admin_audit_target ON public.admin_audit_log USING btree (target_user_id, created_at DESC)",
+      "expectedMd5": "a30e2c8f582d42f22558fa54188b28bb",
+      "definitionMd5": "a30e2c8f582d42f22558fa54188b28bb"
+    },
+    {
+      "name": "Admins read admin audit",
+      "table": "admin_audit_log",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Admins write admin audit",
+      "table": "admin_audit_log",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": "(public.has_role(auth.uid(), 'admin'::public.app_role) AND (auth.uid() = actor_id))",
+      "expectedMd5": "42f97d95c904a075a7bd26312db73461",
+      "definitionMd5": "42f97d95c904a075a7bd26312db73461"
+    },
+    {
+      "name": "Support read admin audit",
+      "table": "admin_audit_log",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Admins read admin audit",
+      "table": "admin_audit_log",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "public.has_role(auth.uid(), 'admin'::public.app_role)",
+      "expectedMd5": "52601dff68335277823fcbfe28ec86d5",
+      "definitionMd5": "52601dff68335277823fcbfe28ec86d5"
+    },
+    {
+      "name": "Admins write admin audit",
+      "table": "admin_audit_log",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Support read admin audit",
+      "table": "admin_audit_log",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "public.can_support(auth.uid())",
+      "expectedMd5": "01bcb07f9a9ee3cbedc16fc50e7eb119",
+      "definitionMd5": "01bcb07f9a9ee3cbedc16fc50e7eb119"
+    },
+    {
+      "name": "icon",
+      "table": "business_types",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "label",
+      "table": "business_types",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "slug",
+      "table": "business_types",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "sort_order",
+      "table": "business_types",
+      "category": "column",
+      "permitted": true,
+      "definition": "0",
+      "expectedMd5": "cfcd208495d565ef66e7dff9f98764da",
+      "definitionMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "name": "business_types_pkey",
+      "table": "business_types",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "PRIMARY KEY (slug)",
+      "expectedMd5": "df1d6753f9f1b7aeda2246f8247da522",
+      "definitionMd5": "df1d6753f9f1b7aeda2246f8247da522"
+    },
+    {
+      "name": "business_types_pkey",
+      "table": "business_types",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX business_types_pkey ON public.business_types USING btree (slug)",
+      "expectedMd5": "1561f7d1d35a90d7f98feaf47c4f0e61",
+      "definitionMd5": "1561f7d1d35a90d7f98feaf47c4f0e61"
+    },
+    {
+      "name": "Admins manage business types",
+      "table": "business_types",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": "public.has_role(auth.uid(), 'admin'::public.app_role)",
+      "expectedMd5": "52601dff68335277823fcbfe28ec86d5",
+      "definitionMd5": "52601dff68335277823fcbfe28ec86d5"
+    },
+    {
+      "name": "Business types public read",
+      "table": "business_types",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Admins manage business types",
+      "table": "business_types",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "public.has_role(auth.uid(), 'admin'::public.app_role)",
+      "expectedMd5": "52601dff68335277823fcbfe28ec86d5",
+      "definitionMd5": "52601dff68335277823fcbfe28ec86d5"
+    },
+    {
+      "name": "Business types public read",
+      "table": "business_types",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "true",
+      "expectedMd5": "b326b5062b2f0e69046810717534cb09",
+      "definitionMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "name": "attribution",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "barangay",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "brands_carried",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "city",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "claim_state",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "'owned'::text",
+      "expectedMd5": "e202a18c0f509b7c9549959f76be2a25",
+      "definitionMd5": "e202a18c0f509b7c9549959f76be2a25"
+    },
+    {
+      "name": "cover_url",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "created_at",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "now()",
+      "expectedMd5": "75230039beb12ce952f24927f2bfa2f2",
+      "definitionMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "name": "cta_primary",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "'inquiry'::text",
+      "expectedMd5": "d2f978a113d24af7d844a6f0b4f03502",
+      "definitionMd5": "d2f978a113d24af7d844a6f0b4f03502"
+    },
+    {
+      "name": "custom_domain",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "custom_domain_status",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "'none'::text",
+      "expectedMd5": "3efd06564e0691c4ca7f3df332cbb312",
+      "definitionMd5": "3efd06564e0691c4ca7f3df332cbb312"
+    },
+    {
+      "name": "custom_domain_verified_at",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "custom_domain_verify_token",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "description",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "email",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "expose_inventory_to_network",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "false",
+      "expectedMd5": "68934a3e9455fa72420237eb05902327",
+      "definitionMd5": "68934a3e9455fa72420237eb05902327"
+    },
+    {
+      "name": "facebook_url",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "featured",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "false",
+      "expectedMd5": "68934a3e9455fa72420237eb05902327",
+      "definitionMd5": "68934a3e9455fa72420237eb05902327"
+    },
+    {
+      "name": "featured_until",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "featured_video_provider",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "featured_video_url",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "hours",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "id",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "gen_random_uuid()",
+      "expectedMd5": "f3b72bb359a50b640590970a2ab8e514",
+      "definitionMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "name": "import_metadata",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "lat",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "lng",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "logo_url",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "messenger_url",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "name",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "network_exposure_requested_at",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "network_exposure_review_note",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "network_exposure_reviewed_at",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "network_exposure_reviewed_by",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "network_exposure_status",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "'none'::text",
+      "expectedMd5": "3efd06564e0691c4ca7f3df332cbb312",
+      "definitionMd5": "3efd06564e0691c4ca7f3df332cbb312"
+    },
+    {
+      "name": "organization_id",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "owner_id",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "phone",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "photos",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "'[]'::jsonb",
+      "expectedMd5": "8b4b2df56ad0773943ef9179742da01b",
+      "definitionMd5": "8b4b2df56ad0773943ef9179742da01b"
+    },
+    {
+      "name": "postal_code",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "price_label",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "price_updated_at",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "province",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "rating_avg",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "0",
+      "expectedMd5": "cfcd208495d565ef66e7dff9f98764da",
+      "definitionMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "name": "rating_count",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "0",
+      "expectedMd5": "cfcd208495d565ef66e7dff9f98764da",
+      "definitionMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "name": "region",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "removal_requested_at",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "show_contact",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "true",
+      "expectedMd5": "b326b5062b2f0e69046810717534cb09",
+      "definitionMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "name": "show_gallery",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "true",
+      "expectedMd5": "b326b5062b2f0e69046810717534cb09",
+      "definitionMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "name": "show_posts",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "true",
+      "expectedMd5": "b326b5062b2f0e69046810717534cb09",
+      "definitionMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "name": "show_products",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "true",
+      "expectedMd5": "b326b5062b2f0e69046810717534cb09",
+      "definitionMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "name": "show_services",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "true",
+      "expectedMd5": "b326b5062b2f0e69046810717534cb09",
+      "definitionMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "name": "slug",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "source",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "'manual'::text",
+      "expectedMd5": "1c86fb6219cabad38570bf1d10fc4e27",
+      "definitionMd5": "1c86fb6219cabad38570bf1d10fc4e27"
+    },
+    {
+      "name": "source_external_id",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "status",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "'pending'::public.business_status",
+      "expectedMd5": "15a5a4bca68c8abf9d4a8dd6bdb5eeff",
+      "definitionMd5": "15a5a4bca68c8abf9d4a8dd6bdb5eeff"
+    },
+    {
+      "name": "street_address",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "subscription_tier",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "'free'::public.business_tier",
+      "expectedMd5": "1f9d28e7a80fe25e88b6e26c9a7b34c4",
+      "definitionMd5": "1f9d28e7a80fe25e88b6e26c9a7b34c4"
+    },
+    {
+      "name": "tagline",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "theme_color",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "type_slug",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "updated_at",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": "now()",
+      "expectedMd5": "75230039beb12ce952f24927f2bfa2f2",
+      "definitionMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "name": "vanity_slug",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "website",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "whatsapp_number",
+      "table": "businesses",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "businesses_claim_state_check",
+      "table": "businesses",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "CHECK ((claim_state = ANY (ARRAY['owned'::text, 'unclaimed'::text, 'claim_pending'::text])))",
+      "expectedMd5": "200a7f3ac1786a022f3784e4401c8c75",
+      "definitionMd5": "200a7f3ac1786a022f3784e4401c8c75"
+    },
+    {
+      "name": "businesses_featured_video_provider_check",
+      "table": "businesses",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "CHECK (((featured_video_provider IS NULL) OR (featured_video_provider = ANY (ARRAY['youtube'::text, 'vimeo'::text, 'facebook'::text]))))",
+      "expectedMd5": "e757b86ec912cd815b7e5e8f7b78eb98",
+      "definitionMd5": "e757b86ec912cd815b7e5e8f7b78eb98"
+    },
+    {
+      "name": "businesses_network_exposure_reviewed_by_fkey",
+      "table": "businesses",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (network_exposure_reviewed_by) REFERENCES auth.users(id) ON DELETE SET NULL",
+      "expectedMd5": "f38f2a3dc227338a060e1d78f4aa0c98",
+      "definitionMd5": "f38f2a3dc227338a060e1d78f4aa0c98"
+    },
+    {
+      "name": "businesses_network_exposure_status_check",
+      "table": "businesses",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "CHECK ((network_exposure_status = ANY (ARRAY['none'::text, 'pending'::text, 'approved'::text, 'revoked'::text])))",
+      "expectedMd5": "76db3ba69e3b15b0eade488e84f538b8",
+      "definitionMd5": "76db3ba69e3b15b0eade488e84f538b8"
+    },
+    {
+      "name": "businesses_organization_id_fkey",
+      "table": "businesses",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE SET NULL",
+      "expectedMd5": "dfae532b0de8c0f4bb512c9b30235ed9",
+      "definitionMd5": "dfae532b0de8c0f4bb512c9b30235ed9"
+    },
+    {
+      "name": "businesses_pkey",
+      "table": "businesses",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "PRIMARY KEY (id)",
+      "expectedMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3"
+    },
+    {
+      "name": "businesses_slug_key",
+      "table": "businesses",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "UNIQUE (slug)",
+      "expectedMd5": "687397275d0e852fb2a4b50394adffee",
+      "definitionMd5": "687397275d0e852fb2a4b50394adffee"
+    },
+    {
+      "name": "businesses_type_slug_fkey",
+      "table": "businesses",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (type_slug) REFERENCES public.business_types(slug)",
+      "expectedMd5": "ec942722226f529ad569e51a5f0fa435",
+      "definitionMd5": "ec942722226f529ad569e51a5f0fa435"
+    },
+    {
+      "name": "businesses_vanity_slug_format_chk",
+      "table": "businesses",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "CHECK (((vanity_slug IS NULL) OR (vanity_slug ~ '^[a-z0-9]([a-z0-9-]{1,30})[a-z0-9]$'::text)))",
+      "expectedMd5": "9078bbd0dfc8379d5675d4bb7b42538a",
+      "definitionMd5": "9078bbd0dfc8379d5675d4bb7b42538a"
+    },
+    {
+      "name": "businesses_lat_lng_idx",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX businesses_lat_lng_idx ON public.businesses USING btree (lat, lng) WHERE ((lat IS NOT NULL) AND (lng IS NOT NULL))",
+      "expectedMd5": "3031ba3e2eabe2e40efc0a5050fc85f5",
+      "definitionMd5": "3031ba3e2eabe2e40efc0a5050fc85f5"
+    },
+    {
+      "name": "businesses_network_exposure_status_idx",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX businesses_network_exposure_status_idx ON public.businesses USING btree (network_exposure_status) WHERE (network_exposure_status <> 'none'::text)",
+      "expectedMd5": "5476ac1d0e29dd7a3d2763e4b0a277d3",
+      "definitionMd5": "5476ac1d0e29dd7a3d2763e4b0a277d3"
+    },
+    {
+      "name": "businesses_pkey",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX businesses_pkey ON public.businesses USING btree (id)",
+      "expectedMd5": "2f94b1c1ec96859e0551bd5d6c0f1b08",
+      "definitionMd5": "2f94b1c1ec96859e0551bd5d6c0f1b08"
+    },
+    {
+      "name": "businesses_slug_key",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX businesses_slug_key ON public.businesses USING btree (slug)",
+      "expectedMd5": "cb3f88e8fc2dbd89c3da72dd0753bc55",
+      "definitionMd5": "cb3f88e8fc2dbd89c3da72dd0753bc55"
+    },
+    {
+      "name": "businesses_source_external_id_unique",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX businesses_source_external_id_unique ON public.businesses USING btree (source, source_external_id) WHERE (source_external_id IS NOT NULL)",
+      "expectedMd5": "cd1a82dfebaacfffc70a0686d9ceef2c",
+      "definitionMd5": "cd1a82dfebaacfffc70a0686d9ceef2c"
+    },
+    {
+      "name": "businesses_vanity_slug_lower_uidx",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX businesses_vanity_slug_lower_uidx ON public.businesses USING btree (lower(vanity_slug)) WHERE (vanity_slug IS NOT NULL)",
+      "expectedMd5": "99ca865f91cd0dc11ae3bb1b63365a71",
+      "definitionMd5": "99ca865f91cd0dc11ae3bb1b63365a71"
+    },
+    {
+      "name": "idx_businesses_city",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_businesses_city ON public.businesses USING btree (city)",
+      "expectedMd5": "a66fd93e16a1bbde2ce5be57cb335819",
+      "definitionMd5": "a66fd93e16a1bbde2ce5be57cb335819"
+    },
+    {
+      "name": "idx_businesses_claim_state",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_businesses_claim_state ON public.businesses USING btree (claim_state) WHERE (claim_state <> 'owned'::text)",
+      "expectedMd5": "64c85254afd8d9d070ff39e87a09492a",
+      "definitionMd5": "64c85254afd8d9d070ff39e87a09492a"
+    },
+    {
+      "name": "idx_businesses_organization_id",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_businesses_organization_id ON public.businesses USING btree (organization_id)",
+      "expectedMd5": "73533000127ad553d849a993943716f6",
+      "definitionMd5": "73533000127ad553d849a993943716f6"
+    },
+    {
+      "name": "idx_businesses_owner",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_businesses_owner ON public.businesses USING btree (owner_id)",
+      "expectedMd5": "61b83c2fe3f6cdec1a13d8fd878dfc77",
+      "definitionMd5": "61b83c2fe3f6cdec1a13d8fd878dfc77"
+    },
+    {
+      "name": "idx_businesses_province",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_businesses_province ON public.businesses USING btree (province)",
+      "expectedMd5": "b9328e6651bf227b971e323437b5f6b0",
+      "definitionMd5": "b9328e6651bf227b971e323437b5f6b0"
+    },
+    {
+      "name": "idx_businesses_region",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_businesses_region ON public.businesses USING btree (region)",
+      "expectedMd5": "e7fa8858735747d245ef097ab9900afc",
+      "definitionMd5": "e7fa8858735747d245ef097ab9900afc"
+    },
+    {
+      "name": "idx_businesses_status",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_businesses_status ON public.businesses USING btree (status)",
+      "expectedMd5": "207b0fdc5e8e80a39eb9bad47163abb5",
+      "definitionMd5": "207b0fdc5e8e80a39eb9bad47163abb5"
+    },
+    {
+      "name": "idx_businesses_tier_featured",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_businesses_tier_featured ON public.businesses USING btree (subscription_tier, featured_until DESC)",
+      "expectedMd5": "8246463eab01415a7e19ce4834d69d0b",
+      "definitionMd5": "8246463eab01415a7e19ce4834d69d0b"
+    },
+    {
+      "name": "idx_businesses_type",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX idx_businesses_type ON public.businesses USING btree (type_slug)",
+      "expectedMd5": "1cb388a84a7587736491031fca8bfb45",
+      "definitionMd5": "1cb388a84a7587736491031fca8bfb45"
+    },
+    {
+      "name": "uniq_business_custom_domain",
+      "table": "businesses",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX uniq_business_custom_domain ON public.businesses USING btree (custom_domain) WHERE (custom_domain IS NOT NULL)",
+      "expectedMd5": "d74743f21db3efbc7601a1492cc3a9a8",
+      "definitionMd5": "d74743f21db3efbc7601a1492cc3a9a8"
+    },
+    {
+      "name": "Active businesses public read",
+      "table": "businesses",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Business owners can read own businesses",
+      "table": "businesses",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Moderators manage businesses",
+      "table": "businesses",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": "public.can_moderate(auth.uid())",
+      "expectedMd5": "fc10a64d29959c789918a9f3bce331e3",
+      "definitionMd5": "fc10a64d29959c789918a9f3bce331e3"
+    },
+    {
+      "name": "Owners delete own businesses",
+      "table": "businesses",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Owners insert businesses",
+      "table": "businesses",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": "((auth.uid() = owner_id) AND (status = 'pending'::public.business_status))",
+      "expectedMd5": "64f9350ee6d0aeb102a1dbbc8be84888",
+      "definitionMd5": "64f9350ee6d0aeb102a1dbbc8be84888"
+    },
+    {
+      "name": "Owners update own businesses",
+      "table": "businesses",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": "(auth.uid() = owner_id)",
+      "expectedMd5": "dd01f9aa259e485c4c0bc023d3a0a965",
+      "definitionMd5": "dd01f9aa259e485c4c0bc023d3a0a965"
+    },
+    {
+      "name": "Public can resolve verified custom domains",
+      "table": "businesses",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Active businesses public read",
+      "table": "businesses",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "(status = 'active'::public.business_status)",
+      "expectedMd5": "dcd60eff20b467df6d2140c61dced723",
+      "definitionMd5": "dcd60eff20b467df6d2140c61dced723"
+    },
+    {
+      "name": "Business owners can read own businesses",
+      "table": "businesses",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "(auth.uid() = owner_id)",
+      "expectedMd5": "dd01f9aa259e485c4c0bc023d3a0a965",
+      "definitionMd5": "dd01f9aa259e485c4c0bc023d3a0a965"
+    },
+    {
+      "name": "Moderators manage businesses",
+      "table": "businesses",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "public.can_moderate(auth.uid())",
+      "expectedMd5": "fc10a64d29959c789918a9f3bce331e3",
+      "definitionMd5": "fc10a64d29959c789918a9f3bce331e3"
+    },
+    {
+      "name": "Owners delete own businesses",
+      "table": "businesses",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "(auth.uid() = owner_id)",
+      "expectedMd5": "dd01f9aa259e485c4c0bc023d3a0a965",
+      "definitionMd5": "dd01f9aa259e485c4c0bc023d3a0a965"
+    },
+    {
+      "name": "Owners insert businesses",
+      "table": "businesses",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "Owners update own businesses",
+      "table": "businesses",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "(auth.uid() = owner_id)",
+      "expectedMd5": "dd01f9aa259e485c4c0bc023d3a0a965",
+      "definitionMd5": "dd01f9aa259e485c4c0bc023d3a0a965"
+    },
+    {
+      "name": "Public can resolve verified custom domains",
+      "table": "businesses",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "((custom_domain IS NOT NULL) AND (custom_domain_status = 'verified'::text))",
+      "expectedMd5": "2a1d8b440c9ea6949fc7dc5912dc2646",
+      "definitionMd5": "2a1d8b440c9ea6949fc7dc5912dc2646"
+    },
+    {
+      "name": "business_team_thread_on_create",
+      "table": "businesses",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER business_team_thread_on_create AFTER INSERT ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.trg_business_created_team_thread()",
+      "expectedMd5": "db389d1a96becdea574203f4323edc76",
+      "definitionMd5": "db389d1a96becdea574203f4323edc76"
+    },
+    {
+      "name": "businesses_recompute_intent",
+      "table": "businesses",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER businesses_recompute_intent AFTER INSERT OR DELETE OR UPDATE OF owner_id ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.trg_businesses_recompute_intent()",
+      "expectedMd5": "44234a98b0dbeb833a6033bf42ec26d5",
+      "definitionMd5": "44234a98b0dbeb833a6033bf42ec26d5"
+    },
+    {
+      "name": "set_businesses_updated_at",
+      "table": "businesses",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER set_businesses_updated_at BEFORE UPDATE ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at()",
+      "expectedMd5": "a0f9d25d2c190f91aa068867c3fe31f0",
+      "definitionMd5": "a0f9d25d2c190f91aa068867c3fe31f0"
+    },
+    {
+      "name": "trg_block_internal_staff_business",
+      "table": "businesses",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER trg_block_internal_staff_business BEFORE INSERT ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.block_internal_staff_business()",
+      "expectedMd5": "de3397695e95fd79a098bb863a63ddd2",
+      "definitionMd5": "de3397695e95fd79a098bb863a63ddd2"
+    },
+    {
+      "name": "trg_enforce_business_custom_domain",
+      "table": "businesses",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER trg_enforce_business_custom_domain BEFORE INSERT OR UPDATE OF custom_domain, custom_domain_status ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.enforce_business_custom_domain()",
+      "expectedMd5": "767dc3bc6ebf89c6ca9249e9dec56d80",
+      "definitionMd5": "767dc3bc6ebf89c6ca9249e9dec56d80"
+    },
+    {
+      "name": "trg_guard_business_owner_update",
+      "table": "businesses",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER trg_guard_business_owner_update BEFORE UPDATE ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.guard_business_owner_update()",
+      "expectedMd5": "16f225e2d5a34fd2871c762ff4d8773b",
+      "definitionMd5": "16f225e2d5a34fd2871c762ff4d8773b"
+    },
+    {
+      "name": "trg_notify_business_approved",
+      "table": "businesses",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER trg_notify_business_approved AFTER UPDATE OF status ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.tg_notify_business_approved()",
+      "expectedMd5": "b0e9077178bcb78a490e56a8799b6b1d",
+      "definitionMd5": "b0e9077178bcb78a490e56a8799b6b1d"
+    },
+    {
+      "name": "trg_notify_business_archive_change",
+      "table": "businesses",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER trg_notify_business_archive_change AFTER UPDATE OF status ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.tg_notify_business_archive_change()",
+      "expectedMd5": "207992e8b0439d3cacbb6291ba9c9355",
+      "definitionMd5": "207992e8b0439d3cacbb6291ba9c9355"
+    },
+    {
+      "name": "trg_notify_business_submitted",
+      "table": "businesses",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER trg_notify_business_submitted AFTER INSERT ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.tg_notify_business_submitted()",
+      "expectedMd5": "8eb9defcd63018d8ddb275dd0e49537e",
+      "definitionMd5": "8eb9defcd63018d8ddb275dd0e49537e"
+    },
+    {
+      "name": "trg_pp_business_signup_bounty",
+      "table": "businesses",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER trg_pp_business_signup_bounty AFTER INSERT ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.pp_business_signup_bounty()",
+      "expectedMd5": "dbe661b67d6a677ab0afc4cb8cee4a6b",
+      "definitionMd5": "dbe661b67d6a677ab0afc4cb8cee4a6b"
+    }
+  ],
+  "tables": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "admin_audit_log",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "business_types",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "businesses",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    }
+  ],
+  "columns": [
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "actor_id",
+      "type": "uuid",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "target_user_id",
+      "type": "uuid",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "action",
+      "type": "text",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "field",
+      "type": "text",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "old_value",
+      "type": "text",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "new_value",
+      "type": "text",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "note",
+      "type": "text",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "entity_type",
+      "type": "text",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "entity_id",
+      "type": "text",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 11,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "metadata",
+      "type": "jsonb",
+      "table": "admin_audit_log",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 12,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "slug",
+      "type": "text",
+      "table": "business_types",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "label",
+      "type": "text",
+      "table": "business_types",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "icon",
+      "type": "text",
+      "table": "business_types",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "sort_order",
+      "type": "integer",
+      "table": "business_types",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "owner_id",
+      "type": "uuid",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "slug",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "name",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "type_slug",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "description",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "logo_url",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "cover_url",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "photos",
+      "type": "jsonb",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": "8b4b2df56ad0773943ef9179742da01b"
+    },
+    {
+      "acl": null,
+      "name": "phone",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "email",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 11,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "website",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 12,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "messenger_url",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 13,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "hours",
+      "type": "jsonb",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 14,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "region",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 15,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "province",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 16,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "city",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 17,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "barangay",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 18,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "street_address",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 19,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "lat",
+      "type": "numeric",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 20,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "lng",
+      "type": "numeric",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 21,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "status",
+      "type": "public.business_status",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 22,
+      "generated": "",
+      "defaultMd5": "15a5a4bca68c8abf9d4a8dd6bdb5eeff"
+    },
+    {
+      "acl": null,
+      "name": "featured",
+      "type": "boolean",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 23,
+      "generated": "",
+      "defaultMd5": "68934a3e9455fa72420237eb05902327"
+    },
+    {
+      "acl": null,
+      "name": "rating_avg",
+      "type": "numeric",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 24,
+      "generated": "",
+      "defaultMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "acl": null,
+      "name": "rating_count",
+      "type": "integer",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 25,
+      "generated": "",
+      "defaultMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 26,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 27,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "postal_code",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 28,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "brands_carried",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 29,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "price_label",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 30,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "price_updated_at",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 31,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "source",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 32,
+      "generated": "",
+      "defaultMd5": "1c86fb6219cabad38570bf1d10fc4e27"
+    },
+    {
+      "acl": null,
+      "name": "source_external_id",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 33,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "subscription_tier",
+      "type": "public.business_tier",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 34,
+      "generated": "",
+      "defaultMd5": "1f9d28e7a80fe25e88b6e26c9a7b34c4"
+    },
+    {
+      "acl": null,
+      "name": "featured_until",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 35,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "organization_id",
+      "type": "uuid",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 36,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "tagline",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 37,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "theme_color",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 38,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "show_services",
+      "type": "boolean",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 39,
+      "generated": "",
+      "defaultMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "acl": null,
+      "name": "show_products",
+      "type": "boolean",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 40,
+      "generated": "",
+      "defaultMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "acl": null,
+      "name": "show_posts",
+      "type": "boolean",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 41,
+      "generated": "",
+      "defaultMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "acl": null,
+      "name": "cta_primary",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 42,
+      "generated": "",
+      "defaultMd5": "d2f978a113d24af7d844a6f0b4f03502"
+    },
+    {
+      "acl": null,
+      "name": "show_gallery",
+      "type": "boolean",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 43,
+      "generated": "",
+      "defaultMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "acl": null,
+      "name": "show_contact",
+      "type": "boolean",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 44,
+      "generated": "",
+      "defaultMd5": "b326b5062b2f0e69046810717534cb09"
+    },
+    {
+      "acl": null,
+      "name": "featured_video_url",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 45,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "featured_video_provider",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 46,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "vanity_slug",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 47,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "claim_state",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 48,
+      "generated": "",
+      "defaultMd5": "e202a18c0f509b7c9549959f76be2a25"
+    },
+    {
+      "acl": null,
+      "name": "import_metadata",
+      "type": "jsonb",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 49,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "attribution",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 50,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "removal_requested_at",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 51,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "facebook_url",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 52,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "whatsapp_number",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 53,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "expose_inventory_to_network",
+      "type": "boolean",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 54,
+      "generated": "",
+      "defaultMd5": "68934a3e9455fa72420237eb05902327"
+    },
+    {
+      "acl": null,
+      "name": "network_exposure_status",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 55,
+      "generated": "",
+      "defaultMd5": "3efd06564e0691c4ca7f3df332cbb312"
+    },
+    {
+      "acl": null,
+      "name": "network_exposure_requested_at",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 56,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "network_exposure_reviewed_at",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 57,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "network_exposure_reviewed_by",
+      "type": "uuid",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 58,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "network_exposure_review_note",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 59,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "custom_domain",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 60,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "custom_domain_status",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 61,
+      "generated": "",
+      "defaultMd5": "3efd06564e0691c4ca7f3df332cbb312"
+    },
+    {
+      "acl": null,
+      "name": "custom_domain_verify_token",
+      "type": "text",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 62,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "custom_domain_verified_at",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 63,
+      "generated": "",
+      "defaultMd5": null
+    }
+  ],
+  "indexes": [
+    {
+      "name": "admin_audit_log_pkey",
+      "ready": true,
+      "table": "admin_audit_log",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "29fda601e4c4b3790790c6b6b28f1b8a"
+    },
+    {
+      "name": "idx_admin_audit_action",
+      "ready": true,
+      "table": "admin_audit_log",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "df2a899dbb625567a5a1a61accf1c977"
+    },
+    {
+      "name": "idx_admin_audit_actor",
+      "ready": true,
+      "table": "admin_audit_log",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "a205989317c5597070e26d7706e4f563"
+    },
+    {
+      "name": "idx_admin_audit_created",
+      "ready": true,
+      "table": "admin_audit_log",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "6fb8a5147a2ca8e902903038f0b6149c"
+    },
+    {
+      "name": "idx_admin_audit_entity",
+      "ready": true,
+      "table": "admin_audit_log",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "ae60a7cd40a577f2e5d832f38724074e"
+    },
+    {
+      "name": "idx_admin_audit_target",
+      "ready": true,
+      "table": "admin_audit_log",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "a30e2c8f582d42f22558fa54188b28bb"
+    },
+    {
+      "name": "business_types_pkey",
+      "ready": true,
+      "table": "business_types",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "1561f7d1d35a90d7f98feaf47c4f0e61"
+    },
+    {
+      "name": "businesses_lat_lng_idx",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "3031ba3e2eabe2e40efc0a5050fc85f5"
+    },
+    {
+      "name": "businesses_network_exposure_status_idx",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "5476ac1d0e29dd7a3d2763e4b0a277d3"
+    },
+    {
+      "name": "businesses_pkey",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "2f94b1c1ec96859e0551bd5d6c0f1b08"
+    },
+    {
+      "name": "businesses_slug_key",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "cb3f88e8fc2dbd89c3da72dd0753bc55"
+    },
+    {
+      "name": "businesses_source_external_id_unique",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "cd1a82dfebaacfffc70a0686d9ceef2c"
+    },
+    {
+      "name": "businesses_vanity_slug_lower_uidx",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "99ca865f91cd0dc11ae3bb1b63365a71"
+    },
+    {
+      "name": "idx_businesses_city",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "a66fd93e16a1bbde2ce5be57cb335819"
+    },
+    {
+      "name": "idx_businesses_claim_state",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "64c85254afd8d9d070ff39e87a09492a"
+    },
+    {
+      "name": "idx_businesses_organization_id",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "73533000127ad553d849a993943716f6"
+    },
+    {
+      "name": "idx_businesses_owner",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "61b83c2fe3f6cdec1a13d8fd878dfc77"
+    },
+    {
+      "name": "idx_businesses_province",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "b9328e6651bf227b971e323437b5f6b0"
+    },
+    {
+      "name": "idx_businesses_region",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "e7fa8858735747d245ef097ab9900afc"
+    },
+    {
+      "name": "idx_businesses_status",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "207b0fdc5e8e80a39eb9bad47163abb5"
+    },
+    {
+      "name": "idx_businesses_tier_featured",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "8246463eab01415a7e19ce4834d69d0b"
+    },
+    {
+      "name": "idx_businesses_type",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "1cb388a84a7587736491031fca8bfb45"
+    },
+    {
+      "name": "uniq_business_custom_domain",
+      "ready": true,
+      "table": "businesses",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "d74743f21db3efbc7601a1492cc3a9a8"
+    }
+  ],
+  "policies": [
+    {
+      "name": "Admins read admin audit",
+      "roles": [
+        "public"
+      ],
+      "table": "admin_audit_log",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "Admins write admin audit",
+      "roles": [
+        "public"
+      ],
+      "table": "admin_audit_log",
+      "command": "a",
+      "checkMd5": "42f97d95c904a075a7bd26312db73461",
+      "usingMd5": null,
+      "permissive": true
+    },
+    {
+      "name": "Support read admin audit",
+      "roles": [
+        "public"
+      ],
+      "table": "admin_audit_log",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "01bcb07f9a9ee3cbedc16fc50e7eb119",
+      "permissive": true
+    },
+    {
+      "name": "Admins manage business types",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_types",
+      "command": "*",
+      "checkMd5": "52601dff68335277823fcbfe28ec86d5",
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "Business types public read",
+      "roles": [
+        "public"
+      ],
+      "table": "business_types",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "b326b5062b2f0e69046810717534cb09",
+      "permissive": true
+    },
+    {
+      "name": "Active businesses public read",
+      "roles": [
+        "public"
+      ],
+      "table": "businesses",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "dcd60eff20b467df6d2140c61dced723",
+      "permissive": true
+    },
+    {
+      "name": "Business owners can read own businesses",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "businesses",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "dd01f9aa259e485c4c0bc023d3a0a965",
+      "permissive": true
+    },
+    {
+      "name": "Moderators manage businesses",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "businesses",
+      "command": "*",
+      "checkMd5": "fc10a64d29959c789918a9f3bce331e3",
+      "usingMd5": "fc10a64d29959c789918a9f3bce331e3",
+      "permissive": true
+    },
+    {
+      "name": "Owners delete own businesses",
+      "roles": [
+        "public"
+      ],
+      "table": "businesses",
+      "command": "d",
+      "checkMd5": null,
+      "usingMd5": "dd01f9aa259e485c4c0bc023d3a0a965",
+      "permissive": true
+    },
+    {
+      "name": "Owners insert businesses",
+      "roles": [
+        "public"
+      ],
+      "table": "businesses",
+      "command": "a",
+      "checkMd5": "64f9350ee6d0aeb102a1dbbc8be84888",
+      "usingMd5": null,
+      "permissive": true
+    },
+    {
+      "name": "Owners update own businesses",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "businesses",
+      "command": "w",
+      "checkMd5": "dd01f9aa259e485c4c0bc023d3a0a965",
+      "usingMd5": "dd01f9aa259e485c4c0bc023d3a0a965",
+      "permissive": true
+    },
+    {
+      "name": "Public can resolve verified custom domains",
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "businesses",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "2a1d8b440c9ea6949fc7dc5912dc2646",
+      "permissive": true
+    }
+  ],
+  "triggers": [
+    {
+      "name": "business_team_thread_on_create",
+      "table": "public.businesses",
+      "enabled": "O",
+      "function": "public.trg_business_created_team_thread()",
+      "typeBits": 5,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "db389d1a96becdea574203f4323edc76",
+      "updateColumns": []
+    },
+    {
+      "name": "businesses_recompute_intent",
+      "table": "public.businesses",
+      "enabled": "O",
+      "function": "public.trg_businesses_recompute_intent()",
+      "typeBits": 29,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "44234a98b0dbeb833a6033bf42ec26d5",
+      "updateColumns": [
+        "owner_id"
+      ]
+    },
+    {
+      "name": "set_businesses_updated_at",
+      "table": "public.businesses",
+      "enabled": "O",
+      "function": "public.tg_set_updated_at()",
+      "typeBits": 19,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "a0f9d25d2c190f91aa068867c3fe31f0",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_block_internal_staff_business",
+      "table": "public.businesses",
+      "enabled": "O",
+      "function": "public.block_internal_staff_business()",
+      "typeBits": 7,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "de3397695e95fd79a098bb863a63ddd2",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_enforce_business_custom_domain",
+      "table": "public.businesses",
+      "enabled": "O",
+      "function": "public.enforce_business_custom_domain()",
+      "typeBits": 23,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "767dc3bc6ebf89c6ca9249e9dec56d80",
+      "updateColumns": [
+        "custom_domain",
+        "custom_domain_status"
+      ]
+    },
+    {
+      "name": "trg_guard_business_owner_update",
+      "table": "public.businesses",
+      "enabled": "O",
+      "function": "public.guard_business_owner_update()",
+      "typeBits": 19,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "16f225e2d5a34fd2871c762ff4d8773b",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_notify_business_approved",
+      "table": "public.businesses",
+      "enabled": "O",
+      "function": "public.tg_notify_business_approved()",
+      "typeBits": 17,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "b0e9077178bcb78a490e56a8799b6b1d",
+      "updateColumns": [
+        "status"
+      ]
+    },
+    {
+      "name": "trg_notify_business_archive_change",
+      "table": "public.businesses",
+      "enabled": "O",
+      "function": "public.tg_notify_business_archive_change()",
+      "typeBits": 17,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "207992e8b0439d3cacbb6291ba9c9355",
+      "updateColumns": [
+        "status"
+      ]
+    },
+    {
+      "name": "trg_notify_business_submitted",
+      "table": "public.businesses",
+      "enabled": "O",
+      "function": "public.tg_notify_business_submitted()",
+      "typeBits": 5,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "8eb9defcd63018d8ddb275dd0e49537e",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_pp_business_signup_bounty",
+      "table": "public.businesses",
+      "enabled": "O",
+      "function": "public.pp_business_signup_bounty()",
+      "typeBits": 5,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "dbe661b67d6a677ab0afc4cb8cee4a6b",
+      "updateColumns": []
+    }
+  ],
+  "functions": [
+    {
+      "acl": "{=X/supabase_auth_admin,supabase_auth_admin=X/supabase_auth_admin,dashboard_user=X/supabase_auth_admin}",
+      "kind": "f",
+      "owner": "supabase_auth_admin",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "cdef18c69c4f4cbbced2eaf81e628b49",
+      "configMd5": null,
+      "signature": "auth.uid()",
+      "configKeys": [],
+      "resultType": "uuid",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "ea3b41bf29e2ad573067939329aa088e",
+      "serviceExecute": true,
+      "definitionBytes": 274,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "4013bf118428ed2335d0889a2ba185af",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.block_internal_staff_business()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "dd3c9c1ebddb7e68cadf8dec69fac26a",
+      "serviceExecute": true,
+      "definitionBytes": 433,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "995bf3deb59ebb7314cadfb102c0ec7c",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.can_moderate(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "27656335d4ff4b9557951c2f3678e7a2",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id"
+      ],
+      "definitionMd5": "f7e561172cb3ff6dd98ffdb015066c3c",
+      "serviceExecute": true,
+      "definitionBytes": 299,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "318998007586fe3538d6ae3b381212df",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.can_support(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "27656335d4ff4b9557951c2f3678e7a2",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id"
+      ],
+      "definitionMd5": "29bb2f0b57fd8abe4bce8555627afa2a",
+      "serviceExecute": true,
+      "definitionBytes": 314,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres,authenticated=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "eee9038a5060ac2f0a74871148972abe",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.derive_signup_intent(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "text",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": false,
+      "argumentsMd5": "27656335d4ff4b9557951c2f3678e7a2",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id"
+      ],
+      "definitionMd5": "037f53638583143d112ecfa99289b2e0",
+      "serviceExecute": true,
+      "definitionBytes": 754,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "201a674653b4a01175449620008f8e77",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.enforce_business_custom_domain()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "6a0a444bec960647f537c9248de872b5",
+      "serviceExecute": true,
+      "definitionBytes": 663,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "8cb2be4c21b728a5a86e9b06fcf6e94b",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.guard_business_owner_update()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "e56525d41e0d9ec0cd6608873fc6b714",
+      "serviceExecute": true,
+      "definitionBytes": 835,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres,authenticated=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "dae5cfc5a8d92461a428f6702e4e65af",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.has_role(uuid,public.app_role)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "8216964371cd350348af933959ab4fda",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id",
+        "_role"
+      ],
+      "definitionMd5": "0c2c78626ed8a4807e6cc1b7b54d641c",
+      "serviceExecute": true,
+      "definitionBytes": 295,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "6ff565d45c820cd0b7134f5e2977cea1",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.pp_business_signup_bounty()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "654d0ac0cb383be9796d3883cd6168b7",
+      "serviceExecute": true,
+      "definitionBytes": 500,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 6,
+      "language": "plpgsql",
+      "bodyMd5Lf": "0f539857998f64fb0e3bcc212941ce90",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.recompute_signup_intent(uuid,text,text,text,text,text,text)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "void",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "6f4bd920d2ae876513cd548636dfbeca",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id",
+        "_trigger_source",
+        "_trigger_field",
+        "_trigger_old",
+        "_trigger_new",
+        "_trigger_entity_type",
+        "_trigger_entity_id"
+      ],
+      "definitionMd5": "6a3b02a5f5ff0f859f1e8fc8713aef44",
+      "serviceExecute": true,
+      "definitionBytes": 1822,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "bf98af3fb51d414f568de3fa34e80afa",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.recompute_signup_intent(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "void",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "27656335d4ff4b9557951c2f3678e7a2",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id"
+      ],
+      "definitionMd5": "1b7e8c8e59c2959ca12cd072529d2517",
+      "serviceExecute": true,
+      "definitionBytes": 1039,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "fda41e1bcd640b80cce098c2ee02064f",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_notify_business_approved()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "ce4d2adb4953337c22c5e6bc95753002",
+      "serviceExecute": true,
+      "definitionBytes": 1040,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "00dda14f4b2e8a8662ff9676b03da004",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_notify_business_archive_change()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "16cd3c2fa08e8300e63558d6bc873c29",
+      "serviceExecute": true,
+      "definitionBytes": 1113,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "11b19dbfb5155289054dc6aa181ac502",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_notify_business_submitted()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "6b5be7e69a5385a130d4de9ef16b1201",
+      "serviceExecute": true,
+      "definitionBytes": 854,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "301a884953d37769916294bb60562e05",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_set_updated_at()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "494198e1eb8f9c98c4cf075ed9d79bb9",
+      "serviceExecute": true,
+      "definitionBytes": 194,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "d13017c493f1ab0e1788022d6030130a",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.trg_business_created_team_thread()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "3176f1c2c3d3abeb3f01b0c44d8817d9",
+      "serviceExecute": true,
+      "definitionBytes": 255,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "46b92e78631dff66834b7e4035b4e251",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.trg_businesses_recompute_intent()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "6d715f23167595b07aaddd268ee3bf25",
+      "serviceExecute": true,
+      "definitionBytes": 1085,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "8a393cd291584b8d821c01af94753c27",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.trg_profiles_recompute_intent()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "a053269427e5fb5e848e7021c6d5ffd2",
+      "serviceExecute": true,
+      "definitionBytes": 663,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    }
+  ],
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "constraints": [
+    {
+      "name": "admin_audit_log_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "admin_audit_log",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "business_types_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "business_types",
+      "columns": [
+        "slug"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "df1d6753f9f1b7aeda2246f8247da522",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "businesses_claim_state_check",
+      "type": "c",
+      "match": " ",
+      "table": "businesses",
+      "columns": [
+        "claim_state"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "200a7f3ac1786a022f3784e4401c8c75",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "businesses_featured_video_provider_check",
+      "type": "c",
+      "match": " ",
+      "table": "businesses",
+      "columns": [
+        "featured_video_provider"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "e757b86ec912cd815b7e5e8f7b78eb98",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "businesses_network_exposure_reviewed_by_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "businesses",
+      "columns": [
+        "network_exposure_reviewed_by"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "f38f2a3dc227338a060e1d78f4aa0c98",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "businesses_network_exposure_status_check",
+      "type": "c",
+      "match": " ",
+      "table": "businesses",
+      "columns": [
+        "network_exposure_status"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "76db3ba69e3b15b0eade488e84f538b8",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "businesses_organization_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "businesses",
+      "columns": [
+        "organization_id"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "dfae532b0de8c0f4bb512c9b30235ed9",
+      "referenceTable": "public.organizations",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "businesses_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "businesses",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "businesses_slug_key",
+      "type": "u",
+      "match": " ",
+      "table": "businesses",
+      "columns": [
+        "slug"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "687397275d0e852fb2a4b50394adffee",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "businesses_type_slug_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "businesses",
+      "columns": [
+        "type_slug"
+      ],
+      "deferred": false,
+      "onDelete": "a",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "ec942722226f529ad569e51a5f0fa435",
+      "referenceTable": "public.business_types",
+      "referenceColumns": [
+        "slug"
+      ]
+    },
+    {
+      "name": "businesses_vanity_slug_format_chk",
+      "type": "c",
+      "match": " ",
+      "table": "businesses",
+      "columns": [
+        "vanity_slug"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "9078bbd0dfc8379d5675d4bb7b42538a",
+      "referenceTable": null,
+      "referenceColumns": []
+    }
+  ],
+  "observedAtUtc": "2026-10-15T08:42:08.249322",
+  "serverVersion": "17.6"
+}

@@ -136,6 +136,9 @@ jobs:
       - name: Selected bootstrap core structure recovery and seven-table parity (offline, never quarantined)
         run: node --test --test-concurrency=1 scripts/ci/bootstrap-core-structure-review.test.mjs
 
+      - name: Bootstrap business-read/audit structure and ten-table parity (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/bootstrap-business-structure-review.test.mjs
+
       - name: Claim review current caller and unwired command contracts (never quarantined)
         run: npx vitest run src/lib/business-claims.functions.test.ts src/lib/claim-review-contract.server.test.ts --maxWorkers=1
 
