@@ -1006,3 +1006,39 @@ seller enum/trial ANY, source/baseline/replay/parity/release and receipt/mobile/
 owner/consent/private-history/recovery/full-media/hosting gates remain open. No
 sparse deploy, restriction replay, paid resource, customer message, data deletion,
 PR merge or duplicate automation; single recurring continuation stays active.
+
+PR #62 docs `9425099` passed all six CI gates (`38721062998`); hosting failed
+separately and production/migrations skipped. Draft PR #63, code `d59b24e`,
+recovers actual provider auth.uid() with one READ ONLY guarded source diagnostic
+at `10:40:55.605099` UTC. Complete prior envelope plus independent privacy/size/
+literal checks permit its reviewed 274-byte definition; exact header/body/owner/
+ACL/effective execute match locally. No Auth/app/config rows/counts, settings/JWT/
+sequence values or helper invocation read. Its schema grants/role flags and
+unsigned request settings are explicit lab supports, not original-human/session
+or whole provider/native authority proof, and not the earlier uid stub.
+
+Separately, actual staff Auth SQL against unchanged PR #62 full schema confirms
+genuine missing-manager FK/late subscription failure, complete eighteen-table/
+Auth rollback, local sequence gaps and original-input/default recovery. Current
+staff source can flag unconfirmed accounts, derive private/buyer/founding Bronze,
+accept ordinary metadata-selected managers and leave roles/staff/partners absent
+after confirmation. Earlier staff seller NULL/enum concern is not reproduced in
+this current Auth branch, not a claim every variant fixed. These are policy/
+authority/entitlement gaps, not accepted role provisioning. Twenty-six focused
+pass (23.084 seconds), syntax/lint/format/canonical JSON/diff/primary review pass;
+full serial tooling 628/628 passes (508.675 seconds), then 10/10 receipt assets
+(0.298 seconds): 638 aggregate, zero failures/skips/cancellations. No fresh
+application suite claimed; PR #54 remains parent evidence. Evidence:
+`evidence/PROVIDER_UID_STAFF_AUTH_PREREQUISITES.md`. PR #63 needs latest checks.
+
+Next compose remaining actual staff audit/sales profile/territory full schemas,
+role/staff writer functions/attachments (PR #50/#54), full PR #62 Auth and now
+recovered actual provider uid, retaining genuine canonical-manager/org inputs,
+all constraints and late rollback/local sequence behavior. Do not repeat completed
+source/prerequisite/ordinary/financial/full-schema recovery or adopt unsigned lab
+subjects as actors. Real role provisioning is separate from confirmed staff Auth.
+Then original actor/revisions/common locks/offboarding/native acceptance. Source/
+baseline/replay/parity/release and all financial/consent/private-history/recovery/
+receipt/mobile/owner/full-media/hosting gates unchanged. No live mutation/migration/
+deploy, paid resource, customer message, data deletion, restriction replay, PR merge
+or duplicate automation; single recurring continuation remains active.
