@@ -42,8 +42,14 @@ Security reconciliation branch: `completion/365-security`.
    tested in draft PR #39, with no adopted privileged positive branches. The
    deny-only direct native profile/user-role write prototype is now implemented/
    tested offline in draft PR #43 (`7ce8f19`): 19 focused and 356 total tooling/
-   receipt-asset tests pass. Verify its latest CI, then close the original-actor
-   business_staff trigger/native-sync writer boundary and trusted team/ownership/
+   receipt-asset tests pass. Its documentation head `3bf5f43` now passed all six
+   CI gates (`38673257097`); hosting still fails separately. The selected native-
+   sync endpoint deny-all containment/recovery prototype is now implemented/tested
+   offline in draft PR #44 (`aad4f26`), with 19 focused and 375 total tooling/
+   receipt-asset tests. It is not trusted
+   original-actor authority, a complete roster guard or production mitigation.
+   Verify its latest checks, then recover the ownership-claim/transfer guard/audit
+   chain before owner positives and close trusted team/ownership/
    shift/audit dependencies before adopting privileged positives. The narrow
    roles-catalog restriction/recovery candidate is implemented/tested in draft
    PR #41, memory-only and unapplied; docs `5ab35ef` passed all six CI gates
@@ -1012,8 +1018,11 @@ and wrapper `38670594626` skipped migrations/production deployment. No green
 preview-wrapper upload or production workflow acceptance is claimed. Initial
 code CI `38672918147` is pending at capture (build/unit still running); hosting
 `051891c6-e359-4e58-a36a-db9731c2fda1` failed separately and wrapper `38672918177`
-skipped migrations/production deployment. Latest documentation head requires its
-own next-resume check.
+skipped migrations/production deployment. Latest documentation head `3bf5f43`
+passed all six CI gates (`38673257097`), verified on the staff-sync follow-up;
+hosting `d6a78c2b-157f-4d13-8904-2300c7c91cd2` failed separately and wrapper
+`38673257105` skipped migrations/production deployment. This does not change
+the draft/unapplied/release state.
 
 This slice is **offline, unapplied and not production authority**. The fixed-
 evidence builder atomically removes only authenticated INSERT/UPDATE/DELETE on
@@ -1083,6 +1092,97 @@ storage restore, consent/tenure, real API/session/role/concurrency, OCR/mobile/
 owner pilot and full-media hosting remain open. No paid resources, customer
 communication, data/history repair or sparse deployment. Existing heartbeat
 remains active without duplicate reminders; no premature live approval request.
+
+## Native staff-sync endpoint containment checkpoint (2026-10-15)
+
+Draft PR #44, code `aad4f2644fb7612562a94e52ddf460971c34037e`, branch
+`security/native-staff-sync-containment`, stacked on PR #43 docs `3bf5f43`.
+The parent passed all six CI gates (`38673257097`), verified on this resume.
+Hosting `d6a78c2b-157f-4d13-8904-2300c7c91cd2` failed separately; wrapper
+`38673257105` skipped migrations/production deployment. Code-head CI
+`38675228250` is pending at initial publication, hosting
+`fc69c404-608a-4572-b6ed-4d719328ba50` failed separately and wrapper
+`38675228305` skipped migrations/production deployment. Later documentation head
+needs its own next-resume check; no preview-wrapper upload evidence is inferred.
+
+This **memory-only, unapplied, non-adopted selected-writer prototype** inserts
+one unconditional distinctive 42501 before the latest native sync member's first
+business SELECT/write. Header/defaults/DECLARE/original tail/raw ACL, later
+boundary wrapper and exactly three enabled staff attachments remain unchanged.
+All callers—including SQL owner/service/actual owner/NULL subjects and arguments—
+are denied at the endpoint, without a manager or signed-out bypass. No trusted
+original-human attribution or complete roster/native authority is established.
+It intentionally breaks the selected provisioning/promote/remove path in the lab;
+it is not compatible staff management or an approved live restriction.
+
+Exact original/candidate before/after definition/body/argument/default/owner/
+config/ACL/effective-right guards, unchanged wrapper/attachments and ordinary
+roster topology surround replacement. Transaction-local `pg_catalog,pg_temp`
+protects guards and raw retained CREATE type parsing, then restores caller path.
+No table lock/new object/table privilege/source CHECK/application/data/history
+change is supplied. Ordinary DDL locks still exist; independent-session/function-
+OID/concurrent-DDL and target-version/operator acceptance remain unverified.
+Explicit transaction/timeouts/rollback are a caller contract, not enforced outer
+transaction/human approval. Separate guarded recovery restores the unsafe source
+body, not earlier committed data, and is not automatically or live authorized.
+
+Verification: final focused 19/19 (24.359s), no failures/skips/cancellations;
+syntax/lint/format/diff and independent module/test/document review pass. Final
+full tooling passes in consecutive serial commands: 365/365 scripts/ci
+(296.829s) plus 10/10 receipt OCR/PDF asset tests, 375 aggregate, no failures/
+skips/cancellations. This is not one combined command or a fresh app/production
+acceptance run. Review corrected
+explicit returned-ID/stored-toggle assertions and temporary-type parsing. No
+historical source, original function tail or actual CHECK was weakened.
+
+Controls distinguish client EXECUTE denial from body denial through actual later
+wrapper/no-op targets/INSERT/conflict/owner DELETE/service/NULL paths. A clearly
+labelled local nontransactional midpoint sequence witnesses earlier transient
+chat activation before endpoint failure; all 14 business relations/selected
+catalog restore. The sequence intentionally does not roll back and is not native
+human attribution. Actual team provisioning also rolls back; existing-member
+deactivation can still fail the earlier real chat 23514 CHECK. Genuine post-DDL
+security-mode faults return to own postguard 55000 in both directions; separate
+22012 suffix faults test outer transactions. Hostile temporary types preserve
+builtin argument/result/OID/one overload/path and exact recovery. Reinstall,
+recovery/body/default/security/ACL/wrapper/attachment/topology drift refuse.
+
+Successful zero-row/DO NOTHING acknowledgements are not mutations. Shift-only
+and identity-only writes still bypass the native target-list attachment and can
+reactivate/retarget chat; those residual controls remain explicit. The separate
+PR #39 self-shift candidate composes only in the tested endpoint→companion
+install and companion→endpoint recovery order, with legacy identity/membership
+and exact returned/stored-toggle controls. No automatic ordering with PR #41/#43
+ACL prototypes or accepted native authority model is established.
+
+Migration impact: none. Live database call/mutation/deployment: none. All three
+approved legacy restrictions are preserved without replay or recovery. Global
+composer stays 404/423 with 19 unclassified and helper-envelope facts separate;
+baseline/replay/parity/release flags stay false. Exact scope/pins:
+`evidence/NATIVE_STAFF_SYNC_CONTAINMENT_CANDIDATE.md`.
+
+Exact next action: verify PR #44 latest head/checks, then recover narrow current
+metadata for approve_business_claim, can_moderate, business owner-update guard,
+claim status-audit function/attachment, selected claim/audit tables and owner-column
+ACL/policies. Compose unchanged selected claim/transfer/guard/audit declarations
+offline with zero-row ordinary-claim approval, transfer/repeated/rejected claim,
+sibling rejection, NULL/stored reviewer attribution, direct protected update and
+transaction rollback controls. The latest claim body is
+`20260619183732_375472c8-9c6b-4392-85c3-021a02d51140.sql`; original source service-
+only grants are not current ACL evidence, and August's skip-revoke list is not a
+GRANT. Manual service approval then reviewer stamping is non-atomic/unchecked;
+separate browser transfer has error-only success, no previous-owner comparison or
+returned-row confirmation. Do not adopt these as owner/native reconciliation or
+expand permissions. A bounded caller-confirmation/lifetime fix may proceed
+independently without claiming database transfer/audit/concurrency acceptance.
+
+Then close trusted team classification/raw reentry, owner/delegation/invitation/
+multi-roster policy, original-actor shift/audit and other native/bootstrap writers
+before positive management or valid atomic offboarding. Full DB/private-storage
+restore, real JWT/API/role/session/concurrency, consent/tenure, OCR/mobile/owner
+pilot and full-media hosting remain open. No paid resources, communications,
+data/history repair or sparse deployment. Existing heartbeat stays active without
+duplicate automation or premature live approval requests.
 
 ## Recovery evidence (original scope, retained below)
 

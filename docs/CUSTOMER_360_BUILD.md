@@ -421,7 +421,9 @@ rollback faults are rehearsed. A generated OID-array comparison defect was fixed
 before passing runs, without changing original source/constraints. See
 `evidence/NATIVE_PROFILE_ASSIGNMENT_CONTAINMENT_CANDIDATE.md` for exact pins and
 limits. The parent's latest PR #42 docs `dbdbf01` passed all six gates; this
-slice's newest head needs its own next-resume CI check.
+slice's documentation head `3bf5f43` now passed all six gates (`38673257097`),
+verified on the staff-sync follow-up; hosting remains separately failed and
+migrations/production deployment skipped. No production authority is inferred.
 
 The separate roles-catalog restriction remains unapplied, so the original catalog
 stays writable. This candidate requires
@@ -434,3 +436,31 @@ valid offboarding. Preserve the three live legacy restrictions without replay.
 No live table authority or release readiness is inferred; baseline/recovery,
 API/session/concurrency, consent/tenure, OCR/mobile/owner pilot and full-media
 hosting remain open. Recurring continuation stays active without duplication.
+
+Draft PR #44 (code `aad4f26`) now implements/tests the memory-only selected native
+staff-sync endpoint deny-all prototype. One distinctive 42501 precedes all reads/
+writes for every caller; original header/defaults/tail/ACL, the later boundary
+wrapper and three attachments remain unchanged. No trusted-human attribution,
+manager/service/NULL exception, full roster containment or production mitigation
+is inferred. Exact before/after guards, explicit unsafe source-body recovery and
+trusted `pg_catalog,pg_temp` type parsing are local research, not release authority.
+
+Final 19/19 focused tests pass (24.359s); full tooling/receipt-asset regression
+passes 375 total in consecutive serial commands (365 CI-tooling plus 10 assets),
+no failures/skips/cancellations. Independent review corrected returned-row/stored-
+shift and temporary-type controls; original source/constraints remain unchanged.
+Tests distinguish client EXECUTE/body denial, actual wrapper/no-op/upsert/owner
+paths, earlier chat effects with full business rollback, real prior CHECK failures,
+own postguard versus outer-transaction faults, drift and exact unsafe recovery.
+Identity/shift-only chat bypasses remain explicit; PR #39 composition has a tested
+specific install/recovery order, not automatic ACL-prototype adoption.
+
+See `evidence/NATIVE_STAFF_SYNC_CONTAINMENT_CANDIDATE.md` for pins and limits.
+PR #43 docs `3bf5f43` passed all six gates; this latest slice still needs its own
+head check. Migration impact/live DB calls/deployment: none. Preserve the three
+applied helper restrictions without replay. Next recover and compose ownership-
+claim/transfer guard/audit provenance before native owner positives, then trusted
+team/original-actor shift/audit and other writers. Error-free zero-row browser
+transfer and later unchecked reviewer stamping are not confirmed/audited transfer.
+No baseline/parity/release flag changes; all existing recovery/consent/tenure/
+API/session/concurrency/OCR/mobile/full-media hosting gates remain open.
