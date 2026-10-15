@@ -104,3 +104,7 @@ described above, recover/match organization/bootstrap source and actual critical
 metadata, then compose nonempty referrals and incoming/offboarding/original-
 actor dependencies. Do not repeat completed catalog recovery or the three
 approved EXECUTE restrictions. Same-chat continuation remains active.
+
+Follow-up: docs HEAD `0d925e2` passed all six CI gates (`38693190311`). The
+separate empty-referrals behavioral extension is documented in
+`STAFF_PARTNER_EMPTY_REFERRALS.md`; this dated inventory/query is unchanged.

@@ -15,6 +15,20 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest completed bounded slice: draft PR #54, code `e4348cf`, composes the actual
+staff-domain partner forward chain with an actual empty user-referrals table in
+discarded databases. Immutable PR #50 and PR #52 artifacts are unchanged. 29
+focused and 485 tooling/receipt-asset tests pass (475 plus separate 10). No
+migration, live query/mutation or deployment. Newest PR CI still needs its own
+verification. Exact evidence: `evidence/STAFF_PARTNER_EMPTY_REFERRALS.md`.
+Fresh full application suite also passes: 1,207 tests/59 files (93.25s), plus
+full TypeScript. Lint/syntax/format/diff pass; primary review only, no quota retry.
+Next recover the bounded auth/profile/org/member/settings/subscription/sequence
+catalog/source frontier and missing original org DDL before composing bootstrap;
+independently close nonempty referral intent/bounty/assignment dependencies.
+Partner mismatch/reactivation and stale offboarding are characterized, not fixed
+or adopted authority. No repeated completed catalog/partner work or helper replay.
+
 1. Preserve the approved converter live restriction. The owner now separately
    approved both PR #18 bootstrap/totals EXECUTE restrictions; PR #18 `88a8977`
    passed all six CI gates. Both approved restrictions were individually applied
@@ -106,16 +120,16 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest fully CI-verified application slice: PR #51, docs head `681e36c`, all six
-CI gates passed (run `38688332298`), 1,154 application tests across 58 files. These are review
+Latest fully CI-verified application slice: PR #53, docs head `c18cc62`, all six
+CI gates passed (run `38693787258`), 1,207 application tests across 59 files. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
 Latest application candidate: draft PR #53, code `b140407`, 1,207 application tests
 across 59 files and full TypeScript pass. It adds strict role/profile returned-row
 identity evidence to the existing account API, without adopting backend authority
-or repairing provisioning/model gaps; its own latest CI requires verification.
-PR #51 remains the latest fully CI-verified connected source parent (`681e36c`,
+or repairing provisioning/model gaps; docs `c18cc62` passed all six CI gates.
+PR #51 is the earlier verified connected source parent (`681e36c`,
 1,154 tests), with caller/private-lifetime hardening. PR #48 remains the
 earlier verified claim UI parent, with its six gates recorded above. PR #46 remains the
 earlier verified owner-row confirmation parent (1,029 tests). PR #38, code `22c2724`, remains the earlier
@@ -144,8 +158,8 @@ all six CI gates (`38687811205`), not production authority or release acceptance
 Latest dependency inventory: draft PR #52, code `e4e099d`, six offline catalog
 contracts and 456 tooling/assets pass. New fingerprint-only partner/referral
 inventory exposes bounty/assignment and nonempty intent frontiers; no partner
-behavioral fixture or complete signup proof is claimed. Its own latest CI still
-requires verification.
+behavioral fixture or complete signup proof is claimed by that inventory. Docs
+`0d925e2` now passed all six CI gates (`38693190311`).
 
 Latest database read candidate: draft PR #31, code `797876c`,22 new focused tests
 and 191/191 full sequential tooling pass. The CLI-generated reminder invoker API
