@@ -361,8 +361,9 @@ restriction/recovery candidate. 16/16 focused and 315/315 full sequential toolin
 tests pass; formatting/lint/diff and independent review pass. Exact guards preserve
 permitted SELECT/helpers/owner/service, and real post-DDL faults roll back. The
 process receipt is explicitly caller-fabricable bookkeeping, not production
-approval/commit proof/durable provenance. Code CI `38667600224` is pending at this
-checkpoint; wrapper migrations/production deployment skip. No live database call,
+approval/commit proof/durable provenance. Code CI `38667600224` was superseded;
+docs `5ab35ef` passed all six gates (`38667796510`). Hosting failed separately;
+wrapper migrations/production deployment skip. No live database call,
 app change, migration or deployment; all release flags remain false.
 
 See `evidence/NATIVE_ROLE_CATALOG_CONTAINMENT_CANDIDATE.md`. Next verify PR #41's
@@ -372,3 +373,31 @@ restriction is not trusted tenant authority: bootstrap/roster/ownership/team/shi
 audit writers, real concurrency/operator recovery, baseline/storage, consent/tenure,
 OCR/mobile/owner pilot and hosting acceptance remain open. Separate live approval
 must follow readiness; existing converter authority does not apply to these tables.
+
+The owner subsequently approved both legacy helper EXECUTE restrictions only.
+Draft PR #42 (code `9bad6b2`) records tested trusted-path atomic execution
+envelopes around unchanged PR #18 SQL and fresh metadata-only release evidence.
+The original 17 helper tests plus 22 new envelope/query/recorded-evidence checks
+pass (final new combined run 6.146s); lint,
+formatting and independent review pass. Both helper restrictions are now applied
+and catalog/source verified at 2026-10-15 02:11:58 UTC: anon/authenticated EXECUTE
+denied, postgres/service preserved, all four definitions/header/config unchanged,
+invoice restriction intact and quote converter unchanged/public. No business
+routine/rows/counts, unsafe recovery, data/history repair or application deployment.
+
+Actual remote versions `20261015021118` and `20261015021145` each map exactly to
+one stored execution envelope, with separately pinned original embedded bytes.
+See `evidence/APPROVED_HELPER_EXECUTE_RELEASE.md` and
+`evidence/approved-helper-execution-2026-10-15.json`. Do not rerun those actions or
+claim global source-composer adoption; correspondence remains the previous
+404/423 with 19 unclassified pending formal composition of these new envelopes.
+PR #42 code `9bad6b2` passed all six CI gates (`38669588329`), including the new
+regression step/full unit gate; hosting failed separately and wrapper
+migrations/production deployment skipped. PR #41 docs `5ab35ef` passed all six
+gates (`38667796510`), while its roles
+candidate remains unapplied. Verify PR #42 latest documentation checks next,
+then continue the offline deny-only direct profiles/user_roles prototype and
+remaining indirect-writer authority boundaries. This helper approval does not
+authorize native tables/roles or quote conversion. The indirect quote bypass,
+baseline/recovery, real API/session/concurrency, OCR/mobile pilot and full-media
+hosting gates remain open; heartbeat stays active without duplicate automation.

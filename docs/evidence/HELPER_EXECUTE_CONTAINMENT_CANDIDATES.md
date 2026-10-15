@@ -107,7 +107,14 @@ Running it would reopen an observed risk; it requires a new operator/owner
 decision, not automatic authorization from a containment approval. No recovery
 was run live. Broader database/private-storage restore readiness remains open.
 
-## Live gate and exact next action
+## Original live gate checklist (now superseded by release evidence)
+
+The two helper restrictions are now individually applied and verified in
+`APPROVED_HELPER_EXECUTE_RELEASE.md` / draft PR #42. Actual remote versions are
+`20261015021118` and `20261015021145`; each stored single statement is the pinned
+trusted-path execution envelope containing the exact original source bytes,
+not the original candidate whole file. Do not replay either applied action or
+restore unsafe access. The original preparation checklist follows for context.
 
 Publish/review these sources and tests, require CI, obtain explicit scope approval,
 refresh exact complete ACL/definition/effective roles, confirm the approved

@@ -64,9 +64,43 @@ approved file. Preserve both pins and exact delimiter/byte-offset extraction.
 Owner approval and fresh preflight are verified. The execution envelope rehearsal
 passed 7/7 in 4.938 seconds; independent full-generator and generated-SQL review
 passed. Metadata query regressions passed 8/8 in 1.119 seconds using one synthetic
-memory database. Lint/format checks pass. **Neither helper restriction has
-been applied at this checkpoint.** Apply each only through `apply_migration`,
-then inspect the same narrow metadata SELECT and actual stored-source hashes.
+memory database. Lint/format checks pass. Root's combined sequential run passed
+15/15 in 5.964 seconds, no failures/skips/cancellations.
+
+After recording production observations, seven additional file-only evidence
+regressions pass. The final combined three-suite run passes 22/22 in 6.146
+seconds, no failures/skips/cancellations. These compare immutable saved records,
+not current live truth or independent provenance. Independent artifact review
+also confirms exact intended deltas and source mappings; it is not a second live
+database audit. No previous observation or original SQL was changed to pass.
+
+**Both approved restrictions are applied and verified.** After publishing code
+`9bad6b2f26b77fa92a78a191c7e9fcd5bff5821c` in draft PR #42, an immediate fresh
+read-only preflight at `2026-10-15 02:11:11.50546 UTC` again matched every selected
+function/role/history field. Each exact envelope was then submitted once through
+Supabase `apply_migration`, which reported success. No retry or recovery occurred.
+
+| Target    | Actual generated remote migration version | Postflight UTC               |
+| --------- | ----------------------------------------- | ---------------------------- |
+| Bootstrap | `20261015021118`                          | `2026-10-15 02:11:38.980018` |
+| Totals    | `20261015021145`                          | `2026-10-15 02:11:58.84888`  |
+
+Postflight after each action matched the expected permission-only delta: the
+target's anon/authenticated EXECUTE became false, postgres/service stayed true,
+and the declared ACL became exactly `{postgres=X/postgres,service_role=X/postgres}`.
+The complete selected metadata for every other function and the four roles was
+unchanged. All four definitions/body/header/configuration fingerprints remain
+identical. The existing invoice restriction/history remained intact and the
+quote converter remained public and unchanged. No production business routine
+was called or business row/count read to claim runtime workflow verification.
+
+Each new history name has exactly one row and one non-NULL stored statement;
+its SHA-256 and byte length exactly match the checked-in execution envelope
+below. Complete immediate preflight/intermediate/final selected observations and
+both local/remote source mappings are retained in
+`approved-helper-execution-2026-10-15.json`. No raw stored SQL was queried. These
+are new bounded correspondence facts, not an update to the global evidence
+composer or acceptance of either original whole-file migration.
 
 | Exact stored execution source                     | Envelope SHA-256, UTF-8 LF                                         | Bytes | Embedded original byte interval |
 | ------------------------------------------------- | ------------------------------------------------------------------ | ----- | ------------------------------- |
@@ -80,6 +114,25 @@ Intervals are zero-based UTF-8 bytes with exclusive ends, not character/line off
 Each inner delimiter occurs exactly twice and the extracted buffer equals the
 unchanged original migration file. The checked-in envelope files are outside
 the migration directory; do not db-push them or the unreconciled history chain.
+
+Publication: draft [PR #42](https://github.com/Hunting-Fishing/motorsales365/pull/42),
+branch `security/approved-helper-execution`, stacked on PR #41 docs `5ab35ef`.
+PR #41 docs passed all six CI gates (`38667796510`); its native roles candidate
+is still memory-only/unapplied. PR #42 code `9bad6b2` passed all six CI gates
+(`38669588329`), including the new envelope/query regression step and full unit
+gate, verified on this run. Separate hosting build
+`994a4f64-94a7-4679-abe7-685b8fef64dc` failed; wrapper `38669588369` skipped
+migrations/production deployment, and its green preview wrapper is not an upload.
+PR #42's newest documentation/evidence-test head requires a
+fresh CI check on the next resume. Passing those checks is not production workflow
+or hosting acceptance. No merge, application upload/deployment or sparse-media
+checkout release was performed.
+
+Exact next action: verify PR #42 latest head/checks without replaying either
+applied helper, then continue the offline deny-only direct native profiles and
+user_roles write prototype described in the completion checklist. Preserve all
+legacy rows and permitted SELECT; add no manager/contact-edit exception or repair.
+Keep the separate quote-conversion risk explicit and outside this approval.
 
 If a tool result is ambiguous, inspect ACL/history before any retry. If one
 restriction succeeds and the other fails, preserve and document the partial
