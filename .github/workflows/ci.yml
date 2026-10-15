@@ -103,6 +103,9 @@ jobs:
       - name: Native profile and role-assignment direct containment candidate (memory-only, unapplied)
         run: node --test --test-concurrency=1 scripts/ci/native-profile-assignment-containment.test.mjs
 
+      - name: Native staff-sync selected writer containment candidate (memory-only, unapplied)
+        run: node --test --test-concurrency=1 scripts/ci/native-staff-sync-containment.test.mjs
+
       - name: Approved helper execution envelope and metadata review regressions (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/approved-helper-execution-envelope.test.mjs scripts/ci/approved-helpers-catalog-review.test.mjs scripts/ci/approved-helper-release-evidence.test.mjs
 
