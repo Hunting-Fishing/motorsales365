@@ -83,3 +83,8 @@ locks, offboarding/native/consent reconciliation, recovery and real HTTP/JWT/RLS
 session/concurrency/receipt/mobile/owner/full-media acceptance remain open.
 Supabase safety guidance kept live inspection catalog-only and tests disposable;
 neither returned-row evidence nor a passing build adopts production authority.
+
+Follow-up verification: documentation HEAD `c18cc62` passed all six CI gates
+(`38693787258`); PR #52 docs `0d925e2` also passed all six (`38693190311`).
+Separate hosting checks still failed, with migration/production deployment skipped.
+These supersede the in-progress snapshots above, not the stated release blockers.

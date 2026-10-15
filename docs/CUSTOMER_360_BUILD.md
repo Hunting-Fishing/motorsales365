@@ -715,3 +715,37 @@ occurred this heartbeat. Next verify latest heads then complete actual partner/
 auth/profile/org/member and nonempty referral/incoming/offboarding/original-
 actor/revision/lock dependencies before model/atomic kernel adoption. Preserve
 native/consent/recovery/receipt/mobile/owner/full-media gates and single continuation.
+
+Follow-up: PR #52 docs `0d925e2` and PR #53 docs `c18cc62` now passed all six CI
+gates (`38693190311`, `38693787258`). PR #53 is the latest verified connected
+application-source slice (1,207 tests), not deployed or full provisioning proof.
+Both separate hosting checks failed; migration/production wrappers skipped.
+
+Draft PR #54 (`e4348cf`) now adds the actual staff-domain partner forward
+composition around unchanged PR #50, with unchanged PR #52 fingerprints. Nine
+real tables/117 columns/28 constraints/28 indexes/27 policies, fifteen actual
+functions and twelve selected attachments match. The real partner wrapper SELECT
+executes on an EMPTY actual user-referrals table; no intent-helper stub or nonempty
+referral/writer-fanout coverage is claimed. Creation/reactivation/existing email/
+application branches and late genuine partner NOT NULL/PK rollback/recovery pass.
+Mismatched binding reactivation, permissive application claims and stale selected
+offboarding remain unadopted behavior, not fixes. 29 focused and 485 tooling/assets
+pass (475 serial plus separate 10), no failures/skips/cancellations. Dedicated CI,
+primary review/syntax/lint/format/diff pass; quota-blocked agents were not retried.
+Evidence: `evidence/STAFF_PARTNER_EMPTY_REFERRALS.md`. No live query, migration,
+mutation, deployment, paid resource, data deletion or customer communication.
+
+Next bounded dependency: map/recover auth/profile/org/member/settings/subscription/
+member-sequence source and exact catalog, including missing original organization
+DDL and creator-owner trigger provenance, before composing bootstrap. Separately
+close nonempty referral intent/profile/admin-audit/bounty/assignment fanouts and
+critical constraints, then original-actor/revision/lock/incoming/offboarding/native
+authority before any atomic kernel adoption. Baseline/replay/parity/release flags
+remain false; preserve all native/consent/private-history/receipt/mobile/owner/
+full-media/recovery acceptance gates and the existing single continuation.
+
+PR #54's fresh full application regression also passes, 1,207/1,207 in 59 files
+(93.25 seconds), and full TypeScript passes. Code CI `38696532588` has OCR/lint/Parts passed, build/type/unit
+pending; hosting `6f0e6469-b986-4938-bbaa-418a361b69ab` failed separately and
+wrapper `38696532720` skipped migrations/production deployment. Verify later docs
+HEAD separately; no passing build/preview wrapper constitutes deployment.

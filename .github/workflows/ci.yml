@@ -121,6 +121,9 @@ jobs:
       - name: Staff partner catalog fingerprints and explicit dependency frontier (offline)
         run: node --test scripts/ci/staff-partner-catalog-review.test.mjs
 
+      - name: Staff partner actual forward chain with empty referrals (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/staff-partner-empty-referrals.test.mjs
+
       - name: Claim review current caller and unwired command contracts (never quarantined)
         run: npx vitest run src/lib/business-claims.functions.test.ts src/lib/claim-review-contract.server.test.ts --maxWorkers=1
 
