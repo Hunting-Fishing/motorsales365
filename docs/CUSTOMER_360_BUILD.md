@@ -542,3 +542,29 @@ authority still need closure. The claim-review ACK/lifetime UI is the next
 separate application slice; recovery/consent/tenure/API/concurrency/OCR/mobile/
 full-media hosting remain open. Preserve applied restrictions without replay;
 no baseline/parity/release flag changes or duplicate continuation automation.
+
+Draft PR #48 (code `59228c5`) now hardens the separate admin claim-review UI:
+exact acknowledgement-only feedback, one-flight captured requests, per-claim ACK
+and permanent same-account unknown-outcome locks, observed target/masking/ABA
+fences, private account-scoped fresh list/audit reads and signed-preview lifetime
+isolation. NULL audit actors remain unrecorded rather than being inferred human/
+System actions. Refresh never unlocks or attests a review outcome. The backend
+handler is byte-unchanged; unchecked separate stamping, row counts/error paths,
+idempotency and original-actor/role authority are not repaired by the UI.
+
+39 focused tests pass; final app 1,068/1,068 across 55 files (86.35s), TypeScript,
+zero-error/warning lint, formatting/diff and independent review pass. Same-run
+tooling 415/415 passed separately, not one production test. PR #47's docs CI has
+five gates passed/unit pending and PR #48's code CI is running at capture; later
+documentation heads need their own verification. Hosting fails separately and
+migrations/production deployment are skipped. No live application test/mutation,
+migration, API call or deployment occurred. Exact scope/pins:
+`evidence/CLAIM_REVIEW_ACKNOWLEDGEMENT_SLICE.md`.
+
+Next verify latest heads, then close narrowly authorized original-actor/pending/
+prior-owner/idempotent atomic decisions with trusted team/native/shift/audit and
+separate manual-writer authorization. Real HTTP/JWT/RLS/session/concurrency,
+operator recovery/consent/tenure/private retention/OCR/mobile/owner pilot/full-media
+hosting remain open; no sparse artifact deploy, baseline/parity/release promotion
+or replay of the three applied restrictions. Same-chat scheduled continuation stays
+active without duplication or a claim of continuous between-run work.

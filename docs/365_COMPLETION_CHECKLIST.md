@@ -109,10 +109,11 @@ CI gates passed (run `38678740970`), 1,029 application tests across 54 files. Th
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
-Latest application candidate: draft PR #46, code `8176dc9`, 1,029 application tests
-across 54 files and full TypeScript pass. It hardens admin owner-row confirmation/
-request lifetimes without changing database authority; its documentation head
-passed the six gates recorded above. PR #38, code `22c2724`, remains the earlier
+Latest application candidate: draft PR #48, code `59228c5`, 1,068 application tests
+across 55 files and full TypeScript pass. It hardens claim-review acknowledgement,
+private snapshot caches and request lifetimes without changing backend authority;
+its latest head needs CI verification. PR #46 remains the latest fully CI-verified
+application parent (owner-row confirmation, 1,029 tests). PR #38, code `22c2724`, remains the earlier
 six-chat-caller slice (986 tests), not the latest verified application head.
 The following PR #39 is a separate memory-only,
 non-adopted research candidate, not a compatible staff-management release.
@@ -1388,6 +1389,60 @@ real API/role/session/concurrency, operator recovery, consent/tenure, receipt/mo
 owner pilot and full-media hosting gates remain open. No sparse deployment, paid
 resources, customer communication or destructive history/data repair. Existing
 heartbeat stays active without duplication.
+
+## Admin claim-review acknowledgement checkpoint (2026-10-15)
+
+Draft PR #48, code `59228c57be456d62c2e2cd67c7078dec4ab63fde`, branch
+`completion/claim-review-acknowledgement`, stacked on PR #47 docs `8b1b38e`.
+PR #47 CI `38681676475` has five gates passed/unit pending at capture; hosting
+`40775dcb-bd16-4afe-823b-01bd8c5665c5` failed separately and wrapper
+`38681676472` skipped migrations/production deployment. PR #48 app-code CI
+`38681989244` is running; hosting `2b616737-6cb3-4f8b-ab9d-8dfd2a5d3825`
+failed separately and wrapper `38681989204` skipped migrations/production deploy.
+Later documentation heads require their own check; green wrappers are not uploads.
+
+The existing review server handler is byte-unchanged. Exact `{ok:true}` is now
+ACK only: no approved/rejected/ownership success claim, optimistic mutation or
+automatic retry. One synchronous flight covers every claim/decision; captured
+target/notes/decision, per-claim ACK lock and permanent same-account uncertain-
+outcome lock survive refresh. Monotonic observed-render target/masking/A→B→A
+fencing prevents old responses from publishing/invalidation or unlocking review;
+account changes remount private state. Refresh is inspection, not outcome recovery.
+Unobserved cache transitions and SQL/session/role ABA remain outside client proof.
+
+Private list/audit query keys include account/claim and fresh-only reads hide
+stale/current/unscoped caches during fetching/error. Signals are consumed, retries
+disabled, generic errors avoid backend exception payloads, strict list/audit
+shapes enforce context (100 claims/200 audit entries; related evidence dictionaries
+are not globally capped). Private HTTPS previews remount/clear/fence on account/
+evidence/path changes. NULL audit actor is “Actor not recorded”; stored labels
+are not verified original-human attribution. Email and phone confirmation labels
+remain distinct; evidence/empty-queue wording describes visible snapshots only.
+
+Verification: 39 focused tests pass (3.22s final run); final full app
+1,068/1,068 across 55 files (86.35s), no failure/skip/quarantine; full TypeScript
+passes. ESLint zero errors/warnings, formatting/diff and independent source/test/
+final effect-dependency review pass. Same-run parent tooling 415/415 passed in
+separate serial commands (405 CI-tooling plus10assets). No real HTTP/JWT/RLS,
+independent sessions, visual/mobile/accessibility/owner pilot or production
+workflow acceptance inferred. Exact pins/scope:
+`evidence/CLAIM_REVIEW_ACKNOWLEDGEMENT_SLICE.md`.
+
+Migration impact/live application calls/deployment: none; PR #47's two catalog
+observations are not live review/transfer tests. No new RPC/service client,
+authorization exception, grant/policy/schema/data/history changes or sparse
+deployment. Preserve all three applied helper restrictions without replay;
+baseline/replay/parity/release flags stay false, composer remains 404/423 with
+19 unclassified. Exact next action: verify PR #48/#47 latest checks, then draft/
+test the narrowly authorized original-actor/pending/prior-owner/idempotent atomic
+decision contract with trusted team/shift/native and separate manual-writer
+authorization closure. The unchanged legacy server's unchecked reviewer stamping,
+reject affected-row/count/error paths and mutable role authority are unresolved,
+not hidden by a truthful UI. Operator recovery, real API/role/session/concurrency,
+consent/tenure/private retention, receipt/mobile/owner pilot and full-media hosting
+gates remain open. No paid resources, customer communication, data deletion or
+destructive history repair. Existing recurring follow-up stays active, without
+duplicate automation or any claim of continuous work between scheduled turns.
 
 ## Recovery evidence (original scope, retained below)
 
