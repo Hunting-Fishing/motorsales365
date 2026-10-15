@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
   id: "wo-1",
   responses: {} as Record<string, DbResult | Promise<DbResult>>,
   read: vi.fn(),
+  select: vi.fn(),
   write: vi.fn(),
   navigate: vi.fn(),
   success: vi.fn(),
@@ -72,7 +73,10 @@ vi.mock("@/lib/shop-manager/db", () => ({
         );
       };
       const builder = {
-        select: () => builder,
+        select: (columns: string) => {
+          state.select(userId, table, columns);
+          return builder;
+        },
         eq: (column: string, value: string) => {
           filters[column] = value;
           return builder;
@@ -189,6 +193,18 @@ describe("Account-scoped work-order detail", () => {
   it("loads PHP totals and account/target-scoped source caches", async () => {
     const { client } = show();
     await ready();
+    expect(state.select).toHaveBeenCalledWith(
+      "employee-a",
+      "work_orders",
+      expect.stringContaining(
+        "customers!fk_work_orders_customer(first_name,last_name,email,phone)",
+      ),
+    );
+    expect(state.select).toHaveBeenCalledWith(
+      "employee-a",
+      "work_orders",
+      expect.stringContaining("vehicles!fk_work_orders_vehicle(year,make,model,license_plate,vin)"),
+    );
     expect(screen.getAllByText("₱1,250.50").length).toBeGreaterThan(0);
     expect(screen.getAllByText("₱250.00").length).toBeGreaterThan(0);
     expect(screen.getByText("₱1,500.50")).toBeInTheDocument();
@@ -385,7 +401,7 @@ describe("Account-scoped work-order detail", () => {
     expect(screen.queryByText("private route details")).not.toBeInTheDocument();
   });
 
-  it("refreshes the exact legacy list and current-account service histories after a write", async () => {
+  it("refreshes current-account list lifetimes, the exact legacy list and service histories after a write", async () => {
     const { client } = show();
     const invalidate = vi.spyOn(client, "invalidateQueries");
     await ready();
@@ -402,6 +418,10 @@ describe("Account-scoped work-order detail", () => {
     expect(invalidate).toHaveBeenCalledWith({
       queryKey: ["shop-manager", "work-orders", "list"],
       exact: true,
+    });
+    expect(invalidate).toHaveBeenCalledWith({
+      queryKey: ["shop-manager", "employee-a", "work-orders", "list"],
+      exact: false,
     });
     expect(invalidate).toHaveBeenCalledWith({
       queryKey: ["shop-manager", "employee-a", "work-orders", "detail", "wo-1"],

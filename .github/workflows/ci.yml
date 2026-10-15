@@ -26,9 +26,11 @@ env:
   CI: "true"
 
 jobs:
+  # Keep this candidate on the current OS family while ubuntu-latest transitions.
+  # https://github.com/actions/runner-images/issues/14748
   receipt-ocr-browser:
     name: Receipt OCR (real browser, same-origin assets)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +44,7 @@ jobs:
 
   typecheck:
     name: Typecheck (tsc --noEmit)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +57,7 @@ jobs:
 
   test:
     name: Unit tests (vitest + quarantine)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -184,6 +186,12 @@ jobs:
       - name: Native invoice read lifetimes and financial acknowledgments (never quarantined)
         run: npx vitest run src/components/shop-manager/invoice-detail.test.tsx src/components/shop-manager/invoice-list.test.tsx --maxWorkers=1
 
+      - name: Native quote and work-order list read lifetimes (never quarantined)
+        run: npx vitest run src/components/shop-manager/quote-list.test.tsx src/components/shop-manager/work-order-list.test.tsx src/components/shop-manager/work-order-detail.test.tsx --maxWorkers=1
+
+      - name: Native commerce test and pinned CI runner guards (offline, never quarantined)
+        run: node --test scripts/ci/native-commerce-ci.test.mjs
+
       - name: Native Google OAuth handoff and route lifetimes (never quarantined)
         run: npx vitest run src/lib/google-oauth.test.ts src/hooks/use-google-oauth.test.tsx src/__tests__/google-oauth-routes.test.tsx --maxWorkers=1
 
@@ -236,7 +244,7 @@ jobs:
 
   build:
     name: Build (vite build, Cloudflare Worker bundle)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -264,7 +272,7 @@ jobs:
 
   lint:
     name: ESLint (changed lines only)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -295,7 +303,7 @@ jobs:
 
   parts-rls:
     name: Parts adversarial RLS suite (throwaway Postgres)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     services:
       postgres:

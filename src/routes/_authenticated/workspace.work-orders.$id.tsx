@@ -87,7 +87,7 @@ async function fetchWorkOrder(id: string): Promise<WorkOrderDetail | null> {
   const { data, error } = await (smSupabase as any)
     .from("work_orders")
     .select(
-      "id, work_order_number, status, priority, service_type, description, customer_complaint, diagnostic_notes, additional_info, urgency_level, estimated_hours, total_cost, initial_mileage, start_time, end_time, created_at, updated_at, customer_id, vehicle_id, customers(first_name,last_name,email,phone), vehicles(year,make,model,license_plate,vin)",
+      "id, work_order_number, status, priority, service_type, description, customer_complaint, diagnostic_notes, additional_info, urgency_level, estimated_hours, total_cost, initial_mileage, start_time, end_time, created_at, updated_at, customer_id, vehicle_id, customers!fk_work_orders_customer(first_name,last_name,email,phone), vehicles!fk_work_orders_vehicle(year,make,model,license_plate,vin)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -266,7 +266,12 @@ function AuthenticatedWorkOrderDetail({ userId, id }: { userId: string; id: stri
       queryKey: ["shop-manager", userId, "work-orders", "detail", id],
       exact: true,
     });
-    // Keep the existing list producer compatible until that route is scoped.
+    // Refresh every lifetime of the current account's list, never another account.
+    void qc.invalidateQueries({
+      queryKey: ["shop-manager", userId, "work-orders", "list"],
+      exact: false,
+    });
+    // Retain the exact older list key for compatibility with prior consumers.
     void qc.invalidateQueries({
       queryKey: ["shop-manager", "work-orders", "list"],
       exact: true,
