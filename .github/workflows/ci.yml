@@ -76,6 +76,9 @@ jobs:
       - name: Seven day integration inventory capture guards (never quarantined)
         run: node --test scripts/ci/seven-day-integration-inventory.test.mjs
 
+      - name: Complete public asset release guard regressions (never quarantined)
+        run: node --test scripts/ci/verify-release-assets.test.mjs
+
       - name: Customer vehicle activity and receipt ownership boundaries (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/customer-vehicle-activity.test.mjs scripts/ci/vehicle-receipt-ownership-boundary.test.mjs
 
@@ -230,6 +233,8 @@ jobs:
           restore-keys: |
             build-cache-v1-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
       - run: npm run build
+      - name: Verify complete tracked public assets before packaging
+        run: node scripts/ci/verify-release-assets.mjs
       - name: Validate Worker package (wrangler deploy --dry-run, no credentials)
         run: |
           set -euo pipefail
