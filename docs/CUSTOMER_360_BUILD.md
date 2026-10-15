@@ -1378,3 +1378,31 @@ hosted 365 backend and approved restrictions remain unchanged.
 Fresh complete build/Worker/backend/OCR/PDF/browser-engine and all 214 tracked
 public Git/source/output checks pass at `0dfac563`, with zero changed-line lint
 errors/warnings. Existing build warnings and wider live acceptance gates remain.
+
+## Native Auth delivery boundaries and financial action inventory (2026-10-16)
+
+Same branch/PR #68, source `0271fc09`: inactive complete-recipient reservation
+commands and exact queued-receipt comparison bind original event/subject/version
+and immutable rendered provider bytes/key/fingerprint. The one-attempt provider
+boundary has explicit injected transport, shared deadline and strict bounded
+acknowledgments. It distinguishes provider acceptance from outcome unknown;
+neither queue comparison nor fake HTTP proves durable storage or delivered mail.
+198 new tests and combined email chain 550/550 pass; independent review/full
+TypeScript/changed-line lint/format/diff pass. No SQL/hook/queue/provider activation,
+live data/Auth write, email send or deploy. Integration/artifact results and
+durable transaction/consent/backlog/recovery gates are in
+`evidence/NATIVE_AUTH_EMAIL_DELIVERY_BOUNDARY.md`.
+
+The release ledger now enumerates C3.01–C3.14 quote/work-order/invoice/payment/
+approval/refund actions. Hardened Customer 360 summaries do not fix the separate
+account-unscoped financial screens. Native payment and inventory-line follow-up
+errors can be ignored; approval labels are not a connected refund executor.
+Next safe source work is C3.10–C3.12 invoice-detail/payment acknowledgment and
+account/target lifetimes, alongside authorized atomic monetary/stock writers,
+fresh authority, private custody and isolated API/storage/recovery acceptance.
+No financial, owner or live acceptance is claimed from this source scan.
+Fresh full application 2,043/2,043 across 72 files (152.91s), full TypeScript and
+report checker pass; all 198 new tests included, zero failures/skips/quarantine.
+Fresh complete build/Worker/backend/OCR/PDF/server-boundary and all 214 tracked
+public Git/source/output checks pass at `0271fc09`, with existing build warnings.
+Local packaging does not satisfy runtime, financial, recovery or owner acceptance.

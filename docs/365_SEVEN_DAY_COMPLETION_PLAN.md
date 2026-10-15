@@ -55,6 +55,29 @@ schedule alone. Existing approved production restrictions must be preserved.
 
 ## Delivery schedule
 
+Current Day 1 status, 16 October: integrated candidate/draft PR #68 is established;
+complete local media and source guards pass. The original nineteen outside exact
+whole-source mapping are classified as twelve historical unresolved, five
+recorded-unapplied and two recorded embedded executions. Mapping remains 404/423;
+classification does not satisfy baseline/schema/replay/recovery gates. Bounded
+financial actions C3.01–C3.14 are now enumerated in the acceptance ledger, while
+the complete application action inventory is still unfinished.
+
+Inactive Auth reservation/receipt and bounded fake-provider modules at `0271fc09`
+pass focused 550/550; full application 2,043/2,043 and TypeScript pass. These are
+source integration results, not real API/storage/transaction or live acceptance.
+Financial payment/totals follow-up errors, account-unscoped invoice/quote screens
+and missing connected refund execution remain concrete Day 2/3 dependencies.
+Next safe slice targets invoice-detail/payment acknowledgments and account/target
+lifetimes without inventing paid, stock, rollback or durable-dedupe success.
+
+Independent hosting failure still needs authenticated diagnostic/configuration
+access. Local synthetic API/Auth/private-storage/transaction and restore acceptance
+is not established; a current resource snapshot found 0.90 GiB free of 15.71 GiB RAM,
+and no Docker daemon/image/stack was started. Pilot shop/test-account nomination
+remains unanswered. These gaps threaten the seven-day target and must enter the
+Day 2 feasibility review; source test counts are not a reliable completion forecast.
+
 Each day ends at 21:00 Manila time. QA runs throughout the week, not only on Day 6.
 
 | Day and deadline | Main delivery                                                                                                                                                                                                                                                                                                                        | Required evidence before calling it complete                                                                                                                                                                                                                                                                                                                                   |

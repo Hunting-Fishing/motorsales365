@@ -40,7 +40,52 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest native Auth plan slice: `0dfac563`, same branch/draft PR #68. The planner
+Latest native Auth delivery-boundary slice: `0271fc09`, same branch/draft PR #68.
+The unwired reservation command requires every same-plan prepared recipient and
+binds source kind/original event/subject/plan version plus exact provider bytes,
+fingerprints and full stable keys. Source-event uniqueness is independent of plan
+version. Exact queued-receipt comparison rejects partial/conflicting fanout and
+lossy/noncanonical queue IDs; it is not storage or atomic-transaction proof.
+The bounded one-attempt Resend candidate requires explicit fake/injected transport
+and key; no environment/default fetch/route/scheduler. A five-second shared
+header/body deadline, 4,096-byte response cap and strict sole-ID HTTP200 schema
+separate provider acceptance from outcome unknown. No retries, queue deletion or
+delivery-confirmed result. Controlled provider compatibility remains a gate.
+
+New focused tests 198/198 (112 provider +86 reservation); combined email boundary
+550/550 across five files (2.30s). Independent review corrected UTF-8 classification
+and array pre-enumeration; no remaining finding. Full TypeScript, targeted lint,
+changed-line lint (zero errors/warnings), formatting/diff pass. Both new suites
+are explicit and never quarantined in CI. Source guards 103/103 (5.229s) and
+release/report/inventory/assets 75/75 (9.046s) pass; five inventory tests overlap.
+Full application and artifact evidence follows in
+`evidence/NATIVE_AUTH_EMAIL_DELIVERY_BOUNDARY.md`.
+Fresh full application 2,043/2,043 across 72 files (152.91s), zero failures/skips/
+quarantine, includes all 198 new tests without double counting. Full TypeScript
+and report checker pass. Fresh complete build/Worker/backend/OCR/PDF/browser-engine
+and all 214 tracked public Git/source/output checks pass at `0271fc09`. Existing
+build warnings remain; no upload or runtime/owner acceptance is inferred.
+
+The bounded financial action scan adds C3.01–C3.14 to the acceptance ledger:
+quote/work-order/invoice/payment/approval/refund actions. Invoice payment/totals
+follow-up errors are ignored, several financial caches are account-unscoped, and
+refund approval is not connected native financial execution. These are current
+source gaps, not executed production failures. Next safe source slice is invoice
+detail/payment acknowledgment and account/target lifetimes (C3.10–C3.12), while
+closing shared authority and actual atomic financial/stock/recovery acceptance.
+Do not expand into indefinite email-only proofs. Native email still needs actual
+durable ingress/lease/fenced completion and consent transactions; legacy backlog
+must remain untouched and separate. No SQL/provider/live writes or deploy.
+
+Prior exact head `52145a0a`: all six CI gates passed (`38774110116`) on follow-up
+discovery. An earlier diagnostic HTTP 502 was transient, not a failed test. Independent hosting
+build `8acd0607-20da-4608-a980-8635015eb2bc` failed with ID/link only; no root-cause
+diagnostics. Wrapper `38774110207` preview passed, migration/production skipped.
+New publication needs exact-head checks. Local RAM snapshot: 0.90 GiB free of 15.71;
+no daemon/image/local API stack started. Mapping 404/423, typed 12/5/2, approved
+restrictions and all release/baseline/replay/parity gates are unchanged.
+
+Previous native Auth plan slice: `0dfac563`, same branch/draft PR #68. The planner
 requires a current verifier-instance result, explicit canonical-project/site/
 secure-change policy and fresh bounded native payloads. It produces immutable
 commands only, with stable event/recipient identities, exact-body/policy
@@ -255,10 +300,14 @@ Exact next action: verify existing PR #68's exact latest published head; keep al
 further slices on that branch/PR. Use completed PR #2 source recovery/crosswalk
 without repeating it or adopting future proposals. Complete action-level feature
 acceptance and remaining PR #9 provider/build/MCP/asset/legacy-URL work selectively.
-Next native email dependency is the atomic event/recipient reservation and enqueue/
-acknowledgment contract, with exact schema/backlog/recovery boundaries and a bounded
-fake-transport provider adapter. Distinguish queued/provider-accepted/delivery-
-confirmed/outcome-unknown states. Do not repeat completed signature/planner work,
+The inactive native reservation/provider boundary is now implemented at `0271fc09`;
+do not repeat its command/receipt/fake-transport work. Next safe integrated source
+work is C3.10–C3.12 invoice-detail/payment acknowledgment and account/target
+lifetimes, using the neighboring work-order QueryClient/deferred-builder tests.
+In parallel, close actual atomic Auth ingress/lease/fenced completion, consent
+and financial/stock writers with isolated transaction/recovery acceptance.
+Distinguish queued/provider-accepted/delivery-confirmed/outcome-unknown states.
+Do not repeat completed signature/planner work,
 wire into the legacy dispatcher or activate the hook. Resolve intended action/
 callback coverage, actual secret/project/sender/Auth-setting ownership and atomic
 consent/suppression policy before deployment. Use

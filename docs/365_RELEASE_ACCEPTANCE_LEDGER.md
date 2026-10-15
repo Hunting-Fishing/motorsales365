@@ -14,7 +14,8 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
-Latest source slice: `0dfac563` (unwired native Auth planner/first-email rendering).
+Latest source slice: `0271fc09` (inactive native Auth reservation/receipt and bounded provider attempt).
+Prior source slice: `0dfac563` (unwired native Auth planner/first-email rendering).
 Prior source slices: `5e5d5f8a` (unwired webhook verifier), `65475626`
 (unsubscribe acknowledgment/UI), test-type follow-up `3f829a6b`.
 Prior slices: `f46b048d` (unused cloud-auth retirement), `a420a44d`
@@ -26,9 +27,10 @@ staff slice: `ece7e2a0288a9a70be58feeeaefdfe1922fde887`.
 Main remains `70ab892a8b7c05eac288ea4a6cce7a002d316f00`.
 
 Published/attached [draft PR #68](https://github.com/Hunting-Fishing/motorsales365/pull/68),
-stacked on PR #67 at `576fb17d`. Prior head `67f81e7e` passed all six CI gates
-(`38769939396`); independent hosting failed. New native Auth publication needs
-its own exact latest-head checks. No upload or new-head pass is claimed.
+stacked on PR #67 at `576fb17d`. Prior `52145a0a` passed all six CI gates
+(`38774110116`); a transient diagnostic HTTP 502 did not represent a test failure.
+Independent hosting failed without root-cause text. New
+publication requires exact latest-head checks. No upload or new-head pass is claimed.
 
 The dated PR inventory found 59 of the 61 then-open PR heads already ancestors
 of the candidate, including CI PR #8. Do not merge those heads again. PR #9
@@ -75,7 +77,7 @@ route is not evidence that the changed candidate has passed those gates.
 | U4 / pipelines/UI  | Learn, partner/franchise and staff academy, `src/routes/learn.index.tsx`, `src/routes/franchise.apply.tsx`, `src/routes/dashboard.partner.tsx`                     | Existing surfaces included; external program proposals remain separate                                      | Not run | Pending | Not verified | Enumerate and test current enrollment/content/progress/application/referral/admin actions and entitlements. Licensed repair feeds, government/insurer feeds, hardware and new-country programs need separate decisions/access.                                                                                                                          |
 | U5 / pipelines/UI  | Existing billing/entitlements, `src/lib/billing.functions.ts`, `src/routes/dashboard.business.$businessId.billing.tsx`                                             | Existing billing/checkout code included; provider/cutover PR #9 not reconciled                              | Blocked | Pending | Not verified | Verify test-mode subscription/entitlement/checkout/webhook/refund and financial reconciliation with approved configuration. No real charges, new settlement/legal model or customer communications.                                                                                                                                                     |
 | U6 / pipelines/UI  | Professional role-based UI, staff view and all above journeys                                                                                                      | Staff labels, error/loading/private-context behavior improved; full visual/accessibility work unfinished    | Not run | Pending | Not verified | Owner/manager/advisor/parts/technician/permitted-admin desktop/phone journeys, keyboard/accessibility, navigation, loading/error/empty states, account-switch privacy and performance. Component mocks are not visual/mobile acceptance.                                                                                                                |
-| U7 / providers     | Native Auth/transactional email and unsubscribe, `src/lib/webhooks/standard-webhooks.server.ts`, `src/routes/email/unsubscribe.ts`                                 | Bounded verifier/planner unwired; first-email template and unsubscribe acknowledgment fixes integrated      | Blocked | Pending | Not verified | Atomic event/slot/consent writers, complete action/callback/native-setting coverage, suppression/backlog classification, bounded provider acknowledgments and delivery-event correlation, sender/hook/controlled-recipient/recovery acceptance. No email cutover or live send.                                                                          |
+| U7 / providers     | Native Auth/transactional email and unsubscribe, `src/lib/email/native-auth-email-reservation.server.ts`, `src/lib/email/resend-auth-attempt.server.ts`            | Verifier/planner/reservation/receipt/provider boundary unwired; first-email and unsubscribe fixes included  | Blocked | Pending | Not verified | Actual atomic ingress/slot/consent/lease/fenced completion writers and real transaction/recovery tests; action/callback/native settings, suppression/backlog classification, provider compatibility/correlation and sender/hook/controlled-recipient acceptance. Receipt comparison/fake transport is not durable or live delivery. No cutover/send.    |
 | R4 / release       | Final owner/staff pilot, monitoring/support/release                                                                                                                | Seven-day plan saved and candidate established; release prerequisites open                                  | Blocked | Pending | Not verified | Name pilot/test accounts, run financial/stock/privacy/recovery acceptance on one full candidate, obtain required release approval, deploy through gated full-artifact workflow and check actual live behavior.                                                                                                                                          |
 
 Lane assignments describe sequencing, not guaranteed builder capacity. Three
@@ -84,7 +86,64 @@ ownership and no branch changes; capacity must be checked again when needed.
 Do not promise parallel throughput or continuous execution
 between scheduled turns.
 
+## Shop Manager financial action inventory
+
+Bounded source scan at `0271fc09`, not exhaustive application inventory. These
+ported actions use browser `smSupabase` scoped by `src/lib/shop-manager/db.ts`,
+not connected dedicated financial command handlers. Every row remains staging/API
+unverified, owner pending and live unverified. Existing component/SDK mocks do not
+establish JWT/RLS, monetary/stock transactions or recovery acceptance.
+
+| ID    | Existing action and route anchor                                                                                                             | Required closure                                                                                                                                                                            |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C3.01 | Browse/open quotes; `workspace.quotes.tsx:31`, `workspace.quotes.$id.tsx:47`                                                                 | Account/shop-scoped caches, bounded complete items and generic errors; no direct quote-route tests located.                                                                                 |
+| C3.02 | Create quote/items; `workspace.quotes.new.tsx:116`                                                                                           | Separate header/items can partially commit. Verify current shop/customer/vehicle, amounts/date/number, retry identity and atomic creation.                                                  |
+| C3.03 | Convert quote; `workspace.quotes.$id.tsx:103`                                                                                                | Four separate writes and source-item readiness/mappings/shop binding; atomic authorized conversion and idempotency required.                                                                |
+| C3.04 | Browse/create work order; `workspace.work-orders.tsx:29`, `workspace.work-orders.new.tsx:110`                                                | Unscoped list/options, current shop/customer/vehicle binding, returned-row/late callback and retry tests.                                                                                   |
+| C3.05 | Open work order/change status; `workspace.work-orders.$id.tsx:227`, `:379`                                                                   | Existing mocked detail readiness/lifetime tests; affected-row confirmation, authorized transitions and actual API acceptance remain.                                                        |
+| C3.06 | Add/remove labor; `workspace.work-orders.$id.tsx:858`, `:398`                                                                                | Existing draft/late-callback mocks; finite amounts, affected rows, billing locks and authoritative totals reconciliation remain.                                                            |
+| C3.07 | Add/remove parts; `workspace.work-orders.$id.tsx:987`, `:418`                                                                                | Existing caller mocks; atomic stock reservation/issue/actual installation and reversals remain.                                                                                             |
+| C3.08 | Add/delete billable time; `src/components/shop-manager/work-order-time-entries.tsx:86`, `:243`, `:100`                                       | Existing scoped child-card mocks; define labor/time billing contract, since current invoice generation does not consume these entries.                                                      |
+| C3.09 | Generate invoice; `workspace.work-orders.$id.tsx:293`                                                                                        | Existing incomplete-source/partial-write warnings; due date, field mapping, atomic header/items/work-order link, concurrent retries and reviewed tax/stock policy remain.                   |
+| C3.10 | Browse/open invoice/items/payments; `workspace.invoices.tsx:34`, `workspace.invoices.$id.tsx:76`                                             | Unscoped caches/ungated child reads and unreviewed paid/outstanding status semantics; no direct invoice-route tests located.                                                                |
+| C3.11 | Add inventory invoice line; `workspace.invoices.$id.tsx:574`                                                                                 | Separate insert/read/totals update ignores later errors; stock/COGS success is asserted without confirmation. Safe acknowledgment plus atomic stock/financial/reversal acceptance required. |
+| C3.12 | Record payment; `workspace.invoices.$id.tsx:428`                                                                                             | Insert followed by conditional invoice update ignores update error; no returned receipt/idempotency. Partial/unknown/stale/concurrent/overpayment and reconciliation tests required.        |
+| C3.13 | Request/decide refund, void or credit approval; `workspace.operations.tsx:180`, `:205`                                                       | Approval RPCs record request/decision, not financial execution. Verify entity binding and fresh authority/role/RPC acceptance.                                                              |
+| C3.14 | Execute native refund/void and reconcile; approval labels `workspace.operations.tsx:69`, payment exclusions `workspace.invoices.$id.tsx:175` | No connected native execution handler located in this bounded scan. Keep as an explicit implementation gap; approval/display is not completion.                                             |
+
+Route anchors above are under `src/routes/_authenticated/` unless given in full.
+Existing `work-order-detail.test.tsx` and `work-order-child-cards.test.tsx` cover
+mocked caller boundaries; Customer 360 commercial tests cover hardened summary
+reads, not these invoice/quote screens. `payments-manual.smoke.test.ts` covers
+marketplace/admin payments, not native `shop_manager.payments`.
+
+Next safe implementation is C3.10–C3.12: actual invoice route and payment
+acknowledgments, independent child errors and account/invoice/editor lifetime
+tests. Use the neighboring work-order deferred browser-builder and real
+QueryClient harness. Unknown writes must stay visibly uncertain; no invented
+rollback, durable dedupe, paid state or stock posting. Atomic financial/stock and
+original-human/fresh-role authority remain release prerequisites.
+
 ## Current verified slice
+
+Inactive native Auth reservation/receipt and provider boundary at `0271fc09`:
+198 new focused tests (86 reservation +112 provider), combined email chain 550/550
+across five files (2.30s), independent review, full TypeScript/targeted lint/
+changed-line lint/format/diff pass. Source guards 103/103 and release/report/assets
+75/75 pass, with five overlapping inventory tests not double-counted.
+Every same-plan recipient and exact private body/key/fingerprint is bound;
+original source identity is version-independent. Strict queue receipts remain
+comparison only. HTTP attempts are bounded, explicit/injected and never infer
+delivery or retry from timeout/malformed acknowledgment. No SQL/queue/hook/provider
+activation, live writes/emails or application upload. Exact full integration and
+artifact results: `evidence/NATIVE_AUTH_EMAIL_DELIVERY_BOUNDARY.md`.
+Fresh full application 2,043/2,043 across 72 files (152.91s), report checker and full
+TypeScript pass; all 198 new tests included, zero failures/skips/quarantine.
+Fresh complete build/Worker/backend/OCR/PDF/server-boundary and all 214 tracked
+public Git/source/output checks pass at `0271fc09`. Build warnings remain; this
+is local packaging, not upload, runtime/owner or complete release acceptance.
+
+### Previous Auth planning slice
 
 Native Auth command planning and first-address rendering are implemented at
 `0dfac563`, intentionally unwired. The planner uses current verifier-instance
@@ -207,17 +266,20 @@ Reference sources, authority crosswalk and commercial/expansion limits:
 ## Next actions and owner dependencies
 
 1. Verify existing PR #68's exact latest published CI head; continue on the same
-   branch/PR. Do not substitute prior `67f81e7e` green CI for new-head checks.
+   branch/PR. Do not substitute prior-head CI for new-head checks.
 2. Continue the remaining PR #9 reconciliation, including provider/generated middleware,
    configuration, assets and its legacy-URL migration. Do not expose tracked
    `.env` contents or bulk merge the provider cleanup. Next native email work is
-   the atomic event/recipient reservation and enqueue/acknowledgment contract plus
-   bounded fake-transport provider adapter. Complete action/callback/cohort and
+   actual durable ingress/lease/fenced completion and consent transactions;
+   the inactive command/receipt/fake-transport boundary is now implemented. Complete action/callback/cohort and
    actual project/secret/sender/Auth-setting coverage; keep consent/suppression/
    backlog/recovery gates explicit. Do not repeat completed verifier/planner work
    or enable delivery. Use the recovered PR #2
    source/crosswalk; formal baseline/activation acceptance is not granted.
-3. Complete action-level feature acceptance. Use the pinned 12/5/2 remaining-source
+3. Implement safe C3.10–C3.12 invoice-detail/payment acknowledgments and private
+   account/target lifetimes, then continue the C3.01–C3.14 financial actions with
+   authorized atomic monetary/stock/recovery acceptance. Complete the remaining
+   action-level feature inventory. Use the pinned 12/5/2 remaining-source
    ledger for a reviewed forward/recovery path; preserve exact 404/423 and do not
    replay recorded restrictions or repeat already completed source proof.
 4. Owner requires `wjxaajgvddtrxxtocxen` as the only hosted 365 backend. The earlier
