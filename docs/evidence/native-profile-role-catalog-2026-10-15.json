@@ -1,0 +1,1349 @@
+{
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "scope": "Catalog metadata only: three selected native tables, three exact helpers and their noninternal attachments (none observed). No application rows/counts, function invocation or writes. Separate observations, not a shared snapshot; query does not enforce READ ONLY transaction or timeouts. Incoming FKs, full role membership/default ACL and invoked dependencies remain outside this scope.",
+  "observed_at_utc": "2026-10-15 01:00:28.666866",
+  "tables": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=arwd/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "table": "profiles",
+      "schema": "shop_manager",
+      "columns": [
+        {
+          "acl": null,
+          "name": "id",
+          "type": "uuid",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "first_name",
+          "type": "text",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "last_name",
+          "type": "text",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "email",
+          "type": "text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "phone",
+          "type": "text",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": "75230039beb12ce952f24927f2bfa2f2",
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": "75230039beb12ce952f24927f2bfa2f2",
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "shop_id",
+          "type": "uuid",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "job_title",
+          "type": "text",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "department",
+          "type": "text",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "department_id",
+          "type": "uuid",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "notification_preferences",
+          "type": "jsonb",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": "1883e108b156af277d4de90ebcaee1de",
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "full_name",
+          "type": "text",
+          "identity": "",
+          "not_null": false,
+          "generated": "s",
+          "default_md5": "dfd809893566c6ef65ec303b52d66ecb",
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "has_auth_account",
+          "type": "boolean",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": "68934a3e9455fa72420237eb05902327",
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "invitation_sent_at",
+          "type": "timestamp with time zone",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "invitation_accepted_at",
+          "type": "timestamp with time zone",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "middle_name",
+          "type": "text",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "user_id",
+          "type": "uuid",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "automotive_region",
+          "type": "text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": "7827d14b2244002e075eb23abd3eacf3",
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "hourly_rate",
+          "type": "numeric(10,2)",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "cost_rate",
+          "type": "numeric(10,2)",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "profiles_email_key",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX profiles_email_key ON shop_manager.profiles USING btree (email)"
+        },
+        {
+          "name": "profiles_one_per_auth_user",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX profiles_one_per_auth_user ON shop_manager.profiles USING btree (user_id) WHERE (user_id IS NOT NULL)"
+        },
+        {
+          "name": "profiles_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX profiles_pkey ON shop_manager.profiles USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "sm_profiles_insert_self",
+          "check": "((id = auth.uid()) OR (user_id = auth.uid()))",
+          "roles": ["authenticated"],
+          "using": null,
+          "command": "a",
+          "permissive": true
+        },
+        {
+          "name": "sm_profiles_select_self",
+          "check": null,
+          "roles": ["authenticated"],
+          "using": "((id = auth.uid()) OR (user_id = auth.uid()))",
+          "command": "r",
+          "permissive": true
+        },
+        {
+          "name": "sm_profiles_select_shop",
+          "check": null,
+          "roles": ["authenticated"],
+          "using": "((shop_id = shop_manager.get_current_user_shop_id()) AND (shop_id IS NOT NULL))",
+          "command": "r",
+          "permissive": true
+        },
+        {
+          "name": "sm_profiles_update_self",
+          "check": "((id = auth.uid()) OR (user_id = auth.uid()))",
+          "roles": ["authenticated"],
+          "using": "((id = auth.uid()) OR (user_id = auth.uid()))",
+          "command": "w",
+          "permissive": true
+        }
+      ],
+      "force_rls": false,
+      "schema_acl": "{postgres=UC/postgres,authenticated=U/postgres,service_role=U/postgres,anon=U/postgres}",
+      "constraints": [
+        {
+          "name": "profiles_email_key",
+          "type": "u",
+          "validated": true,
+          "definition": "UNIQUE (email)"
+        },
+        {
+          "name": "profiles_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "profiles_user_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+        }
+      ],
+      "effective_acl": [
+        {
+          "role": "anon",
+          "delete": false,
+          "insert": false,
+          "select": false,
+          "update": false,
+          "trigger": false,
+          "truncate": false,
+          "references": false,
+          "schema_usage": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": false,
+          "truncate": false,
+          "references": false,
+          "schema_usage": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true,
+          "schema_usage": true
+        }
+      ],
+      "user_triggers": []
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=arwd/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "table": "roles",
+      "schema": "shop_manager",
+      "columns": [
+        {
+          "acl": null,
+          "name": "id",
+          "type": "uuid",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": "f3b72bb359a50b640590970a2ab8e514",
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "name",
+          "type": "shop_manager.app_role",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": "75230039beb12ce952f24927f2bfa2f2",
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "roles_name_key",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX roles_name_key ON shop_manager.roles USING btree (name)"
+        },
+        {
+          "name": "roles_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX roles_pkey ON shop_manager.roles USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "shop scoped access roles_select_all",
+          "check": "(shop_manager.get_current_user_shop_id() IS NOT NULL)",
+          "roles": ["authenticated"],
+          "using": "(shop_manager.get_current_user_shop_id() IS NOT NULL)",
+          "command": "*",
+          "permissive": true
+        }
+      ],
+      "force_rls": false,
+      "schema_acl": "{postgres=UC/postgres,authenticated=U/postgres,service_role=U/postgres,anon=U/postgres}",
+      "constraints": [
+        {
+          "name": "roles_name_key",
+          "type": "u",
+          "validated": true,
+          "definition": "UNIQUE (name)"
+        },
+        {
+          "name": "roles_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "effective_acl": [
+        {
+          "role": "anon",
+          "delete": false,
+          "insert": false,
+          "select": false,
+          "update": false,
+          "trigger": false,
+          "truncate": false,
+          "references": false,
+          "schema_usage": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": false,
+          "truncate": false,
+          "references": false,
+          "schema_usage": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true,
+          "schema_usage": true
+        }
+      ],
+      "user_triggers": []
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=arwd/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "owner": "postgres",
+      "table": "user_roles",
+      "schema": "shop_manager",
+      "columns": [
+        {
+          "acl": null,
+          "name": "id",
+          "type": "uuid",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": "f3b72bb359a50b640590970a2ab8e514",
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "user_id",
+          "type": "uuid",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "role_id",
+          "type": "uuid",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": null,
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        },
+        {
+          "acl": null,
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "default_md5": "75230039beb12ce952f24927f2bfa2f2",
+          "effective_acl": [
+            {
+              "role": "anon",
+              "insert": false,
+              "select": false,
+              "update": false,
+              "references": false
+            },
+            {
+              "role": "authenticated",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": false
+            },
+            {
+              "role": "service_role",
+              "insert": true,
+              "select": true,
+              "update": true,
+              "references": true
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "user_roles_pkey",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX user_roles_pkey ON shop_manager.user_roles USING btree (id)"
+        },
+        {
+          "name": "user_roles_user_id_role_id_key",
+          "ready": true,
+          "valid": true,
+          "unique": true,
+          "definition": "CREATE UNIQUE INDEX user_roles_user_id_role_id_key ON shop_manager.user_roles USING btree (user_id, role_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "sm_user_roles_admin_manage",
+          "check": "(shop_manager.is_owner_or_admin(auth.uid()) AND shop_manager.user_belongs_to_shop(user_id, shop_manager.get_current_user_shop_id()))",
+          "roles": ["authenticated"],
+          "using": "(shop_manager.is_owner_or_admin(auth.uid()) AND shop_manager.user_belongs_to_shop(user_id, shop_manager.get_current_user_shop_id()))",
+          "command": "*",
+          "permissive": true
+        },
+        {
+          "name": "sm_user_roles_select_self",
+          "check": null,
+          "roles": ["authenticated"],
+          "using": "(user_id = auth.uid())",
+          "command": "r",
+          "permissive": true
+        }
+      ],
+      "force_rls": false,
+      "schema_acl": "{postgres=UC/postgres,authenticated=U/postgres,service_role=U/postgres,anon=U/postgres}",
+      "constraints": [
+        {
+          "name": "user_roles_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "user_roles_user_id_fkey",
+          "type": "f",
+          "validated": true,
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "user_roles_user_id_role_id_key",
+          "type": "u",
+          "validated": true,
+          "definition": "UNIQUE (user_id, role_id)"
+        }
+      ],
+      "effective_acl": [
+        {
+          "role": "anon",
+          "delete": false,
+          "insert": false,
+          "select": false,
+          "update": false,
+          "trigger": false,
+          "truncate": false,
+          "references": false,
+          "schema_usage": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": false,
+          "truncate": false,
+          "references": false,
+          "schema_usage": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true,
+          "schema_usage": true
+        }
+      ],
+      "user_triggers": []
+    }
+  ],
+  "functions": [
+    {
+      "acl": "{=X/postgres,postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "cost": 100,
+      "name": "get_current_user_shop_id",
+      "rows": 0,
+      "owner": "postgres",
+      "schema": "shop_manager",
+      "strict": false,
+      "language": "sql",
+      "parallel": "u",
+      "leakproof": false,
+      "signature": "shop_manager.get_current_user_shop_id()",
+      "config_md5": "8506a0911fb3ebfe6f35ed71d4100474",
+      "volatility": "s",
+      "body_md5_lf": "6049d4aebd36a1230288e6a2227e1071",
+      "config_keys": ["search_path"],
+      "return_type": "uuid",
+      "returns_set": false,
+      "anon_execute": true,
+      "return_shape": "uuid",
+      "variadic_type": null,
+      "argument_count": 0,
+      "argument_modes": null,
+      "argument_names": null,
+      "argument_types": [],
+      "definition_md5": "be63946995c909e4a224b0e4989eaaf7",
+      "service_execute": true,
+      "security_definer": true,
+      "anon_schema_usage": true,
+      "all_argument_types": null,
+      "identity_arguments": "",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "db11771cee5fd39f92dfba5c83d713f3"
+        }
+      ],
+      "selected_header_md5": "bf66f9ecf3b6815ba51aeba5ce26bb5a",
+      "service_schema_usage": true,
+      "argument_defaults_md5": null,
+      "authenticated_execute": true,
+      "argument_defaults_count": 0,
+      "authenticated_schema_usage": true
+    },
+    {
+      "acl": "{=X/postgres,postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "cost": 100,
+      "name": "is_owner_or_admin",
+      "rows": 0,
+      "owner": "postgres",
+      "schema": "shop_manager",
+      "strict": false,
+      "language": "sql",
+      "parallel": "u",
+      "leakproof": false,
+      "signature": "shop_manager.is_owner_or_admin(uuid)",
+      "config_md5": "8506a0911fb3ebfe6f35ed71d4100474",
+      "volatility": "s",
+      "body_md5_lf": "2ffa08c10ab6bd41b1d47a9a2610d56a",
+      "config_keys": ["search_path"],
+      "return_type": "boolean",
+      "returns_set": false,
+      "anon_execute": true,
+      "return_shape": "boolean",
+      "variadic_type": null,
+      "argument_count": 1,
+      "argument_modes": null,
+      "argument_names": ["_user_id"],
+      "argument_types": ["uuid"],
+      "definition_md5": "869849c9428ef51ca5d9ac2fab605570",
+      "service_execute": true,
+      "security_definer": true,
+      "anon_schema_usage": true,
+      "all_argument_types": null,
+      "identity_arguments": "_user_id uuid",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "db11771cee5fd39f92dfba5c83d713f3"
+        }
+      ],
+      "selected_header_md5": "ffe40f4876d3799f10389d8cbece8c58",
+      "service_schema_usage": true,
+      "argument_defaults_md5": null,
+      "authenticated_execute": true,
+      "argument_defaults_count": 0,
+      "authenticated_schema_usage": true
+    },
+    {
+      "acl": "{=X/postgres,postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "cost": 100,
+      "name": "user_belongs_to_shop",
+      "rows": 0,
+      "owner": "postgres",
+      "schema": "shop_manager",
+      "strict": false,
+      "language": "sql",
+      "parallel": "u",
+      "leakproof": false,
+      "signature": "shop_manager.user_belongs_to_shop(uuid,uuid)",
+      "config_md5": "8506a0911fb3ebfe6f35ed71d4100474",
+      "volatility": "s",
+      "body_md5_lf": "7786134c6646c4ade72c0107d4219236",
+      "config_keys": ["search_path"],
+      "return_type": "boolean",
+      "returns_set": false,
+      "anon_execute": true,
+      "return_shape": "boolean",
+      "variadic_type": null,
+      "argument_count": 2,
+      "argument_modes": null,
+      "argument_names": ["_user_id", "_shop_id"],
+      "argument_types": ["uuid", "uuid"],
+      "definition_md5": "ef1de965a932a522f9dd61a203338d17",
+      "service_execute": true,
+      "security_definer": true,
+      "anon_schema_usage": true,
+      "all_argument_types": null,
+      "identity_arguments": "_user_id uuid, _shop_id uuid",
+      "config_value_hashes": [
+        {
+          "key": "search_path",
+          "value_md5": "db11771cee5fd39f92dfba5c83d713f3"
+        }
+      ],
+      "selected_header_md5": "6d71c9591c43286265838d226ec92a86",
+      "service_schema_usage": true,
+      "argument_defaults_md5": null,
+      "authenticated_execute": true,
+      "argument_defaults_count": 0,
+      "authenticated_schema_usage": true
+    }
+  ]
+}
