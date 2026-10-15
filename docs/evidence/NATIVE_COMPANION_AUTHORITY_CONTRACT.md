@@ -1,6 +1,6 @@
 # Native companion authority: proposed offline contract
 
-2026-10-15 Asia/Manila. **Design only: not adopted, implemented, applied or
+2026-10-15 Asia/Manila. **Full authority contract: not adopted, implemented, applied or
 release-ready.** This document defines the next bounded offline dependency after
 the selected staff/chat/profile/module proofs and application command-confirmation
 work. It is not permission to change production, repair bindings, introduce a
@@ -182,5 +182,8 @@ affected-row behavior and catalog/ACL preservation, not toast or array length al
    consent/ownership-tenure/retention, receipt/mobile pilot and hosting gates remain
    open. Do not deploy the sparse checkout or promote any completion flag here.
 
-This slice changes documentation only. No tests, SQL, migration, production action,
-data repair or authority adoption were performed for this contract.
+The original proposal changed documentation only. The first separate self-shift-only
+memory research subset is now implemented/tested in `NATIVE_SELF_SHIFT_CANDIDATE.md`,
+not adopted as the full contract. It denies privileged branches instead of choosing
+owner/delegation/provenance/multi-roster policy. No migration, production action,
+data repair or authority adoption is supplied by this proposal or research subset.

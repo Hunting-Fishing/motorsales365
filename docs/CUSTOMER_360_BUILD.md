@@ -299,17 +299,34 @@ remain explicit in `evidence/MESSAGING_REQUEST_CONFIRMATION.md`.
 report checker/no quarantine, formatting/diff and zero-error focused lint pass.
 Full sequential tooling re-run passes 259/259 (157.79s); no SQL tooling changed.
 Independent bounded review is clean after two corrected route regressions.
-Code `22c2724` passed all six CI gates (run `38659076609`); the following docs head
-needs its own next-run check. Hosting still fails separately; migrations/production
+Code `22c2724` passed all six CI gates (run `38659076609`); docs `14c18d3` also
+passed all six (run `38659674559`), verified on the self-shift follow-up.
+Hosting still fails separately; migrations/production
 deployment skip and the green preview wrapper is not an upload. No SQL, migration, grant, live
 business RPC/message, authority repair or deployment is performed.
 
-The next offline dependency is now proposed in
-`evidence/NATIVE_COMPANION_AUTHORITY_CONTRACT.md`: design-only, not adopted or
-implemented. Start a separate disposable identity/self-shift/privileged-target
-candidate while preserving legacy IDs and actual attachments; keep unresolved
+The next offline dependency is proposed in
+`evidence/NATIVE_COMPANION_AUTHORITY_CONTRACT.md`: the full contract is not adopted
+or implemented. Its first disposable self-shift-only candidate is now implemented
+as research in draft PR #39 (code `62f4c4b`), preserving legacy IDs and all three
+actual attachments. 18 focused cases and 277 full sequential tooling tests pass;
+the nine original characterization bodies and fixture SQL are unchanged. The
+candidate adds identity/self/target guards, an explicit chat UPDATE short-circuit
+and deny-only privileged branches, not production authority or app upsert compatibility.
+No application, historical SQL/migration or production workflow changes.
+See `evidence/NATIVE_SELF_SHIFT_CANDIDATE.md`. Keep unresolved
 owner/delegation/provenance/multi-roster positives gated and close trusted team/
 native provisioning/role writers before claiming atomic offboarding authority.
 Real independent-session concurrency, baseline/storage recovery, consent/tenure,
 configuration/role/API acceptance, OCR/mobile pilot and hosting remain open. The
 recurring follow-up remains active without duplicate automations or reminders.
+
+Exact next bounded native dependency: current metadata/source composition of
+`is_owner_or_admin(uuid)` and `user_belongs_to_shop(uuid,uuid)` with the actual
+profile self-insert/update and role-admin policies, including legacy/shadow/global-
+role controls. Reuse completed bootstrap evidence rather than repeating it; no
+current effective policy/ACL or applied-history acceptance is implied. Then close
+ownership claim/transfer, team membership and original-actor shift/audit writers
+before approving privileged positives or atomic offboarding. PR #39 code `62f4c4b`
+passed all six CI gates (run `38661636502`); the subsequent documentation head
+requires its own next-run check. Hosting remains separately failed; no deployment.
