@@ -39,7 +39,39 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest application slice: native Google OAuth handoff, source
+Latest integration reconciliation: unused cloud-auth retirement `f46b048d`,
+Parts reference recovery `a420a44d`, remaining migration ledger/CI `2350e403`.
+Same branch/draft PR #68. Eleven missing PR #2 documents are preserved exactly
+(7,186 lines / 381,036 bytes) under `reference/parts-pr2/`, not adopted as control
+authority. Gate crosswalk preserves active G2 security/G4 build authorization;
+current platform/specialist/RLS plans remain unchanged. Source recovery is now
+complete; formal baseline adoption and operational acceptance are not.
+
+The exact 19 outside whole-source classification are individually recorded as
+12 historical unresolved / five recorded-unapplied candidates / two recorded
+embedded executions. Do not replay the two approved helper restrictions or
+substitute embedded bytes for stored-envelope hashes. Exact mapping stays 404/423;
+replay/cost-trap/baseline/parity/release flags stay blocked/false. PR #9's media
+rewrite is absent/outside 423, not one of these 19 or accepted migration ingress.
+
+PR #9's full scope is inventoried (205 rename-aware / 211 physical paths), not
+blindly adopted. Only the unused cloud-auth dependency/wrapper were retired after
+native Google: one lock entry removed, all other package fields/versions retained.
+The wrapper is recoverable in Git. Provider/config/assets/MCP/email/billing/data
+cutover remains bounded review/implementation work, not operationally complete.
+Three bounded agents completed separate review/edit tasks without branch changes
+or overlapping edits; independent review covers Parts preservation, not runtime.
+
+Fresh 119/119 Node checks (98 new + 21 existing), application 1,431/1,431 across 65 files,
+report checker/full TypeScript/new-guard lint/format/diff/primary review pass.
+Fresh full build/Worker/214-file Git-source-output verification passes at `2350e403`,
+canonical backend and 15 OCR/202 PDF assets retained. No live write/migration/deploy,
+restriction replay, paid resource, PR merge or new automation. Evidence and exact
+remaining provider/Parts/migration boundaries:
+`evidence/PARTS_AND_PROVIDER_RECONCILIATION.md` and
+`evidence/migration-remaining-source-ledger-2026-10-15.json`.
+
+Previous application slice: native Google OAuth handoff, source
 `c3f6bb9cc11c46246c0662f2030a3056b2287854`, with guard follow-up `b3acef0e`,
 on the same integration branch/PR #68.
 Selectively adopts PR #9's native-client intent without merging its broader
@@ -79,11 +111,12 @@ OCR/PDF assets 10/10 (0.201s), lint/format/diff/primary review/full build/Worker
 checks pass. App/SQL unchanged; prior 1,333 app/701 tooling are not fresh reruns.
 Evidence: `evidence/COMPLETE_PUBLIC_ASSET_RELEASE_GUARD.md`.
 
-PR #68 prior exact head `818651fd` now passed all six CI gates (`38752315795`),
+PR #68 prior exact head `06e21a2e` now passed all six CI gates (`38759812700`),
 including real-browser OCR and disposable Parts PG. Hosting build
-`ea623a17-3b0f-4bc0-ba4e-90f939f8a218` fails separately with no diagnostic text.
-Wrapper `38752316318` preview step passes but upload is configured skipped;
-migration/production skip. The new OAuth publication needs its own exact-head
+`7f06007f-914b-4484-a3b7-66da30fc8f3b` fails separately; reported output contains
+only ID/link, no diagnostic text/annotations/root cause. Wrapper `38759812816`
+preview passes; migration/production skip. No upload is inferred.
+The new reconciliation publication needs its own exact-head
 checks; prior-head green CI is not new-head or live acceptance.
 
 Owner answered the staging question with production project `wjxaajgvddtrxxtocxen`.
@@ -139,9 +172,12 @@ Local Docker CLI exists but Linux engine is unavailable; psql absent on PATH.
 No daemon/image install or paid resource. Safe local work continues meanwhile.
 
 Exact next action: verify existing PR #68's exact latest published head; keep all
-further slices on that branch/PR. Complete remaining PR #9 provider/generated-middleware/config/
-asset/legacy-URL reconciliation and PR #2 plan review; complete the action-level
-ledger and 19 outstanding migration classifications. Establish local synthetic
+further slices on that branch/PR. Use completed PR #2 source recovery/crosswalk
+without repeating it or adopting future proposals. Complete action-level feature
+acceptance and remaining PR #9 native email/readiness/webhook/provider/build/MCP/
+asset/legacy-URL work selectively. Use the pinned 12/5/2 remaining-source ledger
+to prepare a reviewed forward/recovery path; do not repeat completed proof or
+replay history. Establish local synthetic
 API/Auth/storage and production-safe acceptance without a new hosted project.
 Close original-human/fresh
 session-role-tenant/native-team/claim/offboarding/private-object transaction and

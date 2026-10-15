@@ -1283,3 +1283,33 @@ business/Auth write, provider change, restriction replay, paid resource or deplo
 Continue remaining PR #9/#2 and action-level migration/feature inventory, then
 trusted actor/fresh role/native-team/claim/offboarding/private-custody/recovery
 acceptance. The pilot shop/test-account question remains open, not repeated.
+
+## Parts and provider reconciliation follow-up (2026-10-15)
+
+Same integration branch/PR #68: `f46b048d` retires the now-unused cloud-auth
+wrapper/dependency, `a420a44d` recovers the 11 missing PR #2 planning documents as
+exact non-authoritative references, `2350e403` adds the typed remaining-source
+ledger and CI guards. Current platform/Parts/RLS/Repair/History control plans
+remain unchanged; draft G2 legal/finance does not replace active G2 security.
+Do not repeat source recovery or treat these proposals as acceptance/authority.
+
+The 19 entries outside exact source correspondence are 12 historical unresolved,
+five recorded-unapplied candidates and two recorded embedded helper executions;
+preserve 404/423 and all release/baseline/replay/parity flags. The two approved
+restrictions must not be replayed. PR #9's legacy media rewrite remains absent,
+outside 423 and unapproved for ingress. Full PR #9 scope is inventoried: 205 rename-
+aware/211 physical paths; broader provider/MCP/assets/email/billing/build/data
+cutover is not adopted. Existing native Google behavior remains unchanged here.
+
+Fresh Node 119/119 (98 new + 21 existing), application 1,431/1,431 across 65 files,
+report checker/full TypeScript/new-guard lint/format/diff pass. Full build/Worker/
+214-file Git-source-output verification passes at `2350e403`. Prior published `06e21a2e`
+passed all six CI gates (`38759812700`); independent hosting build `7f06007f-914b-4484-a3b7-66da30fc8f3b`
+failed with no root-cause diagnostics. Verify the new publication's exact head.
+Evidence: `evidence/PARTS_AND_PROVIDER_RECONCILIATION.md`; minimum Parts acceptance
+groups are in the integrated release ledger. No SQL/business/Auth mutation,
+history repair, restriction replay, provider change, paid resource or deploy.
+Continue action-level acceptance, reviewed forward/recovery planning, bounded
+native email readiness/signature tests and shared fresh authority/atomic writers.
+Sole hosted backend/local test boundary and all Customer360/receipt/consent/
+financial/private-custody/mobile/owner/recovery gates remain unchanged.
