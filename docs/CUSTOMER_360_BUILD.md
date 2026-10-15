@@ -689,3 +689,29 @@ claiming another independent final API review. Next construct the actual bounded
 partner wrapper, recover/map auth/org/member source and close nonempty referrals,
 incoming/offboarding/original-actor/revision/lock dependencies. No migration,
 deployment, baseline/parity/replay/release promotion or restriction replay.
+
+Draft PR #53 (code `b140407`) now corrects the separate account API's row-evidence
+gap: same role/profile writes request minimal returned identities; exact requested
+roles and one matching profile id are required before normal acknowledgment.
+Error/zero/NULL/malformed/wrong/extra/duplicate receipts and known post-Auth promise
+failures remain generic partial/unknown, without retry/delete/rollback claims.
+Normal 200 and existing 207 shapes remain caller-compatible. Auth/admin ordering,
+exact requested writes/schema/domain/password behavior and known seller/NULL gaps
+are retained, not new authority or atomic/idempotent provisioning.
+
+53 new handler tests plus 41 unchanged caller cases pass (94 focused); final app
+1,207/1,207 across 59 files (92.56s), full TypeScript passes. Serial tooling 446
+plus 10 receipt assets pass separately (456 total); format/diff/primary review pass,
+lint zero errors/four retained warnings. Subagent usage limits prevented another
+independent final API review, not hidden by mock tests. Real HTTP/JWT/RLS/SQL/
+trigger/authority/value/delivery/durable-audit/session/concurrency remain unverified.
+Evidence/pins: `evidence/ACCOUNT_CREATION_ROW_EVIDENCE.md`.
+
+PR #52 docs `0d925e2` has four gates passed/build+unit pending; PR #53 code CI
+`38693453126` is running, hosting failed separately and migration/deployment
+wrappers skipped. Later documentation heads need fresh checks. No live calls/
+mutations or deployment for the API slice; only PR #52's two catalog-only reads
+occurred this heartbeat. Next verify latest heads then complete actual partner/
+auth/profile/org/member and nonempty referral/incoming/offboarding/original-
+actor/revision/lock dependencies before model/atomic kernel adoption. Preserve
+native/consent/recovery/receipt/mobile/owner/full-media gates and single continuation.
