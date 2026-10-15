@@ -1134,3 +1134,16 @@ trusted zero or legacy privileged adoption. Source404/423,19 unclassified; all
 baseline/replay/parity/release and existing acceptance gates stay open. Zero live
 query/mutation/migration/deploy, paid resource, customer communication, deletion,
 restriction replay, PR merge or duplicate automation; continuation active.
+
+CI budget follow-up: PR #65's original unit job `116415203931`/run`38733014822`
+cancelled after15m08s at12:28:38 UTC; annotation confirms15m0s maximum exceeded
+before mandatory suites finished. Not passing or an assertion-failure diagnosis.
+Only unit timeout is now25 minutes; all tests/quarantine/report/release gates
+preserved. Isolated `360b1e0` cherry-picked onto PR #65 as `3040a1e` and merged
+non-destructively into v2 branch (`cc54b94`), histories preserved; parent diff only
+timeout and v2 runtime/test bytes unchanged. Ten release/report guards pass again
+(0.529 seconds); YAML format/diff pass. PR #65 CI `38735096453` running, hosting
+failed separately, wrapper`38735096472` preview passed/production-migrations skipped.
+Verify latest PR #66 HEAD, superseding earlier`040599a` run, before claiming CI.
+No paid resource/tier, production setting or source/authority/release flag changed.
+Next companion revision/invalidation model remains as above; continuation active.

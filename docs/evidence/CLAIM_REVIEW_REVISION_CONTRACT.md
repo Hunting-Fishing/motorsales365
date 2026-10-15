@@ -77,7 +77,8 @@ an unwired/tree-shaken file and a passing TypeScript/build cannot prove it.
 - Full TypeScript passes. Direct ESLint zero warnings, Prettier, diff and primary
   source/test review pass. No independent review claimed; known subagent quota
   remains unchanged and was not retried.
-- **10 fresh report/release guard tests pass**, 0.753 seconds. These are a subset
+- **10 fresh report/release guard tests pass**, 0.529 seconds after the CI budget
+  correction below. These are a subset
   of the unchanged tooling suite, not added to a new aggregate. PR #65's 676
   tooling +10 receipt assets are **parent evidence**, not rerun for this codec.
 - CI adds the v2 file to the existing dedicated never-quarantined claim-contract
@@ -86,6 +87,27 @@ an unwired/tree-shaken file and a passing TypeScript/build cannot prove it.
   observation; hosting **d95849c7-2798-4699-9864-cebf717fd2d6** failed separately.
   Wrapper **38733014809** preview passed, migrations/production skipped. These
   are parent state, not this publication or production behavior.
+
+### Required CI time budget correction
+
+PR #65's original unit job **116415203931**, run **38733014822**, was cancelled
+at 12:28:38 UTC after 15m08s. Its check annotation explicitly reports that the
+job exceeded the maximum execution time of 15m0s; it had not finished the required
+serial security suites. This is **not a passing run** or an assertion diagnosis.
+The existing unit-job timeout alone is now **25 minutes**, preserving every
+test/quarantine/report/release gate. No paid tier, resource or production setting
+was provisioned/changed.
+
+Isolated CI commit **360b1e0** was cherry-picked onto PR #65 as
+**3040a1e711803b95a9bc14effccf288ecd715392**, then non-destructively merged into
+the v2 branch (merge **cc54b94**), preserving both branch histories. Parent diff
+is exactly the timeout field; v2 runtime/test bytes are unchanged from the full
+application/TypeScript verification. PR #65's new CI **38735096453** is running;
+hosting **7c38967b-7611-44fb-82ba-e949f466fd7e** failed separately, wrapper
+**38735096472** preview passed and migrations/production skipped. The new PR #66
+publication HEAD needs its own checks; earlier 040599a checks are superseded.
+No PR was merged. New Actions runner deprecation notices were not treated as
+authorization to upgrade actions, runners, engine or release state.
 
 Supabase security guidance kept browser-asserted revisions and supplied actor
 values separate from trusted authorization. This slice performs **zero live

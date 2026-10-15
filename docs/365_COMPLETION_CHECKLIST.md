@@ -15,6 +15,20 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+CI budget follow-up for attached PR #65/#66: original PR #65 unit job
+`116415203931`/run `38733014822` cancelled at12:28:38 UTC after15m08s; annotation
+confirms 15m0s maximum exceeded before mandatory suites completed, not a pass or
+an assertion diagnosis. Unit-job timeout alone raised to25 minutes with all tests/
+quarantine/report/release gates unchanged. Isolated `360b1e0` cherry-picked to
+PR #65 as `3040a1e`, then non-destructively merged into v2 branch (`cc54b94`),
+both histories preserved. Parent diff only timeout; runtime/tests unchanged.
+Ten release/report guards pass again (0.529 seconds), YAML format/diff pass.
+PR #65 new CI `38735096453` running; hosting failed separately, wrapper
+`38735096472` preview passed/migrations-production skipped. New PR #66 publication
+HEAD checks supersede its earlier `040599a` run. Verify exact latest heads next;
+no source/authority/release flag, paid tier/resource or production setting change.
+Resume the companion revision/invalidation model below, not completed recovery.
+
 Newest revision-aware claim contract: code `dce37b1`, branch
 `security/claim-review-revision-contract`, based on draft PR #65 docs `a9987a5`.
 Separate UNWIRED v2 codec requires explicit attempt UUID and canonical decimal
