@@ -4,9 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
 import { logRouteAccess } from "@/integrations/supabase/route-audit.server";
 import { BUSINESS_KIND_VALUES } from "@/data/business-kinds";
-import { STAFF_EMAIL_DOMAIN, isStaffEmail } from "@/lib/staff-domain";
-
-
+import { isStaffEmail } from "@/lib/staff-domain";
 
 const RoleEnum = z.enum(["admin", "moderator", "support", "sales", "advertising"]);
 const SellerTypeEnum = z.enum(["private", "dealer", "repair_shop", "insurance"]);
@@ -56,12 +54,67 @@ function normalizeE164(raw: string | null | undefined): string | null {
   return digits || null;
 }
 
+const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const roleFailure =
+  "Account creation may be partial. Role assignment was not confirmed. Inspect records before another request.";
+const profileFailure =
+  "Profile update was not confirmed. Inspect account records before another request.";
+const completionFailure =
+  "Request completion was not confirmed. Inspect account records before another request.";
+const creationFailure =
+  "Account creation was not confirmed. Inspect records before another request.";
+function sameUuid(value: unknown, expected: string): boolean {
+  return (
+    typeof value === "string" &&
+    uuid.test(value) &&
+    uuid.test(expected) &&
+    value.toLowerCase() === expected.toLowerCase()
+  );
+}
+function recordWithKeys(value: unknown, keys: string): value is Record<string, unknown> {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    Object.keys(value).sort().join(",") === keys
+  );
+}
+function confirmsRoles(value: unknown, userId: string, requested: readonly string[]): boolean {
+  const expected = new Set(requested);
+  if (expected.size !== requested.length || !Array.isArray(value) || value.length !== expected.size)
+    return false;
+  const seen = new Set<string>();
+  for (const row of value) {
+    if (
+      !recordWithKeys(row, "role,user_id") ||
+      !sameUuid(row.user_id, userId) ||
+      typeof row.role !== "string" ||
+      !expected.has(row.role) ||
+      seen.has(row.role)
+    )
+      return false;
+    seen.add(row.role);
+  }
+  return seen.size === expected.size;
+}
+function confirmsProfile(value: unknown, userId: string): boolean {
+  return (
+    Array.isArray(value) &&
+    value.length === 1 &&
+    recordWithKeys(value[0], "id") &&
+    sameUuid(value[0].id, userId)
+  );
+}
+
 export const Route = createFileRoute("/api/admin/create-user")({
   server: {
     handlers: {
       POST: async ({ request }) => {
         const label = "admin.createUser";
         let actorId: string | null = null;
+        let createdUserId: string | null = null;
+        let createdEmail: string | null = null;
+        let stage: "precreate" | "roles" | "profile" | "audit" = "precreate";
         const start = Date.now();
         try {
           const authHeader = request.headers.get("authorization") ?? "";
@@ -158,7 +211,6 @@ export const Route = createFileRoute("/api/admin/create-user")({
             input.mark_verified = undefined;
           }
 
-
           const { data: created, error: createErr } = await sb.auth.admin.createUser({
             email: input.email,
             password: input.password,
@@ -169,7 +221,7 @@ export const Route = createFileRoute("/api/admin/create-user")({
               last_name: input.last_name,
             },
           });
-          if (createErr || !created.user) {
+          if (createErr || !created?.user || !uuid.test(created.user.id ?? "")) {
             await logRouteAccess({
               actorId,
               role: "admin",
@@ -181,31 +233,34 @@ export const Route = createFileRoute("/api/admin/create-user")({
               request,
               targetSummary: { email: input.email, account_type: input.account_type },
             });
-            return new Response(
-              JSON.stringify({ error: createErr?.message ?? "Failed to create user" }),
-              { status: 400 },
-            );
+            return new Response(JSON.stringify({ error: creationFailure }), { status: 400 });
           }
           const newUserId = created.user.id;
+          createdUserId = newUserId;
+          createdEmail = input.email;
 
           if (input.account_type === "staff" && input.roles.length > 0) {
+            stage = "roles";
             const rows = input.roles.map((role) => ({ user_id: newUserId, role }));
-            const { error: roleErr } = await sb.from("user_roles").insert(rows as any);
-            if (roleErr) {
+            const { data: roleRows, error: roleErr } = await sb
+              .from("user_roles")
+              .insert(rows as any)
+              .select("user_id,role");
+            if (roleErr || !confirmsRoles(roleRows, newUserId, input.roles)) {
               await logRouteAccess({
                 actorId,
                 role: "admin",
                 label,
                 method: "POST",
                 outcome: "error",
-                errorMessage: `Role assignment failed: ${roleErr.message}`,
+                errorMessage: "Role assignment response was not confirmed",
                 durationMs: Date.now() - start,
                 request,
                 targetSummary: { email: input.email, new_user_id: newUserId },
               });
               return new Response(
                 JSON.stringify({
-                  error: `User created but role assignment failed: ${roleErr.message}`,
+                  error: roleFailure,
                   userId: newUserId,
                 }),
                 { status: 207 },
@@ -213,11 +268,13 @@ export const Route = createFileRoute("/api/admin/create-user")({
             }
           }
 
+          stage = "profile";
+
           // Build a full profile update from every provided field.
           const profilePatch: Record<string, any> = { full_name: input.full_name };
           const copyIf = (k: keyof typeof input, dst?: string) => {
             const v = input[k];
-            if (v !== undefined && v !== "") profilePatch[(dst ?? (k as string))] = v;
+            if (v !== undefined && v !== "") profilePatch[dst ?? (k as string)] = v;
           };
           copyIf("first_name");
           copyIf("last_name");
@@ -253,7 +310,6 @@ export const Route = createFileRoute("/api/admin/create-user")({
             }
           }
 
-
           const patchedFields = Object.keys(profilePatch);
           const fieldFlags = {
             had_phone: "phone" in profilePatch,
@@ -262,19 +318,20 @@ export const Route = createFileRoute("/api/admin/create-user")({
             had_business_address: "business_address" in profilePatch,
           };
 
-          const { error: patchErr } = await sb
+          const { data: patchedRows, error: patchErr } = await sb
             .from("profiles")
             .update(profilePatch as any)
-            .eq("id", newUserId);
+            .eq("id", newUserId)
+            .select("id");
 
-          if (patchErr) {
+          if (patchErr || !confirmsProfile(patchedRows, newUserId)) {
             await logRouteAccess({
               actorId,
               role: "admin",
               label,
               method: "POST",
               outcome: "error",
-              errorMessage: `Profile patch failed: ${patchErr.message}`,
+              errorMessage: "Profile update response was not confirmed",
               durationMs: Date.now() - start,
               request,
               targetSummary: {
@@ -292,12 +349,13 @@ export const Route = createFileRoute("/api/admin/create-user")({
                 ok: true,
                 userId: newUserId,
                 email: input.email,
-                warning: `Profile fields not saved: ${patchErr.message}. Open the user's Edit dialog to re-enter them.`,
+                warning: profileFailure,
               }),
               { status: 207, headers: { "Content-Type": "application/json" } },
             );
           }
 
+          stage = "audit";
           await logRouteAccess({
             actorId,
             role: "admin",
@@ -317,27 +375,50 @@ export const Route = createFileRoute("/api/admin/create-user")({
             },
           });
 
+          // This confirms only the returned identities from separate requests,
+          // not bootstrap safety, role authority, full stored values, delivery,
+          // a transaction spanning Auth/PostgREST, or durable audit recording.
           return new Response(JSON.stringify({ ok: true, userId: newUserId, email: input.email }), {
             status: 200,
             headers: { "Content-Type": "application/json" },
           });
-        } catch (e: any) {
-          await logRouteAccess({
-            actorId,
-            role: "admin",
-            label,
-            method: "POST",
-            outcome: "error",
-            errorMessage: e?.message ?? "Server error",
-            durationMs: Date.now() - start,
-            request,
-          });
-          return new Response(JSON.stringify({ error: e?.message ?? "Server error" }), {
+        } catch {
+          try {
+            await logRouteAccess({
+              actorId,
+              role: "admin",
+              label,
+              method: "POST",
+              outcome: "error",
+              errorMessage: "Account creation request failed",
+              durationMs: Date.now() - start,
+              request,
+            });
+          } catch {
+            /* Best-effort audit is not an acknowledgment receipt. */
+          }
+          if (createdUserId && createdEmail) {
+            // A rejected later promise cannot undo a previously acknowledged
+            // Auth creation. Preserve partial envelopes without retry/delete.
+            const body =
+              stage === "roles"
+                ? { error: roleFailure, userId: createdUserId }
+                : {
+                    ok: true,
+                    userId: createdUserId,
+                    email: createdEmail,
+                    warning: stage === "audit" ? completionFailure : profileFailure,
+                  };
+            return new Response(JSON.stringify(body), {
+              status: 207,
+              headers: { "Content-Type": "application/json" },
+            });
+          }
+          return new Response(JSON.stringify({ error: creationFailure }), {
             status: 500,
           });
         }
       },
-
     },
   },
 });
