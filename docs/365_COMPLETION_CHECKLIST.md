@@ -111,10 +111,12 @@ CI gates passed (run `38688332298`), 1,154 application tests across 58 files. Th
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
-Latest application candidate: draft PR #51, code `883c505`, 1,154 application tests
-across 58 files and full TypeScript pass. It hardens account-creation acknowledgments,
-private request lifetimes and known input boundaries without changing the API or
-backend authority; docs `681e36c` now passed all six CI gates. PR #48 remains the
+Latest application candidate: draft PR #53, code `b140407`, 1,207 application tests
+across 59 files and full TypeScript pass. It adds strict role/profile returned-row
+identity evidence to the existing account API, without adopting backend authority
+or repairing provisioning/model gaps; its own latest CI requires verification.
+PR #51 remains the latest fully CI-verified connected source parent (`681e36c`,
+1,154 tests), with caller/private-lifetime hardening. PR #48 remains the
 earlier verified claim UI parent, with its six gates recorded above. PR #46 remains the
 earlier verified owner-row confirmation parent (1,029 tests). PR #38, code `22c2724`, remains the earlier
 six-chat-caller slice (986 tests), not the latest verified application head.
@@ -140,9 +142,10 @@ offboarding and original-actor custody remain separate. Docs `3c153c5` now passe
 all six CI gates (`38687811205`), not production authority or release acceptance.
 
 Latest dependency inventory: draft PR #52, code `e4e099d`, six offline catalog
-contracts pass. New fingerprint-only partner/referral inventory exposes bounty/
-assignment and nonempty intent frontiers; no partner behavioral fixture or
-complete signup proof is claimed. Full regressions and own CI are being verified.
+contracts and 456 tooling/assets pass. New fingerprint-only partner/referral
+inventory exposes bounty/assignment and nonempty intent frontiers; no partner
+behavioral fixture or complete signup proof is claimed. Its own latest CI still
+requires verification.
 
 Latest database read candidate: draft PR #31, code `797876c`,22 new focused tests
 and 191/191 full sequential tooling pass. The CLI-generated reminder invoker API
@@ -1682,6 +1685,52 @@ kernel. No migrations/deployment; provenance 404/423, 19 unclassified and all
 baseline/replay/parity/release flags stay false. Preserve applied restrictions,
 native/consent/recovery/API/session/concurrency/receipt/mobile/owner/full-media
 gates and one active continuation automation.
+
+## Account API row-evidence checkpoint (2026-10-15)
+
+Draft PR #53, code `b1404074efb8ebab624386356a3c35a94682fa14`, branch
+`security/account-creation-row-evidence`, stacked on PR #52 docs `0d925e2`.
+The same role INSERT now returns only user_id/role and must match the exact unique
+requested set; the same profile UPDATE filtered by new Auth id returns exactly
+one matching id. NULL/zero/malformed/wrong/extra/duplicate receipts or returned
+errors cannot reach normal 200. Malformed Auth UUID prevents later writes.
+Known post-Auth rejected promises remain generic partial 207, without retries,
+compensating delete or rollback claims; completion-audit exceptions are distinct
+from profile-response failures. Exact normal 200 and existing 207 envelope shapes
+remain compatible with PR #51's acknowledgment-only caller.
+
+Verified-user/admin lookup ordering, exact requested writes/domain coercion/input
+schema/password generation are unchanged. No base user role, actor override or
+new permissions. Existing staff seller_type=NULL and legacy enum mismatch remain
+explicit backend/model release blockers. These are separate Auth/PostgREST steps,
+not atomic/idempotent provisioning, full stored-value/trigger/delivery/audit proof
+or trusted original-human authority. No production permissions or data changed.
+
+Verification: 53 new actual-handler/real-Zod/mock-SDK tests, with unchanged caller
+41 giving focused 94/94 (8.24s). Final full app 1,207/1,207 across 59 files
+(92.56s), no failures/skips/quarantine; full TypeScript passes. Same-run serial
+tooling 446 plus separate 10 receipt assets pass (456 total). Formatting/diff
+and primary-agent source review pass; lint zero errors/four retained warnings.
+Subagent usage limits prevented fresh independent final API review; no independent
+audit is claimed from failed calls. Scope/pins:
+`evidence/ACCOUNT_CREATION_ROW_EVIDENCE.md`.
+
+PR #52 docs `0d925e2` CI `38693190311` has OCR/type/lint/Parts passed, build/unit
+running at capture. PR #53 code CI `38693453126` is running; hosting
+`ca9b2edd-0b01-4958-8b33-13c3934b3df5` failed separately and wrapper
+`38693453191` skipped migrations/production deployment. Later docs heads need
+fresh checks. This API slice adds no live application calls, migration, mutation
+or deployment; the heartbeat's two live catalog-only reads belong to PR #52.
+
+Exact next action: verify newest PR #52/#53 heads, then construct the actual
+bounded partner wrapper (genuine empty-referrals branch) and recover/match auth/
+profile/org/member source/critical metadata. Keep nonempty bounty/assignment/
+intent and incoming/offboarding/original-actor/revision/common-lock dependencies
+separate until fully composed; do not guess a seller enum or staff NULL repair.
+Provenance remains 404/423, 19 unclassified; baseline/replay/parity/release flags
+false. Preserve three applied restrictions without replay. Native/consent,
+recovery/real HTTP/JWT/RLS/session/concurrency/receipt/mobile/owner/full-media
+release gates and the one recurring follow-up remain open/active respectively.
 
 ## Recovery evidence (original scope, retained below)
 
