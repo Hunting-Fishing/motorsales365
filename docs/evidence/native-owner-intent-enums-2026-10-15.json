@@ -1,0 +1,35 @@
+{
+  "mode": "read-only-enum-catalog",
+  "enums": [
+    {
+      "type": "app_role",
+      "owner": "postgres",
+      "labels": [
+        "admin",
+        "user",
+        "sales",
+        "moderator",
+        "support",
+        "advertising",
+        "sales_junior",
+        "sales_senior",
+        "sales_manager"
+      ],
+      "schema": "public"
+    },
+    {
+      "type": "seller_type",
+      "owner": "postgres",
+      "labels": [
+        "private",
+        "business",
+        "staff"
+      ],
+      "schema": "public"
+    }
+  ],
+  "scope": "Only public.seller_type and public.app_role catalog labels; no application data or authority acceptance.",
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "observedAtUtc": "2026-10-15T04:08:11.297488",
+  "serverVersion": "17.6"
+}

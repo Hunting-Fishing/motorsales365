@@ -1,0 +1,1006 @@
+{
+  "mode": "read-only-catalog",
+  "scope": "Six named public helper families including every retained recompute overload; profiles six named columns, admin-audit/user-role columns, selected constraints/policies/noninternal attachments. Catalog definitions are observation evidence, not applied migration provenance.",
+  "limits": "No business/auth/profile/audit/role row data or business counts, helper invocation, mutation, hosted API/session/concurrency, full incoming writer/role/object-identity closure, source-history adoption, baseline/parity or release acceptance. Only selected columns and raw metadata values; future capture requires fresh privacy review.",
+  "tables": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "admin_audit_log",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "profiles",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "user_roles",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    }
+  ],
+  "columns": [
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "admin_audit_log",
+      "default": "gen_random_uuid()",
+      "notNull": true,
+      "position": 1,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "actor_id",
+      "type": "uuid",
+      "table": "admin_audit_log",
+      "default": null,
+      "notNull": true,
+      "position": 2,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "target_user_id",
+      "type": "uuid",
+      "table": "admin_audit_log",
+      "default": null,
+      "notNull": false,
+      "position": 3,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "action",
+      "type": "text",
+      "table": "admin_audit_log",
+      "default": null,
+      "notNull": true,
+      "position": 4,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "field",
+      "type": "text",
+      "table": "admin_audit_log",
+      "default": null,
+      "notNull": false,
+      "position": 5,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "old_value",
+      "type": "text",
+      "table": "admin_audit_log",
+      "default": null,
+      "notNull": false,
+      "position": 6,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "new_value",
+      "type": "text",
+      "table": "admin_audit_log",
+      "default": null,
+      "notNull": false,
+      "position": 7,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "note",
+      "type": "text",
+      "table": "admin_audit_log",
+      "default": null,
+      "notNull": false,
+      "position": 8,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "admin_audit_log",
+      "default": "now()",
+      "notNull": true,
+      "position": 9,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "entity_type",
+      "type": "text",
+      "table": "admin_audit_log",
+      "default": null,
+      "notNull": false,
+      "position": 10,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "entity_id",
+      "type": "text",
+      "table": "admin_audit_log",
+      "default": null,
+      "notNull": false,
+      "position": 11,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "metadata",
+      "type": "jsonb",
+      "table": "admin_audit_log",
+      "default": null,
+      "notNull": false,
+      "position": 12,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "profiles",
+      "default": null,
+      "notNull": true,
+      "position": 1,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "seller_type",
+      "type": "public.seller_type",
+      "table": "profiles",
+      "default": "'private'::public.seller_type",
+      "notNull": true,
+      "position": 4,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "profiles",
+      "default": "now()",
+      "notNull": true,
+      "position": 15,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "signup_intent",
+      "type": "text",
+      "table": "profiles",
+      "default": null,
+      "notNull": false,
+      "position": 27,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "intent_evaluated_at",
+      "type": "timestamp with time zone",
+      "table": "profiles",
+      "default": null,
+      "notNull": false,
+      "position": 54,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "intent_evaluated_by",
+      "type": "uuid",
+      "table": "profiles",
+      "default": null,
+      "notNull": false,
+      "position": 55,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "user_roles",
+      "default": "gen_random_uuid()",
+      "notNull": true,
+      "position": 1,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "user_id",
+      "type": "uuid",
+      "table": "user_roles",
+      "default": null,
+      "notNull": true,
+      "position": 2,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "role",
+      "type": "public.app_role",
+      "table": "user_roles",
+      "default": null,
+      "notNull": true,
+      "position": 3,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "user_roles",
+      "default": "now()",
+      "notNull": true,
+      "position": 4,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    }
+  ],
+  "policies": [
+    {
+      "name": "Admins read admin audit",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "admin_audit_log",
+      "using": "public.has_role(auth.uid(), 'admin'::public.app_role)",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins write admin audit",
+      "check": "(public.has_role(auth.uid(), 'admin'::public.app_role) AND (auth.uid() = actor_id))",
+      "roles": [
+        "public"
+      ],
+      "table": "admin_audit_log",
+      "using": null,
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Support read admin audit",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "admin_audit_log",
+      "using": "public.can_support(auth.uid())",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can manage all profiles",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "profiles",
+      "using": "public.has_role(auth.uid(), 'admin'::public.app_role)",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Sales view assigned profiles",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "(public.has_role(auth.uid(), 'sales'::public.app_role) AND public.is_sales_assigned_user(auth.uid(), id))",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Support read profiles",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "profiles",
+      "using": "public.can_support(auth.uid())",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can insert own profile",
+      "check": "((auth.uid() = id) AND (is_staff_account = false))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": null,
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can update own profile",
+      "check": "((auth.uid() = id) AND (NOT (verification_status IS DISTINCT FROM ( SELECT p.verification_status\n   FROM public.profiles p\n  WHERE (p.id = auth.uid())))) AND (NOT (verified_at IS DISTINCT FROM ( SELECT p.verified_at\n   FROM public.profiles p\n  WHERE (p.id = auth.uid())))) AND (NOT (is_founding_member IS DISTINCT FROM ( SELECT p.is_founding_member\n   FROM public.profiles p\n  WHERE (p.id = auth.uid())))) AND (NOT (founding_member_number IS DISTINCT FROM ( SELECT p.founding_member_number\n   FROM public.profiles p\n  WHERE (p.id = auth.uid())))) AND (NOT (account_status IS DISTINCT FROM ( SELECT p.account_status\n   FROM public.profiles p\n  WHERE (p.id = auth.uid())))) AND (NOT (is_staff_account IS DISTINCT FROM ( SELECT p.is_staff_account\n   FROM public.profiles p\n  WHERE (p.id = auth.uid())))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "(auth.uid() = id)",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can view own profile",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "profiles",
+      "using": "(auth.uid() = id)",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins manage roles",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "user_roles",
+      "using": "public.has_role(auth.uid(), 'admin'::public.app_role)",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Sales view user_roles",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_roles",
+      "using": "(public.has_role(auth.uid(), 'sales'::public.app_role) AND public.is_sales_assigned_user(auth.uid(), user_id))",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can view own roles",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "user_roles",
+      "using": "((auth.uid() = user_id) OR public.has_role(auth.uid(), 'admin'::public.app_role))",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    }
+  ],
+  "triggers": [
+    {
+      "name": "auto_create_seller_org",
+      "table": "profiles",
+      "enabled": "O",
+      "function": "public.tg_auto_create_seller_org()",
+      "definition": "CREATE TRIGGER auto_create_seller_org AFTER INSERT ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.tg_auto_create_seller_org()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "dff1ab9bbef20d62f3248f1698a3e416",
+      "functionDefinitionMd5": "ebcf7fc786cefd30a91b1202b9ff7a08",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "profiles_recompute_intent",
+      "table": "profiles",
+      "enabled": "O",
+      "function": "public.trg_profiles_recompute_intent()",
+      "definition": "CREATE TRIGGER profiles_recompute_intent AFTER INSERT OR UPDATE OF seller_type ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.trg_profiles_recompute_intent()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [
+        "seller_type"
+      ],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "8a393cd291584b8d821c01af94753c27",
+      "functionDefinitionMd5": "a053269427e5fb5e848e7021c6d5ffd2",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "set_profiles_updated",
+      "table": "profiles",
+      "enabled": "O",
+      "function": "public.tg_set_updated_at()",
+      "definition": "CREATE TRIGGER set_profiles_updated BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "301a884953d37769916294bb60562e05",
+      "functionDefinitionMd5": "494198e1eb8f9c98c4cf075ed9d79bb9",
+      "functionSecurityDefiner": false
+    },
+    {
+      "name": "tg_assign_founding_member",
+      "table": "profiles",
+      "enabled": "O",
+      "function": "public.assign_founding_member()",
+      "definition": "CREATE TRIGGER tg_assign_founding_member BEFORE INSERT ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.assign_founding_member()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "b348f7bf1642a6de74574c208de12f66",
+      "functionDefinitionMd5": "88ff5012f524b7817b048f9f5c83e318",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "tg_grant_founding_bronze",
+      "table": "profiles",
+      "enabled": "O",
+      "function": "public.grant_founding_bronze()",
+      "definition": "CREATE TRIGGER tg_grant_founding_bronze AFTER INSERT ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.grant_founding_bronze()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "8091aa106f8a18220a0cbcac20c1fc5a",
+      "functionDefinitionMd5": "c07811e3fe7c025047b39e43144b2c3f",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "trg_assign_profile_member_number",
+      "table": "profiles",
+      "enabled": "O",
+      "function": "public.assign_profile_member_number()",
+      "definition": "CREATE TRIGGER trg_assign_profile_member_number BEFORE INSERT ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.assign_profile_member_number()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "ca6b5b10ac00dc3602abd5a488e7907b",
+      "functionDefinitionMd5": "35d29fc6b60516968ec208a062ff0761",
+      "functionSecurityDefiner": false
+    },
+    {
+      "name": "trg_attach_signup_referral",
+      "table": "profiles",
+      "enabled": "O",
+      "function": "public.attach_signup_referral()",
+      "definition": "CREATE TRIGGER trg_attach_signup_referral AFTER INSERT ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.attach_signup_referral()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "a91c3e78e84de0cf2ecbfddbf3c447cf",
+      "functionDefinitionMd5": "5dbeac8e42654ca4a04cde8c4190e23d",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "trg_grant_business_trial",
+      "table": "profiles",
+      "enabled": "O",
+      "function": "public.grant_business_trial()",
+      "definition": "CREATE TRIGGER trg_grant_business_trial AFTER INSERT OR UPDATE OF business_kind, verification_status ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.grant_business_trial()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [
+        "verification_status",
+        "business_kind"
+      ],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "fa8713996c0893566734444c50b08e72",
+      "functionDefinitionMd5": "db0b97ad933781540f49d916f1fe8ce9",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "trg_set_internal_staff_manager",
+      "table": "profiles",
+      "enabled": "O",
+      "function": "public.set_internal_staff_manager()",
+      "definition": "CREATE TRIGGER trg_set_internal_staff_manager BEFORE INSERT ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.set_internal_staff_manager()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "3954055b4642c15f128c36ca050fd228",
+      "functionDefinitionMd5": "4de69facca0a5ee7ecc73b024bf2745a",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "trg_auto_setup_sales_rep_territory_on_role",
+      "table": "user_roles",
+      "enabled": "O",
+      "function": "public.trg_auto_setup_sales_rep_territory()",
+      "definition": "CREATE TRIGGER trg_auto_setup_sales_rep_territory_on_role AFTER INSERT ON public.user_roles FOR EACH ROW EXECUTE FUNCTION public.trg_auto_setup_sales_rep_territory()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "69fa75c9327b83a603599aacfcf52b07",
+      "functionDefinitionMd5": "8a8835836cfdf1afb7365a7fad434fd0",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "trg_create_staff_referral",
+      "table": "user_roles",
+      "enabled": "O",
+      "function": "public.tg_create_staff_referral()",
+      "definition": "CREATE TRIGGER trg_create_staff_referral AFTER INSERT ON public.user_roles FOR EACH ROW EXECUTE FUNCTION public.tg_create_staff_referral()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "8c728c2ab83ef33108d3248393020d08",
+      "functionDefinitionMd5": "2155ff63d16ea6e86c488e5f11ac8738",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "trg_user_roles_create_sales_rep",
+      "table": "user_roles",
+      "enabled": "O",
+      "function": "public.tg_create_sales_rep_profile()",
+      "definition": "CREATE TRIGGER trg_user_roles_create_sales_rep AFTER INSERT ON public.user_roles FOR EACH ROW EXECUTE FUNCTION public.tg_create_sales_rep_profile()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "updateColumns": [],
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "6d32b8a8d6c88e34bd746dd8b1d34620",
+      "functionDefinitionMd5": "459db05a0ea726375b273ae3896a609b",
+      "functionSecurityDefiner": true
+    }
+  ],
+  "functions": [
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "boolean",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "arguments": "_user_id uuid",
+      "bodyMd5Lf": "318998007586fe3538d6ae3b381212df",
+      "signature": "public.can_support(uuid)",
+      "definition": "CREATE OR REPLACE FUNCTION public.can_support(_user_id uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  SELECT EXISTS (\n    SELECT 1 FROM public.user_roles\n    WHERE user_id = _user_id\n      AND role::text IN ('admin','moderator','support')\n  )\n$function$\n",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "definitionMd5": "29bb2f0b57fd8abe4bce8555627afa2a",
+      "serviceExecute": true,
+      "definitionBytes": 314,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres,authenticated=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "text",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "arguments": "_user_id uuid",
+      "bodyMd5Lf": "eee9038a5060ac2f0a74871148972abe",
+      "signature": "public.derive_signup_intent(uuid)",
+      "definition": "CREATE OR REPLACE FUNCTION public.derive_signup_intent(_user_id uuid)\n RETURNS text\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  _seller_type text;\n  _owns_business boolean;\nBEGIN\n  SELECT seller_type INTO _seller_type FROM public.profiles WHERE id = _user_id;\n  IF NOT FOUND THEN\n    RETURN NULL;\n  END IF;\n\n  SELECT EXISTS (SELECT 1 FROM public.businesses WHERE owner_id = _user_id)\n    INTO _owns_business;\n\n  IF lower(coalesce(_seller_type, '')) = 'repair_shop' THEN\n    RETURN 'service_provider';\n  ELSIF lower(coalesce(_seller_type, '')) IN ('dealer', 'insurance') THEN\n    RETURN 'business';\n  ELSIF _owns_business THEN\n    RETURN 'business';\n  ELSE\n    RETURN 'buyer';\n  END IF;\nEND;\n$function$\n",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": false,
+      "definitionMd5": "037f53638583143d112ecfa99289b2e0",
+      "serviceExecute": true,
+      "definitionBytes": 754,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres,authenticated=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "boolean",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "arguments": "_user_id uuid, _role public.app_role",
+      "bodyMd5Lf": "dae5cfc5a8d92461a428f6702e4e65af",
+      "signature": "public.has_role(uuid,public.app_role)",
+      "definition": "CREATE OR REPLACE FUNCTION public.has_role(_user_id uuid, _role public.app_role)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  SELECT EXISTS (\n    SELECT 1 FROM public.user_roles\n    WHERE user_id = _user_id AND role = _role\n  )\n$function$\n",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "definitionMd5": "0c2c78626ed8a4807e6cc1b7b54d641c",
+      "serviceExecute": true,
+      "definitionBytes": 295,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "void",
+      "strict": false,
+      "defaults": 6,
+      "language": "plpgsql",
+      "arguments": "_user_id uuid, _trigger_source text DEFAULT NULL::text, _trigger_field text DEFAULT NULL::text, _trigger_old text DEFAULT NULL::text, _trigger_new text DEFAULT NULL::text, _trigger_entity_type text DEFAULT NULL::text, _trigger_entity_id text DEFAULT NULL::text",
+      "bodyMd5Lf": "0f539857998f64fb0e3bcc212941ce90",
+      "signature": "public.recompute_signup_intent(uuid,text,text,text,text,text,text)",
+      "definition": "CREATE OR REPLACE FUNCTION public.recompute_signup_intent(_user_id uuid, _trigger_source text DEFAULT NULL::text, _trigger_field text DEFAULT NULL::text, _trigger_old text DEFAULT NULL::text, _trigger_new text DEFAULT NULL::text, _trigger_entity_type text DEFAULT NULL::text, _trigger_entity_id text DEFAULT NULL::text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  _next text;\n  _prev text;\n  _meta jsonb;\nBEGIN\n  IF _user_id IS NULL THEN\n    RETURN;\n  END IF;\n  _next := public.derive_signup_intent(_user_id);\n  SELECT signup_intent INTO _prev FROM public.profiles WHERE id = _user_id;\n  IF _prev IS DISTINCT FROM _next THEN\n    UPDATE public.profiles\n       SET signup_intent = _next,\n           intent_evaluated_at = now(),\n           intent_evaluated_by = NULL\n     WHERE id = _user_id;\n\n    _meta := jsonb_build_object('source', 'auto');\n    IF _trigger_source IS NOT NULL THEN\n      _meta := _meta || jsonb_build_object('trigger', _trigger_source);\n    END IF;\n    IF _trigger_field IS NOT NULL THEN\n      _meta := _meta || jsonb_build_object(\n        'changed_field', _trigger_field,\n        'changed_old', _trigger_old,\n        'changed_new', _trigger_new\n      );\n    END IF;\n\n    BEGIN\n      INSERT INTO public.admin_audit_log\n        (actor_id, target_user_id, action, field, old_value, new_value, note,\n         entity_type, entity_id, metadata)\n      VALUES\n        (_user_id, _user_id, 'intent_recomputed', 'signup_intent',\n         _prev, _next,\n         COALESCE(\n           'Automatic re-evaluation via database trigger (' || _trigger_source || ')',\n           'Automatic re-evaluation via database trigger'),\n         _trigger_entity_type, _trigger_entity_id, _meta);\n    EXCEPTION WHEN OTHERS THEN\n      NULL;\n    END;\n  END IF;\nEND;\n$function$\n",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "definitionMd5": "6a3b02a5f5ff0f859f1e8fc8713aef44",
+      "serviceExecute": true,
+      "definitionBytes": 1822,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "void",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "arguments": "_user_id uuid",
+      "bodyMd5Lf": "bf98af3fb51d414f568de3fa34e80afa",
+      "signature": "public.recompute_signup_intent(uuid)",
+      "definition": "CREATE OR REPLACE FUNCTION public.recompute_signup_intent(_user_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  _next text;\n  _prev text;\nBEGIN\n  IF _user_id IS NULL THEN\n    RETURN;\n  END IF;\n  _next := public.derive_signup_intent(_user_id);\n  SELECT signup_intent INTO _prev FROM public.profiles WHERE id = _user_id;\n  IF _prev IS DISTINCT FROM _next THEN\n    UPDATE public.profiles\n       SET signup_intent = _next,\n           intent_evaluated_at = now(),\n           intent_evaluated_by = NULL\n     WHERE id = _user_id;\n    BEGIN\n      INSERT INTO public.admin_audit_log\n        (actor_id, target_user_id, action, field, old_value, new_value, note, metadata)\n      VALUES\n        (_user_id, _user_id, 'intent_recomputed', 'signup_intent',\n         _prev, _next, 'Automatic re-evaluation via database trigger',\n         jsonb_build_object('source', 'auto'));\n    EXCEPTION WHEN OTHERS THEN\n      -- audit failure is non-fatal\n      NULL;\n    END;\n  END IF;\nEND;\n$function$\n",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "definitionMd5": "1b7e8c8e59c2959ca12cd072529d2517",
+      "serviceExecute": true,
+      "definitionBytes": 1039,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "trigger",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "arguments": "",
+      "bodyMd5Lf": "46b92e78631dff66834b7e4035b4e251",
+      "signature": "public.trg_businesses_recompute_intent()",
+      "definition": "CREATE OR REPLACE FUNCTION public.trg_businesses_recompute_intent()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nBEGIN\n  IF TG_OP = 'INSERT' THEN\n    PERFORM public.recompute_signup_intent(\n      NEW.owner_id,\n      'business_added',\n      'owns_business', 'false', 'true',\n      'business', NEW.id::text\n    );\n  ELSIF TG_OP = 'DELETE' THEN\n    PERFORM public.recompute_signup_intent(\n      OLD.owner_id,\n      'business_removed',\n      'owns_business', 'true', 'false',\n      'business', OLD.id::text\n    );\n  ELSIF TG_OP = 'UPDATE' THEN\n    IF NEW.owner_id IS DISTINCT FROM OLD.owner_id THEN\n      PERFORM public.recompute_signup_intent(\n        OLD.owner_id,\n        'business_owner_changed',\n        'owns_business', 'true', 'false',\n        'business', OLD.id::text\n      );\n      PERFORM public.recompute_signup_intent(\n        NEW.owner_id,\n        'business_owner_changed',\n        'owns_business', 'false', 'true',\n        'business', NEW.id::text\n      );\n    END IF;\n  END IF;\n  RETURN COALESCE(NEW, OLD);\nEND;\n$function$\n",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "definitionMd5": "6d715f23167595b07aaddd268ee3bf25",
+      "serviceExecute": true,
+      "definitionBytes": 1085,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "trigger",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "arguments": "",
+      "bodyMd5Lf": "8a393cd291584b8d821c01af94753c27",
+      "signature": "public.trg_profiles_recompute_intent()",
+      "definition": "CREATE OR REPLACE FUNCTION public.trg_profiles_recompute_intent()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nBEGIN\n  IF TG_OP = 'INSERT' THEN\n    PERFORM public.recompute_signup_intent(\n      NEW.id,\n      'profile_insert',\n      'seller_type', NULL::text, NEW.seller_type::text,\n      'profile', NEW.id::text\n    );\n  ELSIF NEW.seller_type IS DISTINCT FROM OLD.seller_type THEN\n    PERFORM public.recompute_signup_intent(\n      NEW.id,\n      'seller_type_changed',\n      'seller_type', OLD.seller_type::text, NEW.seller_type::text,\n      'profile', NEW.id::text\n    );\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "definitionMd5": "a053269427e5fb5e848e7021c6d5ffd2",
+      "serviceExecute": true,
+      "definitionBytes": 663,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    }
+  ],
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "constraints": [
+    {
+      "name": "admin_audit_log_pkey",
+      "type": "p",
+      "table": "admin_audit_log",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "profiles_founding_member_number_key",
+      "type": "u",
+      "table": "profiles",
+      "validated": true,
+      "definition": "UNIQUE (founding_member_number)"
+    },
+    {
+      "name": "profiles_id_fkey",
+      "type": "f",
+      "table": "profiles",
+      "validated": true,
+      "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "profiles_intent_evaluated_by_fkey",
+      "type": "f",
+      "table": "profiles",
+      "validated": true,
+      "definition": "FOREIGN KEY (intent_evaluated_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "profiles_login_username_key",
+      "type": "u",
+      "table": "profiles",
+      "validated": true,
+      "definition": "UNIQUE (login_username)"
+    },
+    {
+      "name": "profiles_manager_user_id_fkey",
+      "type": "f",
+      "table": "profiles",
+      "validated": true,
+      "definition": "FOREIGN KEY (manager_user_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "profiles_parent_org_id_fkey",
+      "type": "f",
+      "table": "profiles",
+      "validated": true,
+      "definition": "FOREIGN KEY (parent_org_id) REFERENCES public.organizations(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "profiles_pkey",
+      "type": "p",
+      "table": "profiles",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "profiles_signup_intent_check",
+      "type": "c",
+      "table": "profiles",
+      "validated": true,
+      "definition": "CHECK (((signup_intent IS NULL) OR (signup_intent = ANY (ARRAY['buyer'::text, 'private_seller'::text, 'business'::text, 'service_provider'::text, 'internal_staff'::text]))))"
+    },
+    {
+      "name": "profiles_signup_source_check",
+      "type": "c",
+      "table": "profiles",
+      "validated": true,
+      "definition": "CHECK ((signup_source = ANY (ARRAY['qr'::text, 'link'::text, 'direct'::text])))"
+    },
+    {
+      "name": "profiles_tier_id_fkey",
+      "type": "f",
+      "table": "profiles",
+      "validated": true,
+      "definition": "FOREIGN KEY (tier_id) REFERENCES public.member_tiers(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "user_roles_pkey",
+      "type": "p",
+      "table": "user_roles",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "user_roles_user_id_fkey",
+      "type": "f",
+      "table": "user_roles",
+      "validated": true,
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "user_roles_user_id_role_key",
+      "type": "u",
+      "table": "user_roles",
+      "validated": true,
+      "definition": "UNIQUE (user_id, role)"
+    }
+  ],
+  "observedAtUtc": "2026-10-15T04:00:11.110715",
+  "serverVersion": "17.6"
+}
