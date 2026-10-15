@@ -484,9 +484,27 @@ owner transaction/native reconciliation is not established. No original-human
 authority, migration provenance or baseline/parity/release flag is promoted.
 
 See `evidence/NATIVE_OWNERSHIP_CLAIM_COMPOSITION_PROOF.md` for exact scope/pins.
-Next complete the separate browser confirmation/lifetime slice, then actual
-owner-intent/derive/global-role/profile/audit and atomic attributable claim/transfer
+The separate browser confirmation/lifetime handoff is now implemented in PR #46
+below. Next close actual owner-intent/derive/global-role/profile/audit and atomic attributable claim/transfer
 dependencies before native owner positives. All recovery/consent/tenure/role/API/
 session/concurrency/OCR/mobile/full-media hosting gates remain open. Preserve the
 three applied legacy restrictions without replay; recurring continuation remains
 active without duplicate automation.
+
+Draft PR #46 (code `8176dc9`) hardens the admin owner-row transfer dialog without
+changing database authority: business/prior-owner compare (including NULL), exact
+one matching returned id/owner_id, generic unconfirmed-outcome handling/no auto
+retry, and account/business/prior-owner/open/search/transfer lifetime isolation.
+After observed account/target/lifetime changes, old requests cannot publish private
+results or act on the new UI context; transport
+abort does not prove server rollback. Success confirms the owner row only, not
+audit, staff/native profiles/roles/shop-access reconciliation.
+
+43 new focused tests pass; final full application suite 1,029/1,029 across 54 files
+(112.60s), TypeScript, lint/format/diff and independent review pass. Same-run
+parent tooling 394/394 passed separately. Latest CI needs its own verification;
+no migration/live application call/deployment occurred. See
+`evidence/OWNER_TRANSFER_CONFIRMATION_SLICE.md`. Keep owner-intent/global profile/
+audit, original-actor/idempotent atomic transfer, real API/session/concurrency,
+recovery/consent/tenure/OCR/mobile/full-media hosting gates open. The three applied
+legacy restrictions remain preserved without replay, and continuation stays active.

@@ -54,7 +54,11 @@ Security reconciliation branch: `completion/365-security`.
    offline in draft PR #45 (`340f2ca`): 19 focused and 394 tooling/receipt-asset
    tests pass. Read-only catalog recovery confirms approval remains service-only;
    zero-row approvals and attribution/repetition gaps are rehearsed, not repaired.
-   Eight business attachments remain excluded, especially owner-intent/global
+   The separate admin owner-row confirmation/lifetime fix is now implemented in
+   draft PR #46 (`8176dc9`), with 43 new tests, 1,029 full application tests across
+   54 files and TypeScript passing. It changes no database authority or audit/
+   native reconciliation; verify its own latest CI. Eight business attachments
+   remain excluded from the SQL proof, especially owner-intent/global
    profile/audit recomputation. Verify latest checks and close that chain before
    owner positives, then close trusted team/ownership/
    shift/audit dependencies before adopting privileged positives. The narrow
@@ -95,10 +99,12 @@ CI gates passed (run `38659674559`), 986 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
-Latest application candidate: draft PR #38, code `22c2724`, 986 application tests
-across 53 files and full TypeScript pass. It hardens six chat command callers and
-their UI lifetimes without changing database authority; all six documentation-head
-gates passed as recorded above. The following PR #39 is a separate memory-only,
+Latest application candidate: draft PR #46, code `8176dc9`, 1,029 application tests
+across 54 files and full TypeScript pass. It hardens admin owner-row confirmation/
+request lifetimes without changing database authority; its latest CI requires
+verification. The fully CI-verified application parent remains PR #38, code
+`22c2724`, whose six chat callers and 986 tests passed the gates recorded above.
+The following PR #39 is a separate memory-only,
 non-adopted research candidate, not a compatible staff-management release.
 PR #32's reminder consumer is retained in this stack and its
 API remains unapplied: do not ship before compatible database, native authority
@@ -1267,6 +1273,62 @@ shift/audit/other privileged writers, full DB/private-storage restore, consent/
 tenure, real API/session/concurrency, receipt/mobile/owner pilot and full-media
 hosting remain open. No paid resources, customer communications, data/history
 repair or sparse deployment; existing heartbeat stays active without duplication.
+
+## Admin owner-row confirmation checkpoint (2026-10-15)
+
+Draft PR #46, code `8176dc996acb0bf64d94a0c600434d382c9dd698`, branch
+`completion/owner-transfer-confirmation`, stacked on PR #45 docs `53350cf`.
+That parent's latest CI `38678253032` is running at capture; hosting
+`f8d81fc3-7ae4-4b0a-b2da-84a18ab0c424` failed separately and wrapper
+`38678253257` skipped migrations/production deployment. This app slice's newest
+head requires its own next-resume check; no preview upload is inferred.
+Initial app-code CI `38678357766` has four gates passed/build and unit pending at
+capture; hosting `9b812562-12a1-4f84-b12d-08b43068ac0b` failed separately and
+wrapper `38678357989` skipped migrations/production deployment. Later docs head
+requires its own verification.
+
+The retained browser UPDATE now compares business and displayed prior owner
+(including IS NULL), selects only id/owner_id and requires exactly one matching
+returned row. Zero/multiple/malformed/mismatched/error/unknown responses never
+announce success or trigger transfer callbacks; generic error/outcome-unknown
+copy blocks another submission in that form and instructs refresh/inspection
+before manual retry; it does not observe or attest a refresh. No auto
+mutation retry, new RPC, service client, policy/grant/schema or migration.
+
+Keyed account/business/prior-owner/open sessions, independent flight/epoch refs
+and synchronous close invalidation fence late private results/toasts/callbacks,
+old dismiss events and A→B→A. Search input/filter changes clear choices; one-flight
+dispatch captures the selected owner. Known-confirmed callback failure closes only
+the still-current original form. Transport abort is not SQL rollback or immutable
+server actor proof. Labelled form/buttons/email-confirmed wording improve markup,
+without claiming visual/mobile/real-dialog/accessibility acceptance.
+
+Verification: 43 focused tests pass; final full app 1,029/1,029 across 54 files
+(112.60s), no quarantine/failures/skips; TypeScript passes. Lint/format/diff and
+independent source/test review pass. Same-run parent tooling 394/394 (384 CI plus 10
+receipt assets) passed in separate serial commands, not a combined production
+acceptance test. Exact pins/scope: `evidence/OWNER_TRANSFER_CONFIRMATION_SLICE.md`.
+
+Migration impact/live application calls/deployment: none. The preceding one
+catalog-only call is PR #45's evidence, not a transfer test. Existing RLS/audited
+admin search authority is unchanged; row confirmation does not prove complete
+transfer, audit, staff/native profile/role/shop access migration or concurrency.
+No paid resources, customer communications, data/history repair or sparse deploy.
+Preserve all three live legacy restrictions without replay; all baseline/replay/
+parity/release flags remain false and global composition remains 404/423 with 19
+unclassified.
+
+Exact next action: verify PR #46 and #45 latest head/checks, then recover/compose
+the actual businesses_recompute_intent → recompute_signup_intent →
+derive_signup_intent → global role/profile/admin_audit writer/dependency chain.
+Reuse existing incoming metadata/source inventory; do not stub its permission,
+failure or audit behavior. Resolve pending/current-owner conflict, original actor,
+atomic reviewer stamping/idempotency, operator recovery and independent sessions
+before authorized claim/transfer or native owner positives. Trusted team/raw
+reentry and management/delegation/invitation/multi-roster policy, other privileged
+writers, full DB/private-storage restore, consent/tenure, real API/session/role,
+OCR/mobile/owner pilot and full-media hosting remain open. Heartbeat stays active
+without duplicate automation or repeated unchanged-state notices.
 
 ## Recovery evidence (original scope, retained below)
 
