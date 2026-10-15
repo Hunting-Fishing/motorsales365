@@ -1074,3 +1074,37 @@ recovery or promote unsigned lab subjects/service/global-admin positives. Source
 financial/consent/privacy/recovery/receipt/mobile/owner/full-media/hosting gates
 unchanged. No sparse deploy, restriction replay, paid resources, customer messages,
 production deletion, PR merge or duplicate automation; single continuation active.
+
+Full claim/evidence/ownership follow-up: code `dfac9d9`, branch
+`security/full-claim-evidence-composition`, based on PR #64 docs `5de2189`.
+One READ ONLY metadata diagnostic at `11:41:19.388797` UTC recovers full three
+claim tables, 31 columns/11 critical constraints/10 indexes/8 policies/4
+attachments/8 function envelopes, with no app/Auth/config/storage rows/counts,
+raw bodies/defaults/config/expressions, paths/content, helper calls or live settings/
+sequence values. Current retained source/complete schema matches locally.
+Full Auth/staff plus claim/evidence/owner UPDATE: 24 public tables/378 columns/
+89 critical constraints/91 indexes/43 public function envelopes plus provider uid/
+37 selected attachments. No projected business/Auth/profile/role/identity supports
+or legacy client-policy/privileged-positive adoption. Seven non-owner business
+attachments, native/team sync and storage custody remain excluded, not stubbed.
+Twenty-five focused pass (36.094 seconds), syntax/lint/format/canonical JSON/diff/
+primary review pass; full serial tooling 676/676 passes (598.845 seconds), then
+10/10 receipt assets (0.283 seconds): 686 aggregate, zero failures/skips/cancellations.
+Focused included, not double-counted. Evidence:
+`evidence/FULL_CLAIM_EVIDENCE_COMPOSITION.md`. Late genuine failures restore all
+24 public/Auth rows; zero-change approval, ignored pending/owner revisions,
+repeated transfer/audit/retention and unaudited evidence changes remain blockers.
+Actual uid/execute is not trusted original reviewer/session or confirmed mutation.
+
+PR #64 docs `5de2189` passed all six CI gates (`38728141238`); hosting failed
+separately, migrations/production skipped. Verify new publication HEAD. Next strict
+separate unwired revision-fenced command contract/tests for claim attempt/evidence
+set/owner tenure and payload-bound request identity; deny missing/unknown bindings.
+Keep v1/generated middleware unchanged; no parsing/actor-equality authority claim.
+Then trusted/fresh original actor, atomic pending/current-owner/version/idempotency
+receipt, common locks/native-team/offboarding/private-object custody and recovery.
+No repeated completed source/schema/staff/claim recovery or legacy authority adoption.
+Source404/423, 19 unclassified; baseline/replay/parity/release and financial/consent/
+privacy/recovery/receipt/mobile/owner/full-media/hosting gates unchanged. Zero
+production write/migration/deploy, paid resource, customer communication, data
+deletion, restriction replay, PR merge or duplicate automation; continuation active.

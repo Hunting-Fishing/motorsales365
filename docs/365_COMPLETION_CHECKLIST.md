@@ -15,6 +15,44 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest full claim/evidence/ownership writer slice: code `dfac9d9`, branch
+`security/full-claim-evidence-composition`, based on PR #64 docs `5de2189`.
+One READ ONLY metadata diagnostic at `11:41:19.388797` UTC recovers actual three
+claim tables: 31 columns/11 critical constraints/10 indexes/8 policies/4 attachments/
+8 function envelopes. No app/Auth/config/storage rows/counts, raw bodies/defaults/
+config/expressions, paths/file content, helper calls or live settings/sequence
+values read. Actual retained source and complete structures match locally.
+Full unchanged Auth/staff foundation plus claim/evidence/owner UPDATE now yields
+24 public tables/378 columns/89 critical constraints/91 indexes/43 public function
+envelopes plus provider uid/37 selected attachments. No reduced business/Auth/
+profile/role/identity supports, no client policy/privileged authority adoption.
+Seven non-owner business attachments, native/team sync and storage-object custody
+remain explicitly excluded, not stubbed. Twenty-five focused pass (36.094 seconds),
+syntax/lint/format/canonical JSON/diff/primary review pass; full serial tooling
+676/676 passes (598.845 seconds), then 10/10 receipt assets (0.283 seconds):
+686 aggregate, zero failures/skips/cancellations. Focused included, not double-counted.
+Evidence: `evidence/FULL_CLAIM_EVIDENCE_COMPOSITION.md`.
+Genuine late claim/evidence audit failures restore all 24 public/Auth rows and
+original defaults recover. Zero-owner-change approval, ignored pending status/
+owner revision, repeated-transfer audit, target/stale reviewer attribution,
+unaudited evidence UPDATE and cascade audit FK/deletion-retention gaps remain
+characterized blockers, not professional policy adopted. Actual function execute
+is not original reviewer/session authority or confirmed ownership mutation.
+PR #64 docs `5de2189` now passed all six CI gates (`38728141238`); hosting failed
+separately, migrations/production skipped. Verify new publication HEAD separately.
+Next separate strict unwired revision-fenced claim-review command contract/tests:
+expected claim-attempt/evidence-set/owner-tenure revisions and payload-bound
+request identity; missing/unknown bindings deny. Do not alter v1 codec/generated
+middleware or label parsing/supplied actor equality an auth check/atomic ledger.
+Then trusted original actor/fresh authority, atomic pending/current-owner/version/
+idempotency audit receipt and shared lock/native-team/offboarding/storage custody
+gates. No repeated completed recovery or privileged legacy positives adopted.
+Source404/423, 19 unclassified; baseline/replay/parity/release and financial/
+consent/privacy/recovery/receipt/mobile/owner/full-media/hosting gates unchanged.
+Zero production write/migration/deploy, paid resource, customer message, data
+deletion, restriction replay, PR merge or duplicate automation; single recurring
+continuation active. Independent internal-staff caller acknowledgment remains safe.
+
 Newest full staff writer slice: code `5e748d2`, branch
 `security/full-staff-writer-composition`, based on PR #63 docs `a188571`.
 Actual provider uid and role/staff/audit/sales/territory writers now compose with
