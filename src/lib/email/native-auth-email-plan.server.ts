@@ -68,6 +68,12 @@ export class NativeAuthEmailPlanError extends Error {
 }
 
 const plans = new WeakSet<NativeAuthEmailPlan>();
+
+/** Same-instance command provenance, not durable storage or delivery authority. */
+export function isNativeAuthEmailPlan(value: unknown): value is NativeAuthEmailPlan {
+  return typeof value === "object" && value !== null && plans.has(value as NativeAuthEmailPlan);
+}
+
 const actions = new Set<NativeAuthAction>([
   "signup",
   "invite",
