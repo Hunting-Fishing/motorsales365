@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/site-layout";
 import { Loader2, MailMinus, CheckCircle2, XCircle } from "lucide-react";
@@ -11,37 +11,57 @@ export const Route = createFileRoute("/unsubscribe")({
   }),
 });
 
-type State = "validating" | "valid" | "already" | "invalid" | "submitting" | "done" | "error";
+type State =
+  | "validating"
+  | "valid"
+  | "already"
+  | "invalid"
+  | "consumed"
+  | "submitting"
+  | "done"
+  | "error";
+
+function failedRequestState(status: number): "invalid" | "consumed" | "error" {
+  if (status === 409) return "consumed";
+  return status === 400 || status === 404 ? "invalid" : "error";
+}
 
 function UnsubscribePage() {
   const { token } = Route.useSearch();
   const [state, setState] = useState<State>("validating");
+  const requestEpoch = useRef<symbol | null>(null);
 
   useEffect(() => {
+    const epoch = Symbol();
+    requestEpoch.current = epoch;
     if (!token) {
       setState("invalid");
-      return;
+    } else {
+      setState("validating");
+      void (async () => {
+        try {
+          const res = await fetch(`/email/unsubscribe?token=${encodeURIComponent(token)}`);
+          const json = await res.json();
+          if (epoch !== requestEpoch.current) return;
+          if (!res.ok) setState(failedRequestState(res.status));
+          else if (json.valid === true) setState("valid");
+          else if (json.reason === "already_unsubscribed") setState("already");
+          else setState("error");
+        } catch {
+          if (epoch === requestEpoch.current) setState("error");
+        }
+      })();
     }
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch(`/email/unsubscribe?token=${encodeURIComponent(token)}`);
-        const json = await res.json();
-        if (cancelled) return;
-        if (!res.ok) setState("invalid");
-        else if (json.valid) setState("valid");
-        else if (json.reason === "already_unsubscribed") setState("already");
-        else setState("invalid");
-      } catch {
-        if (!cancelled) setState("invalid");
-      }
-    })();
     return () => {
-      cancelled = true;
+      // Also invalidate a POST started after this GET. Token changes and
+      // unmount must never let an older response replace the current outcome.
+      requestEpoch.current = null;
     };
   }, [token]);
 
   async function confirm() {
+    const epoch = Symbol();
+    requestEpoch.current = epoch;
     setState("submitting");
     try {
       const res = await fetch(`/email/unsubscribe`, {
@@ -50,15 +70,18 @@ function UnsubscribePage() {
         body: JSON.stringify({ token }),
       });
       const json = await res.json();
+      if (epoch !== requestEpoch.current) return;
       setState(
-        res.ok && json.success
-          ? "done"
-          : json.reason === "already_unsubscribed"
-            ? "already"
-            : "error",
+        !res.ok
+          ? failedRequestState(res.status)
+          : json.success === true
+            ? "done"
+            : json.reason === "already_unsubscribed"
+              ? "already"
+              : "error",
       );
     } catch {
-      setState("error");
+      if (epoch === requestEpoch.current) setState("error");
     }
   }
 
@@ -68,7 +91,7 @@ function UnsubscribePage() {
         <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
           {state === "done" || state === "already" ? (
             <CheckCircle2 className="h-7 w-7" />
-          ) : state === "invalid" || state === "error" ? (
+          ) : state === "invalid" || state === "consumed" || state === "error" ? (
             <XCircle className="h-7 w-7" />
           ) : state === "validating" || state === "submitting" ? (
             <Loader2 className="h-7 w-7 animate-spin" />
@@ -85,8 +108,8 @@ function UnsubscribePage() {
           <>
             <h1 className="font-display text-3xl font-bold">Unsubscribe from emails</h1>
             <p className="mt-3 text-muted-foreground">
-              You'll stop receiving marketing and lifecycle emails from 365 MotorSales. Critical
-              account and security emails will still be sent.
+              Request a marketing opt-out for this email address. Critical account and security
+              messages are handled separately.
             </p>
             <Button className="mt-8" size="lg" onClick={confirm}>
               Confirm unsubscribe
@@ -100,7 +123,8 @@ function UnsubscribePage() {
           <>
             <h1 className="font-display text-3xl font-bold">You're unsubscribed</h1>
             <p className="mt-3 text-muted-foreground">
-              We won't send you marketing emails anymore. Thanks for letting us know.
+              Your marketing opt-out has been recorded. Critical account and security messages are
+              handled separately.
             </p>
           </>
         )}
@@ -109,7 +133,7 @@ function UnsubscribePage() {
           <>
             <h1 className="font-display text-3xl font-bold">Already unsubscribed</h1>
             <p className="mt-3 text-muted-foreground">
-              This email address has already been unsubscribed.
+              A marketing opt-out is already recorded for this email address.
             </p>
           </>
         )}
@@ -118,19 +142,43 @@ function UnsubscribePage() {
           <>
             <h1 className="font-display text-3xl font-bold">Invalid link</h1>
             <p className="mt-3 text-muted-foreground">
-              This unsubscribe link is invalid or has expired. If you keep receiving emails, reply
-              to any of them and we'll remove you manually.
+              This unsubscribe link is invalid or has expired. Use a newer unsubscribe link or
+              contact 365 MotorSales support if you need help with your email preferences.
             </p>
+            <a className="mt-6 underline" href="/contact">
+              Contact support
+            </a>
+          </>
+        )}
+
+        {state === "consumed" && (
+          <>
+            <h1 className="font-display text-3xl font-bold">This link has already been used</h1>
+            <p className="mt-3 text-muted-foreground">
+              We cannot confirm your current email preferences from this link. Use a newer
+              unsubscribe link or contact 365 MotorSales support. This used-token request has not
+              reapplied suppression.
+            </p>
+            <a className="mt-6 underline" href="/contact">
+              Contact support
+            </a>
           </>
         )}
 
         {state === "error" && (
           <>
-            <h1 className="font-display text-3xl font-bold">Something went wrong</h1>
-            <p className="mt-3 text-muted-foreground">Please try again in a moment.</p>
+            <h1 className="font-display text-3xl font-bold">
+              We couldn't confirm your email preferences
+            </h1>
+            <p className="mt-3 text-muted-foreground">
+              The request could not be confirmed. Please try again in a moment or contact support.
+            </p>
             <Button className="mt-6" variant="outline" onClick={() => location.reload()}>
               Retry
             </Button>
+            <a className="mt-4 underline" href="/contact">
+              Contact support
+            </a>
           </>
         )}
       </div>
