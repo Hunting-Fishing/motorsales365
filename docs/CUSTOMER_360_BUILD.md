@@ -902,3 +902,39 @@ trial ANY logic and staff seller NULL/enum mismatch remain release blockers.
 Source/baseline/replay/parity/release flags unchanged. No live mutation/migration/
 deploy, paid resource, customer message, data deletion, PR merge, restriction replay
 or duplicate automation; existing single continuation stays active.
+
+PR #59 docs `45b1971` now passed all six CI gates (`38709262357`); hosting failed
+separately, production/migrations skipped. Draft PR #60 (`099b706`) executes actual
+ordinary nonstaff/no-referral Auth→profile/org/owner/subscription/intent-audit
+forward chain in discarded databases. Unchanged full ten-table structure plus
+actual empty staff rowtype: eleven public tables/219 columns/42 critical constraints/
+52 indexes, all 21 current full function envelopes and fifteen attachments exact.
+No Auth uid or global-role/referral/partner success substitute, source replay or
+live query/mutation. Provider Auth four-field support and tier/plan configuration
+are explicitly synthetic; client policies/business/staff writer attachments are
+omitted. This is not provider/API/trusted actor/native whole-workflow acceptance.
+
+Runtime structural guards detect dropped FKs/unrestored defaults before outer
+rollback can conceal drift. Missing tier, invalid metadata, real org UNIQUE and
+late subscription NOT NULL failures restore all row snapshots and recover. Local
+member sequence allocation does not roll back with rows; gaps are explicitly
+tested, not hidden. Audit swallowing/target-as-actor, inactive Bronze grants,
+trial ANY bug, editable org suppression and lab entitlement conflict suppression
+remain characterized legacy behavior, not repairs/adopted policy.
+Twenty-two focused and 570 tooling/assets pass (560 serial plus separate 10), zero
+failures/skips/cancellations; syntax/lint/source+Markdown format/diff/primary review
+pass. No fresh app run claimed; PR #54 1,207 tests/TypeScript remain parent evidence.
+New PR #60 requires latest-head checks. Evidence: `evidence/AUTH_NO_REFERRAL_BOOTSTRAP.md`.
+Zero live query/mutation/migration/deployment, paid resource or customer message.
+
+Next actual nonempty user_referrals INSERT fanouts: reuse PR #52 metadata,
+recover/match pp_user_signup_bounty/tg_auto_assign_sales_rep and real downstream
+financial/assignment/intent constraints/functions/attachments before composition.
+Then staff-domain Auth/platform-role/staff/partner integration with genuine
+canonical org/manager inputs and trusted original actor/revisions/common locks/
+offboarding/native acceptance. Do not repeat completed ordinary/full-schema/current
+org-function recovery, strip constraints or stub dependencies. Source/baseline/
+replay/parity/release flags unchanged; trial/staff enum, consent/private-history/
+recovery/receipt/mobile/owner/full-media/hosting gates remain open. No sparse deploy,
+restriction replay, data deletion, PR merge or duplicate automation; single
+recurring continuation stays active.
