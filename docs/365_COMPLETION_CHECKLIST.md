@@ -15,6 +15,34 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest completed business-read/audit structural slice: draft PR #59, code
+`ed256f5`, recovers complete businesses (63 columns), business_types (4) and
+admin_audit_log (12), 11 critical constraints/23 indexes/12 policies/10 business
+attachments/18 function envelopes/3 enums/147 guarded pieces. Exactly two
+READ ONLY diagnostics at `08:40:15.535109` and `08:42:08.249322` UTC, metadata
+then preceding-hash/privacy-gated pieces, reviewed before saving. No app/Auth/config
+rows/counts, raw function bodies, helpers/sequence/settings values or mutation.
+Actual retained type/audit DDL (no seeds) plus labeled current-catalog businesses
+extends unchanged PR #58 to ten empty tables/208 columns/38 critical constraints/
+47 indexes and exact prior sequence configuration. Policies/helpers/attachments
+not installed; persistent declared-table data or checked drift fails invariants.
+No business owner/audit actor Auth FK exists: UUID storage is not trusted identity.
+Sixteen focused and 548 tooling/assets pass (538 serial plus separate 10), no
+failures/skips/cancellations; syntax/lint/format/canonical JSON/diff/primary review
+pass. Zero migration/production mutation/deployment. Evidence:
+`evidence/BOOTSTRAP_BUSINESS_AUDIT_STRUCTURE.md`. New PR #59 requires latest-head
+checks. Next actual ordinary no-referral Auth bootstrap using real source/functions/
+attachments, staff_referrals rowtype, canonical initializer, tier/plan/sequence and
+intent/admin-audit effects; test genuine late failures/rollback with explicitly
+synthetic Auth/configuration prerequisites. Do not repeat completed business/audit/
+core/org/tier/three-function recovery, use old reduced business projection, drop
+constraints or stub helpers. Nonempty referrals, trial ANY/staff seller NULL-enum,
+original actor/revisions/locks/offboarding/native/consent/private-history/recovery/
+receipt/mobile/owner/full-media/hosting release gates remain open. Source/baseline/
+replay/parity/release flags unchanged. No sparse deploy, helper restriction replay,
+paid resource, customer message, data deletion, PR merge or duplicate automation;
+existing single continuation active.
+
 Newest completed core structural slice: draft PR #58, code `734d3b4`, recovers
 profiles/internal settings/plans/subscriptions at `08:23:01.783433` UTC: 4 tables,
 90 columns, 17 critical constraints, 16 indexes/policies, 10 attachments and 165
@@ -28,9 +56,10 @@ migration, single atomic production baseline or release acceptance.
 Thirteen focused and 532 tooling/assets pass (522 serial plus separate 10), zero
 failures/skips/cancellations; syntax/lint/format/canonical JSON/diff/primary review
 pass. One core READ ONLY execution, zero migrations/mutation/deployment.
-Evidence: `evidence/BOOTSTRAP_CORE_STRUCTURE_RECOVERY.md`. New PR #58 requires
-its own latest-head checks. Next close actual business-owner read/admin-audit
-metadata/source, then ordinary no-referral Auth bootstrap with all real effects,
+Evidence: `evidence/BOOTSTRAP_CORE_STRUCTURE_RECOVERY.md`. PR #58 docs `018fd26`
+now passed all six CI gates (`38706843133`); hosting failed separately and
+production/migrations skipped. Business-owner read/admin-audit structure is now
+recovered in PR #59. Next ordinary no-referral Auth bootstrap with all real effects,
 tier/plan/configuration/sequence prerequisites and critical constraints. Do not
 repeat core/org/tier/three-function recovery, substitute helpers, strip constraints
 or adopt catalog-derived DDL as original migration history. Nonempty referral

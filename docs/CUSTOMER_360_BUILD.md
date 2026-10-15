@@ -867,3 +867,38 @@ private-history/recovery/receipt/mobile/owner/full-media/hosting acceptance rema
 open; source/baseline/replay/parity/release flags unchanged. No sparse deploy,
 helper replay, paid resource, customer message, data deletion, PR merge or duplicate
 automation; existing single continuation remains active.
+
+PR #58 docs `018fd26` now passed all six CI gates (`38706843133`); hosting
+failed separately, migrations/production skipped. Draft PR #59 (`ed256f5`)
+recovers full businesses/business_types/admin-audit structure: 79 columns,
+11 critical constraints/23 indexes/12 policies/10 business attachments/18 function
+envelopes/3 enums/147 gated pieces. Two READ ONLY diagnostics at `08:40:15.535109`
+and `08:42:08.249322` UTC (metadata first, then hash/privacy-gated definitions),
+reviewed before saving; no app/Auth/config rows/counts/raw function bodies/helper/
+sequence/settings values or mutation. All between-capture facets and prior
+critical constraints match. Current-catalog businesses DDL is not original history.
+
+Actual selected retained type/audit DDL without seeds plus full current businesses
+extends unchanged PR #58 to ten empty public tables/208 columns/38 critical
+constraints/47 indexes and prior exact sequence configuration. No policies/helpers/
+attachments installed; parent and child invariants retain exact structural facets
+and empty declared tables. Business owner_id and audit actor UUIDs have no Auth FK;
+their storage is characterized, not trusted actor/authority acceptance. Sixteen
+focused and 548 tooling/assets pass (538 serial plus separate 10), zero failures/
+skips/cancellations; syntax/lint/source+Markdown format/canonical JSON/diff/primary
+review pass. No fresh app run claimed; PR #54 1,207 tests/TypeScript remain parent
+evidence. New PR #59 requires latest-head checks. Evidence:
+`evidence/BOOTSTRAP_BUSINESS_AUDIT_STRUCTURE.md`. Zero migration/mutation/deployment.
+
+Next implement actual ordinary no-referral Auth bootstrap behavior using full
+ten-table structures and retained actual functions/attachments, staff_referrals
+rowtype, canonical manager initializer, tier/plan/sequence, business read and real
+intent/admin-audit effects, with explicit synthetic provider/configuration limits
+and genuine late-failure rollback. Do not repeat completed structural/function
+recovery, strip constraints or stub helpers. Nonempty referrals, business writer
+fanouts, original actor/revisions/common locks/offboarding/native/consent/private-
+history/recovery/receipt/mobile/owner/full-media/hosting acceptance stay open;
+trial ANY logic and staff seller NULL/enum mismatch remain release blockers.
+Source/baseline/replay/parity/release flags unchanged. No live mutation/migration/
+deploy, paid resource, customer message, data deletion, PR merge, restriction replay
+or duplicate automation; existing single continuation stays active.
