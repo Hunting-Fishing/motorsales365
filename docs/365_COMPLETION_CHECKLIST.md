@@ -49,6 +49,14 @@ gates unchanged. Zero live query/write/migration/deploy, customer communication,
 paid resource, production data deletion, restriction replay, PR merge or duplicate
 automation; single continuation active.
 
+Published/attached draft PR #67:
+`https://github.com/Hunting-Fishing/motorsales365/pull/67`, code `c03fede`, first
+evidence HEAD `32a7fc9`. First CI `38739987913` started; hosting build
+`492db7e2-d4ad-40e7-bba7-1d14cdb0b7d7` failed separately, wrapper `38739987914`
+started with migrations/production already skipped. This publication-record
+commit supersedes that initial check head: verify PR #67's exact newest HEAD next,
+not the initial run or parent PR CI. No new source/test or release-setting change.
+
 CI budget follow-up for attached PR #65/#66: original PR #65 unit job
 `116415203931`/run `38733014822` cancelled at12:28:38 UTC after15m08s; annotation
 confirms 15m0s maximum exceeded before mandatory suites completed, not a pass or

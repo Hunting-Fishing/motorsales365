@@ -145,3 +145,13 @@ tests. Official references checked for this slice:
 [locking](https://www.postgresql.org/docs/current/explicit-locking.html).
 The changelog's upcoming HTTP TLS change does not affect this local SQL-only model;
 no SDK/server adapter, CLI, auth integration or TLS configuration was changed.
+
+## Publication
+
+Attached draft [PR #67](https://github.com/Hunting-Fishing/motorsales365/pull/67)
+targets PR #66's branch, not main. Code `c03fede`, first evidence HEAD `32a7fc9`.
+First CI `38739987913` started; hosting build
+`492db7e2-d4ad-40e7-bba7-1d14cdb0b7d7` failed separately. Wrapper `38739987914`
+started with migration and production jobs skipped. The publication-record commit
+supersedes that first check head. Verify the PR's exact newest HEAD separately;
+no CI pass, merge, deployment or production acceptance is claimed for this slice.

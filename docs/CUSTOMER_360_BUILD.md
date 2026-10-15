@@ -1182,3 +1182,10 @@ caller acknowledgment/lifetime remains independent. Source404/423,19 unclassifie
 all baseline/replay/parity/release flags unchanged. No live query/mutation/migration/
 deploy, paid resource, customer communication, production deletion, restriction
 replay, PR merge or duplicate automation; single continuation active.
+
+Revision model publication: attached draft PR #67
+`https://github.com/Hunting-Fishing/motorsales365/pull/67`, code `c03fede`, first
+evidence HEAD `32a7fc9`; first CI `38739987913` started. Hosting build
+`492db7e2-d4ad-40e7-bba7-1d14cdb0b7d7` failed separately, wrapper `38739987914`
+started with migrations/production skipped. Verify the newest publication-record
+HEAD next; this documentation-only commit supersedes the first check head.
