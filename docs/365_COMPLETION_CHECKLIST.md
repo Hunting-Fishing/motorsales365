@@ -34,10 +34,13 @@ Security reconciliation branch: `completion/365-security`.
    a confirmed mutation (draft PR #38); docs `14c18d3` passed all six CI gates.
    The first self-shift-only disposable companion candidate is now implemented/
    tested in draft PR #39, with no adopted privileged positive branches. Next
-   prepare the narrow roles-catalog restriction/recovery candidate: PR #40 now
-   composes selected current native profile/role policies and confirms source
-   profile scope pivots/global catalog-role effects offline. It is not a fix.
-   PR #39 docs `6bfde57` passed all six CI gates; verify PR #40 latest checks.
+   build the deny-only direct native profile/user-role write prototype. The narrow
+   roles-catalog restriction/recovery candidate is implemented/tested in draft
+   PR #41, memory-only and unapplied; verify its latest checks. PR #40 composes
+   selected current policies and confirms profile scope pivots/global catalog-role
+   effects offline. Neither is production authority acceptance.
+   PR #40 docs `e97baca` passed all six CI gates (run `38664876182`), verified
+   on the roles-catalog follow-up; hosting remains separately failed.
    Then close the bounded native/bootstrap/role/profile
    and trusted team writer dependencies before authority/offboarding acceptance.
    Resolve the initial
@@ -817,11 +820,11 @@ and other-shop subjects while role-assignment rows remain unchanged. This is a
 security gate, not an adopted positive workflow or a production incident/data
 assertion. Bootstrap/native staff writers remain separate unresolved paths.
 
-Publication checks for code `58a63d6` started in `38664737680`; pending at this
-checkpoint. Deployment wrapper `38664737664` skips migrations and production
-deployment. Hosting build `37372b43-38d7-4059-9cc9-507810124322` is separately
-pending, not an upload or release result. The documentation head requires its
-own check. Detailed pins, scope and next proposal:
+Publication checks for docs `e97baca` passed all six CI gates in `38664876182`,
+verified on the roles-catalog follow-up. Deployment wrapper `38664876278` skips
+migrations and production deployment. Hosting build
+`32e54404-4e90-4412-a970-98ac34b38dce` remains separately failed; wrapper success
+is not an upload or release result. Detailed pins, scope and next proposal:
 `evidence/NATIVE_PROFILE_ROLE_POLICY_PROOF.md`.
 
 Migration impact: none. Deployment/live mutation: none. Existing converter-only
@@ -830,7 +833,8 @@ again. Correspondence remains 404/423 with19 unclassified; selected unknowns and
 all baseline/parity/replay/release flags stay false. No paid resources, customer
 communications, data repair or sparse-checkout deployment.
 
-Exact next action: verify PR #40 latest head/checks, then implement/test an
+Next action at that checkpoint (implemented by the roles-catalog checkpoint below):
+verify PR #40 latest head/checks, then implement/test an
 independently reviewed **memory-only roles-catalog restriction/recovery candidate**
 removing only authenticated INSERT/UPDATE/DELETE, preserving permitted SELECT,
 policy/RLS/helpers/owner/service/defaults. Refuse exact ACL/column/policy/shape drift
@@ -850,6 +854,73 @@ concurrency, baseline/private-storage recovery, consent/tenure, receipt OCR/mobi
 owner pilot, full-media hosting and configuration/API/role acceptance remain
 open. Continue independent safe work if a release decision is pending; do not
 duplicate automation or unchanged decision reminders.
+
+## Native role-catalog containment checkpoint (2026-10-15)
+
+Draft PR #41, code `08cd17fdc2fd82835e61f157bee9b58f24f6182e`, branch
+`security/native-role-catalog-containment`, stacked on PR #40 docs `e97baca`.
+The parent passed all six CI gates (`38664876182`), verified on this resume.
+This slice is **memory-only, unapplied and not production authority**. No live
+database call, app source, historical SQL or migration change occurs.
+
+The pure builder removes only authenticated INSERT/UPDATE/DELETE on native roles,
+preserving permitted SELECT, policy/RLS, three exact helpers, owner/service and
+defaults. Exact table/column/helper pre/post checks refuse drift. Ordinary-table/
+topology checks precede the ONLY-table lock, followed by same-OID/topology
+revalidation; this is not independent-session DDL/race proof. Recovery restores
+only the original three rights and deliberately reopens exposure. The deeply
+frozen per-builder receipt seam is caller-fabricable process bookkeeping, not
+execution/commit/approval/durable provenance; generated SQL cannot enforce it.
+No production operator runner or trusted recovery receipt is supplied.
+
+16/16 focused cases pass (27.786s), full sequential tooling 315/315 (232.393s),
+none skipped/cancelled; ESLint/Prettier/diff and independent bounded review pass.
+Controls cover raw/scoped/RETURNING/no-op/UPSERT/DO NOTHING denial, plain reads
+versus FOR UPDATE, owner/service writes versus installer denial, earlier real
+profile/role-assignment rollback, exact drift/refusal/recovery and unrelated
+committed-data preservation. Two genuine after-DDL lab faults reach postchecks
+and roll back new inherited rights/shape/fault rows; wrapper faults remain
+separately labelled. Review caught/fixed wrong-kind lock scope, observation bounds
+and an actual initial SQL parse defect before the final passing runs. No old SQL
+or constraints were rewritten to make tests pass.
+
+Code CI `38667600224` and separate hosting build
+`2ca956a1-037d-467d-bb89-0567e521298a` are pending at this checkpoint. Wrapper
+`38667600239` skips migrations/production deployment; wrapper success is not an
+upload. The subsequent documentation head requires its own check. Exact pins,
+scope and next proposal: `evidence/NATIVE_ROLE_CATALOG_CONTAINMENT_CANDIDATE.md`.
+Application source is unchanged from the 986-test CI-verified parent.
+
+Migration impact: none. Deployment/live mutation: none. Converter-only approved
+restriction is preserved; pending PR #18 decision remains unchanged/not asked
+again. Baseline/parity/replay/release flags stay false, correspondence 404/423
+with19 unclassified and selected unknowns unchanged. No data repair, paid resource,
+customer communication or sparse-checkout deployment.
+
+Exact next action: verify PR #41 latest checks, then implement/test an offline
+deny-only direct write prototype on `shop_manager.profiles` and `user_roles`,
+removing authenticated I/U/D on both while preserving SELECT/policies/legacy rows.
+No contact or native-admin/owner-role exception: successful phone-update policy
+admission is not an approved contact workflow/allowlist. Use actual 21/four-column
+metadata/constraints, effective column/table guards, deterministic two-table lock
+order, topology/OID checks and atomic rollback/exact recovery. Test canonical/
+legacy reads, identity/shop/shadow/contact/role CRUD/UPSERT denial, privileged
+boundaries and lock-reader compatibility; do not repair, canonicalize or GRANT ALL.
+Bounded native callers are readers; dynamic/external callers remain unverified.
+
+These direct restrictions still leave bootstrap and postgres-owned roster sync
+effective. Reuse the completed seven bootstrap/nine roster characterization cases;
+do not replay them or label these prototypes comprehensive containment. Then
+close indirect/native ownership claim/transfer, trusted team and original-actor
+shift/audit writers before adopting positives or atomic offboarding. The leave-
+request reader's unobserved `profiles.role` column is a separate existing issue.
+
+Live roles restriction/recovery still needs independently reviewed real-session/
+operator readiness, fresh preconditions and separate explicit authority; this
+memory receipt is not enough and no approval is requested prematurely. Full
+baseline/storage recovery, consent/tenure, real API/JWT/concurrency, OCR/mobile/
+owner pilot, configuration and hosting gates remain open. Continue safe independent
+work while release decisions are pending; no duplicate heartbeat or reminders.
 
 ## Recovery evidence (original scope, retained below)
 

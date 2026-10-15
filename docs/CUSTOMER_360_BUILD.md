@@ -341,8 +341,9 @@ not the original SELECT-only policy. Offline profile pivots and catalog-label
 changes affect helper authority; this is a security gate, not a fix or live exploit.
 
 22/22 focused and 299/299 full sequential tooling tests pass, plus lint/format/
-diff and independent bounded review. Publication CI `38664737680` is pending at
-this checkpoint; wrapper migrations/production deployment skip. See
+diff and independent bounded review. Docs `e97baca` passed all six CI gates in
+`38664876182`, verified on the roles-catalog follow-up; hosting remains failed
+and wrapper migrations/production deployment skip. See
 `evidence/NATIVE_PROFILE_ROLE_POLICY_PROOF.md` for exact pins, PG18 NOT NULL/
 OID-header normalization and synthetic/legacy/incoming-FK/indirect-writer limits.
 Application source remains unchanged from the CI-verified 986-test parent.
@@ -354,3 +355,20 @@ the prior converter approval does not apply. Then close mutable profile/bootstra
 claim/team and shift/audit writers before accepting tenant authority or offboarding.
 All baseline/storage, consent/tenure, actual API/concurrency, OCR/mobile/owner pilot
 and hosting release gates remain open; no migration or deployment occurs.
+
+Draft PR #41 (`08cd17f`) now implements the memory-only native roles-catalog I/U/D
+restriction/recovery candidate. 16/16 focused and 315/315 full sequential tooling
+tests pass; formatting/lint/diff and independent review pass. Exact guards preserve
+permitted SELECT/helpers/owner/service, and real post-DDL faults roll back. The
+process receipt is explicitly caller-fabricable bookkeeping, not production
+approval/commit proof/durable provenance. Code CI `38667600224` is pending at this
+checkpoint; wrapper migrations/production deployment skip. No live database call,
+app change, migration or deployment; all release flags remain false.
+
+See `evidence/NATIVE_ROLE_CATALOG_CONTAINMENT_CANDIDATE.md`. Next verify PR #41's
+latest checks, then build the deny-only direct profiles/user_roles prototype
+preserving SELECT and legacy rows, with no contact or manager exception. Direct
+restriction is not trusted tenant authority: bootstrap/roster/ownership/team/shift/
+audit writers, real concurrency/operator recovery, baseline/storage, consent/tenure,
+OCR/mobile/owner pilot and hosting acceptance remain open. Separate live approval
+must follow readiness; existing converter authority does not apply to these tables.

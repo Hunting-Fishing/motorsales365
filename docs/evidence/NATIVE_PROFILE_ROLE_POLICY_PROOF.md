@@ -137,14 +137,20 @@ Focused ESLint/Prettier/diff checks and independent read-only fixture/test/
 metadata review pass. Review corrected a Date-vs-string assertion and added
 stored-value/cross-shop/DELETE controls; source SQL and constraints were not
 altered. Full sequential tooling passes 299/299 in 200.044s, no skipped/cancelled
-tests. A dedicated never-quarantined CI step runs both new suites. Code CI
-`38664737680` is pending at this checkpoint; wrapper `38664737664` skips migrations
-and production deployment. Independent hosting build
-`37372b43-38d7-4059-9cc9-507810124322` is also pending, not a release result.
-The documentation head requires its own check. No application source, migration,
+tests. A dedicated never-quarantined CI step runs both new suites. Docs `e97baca`
+passed all six CI gates (`38664876182`), verified on the roles-catalog follow-up;
+wrapper `38664876278` skips migrations and production deployment. Independent
+hosting build `32e54404-4e90-4412-a970-98ac34b38dce` remains failed, not a release.
+No application source, migration,
 historical SQL, live ACL or configuration is changed by this slice.
 
 ## Exact next dependency and release limits
+
+Follow-up draft PR #41 (`08cd17f`) now implements the narrow memory-lab roles-only
+candidate described below; it is still unapplied and not production authorization.
+See `NATIVE_ROLE_CATALOG_CONTAINMENT_CANDIDATE.md` for final tests/pins, receipt
+limitations and the next deny-only direct profiles/user_roles prototype. The
+following paragraphs retain this checkpoint's bounded proposal and release limits.
 
 Prepare an independently reviewed, fail-closed native profile/role containment
 candidate with exact current preconditions, caller-impact checks, service/owner
