@@ -15,6 +15,37 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest completed ordinary Auth bootstrap slice: draft PR #60, code `099b706`,
+executes actual nonstaff/no-referral Auth→profile/org/owner/subscription/intent-audit
+chain in discarded databases. Unchanged full ten-table structure plus actual empty
+staff rowtype: 11 public tables/219 columns/42 critical constraints/52 indexes.
+All 21 current full function definitions/body/header/config/ACL/effective execute
+envelopes and fifteen selected current attachments match. No Auth uid or role/
+referral/partner success shim; four-field provider Auth/configuration is explicitly
+synthetic, policies/business/staff writer attachments omitted, not provider/API/
+actor/whole-workflow acceptance. Runtime guards prevent dropped FKs or unrestored
+fault defaults being hidden by outer rollback. Genuine missing-tier/intent/slug/
+late subscription failures restore all rows; local member sequence advances are
+explicitly nontransactional. Audit swallowing/target actor, inactive Bronze,
+ANY trial logic, editable org suppression and lab entitlement-conflict suppression
+are characterized, not repaired or adopted policy.
+Twenty-two focused and 570 tooling/assets pass (560 serial plus separate 10), zero
+failures/skips/cancellations; syntax/lint/format/diff/primary review pass. No fresh
+application suite claimed; PR #54 application/TypeScript remains parent evidence.
+Zero live queries, mutations, migrations or deployments. Evidence:
+`evidence/AUTH_NO_REFERRAL_BOOTSTRAP.md`. New PR #60 requires latest-head checks.
+Next actual nonempty user_referrals INSERT frontier: reuse PR #52 metadata and
+recover/match pp_user_signup_bounty/tg_auto_assign_sales_rep plus actual downstream
+financial/assignment/intent structure/functions/attachments before composition.
+Then staff-domain Auth + platform-role/staff/partner integration with actual
+canonical org/manager prerequisites and trusted original actor/revisions/common
+locks/offboarding/native acceptance. Do not repeat ordinary/full schema/current
+org function recovery or stub missing dependencies. Trial/staff enum and all
+documented authority/privacy/consent/recovery/receipt/mobile/owner/full-media/
+hosting release blockers remain open; source/baseline/replay/parity/release flags
+unchanged. No sparse deploy, restriction replay, paid resource, customer message,
+data deletion, PR merge or duplicate automation. Single continuation active.
+
 Newest completed business-read/audit structural slice: draft PR #59, code
 `ed256f5`, recovers complete businesses (63 columns), business_types (4) and
 admin_audit_log (12), 11 critical constraints/23 indexes/12 policies/10 business
@@ -30,8 +61,9 @@ No business owner/audit actor Auth FK exists: UUID storage is not trusted identi
 Sixteen focused and 548 tooling/assets pass (538 serial plus separate 10), no
 failures/skips/cancellations; syntax/lint/format/canonical JSON/diff/primary review
 pass. Zero migration/production mutation/deployment. Evidence:
-`evidence/BOOTSTRAP_BUSINESS_AUDIT_STRUCTURE.md`. New PR #59 requires latest-head
-checks. Next actual ordinary no-referral Auth bootstrap using real source/functions/
+`evidence/BOOTSTRAP_BUSINESS_AUDIT_STRUCTURE.md`. PR #59 docs `45b1971` now passed
+all six CI gates (`38709262357`); hosting failed separately, production/migrations
+skipped. Actual ordinary no-referral bootstrap is now rehearsed in PR #60 using real source/functions/
 attachments, staff_referrals rowtype, canonical initializer, tier/plan/sequence and
 intent/admin-audit effects; test genuine late failures/rollback with explicitly
 synthetic Auth/configuration prerequisites. Do not repeat completed business/audit/

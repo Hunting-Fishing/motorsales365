@@ -229,3 +229,9 @@ Hosting `631b96f0-15e1-44ee-a9ee-f2e8dd718298` failed separately; wrapper
 `38709100327` skipped migrations/production deployment. Verify the later
 documentation HEAD separately; this code snapshot and parent green checks are not
 its acceptance evidence.
+
+Follow-up: PR #59 documentation head `45b1971` passed all six CI gates
+(`38709262357`). Hosting `a1bf9314-7f00-4a0c-b7a1-9b9d38b80c80` failed separately;
+wrapper `38709262572` skipped migrations and production deployment. Actual bounded
+ordinary signup/rollback evidence is now in `AUTH_NO_REFERRAL_BOOTSTRAP.md`.
+This structural fixture/capture remains pinned and unchanged. No release inferred.
