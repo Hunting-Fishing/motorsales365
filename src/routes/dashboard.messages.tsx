@@ -44,65 +44,22 @@ import { MakeOfferButton } from "@/components/messaging/make-offer-button";
 import { OfferBubble } from "@/components/messaging/offer-bubble";
 import { SystemBubble } from "@/components/messaging/system-bubble";
 import { useThreadStates, dmKey } from "@/hooks/use-thread-states";
-
+import { useChatCommandRequest } from "@/hooks/use-chat-command-request";
+import { CHAT_COMMAND_FAILURE, type ChatCommandInput } from "@/lib/chat-commands";
+import {
+  readMessagesSnapshot,
+  MESSAGES_LOAD_FAILURE,
+  type AttachType,
+  type DmRow,
+  type GroupMsg,
+  type GroupThread,
+  type GroupMember,
+  type MyMembership,
+} from "@/lib/messages-snapshot";
 
 export const Route = createFileRoute("/dashboard/messages")({
   component: MessagesPage,
 });
-
-type AttachType = "image" | "video" | "gif" | null;
-
-interface DmRow {
-  id: string;
-  body: string | null;
-  created_at: string;
-  sender_id: string;
-  recipient_id: string;
-  listing_id: string;
-  read_at: string | null;
-  attachment_url: string | null;
-  attachment_type: AttachType;
-  attachment_thumb_url: string | null;
-  attachment_path: string | null;
-  attachment_meta: Record<string, unknown> | null;
-  is_offer?: boolean;
-  offer_amount?: number | null;
-  offer_currency?: string | null;
-  offer_status?: string | null;
-  system_kind?: string | null;
-}
-
-interface GroupMsg {
-  id: string;
-  thread_id: string;
-  sender_id: string;
-  body: string | null;
-  created_at: string;
-  attachment_url: string | null;
-  attachment_type: AttachType;
-  attachment_thumb_url: string | null;
-  attachment_path: string | null;
-  attachment_meta: Record<string, unknown> | null;
-}
-
-interface GroupThread {
-  id: string;
-  title: string;
-  created_by: string;
-  updated_at: string;
-}
-
-interface GroupMember {
-  thread_id: string;
-  user_id: string;
-  status: "invited" | "active" | "left";
-}
-
-interface MyMembership {
-  thread_id: string;
-  status: "invited" | "active" | "left";
-  last_read_at: string | null;
-}
 
 interface ConversationSummary {
   key: string;
@@ -126,7 +83,6 @@ interface ConversationSummary {
   invited?: boolean;
 }
 
-
 function formatPricePHP(n: number | null): string {
   if (n == null) return "";
   try {
@@ -149,7 +105,15 @@ function attachmentPreview(body: string | null, type: AttachType): string {
 }
 
 function MessagesPage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return <p className="p-6 text-muted-foreground">Loading account…</p>;
+  if (!user) return <p className="p-6 text-muted-foreground">Sign in to view messages.</p>;
+  // Local message, membership, composer and thread-state data never survive an
+  // account change (including A -> B -> A). This is not a replacement for RLS.
+  return <MessagesWorkspace key={user.id} user={user} />;
+}
+
+function MessagesWorkspace({ user }: { user: { id: string } }) {
   // Match the back button's `lg:hidden` breakpoint (1024px) so auto-select
   // doesn't fight the back button on tablet/small-desktop widths.
   const [isNarrow, setIsNarrow] = useState<boolean>(false);
@@ -186,6 +150,8 @@ function MessagesPage() {
     >
   >({});
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const chatCommands = useChatCommandRequest(user.id, activeKey);
+  const { run: runChatCommand, isCurrent: isCurrentChatContext } = chatCommands;
   const [sending, setSending] = useState(false);
   const [showNewGroup, setShowNewGroup] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
@@ -194,126 +160,58 @@ function MessagesPage() {
   const [search, setSearch] = useState("");
   const [prefill, setPrefill] = useState<{ key: number; text: string }>({ key: 0, text: "" });
   const threadStates = useThreadStates();
+  const [loadError, setLoadError] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const lifeRef = useRef({ active: true });
+  const loadController = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    const life = { active: true };
+    lifeRef.current = life;
+    return () => {
+      life.active = false;
+      loadController.current?.abort();
+    };
+  }, []);
 
   const load = useCallback(async () => {
-    if (!user) return;
-
-    const [dmRes, myMemRes] = await Promise.all([
-      supabase
-        .from("messages")
-        .select(
-          "id,body,created_at,sender_id,recipient_id,listing_id,read_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta,is_offer,offer_amount,offer_currency,offer_status,system_kind",
-        )
-        .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
-        .order("created_at", { ascending: false })
-        .limit(500),
-      (supabase.from("chat_thread_members" as any) as any)
-        .select("thread_id,status,last_read_at")
-        .eq("user_id", user.id)
-        .in("status", ["active", "invited"]),
-    ]);
-
-    const dmRows = ((dmRes.data ?? []) as DmRow[])
-      .slice()
-      .sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
-    setDms(dmRows);
-
-    const myMems = (myMemRes.data ?? []) as MyMembership[];
-    const memMap: Record<string, MyMembership> = {};
-    myMems.forEach((m) => (memMap[m.thread_id] = m));
-    setMyMemberships(memMap);
-
-    const threadIds = myMems.map((m) => m.thread_id);
-    let allGroupMsgs: GroupMsg[] = [];
-    let allMembers: GroupMember[] = [];
-    let allThreads: GroupThread[] = [];
-    if (threadIds.length) {
-      const [msgRes, threadRes, memberRes] = await Promise.all([
-        (supabase.from("chat_thread_messages" as any) as any)
-          .select(
-            "id,thread_id,sender_id,body,created_at,attachment_url,attachment_type,attachment_thumb_url,attachment_path,attachment_meta",
-          )
-          .in("thread_id", threadIds)
-          .order("created_at", { ascending: true })
-          .limit(1000),
-        (supabase.from("chat_threads" as any) as any)
-          .select("id,title,created_by,updated_at")
-          .in("id", threadIds),
-        (supabase.from("chat_thread_members" as any) as any)
-          .select("thread_id,user_id,status")
-          .in("thread_id", threadIds),
-      ]);
-      allGroupMsgs = (msgRes.data ?? []) as GroupMsg[];
-      allThreads = (threadRes.data ?? []) as GroupThread[];
-      allMembers = (memberRes.data ?? []) as GroupMember[];
+    const life = lifeRef.current;
+    if (!life.active) return;
+    loadController.current?.abort();
+    const controller = new AbortController();
+    loadController.current = controller;
+    const current = () =>
+      life.active &&
+      life === lifeRef.current &&
+      loadController.current === controller &&
+      !controller.signal.aborted;
+    setLoadingMessages(true);
+    try {
+      const snapshot = await readMessagesSnapshot(user.id, controller.signal, current);
+      if (!current()) return;
+      // Publish only the complete visible read, never a mix of old/new stages.
+      setDms(snapshot.dms);
+      setMyMemberships(snapshot.myMemberships);
+      setGroupMsgs(snapshot.groupMsgs);
+      setGroupMembers(snapshot.groupMembers);
+      setGroupThreads(snapshot.groupThreads);
+      setListingsById(snapshot.listingsById);
+      setProfilesById(snapshot.profilesById);
+      setLoadError(false);
+    } catch {
+      if (!current()) return;
+      setDms([]);
+      setMyMemberships({});
+      setGroupMsgs([]);
+      setGroupMembers([]);
+      setGroupThreads({});
+      setListingsById({});
+      setProfilesById({});
+      setLoadError(true);
+    } finally {
+      if (current()) setLoadingMessages(false);
     }
-    setGroupMsgs(allGroupMsgs);
-    setGroupMembers(allMembers);
-    const threadMap: Record<string, GroupThread> = {};
-    allThreads.forEach((t) => (threadMap[t.id] = t));
-    setGroupThreads(threadMap);
-
-    // Collect listing + user ids
-    const listingIds = Array.from(new Set(dmRows.map((m) => m.listing_id)));
-    const userIds = Array.from(
-      new Set([
-        ...dmRows.flatMap((m) => [m.sender_id, m.recipient_id]),
-        ...allGroupMsgs.map((m) => m.sender_id),
-        ...allMembers.map((m) => m.user_id),
-        ...allThreads.map((t) => t.created_by),
-      ]),
-    ).filter((id) => id && id !== user.id);
-
-    if (listingIds.length) {
-      const [{ data: ls }, { data: media }] = await Promise.all([
-        supabase.from("listings").select("id,title,user_id,price_php,status").in("id", listingIds),
-        supabase
-          .from("listing_media")
-          .select("listing_id,url,type,sort_order")
-          .in("listing_id", listingIds)
-          .eq("type", "photo")
-          .order("sort_order", { ascending: true }),
-      ]);
-      const thumbMap: Record<string, string> = {};
-      (media ?? []).forEach((row: any) => {
-        if (!thumbMap[row.listing_id]) thumbMap[row.listing_id] = row.url;
-      });
-      const map: Record<
-        string,
-        { title: string; user_id: string; thumb: string | null; price_php: number | null; status: string | null }
-      > = {};
-      (ls ?? []).forEach(
-        (l: any) =>
-          (map[l.id] = {
-            title: l.title,
-            user_id: l.user_id,
-            thumb: thumbMap[l.id] ?? null,
-            price_php: l.price_php ?? null,
-            status: l.status ?? null,
-          }),
-      );
-      setListingsById(map);
-    }
-    if (userIds.length) {
-      const { data: ps } = await supabase
-        .from("public_profiles")
-        .select("id,full_name,business_name,avatar_url")
-        .in("id", userIds);
-      const map: Record<
-        string,
-        { full_name: string | null; business_name: string | null; avatar_url: string | null }
-      > = {};
-      (ps ?? []).forEach(
-        (p: any) =>
-          (map[p.id] = {
-            full_name: p.full_name,
-            business_name: p.business_name,
-            avatar_url: p.avatar_url ?? null,
-          }),
-      );
-      setProfilesById(map);
-    }
-  }, [user]);
+  }, [user.id]);
 
   useEffect(() => {
     load();
@@ -324,15 +222,11 @@ function MessagesPage() {
     const ch = supabase
       .channel("dashboard-messages-and-groups")
       .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, () => load())
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "chat_thread_messages" },
-        () => load(),
+      .on("postgres_changes", { event: "*", schema: "public", table: "chat_thread_messages" }, () =>
+        load(),
       )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "chat_thread_members" },
-        () => load(),
+      .on("postgres_changes", { event: "*", schema: "public", table: "chat_thread_members" }, () =>
+        load(),
       )
       .subscribe();
     return () => {
@@ -365,7 +259,9 @@ function MessagesPage() {
       const unreadInc = m.recipient_id === user.id && !m.read_at ? 1 : 0;
       const rawPreview = attachmentPreview(m.body, m.attachment_type);
       const mine = m.sender_id === user.id;
-      const preview = rawPreview ? `${mine ? "You: " : `${(name.split(" ")[0] || name)}: `}${rawPreview}` : rawPreview;
+      const preview = rawPreview
+        ? `${mine ? "You: " : `${name.split(" ")[0] || name}: `}${rawPreview}`
+        : rawPreview;
       if (!existing) {
         dmMap.set(key, {
           key,
@@ -405,8 +301,6 @@ function MessagesPage() {
         existing.listing_price = listing?.price_php ?? null;
         existing.listing_status = listing?.status ?? null;
       }
-
-
     }
     list.push(...Array.from(dmMap.values()));
 
@@ -422,7 +316,9 @@ function MessagesPage() {
       if (!thread) continue;
       const tMsgs = msgsByThread.get(tid) ?? [];
       const last = tMsgs[tMsgs.length - 1];
-      const activeMembers = groupMembers.filter((m) => m.thread_id === tid && m.status === "active");
+      const activeMembers = groupMembers.filter(
+        (m) => m.thread_id === tid && m.status === "active",
+      );
       const memberCount = activeMembers.length;
       const lastReadAt = mem.last_read_at ? new Date(mem.last_read_at).getTime() : 0;
       const unread = tMsgs.filter(
@@ -430,7 +326,10 @@ function MessagesPage() {
       ).length;
       const lastAt = last?.created_at ?? thread.updated_at;
       const lastSender = last ? profilesById[last.sender_id] : null;
-      const lastSenderName = last?.sender_id === user.id ? "You" : lastSender?.business_name ?? lastSender?.full_name ?? "";
+      const lastSenderName =
+        last?.sender_id === user.id
+          ? "You"
+          : (lastSender?.business_name ?? lastSender?.full_name ?? "");
       const preview = last
         ? `${lastSenderName ? lastSenderName + ": " : ""}${attachmentPreview(last.body, last.attachment_type)}`
         : mem.status === "invited"
@@ -457,7 +356,6 @@ function MessagesPage() {
         last_read_by_other: false,
         invited: mem.status === "invited",
       });
-
     }
 
     return list.sort((a, b) => (a.last_at < b.last_at ? 1 : -1));
@@ -595,17 +493,58 @@ function MessagesPage() {
       });
   }, [dmThread, user, activeConvo, queryClient]);
 
-  // Mark group thread read
+  const runGroupCommand = useCallback(
+    async (input: ChatCommandInput, automatic = false) => {
+      try {
+        const result = await runChatCommand(input);
+        if (!result || !isCurrentChatContext()) return;
+        if (!automatic)
+          toast.info("Request acknowledged. Refreshing messages; the change is not yet verified.");
+        await load();
+      } catch {
+        if (isCurrentChatContext()) toast.error(CHAT_COMMAND_FAILURE);
+      }
+    },
+    [runChatCommand, isCurrentChatContext, load],
+  );
+
+  const activeGroupId = activeConvo?.kind === "group" ? activeConvo.thread_id : null;
+  const groupInvited = activeConvo?.kind === "group" && !!activeConvo.invited;
+  const groupUnread = activeConvo?.kind === "group" ? activeConvo.unread : 0;
+  const latestInbound = groupThread.filter((m) => m.sender_id !== user.id).at(-1);
+  const inboundWatermark = latestInbound ? `${latestInbound.id}:${latestInbound.created_at}` : null;
+  const readAttempts = useRef(new Set<string>());
+
+  // One automatic attempt per inbound watermark, not per conversation object.
+  // A void acknowledgement is not an affected-row confirmation. Read back the
+  // membership timestamp instead of inventing one (or inventing a membership).
   useEffect(() => {
-    if (!user || !activeConvo || activeConvo.kind !== "group" || activeConvo.invited) return;
-    const tid = activeConvo.thread_id!;
-    (supabase.rpc as any)("mark_thread_read", { p_thread_id: tid }).then(() => {
-      setMyMemberships((prev) => ({
-        ...prev,
-        [tid]: { ...(prev[tid] || { thread_id: tid, status: "active", last_read_at: null }), last_read_at: new Date().toISOString() },
-      }));
-    });
-  }, [activeConvo, groupThread.length, user]);
+    if (
+      !activeGroupId ||
+      groupInvited ||
+      groupUnread === 0 ||
+      !inboundWatermark ||
+      chatCommands.pending ||
+      loadingMessages
+    )
+      return;
+    const attempt = `${activeGroupId}:${inboundWatermark}`;
+    if (readAttempts.current.has(attempt)) return;
+    readAttempts.current.add(attempt);
+    void runGroupCommand(
+      { expectedAccountId: user.id, kind: "mark_read", threadId: activeGroupId },
+      true,
+    );
+  }, [
+    activeGroupId,
+    groupInvited,
+    groupUnread,
+    inboundWatermark,
+    chatCommands.pending,
+    loadingMessages,
+    runGroupCommand,
+    user.id,
+  ]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -625,8 +564,7 @@ function MessagesPage() {
             m.recipient_id === user?.id &&
             m.sender_id === c.other_user_id,
         )
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
-        ?.id;
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]?.id;
       if (latestInboundId) {
         (supabase.rpc as any)("mark_message_notifications_unread", {
           p_message_ids: [latestInboundId],
@@ -668,25 +606,25 @@ function MessagesPage() {
   };
 
   const markGroupRead = async (c: ConversationSummary) => {
-    const { error } = await (supabase.rpc as any)("mark_thread_read", {
-      p_thread_id: c.thread_id!,
+    await runGroupCommand({
+      expectedAccountId: user.id,
+      kind: "mark_read",
+      threadId: c.thread_id!,
     });
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Marked as read");
-      load();
-    }
   };
 
   const markGroupUnread = async (c: ConversationSummary) => {
-    const { error } = await (supabase.rpc as any)("mark_thread_unread", {
-      p_thread_id: c.thread_id!,
+    // Opening a group must not immediately undo an explicit unread request.
+    // Suppress this observed watermark only; do not fabricate read state.
+    const inbound = groupMsgs
+      .filter((m) => m.thread_id === c.thread_id && m.sender_id !== user.id)
+      .at(-1);
+    if (inbound) readAttempts.current.add(`${c.thread_id}:${inbound.id}:${inbound.created_at}`);
+    await runGroupCommand({
+      expectedAccountId: user.id,
+      kind: "mark_unread",
+      threadId: c.thread_id!,
     });
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Marked as unread");
-      load();
-    }
   };
 
   const toggleRead = (c: ConversationSummary) => {
@@ -701,39 +639,16 @@ function MessagesPage() {
   };
 
   const acceptInvite = async (threadId: string) => {
-    const { error } = await (supabase.rpc as any)("respond_to_thread_invite", {
-      p_thread_id: threadId,
-      p_accept: true,
-    });
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Joined group");
-      load();
-    }
+    await runGroupCommand({ expectedAccountId: user.id, kind: "respond", threadId, accept: true });
   };
 
   const declineInvite = async (threadId: string) => {
-    const { error } = await (supabase.rpc as any)("respond_to_thread_invite", {
-      p_thread_id: threadId,
-      p_accept: false,
-    });
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Invite declined");
-      setActiveKey(null);
-      load();
-    }
+    await runGroupCommand({ expectedAccountId: user.id, kind: "respond", threadId, accept: false });
   };
 
   const leaveGroup = async (threadId: string) => {
     if (!confirm("Leave this group chat?")) return;
-    const { error } = await (supabase.rpc as any)("leave_thread", { p_thread_id: threadId });
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Left group");
-      setActiveKey(null);
-      load();
-    }
+    await runGroupCommand({ expectedAccountId: user.id, kind: "leave", threadId });
   };
 
   const sendReply = async (payload: MessagePayload) => {
@@ -764,7 +679,9 @@ function MessagesPage() {
         setDms((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data as DmRow]));
       }
     } else {
-      const { data, error: insertError } = await (supabase.from("chat_thread_messages" as any) as any)
+      const { data, error: insertError } = await (
+        supabase.from("chat_thread_messages" as any) as any
+      )
         .insert({
           thread_id: activeConvo.thread_id!,
           sender_id: user.id,
@@ -818,7 +735,8 @@ function MessagesPage() {
       toast.error(error.message);
       return;
     }
-    if (data) setDms((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data as DmRow]));
+    if (data)
+      setDms((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data as DmRow]));
     load();
   };
 
@@ -834,8 +752,15 @@ function MessagesPage() {
     toast.success(status === "accepted" ? "Offer accepted" : "Offer declined");
   };
 
-
-  const Avatar = ({ url, name, size = 40 }: { url: string | null; name: string; size?: number }) => {
+  const Avatar = ({
+    url,
+    name,
+    size = 40,
+  }: {
+    url: string | null;
+    name: string;
+    size?: number;
+  }) => {
     const initial = name.trim().charAt(0).toUpperCase() || "?";
     return url ? (
       <img
@@ -876,10 +801,7 @@ function MessagesPage() {
     return names.join(", ") + (extra > 0 ? ` +${extra}` : "");
   };
 
-  const totalUnread = conversations.reduce(
-    (sum, c) => (c.invited ? sum : sum + c.unread),
-    0,
-  );
+  const totalUnread = conversations.reduce((sum, c) => (c.invited ? sum : sum + c.unread), 0);
 
   return (
     <div>
@@ -892,13 +814,20 @@ function MessagesPage() {
             </span>
           )}
         </div>
-        {user && (
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={loadingMessages}
+            onClick={() => void load()}
+          >
+            {loadingMessages ? "Refreshing…" : "Refresh messages"}
+          </Button>
           <Button size="sm" onClick={() => setShowNewGroup(true)}>
             <Plus className="mr-1 h-4 w-4" /> New group
           </Button>
-        )}
+        </div>
       </div>
-
 
       <FolderTabs active={folder} counts={folderCounts} onChange={setFolder} />
 
@@ -912,7 +841,11 @@ function MessagesPage() {
         />
       </div>
 
-      {conversations.length === 0 ? (
+      {loadError ? (
+        <p role="alert" className="rounded-xl border border-border p-6 text-muted-foreground">
+          {MESSAGES_LOAD_FAILURE}
+        </p>
+      ) : conversations.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
           <MessageSquare className="mx-auto mb-3 h-8 w-8" />
           No conversations yet. Start a group chat or message a seller from a listing.
@@ -932,225 +865,241 @@ function MessagesPage() {
                 const sKey = stateKeyOf(c);
                 const st = threadStates.get(sKey.scope, sKey.key);
                 return (
-
-                <div
-                  key={c.key}
-                  className={`group relative flex w-full items-start gap-3 p-3 transition-colors ${
-                    c.key === activeKey ? "bg-secondary" : "hover:bg-secondary/50"
-                  }`}
-                >
-                  <button
-                    onClick={() => setActiveKey(c.key)}
-                    className="relative flex flex-1 items-start gap-3 text-left"
+                  <div
+                    key={c.key}
+                    className={`group relative flex w-full items-start gap-3 p-3 transition-colors ${
+                      c.key === activeKey ? "bg-secondary" : "hover:bg-secondary/50"
+                    }`}
                   >
-                    <div className="relative shrink-0">
-                      {c.kind === "group" ? (
-                        <GroupAvatar name={c.title} size={44} />
-                      ) : (
-                        <Avatar url={c.avatar} name={c.title} size={44} />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <div
-                          className={`truncate text-sm ${c.unread > 0 ? "font-bold" : "font-medium"}`}
-                        >
-                          {c.title}
-                          {c.invited && (
-                            <span className="ml-1.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-                              INVITE
+                    <button
+                      onClick={() => setActiveKey(c.key)}
+                      className="relative flex flex-1 items-start gap-3 text-left"
+                    >
+                      <div className="relative shrink-0">
+                        {c.kind === "group" ? (
+                          <GroupAvatar name={c.title} size={44} />
+                        ) : (
+                          <Avatar url={c.avatar} name={c.title} size={44} />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <div
+                            className={`truncate text-sm ${c.unread > 0 ? "font-bold" : "font-medium"}`}
+                          >
+                            {c.title}
+                            {c.invited && (
+                              <span className="ml-1.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                                INVITE
+                              </span>
+                            )}
+                          </div>
+                          <div className="shrink-0 text-[10px] text-muted-foreground">
+                            {formatDate(c.last_at)}
+                          </div>
+                        </div>
+                        {c.kind === "dm" && c.listing_id ? (
+                          <div className="mt-1 flex items-center gap-2 rounded-md border border-border/60 bg-background/60 px-1.5 py-1">
+                            {c.thumb ? (
+                              <img
+                                src={c.thumb}
+                                alt=""
+                                className="h-8 w-8 shrink-0 rounded object-cover"
+                              />
+                            ) : (
+                              <div className="grid h-8 w-8 shrink-0 place-items-center rounded bg-secondary text-muted-foreground">
+                                <Tag className="h-3.5 w-3.5" />
+                              </div>
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate text-[11px] font-medium text-foreground">
+                                {c.listing_title ?? "Listing"}
+                              </div>
+                              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                                {c.listing_price != null && (
+                                  <span className="font-semibold text-primary">
+                                    {formatPricePHP(c.listing_price)}
+                                  </span>
+                                )}
+                                {c.listing_status && c.listing_status !== "active" && (
+                                  <span className="rounded bg-secondary px-1 py-0.5 uppercase">
+                                    {c.listing_status}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="truncate text-xs text-muted-foreground">{c.subtitle}</div>
+                        )}
+                        <div className="mt-1 flex items-center gap-2">
+                          {c.last_from_me && (
+                            <span
+                              title={c.last_read_by_other ? "Seen" : "Sent"}
+                              className={`shrink-0 ${c.last_read_by_other ? "text-primary" : "text-muted-foreground"}`}
+                            >
+                              <CheckCheck className="h-3.5 w-3.5" />
+                            </span>
+                          )}
+                          <div
+                            className={`line-clamp-1 flex-1 text-xs ${c.unread > 0 ? "font-semibold text-foreground" : "text-foreground/70"}`}
+                          >
+                            {c.last_body}
+                          </div>
+                          {c.total > 0 && (
+                            <span
+                              title={`${c.total} message${c.total === 1 ? "" : "s"} total`}
+                              className="inline-flex items-center gap-0.5 rounded-full bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
+                            >
+                              <MessageSquare className="h-3 w-3" />
+                              {c.total}
+                            </span>
+                          )}
+
+                          {c.unread > 0 && (
+                            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
+                              {c.unread}
                             </span>
                           )}
                         </div>
-                        <div className="shrink-0 text-[10px] text-muted-foreground">
-                          {formatDate(c.last_at)}
-                        </div>
                       </div>
-                      {c.kind === "dm" && c.listing_id ? (
-                        <div className="mt-1 flex items-center gap-2 rounded-md border border-border/60 bg-background/60 px-1.5 py-1">
-                          {c.thumb ? (
-                            <img
-                              src={c.thumb}
-                              alt=""
-                              className="h-8 w-8 shrink-0 rounded object-cover"
-                            />
-                          ) : (
-                            <div className="grid h-8 w-8 shrink-0 place-items-center rounded bg-secondary text-muted-foreground">
-                              <Tag className="h-3.5 w-3.5" />
-                            </div>
-                          )}
-                          <div className="min-w-0 flex-1">
-                            <div className="truncate text-[11px] font-medium text-foreground">
-                              {c.listing_title ?? "Listing"}
-                            </div>
-                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                              {c.listing_price != null && (
-                                <span className="font-semibold text-primary">
-                                  {formatPricePHP(c.listing_price)}
-                                </span>
-                              )}
-                              {c.listing_status && c.listing_status !== "active" && (
-                                <span className="rounded bg-secondary px-1 py-0.5 uppercase">
-                                  {c.listing_status}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="truncate text-xs text-muted-foreground">{c.subtitle}</div>
-                      )}
-                      <div className="mt-1 flex items-center gap-2">
-                        {c.last_from_me && (
-                          <span
-                            title={c.last_read_by_other ? "Seen" : "Sent"}
-                            className={`shrink-0 ${c.last_read_by_other ? "text-primary" : "text-muted-foreground"}`}
-                          >
-                            <CheckCheck className="h-3.5 w-3.5" />
-                          </span>
-                        )}
-                        <div
-                          className={`line-clamp-1 flex-1 text-xs ${c.unread > 0 ? "font-semibold text-foreground" : "text-foreground/70"}`}
-                        >
-                          {c.last_body}
-                        </div>
-                        {c.total > 0 && (
-                          <span
-                            title={`${c.total} message${c.total === 1 ? "" : "s"} total`}
-                            className="inline-flex items-center gap-0.5 rounded-full bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
-                          >
-                            <MessageSquare className="h-3 w-3" />
-                            {c.total}
-                          </span>
-                        )}
-
-                        {c.unread > 0 && (
-                          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
-                            {c.unread}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                  {!c.invited && (
-                    <button
-                      type="button"
-                      aria-label={c.unread > 0 ? "Mark as read" : "Mark as unread"}
-                      title={c.unread > 0 ? "Mark as read" : "Mark as unread"}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleRead(c);
-                      }}
-                      className={`rounded-full p-1.5 transition-colors ${
-                        c.unread > 0
-                          ? "text-primary hover:bg-primary/10"
-                          : "text-muted-foreground hover:bg-secondary"
-                      }`}
-                    >
-                      {c.unread > 0 ? (
-                        <CheckCheck className="h-4 w-4" />
-                      ) : (
-                        <MailOpen className="h-4 w-4" />
-                      )}
                     </button>
-                  )}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    {!c.invited && (
                       <button
                         type="button"
-                        aria-label="Conversation options"
-                        className="rounded-full p-1 text-muted-foreground hover:bg-secondary"
-                        onClick={(e) => e.stopPropagation()}
+                        aria-label={c.unread > 0 ? "Mark as read" : "Mark as unread"}
+                        disabled={c.kind === "group" && (chatCommands.pending || loadingMessages)}
+                        title={c.unread > 0 ? "Mark as read" : "Mark as unread"}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleRead(c);
+                        }}
+                        className={`rounded-full p-1.5 transition-colors ${
+                          c.unread > 0
+                            ? "text-primary hover:bg-primary/10"
+                            : "text-muted-foreground hover:bg-secondary"
+                        }`}
                       >
-                        <MoreVertical className="h-4 w-4" />
+                        {c.unread > 0 ? (
+                          <CheckCheck className="h-4 w-4" />
+                        ) : (
+                          <MailOpen className="h-4 w-4" />
+                        )}
                       </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {c.kind === "dm" ? (
-                        <>
-                          {c.unread > 0 ? (
-                            <DropdownMenuItem onClick={() => markDmRead(c)}>
-                              <CheckCheck className="mr-2 h-4 w-4" /> Mark as read
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem onClick={() => markDmUnread(c)}>
-                              <MailOpen className="mr-2 h-4 w-4" /> Mark as unread
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem asChild>
-                            <Link to="/listing/$id" params={{ id: c.listing_id! }}>
-                              <ExternalLink className="mr-2 h-4 w-4" /> Open listing
-                            </Link>
-                          </DropdownMenuItem>
-                        </>
-                      ) : (
-                        <>
-                          {!c.invited &&
-                            (c.unread > 0 ? (
-                              <DropdownMenuItem onClick={() => markGroupRead(c)}>
+                    )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label="Conversation options"
+                          className="rounded-full p-1 text-muted-foreground hover:bg-secondary"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {c.kind === "dm" ? (
+                          <>
+                            {c.unread > 0 ? (
+                              <DropdownMenuItem onClick={() => markDmRead(c)}>
                                 <CheckCheck className="mr-2 h-4 w-4" /> Mark as read
                               </DropdownMenuItem>
                             ) : (
-                              <DropdownMenuItem onClick={() => markGroupUnread(c)}>
+                              <DropdownMenuItem onClick={() => markDmUnread(c)}>
                                 <MailOpen className="mr-2 h-4 w-4" /> Mark as unread
                               </DropdownMenuItem>
-                            ))}
-                          {!c.invited && (
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setActiveKey(c.key);
-                                setShowInvite(true);
-                              }}
-                            >
-                              <UserPlus className="mr-2 h-4 w-4" /> Invite people
+                            )}
+                            <DropdownMenuItem asChild>
+                              <Link to="/listing/$id" params={{ id: c.listing_id! }}>
+                                <ExternalLink className="mr-2 h-4 w-4" /> Open listing
+                              </Link>
                             </DropdownMenuItem>
+                          </>
+                        ) : (
+                          <>
+                            {!c.invited &&
+                              (c.unread > 0 ? (
+                                <DropdownMenuItem
+                                  disabled={chatCommands.pending || loadingMessages}
+                                  onClick={() => markGroupRead(c)}
+                                >
+                                  <CheckCheck className="mr-2 h-4 w-4" /> Mark as read
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem
+                                  disabled={chatCommands.pending || loadingMessages}
+                                  onClick={() => markGroupUnread(c)}
+                                >
+                                  <MailOpen className="mr-2 h-4 w-4" /> Mark as unread
+                                </DropdownMenuItem>
+                              ))}
+                            {!c.invited && (
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setActiveKey(c.key);
+                                  setShowInvite(true);
+                                }}
+                              >
+                                <UserPlus className="mr-2 h-4 w-4" /> Invite people
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem
+                              disabled={chatCommands.pending || loadingMessages}
+                              onClick={() => leaveGroup(c.thread_id!)}
+                            >
+                              <LogOut className="mr-2 h-4 w-4" /> Leave group
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => threadStates.toggle(sKey.scope, sKey.key, "starred")}
+                        >
+                          <Star
+                            className={`mr-2 h-4 w-4 ${st.starred ? "fill-primary text-primary" : ""}`}
+                          />
+                          {st.starred ? "Unstar" : "Star"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => threadStates.toggle(sKey.scope, sKey.key, "muted")}
+                        >
+                          {st.muted ? (
+                            <>
+                              <Bell className="mr-2 h-4 w-4" /> Unmute
+                            </>
+                          ) : (
+                            <>
+                              <BellOff className="mr-2 h-4 w-4" /> Mute
+                            </>
                           )}
-                          <DropdownMenuItem onClick={() => leaveGroup(c.thread_id!)}>
-                            <LogOut className="mr-2 h-4 w-4" /> Leave group
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "starred")}
-                      >
-                        <Star className={`mr-2 h-4 w-4 ${st.starred ? "fill-primary text-primary" : ""}`} />
-                        {st.starred ? "Unstar" : "Star"}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "muted")}
-                      >
-                        {st.muted ? (
-                          <><Bell className="mr-2 h-4 w-4" /> Unmute</>
-                        ) : (
-                          <><BellOff className="mr-2 h-4 w-4" /> Mute</>
-                        )}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "archived")}
-                      >
-                        {st.archived ? (
-                          <><ArchiveRestore className="mr-2 h-4 w-4" /> Unarchive</>
-                        ) : (
-                          <><Archive className="mr-2 h-4 w-4" /> Archive</>
-                        )}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => threadStates.toggle(sKey.scope, sKey.key, "spam")}
-                      >
-                        <ShieldAlert className="mr-2 h-4 w-4" />
-                        {st.spam ? "Not spam" : "Mark as spam"}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => threadStates.toggle(sKey.scope, sKey.key, "archived")}
+                        >
+                          {st.archived ? (
+                            <>
+                              <ArchiveRestore className="mr-2 h-4 w-4" /> Unarchive
+                            </>
+                          ) : (
+                            <>
+                              <Archive className="mr-2 h-4 w-4" /> Archive
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => threadStates.toggle(sKey.scope, sKey.key, "spam")}
+                        >
+                          <ShieldAlert className="mr-2 h-4 w-4" />
+                          {st.spam ? "Not spam" : "Mark as spam"}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 );
               })}
-
             </div>
           </div>
-
-
 
           <div
             className={`flex flex-col overflow-hidden rounded-xl border border-border bg-card ${activeKey ? "flex" : "hidden lg:flex"}`}
@@ -1198,6 +1147,7 @@ function MessagesPage() {
                     <Button
                       size="sm"
                       variant="outline"
+                      disabled={loadingMessages}
                       onClick={() => setShowInvite(true)}
                       className="shrink-0"
                     >
@@ -1214,10 +1164,16 @@ function MessagesPage() {
                       messages and participate.
                     </p>
                     <div className="flex justify-center gap-2">
-                      <Button onClick={() => acceptInvite(activeConvo.thread_id!)}>Join group</Button>
+                      <Button
+                        disabled={chatCommands.pending || loadingMessages}
+                        onClick={() => acceptInvite(activeConvo.thread_id!)}
+                      >
+                        Join group
+                      </Button>
                       <Button
                         variant="outline"
                         onClick={() => declineInvite(activeConvo.thread_id!)}
+                        disabled={chatCommands.pending || loadingMessages}
                       >
                         Decline
                       </Button>
@@ -1237,7 +1193,10 @@ function MessagesPage() {
                             }
                             if (m.is_offer) {
                               return (
-                                <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                                <div
+                                  key={m.id}
+                                  className={`flex ${mine ? "justify-end" : "justify-start"}`}
+                                >
                                   <OfferBubble
                                     mine={mine}
                                     messageId={m.id}
@@ -1248,7 +1207,9 @@ function MessagesPage() {
                                     canRespond={!mine}
                                     onUpdated={({ offer_status }) =>
                                       setDms((prev) =>
-                                        prev.map((x) => (x.id === m.id ? { ...x, offer_status } : x)),
+                                        prev.map((x) =>
+                                          x.id === m.id ? { ...x, offer_status } : x,
+                                        ),
                                       )
                                     }
                                   />
@@ -1295,13 +1256,11 @@ function MessagesPage() {
                               </div>
                             );
                           })
-
                         : groupThread.map((m) => {
                             const mine = m.sender_id === user?.id;
                             const hasAttachment = !!m.attachment_type;
                             const sp = profilesById[m.sender_id];
-                            const senderName =
-                              sp?.business_name ?? sp?.full_name ?? "Member";
+                            const senderName = sp?.business_name ?? sp?.full_name ?? "Member";
                             return (
                               <div
                                 key={m.id}
@@ -1353,6 +1312,7 @@ function MessagesPage() {
                     </div>
                     <div className="border-t border-border p-3">
                       <MessageComposer
+                        key={`${user.id}:${activeConvo.key}`}
                         onSend={sendReply}
                         sending={sending}
                         placeholder={
@@ -1370,13 +1330,11 @@ function MessagesPage() {
                                 listingPrice={activeConvo.listing_price ?? null}
                                 onSend={({ amount, note }) => sendOffer(amount, note)}
                               />
-
                             )}
                           </>
                         }
                       />
                     </div>
-
                   </>
                 )}
               </>
@@ -1402,8 +1360,10 @@ function MessagesPage() {
       )}
       {activeConvo?.kind === "group" && activeConvo.thread_id && (
         <InviteToThreadDialog
+          key={`${user.id}:${activeConvo.thread_id}`}
           open={showInvite}
           onOpenChange={setShowInvite}
+          currentUserId={user.id}
           threadId={activeConvo.thread_id}
           threadTitle={activeConvo.title}
           excludeIds={activeMembers.map((m) => m.user_id)}

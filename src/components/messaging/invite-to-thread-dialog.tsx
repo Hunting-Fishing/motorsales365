@@ -1,66 +1,136 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { MAX_CHAT_MEMBERS, chatCommandInput } from "@/lib/chat-commands";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { UserSearch, type UserPick } from "./user-search";
+import { useChatDialogCommand } from "./new-group-chat-dialog";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  currentUserId: string;
   threadId: string;
   threadTitle: string;
   excludeIds: string[];
   onInvited?: () => void;
 }
 
-export function InviteToThreadDialog({
-  open,
-  onOpenChange,
+export function InviteToThreadDialog(props: Props) {
+  if (!props.open) return null;
+  return <InviteToThreadSession key={props.currentUserId + ":" + props.threadId} {...props} />;
+}
+
+function InviteToThreadSession(props: Props) {
+  const [closed, setClosed] = useState(false);
+  if (closed) return null;
+  return (
+    <InviteToThreadForm
+      {...props}
+      onClose={() => {
+        setClosed(true);
+        props.onOpenChange(false);
+      }}
+    />
+  );
+}
+
+function InviteToThreadForm({
+  currentUserId,
   threadId,
   threadTitle,
   excludeIds,
   onInvited,
-}: Props) {
+  onClose,
+}: Props & { onClose: () => void }) {
   const [members, setMembers] = useState<UserPick[]>([]);
-  const [saving, setSaving] = useState(false);
-
-  const submit = async () => {
-    if (members.length === 0) {
-      toast.error("Pick at least one person");
-      return;
-    }
-    setSaving(true);
-    const { data, error } = await (supabase.rpc as any)("invite_to_thread", {
-      p_thread_id: threadId,
-      p_user_ids: members.map((m) => m.id),
+  const { saving, run, invalidate, isAlive } = useChatDialogCommand();
+  const close = () => {
+    if (!isAlive()) return;
+    invalidate();
+    onClose();
+  };
+  const submit = () => {
+    if (!isAlive()) return;
+    const parsed = chatCommandInput.safeParse({
+      expectedAccountId: currentUserId,
+      kind: "invite",
+      threadId,
+      memberIds: members.map((member) => member.id),
     });
-    setSaving(false);
-    if (error) {
-      toast.error(error.message);
+    if (!parsed.success) {
+      toast.error(
+        "Select 1–" + MAX_CHAT_MEMBERS + " distinct people other than yourself for a valid group.",
+      );
       return;
     }
-    toast.success(`Invited ${data ?? 0} to "${threadTitle}"`);
-    setMembers([]);
-    onOpenChange(false);
-    onInvited?.();
+    void run(parsed.data, (result, isCurrent) => {
+      if (result.kind !== "invited" || !isCurrent()) return;
+      toast.success(
+        result.insertedCount === 0
+          ? "No new memberships added."
+          : result.insertedCount +
+              " invitation" +
+              (result.insertedCount === 1 ? "" : "s") +
+              " recorded.",
+      );
+      setMembers([]);
+      if (isCurrent()) onInvited?.();
+      if (isCurrent()) close();
+    });
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open
+      onOpenChange={(next) => {
+        if (!next) close();
+      }}
+    >
       <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Invite to {threadTitle}</DialogTitle>
-        </DialogHeader>
-        <UserSearch selected={members} onChange={setMembers} excludeIds={excludeIds} />
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
-            Cancel
-          </Button>
-          <Button onClick={submit} disabled={saving}>
-            {saving ? "Sending…" : "Send invites"}
-          </Button>
-        </DialogFooter>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            submit();
+          }}
+          aria-label="Invite group members"
+        >
+          <DialogHeader>
+            <DialogTitle>Invite to {threadTitle}</DialogTitle>
+          </DialogHeader>
+          <fieldset disabled={saving} className="py-4">
+            <UserSearch
+              selected={members}
+              onChange={(next) => {
+                if (!isAlive()) return;
+                if (next.length > MAX_CHAT_MEMBERS) {
+                  toast.error("Select at most " + MAX_CHAT_MEMBERS + " people.");
+                  return;
+                }
+                setMembers(next);
+              }}
+              excludeIds={[...excludeIds, currentUserId]}
+            />
+            <p className="mt-2 text-xs text-muted-foreground">
+              {members.length}/{MAX_CHAT_MEMBERS} people selected. Recorded invitations do not
+              confirm delivery.
+            </p>
+          </fieldset>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={close}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Recording…" : "Send invites"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
