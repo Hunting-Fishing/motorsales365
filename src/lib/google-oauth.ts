@@ -8,13 +8,21 @@ export const GOOGLE_OAUTH_FAILED = "Could not start Google sign-in. Please try a
 export const GOOGLE_AUTH_ORIGIN = "https://wjxaajgvddtrxxtocxen.supabase.co";
 const siteOrigins = new Set(["https://www.365motorsales.com", "https://365motorsales.com"]);
 
+function hasUnsafeUrlCharacters(value: string): boolean {
+  for (let index = 0; index < value.length; index++) {
+    const code = value.charCodeAt(index);
+    if (code <= 32 || code === 127 || code === 92) return true;
+  }
+  return false;
+}
+
 export function safeAuthInternalPath(value: unknown): string | undefined {
   if (
     typeof value !== "string" ||
     value.length > 2048 ||
     !value.startsWith("/") ||
     value.startsWith("//") ||
-    /[\\\x00-\x20\x7f]/.test(value)
+    hasUnsafeUrlCharacters(value)
   )
     return undefined;
   try {
@@ -44,7 +52,7 @@ const responseSchema = z
   .strict();
 
 function validReturnTo(returnTo: unknown): returnTo is string {
-  if (typeof returnTo !== "string" || returnTo.length > 4096 || /[\\\x00-\x20\x7f]/.test(returnTo))
+  if (typeof returnTo !== "string" || returnTo.length > 4096 || hasUnsafeUrlCharacters(returnTo))
     return false;
   try {
     const callback = new URL(returnTo);
@@ -76,7 +84,7 @@ export function confirmedGoogleAuthorizationUrl(raw: unknown, returnTo: string):
     const challenge = parsed.searchParams.get("code_challenge");
     const method = parsed.searchParams.get("code_challenge_method");
     if (
-      /[\x00-\x20\x7f\\]/.test(url) ||
+      hasUnsafeUrlCharacters(url) ||
       parsed.origin !== GOOGLE_AUTH_ORIGIN ||
       parsed.pathname !== "/auth/v1/authorize" ||
       parsed.username ||

@@ -17,17 +17,17 @@ type Options = {
 export function useGoogleOAuth({ redirect, scopeKey, blocked, flight }: Options) {
   const [busy, setBusy] = useState(false);
   const mounted = useRef(false);
-  const generation = useRef(0);
+  const lifetime = useRef<symbol | null>(null);
   const request = useRef<symbol | null>(null);
   const context = useMemo(() => ({ scopeKey, blocked, redirect }), [scopeKey, blocked, redirect]);
   const currentContext = useRef<typeof context | null>(null);
   useLayoutEffect(() => {
     currentContext.current = context;
     mounted.current = true;
-    generation.current++;
+    lifetime.current = Symbol();
     return () => {
       mounted.current = false;
-      generation.current++;
+      lifetime.current = null;
     };
   }, [context]);
 
@@ -35,9 +35,9 @@ export function useGoogleOAuth({ redirect, scopeKey, blocked, flight }: Options)
     if (blocked || busy || flight.current || !mounted.current || currentContext.current !== context)
       return;
     const token = Symbol();
-    const epoch = generation.current;
+    const epoch = lifetime.current;
     const current = () =>
-      mounted.current && generation.current === epoch && currentContext.current === context;
+      mounted.current && lifetime.current === epoch && currentContext.current === context;
     request.current = token;
     flight.current = true;
     setBusy(true);
