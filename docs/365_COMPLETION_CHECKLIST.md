@@ -1,6 +1,6 @@
 # 365 application completion checklist
 
-Updated: 2026-10-15 (Asia/Manila)
+Updated: 2026-10-16 (Asia/Manila)
 
 ## Authority and source
 
@@ -10,10 +10,11 @@ the platform, Parts, Repair Knowledge, or Vehicle History program decisions.
 
 Canonical repository: `Hunting-Fishing/motorsales365`.
 Starting main: `70ab892a8b7c05eac288ea4a6cce7a002d316f00`.
-Implementation branch: `completion/365-foundation`.
+Current integration branch: `completion/365-seven-day-integration`.
+Historical foundation branch: `completion/365-foundation`.
 Security reconciliation branch: `completion/365-security`.
 
-## Current resumption order (2026-10-15)
+## Current resumption order (2026-10-16)
 
 Owner backend clarification, 2026-10-15: 365 MotorSales must use only hosted
 Supabase project `wjxaajgvddtrxxtocxen`, API `https://wjxaajgvddtrxxtocxen.supabase.co`.
@@ -39,7 +40,52 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest integration reconciliation: unused cloud-auth retirement `f46b048d`,
+Latest email-safety slices: bounded raw-byte webhook verifier `5e5d5f8a` and
+unsubscribe acknowledgment/public-page fixes `65475626`, same branch/draft PR #68.
+The verifier is intentionally unwired: fixed body/read/freshness/header/key bounds,
+actual WebCrypto HMAC verification and generic errors, with 133 focused tests.
+The unsubscribe handlers require exact returned suppression evidence, never
+reapply suppression from a consumed token, and no longer log raw token/database
+diagnostics. The public page respects HTTP status and request lifetime, separates
+used-but-unconfirmed/transient/invalid results and acknowledges recorded opt-out,
+not a proven dispatcher stop. Sixty-two focused handler/page tests pass; both
+slices have separate never-quarantined CI steps and independent read-only review.
+Combined integration results are recorded in the evidence below.
+Fresh full application 1,626/1,626 across 68 files (109.46s) includes all 195 new
+tests. Report checker/full TypeScript/changed-line lint pass, zero quarantine or
+new lint warnings. Follow-up `3f829a6b` corrects only a test Buffer type annotation;
+no runtime behavior or assertion was weakened.
+Fresh full build/Worker and all 214 tracked public Git/source/output checks pass
+at `3f829a6b`; 15 OCR/202 PDF assets retained. Source guards103/103 (2.263s) and
+release/report/inventory/assets75/75 (11.532s) pass, with five overlapping inventory
+checks not double-counted. Older full SQL/tooling evidence is not freshly rerun.
+Build still reports skipped test-route/directive/config warnings. No upload.
+
+Native email delivery is not ready/activated. Signature authenticity is not
+schema validation, project ownership, fresh human/role/tenant authority or durable
+dedupe. Legacy token-first writes, stronger suppression reason overwrite, consent
+revision/recovery, unbounded parser/runtime backend binding, queue payload/backlog/
+reservation/suppression and provider receipt/timeout/correlation remain gates.
+No SQL, provider setting, email send or deployment. Source mapping stays 404/423;
+12 historical unresolved/five recorded-unapplied/two embedded executions and all
+release/baseline/replay/parity flags remain unchanged. See
+`evidence/NATIVE_EMAIL_WEBHOOK_VERIFIER.md` and
+`evidence/UNSUBSCRIBE_ACKNOWLEDGMENTS.md`.
+
+Prior exact published head `e72553b6` passed all six CI gates (`38764688404`).
+Independent hosting build `e96dd8b6-cdb0-4211-bc13-db782a9badfb` fails separately;
+GitHub-reported output contains only its ID/link, no diagnostic/root-cause text.
+Wrapper `38764688552` preview passes; migration/production skip. One diagnostic
+read returned HTTP 502; a later discovery read confirmed CI success, not a failed
+unit run. New publication requires its own exact-head checks; no live acceptance
+or upload is inferred.
+
+The one existing follow-up was updated, not duplicated: same active interval,
+name and target chat, now retaining the seven-day plan/ledger, sole 365 backend,
+superseded staging question, recovered-but-unselected CRM options and inactive
+email boundary. Do not repeat completed recovery or promise continuous execution.
+
+Previous integration reconciliation: unused cloud-auth retirement `f46b048d`,
 Parts reference recovery `a420a44d`, remaining migration ledger/CI `2350e403`.
 Same branch/draft PR #68. Eleven missing PR #2 documents are preserved exactly
 (7,186 lines / 381,036 bytes) under `reference/parts-pr2/`, not adopted as control
@@ -174,8 +220,14 @@ No daemon/image install or paid resource. Safe local work continues meanwhile.
 Exact next action: verify existing PR #68's exact latest published head; keep all
 further slices on that branch/PR. Use completed PR #2 source recovery/crosswalk
 without repeating it or adopting future proposals. Complete action-level feature
-acceptance and remaining PR #9 native email/readiness/webhook/provider/build/MCP/
-asset/legacy-URL work selectively. Use the pinned 12/5/2 remaining-source ledger
+acceptance and remaining PR #9 provider/build/MCP/asset/legacy-URL work selectively.
+Next native email dependency is the nonactivated Auth payload-to-delivery-plan
+adapter (six existing template actions, explicit unsupported-action handling,
+sole-project/approved redirect binding, secure current/new email-change token/hash
+mapping, stable event/recipient slots and content-conflict detection). Do not
+repeat completed signature tests or activate delivery. Follow with atomic durable
+consent/event/slot writers and a bounded fake-transport provider contract. Use
+the pinned 12/5/2 remaining-source ledger
 to prepare a reviewed forward/recovery path; do not repeat completed proof or
 replay history. Establish local synthetic
 API/Auth/storage and production-safe acceptance without a new hosted project.
@@ -185,7 +237,7 @@ recovery boundaries as the staging integration path, not an endless lab chain.
 Source 404/423 and all baseline/replay/parity/release gates unchanged. Migration
 impact/deployment none; zero live business/Auth mutation, restriction replay,
 history repair, customer message, paid resource, PR merge or duplicate automation.
-Only project/branch metadata was read. The heartbeat remains active.
+No live project/business data was read this email-safety run. The heartbeat remains active.
 
 Published/attached draft PR #68:
 `https://github.com/Hunting-Fishing/motorsales365/pull/68`, base PR #67 branch

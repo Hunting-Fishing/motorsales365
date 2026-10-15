@@ -1,6 +1,6 @@
 # 365 integrated release acceptance ledger
 
-Updated 15 October 2026. Target: 22 October, 21:00 Asia/Manila. This is a delivery
+Updated 16 October 2026. Target: 22 October, 21:00 Asia/Manila. This is a delivery
 target, not a verified forecast. Scope and daily gates are in
 `365_SEVEN_DAY_COMPLETION_PLAN.md`.
 
@@ -14,7 +14,9 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
-Latest source slices: `f46b048d` (unused cloud-auth retirement), `a420a44d`
+Latest source slices: `5e5d5f8a` (unwired webhook verifier), `65475626`
+(unsubscribe acknowledgment/UI), test-type follow-up `3f829a6b`.
+Prior slices: `f46b048d` (unused cloud-auth retirement), `a420a44d`
 (Parts reference recovery), `2350e403` (remaining-source ledger/CI).
 Prior OAuth source: `c3f6bb9cc11c46246c0662f2030a3056b2287854`, guard follow-up
 `b3acef0e` (native Google handoff);
@@ -23,8 +25,8 @@ staff slice: `ece7e2a0288a9a70be58feeeaefdfe1922fde887`.
 Main remains `70ab892a8b7c05eac288ea4a6cce7a002d316f00`.
 
 Published/attached [draft PR #68](https://github.com/Hunting-Fishing/motorsales365/pull/68),
-stacked on PR #67 at `576fb17d`. Prior head `06e21a2e` passed all six CI gates
-(`38759812700`); independent hosting failed. New reconciliation publication needs
+stacked on PR #67 at `576fb17d`. Prior head `e72553b6` passed all six CI gates
+(`38764688404`); independent hosting failed. New email-safety publication needs
 its own exact latest-head checks. No upload or new-head pass is claimed.
 
 The dated PR inventory found 59 of the 61 then-open PR heads already ancestors
@@ -72,6 +74,7 @@ route is not evidence that the changed candidate has passed those gates.
 | U4 / pipelines/UI  | Learn, partner/franchise and staff academy, `src/routes/learn.index.tsx`, `src/routes/franchise.apply.tsx`, `src/routes/dashboard.partner.tsx`                     | Existing surfaces included; external program proposals remain separate                                      | Not run | Pending | Not verified | Enumerate and test current enrollment/content/progress/application/referral/admin actions and entitlements. Licensed repair feeds, government/insurer feeds, hardware and new-country programs need separate decisions/access.                                                                                                                          |
 | U5 / pipelines/UI  | Existing billing/entitlements, `src/lib/billing.functions.ts`, `src/routes/dashboard.business.$businessId.billing.tsx`                                             | Existing billing/checkout code included; provider/cutover PR #9 not reconciled                              | Blocked | Pending | Not verified | Verify test-mode subscription/entitlement/checkout/webhook/refund and financial reconciliation with approved configuration. No real charges, new settlement/legal model or customer communications.                                                                                                                                                     |
 | U6 / pipelines/UI  | Professional role-based UI, staff view and all above journeys                                                                                                      | Staff labels, error/loading/private-context behavior improved; full visual/accessibility work unfinished    | Not run | Pending | Not verified | Owner/manager/advisor/parts/technician/permitted-admin desktop/phone journeys, keyboard/accessibility, navigation, loading/error/empty states, account-switch privacy and performance. Component mocks are not visual/mobile acceptance.                                                                                                                |
+| U7 / providers     | Native Auth/transactional email and unsubscribe, `src/lib/webhooks/standard-webhooks.server.ts`, `src/routes/email/unsubscribe.ts`                                 | Bounded signature helper unwired; unsubscribe returned-evidence/status/lifetime fixes integrated            | Blocked | Pending | Not verified | Nonactivated Auth payload/action/URL/project planner, secure email-change mapping, atomic event/slot/consent writers, suppression/backlog classification, bounded provider acknowledgments and delivery-event correlation, sender/hook/controlled-recipient/recovery acceptance. No email cutover or live send.                                         |
 | R4 / release       | Final owner/staff pilot, monitoring/support/release                                                                                                                | Seven-day plan saved and candidate established; release prerequisites open                                  | Blocked | Pending | Not verified | Name pilot/test accounts, run financial/stock/privacy/recovery acceptance on one full candidate, obtain required release approval, deploy through gated full-artifact workflow and check actual live behavior.                                                                                                                                          |
 
 Lane assignments describe sequencing, not guaranteed builder capacity. Three
@@ -82,7 +85,26 @@ between scheduled turns.
 
 ## Current verified slice
 
-Parts reference recovery, remaining-source categorization and unused cloud-auth
+Native email authenticity and unsubscribe acknowledgment slices have focused
+133/133 and 62/62 tests respectively. The verifier uses actual WebCrypto and
+independent Node HMAC fixtures; unsubscribe uses mocked SDK/HTTP with actual
+handlers/page. Independent read-only review found no introduced issue. These are
+not project/sender/provider/delivery, real database/concurrency, role, mobile or
+owner acceptance. See `evidence/NATIVE_EMAIL_WEBHOOK_VERIFIER.md` and
+`evidence/UNSUBSCRIBE_ACKNOWLEDGMENTS.md` for combined integration results and
+unchanged activation blockers. No migration, live write, provider change or deploy.
+Fresh combined application 1,626/1,626 across 68 files (109.46s) includes all 195
+new tests; report checker/full TypeScript/changed-line lint pass, zero quarantine
+or new lint warnings. The fixture type-only correction weakens no runtime/test
+assertion. Node source guards103/103 pass (2.263s), release/report/inventory/assets
+75/75 pass (11.532s); five inventory checks overlap and are not summed into a
+unique total or the older full tooling evidence.
+Fresh complete build/Worker/backend/browser-engine and all 214 tracked public
+Git/source/output checks pass at `3f829a6b`, retaining 15 OCR/202 PDF assets.
+Build warnings remain explicit in the evidence; local packaging is not release
+approval, provider activation or live acceptance.
+
+Previous Parts reference recovery, remaining-source categorization and unused cloud-auth
 retirement are verified at the latest source slices above. Fresh 119/119 Node
 checks comprise 18 reference, 41 remaining-ledger, 39 retired-auth (98 new), 16 existing
 provenance/helper-evidence and five inventory checks. All pass without quarantine;
@@ -161,11 +183,13 @@ Reference sources, authority crosswalk and commercial/expansion limits:
 ## Next actions and owner dependencies
 
 1. Verify existing PR #68's exact latest published CI head; continue on the same
-   branch/PR. Do not substitute prior `06e21a2e` green CI for new-head checks.
+   branch/PR. Do not substitute prior `e72553b6` green CI for new-head checks.
 2. Continue the remaining PR #9 reconciliation, including provider/generated middleware,
    configuration, assets and its legacy-URL migration. Do not expose tracked
-   `.env` contents or bulk merge the provider cleanup. Prepare native email
-   readiness/signature tests without activating delivery. Use the recovered PR #2
+   `.env` contents or bulk merge the provider cleanup. Continue native email with
+   the nonactivated Auth payload/URL/action/secure-email-change planner, stable
+   event/recipient identity and atomic consent/delivery contracts. Do not repeat
+   completed signature work or enable delivery. Use the recovered PR #2
    source/crosswalk; formal baseline/activation acceptance is not granted.
 3. Complete action-level feature acceptance. Use the pinned 12/5/2 remaining-source
    ledger for a reviewed forward/recovery path; preserve exact 404/423 and do not
@@ -180,7 +204,8 @@ Reference sources, authority crosswalk and commercial/expansion limits:
 6. Close trusted original-actor/fresh authority and native-team/offboarding/claim
    mutation boundaries with actual transaction and recovery tests, then validate
    the complete candidate through the agreed safe acceptance path. Docker Desktop
-   is stopped/unavailable; 1.93 GiB free of 15.71 GiB RAM was observed. No local
+   was previously stopped/unavailable; latest read-only RAM snapshot is 2.32 GiB
+   free of 15.71 GiB. No local
    independent-session API/Auth/storage/PostgreSQL acceptance is claimed and no
    daemon was started or image downloaded.
 7. Reassess the seven-day target by Day 2 using actual integrated acceptance,

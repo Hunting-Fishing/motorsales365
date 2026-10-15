@@ -1313,3 +1313,37 @@ Continue action-level acceptance, reviewed forward/recovery planning, bounded
 native email readiness/signature tests and shared fresh authority/atomic writers.
 Sole hosted backend/local test boundary and all Customer360/receipt/consent/
 financial/private-custody/mobile/owner/recovery gates remain unchanged.
+
+## Native email and opt-out acknowledgment boundary (2026-10-16)
+
+Same integration branch/PR #68: verifier `5e5d5f8a`, unsubscribe acknowledgment/UI
+`65475626`. The bounded raw-byte HMAC helper remains unwired and sends nothing;
+133 focused actual-crypto/stream tests pass. The existing unsubscribe handler now
+requires matching suppression evidence before acknowledgment, returns an honest
+consumed-token conflict without reapplying old consent and removes raw diagnostics.
+The page distinguishes HTTP failure/invalid/consumed results, suppresses stale
+responses and acknowledges recorded opt-out rather than guaranteed delivery stop.
+Sixty-two focused handler/page tests and separate independent reviews pass.
+Fresh combined application 1,626/1,626 across 68 files (109.46s), report checker,
+full TypeScript and changed-line lint pass; all 195 new tests included, zero
+quarantine/new lint warnings. `3f829a6b` is a fixture type-only follow-up.
+Fresh full build/Worker/214-file media checks pass at that head; source guards
+103/103 and release/report/inventory/assets75/75 pass (five inventory checks overlap).
+Local artifact verification is not application upload or live acceptance.
+Combined integration results are in `evidence/NATIVE_EMAIL_WEBHOOK_VERIFIER.md`
+and `evidence/UNSUBSCRIBE_ACKNOWLEDGMENTS.md`.
+
+This does not enable Customer 360/reminder/transactional email. Original action/
+tenant/fresh-authority, atomic consent/event/recipient ledgers, secure Auth payload/
+URL mapping, current suppression, backlog/provider acknowledgments and sender/
+project/recovery acceptance remain required. Token-first partial writes and
+bounce/complaint reason overwrite are not repaired. No SQL/provider setting or
+live email/data/Auth write, application upload or additional hosted backend.
+Migration source mapping and approved restrictions remain unchanged.
+
+Prior published exact head `e72553b6` passed all six CI gates (`38764688404`);
+independent hosting build `e96dd8b6-cdb0-4211-bc13-db782a9badfb` failed without
+diagnostic/root-cause text. New publication needs exact-head verification. Next
+implement the nonactivated Auth payload-to-plan adapter and atomic delivery/consent
+contracts, while continuing the shared authority/private-custody/transaction/
+recovery path. Do not promote source tests to production readiness.
